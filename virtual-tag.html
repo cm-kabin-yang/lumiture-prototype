@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Lumiture.ai — Virtual Tags Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+:root{--pri:#004FB0;--pri-dk:#002663;--pri-lt:#0B6DD7;--pri-lt30:#9ED7FF;--pri-lt20:#D1EEFF;--pri-lt10:#F2FAFF;--sec:#34B5D9;--sec-dk:#228EB3;--sec-lt:#4ADFFF;--sec-lt10:#F0FFFF;--sb:#0D1B3E;--sb-hov:#162B5E;--wh:#FFF;--g50:#F9FAFB;--g100:#F3F4F6;--g200:#E5E7EB;--g300:#D1D5DB;--g400:#9CA3AF;--g500:#6B7280;--g600:#4B5563;--g700:#374151;--g800:#1F2937;--g900:#111827;--ok:#10B981;--ok-lt:#D1FAE5;--warn:#F59E0B;--warn-lt:#FEF3C7;--err:#EF4444;--err-lt:#FEE2E2;--info:#3B82F6;--info-lt:#DBEAFE;--r-sm:4px;--r-md:8px;--r-lg:12px;--shd:0 1px 2px rgba(0,0,0,.05);--shd2:0 4px 6px -1px rgba(0,0,0,.1);--shd3:0 10px 15px -3px rgba(0,0,0,.1);--sw:240px}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Noto Sans',sans-serif;font-size:14px;line-height:1.75;color:var(--g800);background:var(--g50);letter-spacing:0}a{color:var(--pri);text-decoration:none}button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:14px}input,select,textarea{font-family:inherit;font-size:14px}.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;vertical-align:middle}
+.app{display:flex;min-height:100vh}.sidebar{width:var(--sw);background:var(--sb);color:var(--wh);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:100;display:flex;flex-direction:column;transition:width .2s ease}.sidebar.collapsed{width:64px;overflow:visible}.sb-logo{padding:16px 20px;display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap;overflow:hidden}.sb-logo-wrap{position:relative;width:32px;height:32px;flex-shrink:0}.sb-logo-wrap svg{width:32px;height:32px}.sb-proto{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);background:var(--sb);color:var(--sec);font-size:6px;font-weight:700;padding:1px 3px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px;line-height:1.2;white-space:nowrap}.sb-logo-text{transition:opacity .2s}.sidebar.collapsed .sb-logo-text{opacity:0;width:0;overflow:hidden}.sidebar.collapsed .sb-proto{display:none}.sidebar.collapsed .sb-logo{padding:16px;justify-content:center;gap:0}.sb-nav{flex:1;padding:8px 0}.ni{display:flex;align-items:center;gap:12px;padding:10px 20px;color:rgba(255,255,255,.7);font-size:14px;cursor:pointer;transition:all .15s;white-space:nowrap;overflow:hidden}.ni:hover{background:var(--sb-hov);color:var(--wh)}.ni.act{background:var(--pri);color:var(--wh);font-weight:500;border-radius:0 8px 8px 0;margin-right:8px}.sidebar.collapsed .ni{padding:10px 0;justify-content:center;margin-right:0;border-radius:0}.sidebar.collapsed .ni.act{border-radius:0;margin-right:0}.sidebar.collapsed .ni span:not(.material-symbols-outlined){display:none}.sidebar.collapsed .ni-badge{display:none}.ns{padding:16px 20px 8px;font-size:12px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;overflow:hidden}.sidebar.collapsed .ns{font-size:0;padding:8px 0;border-top:1px solid rgba(255,255,255,.1);margin:0 12px}.ni .material-symbols-outlined{font-size:20px;flex-shrink:0}.ni-badge{background:var(--sec);color:var(--wh);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:auto}.sb-collapse{padding:12px;display:flex;justify-content:flex-end;border-top:1px solid rgba(255,255,255,.1)}.sb-collapse button{color:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--r-sm);transition:all .15s}.sb-collapse button:hover{background:var(--sb-hov);color:var(--wh)}.sidebar.collapsed .sb-collapse{justify-content:center}
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;transition:margin-left .2s ease}.main.sb-collapsed{margin-left:64px}.topbar{background:var(--wh);border-bottom:1px solid var(--g200);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}.tb-title{font-size:20px;font-weight:700}.tb-r{display:flex;align-items:center;gap:16px}.tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--g500)}.tb-ic:hover{background:var(--g100)}.content{padding:24px 32px;flex:1}.view{display:none}.view.active{display:block}
+.bc{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--g500);margin-bottom:24px}.bc a{color:var(--pri);font-weight:500}.bc .material-symbols-outlined{font-size:16px;color:var(--g400)}
+.card{background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);padding:20px}.cg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}.mc{text-align:center}.mv{font-size:36px;font-weight:700;line-height:1.25}.ml{font-size:12px;font-weight:500;color:var(--g500);margin-bottom:4px;text-transform:uppercase}.ms{font-size:12px;color:var(--g400);margin-top:4px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r-sm);font-weight:500;font-size:14px;transition:all .15s;line-height:1.5}.btn-p{background:var(--pri);color:var(--wh)}.btn-p:hover{background:var(--pri-lt)}.btn-s{background:var(--g100);color:var(--g700);border:1px solid var(--g300)}.btn-s:hover{background:var(--g200)}.btn-o{background:var(--wh);color:var(--pri);border:1px solid var(--pri)}.btn-o:hover{background:var(--pri-lt10)}.btn-sm{padding:4px 12px;font-size:12px}.btn-lg{padding:10px 24px;font-size:16px}.btn .material-symbols-outlined{font-size:18px}.btn:disabled{opacity:.4;cursor:not-allowed}
+.tw{background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);overflow:hidden}table{width:100%;border-collapse:collapse}th{background:var(--pri-lt10);padding:12px 16px;text-align:left;font-size:12px;font-weight:700;color:var(--g600);text-transform:uppercase;border-bottom:1px solid var(--g200)}td{padding:12px 16px;border-bottom:1px solid var(--g100);font-size:14px;vertical-align:middle}tr:last-child td{border-bottom:none}
+.tkn{font-weight:700;color:var(--g900)}.tkv{font-size:12px;color:var(--g400);margin-top:2px}
+.cb{display:flex;align-items:center;gap:8px}.ct{width:100px;height:6px;background:var(--g200);border-radius:3px;overflow:hidden}.cf{height:100%;border-radius:3px;background:var(--ok)}.cf.med{background:var(--warn)}.cf.low{background:var(--err)}.cp{font-size:12px;font-weight:500;color:var(--g600);min-width:36px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:500}.b-act{background:var(--ok-lt);color:#065F46}.b-dft{background:var(--g200);color:var(--g500)}.bd{width:6px;height:6px;border-radius:50%}.b-act .bd{background:#10B981}.b-dft .bd{background:var(--g400)}
+.ab{width:32px;height:32px;border-radius:var(--r-sm);display:inline-flex;align-items:center;justify-content:center;color:var(--g400);transition:all .15s}.ab:hover{background:var(--g100);color:var(--g700)}.ab.dng:hover{background:var(--err-lt);color:var(--err)}.ab:disabled{opacity:.3;cursor:not-allowed}.ab:disabled:hover{background:none;color:var(--g400)}[data-tip]{position:relative}[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--g800);color:var(--wh);padding:4px 8px;border-radius:4px;font-size:11px;white-space:nowrap;z-index:10}
+.tbar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}.ts{position:relative}.ts input{padding:8px 12px 8px 36px;border:1px solid var(--g300);border-radius:var(--r-sm);width:240px;outline:none}.ts input:focus{border-color:var(--pri);box-shadow:0 0 0 2px rgba(0,79,176,.1)}.ts .material-symbols-outlined{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--g400)}.tsp{flex:1}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--g200);margin-bottom:16px}.tab{padding:8px 16px;font-size:14px;font-weight:500;color:var(--g500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}.tab:hover{color:var(--g700)}.tab.active{color:var(--pri);border-bottom-color:var(--pri)}.tab-ct{font-size:12px;color:var(--g400);margin-left:4px}
+.banner{background:var(--pri-lt10);border:1px solid var(--pri-lt20);border-radius:var(--r-md);padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:12px}.banner-ic{color:var(--pri)}.banner-t{flex:1}.banner-tt{font-weight:700;font-size:14px;color:var(--g900)}.banner-d{font-size:13px;color:var(--g500)}.banner-cl{color:var(--g400);cursor:pointer}
+.fg{margin-bottom:20px}.fl{display:block;font-size:12px;font-weight:700;color:var(--g600);text-transform:uppercase;margin-bottom:6px}.fi{width:100%;padding:10px 12px;border:1px solid var(--g300);border-radius:var(--r-sm);outline:none;font-size:14px}.fi:focus{border-color:var(--pri);box-shadow:0 0 0 2px rgba(0,79,176,.1)}.fi.err{border-color:var(--err)}.fh{font-size:12px;color:var(--g400);margin-top:4px}.fh.err{color:var(--err)}.fsel{padding:8px 12px;border:1px solid var(--g300);border-radius:var(--r-sm);outline:none;font-size:14px;background:var(--wh);min-width:140px}.fsel:focus{border-color:var(--pri)}
+.vc{background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);padding:16px;margin-bottom:12px}.vc.dov{border-color:var(--pri);background:var(--pri-lt10)}.vh{display:flex;align-items:center;gap:12px;margin-bottom:8px}.dh{cursor:grab;color:var(--g400);display:flex;align-items:center}.dh:active{cursor:grabbing}.pn{font-size:12px;font-weight:700;color:var(--g400);background:var(--g100);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}.vh input{flex:1;padding:8px 12px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:14px;font-weight:500}.vh input:focus{border-color:var(--pri);outline:none}.vm{font-size:12px;color:var(--g500);background:var(--g50);padding:6px 12px;border-radius:var(--r-sm);display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.vm .material-symbols-outlined{font-size:14px}.vm.ok{color:var(--ok);background:var(--ok-lt)}.vm.inc{color:var(--warn);background:var(--warn-lt)}.rv{color:var(--g400);cursor:pointer;display:flex;align-items:center}.rv:hover{color:var(--err)}
+.ca{margin-top:4px;padding-left:36px}.cr{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}.cr select{padding:6px 10px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:13px;background:var(--wh)}.cr input{padding:6px 10px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:13px;flex:1;min-width:120px}.cr input:focus,.cr select:focus{border-color:var(--pri);outline:none}.crm{color:var(--g400);cursor:pointer;display:flex;align-items:center}.crm:hover{color:var(--err)}.bac{font-size:12px;color:var(--pri);display:inline-flex;align-items:center;gap:4px;padding:4px 8px;margin-top:4px;border-radius:var(--r-sm)}.bac:hover{background:var(--pri-lt10)}.bac .material-symbols-outlined{font-size:16px}.wl{min-width:56px;display:inline-block;font-size:12px;font-weight:700;color:var(--g400)}.csel{padding:4px 8px!important;border:1px solid var(--g300)!important;border-radius:4px!important;font-size:12px!important;font-weight:700!important;color:var(--pri)!important;background:var(--pri-lt10)!important;min-width:56px}
+.st{font-size:18px;font-weight:700;color:var(--g900)}.sd{font-size:13px;color:var(--g500);margin-bottom:16px}
+.cpv{background:var(--g50);border:1px solid var(--g200);border-radius:var(--r-md);padding:16px;margin-top:16px}.cpv-bar{display:flex;height:24px;border-radius:var(--r-sm);overflow:hidden;margin-bottom:8px}.cpv-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--wh);min-width:2px}.cpv-leg{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--g500);margin-bottom:8px}.cpv-li{display:flex;align-items:center;gap:4px}.cpv-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}.cpv-unalloc{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--warn-lt);border-radius:var(--r-sm);margin-top:8px;font-size:13px;font-weight:500;color:#92400E}.cpv-unalloc .material-symbols-outlined{font-size:16px;color:var(--warn)}
+.abar{display:flex;height:32px;border-radius:var(--r-sm);overflow:hidden;margin-bottom:8px}.aseg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--wh);min-width:2px}.aleg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px}.li{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--g600)}.ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.cc{border:1px solid var(--g200);border-radius:var(--r-md);padding:12px 16px;margin-bottom:8px}.ccr{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;margin-bottom:8px}.ccc{font-size:12px;color:var(--g500);font-weight:400}.ccl{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px}.cw{color:var(--ok)}.co{color:var(--g400);text-decoration:line-through}
+.pt tr.ua td{background:var(--warn-lt);cursor:pointer}.pt tr.nm td{color:var(--g400)}.pt tr.clickable{cursor:pointer}.pt tr.clickable:hover td{background:var(--pri-lt10)}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}.mo.active{display:flex}.modal{background:var(--wh);border-radius:var(--r-lg);padding:24px;max-width:560px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:var(--shd3)}.modal-lg{max-width:800px}.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.mt{font-size:18px;font-weight:700}.mx{color:var(--g400);cursor:pointer}.mx:hover{color:var(--g700)}.mf{display:flex;justify-content:flex-end;gap:12px;margin-top:24px;padding-top:16px;border-top:1px solid var(--g200)}
+.tc{position:fixed;bottom:24px;right:24px;z-index:300;display:flex;flex-direction:column;gap:8px}.toast{background:var(--g800);color:var(--wh);padding:12px 20px;border-radius:var(--r-md);font-size:14px;display:flex;align-items:center;gap:8px;box-shadow:var(--shd3);animation:sIn .3s ease}.tok .material-symbols-outlined{color:var(--ok)}@keyframes sIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.ta{display:flex;align-items:center;gap:8px;margin-bottom:8px}.ta select{flex:1}.ta .fi{flex:1}.teq{font-weight:700;color:var(--g400)}
+.notice{display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:var(--r-md);margin-bottom:20px;font-size:13px}.n-info{background:var(--info-lt);color:#1E40AF}.n-warn{background:var(--warn-lt);color:#92400E}.notice .material-symbols-outlined{font-size:18px}
+.sbtm{position:sticky;bottom:0;background:var(--wh);border-top:1px solid var(--g200);padding:16px 0;margin-top:24px;display:flex;align-items:center;gap:12px;z-index:10}.ssp{flex:1}
+tr.dft td{background:#F2F2F2;color:var(--g400)}tr.dft .tkn{color:var(--g400)}tr.dft .cf{opacity:.4}tr.dft:hover td{background:#EBEBEB;color:var(--g500)}tr.dft:hover .tkn{color:var(--g500)}tr.row-click{cursor:pointer}tr.row-click:hover td{background:var(--pri-lt10)}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--g300);border-radius:3px}
+</style>
+</head>
+<body>
+<!-- PASSWORD GATE -->
+<div id="pw-gate" style="position:fixed;inset:0;z-index:9999;background:#0D1B3E;display:flex;align-items:center;justify-content:center;font-family:'Noto Sans',sans-serif">
+<div style="text-align:center;color:#fff;max-width:360px;padding:32px">
+<div style="margin-bottom:24px">
+<svg width="140" height="100" viewBox="0 0 112 80" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.5454 72C89.2185 72 103.545 57.6731 103.545 40C103.545 22.3269 89.2185 8 71.5454 8C53.8723 8 39.5454 22.3269 39.5454 40C39.5454 57.6731 53.8723 72 71.5454 72ZM71.5454 80C93.6368 80 111.545 62.0914 111.545 40C111.545 17.9086 93.6368 0 71.5454 0C62.7772 0 54.6679 2.82121 48.0758 7.6054C47.9028 7.73098 47.6949 7.7998 47.4811 7.7998H19.1193C18.3618 7.7998 17.6693 8.22781 17.3305 8.90538L13.6069 16.3526C13.2744 17.0175 13.7579 17.7998 14.5013 17.7998H36.3952C37.1944 17.7998 37.6759 18.6947 37.2633 19.3792C36.1571 21.2143 35.1941 23.1454 34.3898 25.157C34.2356 25.5426 33.8646 25.7998 33.4493 25.7998H6.11932C5.36178 25.7998 4.66925 26.2278 4.33047 26.9054L0.606863 34.3526C0.274413 35.0175 0.757908 35.7998 1.50129 35.7998H30.6535C31.2468 35.7998 31.7086 36.3134 31.6633 36.905C31.5852 37.9264 31.5454 38.9586 31.5454 40C31.5454 40.909 31.5757 41.8109 31.6354 42.7047C31.6746 43.2928 31.2142 43.7998 30.6248 43.7998H1.00129C0.257908 43.7998-0.22559 44.5821 0.106861 45.247L3.83047 52.6942C4.16925 53.3718 4.86178 53.7998 5.61932 53.7998H33.2918C33.711 53.7998 34.0846 54.0618 34.2361 54.4527C35.0153 56.4626 35.9521 58.394 37.0316 60.2315C37.4337 60.9159 36.9515 61.7998 36.1576 61.7998H25.5013C24.7579 61.7998 24.2744 62.5821 24.6069 63.247L28.3305 70.6942C28.6693 71.3718 29.3618 71.7998 30.1193 71.7998H46.9389C47.1584 71.7998 47.3715 71.8723 47.547 72.0041C54.232 77.0249 62.5412 80 71.5454 80Z" fill="white"/><path d="M18.4361 62.9054C18.0973 62.2278 17.4048 61.7998 16.6472 61.7998H9.50134C8.75795 61.7998 8.27446 62.5821 8.60691 63.247L12.3305 70.6942C12.6693 71.3718 13.3618 71.7998 14.1194 71.7998H21.2653C22.0086 71.7998 22.4921 71.0175 22.1597 70.3526L18.4361 62.9054Z" fill="#4ADFFF"/><path fill-rule="evenodd" clip-rule="evenodd" d="M71.5454 64C84.8002 64 95.5454 53.2548 95.5454 40C95.5454 26.7452 84.8002 16 71.5454 16C58.2906 16 47.5454 26.7452 47.5454 40C47.5454 53.2548 58.2906 64 71.5454 64ZM87.5454 40C87.5454 48.8366 80.382 56 71.5454 56C62.7089 56 55.5454 48.8366 55.5454 40C55.5454 37.1848 56.2725 34.5393 57.5491 32.2413C57.6615 35.4562 60.3031 38.0279 63.5454 38.0279C66.8591 38.0279 69.5454 35.3416 69.5454 32.0279C69.5454 28.7786 66.9625 26.1326 63.7379 26.0309C66.0473 24.7374 68.7102 24 71.5454 24C80.382 24 87.5454 31.1634 87.5454 40Z" fill="white"/></svg>
+</div>
+<div style="font-size:13px;color:#34B5D9;margin-bottom:32px;letter-spacing:1px">VIRTUAL TAG PROTOTYPE</div>
+<div style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:12px">Enter password to continue</div>
+<input id="pw-input" type="password" placeholder="Password" style="width:100%;padding:12px 16px;border:1px solid rgba(255,255,255,.2);border-radius:8px;background:rgba(255,255,255,.08);color:#fff;font-size:14px;outline:none;text-align:center;letter-spacing:1px" onkeydown="if(event.key==='Enter')checkPw()">
+<div id="pw-err" style="color:#EF4444;font-size:12px;margin-top:8px;height:18px"></div>
+<button onclick="checkPw()" style="margin-top:8px;width:100%;padding:12px;background:#004FB0;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit">Enter</button>
+<div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:24px">Internal use only. Do not share publicly.</div>
+</div>
+</div>
+<script>
+async function hashStr(s){const d=new TextEncoder().encode(s);const h=await crypto.subtle.digest('SHA-256',d);return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('')}
+const PW_HASH='811d6b92a57f29a90c9eeeeec80002f66eb9617f18b0339f64133805cd9106f4';
+async function checkPw(){const p=document.getElementById('pw-input').value;const h=await hashStr(p);if(h===PW_HASH){document.getElementById('pw-gate').style.display='none';sessionStorage.setItem('pw-ok','1')}else{document.getElementById('pw-err').textContent='Incorrect password';document.getElementById('pw-input').style.borderColor='#EF4444';setTimeout(()=>{document.getElementById('pw-err').textContent='';document.getElementById('pw-input').style.borderColor='rgba(255,255,255,.2)'},2000)}}
+if(sessionStorage.getItem('pw-ok')==='1')document.getElementById('pw-gate').style.display='none';
+</script>
+<!-- END PASSWORD GATE -->
+<div class="app">
+<aside class="sidebar">
+<div class="sb-logo"><div class="sb-logo-wrap"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13" stroke="#FFF" stroke-width="2" fill="none"/><circle cx="16" cy="16" r="7" stroke="#FFF" stroke-width="2" fill="none"/><circle cx="16" cy="16" r="3" fill="#FFF"/></svg><span class="sb-proto">PROTOTYPE</span></div><span class="sb-logo-text">LumiTure.ai</span></div>
+<nav class="sb-nav">
+<div class="ni"><span class="material-symbols-outlined">home</span><span>Overview</span></div>
+<div class="ni"><span class="material-symbols-outlined">compress</span><span>Rightsizing</span><span class="ni-badge">BETA</span></div>
+<div class="ni"><span class="material-symbols-outlined">bookmark</span><span>Saving Report</span></div>
+<div class="ns">Dashboard</div>
+<div class="ni"><span class="material-symbols-outlined">auto_awesome</span><span>Executive Insights</span></div>
+<div class="ni"><span class="material-symbols-outlined">dashboard</span><span>Cost Dashboard</span></div>
+<div class="ns">Cost Analysis</div>
+<div class="ni"><span class="material-symbols-outlined">query_stats</span><span>Cost Analysis</span></div>
+<div class="ns">Cost Allocation</div>
+<div class="ni act" onclick="go('list')"><span class="material-symbols-outlined">sell</span><span>Virtual Tags</span></div>
+<div class="ns">Budget</div>
+<div class="ni"><span class="material-symbols-outlined">monitoring</span><span>Budget Monitoring</span></div>
+<div class="ns">Settings</div>
+<div class="ni"><span class="material-symbols-outlined">settings</span><span>Organization Settings</span></div>
+<div class="ni"><span class="material-symbols-outlined">shield</span><span>Security</span></div>
+</nav>
+<div class="sb-collapse"><button onclick="toggleSidebar()" title="Toggle sidebar"><span class="material-symbols-outlined" id="sb-toggle-icon">chevron_left</span></button></div>
+</aside>
+<div class="main">
+<div class="topbar"><div><span class="tb-title" id="ttl">Virtual Tags</span></div><div class="tb-r"><div class="tb-ic"><span class="material-symbols-outlined">notifications</span></div><div class="tb-ic"><span class="material-symbols-outlined">account_circle</span></div></div></div>
+<div class="content">
+<div class="view active" id="v-list"></div>
+<div class="view" id="v-create"></div>
+<div class="view" id="v-edit"></div>
+<div class="view" id="v-preview"></div>
+<div class="view" id="v-batch"></div>
+</div>
+</div>
+</div>
+<div class="mo" id="mo"><div class="modal" id="mc"></div></div>
+<div class="tc" id="tc"></div>
+<script>
+const COLORS=['#004FB0','#34B5D9','#10B981','#F59E0B','#8B5CF6','#EC4899','#6366F1','#14B8A6'];
+const FIELDS=[['project','Project'],['account','Account'],['service','Service'],['region','Region'],['label','Label'],['resource_type','Resource Type'],['provider','Cloud Provider']];
+const OPS=[['is','is'],['is_not','is not'],['contains','contains'],['not_contains','not contains'],['starts_with','starts with'],['ends_with','ends with'],['exists','exists'],['not_exists','not exists']];
+const fOpts=(s)=>FIELDS.map(([v,l])=>`<option value="${v}"${v===s?' selected':''}>${l}</option>`).join('');
+const oOpts=(s)=>OPS.map(([v,l])=>`<option value="${v}"${v===s?' selected':''}>${l}</option>`).join('');
+const fmt=n=>'$'+n.toLocaleString();
+const pct=(p,t)=>t>0?((p/t)*100).toFixed(1):'0.0';
+const aRes=t=>t.values.reduce((s,v)=>s+v.res,0);
+const aCost=t=>t.values.reduce((s,v)=>s+v.cost,0);
+const covC=p=>p>=70?'':p>=40?' med':' low';
+
+// Mock resources generator
+const _ps='display:inline-flex;align-items:center;justify-content:center;width:36px;height:16px;border-radius:3px;flex-shrink:0;margin-right:6px;font-size:9px;font-weight:700;color:#fff;letter-spacing:.3px';
+const PROV_ICON={GCP:`<span style="${_ps};background:#34A853">GCP</span>`,AWS:`<span style="${_ps};background:#FF9900">AWS</span>`,Azure:`<span style="${_ps};background:#0078D4">Azure</span>`};
+function mockResources(count,prefix){const cats=['Compute','Database','Storage','Networking','Analytics','Container','Serverless','AI/ML','Security','Monitoring'];const provs=['GCP','AWS','Azure'];const names={GCP:['vm-','gcs-','gke-','bq-','sql-'],AWS:['ec2-','s3-','rds-','eks-','lambda-'],Azure:['vm-','blob-','cosmos-','aks-','func-']};const r=[];for(let i=0;i<count;i++){const p=provs[i%3];const pfx=names[p][i%5];r.push({n:`${pfx}${prefix||'res'}-${String(i+1).padStart(2,'0')}`,cat:cats[i%cats.length],p,c:Math.floor(Math.random()*4000)+200})}r.sort((a,b)=>b.c-a.c);return r}
+
+const S={
+tags:[
+{id:'env',name:'Environment',preset:true,status:'active',editor:'Daniel Lai',modified:'2025-03-20',totalRes:831,totalCost:222050,values:[
+{id:'v1',name:'Production',conds:[{f:'project',o:'contains',v:'prd',c:''}],res:187,cost:89200},
+{id:'v2',name:'Staging',conds:[{f:'project',o:'contains',v:'stg',c:''}],res:94,cost:32400},
+{id:'v3',name:'Development',conds:[{f:'project',o:'contains',v:'dev',c:''}],res:156,cost:41200},
+{id:'v4',name:'Sandbox',conds:[{f:'label',o:'is',v:'sandbox',c:''}],res:82,cost:11020}]},
+{id:'cc',name:'Cost Center',preset:true,status:'active',editor:'Jessie Lee',modified:'2025-03-18',totalRes:831,totalCost:222050,values:[
+{id:'v1',name:'CC-Engineering',conds:[{f:'account',o:'is',v:'eng-account',c:''}],res:210,cost:95000},
+{id:'v2',name:'CC-Marketing',conds:[{f:'account',o:'contains',v:'mktg',c:''}],res:85,cost:38200},
+{id:'v3',name:'CC-Operations',conds:[{f:'label',o:'is',v:'ops',c:''}],res:120,cost:42000}]},
+{id:'bu',name:'Business Unit',preset:true,status:'draft',editor:'Kabin Yang',modified:'2025-03-22',totalRes:831,totalCost:222050,values:[
+{id:'v1',name:'Platform',conds:[{f:'project',o:'contains',v:'platform',c:''}],res:145,cost:62000},
+{id:'v2',name:'Data',conds:[{f:'project',o:'contains',v:'data',c:''}],res:98,cost:44500}]},
+{id:'app',name:'Application',preset:true,status:'active',editor:'Daniel Lai',modified:'2025-03-15',totalRes:831,totalCost:222050,values:[
+{id:'v1',name:'API Gateway',conds:[{f:'service',o:'is',v:'api-gateway',c:''}],res:42,cost:18900},
+{id:'v2',name:'Web App',conds:[{f:'service',o:'contains',v:'web',c:''}],res:67,cost:31200},
+{id:'v3',name:'Batch Jobs',conds:[{f:'service',o:'contains',v:'batch',c:''}],res:38,cost:12400},
+{id:'v4',name:'ML Pipeline',conds:[{f:'label',o:'is',v:'ml-pipeline',c:''}],res:23,cost:48200},
+{id:'v5',name:'Database',conds:[{f:'service',o:'contains',v:'sql',c:'AND'},{f:'service',o:'contains',v:'db',c:''}],res:55,cost:62000}]},
+{id:'owner',name:'Owner',preset:true,status:'active',editor:'Jessie Lee',modified:'2025-03-19',totalRes:831,totalCost:222050,values:[
+{id:'v1',name:'team-backend',conds:[{f:'label',o:'is',v:'team-backend',c:''}],res:120,cost:54000},
+{id:'v2',name:'team-frontend',conds:[{f:'label',o:'is',v:'team-frontend',c:''}],res:85,cost:28500},
+{id:'v3',name:'team-data',conds:[{f:'label',o:'is',v:'team-data',c:''}],res:95,cost:46200}]},
+{id:'rg',name:'Region Group',preset:false,status:'active',editor:'Kabin Yang',modified:'2025-03-21',totalRes:831,totalCost:222050,values:[
+{id:'v1',name:'APAC',conds:[{f:'region',o:'contains',v:'asia',c:''}],res:210,cost:78000},
+{id:'v2',name:'US',conds:[{f:'region',o:'contains',v:'us-',c:''}],res:380,cost:112000},
+{id:'v3',name:'EU',conds:[{f:'region',o:'contains',v:'europe',c:''}],res:150,cost:32050}]},
+{id:'pp',name:'Project Phase',preset:false,status:'draft',editor:'Jessie Lee',modified:'2025-03-23',totalRes:831,totalCost:222050,values:[
+{id:'v1',name:'Active',conds:[{f:'label',o:'is',v:'phase-active',c:''}],res:320,cost:145000},
+{id:'v2',name:'Sunset',conds:[{f:'label',o:'is',v:'phase-sunset',c:''}],res:45,cost:8200}]}
+],
+bannerOn:true,_tmp:null,_isNew:false,_curEdit:null,_tab:'all'
+};
+let _c=100;const gid=()=>'t'+_c++;const gvid=()=>'v'+_c++;
+
+function go(n,p){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));const el=document.getElementById('v-'+n);if(el)el.classList.add('active');const titles={list:'Virtual Tags',create:'Create Virtual Tag',edit:'Edit Virtual Tag',preview:'Preview Changes',batch:'Batch Create Rules'};document.getElementById('ttl').textContent=titles[n]||'';if(n==='list')renderList();else if(n==='create')renderCreate();else if(n==='edit'){S._curEdit=p;renderEdit(p)}else if(n==='preview')renderPreview(p);else if(n==='batch')renderBatch();window.scrollTo(0,0)}
+
+/* ===== LIST ===== */
+function renderList(){const el=document.getElementById('v-list');const ref=S.tags.find(t=>t.id==='env');const ac=ref?aCost(ref):0;const uc=ref?ref.totalCost-ac:222050;const aai=ref?pct(ac,ref.totalCost):'0.0';const upct=ref?pct(uc,ref.totalCost):'100.0';const actT=S.tags.filter(t=>t.status==='active');const comp=actT.length?(actT.reduce((s,t)=>s+(aRes(t)/t.totalRes)*100,0)/actT.length).toFixed(1):'0.0';
+const dftCount=S.tags.filter(t=>t.status==='draft').length;const actCount=S.tags.filter(t=>t.status==='active').length;
+let h='';
+if(S.bannerOn)h+=`<div class="banner"><span class="material-symbols-outlined banner-ic">lightbulb</span><div class="banner-t"><div class="banner-tt">Get started with FinOps Foundation recommended tags</div><div class="banner-d">We've pre-configured 5 essential virtual tag keys. Customize them to match your organization's needs.</div></div><button class="btn btn-o btn-sm" onclick="toast('5 preset tags activated!');S.bannerOn=false;renderList()"><span class="material-symbols-outlined">rocket_launch</span>Get Started</button><span class="material-symbols-outlined banner-cl" onclick="S.bannerOn=false;renderList()">close</span></div>`;
+h+=`<div class="cg"><div class="card mc"><div class="ml">Allocation Accuracy Index</div><div class="mv" style="color:${parseFloat(aai)>=70?'var(--ok)':'var(--warn)'}">${aai}%</div><div class="ms">of total cost allocated</div></div><div class="card mc"><div class="ml">Unallocated Cost</div><div class="mv" style="color:var(--warn)">${fmt(uc)}</div><div class="ms">${upct}% of total spend</div></div><div class="card mc"><div class="ml">Metadata Compliance Rate</div><div class="mv" style="color:${parseFloat(comp)>=70?'var(--ok)':'var(--warn)'}">${comp}%</div><div class="ms">of resources with tags</div></div></div>`;
+h+=`<div class="tbar"><button class="btn btn-p" onclick="go('create')"><span class="material-symbols-outlined">add</span>Create Virtual Tag</button><!-- Batch Create Rules - hidden for Phase 1, uncomment to enable: <button class="btn btn-o" onclick="go('batch')"><span class="material-symbols-outlined">dynamic_feed</span>Batch Create Rules</button> --><div class="tsp"></div><div class="ts"><span class="material-symbols-outlined">search</span><input type="text" placeholder="Search virtual tags..." oninput="filterTbl(this.value)"></div></div>`;
+h+=`<div class="tabs"><div class="tab ${S._tab==='all'?'active':''}" onclick="S._tab='all';renderList()">All<span class="tab-ct">(${S.tags.length})</span></div><div class="tab ${S._tab==='active'?'active':''}" onclick="S._tab='active';renderList()">Active<span class="tab-ct">(${actCount})</span></div><div class="tab ${S._tab==='draft'?'active':''}" onclick="S._tab='draft';renderList()">Draft<span class="tab-ct">(${dftCount})</span></div></div>`;
+const filtered=S._tab==='all'?S.tags:S.tags.filter(t=>t.status===S._tab);
+h+=`<div class="tw"><table id="tbl"><thead><tr><th style="width:28%">Virtual Tag</th><th style="width:16%">Coverage</th><th style="width:10%">Status</th><th style="width:14%">Last Editor</th><th style="width:14%">Last Modified</th><th style="width:8%">Actions</th></tr></thead><tbody>`;
+filtered.forEach(t=>{const ar=aRes(t);const cp=pct(ar,t.totalRes);const cc=covC(parseFloat(cp));const isDft=t.status==='draft';
+h+=`<tr class="${isDft?'dft ':''} row-click" data-n="${t.name.toLowerCase()}" onclick="if(!event.target.closest('.ab'))go('edit','${t.id}')"><td><div class="tkn">${t.name}</div><div class="tkv">${t.values.length} values</div></td><td><div class="cb"><div class="ct"><div class="cf${cc}" style="width:${cp}%"></div></div><span class="cp">${cp}%</span></div></td><td><span class="badge ${isDft?'b-dft':'b-act'}"><span class="bd"></span>${isDft?'Draft':'Active'}</span></td><td style="font-size:13px;color:var(--g600)">${t.editor}</td><td style="font-size:13px;color:var(--g500)">${t.modified}</td><td><button class="ab dng" ${t.preset?'disabled data-tip="Preset tags cannot be deleted"':''} onclick="event.stopPropagation();${t.preset?'':`delTag('${t.id}')`}"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></td></tr>`});
+h+='</tbody></table></div>';el.innerHTML=h}
+function filterTbl(q){q=q.toLowerCase();document.querySelectorAll('#tbl tbody tr').forEach(r=>{r.style.display=r.dataset.n&&r.dataset.n.includes(q)?'':'none'})}
+function delTag(id){const t=S.tags.find(x=>x.id===id);if(!t)return;showModal(`<div class="mh"><span class="mt">Delete Virtual Tag</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><p>Are you sure you want to delete <strong>${t.name}</strong>? This action cannot be undone.</p><div class="mf"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" style="background:var(--err)" onclick="S.tags=S.tags.filter(x=>x.id!=='${id}');closeModal();go('list');toast('Virtual tag deleted')">Delete</button></div>`)}
+
+/* ===== CREATE ===== */
+function renderCreate(){const el=document.getElementById('v-create');
+el.innerHTML=`<div class="bc"><a href="#" onclick="go('list');return false">Virtual Tags</a><span class="material-symbols-outlined">chevron_right</span><span>Create Virtual Tag</span></div>
+<div class="card" style="margin-bottom:24px"><div class="fg" style="margin-bottom:0"><label class="fl">Virtual Tag Name</label><input class="fi" id="cr-name" placeholder="e.g., environment, cost-center, owner" style="max-width:400px" oninput="validateName(this,'cr')" onblur="validateName(this,'cr')"><div class="fh" id="cr-hint">Use lowercase with hyphens or underscores. e.g., cost-center, business_unit</div></div></div>
+<div class="st" style="margin-bottom:8px">Tag Values & Rules</div>
+<p class="sd">Add values for this tag key, then define conditions to auto-assign resources.</p>
+<button class="btn btn-o btn-sm" onclick="addVC('cr-vals')"><span class="material-symbols-outlined">add</span>Add Value</button>
+<div id="cr-vals" style="margin-top:16px"></div>
+<div class="cpv" id="cr-cpv"><div class="cpv-bar" id="cr-cpv-bar"><div class="cpv-seg" style="width:100%;background:var(--g300)"></div></div><div class="cpv-leg" id="cr-cpv-leg"></div><div class="cpv-unalloc"><span class="material-symbols-outlined">warning</span><span>Unallocated: <strong>831 resources</strong> · ${fmt(222050)} (100%)</span><button class="btn btn-sm btn-s" style="margin-left:auto" onclick="showUnallocModal()">View Resources</button></div></div>
+<div class="sbtm"><button class="btn btn-s" onclick="go('list')">Cancel</button><div class="ssp"></div><button class="btn btn-p btn-lg" onclick="saveCreate()"><span class="material-symbols-outlined">visibility</span>Preview Changes</button></div>`}
+
+/* ===== EDIT ===== */
+function renderEdit(id){const t=S.tags.find(x=>x.id===id);if(!t){go('list');return}const el=document.getElementById('v-edit');const ar=aRes(t);const ur=t.totalRes-ar;const ac=aCost(t);const uc=t.totalCost-ac;const up=pct(ur,t.totalRes);const ap=pct(ar,t.totalRes);
+let notice='';if(t.status==='active')notice=`<div class="notice n-info"><span class="material-symbols-outlined">info</span>This tag is currently active. Saving as draft will remove it from cost reports until re-applied.</div>`;
+el.innerHTML=`<div class="bc"><a href="#" onclick="go('list');return false">Virtual Tags</a><span class="material-symbols-outlined">chevron_right</span><span>${t.name}</span></div>${notice}
+<div class="card" style="margin-bottom:24px"><div class="fg" style="margin-bottom:0"><label class="fl">Virtual Tag Name</label><input class="fi" id="ed-name" value="${t.name}" style="max-width:400px" oninput="validateName(this,'ed','${t.id}')" onblur="validateName(this,'ed','${t.id}')"><div class="fh" id="ed-hint">Use lowercase with hyphens or underscores. e.g., cost-center, business_unit</div></div></div>
+<div class="st" style="margin-bottom:8px">Tag Values & Rules</div>
+<p class="sd">Add values for this tag key, then define conditions to auto-assign resources.</p>
+<button class="btn btn-o btn-sm" onclick="addVC('ed-vals')"><span class="material-symbols-outlined">add</span>Add Value</button>
+<div id="ed-vals" style="margin-top:16px"></div>
+<div class="cpv" id="ed-cpv">${renderCPV(t)}</div>
+<div class="sbtm"><button class="btn btn-s" onclick="go('list')">Cancel</button><div class="ssp"></div><button class="btn btn-p btn-lg" onclick="saveEdit('${t.id}')"><span class="material-symbols-outlined">visibility</span>Preview Changes</button></div>`;
+t.values.forEach(v=>addVC('ed-vals',v.name,v.conds,v.res,v.cost))}
+
+function renderCPV(t){const ar=aRes(t);const ac=aCost(t);const ur=t.totalRes-ar;const uc=t.totalCost-ac;const ap=pct(ac,t.totalCost);const up=pct(uc,t.totalCost);
+let bar='';let leg='';t.values.forEach((v,i)=>{const p=pct(v.cost,t.totalCost);if(parseFloat(p)>0)bar+=`<div class="cpv-seg" style="width:${p}%;background:${COLORS[i%8]}">${parseFloat(p)>5?p+'%':''}</div>`;leg+=`<div class="cpv-li"><div class="cpv-dot" style="background:${COLORS[i%8]}"></div>${v.name} ${pct(v.cost,t.totalCost)}%</div>`});
+if(parseFloat(up)>0)bar+=`<div class="cpv-seg" style="width:${up}%;background:var(--g300)">${parseFloat(up)>5?up+'%':''}</div>`;
+return`<div class="cpv-bar">${bar}</div><div class="cpv-leg">${leg}</div><div class="cpv-unalloc"><span class="material-symbols-outlined">warning</span><span>Unallocated: <strong>${ur} resources</strong> · ${fmt(uc)} (${up}%)</span><button class="btn btn-sm btn-s" style="margin-left:auto" onclick="showUnallocModal()">View Resources</button></div>`}
+
+/* ===== NAME VALIDATION ===== */
+function validateName(input,prefix,editId){const v=input.value;const hint=document.getElementById(prefix+'-hint');const valid=/^[a-z0-9_-]*$/.test(v);const exists=S.tags.some(t=>t.name.toLowerCase()===v.toLowerCase()&&t.id!==editId);
+if(!v){input.classList.remove('err');hint.className='fh';hint.textContent='Use lowercase with hyphens or underscores. e.g., cost-center, business_unit'}
+else if(!valid){input.classList.add('err');hint.className='fh err';hint.textContent='Invalid characters. Use letters, numbers, hyphens, or underscores only.'}
+else if(exists){input.classList.add('err');hint.className='fh err';hint.textContent=`"${v}" already exists. Please use a different name.`}
+else{input.classList.remove('err');hint.className='fh';hint.style.color='var(--ok)';hint.textContent='✓ Name is available'}}
+
+/* ===== VALUE CARD ===== */
+function addVC(cid,vname,conds,mres,mcost){const ctn=document.getElementById(cid);const num=ctn.querySelectorAll('.vc').length+1;const d=document.createElement('div');d.className='vc';d.draggable=true;
+let vmClass='';let vmIcon='hourglass_empty';let vmText='Add conditions to match';
+if(mres!==undefined&&mres>0){vmClass=' ok';vmIcon='check_circle';vmText=`${mres} resources · ${fmt(mcost)}`}
+d.innerHTML=`<div class="vh"><span class="dh material-symbols-outlined">drag_indicator</span><span class="pn">${num}</span><input type="text" placeholder="Value name (e.g., Production)" value="${vname||''}" class="vni" oninput="simMatch(this)"><div class="vm${vmClass}" data-vmatch><span class="material-symbols-outlined">${vmIcon}</span><span>${vmText}</span></div><span class="material-symbols-outlined rv" onclick="this.closest('.vc').remove();renum('${cid}');updCPV('${cid}')">close</span></div><div class="ca" data-cid="${cid}"></div>`;
+ctn.appendChild(d);const ca=d.querySelector('.ca');
+if(conds&&conds.length>0)conds.forEach((c,i)=>addCR(ca,c.f,c.o,c.v,i>0?(c.c||'AND'):'',cid));
+const ab=document.createElement('button');ab.className='bac';ab.innerHTML='<span class="material-symbols-outlined">add</span>Add Condition';ab.onclick=function(){addCR(ca,'','','','',cid)};ca.appendChild(ab);
+d.addEventListener('dragstart',e=>{e.dataTransfer.setData('text','');d.style.opacity='.4';window._dc=d});d.addEventListener('dragend',()=>{d.style.opacity='1';window._dc=null;ctn.querySelectorAll('.vc').forEach(c=>c.classList.remove('dov'))});d.addEventListener('dragover',e=>{e.preventDefault();d.classList.add('dov')});d.addEventListener('dragleave',()=>d.classList.remove('dov'));d.addEventListener('drop',e=>{e.preventDefault();d.classList.remove('dov');if(window._dc&&window._dc!==d){ctn.insertBefore(window._dc,d);renum(cid)}})}
+
+function addCR(ca,f,o,v,conn,cid){const ab=ca.querySelector('.bac');const rows=ca.querySelectorAll('.cr');const r=document.createElement('div');r.className='cr';
+const ch=rows.length>0?`<select class="csel"><option value="AND"${conn==='AND'||!conn?' selected':''}>AND</option><option value="OR"${conn==='OR'?' selected':''}>OR</option></select>`:`<span class="wl">WHERE</span>`;
+r.innerHTML=`${ch}<select>${fOpts(f)}</select><select>${oOpts(o)}</select><input type="text" placeholder="Value..." value="${v||''}" oninput="simMatch(this)"><span class="crm" onclick="this.closest('.cr').remove();simMatch(this)"><span class="material-symbols-outlined" style="font-size:16px">close</span></span>`;
+ca.insertBefore(r,ab)}
+
+function renum(cid){document.getElementById(cid).querySelectorAll('.vc').forEach((c,i)=>{const n=c.querySelector('.pn');if(n)n.textContent=i+1})}
+
+function simMatch(el){const card=el.closest('.vc');if(!card)return;const vm=card.querySelector('[data-vmatch]');const nameInput=card.querySelector('.vni');const conds=card.querySelectorAll('.cr');const name=nameInput?.value.trim();
+if(!name){vm.className='vm';vm.innerHTML='<span class="material-symbols-outlined">hourglass_empty</span><span>Add conditions to match</span>'}
+else if(conds.length===0){vm.className='vm';vm.innerHTML='<span class="material-symbols-outlined">hourglass_empty</span><span>Add conditions to match</span>'}
+else{const hasEmpty=Array.from(conds).some(r=>{const inp=r.querySelector('input');return inp&&!inp.value.trim()});
+if(hasEmpty){vm.className='vm inc';vm.innerHTML='<span class="material-symbols-outlined">warning</span><span>Incomplete condition</span>'}
+else{const mr=Math.floor(Math.random()*150)+20;const mc=Math.floor(Math.random()*50000)+5000;vm.className='vm ok';vm.innerHTML=`<span class="material-symbols-outlined">check_circle</span><span>${mr} resources · ${fmt(mc)}</span>`}}
+const cid=card.closest('[id]')?.id;if(cid)updCPV(cid)}
+
+function updCPV(cid){const prefix=cid.startsWith('cr')?'cr':'ed';const cpvEl=document.getElementById(prefix+'-cpv');if(!cpvEl)return;
+const cards=document.getElementById(cid).querySelectorAll('.vc');let totalAlloc=0;let totalCost=0;const segs=[];
+cards.forEach((card,i)=>{const vm=card.querySelector('[data-vmatch]');const name=card.querySelector('.vni')?.value.trim()||`Value ${i+1}`;if(vm&&vm.classList.contains('ok')){const txt=vm.textContent;const m=txt.match(/(\d+) resources/);const cm=txt.match(/\$([0-9,]+)/);const r=m?parseInt(m[1]):0;const c=cm?parseInt(cm[1].replace(/,/g,'')):0;totalAlloc+=r;totalCost+=c;segs.push({name,res:r,cost:c,color:COLORS[i%8]})}});
+const ur=831-totalAlloc;const uc=222050-totalCost;const up=pct(ur,831);
+let bar='';let leg='';segs.forEach(s=>{const p=pct(s.cost,222050);if(parseFloat(p)>0)bar+=`<div class="cpv-seg" style="width:${p}%;background:${s.color}">${parseFloat(p)>5?p+'%':''}</div>`;leg+=`<div class="cpv-li"><div class="cpv-dot" style="background:${s.color}"></div>${s.name} ${pct(s.cost,222050)}%</div>`});
+if(ur>0)bar+=`<div class="cpv-seg" style="width:${up}%;background:var(--g300)">${parseFloat(up)>5?up+'%':''}</div>`;
+if(!bar)bar='<div class="cpv-seg" style="width:100%;background:var(--g300)">100%</div>';
+cpvEl.innerHTML=`<div class="cpv-bar">${bar}</div><div class="cpv-leg">${leg}</div><div class="cpv-unalloc"><span class="material-symbols-outlined">warning</span><span>Unallocated: <strong>${ur} resources</strong> · ${fmt(uc>0?uc:0)} (${up}%)</span><button class="btn btn-sm btn-s" style="margin-left:auto" onclick="showUnallocModal()">View Resources</button></div>`}
+
+/* ===== COLLECT & SAVE ===== */
+function collectVals(cid){const vals=[];document.getElementById(cid).querySelectorAll('.vc').forEach(card=>{const name=card.querySelector('.vni')?.value.trim()||'';const conds=[];card.querySelectorAll('.cr').forEach(row=>{const sels=row.querySelectorAll('select');const inp=row.querySelector('input');const cs=row.querySelector('.csel');const si=cs?1:0;conds.push({f:sels[si]?.value||'project',o:sels[si+1]?.value||'is',v:inp?.value||'',c:cs?.value||''})});const mr=name?Math.floor(Math.random()*150)+20:0;const mc=name?Math.floor(Math.random()*50000)+5000:0;vals.push({id:gvid(),name,conds,res:mr,cost:mc})});return vals}
+
+function saveCreate(){const name=document.getElementById('cr-name').value.trim();if(!name){toast('Please enter a virtual tag name',1);return}if(!/^[a-z0-9_-]+$/.test(name)){toast('Invalid name format',1);return}if(S.tags.some(t=>t.name.toLowerCase()===name.toLowerCase())){toast('This name already exists',1);return}
+const vals=collectVals('cr-vals');const nt={id:gid(),name,preset:false,status:'draft',editor:'Kabin Yang',modified:new Date().toISOString().slice(0,10),totalRes:831,totalCost:222050,values:vals};S._tmp=nt;S._isNew=true;go('preview',nt.id)}
+
+function saveEdit(id){const t=S.tags.find(x=>x.id===id);if(!t)return;const name=document.getElementById('ed-name').value.trim();if(!name){toast('Please enter a virtual tag name',1);return}
+const vals=collectVals('ed-vals');S._tmp={...t,name,status:'draft',editor:'Kabin Yang',modified:new Date().toISOString().slice(0,10),values:vals};S._isNew=false;go('preview',id)}
+
+/* ===== PREVIEW ===== */
+function renderPreview(id){const t=S._tmp||S.tags.find(x=>x.id===id);if(!t){go('list');return}const el=document.getElementById('v-preview');const ar=aRes(t);const ac=aCost(t);const ur=t.totalRes-ar;const uc=t.totalCost-ac;const ap=pct(ac,t.totalCost);const up=pct(uc,t.totalCost);
+let bar='<div class="abar">';let leg='<div class="aleg">';t.values.forEach((v,i)=>{const p=pct(v.cost,t.totalCost);if(parseFloat(p)>0)bar+=`<div class="aseg" style="width:${p}%;background:${COLORS[i%8]}" title="${v.name}: ${p}%">${parseFloat(p)>5?p+'%':''}</div>`;leg+=`<div class="li"><div class="ld" style="background:${COLORS[i%8]}"></div>${v.name}</div>`});
+if(parseFloat(up)>0){bar+=`<div class="aseg" style="width:${up}%;background:var(--g300)" title="Unallocated: ${up}%">${parseFloat(up)>5?up+'%':''}</div>`;leg+=`<div class="li"><div class="ld" style="background:var(--g300)"></div>Unallocated</div>`}bar+='</div>';leg+='</div>';
+
+// Sort values by % of total (descending)
+const sortedVals=[...t.values].sort((a,b)=>b.cost-a.cost);
+let trows='';sortedVals.forEach((v,i)=>{const ci=t.values.indexOf(v);if(v.res>0)trows+=`<tr><td><div class="li"><div class="ld" style="background:${COLORS[ci%8]}"></div><strong>${v.name}</strong></div></td><td style="text-align:right">${fmt(v.cost)}</td><td><a href="#" onclick="event.preventDefault();showMatchedModal('${v.name}',${v.res})" style="color:var(--pri);text-decoration:underline;font-weight:500">${v.res}</a></td><td>${pct(v.cost,t.totalCost)}%</td></tr>`;else trows+=`<tr class="nm"><td><div class="li"><div class="ld" style="background:var(--g200)"></div>${v.name}</div></td><td style="text-align:right;font-style:italic">$0</td><td>0</td><td>0%</td></tr>`});
+trows+=`<tr class="ua"><td><div class="li"><span class="material-symbols-outlined" style="font-size:16px;color:var(--warn)">warning</span><strong style="color:#92400E">Unallocated</strong></div></td><td style="text-align:right;font-weight:700;color:#92400E">${fmt(uc)}</td><td><a href="#" onclick="event.preventDefault();showUnallocModal()" style="color:#92400E;text-decoration:underline;font-weight:700">${ur}</a></td><td>${up}%</td></tr>`;
+
+const conflicts=[{r:'vm-growth-campaign-01',cost:1200,r1:'Rule 1: project contains "mktg" → Marketing',r2:'Rule 3: label = "growth-team" → Growth (Overridden)'},{r:'db-shared-analytics-02',cost:1670,r1:'Rule 1: project contains "mktg" → Marketing',r2:'Rule 4: account = "shared" → Operations (Overridden)'},{r:'gcs-campaign-shared-03',cost:800,r1:'Rule 2: label team = "growth" → Growth',r2:'Rule 4: account = "shared" → Operations (Overridden)'}];
+const ctot=conflicts.reduce((s,c)=>s+c.cost,0);
+let ch=`<div class="card" style="margin-top:24px;border-color:var(--warn)"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="material-symbols-outlined" style="color:var(--warn)">warning</span><strong>${conflicts.length} resources matched multiple rules</strong></div><div style="font-size:13px;color:var(--g500);margin-bottom:16px">Total cost affected by conflicts: <strong>${fmt(ctot)}/30 days</strong></div>`;
+conflicts.forEach(c=>{ch+=`<div class="cc"><div class="ccr">${c.r}<span class="ccc">${fmt(c.cost)}/30 days</span></div><div class="ccl cw"><span class="material-symbols-outlined" style="font-size:16px">check_circle</span>${c.r1}</div><div class="ccl co"><span class="material-symbols-outlined" style="font-size:16px">cancel</span>${c.r2}</div></div>`});ch+='</div>';
+
+const wasActive=S.tags.find(x=>x.id===t.id)?.status==='active';
+const draftBtn=wasActive?`<button class="btn btn-o" onclick="saveDraftFromActive('${t.id}')">Save as Draft</button>`:`<button class="btn btn-o" onclick="saveDraft('${t.id}')">Save as Draft</button>`;
+
+el.innerHTML=`<div class="bc"><a href="#" onclick="go('list');return false">Virtual Tags</a><span class="material-symbols-outlined">chevron_right</span><a href="#" onclick="${S._isNew?`go('create')`:`go('edit','${t.id}')`};return false">${t.name}</a><span class="material-symbols-outlined">chevron_right</span><span>Preview</span></div>
+<div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div class="st">Allocation Overview</div><div style="display:flex;align-items:center;gap:12px"><span style="font-size:14px;color:var(--g500)">Total 30 Days Cost: <strong style="color:var(--g900)">${fmt(t.totalCost)}</strong></span><button class="btn btn-o btn-sm" onclick="toast('CSV exported successfully')"><span class="material-symbols-outlined">download</span>Export CSV</button></div></div>${bar}${leg}</div>
+<div class="card" style="margin-bottom:24px"><div class="st" style="margin-bottom:16px">Tag Value Breakdown</div><div class="tw" style="border:none"><table class="pt"><thead><tr><th>Tag Value</th><th style="text-align:right">30 Days Cost</th><th>Resources</th><th>% of Total</th></tr></thead><tbody>${trows}</tbody></table></div></div>${ch}
+<div class="sbtm"><button class="btn btn-s" onclick="${S._isNew?`go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_back</span>Back to Edit</button><div class="ssp"></div>${draftBtn}<button class="btn btn-p btn-lg" onclick="showApplyModal('${t.id}',${ar},${ur},'${pct(ar,t.totalRes)}','${pct(ur,t.totalRes)}')"><span class="material-symbols-outlined">check_circle</span>Apply to Cost Reports</button></div>`}
+
+function saveDraft(id){if(S._tmp){if(S._isNew)S.tags.push({...S._tmp,status:'draft'});else{const i=S.tags.findIndex(x=>x.id===id);if(i>=0)S.tags[i]={...S._tmp,status:'draft'}}S._tmp=null;S._isNew=false}go('list');toast('Virtual tag saved as draft')}
+
+function saveDraftFromActive(id){showModal(`<div class="mh"><span class="mt">Save as Draft</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><p style="margin-bottom:16px">This tag is currently <strong>active</strong>. Saving as draft will <strong>remove it as a dimension</strong> from all cost reports and dashboards until you re-apply it.</p><div class="notice n-warn"><span class="material-symbols-outlined">warning</span>Users who currently use this tag in their reports will no longer see it.</div><div class="mf"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" style="background:var(--warn)" onclick="closeModal();saveDraft('${id}')">Confirm Save as Draft</button></div>`)}
+
+function showApplyModal(id,ar,ur,arP,urP){const t=S._tmp||S.tags.find(x=>x.id===id);if(!t)return;
+showModal(`<div class="mh"><span class="mt">Apply to Cost Reports</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><p style="margin-bottom:16px">Are you sure you want to apply <strong>${t.name}</strong> to your cost reports?</p><div class="card" style="background:var(--g50);margin-bottom:16px"><div style="display:flex;flex-direction:column;gap:8px;font-size:14px"><div style="display:flex;justify-content:space-between"><span>Tag values</span><strong>${t.values.length}</strong></div><div style="display:flex;justify-content:space-between"><span>Resources allocated</span><strong>${ar} (${arP}%)</strong></div><div style="display:flex;justify-content:space-between;color:#92400E"><span>⚠️ Resources remain unallocated</span><strong>${ur} (${urP}%)</strong></div><div style="display:flex;justify-content:space-between;color:var(--g500)"><span>Conflicts resolved by priority</span><strong>3</strong></div></div></div><div class="notice n-warn"><span class="material-symbols-outlined">info</span>Once applied, this tag will be available as a dimension in all cost reports and dashboards.</div><div class="mf"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="confirmApply('${id}')"><span class="material-symbols-outlined">check_circle</span>Confirm Apply</button></div>`)}
+
+function confirmApply(id){if(S._tmp){if(S._isNew)S.tags.push({...S._tmp,status:'active'});else{const i=S.tags.findIndex(x=>x.id===id);if(i>=0)S.tags[i]={...S._tmp,status:'active'}}S._tmp=null;S._isNew=false}closeModal();go('list');toast('Virtual tag applied to cost reports!')}
+
+/* ===== MATCHED RESOURCES MODAL ===== */
+let _modalSortAsc=false;let _modalResCache=[];let _modalTitle='';let _modalDesc='';
+function renderResTable(resources,sortAsc){const sorted=[...resources].sort((a,b)=>sortAsc?a.c-b.c:b.c-a.c);const arrow=sortAsc?'arrow_upward':'arrow_downward';let th=`<table style="width:100%" id="res-modal-tbl"><thead><tr><th>Resource Name</th><th>Service Category</th><th style="text-align:right;cursor:pointer;user-select:none" onclick="toggleResSort()">30 Days Cost <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">${arrow}</span></th></tr></thead><tbody>`;sorted.forEach(r=>th+=`<tr><td style="font-weight:500"><div style="display:flex;align-items:center">${PROV_ICON[r.p]}${r.n}</div></td><td>${r.cat}</td><td style="text-align:right">${fmt(r.c)}</td></tr>`);th+='</tbody></table>';return th}
+function toggleResSort(){_modalSortAsc=!_modalSortAsc;const tblWrap=document.querySelector('#res-modal-tbl')?.parentElement;if(tblWrap)tblWrap.innerHTML=renderResTable(_modalResCache,_modalSortAsc)}
+function showMatchedModal(valueName,count){_modalResCache=mockResources(count,'matched');_modalSortAsc=false;const th=renderResTable(_modalResCache,false);
+showModal(`<div class="mh"><span class="mt">Resources matched to: ${valueName}</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><p style="margin-bottom:16px;font-size:13px;color:var(--g500)">${count} resources matched this value, sorted by cost.</p><div class="tw" style="max-height:400px;overflow-y:auto">${th}</div><div class="mf"><button class="btn btn-s" onclick="closeModal()">Close</button></div>`,1)}
+
+/* ===== UNALLOCATED MODAL ===== */
+function showUnallocModal(){_modalResCache=mockResources(30,'unalloc');_modalSortAsc=false;const th=renderResTable(_modalResCache,false);
+showModal(`<div class="mh"><span class="mt">Unallocated Resources</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><p style="margin-bottom:16px;font-size:13px;color:var(--g500)">312 unallocated resources, sorted by cost. Click column header to change sort order.</p><div class="tw" style="max-height:400px;overflow-y:auto">${th}</div><div class="mf"><button class="btn btn-s" onclick="closeModal()">Close</button></div>`,1)}
+
+/* ===== BATCH ===== */
+function renderBatch(){const el=document.getElementById('v-batch');
+el.innerHTML=`<div class="bc"><a href="#" onclick="go('list');return false">Virtual Tags</a><span class="material-symbols-outlined">chevron_right</span><span>Batch Create Rules</span></div>
+<div class="card" style="margin-bottom:24px"><div class="st" style="margin-bottom:8px">Define Conditions</div><p class="sd">Set conditions to match resources. These conditions will apply to all tag assignments below.</p><div id="ba-c"></div><button class="bac" onclick="addBC()"><span class="material-symbols-outlined">add</span>Add Condition</button><div style="margin-top:16px;padding:8px 12px;background:var(--g50);border-radius:var(--r-sm);font-size:13px;color:var(--g500)"><span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle">info</span> Matched resources will appear here after conditions are defined</div></div>
+<div class="card" style="margin-bottom:24px"><div class="st" style="margin-bottom:8px">Assign Tags to Matched Resources</div><p class="sd">Select which virtual tag keys and values to assign to the matched resources.</p><div id="ba-a"></div><button class="btn btn-o btn-sm" onclick="addBA()" style="margin-top:8px"><span class="material-symbols-outlined">add</span>Add Tag</button><div id="ba-h" style="margin-top:16px;padding:8px 12px;background:var(--pri-lt10);border-radius:var(--r-sm);font-size:13px;color:var(--pri);display:none"><span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle">info</span> <span id="ba-ht"></span></div></div>
+<div class="sbtm"><button class="btn btn-s" onclick="go('list')">Cancel</button><div class="ssp"></div><button class="btn btn-p btn-lg" onclick="toast('Batch rules created and applied!');go('list')"><span class="material-symbols-outlined">check_circle</span>Preview & Apply</button></div>`;addBC();addBA()}
+
+function addBC(){const c=document.getElementById('ba-c');const rows=c.querySelectorAll('.cr');const r=document.createElement('div');r.className='cr';const ch=rows.length>0?`<select class="csel"><option>AND</option><option>OR</option></select>`:`<span class="wl">WHERE</span>`;r.innerHTML=`${ch}<select>${fOpts()}</select><select>${oOpts()}</select><input type="text" placeholder="Value..."><span class="crm" onclick="this.closest('.cr').remove()"><span class="material-symbols-outlined" style="font-size:16px">close</span></span>`;c.appendChild(r)}
+
+function addBA(){const c=document.getElementById('ba-a');const tO=S.tags.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');const r=document.createElement('div');r.className='ta';r.innerHTML=`<select class="fsel bts" onchange="ubv(this)">${tO}</select><span class="teq">=</span><select class="fsel bvs"></select><span class="crm" onclick="this.closest('.ta').remove();ubh()"><span class="material-symbols-outlined" style="font-size:16px">close</span></span>`;c.appendChild(r);ubv(r.querySelector('.bts'));ubh()}
+function ubv(s){const t=S.tags.find(x=>x.id===s.value);const vs=s.closest('.ta').querySelector('.bvs');if(t)vs.innerHTML=t.values.map(v=>`<option>${v.name}</option>`).join('')+'<option>+ New value...</option>';ubh()}
+function ubh(){const rows=document.querySelectorAll('#ba-a .ta');const h=document.getElementById('ba-h');const ht=document.getElementById('ba-ht');if(rows.length>0){h.style.display='block';ht.textContent=`This will create ${rows.length} rule${rows.length>1?'s':''} (one per tag key). Each rule will be added to its respective virtual tag.`}else h.style.display='none'}
+
+/* ===== MODAL ===== */
+function showModal(h,lg){const o=document.getElementById('mo');const c=document.getElementById('mc');c.className=lg?'modal modal-lg':'modal';c.innerHTML=h;o.classList.add('active');o.onclick=e=>{if(e.target===o)closeModal()}}
+function closeModal(){document.getElementById('mo').classList.remove('active')}
+function toast(msg,err){const c=document.getElementById('tc');const t=document.createElement('div');t.className='toast'+(err?'':' tok');t.innerHTML=`<span class="material-symbols-outlined">${err?'error':'check_circle'}</span>${msg}`;c.appendChild(t);setTimeout(()=>t.remove(),3000)}
+
+function toggleSidebar(){const sb=document.querySelector('.sidebar');const mn=document.querySelector('.main');const ic=document.getElementById('sb-toggle-icon');sb.classList.toggle('collapsed');mn.classList.toggle('sb-collapsed');ic.textContent=sb.classList.contains('collapsed')?'chevron_right':'chevron_left'}
+go('list');
+</script>
+</body>
+</html>
