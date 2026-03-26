@@ -1,2 +1,3 @@
-# prototype
-Central repository for LumiTure’s iterative prototypes, documenting the full design evolution and ideation process for all upcoming features.
+# Lumiture Prototypes
+Design Ideation & Prototypes Archive
+This repository is the centralized hub for all feature ideation at LumiTure. It contains a collection of iterative prototypes documenting the design process from initial concepts to technical validation.
