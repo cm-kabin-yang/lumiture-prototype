@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — LumiTag</title>
+<title>Lumiture.ai — LumiTag v6</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
@@ -64,6 +64,10 @@ tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g20
 .footer{padding:16px 32px;background:var(--pri-lt10);display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--g500);margin-top:auto}.footer a{color:var(--pri);font-weight:500}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--g300);border-radius:3px}
 .res-cost-hero{padding:16px 0 20px;border-bottom:1px solid var(--g100);margin-bottom:16px}.res-cost-num{font-size:28px;font-weight:700;color:var(--g900);line-height:1.1}.res-cost-lbl{font-size:12px;color:var(--g500);margin-top:4px}.res-modal-ctrl{margin-bottom:12px}.res-ctrl-cloud-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}.res-csp-sel{padding:5px 10px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:13px;background:var(--wh);color:var(--g700);cursor:pointer;outline:none;font-family:inherit;height:32px;width:200px}.res-csp-sel:focus{border-color:var(--pri)}.res-level-grp{display:flex;border:1px solid var(--g200);border-radius:var(--r-sm);overflow:hidden;flex-shrink:0}.rlb{padding:6px 13px;font-size:13px;font-weight:500;color:var(--g600);cursor:pointer;border:none;border-right:1px solid var(--g200);background:var(--wh);font-family:inherit;transition:all .15s;white-space:nowrap;line-height:1.5}.rlb:last-child{border-right:none}.rlb:hover{background:var(--g50);color:var(--g800)}.rlb.active{background:var(--pri);color:var(--wh)}.res-modal-searchrow{display:flex;align-items:center;gap:10px;margin-bottom:12px}.res-modal-searchrow .ts{flex:1}.res-modal-searchrow .ts input{width:100%}.res-modal-count{font-size:12px;color:var(--g400);white-space:nowrap;padding-top:2px}
+#gl-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:12px;line-height:1.4;padding:6px 10px;border-radius:4px;white-space:nowrap;max-width:600px;white-space:normal;pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+@keyframes sk-shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+.skeleton{background:linear-gradient(90deg,var(--g100) 25%,var(--g200) 37%,var(--g100) 63%);background-size:1200px 100%;animation:sk-shimmer 1.4s ease infinite;border-radius:4px;display:inline-block}
+.sk-row td{padding:10px 16px;border-bottom:1px solid var(--g100)}
 .seg-tip{display:none;position:fixed;background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 12px rgba(0,0,0,.14);z-index:500;pointer-events:none;overflow:hidden;min-width:180px}.seg-tip-title{font-size:13px;font-weight:700;color:var(--g900);padding:10px 14px 8px;border-bottom:1px solid var(--g100)}.seg-tip-row{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:13px;color:var(--g700)}.seg-tip-amt{margin-left:auto;font-weight:700;color:var(--g900)}
 </style>
 </head>
@@ -447,8 +451,8 @@ function renderCreate(){const el=document.getElementById('v-create');
 el.innerHTML=`<div class="pg-hdr"><a class="back-btn" href="#" onclick="showLeaveConfirm('list');return false"><span class="material-symbols-outlined">arrow_back</span>LumiTag List</a><div class="pg-hdr-row"><div><div class="pg-title">Create LumiTag</div><div class="pg-desc">Define a tag key name and add values with conditions to auto-assign resources.</div></div></div></div>
 <div class="card" style="margin-bottom:16px">
 <div style="display:flex;align-items:center;margin-bottom:16px"><span style="font-size:16px;font-weight:700;color:var(--g900)">Tag Key</span></div>
-<div class="fi-wrap"><input class="fi" id="cr-name" maxlength="64" placeholder="e.g., Cost_Center, Environment, Team_Owner" oninput="validateName(this,'cr');filterSuggestions('cr')" onblur="setTimeout(()=>closeSuggestions('cr'),200)" onfocus="showSuggestions('cr')"><div class="sug-dd" id="cr-sug"></div></div>
-<div class="fh" id="cr-hint" style="margin-top:6px">Use letters, numbers, underscores, or hyphens. e.g., Cost_Center. Tag key name cannot be changed once applied.</div>
+<div class="fi-wrap"><input class="fi" id="cr-name" maxlength="128" placeholder="e.g., cost-center, environment, team-owner" oninput="validateName(this,'cr');filterSuggestions('cr')" onblur="setTimeout(()=>closeSuggestions('cr'),200)" onfocus="showSuggestions('cr')"><div class="sug-dd" id="cr-sug"></div></div>
+<div class="fh" id="cr-hint" style="margin-top:6px">Use lowercase letters, numbers, and hyphens. e.g., cost-center. Tag key name cannot be changed once applied.</div>
 </div>
 <div class="card" style="margin-bottom:24px">
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:16px;font-weight:700;color:var(--g900)">Tag Values</span><button id="cr-add-val-btn" class="btn btn-p" onclick="tryAddVC('cr-vals')"><span class="material-symbols-outlined">add</span>Add Value</button></div>
@@ -465,7 +469,7 @@ const nameLocked=t.wasActive||t.status==='active';
 const lockedHint=t.status==='active'?'The Key Name cannot be changed once established to ensure data consistency.':'This tag was previously applied to cost reports. The tag key name is permanently locked and cannot be changed.';
 const nameInput=nameLocked
 ?`<div style="display:flex;align-items:center;gap:8px"><input class="fi" id="ed-name" value="${t.name}" disabled style="background:var(--g100);color:var(--g500);cursor:not-allowed;flex:1"><span class="info-tip" style="margin-left:0"><span class="material-symbols-outlined" style="font-size:18px">lock</span><span class="tip-box">Tag key name cannot be changed once applied to cost reports.</span></span></div><div class="fh" id="ed-hint" style="margin-top:6px">${lockedHint}</div>`
-:`<div class="fi-wrap"><input class="fi" id="ed-name" maxlength="64" value="${t.name}" oninput="validateName(this,'ed','${t.id}');filterSuggestions('ed','${t.id}')" onblur="setTimeout(()=>closeSuggestions('ed'),200)" onfocus="showSuggestions('ed','${t.id}')"><div class="sug-dd" id="ed-sug"></div></div><div class="fh" id="ed-hint" style="margin-top:6px">Use letters, numbers, underscores, or hyphens. e.g., Cost_Center. Tag key name cannot be changed once applied.</div>`;
+:`<div class="fi-wrap"><input class="fi" id="ed-name" maxlength="128" value="${t.name}" oninput="validateName(this,'ed','${t.id}');filterSuggestions('ed','${t.id}')" onblur="setTimeout(()=>closeSuggestions('ed'),200)" onfocus="showSuggestions('ed','${t.id}')"><div class="sug-dd" id="ed-sug"></div></div><div class="fh" id="ed-hint" style="margin-top:6px">Use lowercase letters, numbers, and hyphens. e.g., cost-center. Tag key name cannot be changed once applied.</div>`;
 const activeTip='This tag is currently active. Saving as an inactive tag will remove it from cost reports until re-applied.';
 const inactiveTip=t.wasActive?'This tag was previously applied to cost reports. It is currently an inactive tag.':'This tag has not been applied to cost reports yet.';
 const statusBadge=t.status==='active'
@@ -496,16 +500,16 @@ const unallocHtml=parseFloat(up)<=0?`<div class="cpv-success"><span class="mater
 return`<div class="cpv-bar">${bar}</div><div class="cpv-leg">${leg}</div>${unallocHtml}`}
 
 /* ===== NAME VALIDATION ===== */
-function validateName(input,prefix,editId){const v=input.value;const hint=document.getElementById(prefix+'-hint');const valid=/^[A-Za-z0-9]([A-Za-z0-9_-]*[A-Za-z0-9])?$/.test(v);const exists=S.tags.some(t=>t.name.toLowerCase()===v.toLowerCase()&&t.id!==editId);
-if(!v){input.classList.remove('err');hint.className='fh';hint.style.color='';hint.textContent='Use letters, numbers, underscores, or hyphens. e.g., Cost_Center'}
-else if(v.length>=64){input.classList.add('err');hint.className='fh err';hint.style.color='';hint.textContent='Tag key cannot exceed 64 characters.'}
-else if(!valid){input.classList.add('err');hint.className='fh err';hint.style.color='';hint.textContent='Use letters, numbers, underscores, or hyphens. No leading/trailing special characters.'}
+function validateName(input,prefix,editId){const v=input.value;const hint=document.getElementById(prefix+'-hint');const valid=/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(v);const exists=S.tags.some(t=>t.name.toLowerCase()===v.toLowerCase()&&t.id!==editId);
+if(!v){input.classList.remove('err');hint.className='fh';hint.style.color='';hint.textContent='Use lowercase letters, numbers, and hyphens. e.g., cost-center'}
+else if(v.length>=128){input.classList.add('err');hint.className='fh err';hint.style.color='';hint.textContent='Tag key cannot exceed 128 characters.'}
+else if(!valid){input.classList.add('err');hint.className='fh err';hint.style.color='';hint.textContent='Please use lowercase letters, numbers, and hyphens only. No underscores or leading/trailing hyphens.'}
 else if(exists){input.classList.add('err');hint.className='fh err';hint.style.color='';hint.textContent=`"${v}" already exists. Please use a different name.`}
 else{input.classList.remove('err');hint.className='fh';hint.style.color='var(--ok)';hint.textContent='✓ Name is available'}}
 
 /* ===== TAG KEY NAME SUGGESTIONS ===== */
 const TAG_SUGGESTIONS=[
-{name:'Cost_Center'},{name:'Environment'},{name:'Team_Owner'},{name:'Business_Unit'},{name:'Application_Name'},{name:'Project'}
+{name:'cost-center'},{name:'business-unit'},{name:'environment'},{name:'service-name'},{name:'application-name'},{name:'owner'}
 ];
 function showSuggestions(prefix,editId){renderSuggestions(prefix,editId)}
 function closeSuggestions(prefix){const dd=document.getElementById(prefix+'-sug');if(dd)dd.classList.remove('open')}
@@ -548,7 +552,7 @@ const area=vcEl.querySelector('.csp-blocks-area');
 const cspCls={GCP:'csp-gcp',AWS:'csp-aws',Azure:'csp-azure',FOCUS:'csp-focus'}[csp]||'csp-gcp';
 const cspLabel={GCP:'Google Cloud',AWS:'Amazon Web Services',Azure:'Microsoft Azure',FOCUS:'FOCUS (Cross Cloud)'}[csp]||csp;
 const block=document.createElement('div');block.className='csp-block';block.dataset.csp=csp;
-block.innerHTML=`<div class="csp-block-hdr"><span class="csp-all-pre">All</span><span class="csp-badge ${cspCls}">${csp}</span><button class="csp-sw-btn" onclick="showCspSwitch(this)"><span class="csp-sw-name">${cspLabel}</span><span class="material-symbols-outlined" style="font-size:14px">expand_more</span></button><span class="csp-hdr-txt">resources matching ALL conditions below:</span><button class="csp-block-rm" onclick="removeCspBlock(this)" data-tip="Remove this Data Source"><span class="material-symbols-outlined" style="font-size:16px">close</span></button></div><div class="ca"></div>`;
+block.innerHTML=`<div class="csp-block-hdr"><span class="csp-all-pre">All</span><span class="csp-badge ${cspCls}">${csp}</span><span class="csp-sw-name" style="font-size:13px;font-weight:600;color:var(--g800)">${cspLabel}</span><span class="csp-hdr-txt">resources matching ALL conditions below:</span><button class="csp-block-rm" onclick="removeCspBlock(this)" data-tip="Remove this Data Source"><span class="material-symbols-outlined" style="font-size:16px">close</span></button></div><div class="ca"></div>`;
 area.appendChild(block);
 const ca=block.querySelector('.ca');
 if(conds&&conds.length>0)conds.forEach((c,i)=>addCR(ca,c.f,c.o,c.v,i>0?(c.c||'AND'):'',c.k||''));
@@ -637,10 +641,18 @@ const ph=selOp==='matches'?getMatchesPlaceholder():(isTag?'tag value, e.g. produ
 if(isTag){const noKey=!k;valEl=`<div class="tag-val-wrap"${noKey?' data-tip="You should select a Label/Tag Key first."':''}><input type="text" class="val-txt" placeholder="${ph}" value="${initVals[0]||''}" maxlength="512" oninput="updMatchesHint(this)"${noKey?' disabled':''}></div><div class="matches-hint"></div>`;}
 else{valEl=`<input type="text" class="val-txt" placeholder="${ph}" value="${initVals[0]||''}" maxlength="512" oninput="updMatchesHint(this)"><div class="matches-hint"></div>`;}
 }
-r.innerHTML=`${ch}${tvOfHtml}${fieldSelHtml}${tagKeyEl}${opDropdown}${valEl}<button class="crm" data-tip="Remove this condition" onclick="S._isDirty=true;const ca=this.closest('.ca');this.closest('.cr').remove();simMatch(this);updBacBtn(ca)">—</button>`;
+r.innerHTML=`${ch}${tvOfHtml}${fieldSelHtml}${tagKeyEl}${opDropdown}${valEl}<button class="crm" data-tip="Remove this Condition" onclick="S._isDirty=true;const ca=this.closest('.ca');this.closest('.cr').remove();simMatch(this);updBacBtn(ca);updCrmState(ca)">—</button>`;
 if(mode==='multi'){if(initVals.length)msRefreshTrigger(r.querySelector('.ms-trigger'),r.querySelector('.ms-panel'));msUpdAllState(r.querySelector('.ms-panel'));}
 else if(selOp==='matches'&&initVals[0])setTimeout(()=>updMatchesHint(r.querySelector('.val-txt')),0);
-ca.insertBefore(r,ab);updBacBtn(ca)}
+ca.insertBefore(r,ab);updBacBtn(ca);updCrmState(ca);}
+
+function updCrmState(ca){
+  if(!ca)return;
+  ca.querySelectorAll('.cr').forEach((cr,i)=>{
+    const btn=cr.querySelector('.crm');if(!btn)return;
+    btn.style.display=i===0?'none':'';
+  });
+}
 
 function toggleMs(trigger){const panel=trigger.nextElementSibling;const isOpen=panel.classList.contains('open');document.querySelectorAll('.ms-panel.open').forEach(p=>{p.classList.remove('open');p.previousElementSibling?.classList.remove('open')});if(!isOpen){panel.classList.add('open');trigger.classList.add('open');setTimeout(()=>panel.querySelector('.ms-search input')?.focus(),50)}}
 function filterMs(inp){const q=inp.value.toLowerCase();inp.closest('.ms-panel').querySelectorAll('.ms-item:not(:first-child)').forEach(item=>{const txt=(item.querySelector('span')?.textContent||item.textContent).toLowerCase();item.style.display=txt.includes(q)?'':'none'});msUpdAllState(inp.closest('.ms-panel'))}
@@ -685,7 +697,7 @@ if(newMode==='multi'&&!hasMsWrap){
   if(inp){inp.value='';inp.placeholder=op==='matches'?getMatchesPlaceholder():(isTag?'tag value, e.g. production':getFieldPlaceholder(f));updMatchesHint(inp);}
 }}
 function updVniLimit(inp){if(inp.value.length>=256){inp.style.borderColor='var(--err)';inp.setAttribute('data-tip','Value name cannot exceed 256 characters.');}else{inp.style.borderColor='';inp.removeAttribute('data-tip');}}
-function updMatchesHint(inp){const row=inp.closest('.cr');const op=row?.querySelector('.op-sel-vis')?.value;const hint=row?.querySelector('.matches-hint');if(!hint)return;if(inp.value.length>=512){hint.textContent='Condition value cannot exceed 512 characters.';hint.style.color='var(--err)';hint.style.display='';return;}if(op!=='matches'){hint.style.display='none';return}const val=inp.value.trim();if(!val){hint.style.display='none';return}try{new RegExp(val);hint.style.display='none'}catch(e){hint.textContent='⚠ Invalid regex — '+(e.message.split(':').pop()?.trim()||e.message);hint.style.color='';hint.style.display=''}}
+function updMatchesHint(inp){const row=inp.closest('.cr');const op=row?.querySelector('.op-sel-vis')?.value;const hint=row?.querySelector('.matches-hint');if(!hint)return;if(inp.value.length>=512){hint.textContent='Condition value cannot exceed 512 characters.';hint.style.color='var(--err)';hint.style.display='';return;}if(op!=='matches'){hint.style.display='none';return}const val=inp.value.trim();if(!val){hint.style.display='none';return}try{new RegExp(val);hint.style.display='none'}catch(e){hint.textContent='Invalid regex: '+(e.message.split(':').pop()?.trim()||e.message);hint.style.color='';hint.style.display=''}}
 function updMsField(fieldSel){
 const row=fieldSel.closest('.cr');const f=fieldSel.value;
 const csp=row.closest('.csp-block')?.dataset.csp||'GCP';
@@ -902,14 +914,14 @@ function saveDraft(id){if(S._tmp){const origTag=S.tags.find(x=>x.id===id);const 
 
 function showSaveDraftModal(id,wasActive){
 const noteHtml=`<div class="notice n-info" style="margin-bottom:0"><span class="material-symbols-outlined">info</span><div><strong>Please Note:</strong><ul style="margin:6px 0 0 0;padding-left:18px;line-height:1.8"><li>This tag will be hidden from reports while inactive.</li><li>The Tag Key Name is locked and cannot be modified to ensure the stability of existing references.</li></ul></div></div>`;
-showModal(`<div class="mh"><span class="mt">Save as Inactive Tag</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><p style="margin-bottom:16px;color:var(--g500)">Save <strong style="color:var(--g700)">${S._tmp?.name||''}</strong> as an inactive tag?</p>${noteHtml}<div class="mf"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="closeModal();saveDraft('${id}')">Confirm</button></div>`)}
+showModal(`<div class="mh"><span class="mt">Save as Inactive Tag</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><p style="margin-bottom:16px;color:var(--g500)">Save <strong style="color:var(--g700)">${S._tmp?.name||''}</strong> as an inactive tag?</p>${noteHtml}<div class="mf"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="closeModal();saveDraft('${id}')">Save as Inactive Tag</button></div>`)}
 
 function showApplyModal(id,ar,ur,arP,urP){const t=S._tmp||S.tags.find(x=>x.id===id);if(!t)return;
 const ac=aCost(t);const uc=t.totalCost-ac;
 const thumbIc=`<span class="material-symbols-outlined" style="font-size:22px;color:var(--ok);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24">thumb_up</span>`;
-const urVal=ur>0?`<div style="font-weight:700;font-size:22px;color:var(--err)">${ur}</div>`:`<div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:22px;color:var(--ok)">${thumbIc}${ur}</div>`;
+const crVal=arP==='100.00'?`<div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:22px;color:var(--ok)">${thumbIc}${arP}%</div>`:`<div style="font-weight:700;font-size:22px;color:var(--g900)">${arP}%</div>`;
 const ucVal=uc<=0?`<div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:22px;color:var(--ok)">${thumbIc}${fmtK(uc)}</div>`:`<div style="font-weight:700;font-size:22px;color:var(--err)">${fmtK(uc)}</div>`;
-showModal(`<div class="mh"><div style="display:flex;align-items:center;gap:10px"><span class="material-symbols-outlined" style="font-size:22px;color:var(--warn);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20">warning</span><span class="mt">Apply LumiTag</span></div><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><p style="margin-bottom:16px;color:var(--g700);line-height:1.8">LumiTag <strong>${t.name}</strong> will be integrated as a primary dimension in all reports and dashboards. Please confirm the summary below:</p><p style="margin-bottom:20px;color:var(--g700)">Applying this tag will cover <strong style="color:var(--pri)">${fmtK(ac)} (${arP}%)</strong> of your total spend.</p><div style="background:var(--pri-lt10);border:1px solid var(--pri-lt20);border-radius:var(--r-md);padding:20px 24px;margin-bottom:24px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px"><div><div style="font-size:13px;color:var(--g500);margin-bottom:8px">Tag Values</div><div style="font-weight:700;font-size:22px;color:var(--g900)">${t.values.length}</div></div><div><div style="font-size:13px;color:var(--g500);margin-bottom:8px">Resources tagged</div><div style="font-weight:700;font-size:22px;color:var(--g900)">${ar}</div></div><div><div style="font-size:13px;color:var(--g500);margin-bottom:8px">Untagged Resources</div>${urVal}</div><div><div style="font-size:13px;color:var(--g500);margin-bottom:8px">Unallocated Spend</div>${ucVal}</div></div><div class="mf"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="confirmApply('${id}')">Apply LumiTag</button></div>`)}
+showModal(`<div class="mh"><div style="display:flex;align-items:center;gap:10px"><span class="material-symbols-outlined" style="font-size:22px;color:var(--warn);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20">warning</span><span class="mt">Apply LumiTag</span></div><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><p style="margin-bottom:16px;color:var(--g700);line-height:1.8">LumiTag <strong>${t.name}</strong> will be integrated as a primary dimension in all reports and dashboards. Please confirm the summary below:</p><p style="margin-bottom:20px;color:var(--g700)">Applying this tag will cover <strong style="color:var(--pri)">${fmtK(ac)}</strong> of your total spend.</p><div style="background:var(--pri-lt10);border:1px solid var(--pri-lt20);border-radius:var(--r-md);padding:20px 24px;margin-bottom:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px"><div><div style="font-size:13px;color:var(--g500);margin-bottom:8px">Tag Values</div><div style="font-weight:700;font-size:22px;color:var(--g900)">${t.values.length}</div></div><div><div style="font-size:13px;color:var(--g500);margin-bottom:8px">Coverage Rate</div>${crVal}</div><div><div style="font-size:13px;color:var(--g500);margin-bottom:8px">Untagged Spend</div>${ucVal}</div></div><div class="mf"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="confirmApply('${id}')">Apply LumiTag</button></div>`)}
 
 function confirmApply(id){if(S._tmp){if(S._isNew)S.tags.push({...S._tmp,status:'active',wasActive:true});else{const i=S.tags.findIndex(x=>x.id===id);if(i>=0)S.tags[i]={...S._tmp,status:'active',wasActive:true}}S._tmp=null;S._isNew=false}closeModal();go('list');toast('Tag applied successfully.')}
 
@@ -928,8 +940,11 @@ const _cspBadge=p=>p?`<span class="csp-badge ${_cspCls[p]||''}" style="font-size
 
 function _aggResLevel(resources,level){
   const valid=resources.filter(r=>r.p);
+  const outside=resources.filter(r=>!r.p);
   if(level==='resource'){
-    return valid.map(r=>({name:r.resource||'Unknown',resourceType:r.resourceType||'—',service:r.service||'—',cloud:r.p,cost:r.c,count:1}));
+    const rows=valid.map(r=>({name:r.resource||'--',resourceType:r.resourceType||'—',service:r.service||'—',cloud:r.p,cost:r.c,count:1}));
+    if(outside.length>0){const oc=outside.reduce((s,r)=>s+r.c,0);rows.push({name:'Billing records outside displayed dimensions',resourceType:null,service:null,cloud:null,cost:oc,count:outside.length,isOutside:true});}
+    return rows;
   }
   const map=new Map();
   valid.forEach(r=>{
@@ -943,6 +958,20 @@ function _aggResLevel(resources,level){
   return Array.from(map.values());
 }
 
+function _renderSkeleton(level){
+  const sk=(w,h=13)=>`<span class="skeleton" style="width:${w}px;height:${h}px"></span>`;
+  const isRes=level==='resource';
+  // Vary widths per row for natural look
+  const widths=isRes
+    ?[[150,90,80,110,38],[200,110,100,130,42],[120,70,90,90,35],[180,100,85,115,40],[160,80,95,105,37],[140,95,88,98,41]]
+    :[[220,140,130,42],[280,120,110,38],[190,150,125,44],[250,130,118,40],[210,145,132,36],[170,155,128,43]];
+  const rows=widths.map(w=>isRes
+    ?`<tr class="sk-row"><td>${sk(w[0])}<br><span class="skeleton" style="width:${w[1]}px;height:10px;margin-top:4px"></span></td><td>${sk(w[2])}</td><td>${sk(w[3])}</td><td style="text-align:right">${sk(120)}</td><td style="text-align:right">${sk(w[4])}</td></tr>`
+    :`<tr class="sk-row"><td>${sk(w[0])}<br><span class="skeleton" style="width:${w[1]}px;height:10px;margin-top:4px"></span></td><td style="text-align:right">${sk(w[2])}</td><td style="text-align:right">${sk(w[3])}</td></tr>`
+  ).join('');
+  return`<div style="text-align:right;font-size:12px;color:var(--g200);margin-bottom:6px">${sk(180,12)}</div><div class="tw" id="res-modal-tbl-wrap" style="max-height:420px;overflow:hidden;box-shadow:none"><table style="width:100%;table-layout:auto"><tbody>${rows}</tbody></table></div>`;
+}
+
 function _renderResLevelTable(rows,level,isUntagged){
   const sl=_subLabel[_RMS.cloud]||'Sub Account';
   const billL=_billLabel[_RMS.cloud]||'Billing Account';
@@ -954,9 +983,11 @@ function _renderResLevelTable(rows,level,isUntagged){
   const costLabel=isUntagged?'30-Day Untagged Spend':'30-Day Matched Spend';
   const pctLabel=isUntagged?'Untagged Rate':'Coverage';
   // first-col cell: badge + 2-line (name on top, id below)
-  const nameCell=(name,id,cloud,title)=>`<td style="width:100%;overflow:hidden;padding:10px 12px" title="${title||name}"><div style="display:flex;align-items:center;gap:6px;overflow:hidden">${_cspBadge(cloud)}<div style="display:flex;flex-direction:column;overflow:hidden;min-width:0"><span style="font-size:13px;color:var(--g800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</span>${id?`<span style="font-size:11px;color:var(--g400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">${id}</span>`:''}</div></div></td>`;
-  // Resource cell (single line: badge + name)
-  const resCell=r=>`<td style="width:100%;overflow:hidden;padding:10px 12px" title="${r.name}"><div style="display:flex;align-items:center;gap:6px;overflow:hidden">${_cspBadge(r.cloud)}<span style="font-size:13px;font-weight:500;color:var(--g800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</span></div></td>`;
+  const nameCell=(name,id,cloud,title)=>`<td style="width:100%;overflow:hidden;padding:10px 12px" title="${title||name}"><div style="display:flex;flex-direction:column;overflow:hidden;min-width:0"><span style="font-size:13px;color:var(--g800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</span>${id?`<span style="font-size:11px;color:var(--g400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">${id}</span>`:''}</div></td>`;
+  // Resource cell — normal or "outside dimensions" special row
+  const resCell=r=>r.isOutside
+    ?`<td style="width:100%;overflow:hidden;padding:10px 12px"><span style="font-size:12px;color:var(--g400);font-style:italic">${r.name}</span></td>`
+    :`<td style="width:100%;overflow:hidden;padding:10px 12px" title="${r.name}"><span style="font-size:13px;font-weight:500;color:${r.name==='--'?'var(--g400)':'var(--g800)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${r.name}</span></td>`;
   // Plain text cell with truncation
   const textCell=v=>`<td style="font-size:13px;color:var(--g700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:10px 12px" title="${v}">${v}</td>`;
   // Cost duo: [matched "A / B" inline, "/ B" in gray small, no duplicate currency] | [coverage % only]
@@ -981,7 +1012,8 @@ function _renderResLevelTable(rows,level,isUntagged){
     return`<table style="width:100%;table-layout:auto" id="res-modal-tbl"><thead><tr><th style="${ts}">Service</th>${costHdrs}</tr></thead><tbody>${rows.map(r=>`<tr>${nameCell(r.name,'',r.cloud)}${costCells(r)}</tr>`).join('')}</tbody></table>`;
   }
   // Resource level — 5 cols: Resource | Resource Type | Service | Spend | Coverage
-  return`<table style="width:100%;table-layout:auto" id="res-modal-tbl"><thead><tr><th style="${ts}">Resource</th><th style="${ts};white-space:nowrap">Resource Type</th><th style="${ts};white-space:nowrap">Service</th>${costHdrs}</tr></thead><tbody>${rows.map(r=>`<tr>${resCell(r)}${textCell(r.resourceType)}${textCell(r.service)}${costCells(r)}</tr>`).join('')}</tbody></table>`;
+  const emptyCell=`<td style="padding:10px 12px"></td>`;
+  return`<table style="width:100%;table-layout:auto" id="res-modal-tbl"><thead><tr><th style="${ts}">Resource</th><th style="${ts};white-space:nowrap">Resource Type</th><th style="${ts};white-space:nowrap">Service</th>${costHdrs}</tr></thead><tbody>${rows.map(r=>`<tr>${resCell(r)}${r.isOutside?emptyCell+emptyCell:textCell(r.resourceType)+textCell(r.service)}${costCells(r)}</tr>`).join('')}</tbody></table>`;
 }
 
 function _renderResModalBody(){
@@ -1026,8 +1058,18 @@ function _renderResModalBody(){
   <div class="tw" id="res-modal-tbl-wrap" style="max-height:420px;overflow-y:auto;box-shadow:none">${tbl}</div>`;
 }
 
-function _setResCloud(c){_RMS.cloud=c;_RMS.search='';document.getElementById('res-modal-inner').innerHTML=_renderResModalBody();}
-function _setResLevel(l){_RMS.level=l;_RMS.search='';_RMS.sortCol='cost';_RMS.sortAsc=false;document.getElementById('res-modal-inner').innerHTML=_renderResModalBody();}
+function _showResLoading(delay=400){
+  const el=document.getElementById('res-modal-inner');
+  if(!el)return;
+  // Swap only the table area with skeleton, keep toolbar
+  const wrap=el.querySelector('#res-modal-tbl-wrap');
+  const count=el.querySelector('[style*="items"]');
+  if(wrap)wrap.innerHTML=`<table style="width:100%;table-layout:auto"><tbody>${Array(6).fill(`<tr class="sk-row"><td>${'<span class="skeleton" style="display:inline-block;height:13px;border-radius:4px;width:180px"></span>'}</td><td style="text-align:right"><span class="skeleton" style="display:inline-block;height:13px;border-radius:4px;width:120px"></span></td><td style="text-align:right"><span class="skeleton" style="display:inline-block;height:13px;border-radius:4px;width:36px"></span></td></tr>`).join('')}</tbody></table>`;
+  if(count)count.innerHTML='<span class="skeleton" style="display:inline-block;height:12px;border-radius:4px;width:180px"></span>';
+  return new Promise(r=>setTimeout(r,delay));
+}
+function _setResCloud(c){_RMS.cloud=c;_RMS.search='';_showResLoading(400).then(()=>{const el=document.getElementById('res-modal-inner');if(el)el.innerHTML=_renderResModalBody();});}
+function _setResLevel(l){_RMS.level=l;_RMS.search='';_RMS.sortCol='cost';_RMS.sortAsc=false;_showResLoading(350).then(()=>{const el=document.getElementById('res-modal-inner');if(el)el.innerHTML=_renderResModalBody();});}
 function _filterResModal(v){_RMS.search=v;document.getElementById('res-modal-inner').innerHTML=_renderResModalBody();}
 function sortResModal(col){if(_RMS.sortCol===col){_RMS.sortAsc=!_RMS.sortAsc;}else{_RMS.sortCol=col;_RMS.sortAsc=col==='name';}document.getElementById('res-modal-inner').innerHTML=_renderResModalBody();}
 
@@ -1035,7 +1077,9 @@ function _openResModal(type,valueName,count,totalCost){
   Object.assign(_RMS,{type,valueName,resources:mockResources(count,type==='matched'?'matched':'unalloc'),totalCost:totalCost||0,level:'billing',cloud:'GCP',search:'',sortCol:'cost',sortAsc:false});
   const isUntagged=type==='untagged';
   const title=isUntagged?'Untagged Resources':`Resources Matched To: ${valueName}`;
-  showModal(`<div class="mh"><span class="mt">${title}</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><div id="res-modal-inner">${_renderResModalBody()}</div><p style="margin-top:12px;font-size:12px;color:var(--g400);font-style:italic">*Note: Costs are estimated based on synchronized data and may differ from final billing.</p><div class="mf"><button class="btn btn-p" onclick="closeModal()">Got it</button></div>`,1);
+  // Show modal with skeleton first, then render real data after 800ms
+  showModal(`<div class="mh"><span class="mt">${title}</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><div id="res-modal-inner">${_renderSkeleton('billing')}</div><p style="margin-top:12px;font-size:12px;color:var(--g400);font-style:italic">*Note: Costs are estimated based on synchronized data and may differ from final billing.</p><div class="mf"><button class="btn btn-p" onclick="closeModal()">Got it</button></div>`,1);
+  setTimeout(()=>{const el=document.getElementById('res-modal-inner');if(el)el.innerHTML=_renderResModalBody();},800);
 }
 
 function showMatchedModal(valueName,count,totalCost){_openResModal('matched',valueName,count,totalCost);}
@@ -1068,6 +1112,29 @@ if(!e.target.closest('.ms-wrap')){document.querySelectorAll('.ms-panel.open').fo
 if(!e.target.closest('.add-csp-wrap')){closePickers()}
 });
 go('list');
+
+// ===== GLOBAL TOOLTIP =====
+(function(){
+  const tip=document.createElement('div');tip.id='gl-tip';document.body.appendChild(tip);
+  let cur=null;
+  document.addEventListener('mouseover',e=>{
+    const el=e.target.closest('[data-tip]');
+    if(!el||el===cur)return;
+    cur=el;tip.textContent=el.dataset.tip;tip.style.display='block';
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!cur)return;
+    const tw=tip.offsetWidth,th=tip.offsetHeight;
+    let x=e.clientX-tw/2,y=e.clientY-th-10;
+    if(x<8)x=8;if(x+tw>window.innerWidth-8)x=window.innerWidth-tw-8;
+    if(y<8)y=e.clientY+16;
+    tip.style.left=x+'px';tip.style.top=y+'px';
+  });
+  document.addEventListener('mouseout',e=>{
+    const el=e.target.closest('[data-tip]');
+    if(el&&el===cur){cur=null;tip.style.display='none';}
+  });
+})();
 </script>
 </body>
 </html>
