@@ -3,31 +3,353 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — LumiTag v6</title>
+<title>Lumiture.ai — LumiTag v8 (Tokens Migration)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 <style>
-:root{--pri:#004FB0;--pri-dk:#002663;--pri-lt:#0B6DD7;--pri-lt30:#9ED7FF;--pri-lt20:#D1EEFF;--pri-lt10:#F2FAFF;--sec:#34B5D9;--sec-dk:#228EB3;--sec-lt:#4ADFFF;--sec-lt10:#F0FFFF;--sb:#0D1B3E;--sb-hov:#162B5E;--wh:#FFF;--g50:#F6F6F6;--g100:#F2F2F2;--g200:#E6E6E6;--g300:#CCCCCC;--g400:#B3B3B3;--g500:#676767;--g600:#676767;--g700:#262626;--g800:#262626;--g900:#262626;--ok:#00B5A6;--ok-lt:#E6FFF8;--ok-dk:#008F88;--warn:#FC9A0F;--warn-lt:#FEF3E1;--err:#FF403D;--err-lt:#FFEBEF;--info:#0B6DD7;--info-lt:#E6F6FF;--r-sm:4px;--r-md:8px;--r-lg:12px;--shd:0 1px 2px rgba(0,0,0,.05);--shd2:0 4px 6px -1px rgba(0,0,0,.1);--shd3:0 10px 15px -3px rgba(0,0,0,.1);--sw:240px}
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Noto Sans',sans-serif;font-size:14px;line-height:1.75;color:var(--g800);background:var(--g50);letter-spacing:0}a{color:var(--pri);text-decoration:none}button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:14px}input,select,textarea{font-family:inherit;font-size:14px}.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;vertical-align:middle}
-.app{display:flex;min-height:100vh}.sidebar{width:var(--sw);background:var(--sb);color:var(--wh);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:100;display:flex;flex-direction:column;transition:width .2s ease}.sidebar.collapsed{width:64px;overflow:visible}.sb-logo{padding:16px 20px;display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap;overflow:hidden}.sb-logo-wrap{position:relative;width:32px;height:32px;flex-shrink:0}.sb-logo-wrap svg{width:32px;height:32px}.sb-proto{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);background:var(--sb);color:var(--sec);font-size:6px;font-weight:700;padding:1px 3px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px;line-height:1.2;white-space:nowrap}.sb-logo-text{transition:opacity .2s}.sidebar.collapsed .sb-logo-text{opacity:0;width:0;overflow:hidden}.sidebar.collapsed .sb-proto{display:none}.sidebar.collapsed .sb-logo{padding:16px;justify-content:center;gap:0}.sb-nav{flex:1;padding:8px 0}.ni{display:flex;align-items:center;gap:12px;padding:10px 20px;color:rgba(255,255,255,.7);font-size:14px;cursor:pointer;transition:all .15s;white-space:nowrap;overflow:hidden}.ni:hover{background:var(--sb-hov);color:var(--wh)}.ni.act{background:var(--pri);color:var(--wh);font-weight:500;border-radius:0 8px 8px 0;margin-right:8px}.sidebar.collapsed .ni{padding:10px 0;justify-content:center;margin-right:0;border-radius:0}.sidebar.collapsed .ni.act{border-radius:0;margin-right:0}.sidebar.collapsed .ni span:not(.material-symbols-outlined){display:none}.sidebar.collapsed .ni-badge{display:none}.ns{padding:16px 20px 8px;font-size:12px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;overflow:hidden}.sidebar.collapsed .ns{font-size:0;padding:8px 0;border-top:1px solid rgba(255,255,255,.1);margin:0 12px}.ni .material-symbols-outlined{font-size:20px;flex-shrink:0}.ni-badge{background:var(--sec);color:var(--wh);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:auto}.sb-collapse{padding:12px;display:flex;justify-content:flex-end;border-top:1px solid rgba(255,255,255,.1)}.sb-collapse button{color:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--r-sm);transition:all .15s}.sb-collapse button:hover{background:var(--sb-hov);color:var(--wh)}.sidebar.collapsed .sb-collapse{justify-content:center}
-.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;transition:margin-left .2s ease}.main.sb-collapsed{margin-left:64px}.topbar{background:var(--sb);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}.tb-r{display:flex;align-items:center;gap:16px}.tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.7)}.tb-ic:hover{background:rgba(255,255,255,.1);color:var(--wh)}.content{padding:24px 32px 32px;flex:1;background:var(--pri-lt10)}.view{display:none}.view.active{display:block}
+/* === Inlined: shared/tokens.css === */
+/* ============================================================
+ * Lumiture Design Tokens
+ * ============================================================
+ * 來源：Figma CMDS + prototype scan + 8 項設計決策 (2026-05-12)
+ * 命名規範：W3C Design Tokens spec（長名結構化 BEM）
+ * 三層架構：Primitive → Semantic → Component
+ * 完整決策紀錄：~/.claude/.../project_design_tokens_decisions.md
+ * ============================================================ */
+
+:root {
+
+  /* ============================================================
+   * LAYER 1 — PRIMITIVE
+   * 原子層：純色號 / 純數值；不直接給 component 用
+   * ============================================================ */
+
+  /* --- Color: Brand Sky Blue (對齊 Figma Theme: LumiTure.ai/Primary) --- */
+  --lt-blue-10: #F2FAFF;   /* Figma: Primary/Light 10 */
+  --lt-blue-20: #D1EEFF;   /* Figma: Primary/Light 20 */
+  --lt-blue-30: #9ED7FF;   /* Figma: Primary/Light 30 */
+  --lt-blue-60: #0B6DD7;   /* Figma: Primary/Light */
+  --lt-blue-70: #004FB0;   /* Figma: Primary/Main */
+  --lt-blue-90: #002663;   /* Figma: Primary/Dark */
+
+  /* --- Color: Brand Turquoise (對齊 Figma Theme: LumiTure.ai/Secondary) --- */
+  --lt-turquoise-10: #F0FFFF;   /* Figma: Turquoise 10 */
+  --lt-turquoise-20: #DBFDFF;   /* Figma: Turquoise 20 */
+  --lt-turquoise-30: #B0F8FF;   /* Figma: Turquoise 30 */
+  --lt-turquoise-60: #4ADFFF;   /* Figma: Turquoise 60 (Chart) */
+  --lt-turquoise-70: #34B5D9;   /* Figma: Secondary/Main */
+  --lt-turquoise-80: #228EB3;   /* Figma: Secondary/Dark */
+
+  /* --- Color: Grey (9 階；同值不同 token = 為未來情境換色保留彈性) --- */
+  --lt-grey-50:  #F6F6F6;
+  --lt-grey-100: #F2F2F2;
+  --lt-grey-200: #E6E6E6;
+  --lt-grey-300: #CCCCCC;
+  --lt-grey-400: #B3B3B3;
+  --lt-grey-500: #676767;
+  --lt-grey-600: #676767;   /* 暫同 500；保留為 icon-default 等情境獨立換色用 */
+  --lt-grey-700: #262626;
+  --lt-grey-800: #262626;   /* 暫同 700；保留為 heading 等情境獨立換色用 */
+  --lt-grey-900: #262626;   /* 暫同 700；保留為 highest contrast 情境用 */
+
+  /* --- Color: Black / White --- */
+  --lt-black: #000000;
+  --lt-white: #FFFFFF;
+
+  /* --- Color: Chart Palette (對齊 Figma General Behavior 規範)
+   * 來源：Figma file 🧞‍♂️-General-Behavior, node 1642-36013
+   * 使用規則：圖表配色一律按 1→10 順序套用；超過 10 個則循環使用
+   * 命名按官方 "#N Main" 編號 + 視覺色名註解
+   */
+  --lt-chart-1:  #7A8BA9;   /* Navy Blue 50 */
+  --lt-chart-2:  #86CBFC;   /* Sky Blue 30 */
+  --lt-chart-3:  #9CF3FF;   /* Turquoise Blue 30 */
+  --lt-chart-4:  #00DCC2;   /* Green 60 */
+  --lt-chart-5:  #94F29D;   /* Emerald Green 40 */
+  --lt-chart-6:  #F3BE68;   /* Tangerine Orange 40 */
+  --lt-chart-7:  #F4B581;   /* Lantern Orange 40 */
+  --lt-chart-8:  #FFA4A9;   /* Red 30 */
+  --lt-chart-9:  #FE89C1;   /* Fuchsia 40 */
+  --lt-chart-10: #C096FF;   /* Purple 40 */
+
+  /* --- Color: Functional (TBC — Figma 未做 Variable，待下輪 audit) --- */
+  --lt-color-success-base:  #00B5A6;   /* TBC: Figma audit needed */
+  --lt-color-success-dark:  #008F88;   /* TBC: Figma audit needed */
+  --lt-color-success-light: #E6FFF8;   /* TBC: Figma audit needed */
+  --lt-color-error-base:    #FF403D;   /* TBC: Figma audit needed */
+  --lt-color-error-light:   #FFEBEF;   /* TBC: Figma audit needed */
+  --lt-color-warning-base:  #FC9A0F;   /* TBC: Figma audit needed */
+  --lt-color-warning-light: #FEF3E1;   /* TBC: Figma audit needed */
+  --lt-color-info-base:     #0B6DD7;   /* = blue-60，符合 Figma info usage */
+  --lt-color-info-light:    #E6F6FF;   /* TBC: Figma audit needed */
+
+  /* --- Spacing: 嚴格 8px grid，4px 為微間距例外 --- */
+  --lt-space-0:    0;
+  --lt-space-4:    4px;     /* 例外：僅限 icon-text gap、border-thin 等微間距 */
+  --lt-space-8:    8px;
+  --lt-space-16:   16px;
+  --lt-space-24:   24px;
+  --lt-space-32:   32px;
+  --lt-space-48:   48px;
+  --lt-space-64:   64px;
+  --lt-space-96:   96px;
+  --lt-space-128:  128px;
+
+  /* --- Radius --- */
+  --lt-radius-none:   0;
+  --lt-radius-xs:     3px;      /* chips / badges / 薄狀指示器 (源自 lumi-tag v7 5 處用法) */
+  --lt-radius-sm:     4px;
+  --lt-radius-md:     8px;
+  --lt-radius-lg:     12px;
+  --lt-radius-xl:     16px;
+  --lt-radius-pill:   9999px;   /* pill button / chip — 矩形元素的最大圓角 */
+  --lt-radius-circle: 50%;      /* 圓形 icon / avatar / toggle dot — 形狀無關 */
+
+  /* --- Typography: Font Family --- */
+  --lt-font-sans: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'PingFang TC', sans-serif;
+  --lt-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* --- Typography: Font Size (對齊 Figma 8 階；13px 為例外備用) --- */
+  --lt-fs-12: 12px;   /* Figma: Caption */
+  --lt-fs-13: 13px;   /* 例外：半 body 半 caption 過渡用；不在 Figma 主規範 */
+  --lt-fs-14: 14px;   /* Figma: Body / Button Regular 1 / Link */
+  --lt-fs-16: 16px;   /* Figma: H6 / Button 2 */
+  --lt-fs-18: 18px;   /* Figma: H5 / Subtitle */
+  --lt-fs-20: 20px;   /* Figma: H4 */
+  --lt-fs-24: 24px;   /* Figma: H3 */
+  --lt-fs-36: 36px;   /* Figma: H2 */
+  --lt-fs-48: 48px;   /* Figma: H1 */
+
+  /* --- Typography: Font Weight --- */
+  --lt-fw-regular:  400;
+  --lt-fw-medium:   500;
+  --lt-fw-semibold: 600;   /* Figma: Button Medium 2 */
+  --lt-fw-bold:     700;
+
+  /* --- Typography: Line Height (對齊 Figma; Body 系列 1.75) --- */
+  --lt-leading-heading: 1.25;   /* Figma: H1 */
+  --lt-leading-tight:   1.5;    /* Figma: H2-H6 / Caption / Button / Link */
+  --lt-leading-body:    1.75;   /* Figma: Body Regular/Medium/Bold */
+
+  /* --- Typography: Letter Spacing (對齊 Figma: 全部 0) --- */
+  --lt-tracking-normal: 0;
+
+  /* --- Shadow: 對齊 CMDS Figma 規範 (2026-05-12 audit)
+   * 來源：Figma node 20599-107518 — CMDS 4 個官方 shadow variables
+   * 命名按「用途」而非「強度」(Cell / Button / Chip / Dialog)，跟 Material/Tailwind 不同
+   * Overlay 系列為 Lumiture 補充規範（CMDS 未涵蓋的較強 floating overlay 場景）
+   */
+  --lt-shadow-cell:   0 2px 0 0 rgba(0, 0, 0, 0.2);              /* 銳邊，blur=0；table row 分隔線替代 */
+  --lt-shadow-button: 0 2px 14px 0 rgba(137, 174, 255, 0.2);     /* 藍色 tinted，#89AEFF；clickable elevation */
+  --lt-shadow-chip:   0 2px 4px 0 rgba(0, 0, 0, 0.3);            /* chip / tag 用，較深 opacity */
+  --lt-shadow-dialog: 0 0 6px 0 rgba(0, 0, 0, 0.2);              /* Card / Dialog / Dropdown 共用；無 offset */
+  --lt-shadow-overlay:        0 4px 12px rgba(0, 0, 0, 0.14);    /* CMDS 未涵蓋；popover / floating menu */
+  --lt-shadow-overlay-strong: 0 4px 16px rgba(0, 0, 0, 0.18);    /* CMDS 未涵蓋；drawer / 較重 overlay */
+
+  /* --- Transition --- */
+  --lt-transition-fast: .15s ease;
+  --lt-transition-base: .2s ease;
+  --lt-transition-slow: .3s ease;
+
+  /* --- Z-index --- */
+  --lt-z-base:     0;
+  --lt-z-elevated: 10;
+  --lt-z-sticky:   100;
+  --lt-z-dropdown: 1000;
+  --lt-z-modal:    2000;
+  --lt-z-tooltip:  3000;
+  --lt-z-toast:    4000;
+
+
+  /* ============================================================
+   * LAYER 2 — SEMANTIC
+   * 語意層：引用 primitive，描述用途；component 預設用此層
+   * ============================================================ */
+
+  /* --- Color: Brand --- */
+  --lt-color-primary:         var(--lt-blue-70);
+  --lt-color-primary-hover:   var(--lt-blue-60);
+  --lt-color-primary-active:  var(--lt-blue-90);
+  --lt-color-primary-bg:      var(--lt-blue-10);
+  --lt-color-primary-bg-emphasized: var(--lt-blue-20);
+
+  --lt-color-secondary:       var(--lt-turquoise-70);
+  --lt-color-secondary-hover: var(--lt-turquoise-60);
+  --lt-color-secondary-bg:    var(--lt-turquoise-10);
+
+  /* --- Color: Functional (alias) --- */
+  --lt-color-success: var(--lt-color-success-base);
+  --lt-color-error:   var(--lt-color-error-base);
+  --lt-color-warning: var(--lt-color-warning-base);
+  --lt-color-info:    var(--lt-color-info-base);
+
+  /* --- Color: Text --- */
+  --lt-color-text-primary:   var(--lt-grey-700);   /* 內文預設 */
+  --lt-color-text-secondary: var(--lt-grey-500);   /* 次要文字 */
+  --lt-color-text-tertiary:  var(--lt-grey-400);   /* hint / placeholder */
+  --lt-color-text-disabled:  var(--lt-grey-400);
+  --lt-color-text-inverse:   var(--lt-white);
+  --lt-color-text-link:      var(--lt-blue-60);
+  --lt-color-text-heading:   var(--lt-grey-800);   /* 為未來 heading 獨立換色預留 */
+  --lt-color-text-icon:      var(--lt-grey-600);   /* 為未來 icon 獨立換色預留 */
+
+  /* --- Color: Background --- */
+  --lt-color-bg-default:    var(--lt-white);
+  --lt-color-bg-subtle:     var(--lt-grey-50);
+  --lt-color-bg-emphasized: var(--lt-grey-100);
+  --lt-color-bg-disabled:   var(--lt-grey-100);
+  --lt-color-bg-inverse:    var(--lt-blue-90);
+  --lt-color-bg-overlay:    rgba(0, 0, 0, 0.5);
+
+  /* --- Color: Border --- */
+  --lt-color-border-default: var(--lt-grey-200);
+  --lt-color-border-strong:  var(--lt-grey-300);
+  --lt-color-border-focus:   var(--lt-color-primary);
+  --lt-color-border-input:   #DCE3EC;   /* prototype --tf-border；略不同於 grey-200 */
+  --lt-color-border-error:   var(--lt-color-error-base);
+
+
+  /* ============================================================
+   * LAYER 3 — COMPONENT
+   * 元件層：給特定元件使用；引用 semantic
+   * ============================================================ */
+
+  /* --- Sidebar (深海軍藍) --- */
+  --lt-sidebar-width:      264px;
+  --lt-sidebar-bg:         var(--lt-blue-90);
+  --lt-sidebar-text:       rgba(255, 255, 255, 0.85);
+  --lt-sidebar-text-muted: rgba(255, 255, 255, 0.50);
+  --lt-sidebar-hover-bg:   rgba(255, 255, 255, 0.06);
+  --lt-sidebar-active-bg:  var(--lt-color-primary);
+
+  /* --- Topbar --- */
+  --lt-topbar-bg:     var(--lt-white);
+  --lt-topbar-shadow: var(--lt-shadow-dialog);   /* CMDS Dialog shadow（Card 級別 elevation）*/
+
+  /* --- Card --- */
+  --lt-card-bg:      var(--lt-color-bg-default);
+  --lt-card-radius:  var(--lt-radius-md);
+  --lt-card-shadow:  var(--lt-shadow-dialog);    /* CMDS 明確規範 Card 用 Dialog shadow */
+  --lt-card-padding: var(--lt-space-24);
+
+  /* --- Button --- */
+  --lt-button-radius:     var(--lt-radius-sm);
+  --lt-button-padding-x:  var(--lt-space-16);
+  --lt-button-padding-y:  var(--lt-space-8);
+  --lt-button-focus-ring: 0 0 0 3px rgba(0, 79, 176, 0.10);
+
+  /* --- Input / Text Field --- */
+  --lt-input-bg:        var(--lt-color-bg-default);
+  --lt-input-border:    var(--lt-color-border-input);
+  --lt-input-radius:    var(--lt-radius-sm);
+  --lt-input-padding-x: var(--lt-space-16);
+  --lt-input-padding-y: var(--lt-space-8);
+
+  /* --- Modal --- */
+  --lt-modal-radius:   var(--lt-radius-lg);
+  --lt-modal-shadow:   var(--lt-shadow-dialog);  /* CMDS Dialog shadow（Modal = Dialog 同類）*/
+  --lt-modal-padding:  var(--lt-space-24);
+  --lt-modal-backdrop: rgba(0, 0, 0, 0.5);
+
+  /* --- Tooltip --- */
+  --lt-tooltip-bg:      #3C3C3C;            /* 對齊 Lumiture-Guideline.md 規範；非品牌色，刻意不引用 brand token */
+  --lt-tooltip-text:    var(--lt-white);
+  --lt-tooltip-radius:  var(--lt-radius-sm);
+  --lt-tooltip-padding: var(--lt-space-8);
+}
+
+
+/* ============================================================
+ * NOT YET DEFINED (Pass 3+)
+ * ============================================================
+ * - ~~Chart palette~~ ✅ 已加入（2026-05-12 從 Figma General Behavior file audit）
+ * - Gradient tokens (Figma 有 Lumiture.ai Blue / Orange / Lemon C 等)
+ * - Opacity tokens (Figma 有 CM Opacity Color 系列)
+ * - Composite typography tokens (--lt-type-h1, --lt-type-body 等 style sets)
+ * - Focus / Inset shadow 特殊變體
+ * - Dark mode 對應 token
+ *
+ * Shadow 結構待 Figma audit：v7/v8 用單層、tokens.css 主階用雙層；Overlay 已用單層作折衷
+ * ============================================================ */
+
+</style>
+<style>
+/* Compatibility aliases — v7 既有短名 token 對映到 tokens.css 長名 token。
+ * body code 沿用舊短名；衝突值（與 tokens.css 不同）以註解標明，待後續對齊 Figma 後決定。 */
+:root{
+  /* Brand */
+  --pri:        var(--lt-color-primary);                /* #004FB0 */
+  --pri-dk:     var(--lt-color-primary-active);         /* #002663 */
+  --pri-lt:     var(--lt-color-primary-hover);          /* #0B6DD7 */
+  --pri-lt30:   var(--lt-blue-30);                      /* #9ED7FF */
+  --pri-lt20:   var(--lt-color-primary-bg-emphasized);  /* #D1EEFF */
+  --pri-lt10:   var(--lt-color-primary-bg);             /* #F2FAFF */
+  --sec:        var(--lt-color-secondary);              /* #34B5D9 */
+  --sec-dk:     var(--lt-turquoise-80);                 /* #228EB3 */
+  --sec-lt:     var(--lt-color-secondary-hover);        /* #4ADFFF */
+  --sec-lt10:   var(--lt-turquoise-10);                 /* #F0FFFF */
+
+  /* Sidebar */
+  --sb:     var(--lt-sidebar-bg);          /* #002663 */
+  --sb-hov: var(--lt-sidebar-hover-bg);    /* rgba(255,255,255,0.06) */
+
+  /* Neutral */
+  --wh:   var(--lt-white);
+  --g50:  var(--lt-grey-50);
+  --g100: var(--lt-grey-100);
+  --g200: var(--lt-grey-200);
+  --g300: var(--lt-grey-300);
+  --g400: var(--lt-grey-400);
+  --g500: var(--lt-grey-500);
+  --g600: var(--lt-grey-600);
+  --g700: var(--lt-grey-700);
+  --g800: var(--lt-grey-800);
+  --g900: var(--lt-grey-900);
+
+  /* Functional */
+  --ok:       var(--lt-color-success-base);   /* #00B5A6 */
+  --ok-lt:    var(--lt-color-success-light);  /* #E6FFF8 */
+  --ok-dk:    var(--lt-color-success-dark);   /* #008F88 */
+  --warn:     var(--lt-color-warning-base);   /* #FC9A0F */
+  --warn-lt:  var(--lt-color-warning-light);  /* #FEF3E1 */
+  --err:      var(--lt-color-error-base);     /* #FF403D */
+  --err-lt:   var(--lt-color-error-light);    /* #FFEBEF */
+  --info:     var(--lt-color-info-base);      /* #0B6DD7 */
+  --info-lt:  var(--lt-color-info-light);     /* #E6F6FF */
+
+  /* Radius (LumiTag v7 本來就是 4px，零衝突) */
+  --r-sm: var(--lt-radius-sm);  /* 4px */
+  --r-md: var(--lt-radius-md);  /* 8px */
+  --r-lg: var(--lt-radius-lg);  /* 12px */
+
+  /* Shadow — CONFLICT: v7 用單層 shadow，tokens.css 用雙層。保留 v7 literal 值避免視覺改變。 */
+  --shd:  0 1px 2px rgba(0,0,0,.05);          /* DIVERGENT from --lt-shadow-xs */
+  --shd2: 0 4px 6px -1px rgba(0,0,0,.1);      /* DIVERGENT from --lt-shadow-md (tokens.css 為雙層) */
+  --shd3: 0 10px 15px -3px rgba(0,0,0,.1);    /* DIVERGENT from --lt-shadow-lg (tokens.css 為雙層) */
+
+  /* Layout */
+  --sw: var(--lt-sidebar-width);  /* 264px */
+}
+*{margin:0;padding:0;box-sizing:border-box}html,body{overscroll-behavior:none}body{font-family:'Noto Sans',sans-serif;font-size:14px;line-height:1.75;color:var(--g800);background:var(--g50);letter-spacing:0}a{color:var(--pri);text-decoration:none}button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:14px}input,select,textarea{font-family:inherit;font-size:14px}.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;vertical-align:middle}
+.app{display:flex;min-height:100vh}.sidebar{width:var(--sw);background:var(--sb);color:var(--wh);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:100;display:flex;flex-direction:column;transition:width .2s ease;scrollbar-width:none}.sidebar::-webkit-scrollbar{display:none}.sidebar.collapsed{width:64px;overflow:visible}.sb-logo{padding:16px 20px;display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap;overflow:hidden}.sb-logo-wrap{position:relative;width:32px;height:32px;flex-shrink:0}.sb-logo-wrap svg{width:32px;height:32px}.sb-proto{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);background:var(--sb);color:var(--sec);font-size:6px;font-weight:700;padding:1px 3px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px;line-height:1.2;white-space:nowrap}.sb-logo-text{transition:opacity .2s}.sidebar.collapsed .sb-logo-text{opacity:0;width:0;overflow:hidden}.sidebar.collapsed .sb-proto{display:none}.sidebar.collapsed .sb-logo{padding:16px;justify-content:center;gap:0}.sb-nav{flex:1;padding:8px 0}.ni{display:flex;align-items:center;gap:12px;padding:10px 20px;color:rgba(255,255,255,.7);font-size:14px;cursor:pointer;transition:all .15s;white-space:nowrap;overflow:hidden}.ni:hover{background:var(--sb-hov);color:var(--wh)}.ni.act{background:var(--pri);color:var(--wh);font-weight:500;border-radius:0 8px 8px 0;margin-right:8px}.sidebar.collapsed .ni{padding:10px 0;justify-content:center;margin-right:0;border-radius:0}.sidebar.collapsed .ni.act{border-radius:0;margin-right:0}.sidebar.collapsed .ni span:not(.material-symbols-outlined){display:none}.sidebar.collapsed .ni-badge{display:none}.ns{padding:16px 20px 8px;font-size:12px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;overflow:hidden}.sidebar.collapsed .ns{font-size:0;padding:8px 0;border-top:1px solid rgba(255,255,255,.1);margin:0 12px}.ni .material-symbols-outlined{font-size:20px;flex-shrink:0}.ni-badge{background:var(--sec);color:var(--wh);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:auto}.sb-collapse{padding:12px;display:flex;justify-content:flex-end;border-top:1px solid rgba(255,255,255,.1)}.sb-collapse button{color:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:var(--r-sm);transition:all .15s}.sb-collapse button:hover{background:var(--sb-hov);color:var(--wh)}.sidebar.collapsed .sb-collapse{justify-content:center}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}.topbar{background:var(--sb);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:var(--sw);right:0;z-index:50;transition:left .2s ease}.tb-r{display:flex;align-items:center;gap:16px}.tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.7)}.tb-ic:hover{background:rgba(255,255,255,.1);color:var(--wh)}.content{padding:92px 32px 32px;flex:1;background:var(--pri-lt10)}.view{display:none}.view.active{display:block}
 .bc{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--g500);margin-bottom:24px}.bc a{color:var(--pri);font-weight:500}.bc .material-symbols-outlined{font-size:16px;color:var(--g400)}
 .back-btn{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:500;color:var(--pri);margin-bottom:8px}.back-btn:hover{text-decoration:underline}.back-btn .material-symbols-outlined{font-size:18px}
 .card{background:var(--wh);border:none;border-radius:var(--r-md);padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06)}.cg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}.mc{text-align:center}.mv{font-size:36px;font-weight:700;line-height:1.25}.ml{font-size:12px;font-weight:700;color:var(--g500);margin-bottom:4px;line-height:1.5}.ms{font-size:12px;color:var(--g400);margin-top:4px}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r-sm);font-weight:500;font-size:14px;transition:all .15s;line-height:1.5}.btn-p{background:var(--pri);color:var(--wh);height:36px}.btn-p:hover{background:var(--pri-lt)}.btn-s{background:var(--wh);color:var(--pri);border:1px solid var(--pri);height:36px}.btn-s:hover{background:var(--pri-lt10)}.btn-o{background:var(--wh);color:var(--pri);border:1px solid var(--pri);height:36px}.btn-o:hover{background:var(--pri-lt10)}.btn-sm{padding:4px 12px;font-size:12px}.btn-lg{padding:10px 24px;font-size:16px}.btn .material-symbols-outlined{font-size:18px}.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r-sm);font-weight:500;font-size:14px;transition:all .15s;line-height:1.5}.btn-p{background:var(--pri);color:var(--wh);height:36px}.btn-p:hover{background:var(--pri-lt)}.btn-s{background:var(--wh);color:var(--pri);border:1px solid var(--pri);height:36px}.btn-s:hover{background:var(--pri-lt10)}.btn-o{background:var(--wh);color:var(--pri);border:1px solid var(--pri);height:36px}.btn-o:hover{background:var(--pri-lt10)}.btn-sm{padding:4px 12px;font-size:12px}.btn-lg{padding:10px 24px;font-size:16px}.btn .material-symbols-outlined{font-size:18px}.btn:disabled{background:var(--g100);color:var(--g300);border-color:var(--g200);cursor:not-allowed}
 .tw{background:var(--wh);border:none;border-radius:var(--r-md);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06)}table{width:100%;border-collapse:collapse}th{background:var(--pri-lt10);padding:0 16px;height:50px;text-align:left;font-size:14px;font-weight:700;color:var(--g700);border-bottom:none;position:sticky;top:0;z-index:2;box-shadow:inset 0 -1px 0 var(--g300)}td{padding:0 16px;height:50px;border-bottom:1px solid var(--g100);font-size:14px;vertical-align:middle}tr:last-child td{border-bottom:none}.tbl-scroll{max-height:575px;overflow-y:auto}
 .tkn{font-weight:400;color:var(--g900);line-height:1.75}.tkv{font-size:12px;color:var(--g400);line-height:1.5;margin-top:0}
 .cb{display:flex;align-items:center;gap:8px}.ct{width:100px;height:6px;background:var(--g200);border-radius:3px;overflow:hidden}.cf{height:100%;border-radius:3px;background:var(--ok)}.cf.med{background:var(--warn)}.cf.low{background:var(--err)}.cp{font-size:12px;font-weight:500;color:var(--g600);min-width:36px}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:500}.b-act{background:var(--ok-lt);color:var(--ok-dk)}.b-ina{background:var(--g200);color:var(--g500)}.bd{width:6px;height:6px;border-radius:50%}.b-act .bd{background:var(--ok)}.b-ina .bd{background:var(--g500)}
-.ab{width:32px;height:32px;border-radius:var(--r-sm);display:inline-flex;align-items:center;justify-content:center;color:var(--g400);transition:all .15s}.ab:hover{background:var(--g100);color:var(--g700)}.ab.dng:hover{background:var(--err-lt);color:var(--err)}.ab:disabled{opacity:.3;cursor:not-allowed}.ab:disabled:hover{background:none;color:var(--g400)}[data-tip]{position:relative}[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#3C3C3C;color:var(--wh);padding:12px 16px;border-radius:var(--r-md);font-size:13px;font-family:'Noto Sans',sans-serif;line-height:1.6;white-space:normal;max-width:400px;min-width:200px;z-index:10;font-weight:400;box-shadow:0 4px 12px rgba(0,0,0,.2);width:max-content}.info-tip{position:relative;display:inline-flex;cursor:help;vertical-align:middle;margin-left:4px}.info-tip .material-symbols-outlined{font-size:18px;color:var(--g400);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}.info-tip:hover .material-symbols-outlined{color:var(--g500)}.info-tip .tip-box{display:none;position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#3C3C3C;color:var(--wh);padding:12px 16px;border-radius:var(--r-md);font-size:13px;line-height:1.6;max-width:600px;min-width:400px;z-index:20;white-space:normal;font-weight:400;box-shadow:0 4px 12px rgba(0,0,0,.2)}.info-tip:hover .tip-box{display:block}
-.tbar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}.ts{position:relative}.ts input{padding:8px 12px 8px 36px;border:1px solid var(--g300);border-radius:var(--r-sm);width:200px;outline:none}.tabs .ts{margin-bottom:8px}.ts input:focus{border-color:var(--pri);box-shadow:0 0 0 2px rgba(0,79,176,.1)}.ts .material-symbols-outlined{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--g400)}.tsp{flex:1}
+.ab{width:32px;height:32px;border-radius:var(--r-sm);display:inline-flex;align-items:center;justify-content:center;color:var(--g400);transition:all .15s}.ab:hover{background:var(--g100);color:var(--g700)}.ab.dng:hover{background:var(--err-lt);color:var(--err)}.ab:disabled{background:var(--g100);color:var(--g300);cursor:not-allowed}.ab:disabled:hover{background:var(--g100);color:var(--g300)}/* [data-tip] 由 JS #gl-tip handler 處理 (line 1305+)，CSS hover::after 已移除避免雙 tooltip */.info-tip{position:relative;display:inline-flex;cursor:help;vertical-align:middle;margin-left:4px}.info-tip .material-symbols-outlined{font-size:18px;color:var(--g400);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}.info-tip:hover .material-symbols-outlined{color:var(--g500)}.info-tip .tip-box{display:none;position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#3C3C3C;color:var(--wh);padding:12px 16px;border-radius:var(--r-md);font-size:13px;line-height:1.6;max-width:600px;min-width:400px;z-index:20;white-space:normal;font-weight:400;box-shadow:0 4px 12px rgba(0,0,0,.2)}.info-tip:hover .tip-box{display:block}
+.tbar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}.ts{position:relative}.ts input{padding:8px 12px 8px 36px;border:1px solid var(--g300);border-radius:var(--r-sm);width:200px;outline:none}.tabs .ts{margin-bottom:8px}.ts input:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}.ts .material-symbols-outlined{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--g400)}.tsp{flex:1}
 .tabs-row{display:flex;align-items:flex-end;gap:8px;margin-bottom:16px}.tabs-row .ts,.tabs-row .btn{margin-bottom:0!important}.tabs{display:flex;gap:0;border-bottom:2px solid var(--g200);flex:1 1 auto;margin-right:0}.tab{padding:8px 16px;font-size:14px;font-weight:500;color:var(--g500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}.tab:hover{color:var(--g700)}.tab.active{color:var(--pri);border-bottom-color:var(--pri)}.tab-ct{font-size:12px;color:var(--g400);margin-left:4px}.tabs-row .ts{margin-bottom:8px}.tabs-row .ts input{padding:7px 12px 7px 36px;height:36px}.tabs-row .btn{margin-bottom:8px;height:36px}
 .banner{background:var(--pri-lt10);border:1px solid var(--pri-lt20);border-radius:var(--r-md);padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:12px}.banner-ic{color:var(--pri)}.banner-t{flex:1}.banner-tt{font-weight:700;font-size:14px;color:var(--g900)}.banner-d{font-size:13px;color:var(--g500)}.banner-cl{color:var(--g400);cursor:pointer}
-.fg{margin-bottom:20px}.fl{display:block;font-size:12px;font-weight:700;color:var(--g600);margin-bottom:6px}.fi{width:100%;padding:10px 12px;border:1px solid var(--g300);border-radius:var(--r-sm);outline:none;font-size:14px}.fi:focus{border-color:var(--pri);box-shadow:0 0 0 2px rgba(0,79,176,.1)}.fi.err{border-color:var(--err)}.fh{font-size:12px;color:var(--g400);margin-top:4px}.fh.err{color:var(--err)}.fi-wrap{position:relative}.sug-dd{position:absolute;top:100%;left:0;right:0;max-width:400px;background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 12px rgba(0,0,0,.12);z-index:20;max-height:280px;overflow-y:auto;display:none;margin-top:4px}.sug-dd.open{display:block}.sug-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;font-size:14px;transition:background .1s}.sug-item:hover{background:var(--g50)}.sug-item.disabled{opacity:.5;cursor:not-allowed;background:var(--g100)}.sug-item.disabled:hover{background:var(--g100)}.sug-badge{font-size:10px;font-weight:700;color:var(--ok);background:var(--ok-lt);padding:2px 6px;border-radius:3px;white-space:nowrap}.sug-exists{font-size:11px;color:var(--g400);font-style:italic}.sug-sec{padding:6px 12px;font-size:11px;font-weight:700;color:var(--g400);text-transform:uppercase;border-top:1px solid var(--g100)}.fsel{padding:8px 12px;border:1px solid var(--g300);border-radius:var(--r-sm);outline:none;font-size:14px;background:var(--wh);min-width:140px}.fsel:focus{border-color:var(--pri)}
+.fg{margin-bottom:20px}.fl{display:block;font-size:12px;font-weight:700;color:var(--g600);margin-bottom:6px}.fi{width:100%;padding:10px 12px;border:1px solid var(--g300);border-radius:var(--r-sm);outline:none;font-size:14px}.fi:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}.fi.err{border-color:var(--err)}.fh{font-size:12px;color:var(--g400);margin-top:4px}.fh.err{color:var(--err)}.fi-wrap{position:relative}.sug-dd{position:absolute;top:100%;left:0;right:0;max-width:400px;background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 12px rgba(0,0,0,.12);z-index:20;max-height:280px;overflow-y:auto;display:none;margin-top:4px}.sug-dd.open{display:block}.sug-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;font-size:14px;transition:background .1s}.sug-item:hover{background:var(--g50)}.sug-item.disabled{color:var(--g300);cursor:not-allowed;background:var(--g100)}.sug-item.disabled:hover{background:var(--g100)}.sug-badge{font-size:10px;font-weight:700;color:var(--ok);background:var(--ok-lt);padding:2px 6px;border-radius:3px;white-space:nowrap}.sug-exists{font-size:11px;color:var(--g400);font-style:italic}.sug-sec{padding:6px 12px;font-size:11px;font-weight:700;color:var(--g400);text-transform:uppercase;border-top:1px solid var(--g100)}.fsel{padding:8px 12px;border:1px solid var(--g300);border-radius:var(--r-sm);outline:none;font-size:14px;background:var(--wh);min-width:140px}.fsel:focus{border-color:var(--pri)}
 @keyframes vc-flash{0%{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.15);background:var(--pri-lt10)}75%{border-color:var(--pri);box-shadow:0 0 0 2px rgba(0,79,176,.08);background:var(--pri-lt10)}100%{border-color:var(--g300);box-shadow:none;background:var(--wh)}}.vc{background:var(--wh);border:1px dashed var(--g300);border-radius:var(--r-md);padding:16px;margin-bottom:12px}.vc.vc-new{animation:vc-flash 1.4s ease forwards}.vc.dov{border-color:var(--pri);background:var(--pri-lt10)}.vh{display:flex;align-items:center;gap:12px;margin-bottom:8px}.dh{cursor:grab;color:var(--g400);display:flex;align-items:center}.dh:active{cursor:grabbing}.pn{font-size:12px;font-weight:700;color:var(--g400);background:var(--g100);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}.vh input{flex:1;padding:8px 12px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:14px;font-weight:500}.vh input:focus{border-color:var(--pri);outline:none}.vm{font-size:12px;color:var(--g500);background:var(--g50);padding:6px 12px;border-radius:var(--r-sm);display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.vm .material-symbols-outlined{font-size:14px}.vm.ok{color:var(--ok);background:var(--ok-lt)}.vm.inc{color:var(--warn);background:var(--warn-lt)}.rv{color:var(--g400);cursor:pointer;display:flex;align-items:center}.rv:hover{color:var(--err)}
-.ca{margin-top:4px;padding-left:36px}.csp-block .ca{padding:8px 12px 4px 12px;margin-top:0}.cr{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}.cr>select{padding:6px 10px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:13px;background:var(--wh)}.cr>input{padding:6px 10px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:13px;flex:1;min-width:120px}.cr>input:focus,.cr>select:focus{border-color:var(--pri);outline:none}.crm{width:28px;height:28px;border:1px solid var(--g200);border-radius:var(--r-sm);background:var(--wh);color:var(--g500);font-size:18px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;line-height:1;font-weight:300}.crm:hover{border-color:var(--err);color:var(--err);background:var(--err-lt)}.bac{font-size:12px;color:var(--pri);display:inline-flex;align-items:center;gap:4px;padding:4px 8px;margin-top:4px;border-radius:var(--r-sm);border:none;background:none;cursor:pointer;font-family:inherit}.bac:hover{background:var(--pri-lt10)}.bac:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}.bac .material-symbols-outlined{font-size:16px}.wl{min-width:56px;display:inline-block;font-size:12px;font-weight:700;color:var(--g400)}.csel{padding:4px 8px!important;border:1px solid var(--g300)!important;border-radius:4px!important;font-size:12px!important;font-weight:700!important;color:var(--pri)!important;background:var(--pri-lt10)!important;min-width:56px}
-.op-lbl{font-size:12px;color:var(--g500);white-space:nowrap;padding:0 2px;flex-shrink:0;line-height:2.2}.val-txt{flex:1;min-width:140px;padding:5px 10px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:13px;outline:none;font-family:inherit}.val-txt:focus{border-color:var(--pri);box-shadow:0 0 0 2px rgba(0,79,176,.1)}.op-sel-vis{padding:5px 8px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:12px;background:var(--wh);color:var(--g700);flex-shrink:0;cursor:pointer;outline:none;font-family:inherit}.op-sel-vis:focus{border-color:var(--pri)}.vc-copy{width:28px;height:28px;border:1px solid var(--g200);border-radius:var(--r-sm);background:var(--wh);color:var(--g400);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s}.vc-copy:hover{border-color:var(--pri);color:var(--pri);background:var(--pri-lt10)}
+.ca{margin-top:4px;padding-left:36px}.csp-block .ca{padding:8px 12px 4px 12px;margin-top:0}.cr{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}.cr>select{padding:6px 10px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:13px;background:var(--wh)}.cr>input{padding:6px 10px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:13px;flex:1;min-width:120px}.cr>input:focus,.cr>select:focus{border-color:var(--pri);outline:none}.crm{width:28px;height:28px;border:1px solid var(--g200);border-radius:var(--r-sm);background:var(--wh);color:var(--g500);font-size:18px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;line-height:1;font-weight:300}.crm:hover{border-color:var(--err);color:var(--err);background:var(--err-lt)}.bac{font-size:12px;color:var(--pri);display:inline-flex;align-items:center;gap:4px;padding:4px 8px;margin-top:4px;border-radius:var(--r-sm);border:none;background:none;cursor:pointer;font-family:inherit}.bac:hover{background:var(--pri-lt10)}.bac:disabled{color:var(--g300);cursor:not-allowed;pointer-events:none}.bac .material-symbols-outlined{font-size:16px}.wl{min-width:56px;display:inline-block;font-size:12px;font-weight:700;color:var(--g400)}.csel{padding:4px 8px!important;border:1px solid var(--g300)!important;border-radius:4px!important;font-size:12px!important;font-weight:700!important;color:var(--pri)!important;background:var(--pri-lt10)!important;min-width:56px}
+.op-lbl{font-size:12px;color:var(--g500);white-space:nowrap;padding:0 2px;flex-shrink:0;line-height:2.2}.val-txt{flex:1;min-width:140px;padding:5px 10px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:13px;outline:none;font-family:inherit}.val-txt:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}.op-sel-vis{padding:5px 8px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:12px;background:var(--wh);color:var(--g700);flex-shrink:0;cursor:pointer;outline:none;font-family:inherit}.op-sel-vis:focus{border-color:var(--pri)}.vc-copy{width:28px;height:28px;border:1px solid var(--g200);border-radius:var(--r-sm);background:var(--wh);color:var(--g400);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s}.vc-copy:hover{border-color:var(--pri);color:var(--pri);background:var(--pri-lt10)}
 .vals-empty-box{border:1.5px dashed var(--g200);border-radius:var(--r-md);padding:40px 24px;text-align:center;transition:border-color .2s,background .2s;background:var(--g50)}.vals-empty-box.err-border{border-color:var(--err);background:rgba(220,38,38,.04)}.vals-empty-title{font-size:14px;font-weight:600;color:var(--g600);margin-bottom:4px}.vals-empty-sub{font-size:13px;color:var(--g400)}
 .vals-err{font-size:12px;color:var(--err);margin-top:8px;display:none;align-items:center;gap:4px}.vals-err.show{display:flex}.vals-err .material-symbols-outlined{font-size:16px;flex-shrink:0}
 .tag-rules-info{font-size:12px;color:var(--g400);line-height:1.8;margin-top:16px;padding-top:16px;border-top:1px solid var(--g100)}.tag-rules-info strong{color:var(--g600)}
@@ -43,7 +365,7 @@
 .tag-key-sel{min-width:110px}.tag-key-lbl{font-size:12px;color:var(--g400);white-space:nowrap;flex-shrink:0;align-self:center;padding:0 2px}
 .tag-val-wrap{flex:1;min-width:140px;position:relative}.tag-val-wrap .val-txt{width:100%;min-width:0}.val-txt:disabled{background:var(--g100);color:var(--g400);cursor:not-allowed;border-color:var(--g200);pointer-events:none}.tag-val-wrap[data-tip]:hover::after{left:0;transform:none;white-space:nowrap;min-width:0;width:max-content;max-width:340px}
 .tv-of{font-size:13px;color:var(--g500);white-space:nowrap;flex-shrink:0;align-self:center;padding:0 2px}
-.ms-wrap{flex:1;min-width:140px;position:relative}.ms-trigger{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:4px 8px;border:1px solid var(--g200);border-radius:var(--r-sm);background:var(--wh);min-height:34px;cursor:pointer;user-select:none;transition:border-color .15s;position:relative}.ms-trigger:hover{border-color:var(--g400)}.ms-trigger.open{border-color:var(--pri);box-shadow:0 0 0 2px rgba(0,79,176,.1)}.ms-placeholder{color:var(--g400);font-size:12px;pointer-events:none;line-height:1.75}.ms-panel{position:absolute;top:calc(100% + 4px);right:0;left:auto;min-width:260px;width:max-content;max-width:340px;background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.16);z-index:200;display:none}.ms-panel.open{display:block}.ms-search{padding:8px;border-bottom:1px solid var(--g100);position:relative}.ms-search input{width:100%;padding:6px 32px 6px 10px;border:1px solid var(--g200);border-radius:var(--r-sm);font-size:13px;outline:none;font-family:inherit}.ms-search input:focus{border-color:var(--pri)}.ms-search .material-symbols-outlined{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--g400);pointer-events:none}.ms-list{max-height:240px;overflow-y:auto}.ms-item{display:flex;align-items:center;justify-content:flex-start;gap:10px;padding:8px 12px;cursor:pointer;font-size:13px;transition:background .1s;border:none;background:none;width:100%;text-align:left;color:var(--g800);line-height:1.4}.ms-item:hover{background:var(--g50)}.ms-item input[type=checkbox]{width:15px;height:15px;accent-color:var(--pri);cursor:pointer;flex-shrink:0;margin:0;display:block}.ms-divider{height:1px;background:var(--g100);margin:0}.ms-empty{padding:12px;font-size:13px;color:var(--g400);text-align:center}
+.ms-wrap{flex:1;min-width:140px;position:relative}.ms-trigger{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:4px 8px;border:1px solid var(--g200);border-radius:var(--r-sm);background:var(--wh);min-height:34px;cursor:pointer;user-select:none;transition:border-color .15s;position:relative}.ms-trigger:hover{border-color:var(--g400)}.ms-trigger.open{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}.ms-placeholder{color:var(--g400);font-size:12px;pointer-events:none;line-height:1.75}.ms-panel{position:absolute;top:calc(100% + 4px);right:0;left:auto;min-width:260px;width:max-content;max-width:340px;background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.16);z-index:200;display:none}.ms-panel.open{display:block}.ms-search{padding:8px;border-bottom:1px solid var(--g100);position:relative}.ms-search input{width:100%;padding:6px 32px 6px 10px;border:1px solid var(--g200);border-radius:var(--r-sm);font-size:13px;outline:none;font-family:inherit}.ms-search input:focus{border-color:var(--pri)}.ms-search .material-symbols-outlined{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--g400);pointer-events:none}.ms-list{max-height:240px;overflow-y:auto}.ms-item{display:flex;align-items:center;justify-content:flex-start;gap:10px;padding:8px 12px;cursor:pointer;font-size:13px;transition:background .1s;border:none;background:none;width:100%;text-align:left;color:var(--g800);line-height:1.4}.ms-item:hover{background:var(--g50)}.ms-item input[type=checkbox]{width:15px;height:15px;accent-color:var(--pri);cursor:pointer;flex-shrink:0;margin:0;display:block}.ms-divider{height:1px;background:var(--g100);margin:0}.ms-empty{padding:12px;font-size:13px;color:var(--g400);text-align:center}
 .chip{display:inline-flex;align-items:center;gap:2px;background:var(--pri-lt10);color:var(--pri);border:1px solid var(--pri-lt20);border-radius:20px;padding:1px 8px 1px 10px;font-size:12px;font-weight:500;white-space:nowrap;line-height:1.6}.chip-x{cursor:pointer;font-size:14px;color:var(--g400);margin-left:2px;line-height:1;display:inline-flex;align-items:center}.chip-x:hover{color:var(--err)}
 .st{font-size:18px;font-weight:700;color:var(--g900)}.sd{font-size:13px;color:var(--g500);margin-bottom:16px}
 .cpv{background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);padding:16px;margin-top:16px}.cpv-bar{display:flex;height:24px;border-radius:var(--r-sm);overflow:hidden;margin-bottom:8px}.cpv-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--wh);min-width:2px}.cpv-leg{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--g500);margin-bottom:8px}.cpv-li{display:flex;align-items:center;gap:4px}.cpv-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}.cpv-unalloc{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--warn-lt);border-radius:var(--r-sm);margin-top:8px;font-size:13px;font-weight:500;color:#EC6F09}.cpv-unalloc .material-symbols-outlined{font-size:16px;color:var(--warn)}.cpv-success{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;background:#E6FFF8;border-radius:var(--r-sm);margin-top:8px;font-size:13px;font-weight:500;color:#00B5A6;text-align:center}.cpv-success .material-symbols-outlined{font-size:16px;color:#00B5A6}
@@ -54,7 +376,7 @@
 .pt tr.ua td{background:rgba(255,64,61,.06)}.pt tr.ua td,.pt tr.ua a{color:var(--err)!important}.pt tr.nm td{color:var(--g400)}.pt tr.clickable{cursor:pointer}.pt tr.clickable:hover td{background:#F6F6F6}
 .coll-card{border:1px solid var(--g200);border-radius:var(--r-md);margin-bottom:24px;overflow:hidden}.coll-hdr{display:flex;align-items:center;gap:10px;padding:16px 20px;cursor:pointer;user-select:none;background:var(--wh)}.coll-hdr:hover{background:var(--g50)}.coll-hdr-title{font-size:15px;font-weight:700;color:var(--g900);flex:1}.coll-body{border-top:1px solid var(--g100);padding:16px 20px;display:none}.coll-body.open{display:block}
 .cf-card{border:1px solid var(--g200);border-radius:var(--r-md);padding:14px 16px;margin-bottom:10px}.cf-res{font-size:14px;font-weight:700;color:var(--g900);margin-bottom:8px}.cf-rule{display:flex;align-items:baseline;gap:8px;font-size:13px;padding:3px 0}.cf-rule .material-symbols-outlined{font-size:16px;flex-shrink:0;margin-top:1px}.cf-applied{color:var(--g700)}.cf-applied strong{color:var(--pri)}.cf-override{color:var(--g400)}.cf-override .cf-val{text-decoration:line-through}
-.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}.mo.active{display:flex}.modal{background:var(--wh);border-radius:var(--r-lg);padding:24px;max-width:660px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:var(--shd3)}.modal-lg{max-width:1000px}.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.mt{font-size:18px;font-weight:700}.mx{color:var(--g400);cursor:pointer}.mx:hover{color:var(--g700)}.mf{display:flex;justify-content:flex-end;gap:12px;margin-top:24px;padding-top:16px;border-top:1px solid var(--g200)}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}.mo.active{display:flex}.modal{background:var(--wh);border-radius:var(--r-lg);padding:24px 32px;max-width:660px;min-width:640px;width:90%;max-height:calc(100vh - 64px);box-shadow:var(--shd3);display:flex;flex-direction:column}.modal-xs{max-width:340px;min-width:0;padding:24px}.modal-center{max-width:460px;min-width:0}.modal-wide{max-width:720px}.modal-lg{max-width:1000px}.modal-tall{min-height:720px}.modal-tall .mb{display:flex;flex-direction:column}.modal-tall #res-modal-inner{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}.modal-tall #res-modal-inner>div:first-child{flex-shrink:0}.modal-tall #res-modal-tbl-wrap{flex:1 1 auto!important;max-height:none!important;min-height:0}.modal-tall .mb>p{flex-shrink:0}.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-shrink:0}.mt{font-size:18px;font-weight:700}.mx{color:var(--g400);cursor:pointer}.mx:hover{color:var(--g700)}.mb{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;min-height:0}.mf{display:flex;justify-content:flex-end;gap:12px;margin-top:24px;padding-top:16px;border-top:1px solid var(--g200);flex-shrink:0}
 .tc{position:fixed;bottom:24px;left:24px;z-index:300;display:flex;flex-direction:column;gap:8px}.toast{color:var(--wh);padding:14px 20px;border-radius:var(--r-md);font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:var(--shd3);animation:sIn .3s ease;min-width:320px}.toast.tok{background:#00B5A6}.toast.terr{background:#FF403D}.toast .material-symbols-outlined{font-size:20px;color:var(--wh);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}@keyframes sIn{from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1}}
 .ta{display:flex;align-items:center;gap:8px;margin-bottom:8px}.ta select{flex:1}.ta .fi{flex:1}.teq{font-weight:700;color:var(--g400)}
 .notice{display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:var(--r-md);margin-bottom:16px;font-size:13px}.n-info{background:var(--info-lt);color:var(--pri)}.n-warn{background:var(--warn-lt);color:#EC6F09}.n-ok{background:var(--ok-lt);color:var(--ok-dk)}.notice .material-symbols-outlined{font-size:18px;flex-shrink:0}
@@ -62,38 +384,45 @@
 tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g200)}tr.dft .tkn{color:var(--g400)}tr.dft .cf{opacity:.4}tr.dft:hover td{background:#EBEBEB;color:var(--g500)}tr.dft:hover .tkn{color:var(--g500)}tr.row-click{cursor:pointer}tr.row-click:hover td{background:#F6F6F6}
 .pg-hdr{margin-bottom:24px}.pg-hdr-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.pg-title{font-size:20px;font-weight:700;color:var(--g900);line-height:1.5}.pg-desc{font-size:14px;color:var(--g500);margin-top:4px}.pg-hdr-r{display:flex;align-items:center;gap:12px;flex-shrink:0;padding-top:4px}
 .footer{padding:16px 32px;background:var(--pri-lt10);display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--g500);margin-top:auto}.footer a{color:var(--pri);font-weight:500}
+.footer-version{font-weight:500;color:#262626}
+.footer-version .ver-tag{background:#34B5D9;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}
+.footer-credit{color:#676767;font-size:12px}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--g300);border-radius:3px}
 .res-cost-hero{padding:16px 0 20px;border-bottom:1px solid var(--g100);margin-bottom:16px}.res-cost-num{font-size:28px;font-weight:700;color:var(--g900);line-height:1.1}.res-cost-lbl{font-size:12px;color:var(--g500);margin-top:4px}.res-modal-ctrl{margin-bottom:12px}.res-ctrl-cloud-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}.res-csp-sel{padding:5px 10px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:13px;background:var(--wh);color:var(--g700);cursor:pointer;outline:none;font-family:inherit;height:32px;width:200px}.res-csp-sel:focus{border-color:var(--pri)}.res-level-grp{display:flex;border:1px solid var(--g200);border-radius:var(--r-sm);overflow:hidden;flex-shrink:0}.rlb{padding:6px 13px;font-size:13px;font-weight:500;color:var(--g600);cursor:pointer;border:none;border-right:1px solid var(--g200);background:var(--wh);font-family:inherit;transition:all .15s;white-space:nowrap;line-height:1.5}.rlb:last-child{border-right:none}.rlb:hover{background:var(--g50);color:var(--g800)}.rlb.active{background:var(--pri);color:var(--wh)}.res-modal-searchrow{display:flex;align-items:center;gap:10px;margin-bottom:12px}.res-modal-searchrow .ts{flex:1}.res-modal-searchrow .ts input{width:100%}.res-modal-count{font-size:12px;color:var(--g400);white-space:nowrap;padding-top:2px}
-#gl-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:12px;line-height:1.4;padding:6px 10px;border-radius:4px;white-space:nowrap;max-width:600px;white-space:normal;pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#gl-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:13px;line-height:1.6;padding:12px 16px;border-radius:var(--r-md);white-space:nowrap;max-width:600px;white-space:normal;pointer-events:none;z-index:9999;display:none;box-shadow:0 4px 12px rgba(0,0,0,.2)}
 @keyframes sk-shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
 .skeleton{background:linear-gradient(90deg,var(--g100) 25%,var(--g200) 37%,var(--g100) 63%);background-size:1200px 100%;animation:sk-shimmer 1.4s ease infinite;border-radius:4px;display:inline-block}
 .sk-row td{padding:10px 16px;border-bottom:1px solid var(--g100)}
 .seg-tip{display:none;position:fixed;background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 12px rgba(0,0,0,.14);z-index:500;pointer-events:none;overflow:hidden;min-width:180px}.seg-tip-title{font-size:13px;font-weight:700;color:var(--g900);padding:10px 14px 8px;border-bottom:1px solid var(--g100)}.seg-tip-row{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:13px;color:var(--g700)}.seg-tip-amt{margin-left:auto;font-weight:700;color:var(--g900)}
+/* ===== SIDEBAR v2 — 對齊 Cost Dashboard ===== */
+.sb-logo{min-height:68px;box-sizing:border-box}
+.topbar{border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-section{padding:8px 12px}
+.ns{display:flex;align-items:center;justify-content:space-between;padding:14px 12px 6px;font-size:13px;font-weight:700;color:#fff;letter-spacing:.2px;text-transform:none;cursor:pointer;white-space:nowrap;overflow:hidden}
+.ns > span:first-child{overflow:hidden;text-overflow:ellipsis}
+.ns:hover{color:rgba(255,255,255,.85)}
+.ns .ns-arrow{font-size:18px;transition:transform .18s;opacity:.85;flex-shrink:0}
+.sb-group.collapsed .ns .ns-arrow{transform:rotate(180deg)}
+.sb-group.collapsed .sb-children{display:none}
+.ni-sub{display:flex;align-items:center;gap:12px;padding:9px 12px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.85);border-radius:6px;transition:background .15s;text-decoration:none;white-space:nowrap;overflow:hidden}
+.ni-sub:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.ni-sub.act{background:var(--pri);color:#fff;font-weight:500}
+.ni-sub .material-symbols-outlined{font-size:18px;opacity:.9;flex-shrink:0}
+.ni-sub.dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}
+.ni-sub.dis:hover{background:transparent}
+.sidebar.collapsed .ni-sub span:not(.material-symbols-outlined){display:none}
+.sidebar.collapsed .ni-sub{padding:10px 0;justify-content:center;border-radius:0}
+.sidebar.collapsed .ni-sub.act{border-radius:0}
+.sidebar.collapsed .ns span:not(.ns-arrow){display:none}
+.sidebar.collapsed .ns{padding:8px 0;justify-content:center}
+.sidebar.collapsed .ns-arrow{display:none!important}
+.sidebar.collapsed .sb-group.collapsed .sb-children{display:block}
+/* Demo FAB styles → see prototypes/shared/demo-fab.js */
 </style>
 </head>
 <body>
 <div class="app">
-<aside class="sidebar">
-<div class="sb-logo"><div class="sb-logo-wrap"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13" stroke="#FFF" stroke-width="2" fill="none"/><circle cx="16" cy="16" r="7" stroke="#FFF" stroke-width="2" fill="none"/><circle cx="16" cy="16" r="3" fill="#FFF"/></svg><span class="sb-proto">PROTOTYPE</span></div><span class="sb-logo-text">LumiTure.ai</span></div>
-<nav class="sb-nav">
-<div class="ni"><span class="material-symbols-outlined">home</span><span>Overview</span></div>
-<div class="ni"><span class="material-symbols-outlined">compress</span><span>Rightsizing</span><span class="ni-badge">BETA</span></div>
-<div class="ni"><span class="material-symbols-outlined">bookmark</span><span>Saving Report</span></div>
-<div class="ns">Dashboard</div>
-<div class="ni"><span class="material-symbols-outlined">auto_awesome</span><span>Executive Insights</span></div>
-<div class="ni"><span class="material-symbols-outlined">dashboard</span><span>Cost Dashboard</span></div>
-<div class="ns">Cost Analysis</div>
-<div class="ni"><span class="material-symbols-outlined">query_stats</span><span>Cost Analysis</span></div>
-<div class="ns">Cost Allocation</div>
-<div class="ni act" onclick="go('list')"><span class="material-symbols-outlined">sell</span><span>LumiTag</span></div>
-<div class="ns">Budget</div>
-<div class="ni"><span class="material-symbols-outlined">monitoring</span><span>Budget Monitoring</span></div>
-<div class="ns">Settings</div>
-<div class="ni"><span class="material-symbols-outlined">settings</span><span>Organization Settings</span></div>
-<div class="ni"><span class="material-symbols-outlined">shield</span><span>Security</span></div>
-</nav>
-<div class="sb-collapse"><button onclick="toggleSidebar()" title="Toggle sidebar"><span class="material-symbols-outlined" id="sb-toggle-icon">chevron_left</span></button></div>
-</aside>
+<aside id="lt-sidebar"></aside>
 <div class="main">
 <div class="topbar"><div></div><div class="tb-r"><div class="tb-ic"><span class="material-symbols-outlined">notifications</span></div><div class="tb-ic"><span class="material-symbols-outlined">account_circle</span></div></div></div>
 <div class="content">
@@ -103,14 +432,17 @@ tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g20
 <div class="view" id="v-preview"></div>
 <div class="view" id="v-batch"></div>
 </div>
-<div class="footer"><span>LumiTag Prototype v6 · Internal Review Only</span><span>Designed & built by Kabin · Special thanks to Jessie, Bater & Consulting Team</span></div>
+<div class="footer"><span class="footer-version">LumiTag Prototype<span class="ver-tag">v8 · Tokens Migration</span></span><span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin · Special thanks to Jessie, Bater &amp; Consulting Team</span></div>
 </div>
 </div>
 <div class="mo" id="mo"><div class="modal" id="mc"></div></div>
 <div class="tc" id="tc"></div>
 <div class="seg-tip" id="seg-tip"><div class="seg-tip-title" id="seg-tip-title"></div><div class="seg-tip-row" id="seg-tip-row"></div></div>
 <script>
-const COLORS=['#004FB0','#308CE3','#34B5D9','#00B5A6','#56DB71','#FC9A0F','#EF8857','#FF403D','#CB1090','#7E55D9','#7C7C7C'];
+// CMDS Color Kit — Main tier, chart usage order (ref: Lumiture-Guideline.md)
+const COLORS=['#86CBFC','#94F29D','#F3BE68','#FE89C1','#9CF3FF','#00DCC2','#F4B581','#C096FF','#FFA4A9','#7A8BA9'];
+const CLR_UNTAGGED='#B3B3B3'; // Gray 30 Main — always for Untagged (never cycles)
+const CLR_OTHER=COLORS[9];    // CMDS 10th color — always for Other Values bucket
 const CSP_FIELDS={
   GCP:[
     ['billing_account_id','Billing Account ID'],
@@ -258,7 +590,7 @@ const TAG_FIELD_DISP={labels:'Label Key',tags:'Tag Key',tag:'Tag Key'};
 const fOptsTagAware=(csp,s)=>(CSP_FIELDS[csp]||CSP_FIELDS.GCP).map(([v,l])=>`<option value="${v}"${v===s?' selected':''}>${TAG_FIELD_DISP[v]||l}</option>`).join('');
 const oOpts=(s)=>OPS.map(([v,l])=>`<option value="${v}"${v===s?' selected':''}>${l}</option>`).join('');
 const fmt=n=>'$'+n.toLocaleString();
-const CURRENCIES={USD:{flag:'🇺🇸'},EUR:{flag:'🇪🇺'},GBP:{flag:'🇬🇧'},JPY:{flag:'🇯🇵'},TWD:{flag:'🇹🇼'}};
+/* CURRENCIES — flags defined in shared/currency-picker.js (CurrencyPicker.CURRENCIES) */
 const fmtCurr=n=>`${S._currency} ${n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
 const fmtDate=d=>{if(!d)return'';const[y,m,day]=d.split('-');return`${day}-${m}-${y}`};
 const fmtK=n=>{const c=S._currency;return n>=1000000000?`${c} ${(n/1000000000).toFixed(2)}B`:n>=1000000?`${c} ${(n/1000000).toFixed(2)}M`:n>=100000?`${c} ${(n/1000).toFixed(2)}K`:`${c} ${n.toLocaleString()}`};
@@ -423,15 +755,27 @@ bannerOn:false,_tmp:null,_isNew:false,_curEdit:null,_tab:'all',_sort:'none',_sor
 };
 let _c=100;const gid=()=>'t'+_c++;const gvid=()=>'v'+_c++;
 
-function go(n,p){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));const el=document.getElementById('v-'+n);if(el)el.classList.add('active');if(n==='list')renderList();else if(n==='create')renderCreate();else if(n==='edit'){S._curEdit=p;renderEdit(p)}else if(n==='preview')renderPreview(p);else if(n==='batch')renderBatch();window.scrollTo(0,0)}
+function go(n,p){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));const el=document.getElementById('v-'+n);if(el)el.classList.add('active');if(n==='list')renderList();else if(n==='create')renderCreate();else if(n==='edit'){S._curEdit=p;renderEdit(p)}else if(n==='preview')renderPreview(p);else if(n==='batch')renderBatch();window.scrollTo(0,0);const _tm={list:'list',create:'edit',edit:'edit',preview:'preview'};if(_tm[n]&&window.demoFabSwitchTab)window.demoFabSwitchTab(_tm[n]);}
 
 /* ===== LIST ===== */
-function renderList(){const el=document.getElementById('v-list');const actT=S.tags.filter(t=>t.status==='active');const aai=actT.length?String(Math.round(actT.reduce((s,t)=>s+(aCost(t)/t.totalCost)*100,0)/actT.length)):'0';const avgUnallocCost=actT.length?actT.reduce((s,t)=>s+(t.totalCost-aCost(t)),0)/actT.length:0;const upct=actT.length?(100-parseFloat(aai)).toFixed(1):'100.0';const comp=actT.length?(actT.reduce((s,t)=>s+(aRes(t)/t.totalRes)*100,0)/actT.length).toFixed(2):'0.00';
+/* ===== SHARED EMPTY STATE HELPERS ===== */
+/* _mkES({icon,ic,cirBg,ttl,sub,btn,bfn}) — generates empty state inner HTML */
+function _mkES(o){const icH=o.cirBg?`<div style="width:56px;height:56px;border-radius:50%;background:${o.cirBg};display:inline-flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="font-size:28px;color:${o.ic||'#fff'};font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24">${o.icon}</span></div>`:`<span class="material-symbols-outlined" style="font-size:56px;color:${o.ic||'var(--pri-lt30)'};display:block;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48">${o.icon}</span>`;return`<div style="padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px">${icH}<div style="font-size:16px;font-weight:700;color:var(--g900)">${o.ttl}</div>${o.sub?`<div style="font-size:14px;color:var(--g500);max-width:480px;line-height:1.6">${o.sub}</div>`:''} ${o.btn?`<button class="btn btn-p" onclick="${o.bfn}"><span class="material-symbols-outlined">add</span>${o.btn}</button>`:''}</div>`;}
+/* _skMC() — skeleton metric cards (3 shimmer cards) */
+function _skMC(){return`<div class="cg">${[['Allocation Accuracy Index','info'],['Untagged Cost','info'],['Resource Coverage Rate','info']].map(([lbl])=>`<div class="card mc"><div class="ml">${lbl}</div><div class="mv" style="padding:8px 0;display:flex;justify-content:center"><span class="skeleton" style="display:inline-block;width:90px;height:28px"></span></div><div class="ms"><span class="skeleton" style="display:inline-block;width:120px;height:10px"></span></div></div>`).join('')}</div>`;}
+/* _skTR() — skeleton table rows (no column headers) */
+function _skTR(){const r=`<tr class="sk-row"><td><span class="skeleton" style="display:inline-block;width:160px;height:13px"></span><br><span class="skeleton" style="display:inline-block;width:80px;height:10px;margin-top:4px"></span></td><td><span class="skeleton" style="display:inline-block;width:90px;height:6px"></span></td><td><span class="skeleton" style="display:inline-block;width:54px;height:20px"></span></td><td><span class="skeleton" style="display:inline-block;width:90px;height:13px"></span></td><td><span class="skeleton" style="display:inline-block;width:80px;height:13px"></span></td><td></td></tr>`;return`<div class="tw" style="box-shadow:none"><div class="tbl-scroll"><table style="width:100%;table-layout:auto"><tbody>${Array(8).fill(r).join('')}</tbody></table></div></div>`;}
+
+function renderList(){const el=document.getElementById('v-list');
+if(S._noAuth){el.innerHTML=`<div class="pg-hdr"><div class="pg-hdr-row"><div><div class="pg-title">LumiTag</div></div></div></div><div class="card">${_mkES({icon:'lock',ic:'var(--sec)',ttl:'Authorize Your Cloud Account to Start Organizing Costs.',sub:'By authorizing, you can leverage LumiTags to categorize and allocate spend without altering your cloud environment. Gain full visibility into your cost distribution across teams and projects instantly.',btn:'Add Your Authorization',bfn:"toast('Navigating to Authorization setup...')"})}</div>`;return;}
+if(S._listError){const _errPGH=`<div class="pg-hdr"><div class="pg-hdr-row"><div><div class="pg-title">LumiTag</div><div class="pg-desc">Allocate cloud costs with precision using LumiTags. By <strong>EXCLUDING CREDITS</strong>, we provide a clearer view of your actual expenditure.</div></div><div class="pg-hdr-r" style="flex-shrink:0"><div style="font-size:13px;color:var(--g400)">Last Updated —</div></div></div></div>`;const _errMC=`<div class="cg">${['Allocation Accuracy Index','Untagged Cost','Resource Coverage Rate'].map(lbl=>`<div class="card mc"><div class="ml">${lbl}</div><div class="mv" style="font-size:22px;font-weight:500;color:var(--g400);line-height:1.4;padding:6px 0">No Data</div><div class="ms" style="color:var(--g300)">—</div></div>`).join('')}</div>`;const _errTbl=`<div class="card" style="padding:0;overflow:hidden;margin-top:16px"><div style="display:flex;align-items:center;gap:0;padding:4px 24px;border-bottom:1px solid var(--g100)"><div class="tabs" style="pointer-events:none;opacity:.5;flex:1"><div class="tab active">All Tags</div><div class="tab">Active</div><div class="tab">Inactive</div></div><div style="display:inline-flex;align-items:center;gap:8px;padding:8px 0"><div class="ts" style="pointer-events:none;opacity:.45"><span class="material-symbols-outlined">search</span><input type="text" placeholder="Search LumiTags..." disabled style="width:200px"></div><button class="btn btn-p" disabled style="opacity:.4;cursor:not-allowed;height:36px"><span class="material-symbols-outlined">add</span>Create LumiTag</button></div></div>${_mkES({icon:'error',cirBg:'var(--pri-lt20)',ic:'var(--pri)',ttl:'Something Went Wrong',sub:'Please ensure you have a stable internet connection and try refreshing the page.'})}</div>`;el.innerHTML=_errPGH+_errMC+_errTbl;return;}
+if(S._skeleton){const _skPGH=`<div class="pg-hdr"><div class="pg-hdr-row"><div><div class="pg-title">LumiTag</div><div class="pg-desc">Allocate cloud costs with precision using LumiTags. By <strong>EXCLUDING CREDITS</strong>, we provide a clearer view of your actual expenditure and highlight true opportunities for optimization.</div></div><div class="pg-hdr-r" style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="skeleton" style="display:inline-block;width:240px;height:14px"></span><span class="skeleton" style="display:inline-block;width:80px;height:14px;margin-top:4px"></span></div></div></div>`;const _skTbl=`<div class="card" style="padding:0;overflow:hidden;margin-top:0"><div style="display:flex;align-items:center;gap:0;padding:4px 24px;border-bottom:1px solid var(--g100)"><div class="tabs" style="pointer-events:none;flex:1"><div class="tab active">All Tags</div><div class="tab">Active</div><div class="tab">Inactive</div></div><div style="display:inline-flex;align-items:center;gap:8px;padding:8px 0"><div class="ts" style="pointer-events:none;opacity:.6"><span class="material-symbols-outlined">search</span><input type="text" placeholder="Search LumiTags..." disabled style="width:200px"></div><button class="btn btn-p" disabled style="opacity:.4;cursor:not-allowed;height:36px"><span class="material-symbols-outlined">add</span>Create LumiTag</button></div></div>${_skTR()}</div>`;el.innerHTML=_skPGH+_skMC()+_skTbl;return;}
+const actT=S.tags.filter(t=>t.status==='active');const aai=actT.length?String(Math.round(actT.reduce((s,t)=>s+(aCost(t)/t.totalCost)*100,0)/actT.length)):'0';const avgUnallocCost=actT.length?actT.reduce((s,t)=>s+(t.totalCost-aCost(t)),0)/actT.length:0;const upct=actT.length?(100-parseFloat(aai)).toFixed(1):'100.0';const comp=actT.length?(actT.reduce((s,t)=>s+(aRes(t)/t.totalRes)*100,0)/actT.length).toFixed(2):'0.00';
 const dftCount=S.tags.filter(t=>t.status==='inactive').length;const actCount=S.tags.filter(t=>t.status==='active').length;
 let h='';
-h+=`<div class="pg-hdr"><div class="pg-hdr-row"><div><div class="pg-title">LumiTag</div><div class="pg-desc">Allocate cloud costs with precision using LumiTags. By <strong>EXCLUDING CREDITS</strong>, we provide a clearer view of your actual expenditure and highlight true opportunities for optimization.</div></div><div class="pg-hdr-r" style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--g500)"><span>Last Updated 2026-04-15</span><span class="info-tip"><span class="material-symbols-outlined" style="font-size:16px">info</span><span class="tip-box" style="min-width:280px;max-width:320px">Data reflects the latest sync from your cloud billing sources. Due to provider-side latency, figures may differ slightly from final billing statements.</span></span></div><div style="position:relative"><button style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid var(--g200);border-radius:var(--r-sm);background:var(--wh);font-size:13px;color:var(--g700);cursor:pointer" onclick="toggleCurrencyPicker(this)"><span style="font-size:14px">${CURRENCIES[S._currency].flag}</span> ${S._currency} <span class="material-symbols-outlined" style="font-size:14px;color:var(--g400)">expand_more</span></button></div></div></div></div>`;
+h+=`<div class="pg-hdr"><div class="pg-hdr-row"><div><div class="pg-title">LumiTag</div><div class="pg-desc">Allocate cloud costs with precision using LumiTags. By <strong>EXCLUDING CREDITS</strong>, we provide a clearer view of your actual expenditure and highlight true opportunities for optimization.</div></div><div class="pg-hdr-r" style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--g500)"><span>Last Updated 2026-04-15</span><span class="info-tip"><span class="material-symbols-outlined" style="font-size:16px">info</span><span class="tip-box" style="min-width:280px;max-width:320px">Data reflects the latest sync from your cloud billing sources. Due to provider-side latency, figures may differ slightly from final billing statements.</span></span></div><div style="position:relative"><button class="curr-btn" onclick="CurrencyPicker.open(this,'${S._currency}',pickCurrency)"><span class="curr-flag">${(CurrencyPicker.CURRENCIES.find(c=>c.code===S._currency)||{flag:''}).flag}</span><span class="curr-code">${S._currency}</span><span class="material-symbols-outlined">expand_more</span></button></div></div></div></div>`;
 if(S.bannerOn)h+=`<div class="banner"><span class="material-symbols-outlined banner-ic">lightbulb</span><div class="banner-t"><div class="banner-tt">Get started with FinOps Foundation recommended tags</div><div class="banner-d">We've pre-configured 5 essential LumiTag keys. Customize them to match your organization's needs.</div></div><button class="btn btn-o btn-sm" onclick="toast('5 preset tags activated!');S.bannerOn=false;renderList()"><span class="material-symbols-outlined">rocket_launch</span>Get Started</button><span class="material-symbols-outlined banner-cl" onclick="S.bannerOn=false;renderList()">close</span></div>`;
-h+=`<div class="cg"><div class="card mc"><div class="ml">Allocation Accuracy Index <span class="info-tip"><span class="material-symbols-outlined">info</span><span class="tip-box">AAI measures how well your cloud cost is tagged with LumiTags. A score of 100 means all cost is fully allocated. Due to data latency from cloud service providers, values may differ slightly from final billing.</span></span></div><div class="mv" style="color:var(--g900)">${aai}<span style="font-size:18px;font-weight:500;color:var(--g400)"> / 100</span></div><div class="ms">Cloud cost tagged</div></div><div class="card mc"><div class="ml">Untagged Cost <span class="info-tip"><span class="material-symbols-outlined">info</span><span class="tip-box">The total cost of resources that have not been assigned to any LumiTag value. Excludes credits. Due to data latency from cloud service providers, values may differ slightly from final billing.</span></span></div><div class="mv" style="color:var(--g900)">${fmtCurr(avgUnallocCost)}</div><div class="ms">${upct}% cost remains untagged</div></div><div class="card mc"><div class="ml">Metadata Compliance Rate <span class="info-tip"><span class="material-symbols-outlined">info</span><span class="tip-box">The percentage of resources (by count) that have been assigned to at least one LumiTag. A higher rate means better tagging coverage across your cloud resources. Due to data latency from cloud service providers, values may differ slightly from final billing.</span></span></div><div class="mv" style="color:var(--g900)">${comp}%</div><div class="ms">Resources successfully tagged</div></div></div>`;
+h+=`<div class="cg"><div class="card mc"><div class="ml">Allocation Accuracy Index <span class="info-tip"><span class="material-symbols-outlined">info</span><span class="tip-box">AAI measures how well your cloud cost is tagged with LumiTags. A score of 100 means all cost is fully allocated. Due to data latency from cloud service providers, values may differ slightly from final billing.</span></span></div><div class="mv" style="color:var(--g900)">${aai}<span style="font-size:18px;font-weight:500;color:var(--g400)"> / 100</span></div><div class="ms">Cloud cost tagged</div></div><div class="card mc"><div class="ml">Untagged Cost <span class="info-tip"><span class="material-symbols-outlined">info</span><span class="tip-box">The total cost of resources that have not been assigned to any LumiTag value. Excludes credits. Due to data latency from cloud service providers, values may differ slightly from final billing.</span></span></div><div class="mv" style="color:var(--g900)">${fmtCurr(avgUnallocCost)}</div><div class="ms">${upct}% cost remains untagged</div></div><div class="card mc"><div class="ml">Resource Coverage Rate <span class="info-tip"><span class="material-symbols-outlined">info</span><span class="tip-box">The percentage of resources (by count) that have been assigned to at least one LumiTag. A higher rate means better tagging coverage across your cloud resources. Due to data latency from cloud service providers, values may differ slightly from final billing.</span></span></div><div class="mv" style="color:var(--g900)">${comp}%</div><div class="ms">Resources successfully tagged</div></div></div>`;
 h+=`<div class="card" style="padding:24px;overflow:hidden"><div><div class="tabs-row"><div class="tabs"><div class="tab ${S._tab==='all'?'active':''}" onclick="S._tab='all';renderList()">All<span class="tab-ct">(${S.tags.length})</span></div><div class="tab ${S._tab==='active'?'active':''}" onclick="S._tab='active';renderList()">Active<span class="tab-ct">(${actCount})</span></div><div class="tab ${S._tab==='inactive'?'active':''}" onclick="S._tab='inactive';renderList()">Inactive<span class="tab-ct">(${dftCount})</span></div></div><div class="ts"><span class="material-symbols-outlined">search</span><input type="text" placeholder="Search LumiTags..." oninput="filterTbl(this.value)"></div><!-- Batch Create Rules - hidden for Phase 1, uncomment to enable: <button class="btn btn-o" onclick="go('batch')"><span class="material-symbols-outlined">dynamic_feed</span>Batch Create Rules</button> -->${S.tags.length>=500?`<span data-tip="You've reached the 500 LumiTag limit. Remove existing tags to create new ones." style="display:inline-flex"><button class="btn btn-p" disabled style="opacity:.5;cursor:not-allowed;pointer-events:none"><span class="material-symbols-outlined">add</span>Create LumiTag</button></span>`:`<button class="btn btn-p" onclick="go('create')"><span class="material-symbols-outlined">add</span>Create LumiTag</button>`}</div></div>`;
 let filtered=S._tab==='all'?[...S.tags]:S.tags.filter(t=>t.status===S._tab);
 if(S._sort==='coverage'){filtered.sort((a,b)=>{const ca=aRes(a)/a.totalRes,cb=aRes(b)/b.totalRes;return S._sortDir==='asc'?ca-cb:cb-ca})}
@@ -439,11 +783,10 @@ else if(S._sort==='modified'){filtered.sort((a,b)=>S._sortDir==='asc'?a.modified
 else if(S._sort==='name'){filtered.sort((a,b)=>S._sortDir==='asc'?a.name.localeCompare(b.name):b.name.localeCompare(a.name))}
 function sortIcon(col){const isActive=S._sort===col;const arrow=isActive?(S._sortDir==='asc'?'arrow_upward':'arrow_downward'):'arrow_upward';const color=isActive?'var(--pri)':'var(--g300)';return ` <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;color:${color};font-variation-settings:'FILL' 0,'wght' 600,'GRAD' 0,'opsz' 20">${arrow}</span>`}
 const thS='cursor:pointer;user-select:none';
-if(S.tags.length===0){h+=`<div style="padding:64px 24px;text-align:center"><span class="material-symbols-outlined" style="font-size:56px;color:var(--pri-lt30);font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48;display:block;margin-bottom:16px">sell</span><div style="font-size:16px;font-weight:700;color:var(--g700);margin-bottom:8px">No LumiTags Yet</div><div style="font-size:14px;color:var(--g500)"><a href="#" onclick="go('create');return false" style="color:var(--pri);font-weight:500">Create your first LumiTag</a> to start allocating cloud costs by team, project, or cost center.</div></div></div>`;}else{h+=`<div class="tbl-scroll"><table id="tbl"><thead><tr><th style="width:28%;${thS}" onclick="toggleSort('name')">LumiTag${sortIcon('name')}</th><th style="width:16%;${thS}" onclick="toggleSort('coverage')">Coverage <span class="info-tip" onclick="event.stopPropagation()"><span class="material-symbols-outlined">info</span><span class="tip-box">The percentage of total cloud cost covered by this LumiTag. A tag with 100% coverage means all resources have been assigned a value under this tag key.</span></span>${sortIcon('coverage')}</th><th style="width:10%">Status</th><th style="width:14%">Last Editor</th><th style="width:14%;${thS}" onclick="toggleSort('modified')">Last Modified${sortIcon('modified')}</th><th style="width:8%">Actions</th></tr></thead><tbody>`;filtered.forEach(t=>{const ar=aRes(t);const cp=pct(ar,t.totalRes);const cc=covC(parseFloat(cp));const isDft=t.status==='inactive';h+=`<tr class="${isDft?'dft ':''} row-click" data-n="${t.name.toLowerCase()}" onclick="if(!event.target.closest('.ab'))go('edit','${t.id}')"><td><div class="tkn">${t.name}</div><div class="tkv">${t.values.length} values${t.preset?' · FinOps Recommended':''}</div></td><td><div class="cb"><div class="ct"><div class="cf${cc}" style="width:${cp}%"></div></div><span class="cp">${cp}%</span></div></td><td><span class="badge ${isDft?'b-ina':'b-act'}"><span class="bd"></span>${isDft?'Inactive':'Active'}</span></td><td style="font-size:13px;color:var(--g600)">${t.editor}</td><td style="font-size:13px;color:var(--g500)">${fmtDate(t.modified)}</td><td><button class="ab dng" onclick="event.stopPropagation();delTag('${t.id}')"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></td></tr>`});h+='</tbody></table></div></div>';}el.innerHTML=h}
+if(S.tags.length===0){h+=`<div style="padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px"><span class="material-symbols-outlined" style="font-size:56px;color:var(--pri-lt30);font-variation-settings:'FILL' 1,'wght' 300,'GRAD' 0,'opsz' 48">sell</span><div style="font-size:16px;font-weight:700;color:var(--g900)">Get Started with LumiTag</div><div style="font-size:14px;color:var(--g500);max-width:480px;line-height:1.6"><a href="#" onclick="go('create');return false" style="color:var(--pri);font-weight:500">Create your first LumiTag</a> to start allocating cloud costs by team, project, or cost center.</div></div></div>`;}else{h+=`<div class="tbl-scroll"><table id="tbl"><thead><tr><th style="width:28%;${thS}" onclick="toggleSort('name')">LumiTag${sortIcon('name')}</th><th style="width:16%;${thS}" onclick="toggleSort('coverage')">Coverage <span class="info-tip" onclick="event.stopPropagation()"><span class="material-symbols-outlined">info</span><span class="tip-box">The percentage of total cloud cost covered by this LumiTag. A tag with 100% coverage means all resources have been assigned a value under this tag key.</span></span>${sortIcon('coverage')}</th><th style="width:10%">Status</th><th style="width:14%">Last Editor</th><th style="width:14%;${thS}" onclick="toggleSort('modified')">Last Modified${sortIcon('modified')}</th><th style="width:8%">Actions</th></tr></thead><tbody>`;filtered.forEach(t=>{const ar=aRes(t);const cp=pct(ar,t.totalRes);const cc=covC(parseFloat(cp));const isDft=t.status==='inactive';h+=`<tr class="${isDft?'dft ':''} row-click" data-n="${t.name.toLowerCase()}" onclick="if(!event.target.closest('.ab'))go('edit','${t.id}')"><td><div class="tkn">${t.name}</div><div class="tkv">${t.values.length} values${t.preset?' · FinOps Recommended':''}</div></td><td><div class="cb"><div class="ct"><div class="cf${cc}" style="width:${cp}%"></div></div><span class="cp">${cp}%</span></div></td><td><span class="badge ${isDft?'b-ina':'b-act'}"><span class="bd"></span>${isDft?'Inactive':'Active'}</span></td><td style="font-size:13px;color:var(--g600)">${t.editor}</td><td style="font-size:13px;color:var(--g500)">${fmtDate(t.modified)}</td><td><button class="ab dng" onclick="event.stopPropagation();delTag('${t.id}')"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></td></tr>`});h+='</tbody></table></div></div>';}el.innerHTML=h}
 function filterTbl(q){q=q.toLowerCase();document.querySelectorAll('#tbl tbody tr').forEach(r=>{r.style.display=r.dataset.n&&r.dataset.n.includes(q)?'':'none'})}
 function toggleSort(col){if(S._sort===col){if(S._sortDir==='asc')S._sortDir='desc';else{S._sort='none';S._sortDir='asc'}}else{S._sort=col;S._sortDir=col==='coverage'?'asc':'desc'}renderList()}
-function toggleCurrencyPicker(btn){const existing=document.getElementById('curr-picker');if(existing){existing.remove();return;}const p=document.createElement('div');p.id='curr-picker';p.style.cssText='position:absolute;top:calc(100% + 4px);right:0;background:#fff;border:1px solid #E6E6E6;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.14);z-index:200;overflow:hidden;min-width:150px';p.innerHTML=Object.entries(CURRENCIES).map(([c,{flag}])=>`<button style="display:flex;align-items:center;gap:8px;padding:8px 14px;width:100%;font-size:13px;border:none;background:${c===S._currency?'#F2FAFF':'none'};cursor:pointer;font-family:inherit;color:#262626;font-weight:${c===S._currency?'700':'400'}" onmouseover="this.style.background='#F2FAFF'" onmouseout="this.style.background='${c===S._currency?'#F2FAFF':'none'}'" onclick="pickCurrency('${c}')"><span style="font-size:14px">${flag}</span>${c}</button>`).join('');btn.parentNode.appendChild(p);setTimeout(()=>document.addEventListener('click',function cl(e){if(!btn.parentNode.contains(e.target)){document.getElementById('curr-picker')?.remove();document.removeEventListener('click',cl)}},{capture:true}),0);}
-function pickCurrency(c){S._currency=c;document.getElementById('curr-picker')?.remove();renderList();}
+function pickCurrency(c){S._currency=c;renderList();}
 function delTag(id){const t=S.tags.find(x=>x.id===id);if(!t)return;showModal(`<div class="mh"><span class="mt">Remove LumiTag</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><p>Are you sure you want to remove <strong>${t.name}</strong>? This action cannot be undone.${t.status==='active'?' This tag will be removed from all cost reports and dashboards.':''}</p><div class="mf"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" style="background:var(--err)" onclick="S.tags=S.tags.filter(x=>x.id!=='${id}');closeModal();go('list');toast('Tag removed successfully.')">Remove</button></div>`)}
 
 /* ===== CREATE ===== */
@@ -496,7 +839,7 @@ t.values.forEach(v=>addVC('ed-vals',v.name,v.cspBlocks,v.res,v.cost));S._isDirty
 function renderCPV(t){const ar=aRes(t);const ac=aCost(t);const ur=t.totalRes-ar;const uc=t.totalCost-ac;const ap=pct(ac,t.totalCost);const up=pct(uc,t.totalCost);
 let bar='';let leg='';t.values.forEach((v,i)=>{const p=pct(v.cost,t.totalCost);if(parseFloat(p)>0)bar+=`<div class="cpv-seg" style="width:${p}%;background:${COLORS[i%8]}">${parseFloat(p)>5?p+'%':''}</div>`;leg+=`<div class="cpv-li"><div class="cpv-dot" style="background:${COLORS[i%8]}"></div>${v.name} ${pct(v.cost,t.totalCost)}%</div>`});
 if(parseFloat(up)>0)bar+=`<div class="cpv-seg" style="width:${up}%;background:var(--g300)">${parseFloat(up)>5?up+'%':''}</div>`;
-const unallocHtml=parseFloat(up)<=0?`<div class="cpv-success"><span class="material-symbols-outlined">celebration</span><span>🎉 100% Coverage Achieved! All resources are successfully tagged and accounted for.</span></div>`:`<div class="cpv-unalloc"><span class="material-symbols-outlined">warning</span><span>Untagged: <strong>${fmt(uc)}</strong> (${up}%)</span><button class="btn btn-s" style="margin-left:auto" onclick="showUnallocModal(${uc})">View Untagged</button></div>`;
+const unallocHtml=parseFloat(up)<=0?`<div class="cpv-success"><span class="material-symbols-outlined">celebration</span><span>100% Coverage Achieved! All resources are successfully tagged and accounted for.</span></div>`:`<div class="cpv-unalloc"><span class="material-symbols-outlined">warning</span><span>Untagged: <strong>${fmt(uc)}</strong> (${up}%)</span><button class="btn btn-s" style="margin-left:auto" onclick="showUnallocModal(${uc})">View Untagged</button></div>`;
 return`<div class="cpv-bar">${bar}</div><div class="cpv-leg">${leg}</div>${unallocHtml}`}
 
 /* ===== NAME VALIDATION ===== */
@@ -790,7 +1133,7 @@ const ur=831-totalAlloc;const uc=222050-totalCost;const up=pct(ur,831);
 let bar='';let leg='';segs.forEach(s=>{const p=pct(s.cost,222050);if(parseFloat(p)>0)bar+=`<div class="cpv-seg" style="width:${p}%;background:${s.color}">${parseFloat(p)>5?p+'%':''}</div>`;leg+=`<div class="cpv-li"><div class="cpv-dot" style="background:${s.color}"></div>${s.name} ${pct(s.cost,222050)}%</div>`});
 if(ur>0)bar+=`<div class="cpv-seg" style="width:${up}%;background:var(--g300)">${parseFloat(up)>5?up+'%':''}</div>`;
 const title='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="material-symbols-outlined" style="font-size:18px;color:var(--g400)">pie_chart</span><span style="font-size:14px;font-weight:700;color:var(--g700)">Coverage Preview</span></div>';
-const successHtml=`<div class="cpv-success"><span class="material-symbols-outlined">celebration</span><span>🎉 100% Coverage Achieved! All resources are successfully tagged and accounted for.</span></div>`;
+const successHtml=`<div class="cpv-success"><span class="material-symbols-outlined">celebration</span><span>100% Coverage Achieved! All resources are successfully tagged and accounted for.</span></div>`;
 const unallocHtml2=ur<=0?successHtml:`<div class="cpv-unalloc"><span class="material-symbols-outlined">warning</span><span>Untagged: <strong>${fmt(uc>0?uc:0)}</strong> (${up}%)</span><button class="btn btn-s" style="margin-left:auto" onclick="showUnallocModal(${uc>0?uc:0})">View Untagged</button></div>`;
 if(!bar)cpvEl.innerHTML=`${title}<div style="text-align:center;padding:24px 16px;color:var(--g400);font-size:13px"><span class="material-symbols-outlined" style="font-size:32px;display:block;margin-bottom:8px;color:var(--g300)">donut_large</span>Add values and define conditions to preview coverage allocation.</div>${unallocHtml2}`;
 else cpvEl.innerHTML=`${title}<div class="cpv-bar">${bar}</div><div class="cpv-leg">${leg}</div>${unallocHtml2}`}
@@ -869,6 +1212,21 @@ else go('preview',id)}
 function renderPreview(id){
 const t=S._tmp||S.tags.find(x=>x.id===id);if(!t){go('list');return}
 const el=document.getElementById('v-preview');
+
+// === SKELETON STATE ===
+if(S._previewLoading){
+  const skBar=`<div style="display:flex;gap:4px;height:40px;border-radius:var(--r-sm);overflow:hidden">${['38%','22%','18%','12%','10%'].map(w=>`<span class="skeleton" style="display:block;width:${w};border-radius:0"></span>`).join('')}</div>`;
+  const skLeg=`<div style="display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px">${Array(5).fill(0).map(()=>`<span class="skeleton" style="display:inline-block;width:${70+Math.floor(Math.random()*50)}px;height:14px;border-radius:4px"></span>`).join('')}</div>`;
+  const skColW=`<colgroup><col style="width:44%"><col style="width:26%"><col style="width:30%"></colgroup>`;
+  const skRow=`<tr><td><span class="skeleton" style="display:inline-block;width:140px;height:14px;border-radius:4px"></span></td><td style="text-align:right"><span class="skeleton" style="display:inline-block;width:70px;height:14px;border-radius:4px"></span></td><td><span class="skeleton" style="display:inline-block;width:60px;height:14px;border-radius:4px"></span></td></tr>`;
+  el.innerHTML=`<div class="pg-hdr"><a class="back-btn" href="#" onclick="showLeaveConfirm('list');return false"><span class="material-symbols-outlined">arrow_back</span>LumiTag List</a><div class="pg-hdr-row"><div class="pg-title">Coverage Preview</div></div></div>
+<div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span class="skeleton" style="display:inline-block;width:240px;height:16px;border-radius:4px"></span><span class="skeleton" style="display:inline-block;width:200px;height:14px;border-radius:4px"></span></div>${skBar}${skLeg}</div>
+<div class="card" style="margin-bottom:24px"><div class="st" style="margin-bottom:16px">Spend Breakdown</div><div class="pt-wrap"><table class="pt" style="table-layout:fixed">${skColW}<thead><tr><th>Tag Value</th><th style="text-align:right">30 Days Spend</th><th>Share of Spend</th></tr></thead><tbody>${Array(5).fill(skRow).join('')}</tbody></table></div></div>
+<div class="sbtm"><button class="btn btn-o" onclick="${S._isNew?`go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_back</span>Back to Edit</button><div class="ssp"></div><button class="btn btn-o" disabled style="opacity:.45;cursor:not-allowed">Save as Inactive Tag</button><button class="btn btn-p" disabled style="opacity:.45;cursor:not-allowed"><span class="material-symbols-outlined">check_circle</span>Apply LumiTag</button></div>`;
+  return;
+}
+
+
 const ar=aRes(t);const ac=aCost(t);const ur=t.totalRes-ar;const uc=t.totalCost-ac;const up=pct(uc,t.totalCost);
 
 // === CHART: top 9 + Other Values + Untagged ===
@@ -879,14 +1237,14 @@ const otherVals=sortedForBar.slice(BAR_LIMIT);
 const otherCost=otherVals.reduce((s,v)=>s+v.cost,0);
 let bar='<div class="abar">';let leg='<div class="aleg">';
 topVals.forEach((v,i)=>{const p=pct(v.cost,t.totalCost);if(parseFloat(p)>0){const esc=v.name.replace(/'/g,'&apos;');bar+=`<div class="aseg" style="width:${p}%;background:${COLORS[i]}" onmouseenter="showSegTip(event,'${esc}','${COLORS[i]}','${fmtK(v.cost)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${p}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${COLORS[i]}"></div>${v.name}</div>`;}});
-if(otherVals.length>0){const op=pct(otherCost,t.totalCost);if(parseFloat(op)>0)bar+=`<div class="aseg" style="width:${op}%;background:#B0BEC5" onmouseenter="showSegTip(event,'Other Values','#B0BEC5','${fmtK(otherCost)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${op}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:#B0BEC5"></div>Other Values (${otherVals.length} more)</div>`;}
-if(parseFloat(up)>0){bar+=`<div class="aseg" style="width:${up}%;background:#CFD8DC" onmouseenter="showSegTip(event,'Untagged','#CFD8DC','${fmtK(uc)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${up}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:#CFD8DC"></div>Untagged</div>`;}
+if(otherVals.length>0){const op=pct(otherCost,t.totalCost);if(parseFloat(op)>0)bar+=`<div class="aseg" style="width:${op}%;background:${CLR_OTHER}" onmouseenter="showSegTip(event,'Other Values','${CLR_OTHER}','${fmtK(otherCost)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${op}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${CLR_OTHER}"></div>Other Values (${otherVals.length} more)</div>`;}
+if(parseFloat(up)>0){bar+=`<div class="aseg" style="width:${up}%;background:${CLR_UNTAGGED}" onmouseenter="showSegTip(event,'Untagged','${CLR_UNTAGGED}','${fmtK(uc)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${up}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${CLR_UNTAGGED}"></div>Untagged</div>`;}
 bar+='</div>';leg+='</div>';
 
 // === TABLE: sorted by cost, Untagged fixed at bottom (outside scroll) ===
 const colW=`<colgroup><col style="width:44%"><col style="width:26%"><col style="width:30%"></colgroup>`;
 let trows='';sortedForBar.forEach((v,i)=>{
-const color=i<BAR_LIMIT?COLORS[i]:'#B0BEC5';
+const color=i<BAR_LIMIT?COLORS[i]:CLR_OTHER;
 const esc=v.name.replace(/'/g,'&apos;');
 if(v.res>0){
   trows+=`<tr><td><div class="li"><div class="ld" style="background:${color}"></div>${v.name}</div></td><td style="text-align:right">${fmtK(v.cost)}</td><td><div style="display:flex;align-items:center;justify-content:space-between">${pct(v.cost,t.totalCost)}%<a href="#" onclick="event.preventDefault();showMatchedModal('${esc}',${v.res},${v.cost})" style="color:var(--pri);font-size:12px;font-weight:500;white-space:nowrap;margin-left:8px">View Details →</a></div></td></tr>`;
@@ -898,7 +1256,7 @@ if(v.res>0){
 });
 const untaggedFooter=ur>0
 ?`<table class="pt" style="width:100%;table-layout:fixed;border-top:2px solid var(--g200)">${colW}<tbody><tr class="ua"><td><div class="li"><span class="material-symbols-outlined" style="font-size:16px">warning</span><strong>Untagged</strong></div></td><td style="text-align:right;font-weight:700">${fmtK(uc)}</td><td><div style="display:flex;align-items:center;justify-content:space-between">${up}%<a href="#" onclick="event.preventDefault();showUnallocModal(${uc})" style="color:var(--pri);font-size:12px;font-weight:500;white-space:nowrap;margin-left:8px">View Untagged →</a></div></td></tr></tbody></table>`
-:`<div style="text-align:center;color:var(--ok-dk);font-weight:700;padding:14px 16px;background:var(--ok-lt);border-top:1px solid #B2EFE7;border-radius:0 0 var(--r-sm) var(--r-sm)"><span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:6px">celebration</span>🎉 100% Coverage! All resources are successfully tagged.</div>`;
+:`<div style="text-align:center;color:var(--ok-dk);font-weight:700;padding:14px 16px;background:var(--ok-lt);border-top:1px solid #B2EFE7;border-radius:0 0 var(--r-sm) var(--r-sm)"><span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:6px">celebration</span>100% Coverage! All resources are successfully tagged.</div>`;
 
 
 
@@ -983,13 +1341,13 @@ function _renderResLevelTable(rows,level,isUntagged){
   const costLabel=isUntagged?'30-Day Untagged Spend':'30-Day Matched Spend';
   const pctLabel=isUntagged?'Untagged Rate':'Coverage';
   // first-col cell: badge + 2-line (name on top, id below)
-  const nameCell=(name,id,cloud,title)=>`<td style="width:100%;overflow:hidden;padding:10px 12px" title="${title||name}"><div style="display:flex;flex-direction:column;overflow:hidden;min-width:0"><span style="font-size:13px;color:var(--g800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</span>${id?`<span style="font-size:11px;color:var(--g400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">${id}</span>`:''}</div></td>`;
+  const nameCell=(name,id,cloud,title)=>`<td style="width:100%;overflow:hidden;" data-tip="${title||name}"><div style="display:flex;flex-direction:column;overflow:hidden;min-width:0"><span style="font-size:13px;color:var(--g800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</span>${id?`<span style="font-size:11px;color:var(--g400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">${id}</span>`:''}</div></td>`;
   // Resource cell — normal or "outside dimensions" special row
   const resCell=r=>r.isOutside
-    ?`<td style="width:100%;overflow:hidden;padding:10px 12px"><span style="font-size:12px;color:var(--g400);font-style:italic">${r.name}</span></td>`
-    :`<td style="width:100%;overflow:hidden;padding:10px 12px" title="${r.name}"><span style="font-size:13px;font-weight:500;color:${r.name==='--'?'var(--g400)':'var(--g800)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${r.name}</span></td>`;
+    ?`<td style="width:100%;overflow:hidden;"><span style="font-size:12px;color:var(--g400);font-style:italic">${r.name}</span></td>`
+    :`<td style="width:100%;overflow:hidden;" data-tip="${r.name}"><span style="font-size:13px;font-weight:500;color:${r.name==='--'?'var(--g400)':'var(--g800)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">${r.name}</span></td>`;
   // Plain text cell with truncation
-  const textCell=v=>`<td style="font-size:13px;color:var(--g700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:10px 12px" title="${v}">${v}</td>`;
+  const textCell=v=>`<td style="font-size:13px;color:var(--g700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" data-tip="${v}">${v}</td>`;
   // Cost duo: [matched "A / B" inline, "/ B" in gray small, no duplicate currency] | [coverage % only]
   const costCells=r=>{
     const total=Math.round(r.cost*mult);
@@ -1012,7 +1370,7 @@ function _renderResLevelTable(rows,level,isUntagged){
     return`<table style="width:100%;table-layout:auto" id="res-modal-tbl"><thead><tr><th style="${ts}">Service</th>${costHdrs}</tr></thead><tbody>${rows.map(r=>`<tr>${nameCell(r.name,'',r.cloud)}${costCells(r)}</tr>`).join('')}</tbody></table>`;
   }
   // Resource level — 5 cols: Resource | Resource Type | Service | Spend | Coverage
-  const emptyCell=`<td style="padding:10px 12px"></td>`;
+  const emptyCell=`<td style=""></td>`;
   return`<table style="width:100%;table-layout:auto" id="res-modal-tbl"><thead><tr><th style="${ts}">Resource</th><th style="${ts};white-space:nowrap">Resource Type</th><th style="${ts};white-space:nowrap">Service</th>${costHdrs}</tr></thead><tbody>${rows.map(r=>`<tr>${resCell(r)}${r.isOutside?emptyCell+emptyCell:textCell(r.resourceType)+textCell(r.service)}${costCells(r)}</tr>`).join('')}</tbody></table>`;
 }
 
@@ -1078,7 +1436,7 @@ function _openResModal(type,valueName,count,totalCost){
   const isUntagged=type==='untagged';
   const title=isUntagged?'Untagged Resources':`Resources Matched To: ${valueName}`;
   // Show modal with skeleton first, then render real data after 800ms
-  showModal(`<div class="mh"><span class="mt">${title}</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><div id="res-modal-inner">${_renderSkeleton('billing')}</div><p style="margin-top:12px;font-size:12px;color:var(--g400);font-style:italic">*Note: Costs are estimated based on synchronized data and may differ from final billing.</p><div class="mf"><button class="btn btn-p" onclick="closeModal()">Got it</button></div>`,1);
+  showModal(`<div class="mh"><span class="mt">${title}</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><div id="res-modal-inner">${_renderSkeleton('billing')}</div><p style="margin-top:12px;font-size:12px;color:var(--g400);font-style:italic">*Note: Costs are estimated based on synchronized data and may differ from final billing.</p><div class="mf"><button class="btn btn-p" onclick="closeModal()">Got it</button></div>`,'lg tall');
   setTimeout(()=>{const el=document.getElementById('res-modal-inner');if(el)el.innerHTML=_renderResModalBody();},800);
 }
 
@@ -1099,11 +1457,12 @@ function ubv(s){const t=S.tags.find(x=>x.id===s.value);const vs=s.closest('.ta')
 function ubh(){const rows=document.querySelectorAll('#ba-a .ta');const h=document.getElementById('ba-h');const ht=document.getElementById('ba-ht');if(rows.length>0){h.style.display='block';ht.textContent=`This will create ${rows.length} rule${rows.length>1?'s':''} (one per tag key). Each rule will be added to its respective LumiTag.`}else h.style.display='none'}
 
 /* ===== MODAL ===== */
-function showModal(h,lg){const o=document.getElementById('mo');const c=document.getElementById('mc');c.className=lg?'modal modal-lg':'modal';c.innerHTML=h;o.classList.add('active');o.onclick=e=>{if(e.target===o)closeModal()}}
+function showModal(h,size){const o=document.getElementById('mo');const c=document.getElementById('mc');const tokens=String(size||'').toLowerCase().split(/\s+/);let cls='modal';if(tokens.includes('xs'))cls+=' modal-xs';else if(tokens.includes('center')||tokens.includes('s'))cls+=' modal-center';else if(tokens.includes('wide')||tokens.includes('l'))cls+=' modal-wide';else if(tokens.includes('lg')||tokens.includes('xl')||size===true||size===1)cls+=' modal-lg';if(tokens.includes('tall'))cls+=' modal-tall';c.className=cls;c.innerHTML=h;/* Auto-wrap body (between .mh and .mf) into .mb so scroll lives inside body, not on outer modal */const mh=c.querySelector('.mh'),mf=c.querySelector('.mf');if(mh){const mb=document.createElement('div');mb.className='mb';let n=mh.nextSibling;while(n&&n!==mf){const next=n.nextSibling;mb.appendChild(n);n=next;}mh.insertAdjacentElement('afterend',mb);}o.classList.add('active');o.onclick=e=>{if(e.target===o)closeModal()}}
 function closeModal(){document.getElementById('mo').classList.remove('active')}
 function toast(msg,err){const c=document.getElementById('tc');const t=document.createElement('div');t.className='toast'+(err?' terr':' tok');t.innerHTML=`<span class="material-symbols-outlined">${err?'error':'check_circle'}</span>${msg}`;c.appendChild(t);setTimeout(()=>t.remove(),3000)}
 
-function toggleSidebar(){const sb=document.querySelector('.sidebar');const mn=document.querySelector('.main');const ic=document.getElementById('sb-toggle-icon');sb.classList.toggle('collapsed');mn.classList.toggle('sb-collapsed');ic.textContent=sb.classList.contains('collapsed')?'chevron_right':'chevron_left';document.documentElement.style.setProperty('--sw',sb.classList.contains('collapsed')?'64px':'240px')}
+function toggleSbGroup(id){document.getElementById(id).classList.toggle('collapsed')}
+function toggleSidebar(){const sb=document.querySelector('.sidebar');const mn=document.querySelector('.main');const ic=document.getElementById('sb-toggle-icon');sb.classList.toggle('collapsed');mn.classList.toggle('sb-collapsed');ic.textContent=sb.classList.contains('collapsed')?'chevron_right':'chevron_left';document.documentElement.style.setProperty('--sw',sb.classList.contains('collapsed')?'64px':'264px')}
 function showSegTip(e,name,color,costStr){const tip=document.getElementById('seg-tip');document.getElementById('seg-tip-title').textContent=name;document.getElementById('seg-tip-row').innerHTML=`<span style="width:10px;height:10px;border-radius:2px;background:${color};flex-shrink:0;display:inline-block"></span><span>${name}</span><span class="seg-tip-amt">${costStr}</span>`;tip.style.display='block';posSegTip(e);}
 function posSegTip(e){const tip=document.getElementById('seg-tip');const w=tip.offsetWidth||180;const h=tip.offsetHeight||56;let x=e.clientX+14;let y=e.clientY-h-10;if(x+w>window.innerWidth-8)x=e.clientX-w-14;if(y<8)y=e.clientY+14;tip.style.left=x+'px';tip.style.top=y+'px';}
 function hideSegTip(){document.getElementById('seg-tip').style.display='none';}
@@ -1111,7 +1470,171 @@ document.addEventListener('click',e=>{
 if(!e.target.closest('.ms-wrap')){document.querySelectorAll('.ms-panel.open').forEach(p=>{p.classList.remove('open');p.previousElementSibling?.classList.remove('open')})}
 if(!e.target.closest('.add-csp-wrap')){closePickers()}
 });
-go('list');
+// go('list') is deferred to after shared scripts load (see bottom of <body>)
+// Calling it here would fail because CurrencyPicker (loaded later) is referenced in renderList()
+
+// ===== DESIGNER DEMO FAB =====
+const _ORIG_TAGS=JSON.parse(JSON.stringify(S.tags));
+function _demoClean(){S.tags=S.tags.filter(t=>!t._demo);delete S._noAuth;delete S._listError;delete S._skeleton;delete S._previewLoading;}
+function applyScenario(name,btn){
+  document.querySelectorAll('.demo-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  _demoClean();
+  const TR=831,TC=222050;
+  switch(name){
+    case 'list-default':S.tags=JSON.parse(JSON.stringify(_ORIG_TAGS));go('list');break;
+    case 'list-empty':S.tags=[];go('list');break;
+    case 'list-sos':
+      S.tags=[
+        {id:'_ss1',name:'environment',_demo:true,preset:true,status:'active',wasActive:true,editor:'Kabin Yang',modified:'2026-05-05',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Production',cspBlocks:[],res:22,cost:8500}]},
+        {id:'_ss2',name:'cost-center',_demo:true,preset:true,status:'active',wasActive:true,editor:'Jessie Lee',modified:'2026-05-04',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Engineering',cspBlocks:[],res:38,cost:12000}]},
+        {id:'_ss3',name:'team',_demo:true,preset:false,status:'active',wasActive:true,editor:'Bater Chen',modified:'2026-05-03',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Backend',cspBlocks:[],res:15,cost:4200}]},
+        {id:'_ss4',name:'application',_demo:true,preset:true,status:'active',wasActive:true,editor:'Shaobo Yang',modified:'2026-05-02',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'API',cspBlocks:[],res:95,cost:28000}]},
+        {id:'_ss5',name:'region-group',_demo:true,preset:false,status:'inactive',wasActive:false,editor:'Jeff Liu',modified:'2026-04-30',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'APAC',cspBlocks:[],res:0,cost:0}]}
+      ];go('list');break;
+    case 'list-star':
+      S.tags=[
+        {id:'_st1',name:'environment',_demo:true,preset:true,status:'active',wasActive:true,editor:'Kabin Yang',modified:'2026-05-05',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Production',cspBlocks:[],res:342,cost:105200},{id:'v2',name:'Staging',cspBlocks:[],res:165,cost:42400},{id:'v3',name:'Development',cspBlocks:[],res:245,cost:58430},{id:'v4',name:'Sandbox',cspBlocks:[],res:79,cost:16020}]},
+        {id:'_st2',name:'cost-center',_demo:true,preset:true,status:'active',wasActive:true,editor:'Jessie Lee',modified:'2026-05-04',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Engineering',cspBlocks:[],res:415,cost:142000},{id:'v2',name:'Marketing',cspBlocks:[],res:260,cost:56000},{id:'v3',name:'Operations',cspBlocks:[],res:155,cost:24000}]},
+        {id:'_st3',name:'department',_demo:true,preset:false,status:'active',wasActive:true,editor:'Bater Chen',modified:'2026-05-03',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Engineering',cspBlocks:[],res:350,cost:98000},{id:'v2',name:'Marketing',cspBlocks:[],res:285,cost:72000},{id:'v3',name:'Finance',cspBlocks:[],res:196,cost:52050}]}
+      ];go('list');break;
+    case 'list-full-house':{
+      S.tags=JSON.parse(JSON.stringify(_ORIG_TAGS));
+      for(let i=S.tags.length;i<498;i++){S.tags.push({id:`_ff${i}`,_demo:true,name:`auto-tag-${String(i+1).padStart(3,'0')}`,preset:false,status:i%4===0?'inactive':'active',wasActive:true,editor:'System',modified:'2026-01-01',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Default',cspBlocks:[],res:Math.floor(Math.random()*200)+50,cost:Math.floor(Math.random()*50000)+5000}]});}
+      go('list');break;
+    }
+    case 'edit-three-cloud':{
+      const t={id:'__demo__',_demo:true,name:'cross-cloud-env',preset:false,status:'active',wasActive:true,editor:'Demo',modified:'2026-05-05',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Production',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'starts_with',v:'prd-',c:''}]},{csp:'AWS',conds:[{f:'line_item_usage_account_id',o:'starts_with',v:'234',c:''}]},{csp:'Azure',conds:[{f:'ResourceGroupId',o:'contains',v:'prod',c:''}]}],res:242,cost:88000},{id:'v2',name:'Staging',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'starts_with',v:'stg-',c:''}]},{csp:'AWS',conds:[{f:'line_item_usage_account_id',o:'starts_with',v:'456',c:''}]},{csp:'Azure',conds:[{f:'ResourceGroupId',o:'contains',v:'stg',c:''}]}],res:165,cost:42000}]};
+      S.tags.push(t);go('edit','__demo__');break;}
+    case 'edit-regex':{
+      const t={id:'__demo__',_demo:true,name:'cloud-provider',preset:false,status:'active',wasActive:true,editor:'Demo',modified:'2026-05-05',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'GCP-Production',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'matches',v:'^prd-.*',c:''}]}],res:312,cost:98000},{id:'v2',name:'AWS-Legacy',cspBlocks:[{csp:'AWS',conds:[{f:'line_item_resource_id',o:'matches',v:'^i-[a-f0-9]{17}$',c:''}]}],res:198,cost:52000},{id:'v3',name:'Archive',cspBlocks:[{csp:'GCP',conds:[{f:'resource_name',o:'matches',v:'.*-archive-.*|.*-backup-.*',c:''}]}],res:45,cost:8400}]};
+      S.tags.push(t);go('edit','__demo__');break;}
+    case 'edit-isin':{
+      const t={id:'__demo__',_demo:true,name:'region-group',preset:false,status:'active',wasActive:true,editor:'Demo',modified:'2026-05-05',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'APAC',cspBlocks:[{csp:'GCP',conds:[{f:'location_region',o:'is',v:'asia-east1,asia-northeast1,asia-southeast1,australia-southeast1,asia-south1',c:''}]}],res:210,cost:48000},{id:'v2',name:'Americas',cspBlocks:[{csp:'GCP',conds:[{f:'location_region',o:'is',v:'us-east1,us-central1,us-west1,us-west2,northamerica-northeast1,southamerica-east1',c:''}]}],res:380,cost:112000},{id:'v3',name:'EMEA',cspBlocks:[{csp:'GCP',conds:[{f:'location_region',o:'is',v:'europe-west1,europe-west4,europe-north1,me-west1',c:''}]}],res:150,cost:32000}]};
+      S.tags.push(t);go('edit','__demo__');break;}
+    case 'edit-conflict':{
+      const t={id:'__demo__',_demo:true,name:'environment',preset:true,status:'active',wasActive:true,editor:'Demo',modified:'2026-05-05',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Production',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'starts_with',v:'prd-',c:''}]}],res:342,cost:105200},{id:'v2',name:'Production-DR',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'starts_with',v:'prd-',c:''}]}],res:0,cost:0},{id:'v3',name:'Staging',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'starts_with',v:'stg-',c:''}]}],res:165,cost:42400}]};
+      S.tags.push(t);go('edit','__demo__');break;}
+    case 'edit-priority':{
+      const t={id:'__demo__',_demo:true,name:'environment',preset:true,status:'active',wasActive:true,editor:'Demo',modified:'2026-05-05',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Production',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'starts_with',v:'prd-',c:''}]}],res:342,cost:105200},{id:'v2',name:'Staging',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'starts_with',v:'stg-',c:''}]}],res:165,cost:42400},{id:'v3',name:'Development',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'starts_with',v:'dev-',c:''}]}],res:238,cost:58430},{id:'v4',name:'QA',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'env',o:'is',v:'qa',c:''}]}],res:56,cost:12000},{id:'v5',name:'Sandbox',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'env',o:'contains',v:'sandbox',c:''}]}],res:86,cost:16020},{id:'v6',name:'Testing',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'env',o:'contains',v:'test',c:''}]}],res:32,cost:5800},{id:'v7',name:'Legacy',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'lifecycle',o:'is',v:'decom',c:''}]}],res:18,cost:3200}]};
+      S.tags.push(t);go('edit','__demo__');break;}
+    case 'edit-cross-cloud':{
+      const t={id:'__demo__',_demo:true,name:'service-tier',preset:false,status:'active',wasActive:true,editor:'Demo',modified:'2026-05-05',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Premium',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'tier',o:'is',v:'premium',c:''}]},{csp:'AWS',conds:[{f:'tags',k:'tier',o:'is',v:'premium',c:''}]}],res:120,cost:88000},{id:'v2',name:'Standard',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'tier',o:'is',v:'standard',c:''}]},{csp:'AWS',conds:[{f:'tags',k:'tier',o:'is',v:'standard',c:''}]}],res:340,cost:72000}]};
+      S.tags.push(t);go('edit','__demo__');break;}
+    case 'preview-100':{
+      const t={id:'__demo__',_demo:true,name:'environment',preset:true,status:'active',wasActive:true,editor:'Demo',modified:'2026-05-05',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Production',cspBlocks:[],res:350,cost:112000},{id:'v2',name:'Staging',cspBlocks:[],res:180,cost:52000},{id:'v3',name:'Development',cspBlocks:[],res:220,cost:42000},{id:'v4',name:'QA',cspBlocks:[],res:81,cost:16050}]};
+      S._tmp=t;S._isNew=false;S.tags.push(t);go('preview','__demo__');break;}
+    case 'preview-danger':{
+      const t={id:'__demo__',_demo:true,name:'cost-center',preset:true,status:'active',wasActive:true,editor:'Demo',modified:'2026-05-05',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Engineering',cspBlocks:[],res:68,cost:22000},{id:'v2',name:'Marketing',cspBlocks:[],res:31,cost:5800}]};
+      S._tmp=t;S._isNew=false;S.tags.push(t);go('preview','__demo__');break;}
+    case 'preview-multivalue':{
+      const t={id:'__demo__',_demo:true,name:'department',preset:false,status:'active',wasActive:true,editor:'Demo',modified:'2026-05-05',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Engineering',cspBlocks:[],res:280,cost:105000},{id:'v2',name:'Marketing',cspBlocks:[],res:95,cost:42000},{id:'v3',name:'Sales',cspBlocks:[],res:62,cost:18000},{id:'v4',name:'Finance',cspBlocks:[],res:38,cost:22000},{id:'v5',name:'Operations',cspBlocks:[],res:145,cost:8500}]};
+      S._tmp=t;S._isNew=false;S.tags.push(t);go('preview','__demo__');break;}
+    case 'list-no-search':
+      S.tags=JSON.parse(JSON.stringify(_ORIG_TAGS));
+      go('list');
+      setTimeout(()=>{const inp=document.querySelector('#v-list .ts input');if(inp){inp.value='xyz9999';filterTbl('xyz9999');}},50);
+      break;
+    case 'list-no-auth':
+      S._noAuth=true;
+      go('list');
+      break;
+    case 'list-error':
+      S._listError=true;
+      go('list');
+      break;
+    case 'list-skeleton':
+      S._skeleton=true;
+      go('list');
+      break;
+    case 'edit-empty-draft':{
+      const t={id:'__demo__',_demo:true,name:'new-tag-draft',preset:false,status:'inactive',wasActive:false,editor:'Demo',modified:'2026-05-05',totalRes:TR,totalCost:TC,values:[]};
+      S.tags.push(t);go('edit','__demo__');break;}
+    case 'preview-zero':{
+      const t={id:'__demo__',_demo:true,name:'cost-center',preset:true,status:'active',wasActive:true,editor:'Demo',modified:'2026-05-05',totalRes:TR,totalCost:TC,values:[{id:'v1',name:'Engineering',cspBlocks:[],res:0,cost:0},{id:'v2',name:'Marketing',cspBlocks:[],res:0,cost:0},{id:'v3',name:'Operations',cspBlocks:[],res:0,cost:0}]};
+      S._tmp=t;S._isNew=false;S.tags.push(t);go('preview','__demo__');break;}
+    case 'preview-loading':{
+      const t={id:'__demo__',_demo:true,name:'environment',preset:true,status:'active',wasActive:true,editor:'Demo',modified:'2026-05-05',totalRes:831,totalCost:222050,values:[]};
+      S._tmp=t;S._isNew=false;S._previewLoading=true;S.tags.push(t);go('preview','__demo__');break;}
+  }
+}
+
+// ===== DEMO FAB WIRING =====
+// 顯式定義 page tabs（icon + label）— shared/demo-fab.js 會用這個渲染。
+// 若不定義會自動從 scenarios 的 page/tab 欄位推導，但 icon 會用預設 'tab'。
+window.DEMO_PAGES=[
+  {id:'list',    label:'List',    icon:'list'},
+  {id:'edit',    label:'Edit',    icon:'edit'},
+  {id:'preview', label:'Preview', icon:'visibility'},
+];
+
+window.DEMO_SCENARIOS=[
+  // ── LIST ── normal
+  {id:'list-default',   tab:'list', label:'Default（預設 13 個 Tag）',          icon:'refresh',              tip:'回到預設狀態：13 個 LumiTag，Active + Inactive 混合，coverage 高低都有。最接近真實使用的狀態。'},
+  {id:'list-sos',       tab:'list', label:'SOS Board（低 coverage 警示）',       icon:'warning',              tip:'SOS Board：5 個 Tag 的 coverage 都低於 20%，最低甚至是 0%。展示需要緊急處理的警示感。'},
+  {id:'list-star',      tab:'list', label:'Star Team（高 coverage 健康）',       icon:'star',                 tip:'Star Team：3 個 Tag 全部 Active，所有 value 的 coverage 合計都超過 85%。展示健康的理想狀態。'},
+  {id:'list-full-house',tab:'list', label:'Full House（498/500 接近上限）',      icon:'format_list_numbered', tip:'Full House：Tag 數量達到 498/500，Create LumiTag 按鈕變 disabled。展示 500 tag 上限的 UI 保護機制。'},
+  // ── LIST ── no data
+  {id:'list-empty',     tab:'list', label:'Empty Start（新帳號空狀態）',         icon:'inbox',      isNoData:true, tip:'Empty Start：剛開帳號、還沒建 Tag。顯示 empty illustration + 引導文案。展示首次使用體驗。'},
+  {id:'list-no-search', tab:'list', label:'搜尋無結果（搜尋 0 筆）',             icon:'search_off', isNoData:true, tip:'搜尋無結果：13 個 tag 全部在、但搜尋框輸入 xyz9999，篩選後 0 筆結果。展示 empty search state 與清除動作的引導。'},
+  {id:'list-no-auth',   tab:'list', label:'未授權（No Authorization）',          icon:'lock',       isNoData:true, tip:'No Auth：尚未授權任何雲端帳號。只顯示頁面標題 + 全版鎖定卡片，引導前往授權設定。無 metric cards、無表格。'},
+  {id:'list-error',     tab:'list', label:'載入錯誤（Something Went Wrong）',    icon:'error',      isNoData:true, tip:'Error：資料載入失敗（網路或權限錯誤）。顯示完整 page header + metric cards 呈現 "No Data" + 表格區顯示圓形 error icon + 錯誤訊息。'},
+  {id:'list-skeleton',  tab:'list', label:'Skeleton Loading（載入中）',          icon:'view_list',  isNoData:true, tip:'Skeleton Loading：資料讀取中。Page header 顯示、metric cards 以 shimmer 取代數值、表格顯示 shimmer 行（無欄位標題）。'},
+  // ── EDIT ── normal
+  {id:'edit-three-cloud', tab:'edit', label:'三雲齊發（GCP + AWS + Azure）',     icon:'cloud',          tip:'三雲齊發：同一個 Tag 同時設 GCP + AWS + Azure 三個 CSP Block，每塊都有獨立條件。展示跨雲 Tag Key 的設計。'},
+  {id:'edit-regex',       tab:'edit', label:'Regex Master（matches operator）',  icon:'code',           tip:'Regex Master：三個 value 都用 matches operator，帶真實 regex 範例（^prd-.* / ^i-[a-f0-9]{17}$ / .*-archive-.*）。展示 regex 語法的使用情境。'},
+  {id:'edit-isin',        tab:'edit', label:'Is-In 多選（location region）',     icon:'checklist',      tip:'Is-In 多選：三個地區 value 各自用 is operator 選了 4–6 個 region，以逗號分隔。展示 is / is-in 多值選取的情境。'},
+  {id:'edit-conflict',    tab:'edit', label:'衝突現場（Conflict Detection）',    icon:'report',         tip:'衝突現場：Production 和 Production-DR 兩個 value 的條件完全相同（都是 project_id starts_with prd-），觸發 conflict detection。First Match Wins：Production-DR 永遠匹配不到資源。'},
+  {id:'edit-priority',    tab:'edit', label:'Priority Ladder（7 個 value 拖排）',icon:'drag_indicator', tip:'Priority Ladder：7 個 value rule，環境從 Production 到 Legacy 完整一排。展示拖曳排序優先級的情境，也是目前 prototype 最長的 value list。'},
+  {id:'edit-cross-cloud', tab:'edit', label:'Cross-Cloud Tag Key（labels vs tags）',icon:'compare_arrows',tip:'Cross-Cloud Tag Key：GCP 用 labels（Label Key 欄位），AWS 用 tags（Tag Key 欄位）。同一個語意概念，在不同 cloud 的欄位選法不同。'},
+  // ── EDIT ── no data
+  {id:'edit-empty-draft', tab:'edit', label:'空白 Draft（無 value rules）',      icon:'draft',      isNoData:true, tip:'空白 Draft：剛建立、還沒填入任何 value rule 的 Inactive tag。展示 Edit 頁的初始起點狀態，+ Add Value 的引導位置。'},
+  {id:'edit-save-error',  tab:'edit', label:'儲存失敗（Save Error）',            icon:'cloud_off',  isNoData:true, disabled:true, tip:'尚未實作 — 網路中斷或後端錯誤時，按下 Save 後顯示 Error Toast 但表單保留，引導用戶重試。Coming soon.'},
+  // ── PREVIEW ── normal
+  {id:'preview-100',        tab:'preview', label:'100% Party（全覆蓋慶祝）',          icon:'celebration',     tip:'100% Party：4 個 value 的 res 加總剛好等於 totalRes（831），Coverage 100%，顯示慶祝 banner。平常很難真的建出來。'},
+  {id:'preview-danger',     tab:'preview', label:'危機前夕（12% coverage 低警示）',   icon:'crisis_alert',    tip:'危機前夕：只有 2 個 value，res 加總只有 99/831（約 12%），Untagged 金額龐大。展示 Apply 前最需要確認的警示狀態。'},
+  {id:'preview-multivalue', tab:'preview', label:'Multi-Value Breakdown（5 個 value）',icon:'bar_chart',      tip:'Multi-Value Breakdown：5 個 department value，各自 coverage 不同，Coverage bar 分成漂亮的多色段。展示 bar chart 視覺最豐富的狀態。'},
+  // ── PREVIEW ── no data
+  {id:'preview-zero',       tab:'preview', label:'零覆蓋 Preview（0% coverage）',     icon:'do_not_disturb_on',isNoData:true, tip:'零覆蓋 Preview：3 個 value 全部 res:0，Coverage 0%。展示條件設錯、沒有資源匹配的最差情況，是最需要 Review 的警示狀態。'},
+  {id:'preview-loading',    tab:'preview', label:'Preview 載入中（Skeleton）',         icon:'hourglass_empty', isNoData:true, tip:'Skeleton Loading：Coverage 計算中，Coverage bar、legend、Spend Breakdown 表格皆以 shimmer 骨架取代。Apply / Save 按鈕 disabled，Back to Edit 可操作。'},
+];
+window.DEMO_APPLY=applyScenario;
+window.DEMO_DEFAULT='list-default';
+
+// ===== SIDEBAR NAV — NAV definition is in shared/lumiture-nav.js (single source of truth) =====
+window.LUMITURE_ACTIVE='lumitag';
+
+// ===== INFO-TIP VIEWPORT-AWARE POSITIONING =====
+// (.info-tip 是 CSS-only tooltip，原本 left:50% transform:-50% 在右側會切掉 — 加 JS 動態 clamp 到 viewport)
+(function(){
+  document.addEventListener('mouseover',e=>{
+    const it=e.target.closest('.info-tip');
+    if(!it)return;
+    const tb=it.querySelector('.tip-box');
+    if(!tb)return;
+    requestAnimationFrame(()=>{
+      if(!it.matches(':hover'))return;
+      // Reset to default CSS positioning to measure natural size
+      tb.style.left='';tb.style.right='';tb.style.transform='';tb.style.top='';
+      const tw=tb.offsetWidth,th=tb.offsetHeight;
+      const vw=window.innerWidth,vh=window.innerHeight;
+      const itRect=it.getBoundingClientRect();
+      // Horizontal: prefer center on .info-tip, but clamp to viewport
+      const itCenter=itRect.left+itRect.width/2;
+      let desiredLeft=itCenter-tw/2;
+      if(desiredLeft<8)desiredLeft=8;
+      if(desiredLeft+tw>vw-8)desiredLeft=vw-tw-8;
+      // Vertical: prefer below, flip above if would clip bottom
+      let desiredTop=itRect.bottom+8;
+      if(desiredTop+th>vh-8)desiredTop=itRect.top-th-8;
+      if(desiredTop<8)desiredTop=8;
+      // Apply as offset from .info-tip (which has position:relative)
+      tb.style.left=(desiredLeft-itRect.left)+'px';
+      tb.style.top=(desiredTop-itRect.top)+'px';
+      tb.style.transform='none';
+    });
+  });
+})();
 
 // ===== GLOBAL TOOLTIP =====
 (function(){
@@ -1124,10 +1647,22 @@ go('list');
   });
   document.addEventListener('mousemove',e=>{
     if(!cur)return;
+    const vw=window.innerWidth,vh=window.innerHeight;
+    /* Cap tooltip dimensions to viewport (避免內容超大時溢出) */
+    tip.style.maxWidth=(vw-16)+'px';
+    tip.style.maxHeight=(vh-16)+'px';
     const tw=tip.offsetWidth,th=tip.offsetHeight;
+    /* Preferred: above cursor, horizontal center */
     let x=e.clientX-tw/2,y=e.clientY-th-10;
-    if(x<8)x=8;if(x+tw>window.innerWidth-8)x=window.innerWidth-tw-8;
+    /* Horizontal clamp to viewport */
+    if(x<8)x=8;
+    if(x+tw>vw-8)x=vw-tw-8;
+    /* Vertical: if would clip top, flip below cursor */
     if(y<8)y=e.clientY+16;
+    /* Vertical: if would clip bottom, clamp upward */
+    if(y+th>vh-8)y=vh-th-8;
+    /* Final safety: ensure top ≥ 8 */
+    if(y<8)y=8;
     tip.style.left=x+'px';tip.style.top=y+'px';
   });
   document.addEventListener('mouseout',e=>{
@@ -1136,5 +1671,1042 @@ go('list');
   });
 })();
 </script>
+
+<!-- SHARED COMPONENTS — order matters: nav data must load BEFORE sidebar renderer.
+     ?v=... is a cache-buster; bump when shared scripts change to force refetch. -->
+<script>
+/* === Inlined: shared/currency-picker.js === */
+/*!
+ * currency-picker.js — Lumiture Shared Currency Picker v3
+ *
+ * Design spec: CMDS Component Library > Currency Switch (H=30px)
+ *   - Normal: transparent bg, no border; Hover: subtle gray bg; Focus: focus ring
+ *   - Trigger format: [flag] [CODE] [expand_more]
+ *   - Dropdown gap: 4px from trigger bottom
+ *   - Dropdown items: "Full Name (CODE)", selected = gray bg, no checkmark
+ *
+ * Design spec: Figma #01-4 Overview: Change Currency
+ *   - 7 currencies from PRD, sorted alphabetically by full name
+ *
+ * Usage (inline onclick pattern, works with dynamically rendered triggers):
+ *
+ *   HTML trigger (static):
+ *     <button class="curr-btn"
+ *             onclick="CurrencyPicker.open(this, currentCode, onChangeFn)">
+ *       <span class="curr-flag">🇺🇸</span>
+ *       <span class="curr-code">USD</span>
+ *       <span class="material-symbols-outlined">expand_more</span>
+ *     </button>
+ *
+ *   HTML trigger (dynamic, inside JS template):
+ *     const c = CurrencyPicker.CURRENCIES.find(c => c.code === currentCode);
+ *     `<button class="curr-btn" onclick="CurrencyPicker.open(this,'${currentCode}',fn)">
+ *       <span class="curr-flag">${c?.flag || ''}</span>
+ *       <span class="curr-code">${currentCode}</span>
+ *       <span class="material-symbols-outlined">expand_more</span>
+ *     </button>`
+ *
+ *   Update trigger on currency change (setCurrency callback):
+ *     const c = CurrencyPicker.CURRENCIES.find(c => c.code === newCode);
+ *     document.getElementById('currency-flag').textContent = c?.flag || '';
+ *     document.getElementById('currency-code').textContent = newCode;
+ *
+ * Exposes:
+ *   window.CurrencyPicker.CURRENCIES   — [{code, name, flag}]
+ *   window.CurrencyPicker.open(triggerEl, currentCode, onChangeFn)
+ *   window.CurrencyPicker.close()
+ */
+(function () {
+  'use strict';
+
+  /* Sorted alphabetically by full name, per Figma spec + PRD */
+  var CURRENCIES = [
+    { code: 'HKD', name: 'Hong Kong dollar',      flag: '🇭🇰' },
+    { code: 'IDR', name: 'Indonesian rupiah',      flag: '🇮🇩' },
+    { code: 'MYR', name: 'Malaysian ringgit',      flag: '🇲🇾' },
+    { code: 'TWD', name: 'New Taiwan dollar',      flag: '🇹🇼' },
+    { code: 'PHP', name: 'Philippine peso',        flag: '🇵🇭' },
+    { code: 'SGD', name: 'Singapore dollar',       flag: '🇸🇬' },
+    { code: 'USD', name: 'United States dollar',   flag: '🇺🇸' },
+  ];
+
+  /* ===== CSS ===== */
+  var CSS = [
+    /* Trigger button — Normal: transparent, no border; H=30px per CMDS spec */
+    '.curr-btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 8px;',
+    'font-size:13px;color:#262626;',
+    'cursor:pointer;background:transparent;border:none;border-radius:6px;',
+    'font-family:inherit;line-height:1;white-space:nowrap;',
+    'transition:background .12s}',
+    /* Hover: subtle gray wash */
+    '.curr-btn:hover{background:rgba(0,0,0,.06)}',
+    /* Active/open: same wash + arrow flipped */
+    '.curr-btn.cp-open{background:rgba(0,0,0,.06)}',
+    /* Focus: blue focus ring (keyboard nav / Active state ring per CMDS) */
+    '.curr-btn:focus-visible{outline:2px solid #004FB0;outline-offset:1px}',
+    /* Flag + code */
+    '.curr-flag{font-size:15px;line-height:1;flex-shrink:0}',
+    '.curr-code{font-size:13px;color:#262626}',
+    /* Arrow icon */
+    '.curr-btn .material-symbols-outlined{font-size:16px;',
+    'color:#676767;flex-shrink:0;transition:transform .15s}',
+    '.curr-btn.cp-open .material-symbols-outlined{transform:rotate(180deg)}',
+
+    /* Dropdown container — 4px gap per CMDS spec */
+    '.curr-dd{position:absolute;top:calc(100% + 4px);right:0;left:auto;',
+    'background:#fff;border:1px solid #DCE3EC;',
+    'border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);',
+    'z-index:300;min-width:220px;width:max-content;',
+    'overflow:hidden;overscroll-behavior:contain}',
+
+    /* Dropdown items — full name + (CODE), no flag */
+    '.curr-dd-item{display:flex;align-items:center;padding:9px 14px;width:100%;',
+    'font-size:13px;border:none;background:none;cursor:pointer;',
+    'font-family:inherit;color:#262626;text-align:left;',
+    'transition:background .1s;line-height:1.4;white-space:nowrap}',
+    '.curr-dd-item:hover{background:#F5F5F5}',
+    /* Selected: gray bg per Figma, no color/weight change */
+    '.curr-dd-item.cp-active{background:#F0F0F0}',
+  ].join('');
+
+  var style = document.createElement('style');
+  style.textContent = CSS;
+  document.head.appendChild(style);
+
+  /* ===== STATE ===== */
+  var _activeTrigger = null;
+
+  /* ===== INTERNAL ===== */
+  function _close() {
+    var dd = document.getElementById('_curr-dd');
+    if (dd) dd.remove();
+    if (_activeTrigger) {
+      _activeTrigger.classList.remove('cp-open');
+      _activeTrigger = null;
+    }
+  }
+
+  function _open(triggerEl, currentCode, onChange) {
+    _activeTrigger = triggerEl;
+    triggerEl.classList.add('cp-open');
+
+    /* Ensure parent is positioned */
+    var wrap = triggerEl.parentElement;
+    if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+
+    var dd = document.createElement('div');
+    dd.className = 'curr-dd';
+    dd.id = '_curr-dd';
+    dd.innerHTML = CURRENCIES.map(function (c) {
+      var isActive = c.code === currentCode;
+      return '<button class="curr-dd-item' + (isActive ? ' cp-active' : '') + '">' +
+        c.name + ' (' + c.code + ')' +
+        '</button>';
+    }).join('');
+
+    dd.querySelectorAll('.curr-dd-item').forEach(function (btn, i) {
+      btn.addEventListener('click', function () {
+        _close();
+        onChange(CURRENCIES[i].code);
+      });
+    });
+
+    wrap.appendChild(dd);
+
+    /* Outside click to close */
+    setTimeout(function () {
+      document.addEventListener('click', function _outsideClose(e) {
+        if (!dd.contains(e.target) && e.target !== triggerEl) {
+          _close();
+          document.removeEventListener('click', _outsideClose, true);
+        }
+      }, true);
+    }, 0);
+  }
+
+  /* ===== PUBLIC API ===== */
+  window.CurrencyPicker = {
+    CURRENCIES: CURRENCIES,
+
+    /**
+     * Toggle dropdown open / close.
+     * @param {Element}  triggerEl   — the .curr-btn element
+     * @param {string}   currentCode — e.g. 'USD'
+     * @param {Function} onChange    — called with new code when user picks
+     */
+    open: function (triggerEl, currentCode, onChange) {
+      if (_activeTrigger === triggerEl) {
+        _close();
+      } else {
+        _close();
+        _open(triggerEl, currentCode, onChange);
+      }
+    },
+
+    close: _close,
+  };
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-nav.js === */
+/*!
+ * lumiture-nav.js — Canonical Sidebar Navigation (Single Source of Truth)
+ *
+ * Defines window.LUMITURE_NAV used by shared/lumiture-sidebar.js.
+ * All Lumiture prototypes share the same nav structure — this file is the
+ * single source. Each prototype only needs to set window.LUMITURE_ACTIVE.
+ *
+ * Usage in prototype HTML:
+ *   <aside id="lt-sidebar"></aside>
+ *   <script>window.LUMITURE_ACTIVE = 'general-budget';<\/script>
+ *   <script src="../shared/lumiture-nav.js"><\/script>    ← MUST load BEFORE sidebar
+ *   <script src="../shared/lumiture-sidebar.js"><\/script>
+ *
+ * Rules:
+ *   - Items with `href` → rendered as <a> links (clickable, cross-prototype navigation)
+ *   - Items with `disabled:true` → rendered as <div> with .lt-dis class (greyed, not clickable)
+ *   - The item matching LUMITURE_ACTIVE → href automatically stripped by lumiture-sidebar.js
+ *     so the "current page" item won't self-link
+ *
+ * To add a new prototype:
+ *   1. Update the relevant entry below — change `disabled:true` to `href:'../{name}/{name}-prototype-v{N}.html'`
+ *   2. All 3 (or more) prototypes will automatically reflect the new link via this shared script
+ *   3. The new prototype only needs to set LUMITURE_ACTIVE = its own id
+ */
+(function () {
+  'use strict';
+
+  window.LUMITURE_NAV = [
+    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', disabled: true },
+
+    { type: 'group', id: 'dashboard', label: 'Dashboard', items: [
+      { id: 'cost-dashboard',     label: 'Cost Dashboard',     icon: 'dashboard',    href: '../cost-dashboard/cost-dashboard-prototype-v1.html' },
+      { id: 'executive-insights', label: 'Executive Insights', icon: 'auto_awesome', disabled: true },
+    ]},
+
+    { type: 'group', id: 'optimization', label: 'Optimization', items: [
+      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', disabled: true },
+    ]},
+
+    { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
+      { id: 'general-budget',    label: 'General Budget',    icon: 'savings',              href: '../general-budget/general-budget-prototype-v1.html' },
+      { id: 'customized-budget', label: 'Customized Budget', icon: 'tune',                 disabled: true },
+      { id: 'anomaly-detection', label: 'Anomaly Detection', icon: 'notifications_active', disabled: true },
+    ]},
+
+    { type: 'group', id: 'org', label: 'Organization Settings', items: [
+      { id: 'lumitag',            label: 'LumiTag',            icon: 'sell',            href: '../lumi-tag/lumi-tag-prototype-v8.html' },
+      { id: 'group-list',         label: 'Group List',         icon: 'groups',          disabled: true },
+      { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
+      { id: 'authorization-list', label: 'Authorization List', icon: 'link',            disabled: true },
+      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
+    ]},
+  ];
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-sidebar.js === */
+/*!
+ * lumiture-sidebar.js — Lumiture Shared Sidebar (with canonical logo)
+ *
+ * Auto-injects:
+ *   - Sidebar CSS (logo, nav items, group collapse, active state)
+ *   - Canonical Lumiture logo (concentric circles + PROTOTYPE tag + LumiTure.ai wordmark)
+ *
+ * Usage in prototype HTML:
+ *   1. Define window.LUMITURE_NAV = [...]   (see schema below)
+ *   2. Define window.LUMITURE_ACTIVE = 'item-id'  (which item is highlighted)
+ *   3. Add mount point: <aside id="lt-sidebar"></aside>
+ *   4. <script src="../shared/lumiture-sidebar.js"><\/script>
+ *
+ * NAV schema:
+ *   window.LUMITURE_NAV = [
+ *     // Top-level item (no group)
+ *     { type: 'item', id: 'overview', label: 'Overview', icon: 'home', href: '#' },
+ *     // Group with children (expanded by default unless `collapsed: true`)
+ *     { type: 'group', id: 'dashboard', label: 'Dashboard', expanded: true, items: [
+ *       { id: 'cost-dashboard', label: 'Cost Dashboard', icon: 'dashboard', href: '#' },
+ *       { id: 'exec-insights',  label: 'Executive Insights', icon: 'monitoring', disabled: true },
+ *     ]},
+ *   ];
+ *   window.LUMITURE_ACTIVE = 'cost-dashboard';  // which item is active
+ *
+ * API:
+ *   window.LumitureSidebar.toggleGroup(groupId)
+ *   window.LumitureSidebar.toggleCollapse()    — collapse the whole sidebar (icon-only)
+ *   window.LumitureSidebar.setActive(itemId)
+ */
+(function () {
+  'use strict';
+
+  // ===== CSS =====
+  var CSS = [
+    /* CSS variables — sidebar 用 Primary Dark #002663（per Lumiture-Guideline.md，2026-05-08 設計師確認） */
+    ':root{--lt-sb-w:264px;--lt-sb-bg:#002663;--lt-sb-hov:rgba(255,255,255,.06);',
+    '--lt-sb-active:#004FB0;--lt-sb-text:rgba(255,255,255,.85);--lt-sb-text-muted:rgba(255,255,255,.5);',
+    '--lt-sb-border:rgba(255,255,255,.1)}',
+
+    /* Sidebar container — 採 sticky positioning：父層 .app 用 flex 或 grid 都能適應
+       min-width:0 是必要的：flex 子元素預設 min-width:auto 會被內容 min-content size 撐住，導致 collapse 失效 */
+    '.lt-sidebar{width:var(--lt-sb-w);min-width:0;background:var(--lt-sb-bg);color:#fff;',
+    'position:sticky;top:0;height:100vh;z-index:100;overflow:hidden;',
+    'flex-shrink:0;',
+    'display:flex;flex-direction:column;transition:width .2s ease;scrollbar-width:none}',
+    '.lt-sidebar::-webkit-scrollbar{display:none}',
+    '.lt-sidebar.lt-collapsed{width:64px}',
+
+    /* Logo block */
+    '.lt-sb-logo{padding:16px 20px;display:flex;align-items:center;gap:10px;',
+    'font-size:18px;font-weight:700;color:#fff;border-bottom:1px solid var(--lt-sb-border);',
+    'min-height:68px;box-sizing:border-box;white-space:nowrap;overflow:hidden;flex-shrink:0}',
+    '.lt-sb-logo-wrap{position:relative;width:32px;height:32px;flex-shrink:0}',
+    '.lt-sb-logo-wrap svg{width:32px;height:32px;display:block}',
+    /* PROTOTYPE tag — cyan caps below the icon */
+    '.lt-sb-proto{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);',
+    'background:var(--lt-sb-bg);color:#34B5D9;font-size:6px;font-weight:700;',
+    'padding:1px 3px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px;',
+    'line-height:1.2;white-space:nowrap}',
+    '.lt-sb-logo-text{transition:opacity .2s}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo-text{opacity:0;width:0;overflow:hidden}',
+    '.lt-sidebar.lt-collapsed .lt-sb-proto{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo{padding:16px;justify-content:center;gap:0}',
+
+    /* Nav scroll area — 內部捲動，sidebar 外層不捲（寬敞 padding 對齊原始設計） */
+    '.lt-sb-nav{flex:1;padding:8px 12px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}',
+    '.lt-sb-nav::-webkit-scrollbar{width:6px}',
+    '.lt-sb-nav::-webkit-scrollbar-track{background:transparent}',
+    '.lt-sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}',
+    '.lt-sb-nav::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.25)}',
+
+    /* Top-level item (no group) — 寬敞 padding，font-size 14px */
+    '.lt-sb-item{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;',
+    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden;margin-bottom:2px}',
+    '.lt-sb-item:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sb-item.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-item.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
+    '.lt-sb-item .material-symbols-outlined{font-size:20px;opacity:.9;flex-shrink:0}',
+
+    /* Group section */
+    '.lt-sb-group{margin-bottom:4px}',
+    '.lt-sb-group-hdr{display:flex;align-items:center;justify-content:space-between;',
+    'padding:18px 14px 10px;font-size:14px;font-weight:700;color:#fff;',
+    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:.2px}',
+    '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
+    '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
+    '.lt-sb-group-arrow{font-size:18px;transition:transform .18s;opacity:.85;flex-shrink:0}',
+    '.lt-sb-group.lt-collapsed .lt-sb-group-arrow{transform:rotate(180deg)}',
+    '.lt-sb-group.lt-collapsed .lt-sb-group-children{display:none}',
+
+    /* Sub-item (inside group) — 一致 14px font，11px 垂直 padding */
+    '.lt-sb-subitem{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;',
+    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden}',
+    '.lt-sb-subitem:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sb-subitem.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-subitem.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
+    '.lt-sb-subitem .material-symbols-outlined{font-size:18px;opacity:.9;flex-shrink:0}',
+
+    /* Collapsed state — hide labels, center icons */
+    '.lt-sidebar.lt-collapsed .lt-sb-item span:not(.material-symbols-outlined),',
+    '.lt-sidebar.lt-collapsed .lt-sb-subitem span:not(.material-symbols-outlined){display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-item,',
+    '.lt-sidebar.lt-collapsed .lt-sb-subitem{padding:10px 0;justify-content:center;border-radius:0}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-hdr > span:first-child{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-arrow{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-hdr{padding:8px 0;justify-content:center}',
+    /* In collapsed mode, always show children */
+    '.lt-sidebar.lt-collapsed .lt-sb-group.lt-collapsed .lt-sb-group-children{display:block}',
+    '.lt-sidebar.lt-collapsed .lt-sb-nav{padding:8px 4px}',
+
+    /* Collapse toggle button at bottom */
+    '.lt-sb-collapse-btn{padding:12px;display:flex;justify-content:flex-end;',
+    'border-top:1px solid var(--lt-sb-border);flex-shrink:0}',
+    '.lt-sb-collapse-btn button{color:var(--lt-sb-text-muted);background:none;border:0;cursor:pointer;',
+    'display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:4px;',
+    'transition:all .15s}',
+    '.lt-sb-collapse-btn button:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sidebar.lt-collapsed .lt-sb-collapse-btn{justify-content:center}',
+    '.lt-sidebar.lt-collapsed .lt-sb-collapse-btn .material-symbols-outlined{transform:rotate(180deg)}'
+  ].join('');
+
+  function _injectCSS() {
+    if (document.getElementById('lt-sidebar-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-sidebar-css';
+    s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  // ===== Canonical Logo (concentric circles + PROTOTYPE tag + LumiTure.ai) =====
+  var LOGO_HTML =
+    '<div class="lt-sb-logo">' +
+      '<div class="lt-sb-logo-wrap">' +
+        '<svg viewBox="0 0 32 32" fill="none" aria-hidden="true">' +
+          '<circle cx="16" cy="16" r="13" stroke="#FFF" stroke-width="2" fill="none"/>' +
+          '<circle cx="16" cy="16" r="7" stroke="#FFF" stroke-width="2" fill="none"/>' +
+          '<circle cx="16" cy="16" r="3" fill="#FFF"/>' +
+        '</svg>' +
+        '<span class="lt-sb-proto">PROTOTYPE</span>' +
+      '</div>' +
+      '<span class="lt-sb-logo-text">LumiTure.ai</span>' +
+    '</div>';
+
+  // ===== Helpers =====
+  function _esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  function _renderItem(item, isSub) {
+    var cls = isSub ? 'lt-sb-subitem' : 'lt-sb-item';
+    var isActive = (item.id === window.LUMITURE_ACTIVE);
+    var active = isActive ? ' lt-active' : '';
+    var dis = item.disabled ? ' lt-dis' : '';
+    // Active item: render as <div> (no self-link). Disabled item: also no href.
+    var useHref = item.href && !isActive && !item.disabled;
+    var tag = useHref ? 'a' : 'div';
+    var hrefAttr = useHref ? ' href="' + _esc(item.href) + '"' : '';
+    var dataId = ' data-nav-id="' + _esc(item.id) + '"';
+    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + '>' +
+             '<span class="material-symbols-outlined">' + _esc(item.icon || 'circle') + '</span>' +
+             '<span>' + _esc(item.label) + '</span>' +
+           '</' + tag + '>';
+  }
+
+  function _renderGroup(grp) {
+    var collapsed = grp.collapsed ? ' lt-collapsed' : '';
+    var children = (grp.items || []).map(function (item) {
+      return _renderItem(item, true);
+    }).join('');
+    return '<div class="lt-sb-group' + collapsed + '" data-group-id="' + _esc(grp.id) + '">' +
+             '<div class="lt-sb-group-hdr">' +
+               '<span>' + _esc(grp.label) + '</span>' +
+               '<span class="material-symbols-outlined lt-sb-group-arrow">keyboard_arrow_up</span>' +
+             '</div>' +
+             '<div class="lt-sb-group-children">' + children + '</div>' +
+           '</div>';
+  }
+
+  function _renderNav() {
+    var nav = window.LUMITURE_NAV || [];
+    var html = '<div class="lt-sb-nav">';
+    nav.forEach(function (entry) {
+      if (entry.type === 'group') {
+        html += _renderGroup(entry);
+      } else {
+        html += _renderItem(entry, false);
+      }
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function _renderCollapseBtn() {
+    return '<div class="lt-sb-collapse-btn">' +
+             '<button type="button" data-action="toggle-collapse" title="Collapse sidebar">' +
+               '<span class="material-symbols-outlined">chevron_left</span>' +
+             '</button>' +
+           '</div>';
+  }
+
+  // ===== Mount =====
+  function _render() {
+    var mount = document.getElementById('lt-sidebar');
+    if (!mount) {
+      console.warn('[lumiture-sidebar] Mount point #lt-sidebar not found');
+      return;
+    }
+    // If mount is not already a sidebar, wrap it
+    mount.classList.add('lt-sidebar');
+    mount.innerHTML = LOGO_HTML + _renderNav() + _renderCollapseBtn();
+
+    // Group toggle
+    mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
+      hdr.addEventListener('click', function () {
+        var grp = hdr.parentElement;
+        if (grp) grp.classList.toggle('lt-collapsed');
+      });
+    });
+    // Collapse the whole sidebar
+    var btn = mount.querySelector('[data-action="toggle-collapse"]');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        window.LumitureSidebar.toggleCollapse();
+      });
+    }
+  }
+
+  // ===== Public API =====
+  window.LumitureSidebar = {
+    toggleGroup: function (groupId) {
+      var grp = document.querySelector('[data-group-id="' + groupId + '"]');
+      if (grp) grp.classList.toggle('lt-collapsed');
+    },
+    toggleCollapse: function () {
+      var sb = document.getElementById('lt-sidebar');
+      var main = document.querySelector('.lt-main, .main, main');
+      if (sb) sb.classList.toggle('lt-collapsed');
+      if (main) main.classList.toggle('lt-sidebar-collapsed');
+      // Sync legacy CSS vars (--sw) for prototypes that reference them in topbar / footer
+      var w = sb && sb.classList.contains('lt-collapsed') ? '64px' : '264px';
+      document.documentElement.style.setProperty('--sw', w);
+      document.documentElement.style.setProperty('--lt-sb-w', w);
+    },
+    setActive: function (itemId) {
+      window.LUMITURE_ACTIVE = itemId;
+      document.querySelectorAll('.lt-sb-item, .lt-sb-subitem').forEach(function (el) {
+        el.classList.toggle('lt-active', el.dataset.navId === itemId);
+      });
+    },
+    rerender: _render,
+  };
+
+  // ===== INIT =====
+  function _init() {
+    _injectCSS();
+    _render();
+    // Dispatch resize so chart libraries (ECharts 等) 重新測量容器
+    // —— 避免 inline script 已先 init chart 後，shared CSS 才 inject 導致 layout shift
+    requestAnimationFrame(function () {
+      window.dispatchEvent(new Event('resize'));
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else {
+    _init();
+  }
+})();
+
+</script>
+<!-- DESIGNER DEMO FAB (秘技按鈕) — rendered by shared/demo-fab.js -->
+<script>
+/* === Inlined: shared/demo-fab.js === */
+/*!
+ * demo-fab.js — Lumiture Designer Demo Scenarios (Shared Module v2)
+ *
+ * Auto-injects:
+ *   - .demo-fab (FAB button, bottom-left)
+ *   - .demo-popover (480px tall × 390px wide popover)
+ *   - #gl-tip (body-level fixed tooltip — required for demo button hover tips)
+ *
+ * Required globals:
+ *   window.DEMO_SCENARIOS = [...]   — scenario list
+ *   window.DEMO_APPLY     = fn      — called with (id, btn) when scenario clicked
+ *
+ * Optional globals:
+ *   window.DEMO_PAGES = [{id, label, icon}]      — page tabs (top row, pill style)
+ *   window.DEMO_CATEGORIES = [{id, label, icon, hint}]  — category tabs (underline style)
+ *   window.DEMO_DEFAULT = 'scenario-id'           — initial active scenario
+ *
+ * Rendering modes (auto-detected):
+ *   1. No pages, no categories → flat list of buttons
+ *   2. Pages only (LumiTag pattern) → underline tabs at top, scenarios filtered by page
+ *   3. Categories only (single-page Cost Dashboard pattern) → underline tabs, scenarios filtered by category
+ *   4. Pages + Categories → two-layer: pill page tabs (top) + underline category tabs (bottom)
+ *
+ * Scenario schema:
+ *   {
+ *     id:        string,           // unique
+ *     label:     string,
+ *     icon:      string,           // Material Symbols name
+ *     tip:       string?,          // hover tooltip (rendered via #gl-tip, NOT ::after)
+ *     page:      string?,          // matches DEMO_PAGES[].id (alias: 'tab' for backwards compat)
+ *     category:  string?,          // matches DEMO_CATEGORIES[].id
+ *     isNoData:  boolean?,         // groups under "no data" sub-divider
+ *     disabled:  boolean?,         // shows "Soon" badge, not clickable
+ *   }
+ *
+ * Programmatic API:
+ *   window.demoFabSwitchTab(pageId)    // switch to a specific page tab (called on navigation)
+ *   window._demoFabToggle()            // open/close popover
+ *   window._demoFabApply(id, btn)      // apply a scenario (internal)
+ */
+(function () {
+  'use strict';
+
+  // ===== MODULE STATE =====
+  var _activePage = null;         // null until first scenario filtered
+  var _activeCategory = null;
+  var _activeScenario = null;
+
+  // ===== CSS INJECTION =====
+  var CSS = [
+    /* FAB button */
+    '.demo-fab{position:fixed;bottom:18px;left:18px;width:48px;height:48px;border-radius:50%;',
+    'background:radial-gradient(circle at 78% 68%,#D9CC4A 0%,rgba(217,204,74,0) 42%),',
+    'radial-gradient(circle at 30% 28%,#4D8DDB 0%,rgba(77,141,219,0) 52%),',
+    'radial-gradient(circle at 25% 78%,#001A52 0%,rgba(0,26,82,0) 58%),',
+    'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);',
+    'color:#fff;box-shadow:0 4px 14px rgba(13,27,62,.36);z-index:999;cursor:pointer;',
+    'display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;border:0}',
+    '.demo-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(13,27,62,.45)}',
+    '.demo-fab:active{transform:scale(.96)}',
+    '.demo-fab .material-symbols-outlined{font-size:24px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}',
+    '.demo-fab.popped{box-shadow:0 4px 14px rgba(13,27,62,.36),inset 0 2px 6px rgba(0,0,0,.28)}',
+    '.demo-fab .demo-pulse{position:absolute;top:5px;right:5px;width:9px;height:9px;background:#FF403D;',
+    'border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 0 rgba(255,64,61,.6);animation:demoPulse 1.6s ease-in-out infinite}',
+    '@keyframes demoPulse{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,64,61,.6)}',
+    '70%{transform:scale(1.1);box-shadow:0 0 0 8px rgba(255,64,61,0)}',
+    '100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,64,61,0)}}',
+
+    /* Popover shell — 全站固定 390 × 480 */
+    '.demo-popover{position:fixed;bottom:78px;left:18px;width:390px;height:480px;background:#fff;',
+    'border:1px solid rgba(14,58,130,.18);border-radius:12px;box-shadow:0 8px 24px rgba(13,27,62,.16);',
+    'z-index:998;padding:0;opacity:0;transform:translateY(8px);pointer-events:none;',
+    'transition:opacity .18s,transform .18s;display:flex;flex-direction:column;overflow:hidden}',
+    '.demo-popover.show{opacity:1;transform:translateY(0);pointer-events:auto}',
+    '.demo-popover::before{content:\'\';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;',
+    'background:radial-gradient(circle at 78% 50%,#D9CC4A 0%,rgba(217,204,74,0) 32%),',
+    'radial-gradient(circle at 30% 50%,#4D8DDB 0%,rgba(77,141,219,0) 42%),',
+    'linear-gradient(90deg,#0D1B3E 0%,#0E3A82 100%)}',
+
+    /* Popover header */
+    '.demo-popover-hdr{display:flex;align-items:center;justify-content:space-between;',
+    'padding:14px 16px 10px;flex-shrink:0}',
+    '.demo-popover-title{font-size:12px;font-weight:700;color:#0E3A82;text-transform:uppercase;',
+    'letter-spacing:.5px;display:flex;align-items:center;gap:6px}',
+    '.demo-popover-close{color:#B0B7C0;cursor:pointer;padding:2px;border-radius:4px;',
+    'display:flex;align-items:center;background:none;border:none}',
+    '.demo-popover-close:hover{color:#0E3A82;background:rgba(14,58,130,.08)}',
+
+    /* Reset link */
+    '.demo-reset-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#676767;',
+    'font-weight:500;background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:4px;',
+    'font-family:inherit;margin:0 16px 6px}',
+    '.demo-reset-link:hover{color:#004FB0;background:#F2FAFF}',
+    '.demo-reset-link .material-symbols-outlined{font-size:14px}',
+
+    /* Page tabs (Layer 1 — pill / segmented style，only when both layers exist) */
+    '.demo-page-tabs{display:flex;gap:4px;padding:0 16px 8px;flex-shrink:0;overflow-x:auto;scrollbar-width:none}',
+    '.demo-page-tabs::-webkit-scrollbar{display:none}',
+    '.demo-page-tab{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;height:26px;',
+    'background:#F2F2F2;color:#676767;border:none;border-radius:13px;font-size:11px;font-weight:600;',
+    'font-family:inherit;cursor:pointer;transition:all .15s;white-space:nowrap}',
+    '.demo-page-tab:hover{color:#262626;background:#E6E6E6}',
+    '.demo-page-tab.active{background:#fff;color:#004FB0;box-shadow:inset 0 0 0 1px #004FB0}',
+    '.demo-page-tab .material-symbols-outlined{font-size:13px}',
+
+    /* Category tabs (Layer 2，or single-layer underline mode) */
+    '.demo-cat-tabs{display:flex;border-bottom:2px solid #E6E6E6;padding:0 12px;flex-shrink:0;',
+    'overflow-x:auto;scrollbar-width:none}',
+    '.demo-cat-tabs::-webkit-scrollbar{display:none}',
+    '.demo-cat-tab{display:inline-flex;align-items:center;gap:4px;padding:7px 10px;font-size:11px;',
+    'font-weight:600;color:#676767;border:none;background:none;border-bottom:2px solid transparent;',
+    'margin-bottom:-2px;cursor:pointer;letter-spacing:.3px;transition:all .15s;font-family:inherit;white-space:nowrap}',
+    '.demo-cat-tab .material-symbols-outlined{font-size:14px}',
+    '.demo-cat-tab:hover{color:#262626}',
+    '.demo-cat-tab.active{color:#004FB0;border-bottom-color:#004FB0}',
+
+    /* Hint block (淡藍底 + 左藍邊條) */
+    '.demo-pane-hint{font-size:11px;color:#676767;line-height:1.5;margin:0 0 8px;',
+    'padding:8px 10px;background:#F2FAFF;border-left:2px solid #004FB0;border-radius:4px}',
+
+    /* Scroll area (flex 1, hidden scrollbar) */
+    '.demo-popover-scroll{overflow-y:auto;overscroll-behavior:contain;flex:1;min-height:0;',
+    'padding:8px 16px 14px;transition:opacity .12s ease;scrollbar-width:none}',
+    '.demo-popover-scroll::-webkit-scrollbar{display:none}',
+
+    /* Sub-separator (no data divider) */
+    '.demo-sub-sep{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;',
+    'color:#9CAEC4;letter-spacing:.4px;text-transform:uppercase;margin:10px 0 6px}',
+    '.demo-sub-sep::before,.demo-sub-sep::after{content:\'\';flex:1;height:1px;background:rgba(14,58,130,.1)}',
+
+    /* Button group */
+    '.demo-buttons{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}',
+
+    /* Scenario button */
+    '.demo-btn{background:#fff;border:1px solid rgba(14,58,130,.25);color:#0E3A82;',
+    'padding:8px 12px;border-radius:8px;font-size:12px;font-weight:500;',
+    'display:flex;align-items:center;gap:6px;text-align:left;width:100%;',
+    'transition:all .15s;position:relative;cursor:pointer;font-family:inherit}',
+    '.demo-btn:hover{background:rgba(14,58,130,.05);border-color:rgba(14,58,130,.5)}',
+    '.demo-btn.active{background:radial-gradient(circle at 88% 70%,#D9CC4A 0%,rgba(217,204,74,0) 42%),',
+    'radial-gradient(circle at 22% 35%,#4D8DDB 0%,rgba(77,141,219,0) 50%),',
+    'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);color:#fff;border-color:transparent;',
+    'box-shadow:0 2px 6px rgba(13,27,62,.25)}',
+    '.demo-btn .material-symbols-outlined{font-size:16px;flex-shrink:0}',
+
+    /* Disabled button */
+    '.demo-btn.demo-dis{opacity:.42;cursor:not-allowed}',
+    '.demo-btn.demo-dis:hover{background:#fff!important;border-color:rgba(14,58,130,.25)!important}',
+    '.demo-cs{margin-left:auto;font-size:9px;font-weight:700;color:#9CAEC4;',
+    'background:rgba(14,58,130,.06);border-radius:3px;padding:1px 5px;letter-spacing:.3px;flex-shrink:0}',
+
+    /* Empty state when no scenarios match current filters */
+    '.demo-empty{padding:24px 8px;text-align:center;color:#9CAEC4;font-size:12px;line-height:1.5}',
+
+    /* ⚠️ Suppress any global CSS [data-tip]::after on demo elements.
+       Tooltips MUST be handled by #gl-tip (auto-injected below) — pseudo-tooltips
+       get clipped by .demo-popover { overflow: hidden }. */
+    '.demo-btn[data-tip]::after,.demo-btn[data-tip]::before,',
+    '.demo-page-tab[data-tip]::after,.demo-cat-tab[data-tip]::after{display:none!important}',
+
+    /* #gl-tip — body-level fixed tooltip (auto-injected) */
+    '#gl-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:12px;line-height:1.4;',
+    'padding:6px 10px;border-radius:4px;max-width:320px;white-space:normal;',
+    'pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25);',
+    'font-family:\'Noto Sans\',sans-serif}'
+  ].join('');
+
+  var style = document.createElement('style');
+  style.textContent = CSS;
+  document.head.appendChild(style);
+
+  // ===== HELPERS =====
+  function _esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  // Normalise scenario: tab → page (backwards compat)
+  function _normalizedScenarios() {
+    return (window.DEMO_SCENARIOS || []).map(function (s) {
+      return Object.assign({}, s, { page: s.page || s.tab || null });
+    });
+  }
+
+  // Detect rendering mode based on what's configured
+  function _detectMode() {
+    var scenarios = _normalizedScenarios();
+    var hasPages = (window.DEMO_PAGES && window.DEMO_PAGES.length) ||
+                   scenarios.some(function (s) { return !!s.page; });
+    var hasCats  = (window.DEMO_CATEGORIES && window.DEMO_CATEGORIES.length) ||
+                   scenarios.some(function (s) { return !!s.category; });
+    if (hasPages && hasCats) return 'two-layer';
+    if (hasPages) return 'pages-only';
+    if (hasCats)  return 'categories-only';
+    return 'flat';
+  }
+
+  // Auto-derive page list if DEMO_PAGES not provided
+  function _getPages() {
+    if (window.DEMO_PAGES && window.DEMO_PAGES.length) return window.DEMO_PAGES;
+    var seen = {};
+    var pages = [];
+    _normalizedScenarios().forEach(function (s) {
+      if (s.page && !seen[s.page]) {
+        seen[s.page] = true;
+        pages.push({ id: s.page, label: s.page.charAt(0).toUpperCase() + s.page.slice(1), icon: 'tab' });
+      }
+    });
+    return pages;
+  }
+
+  function _getCategories() {
+    return window.DEMO_CATEGORIES || [];
+  }
+
+  // Filter scenarios for current page + category
+  function _filterScenarios() {
+    var scenarios = _normalizedScenarios();
+    return scenarios.filter(function (s) {
+      if (_activePage && s.page && s.page !== _activePage) return false;
+      if (_activePage && !s.page) return false; // page-tab mode requires scenario to have page
+      if (_activeCategory && s.category && s.category !== _activeCategory) return false;
+      if (_activeCategory && !s.category) return false; // cat-tab mode requires scenario to have category
+      return true;
+    });
+  }
+
+  // ===== HTML BUILDERS =====
+  function _renderButtons(scenarios) {
+    if (!scenarios.length) {
+      return '<div class="demo-empty">No scenarios in this view.</div>';
+    }
+    var normal = scenarios.filter(function (s) { return !s.isNoData; });
+    var noData = scenarios.filter(function (s) { return s.isNoData; });
+    var html = _renderGroup(normal);
+    if (noData.length) {
+      html += '<div class="demo-sub-sep">no data</div>' + _renderGroup(noData);
+    }
+    return html;
+  }
+
+  function _renderGroup(scenarios) {
+    if (!scenarios.length) return '';
+    var btns = scenarios.map(function (s) {
+      var dis = s.disabled ? ' demo-dis' : '';
+      var act = s.id === _activeScenario ? ' active' : '';
+      var tip = s.tip ? ' data-tip="' + _esc(s.tip) + '"' : '';
+      var cs = s.disabled ? '<span class="demo-cs">Soon</span>' : '';
+      return '<button class="demo-btn' + dis + act + '"' + tip +
+             ' data-scenario="' + _esc(s.id) + '">' +
+             '<span class="material-symbols-outlined">' + _esc(s.icon || 'play_arrow') + '</span>' +
+             '<span>' + _esc(s.label) + '</span>' + cs + '</button>';
+    }).join('');
+    return '<div class="demo-buttons">' + btns + '</div>';
+  }
+
+  function _renderPageTabs(mode) {
+    var pages = _getPages();
+    if (!pages.length) return '';
+    // 雙層模式：page tabs 用 pill style 放最上面
+    // 單層 pages-only 模式：page tabs 用 underline style（跟 cat-tabs 一致），無第二層
+    var isTwoLayer = mode === 'two-layer';
+    var wrapClass = isTwoLayer ? 'demo-page-tabs' : 'demo-cat-tabs';
+    var tabClass  = isTwoLayer ? 'demo-page-tab' : 'demo-cat-tab';
+    return '<div class="' + wrapClass + '">' + pages.map(function (p) {
+      var act = p.id === _activePage ? ' active' : '';
+      return '<button class="' + tabClass + act + '" data-page="' + _esc(p.id) + '">' +
+             (p.icon ? '<span class="material-symbols-outlined">' + _esc(p.icon) + '</span>' : '') +
+             _esc(p.label) +
+             '</button>';
+    }).join('') + '</div>';
+  }
+
+  function _renderCategoryTabs() {
+    var cats = _getCategories();
+    if (!cats.length) return '';
+    return '<div class="demo-cat-tabs">' + cats.map(function (c) {
+      var act = c.id === _activeCategory ? ' active' : '';
+      return '<button class="demo-cat-tab' + act + '" data-category="' + _esc(c.id) + '">' +
+             (c.icon ? '<span class="material-symbols-outlined">' + _esc(c.icon) + '</span>' : '') +
+             _esc(c.label) +
+             '</button>';
+    }).join('') + '</div>';
+  }
+
+  function _renderHint() {
+    if (!_activeCategory) return '';
+    var cat = _getCategories().find(function (c) { return c.id === _activeCategory; });
+    if (!cat || !cat.hint) return '';
+    return '<div class="demo-pane-hint">' + _esc(cat.hint) + '</div>';
+  }
+
+  function _renderScrollArea() {
+    return _renderHint() + _renderButtons(_filterScenarios());
+  }
+
+  // ===== DOM MOUNTING =====
+  function _render() {
+    if (document.getElementById('demo-fab')) return;
+
+    // Auto-detect first page & category
+    var mode = _detectMode();
+    var pages = _getPages();
+    var cats = _getCategories();
+    if (!_activePage && pages.length) _activePage = pages[0].id;
+    if (!_activeCategory && cats.length) _activeCategory = cats[0].id;
+    if (mode === 'flat') { _activePage = null; _activeCategory = null; }
+    if (mode === 'pages-only') _activeCategory = null;
+    if (mode === 'categories-only') _activePage = null;
+
+    // FAB
+    var fabEl = document.createElement('button');
+    fabEl.className = 'demo-fab';
+    fabEl.id = 'demo-fab';
+    fabEl.title = 'Designer Demo Scenarios';
+    fabEl.innerHTML =
+      '<span class="material-symbols-outlined">science</span>' +
+      '<span class="demo-pulse" id="demo-fab-pulse"></span>';
+    fabEl.addEventListener('click', function () { window._demoFabToggle(); });
+
+    // Popover
+    var popEl = document.createElement('div');
+    popEl.className = 'demo-popover';
+    popEl.id = 'demo-popover';
+    popEl.innerHTML =
+      '<div class="demo-popover-hdr">' +
+        '<div class="demo-popover-title">' +
+          '<span class="material-symbols-outlined" style="font-size:16px">science</span>' +
+          'Demo Scenarios' +
+        '</div>' +
+        '<button class="demo-popover-close" id="demo-pop-close">' +
+          '<span class="material-symbols-outlined" style="font-size:18px">close</span>' +
+        '</button>' +
+      '</div>' +
+      (window.DEMO_DEFAULT
+        ? '<button class="demo-reset-link" id="demo-reset-link">' +
+            '<span class="material-symbols-outlined">refresh</span>Reset to Default</button>'
+        : '') +
+      _renderPageTabs(mode) +
+      _renderCategoryTabs() +
+      '<div class="demo-popover-scroll" id="demo-popover-scroll">' +
+        _renderScrollArea() +
+      '</div>';
+
+    document.body.appendChild(fabEl);
+    document.body.appendChild(popEl);
+
+    // === Event wiring ===
+    document.getElementById('demo-pop-close').addEventListener('click', function () {
+      window._demoFabToggle();
+    });
+
+    // Reset link
+    var resetLink = document.getElementById('demo-reset-link');
+    if (resetLink && window.DEMO_DEFAULT) {
+      resetLink.addEventListener('click', function () {
+        window._demoFabApply(window.DEMO_DEFAULT, null);
+      });
+    }
+
+    // Page tabs
+    popEl.querySelectorAll('.demo-page-tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        window._demoFabSetPage(t.dataset.page);
+      });
+    });
+
+    // Category tabs (also handles page tabs in pages-only mode, where they use demo-cat-tab class)
+    popEl.querySelectorAll('.demo-cat-tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        if (t.dataset.page) {
+          window._demoFabSetPage(t.dataset.page);
+        } else {
+          window._demoFabSetCategory(t.dataset.category);
+        }
+      });
+    });
+
+    // Scenario button clicks (event delegation on scroll area)
+    document.getElementById('demo-popover-scroll').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-scenario]');
+      if (!btn || btn.classList.contains('demo-dis')) return;
+      window._demoFabApply(btn.dataset.scenario, btn);
+    });
+
+    // Outside click to close
+    document.addEventListener('click', function (e) {
+      var pop = document.getElementById('demo-popover');
+      var fab = document.getElementById('demo-fab');
+      if (!pop || !fab) return;
+      if (!pop.contains(e.target) && !fab.contains(e.target) && pop.classList.contains('show')) {
+        pop.classList.remove('show');
+        fab.classList.remove('popped');
+      }
+    });
+
+    _injectGlobalTooltip();
+  }
+
+  // ===== #gl-tip auto-injection =====
+  function _injectGlobalTooltip() {
+    if (document.getElementById('gl-tip')) return; // host page already provides one
+    var tip = document.createElement('div');
+    tip.id = 'gl-tip';
+    document.body.appendChild(tip);
+    var cur = null;
+    document.addEventListener('mouseover', function (e) {
+      var el = e.target.closest('[data-tip]');
+      if (!el || el === cur) return;
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block';
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!cur) return;
+      var tw = tip.offsetWidth, th = tip.offsetHeight;
+      var x = e.clientX - tw / 2, y = e.clientY - th - 10;
+      if (x < 8) x = 8;
+      if (x + tw > window.innerWidth - 8) x = window.innerWidth - tw - 8;
+      if (y < 8) y = e.clientY + 16;
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    });
+    document.addEventListener('mouseout', function (e) {
+      var el = e.target.closest('[data-tip]');
+      if (el && el === cur) { cur = null; tip.style.display = 'none'; }
+    });
+  }
+
+  // ===== PUBLIC API =====
+  function _refreshScrollArea() {
+    var scroll = document.getElementById('demo-popover-scroll');
+    if (!scroll) return;
+    scroll.style.opacity = '0';
+    setTimeout(function () {
+      scroll.innerHTML = _renderScrollArea();
+      scroll.style.opacity = '1';
+    }, 120);
+  }
+
+  function _refreshTabs() {
+    var pop = document.getElementById('demo-popover');
+    if (!pop) return;
+    pop.querySelectorAll('.demo-page-tab').forEach(function (t) {
+      t.classList.toggle('active', t.dataset.page === _activePage);
+    });
+    pop.querySelectorAll('.demo-cat-tab').forEach(function (t) {
+      // In pages-only mode, cat-tab elements carry data-page (not data-category)
+      if (t.dataset.page) {
+        t.classList.toggle('active', t.dataset.page === _activePage);
+      } else {
+        t.classList.toggle('active', t.dataset.category === _activeCategory);
+      }
+    });
+  }
+
+  /** Toggle popover open/close */
+  window._demoFabToggle = function () {
+    var pop = document.getElementById('demo-popover');
+    var fab = document.getElementById('demo-fab');
+    var pulse = document.getElementById('demo-fab-pulse');
+    var opening = !pop.classList.contains('show');
+    pop.classList.toggle('show');
+    fab.classList.toggle('popped');
+    if (opening && pulse) pulse.style.display = 'none';
+  };
+
+  /** Set active page tab (internal + external) */
+  window._demoFabSetPage = function (pageId) {
+    if (_activePage === pageId) return;
+    _activePage = pageId;
+    _refreshTabs();
+    _refreshScrollArea();
+  };
+
+  /** Set active category tab */
+  window._demoFabSetCategory = function (catId) {
+    if (_activeCategory === catId) return;
+    _activeCategory = catId;
+    _refreshTabs();
+    _refreshScrollArea();
+  };
+
+  /**
+   * Called from prototype's navigation function to auto-switch the page tab.
+   * Only switches if the popover doesn't need to stay on current tab.
+   */
+  window.demoFabSwitchTab = function (pageId) {
+    window._demoFabSetPage(pageId);
+  };
+
+  /** Apply a scenario — called via event delegation or by host */
+  window._demoFabApply = function (id, btn) {
+    _activeScenario = id;
+    document.querySelectorAll('.demo-btn').forEach(function (b) {
+      b.classList.remove('active');
+    });
+    if (btn) {
+      btn.classList.add('active');
+    } else {
+      // No btn provided (e.g. Reset link) — find scenario in DOM
+      var found = document.querySelector('[data-scenario="' + id + '"]');
+      if (found) found.classList.add('active');
+    }
+    if (typeof window.DEMO_APPLY === 'function') {
+      window.DEMO_APPLY(id, btn);
+    }
+  };
+
+  // ===== INIT =====
+  function _init() {
+    if (_activeScenario === null && window.DEMO_DEFAULT) {
+      _activeScenario = window.DEMO_DEFAULT;
+    }
+    _render();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else {
+    _init();
+  }
+})();
+
+</script>
+<!-- Init: all shared scripts loaded, CurrencyPicker is now available -->
+<script>go('list');</script>
 </body>
 </html>
