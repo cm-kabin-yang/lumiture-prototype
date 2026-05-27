@@ -1,0 +1,3222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumiture.ai — General Budget v2 (Fiscal Year & Annual Summary)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pri:#004FB0;--pri-dk:#002663;--pri-lt:#0B6DD7;--pri-lt30:#9ED7FF;--pri-lt20:#D1EEFF;--pri-lt10:#F2FAFF;
+  --sec:#34B5D9;--sec-dk:#228EB3;--sec-lt:#4ADFFF;
+  --wh:#FFF;--g50:#F6F6F6;--g100:#F2F2F2;--g200:#E6E6E6;--g300:#CCCCCC;--g400:#B3B3B3;--g500:#676767;--g700:#262626;--g900:#262626;
+  --ok:#00B5A6;--ok-lt:#E6FFF8;--ok-dk:#008F88;--warn:#FC9A0F;--warn-lt:#FEF3E1;--err:#FF403D;--err-lt:#FFEBEF;--info-lt:#E6F6FF;
+  --r-sm:5px;--r-md:8px;--r-lg:12px;
+  --tf-border:#DCE3EC;
+  --sw:264px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overscroll-behavior:none}
+body{font-family:'Noto Sans',sans-serif;font-size:14px;line-height:1.75;color:var(--g700);background:var(--pri-lt10);letter-spacing:0}
+a{color:var(--pri);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:14px;letter-spacing:0}
+input,select,textarea{font-family:inherit;font-size:14px}
+.material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;vertical-align:middle}
+
+/* ==== App layout (sidebar uses sticky from shared script) ==== */
+.app{display:flex;min-height:100vh}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{background:var(--pri-dk);padding:14px 32px;display:flex;align-items:center;justify-content:flex-end;gap:16px;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px}
+.tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.7)}
+.tb-ic:hover{background:rgba(255,255,255,.08);color:#fff}
+.content{padding:24px 32px;flex:1}
+.content.has-savebar{padding-bottom:96px}
+
+/* ==== Page header ==== */
+.pg-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.pg-title{font-size:20px;font-weight:700;color:var(--g900);line-height:1.5}
+.pg-hdr-r{display:flex;align-items:center;gap:12px}
+
+/* ==== Paper (card) — wraps the whole page content ==== */
+.paper{background:#fff;border-radius:var(--r-md);padding:28px 32px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);border:1px solid transparent;transition:border-color .15s,box-shadow .15s}
+.paper.editing{border-color:var(--pri-lt30);box-shadow:0 0 0 1px var(--pri-lt30),0 1px 3px rgba(0,0,0,.08)}
+.paper-section-title{font-size:18px;font-weight:700;color:var(--g900);line-height:1.5}
+.paper-section-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:16px}
+/* When section title is hidden (T2 roles), force action buttons (Export CSV / Edit) to stay right-aligned
+   instead of collapsing to the left edge of the row. */
+.paper-section-row > .pg-hdr-r{margin-left:auto}
+.paper-meta{font-size:12px;color:var(--g500);font-style:italic;white-space:nowrap}
+/* FY entry pattern (aligned with Executive Insights "Fiscal Year Start: ... · Set Fiscal Start Month" inline pattern) */
+.fy-inline{display:inline-flex;align-items:center;gap:12px;font-size:13px;color:var(--g700);font-style:normal;font-weight:500;white-space:nowrap}
+.fy-inline .fy-display{display:inline-flex;align-items:center;gap:6px}
+.fy-inline .fy-display .material-symbols-outlined{font-size:16px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400}
+.fy-inline .fy-display strong{color:var(--g900);font-weight:700}
+.fy-inline .fy-display .fy-note{color:var(--g400);font-weight:400;font-style:italic;font-size:12px;margin-left:4px}
+.fy-set-link{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--pri);font-weight:500;cursor:pointer;padding:2px 6px;border-radius:var(--r-sm);background:none;border:none;font-family:inherit;line-height:1.5}
+.fy-set-link:hover{background:var(--pri-lt10)}
+.fy-set-link:hover .fy-set-link-text{text-decoration:underline}
+.fy-set-link .material-symbols-outlined{font-size:16px;color:var(--pri);font-variation-settings:'FILL' 0,'wght' 500}
+.paper-desc{font-size:12px;color:var(--g500);margin-bottom:24px}
+.paper-desc b{color:var(--g700);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:11px}
+
+/* ==== Section divider inside paper ==== */
+.paper-sep{height:1px;background:var(--g200);margin:32px 0 24px}
+
+/* ==== Org Annual Budget grid ==== */
+.orgrow{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:16px}
+/* Figma 對齊：第一張卡 (Total Annual Budget) 與後面 per-CSP 卡之間有垂直分隔線，
+   視覺分組「合計 vs 各雲」。用 ::after 偽元素畫在 gap 中央，不影響 grid layout。*/
+.orgcell{position:relative}
+.orgcell:first-child::after{
+  content:'';position:absolute;right:-12px;top:6px;bottom:6px;
+  width:1px;background:var(--g200);
+}
+.orgcell .ol{font-size:13px;font-weight:500;color:var(--g700);display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.csp-ic{width:20px;height:20px;border-radius:4px;font-size:10px;font-weight:700;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:.2px}
+.csp-gcp{background:#34A853}.csp-aws{background:#FF9900}.csp-azure{background:#308CE3}.csp-focus{background:#7E55D9}
+.csp-total{background:linear-gradient(135deg,#7E55D9 0%,#34B5D9 100%);font-size:13px}
+.csp-total .material-symbols-outlined{font-size:14px;color:#fff;font-variation-settings:'FILL' 1,'wght' 500}
+
+/* ==== Fiscal Year picker (B+D: admin-locked, others read-only) ==== */
+.pg-hdr-r > .fy-label{font-size:13px;color:var(--g500);font-weight:500}
+.fy-picker{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--g700);padding:6px 10px;border-radius:var(--r-sm);line-height:1.4}
+.fy-picker .fy-label{color:var(--g500)}
+.fy-picker.editable{cursor:pointer;border:1px solid var(--g300);background:#fff;transition:border-color .12s, background .12s}
+.fy-picker.editable:hover{border-color:var(--pri);background:var(--pri-lt10)}
+.fy-picker.editable .fy-value{color:var(--g900);font-weight:500}
+.fy-picker.editable .material-symbols-outlined{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400}
+.fy-picker.readonly{color:var(--g700);font-weight:500}
+.fy-picker.readonly .fy-note{font-size:12px;color:var(--g400);font-weight:400;font-style:italic;margin-left:4px}
+
+/* FY modal — select fields + preview chip + warning callout */
+.fy-select{width:100%;height:40px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);font-family:inherit;font-size:14px;color:var(--g900);background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%23676767'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 12px center;appearance:none;cursor:pointer;outline:none;letter-spacing:0}
+.fy-select:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
+.fy-preview{padding:12px 16px;background:var(--pri-lt10);border:1px solid var(--pri-lt20);border-radius:var(--r-sm);font-size:13px;color:var(--g700);line-height:1.5}
+.fy-preview strong{color:var(--g900);font-weight:700}
+.fy-warning{display:flex;gap:10px;padding:12px 14px;background:var(--warn-lt);border-radius:var(--r-sm);font-size:12px;color:var(--g700);margin-top:12px;align-items:flex-start;line-height:1.5}
+.fy-warning .material-symbols-outlined{font-size:18px;color:var(--warn);flex-shrink:0;font-variation-settings:'FILL' 1,'wght' 500}
+.fy-field-label{display:block;font-size:13px;font-weight:500;color:var(--g700);margin-bottom:6px}
+.orgcell .ov{font-size:36px;font-weight:700;color:var(--g900);line-height:1.1;letter-spacing:-.5px}
+.orgcell .ou{font-size:12px;font-weight:500;color:var(--g500);margin-left:6px}
+.orgcell .conv{font-size:12px;color:var(--g500);margin-top:4px;display:none;font-weight:500}
+.show-conv .orgcell .conv{display:block}
+.orgcell .expected{font-size:12px;color:var(--g500);margin-top:8px;display:flex;align-items:center;gap:6px}
+.orgcell .expected .material-symbols-outlined{font-size:14px;color:var(--g400)}
+.orgcell .empty-val{color:var(--g400);font-weight:500}
+
+/* ==== Currency / converter row ==== */
+.curr-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.toggle{position:relative;width:36px;height:20px;background:var(--g300);border-radius:10px;cursor:pointer;transition:background .15s;flex-shrink:0;display:inline-block;border:none;padding:0}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.toggle.on{background:var(--pri)}
+.toggle.on::after{left:18px}
+.toggle-label{font-size:13px;color:var(--g700);cursor:pointer;user-select:none}
+.curr-trigger-wrap{position:relative;display:none}
+.show-conv .curr-trigger-wrap{display:inline-flex}
+.disclaimer{font-size:11px;color:var(--g400);text-align:right;font-style:italic;margin-top:8px}
+
+/* ==== Tier 1 / Tier 2 section ==== */
+.alert-bar{font-size:13px;color:var(--g500);display:flex;align-items:center;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.alert-bar .material-symbols-outlined{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16}
+.alert-bar b{color:var(--g700);font-weight:700}
+.alert-link{font-size:13px;color:var(--pri);font-weight:500;display:inline-flex;align-items:center;gap:4px;margin-left:4px;cursor:pointer;padding:2px 6px;border-radius:var(--r-sm);background:none;border:none;font-family:inherit;line-height:1.5}
+.alert-link:hover .alert-link-text{text-decoration:underline}
+.alert-link .material-symbols-outlined{font-size:16px;color:var(--pri)}
+
+/* ==== Tabs ==== */
+.tabs-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:2px solid var(--g200);margin-bottom:8px}
+.tabs{display:flex;gap:0}
+.tab{padding:8px 16px;font-size:14px;font-weight:500;color:var(--g500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;display:flex;align-items:center;gap:6px;background:none;border-left:none;border-right:none;border-top:none;font-family:inherit;line-height:1.5}
+.tab:hover{color:var(--g700)}
+.tab.active{color:var(--pri);border-bottom-color:var(--pri)}
+.unit{font-size:12px;color:var(--g500);margin-bottom:12px}
+
+/* ==== Segmented Control (Monthly view: Budget/Spend/Remaining) — Demo FAB toggle ==== */
+.seg-wrap{display:none;align-items:center;margin-bottom:6px;gap:8px}
+.paper.show-seg .seg-wrap{display:inline-flex}
+/* "Monthly view:" label — gives the segment control explicit framing as a全表轉換 affordance
+   (vs. tooltip handles single-cell pinpoint). User research / finance-ui-design pattern：
+   labels improve discoverability of view-switching controls. */
+.seg-label{font-size:13px;color:var(--g500);font-weight:500;white-space:nowrap}
+/* Info hint icon — clarifies when to use segment vs hover tooltip */
+.seg-hint{font-size:16px;color:var(--g400);cursor:help;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16;transition:color .12s}
+.seg-hint:hover{color:var(--g700)}
+.seg-ctrl{display:inline-flex;background:var(--g100);border-radius:var(--r-sm);padding:2px;gap:0}
+.seg-btn{padding:5px 14px;font-size:13px;font-weight:500;color:var(--g500);background:none;border:none;border-radius:calc(var(--r-sm) - 1px);cursor:pointer;font-family:inherit;line-height:1.4;letter-spacing:0;transition:background .12s,color .12s,box-shadow .12s}
+.seg-btn:hover:not(.active){color:var(--g700)}
+.seg-btn.active{background:#fff;color:var(--g900);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.seg-edit-label{display:none;align-items:center;gap:6px;padding:6px 12px;font-size:13px;font-weight:500;color:var(--g500);background:var(--g50);border-radius:var(--r-sm);border:1px dashed var(--g300);line-height:1.4}
+.seg-edit-label .material-symbols-outlined{font-size:16px;color:var(--g500);font-variation-settings:'FILL' 1,'wght' 500}
+.paper.editing.show-seg .seg-ctrl{display:none}
+.paper.editing.show-seg .seg-edit-label{display:inline-flex}
+
+/* ==== Bulk bar (edit mode) ==== */
+.bulkbar{display:none;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--pri-lt10);border:1px solid var(--pri-lt20);border-radius:var(--r-md);font-size:13px;margin-bottom:12px;flex-wrap:wrap;gap:10px}
+.editing .bulkbar{display:flex}
+.bulkbar-l{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.bulkbar-tip{color:var(--g500)}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--pri);color:#fff;border-radius:20px;padding:3px 4px 3px 10px;font-size:12px;font-weight:500;line-height:1.3}
+.chip-x{cursor:pointer;font-size:18px;color:rgba(255,255,255,.85);line-height:1;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:none;border:none;padding:0;margin:0 0 0 2px;font-family:inherit}
+.chip-x:hover{background:rgba(255,255,255,.2);color:#fff}
+.bulkbar-r{display:flex;gap:8px;flex-shrink:0}
+
+/* ==== Buttons (CMDS) ==== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:80px;padding:0 16px;height:36px;border-radius:var(--r-sm);font-weight:500;font-size:14px;transition:background-color .15s,border-color .15s,color .15s,box-shadow .2s;line-height:1.5;white-space:nowrap;border:1px solid transparent;font-family:inherit}
+.btn-p{background:var(--pri);color:#fff}
+.btn-p:hover{background:var(--pri-lt)}
+.btn-p:active{background:var(--pri-dk)}
+.btn-o{background:#fff;color:var(--pri);border-color:var(--pri)}
+.btn-o:hover{background:var(--g50);color:var(--pri-lt);border-color:var(--pri-lt)}
+.btn-o:active{background:var(--g200);color:var(--pri-dk);border-color:var(--pri-dk)}
+.btn-b{background:transparent;color:var(--pri);min-width:auto;padding:0 8px}
+.btn-b:hover{background:var(--g50);color:var(--pri-lt)}
+.btn-b:active{background:var(--g200);color:var(--pri-dk)}
+.btn-sm{height:30px;padding:0 12px;font-size:14px}
+.btn-xs{height:26px;padding:0 12px;font-size:12px}
+.btn .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 16}
+.btn .arr-down{font-size:16px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16}
+.btn:disabled{background:var(--g100)!important;color:var(--g300)!important;border-color:transparent!important;cursor:not-allowed}
+.btn-o:disabled{background:transparent!important;border-color:var(--g300)!important}
+.btn:disabled:hover{background:var(--g100);color:var(--g300)}
+.btn-err{background:var(--err);color:#fff}
+.btn-err:hover{background:#FF5A60}
+
+/* Text button hover behavior — underline only on text span, NOT icon */
+.btn-b .btn-text{transition:text-decoration .15s}
+.btn-b:hover .btn-text{text-decoration:underline}
+
+/* ==== Budget table (inside the paper) ==== */
+.tblwrap{border:1px solid var(--g200);border-radius:var(--r-md);overflow:hidden;background:#fff}
+.tblscroll{max-height:575px;overflow:auto;position:relative}
+.tblscroll::-webkit-scrollbar{width:8px;height:8px}
+.tblscroll::-webkit-scrollbar-thumb{background:var(--g300);border-radius:4px}
+.tblscroll::-webkit-scrollbar-track{background:transparent}
+
+table.budget{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
+table.budget thead th{
+  background:var(--pri-lt10);
+  padding:0 12px;height:50px;text-align:right;
+  font-weight:700;color:var(--g700);font-size:13px;
+  position:sticky;top:0;z-index:3;
+  box-shadow:inset 0 -1px 0 var(--g300);
+  white-space:nowrap;
+}
+table.budget thead th.tx-left{text-align:left}
+table.budget td{
+  padding:0 12px;height:50px;
+  border-bottom:1px solid var(--g100);
+  text-align:right;
+  font-size:14px;color:var(--g700);
+  background:#fff;white-space:nowrap;
+}
+table.budget td.tx-left{text-align:left}
+table.budget tbody tr:hover td{background:var(--g50)}
+table.budget tbody tr.selected td{background:var(--pri-lt10)}
+table.budget tbody tr.selected:hover td{background:var(--pri-lt20)}
+
+/* Sticky left columns — each layer uses incremental left + z-index hierarchy */
+table.budget th.fix,table.budget td.fix{position:sticky;z-index:2}
+table.budget thead th.fix{z-index:4}
+table.budget tbody tr:hover td.fix{background:var(--g50)}
+table.budget tbody tr.selected td.fix{background:var(--pri-lt10)}
+table.budget tbody tr.selected:hover td.fix{background:var(--pri-lt20)}
+
+/* Column positions: cb(40) name(160) gear(44) budget(78) spend(78) pct(96) remain(78)
+   PRD §7.1: 4 欄 annual summary 常駐，順序 Budget → Spend → Spent % → Remaining
+   （財務報表習慣：先看絕對數字、再看百分比；Spent % 用 segmented bar 視覺權重 catch attention）
+   字級維持 CMDS body 14px，padding 縮減控制密度
+   Edit mode 4 欄全保留（PRD §7.5）；月份格寬度 88px view/edit 一致（無 layout jump）；月份區於窄螢幕橫滾
+   When show-4col class is on .paper, 4 columns replace single .col-total */
+.col-cb{width:40px;min-width:40px;padding:0 8px!important;text-align:center;left:0}
+.col-cb input{accent-color:var(--pri);width:16px;height:16px;cursor:pointer;margin:0;vertical-align:middle}
+.col-name{width:160px;min-width:160px;max-width:160px;left:40px;overflow:hidden;text-overflow:ellipsis}
+.col-gear{width:44px;min-width:44px;padding:0!important;text-align:center;left:200px}
+/* Single Total column (current prod baseline) */
+.col-total{width:120px;min-width:120px;left:244px}
+/* 4-column annual summary (PRD §7.1 — when .paper has .show-4col)
+   Order: Budget → Spend → Spent % → Remaining (aligned with PRD)
+   Padding 縮減控制密度（保留 14px body 字級對齊 CMDS）*/
+.col-budget{width:78px;min-width:78px;left:244px;padding:0 8px!important}
+.col-spend{width:78px;min-width:78px;left:322px;padding:0 8px!important}
+.col-pct{width:96px;min-width:96px;left:400px;padding:0 8px!important}
+.col-remain{width:78px;min-width:78px;left:496px;padding:0 8px!important;border-right:2px solid var(--g200)}
+/* Edit mode: 4 欄全保留（PRD §7.5），透過縮窄月份格 88→72px 換取空間 */
+/* When no checkbox (view mode), shift all sticky positions left by 40 */
+.no-cb .col-name{left:0}
+.no-cb .col-gear{left:160px}
+.no-cb .col-total{left:204px}
+.no-cb .col-budget{left:204px}
+.no-cb .col-spend{left:282px}
+.no-cb .col-pct{left:360px}
+.no-cb .col-remain{left:456px}
+/* When no gear (view mode + no edit), shift sticky positions back by 44 */
+.no-gear .col-total{left:200px}
+.no-cb.no-gear .col-total{left:160px}
+.no-gear .col-budget{left:200px}
+.no-gear .col-spend{left:278px}
+.no-gear .col-pct{left:356px}
+.no-gear .col-remain{left:452px}
+.no-cb.no-gear .col-budget{left:160px}
+.no-cb.no-gear .col-spend{left:238px}
+.no-cb.no-gear .col-pct{left:316px}
+.no-cb.no-gear .col-remain{left:412px}
+
+.col-mon{width:88px;min-width:88px}
+/* Month col width unified across view + edit modes (88px) — no layout jump on mode switch.
+   Annual block sticky-left always visible; months scroll horizontally on narrow screens. */
+/* Month header year suffix (e.g., '26) — subdued styling so month is primary, year secondary */
+.col-mon .mon-year{font-size:11px;color:var(--g500);margin-left:2px;font-weight:400;letter-spacing:0}
+/* Sparkline column (Demo 方向Y) — replaces 12 month cells in View Mode with a single mini chart cell */
+.col-spark-head{text-align:left!important;padding-left:24px!important;font-weight:700}
+/* border-box: height 50 含 padding+border。content area = 50 - (4+4) - 1 = 41 >= svg 40，不撐破 → 列高 50 跟其他 cell 一致（user feedback 5/27）*/
+.col-spark{padding:4px 16px 4px 24px!important;text-align:left;min-width:264px}
+.spark-svg{display:block;overflow:visible}
+
+/* Spent % segmented meter — reuses lumi-tag "Coverage" 5-block pattern.
+   Shared visual language across dashboards. Each consumer sets its own threshold + color mapping:
+   - lumi-tag Coverage: high = good（>=70% ok / 40-69% warn / <40% low）
+   - budget Spent %:    high = bad（<70% ok / 70-99% warn / >=100% danger）
+   Same 5-segment structure, color semantics inverted by intent. Worth extracting via /dc-make. */
+.pct-meter{display:inline-flex;align-items:center;gap:4px;vertical-align:middle}
+.pct-meter-bar{display:inline-flex;gap:1.5px;flex-shrink:0}
+.pct-seg{width:9px;height:10px;background:var(--g200);border-radius:1.5px;position:relative;overflow:hidden}
+.pct-seg-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--ok);transition:width .2s}
+.pct-meter.warn .pct-seg-fill{background:var(--warn)}
+.pct-meter.danger .pct-seg-fill{background:var(--err)}
+.pct-text{font-size:11px;font-weight:500;color:var(--g700);min-width:26px;line-height:1.4;letter-spacing:0}
+/* Annual summary block uses plain white in normal/hover state (user feedback 5/22 — finance-ui-design
+   recommendation: light-mode B2B mainstream pattern is no sticky tint, rely on border-right separator).
+   Hover automatically falls through to `tr:hover td.fix{background:g50}` — visual continuity wins.
+   Selected state preserves pri-lt10 highlight as deliberate batch-action affordance. */
+.paper.show-4col table.budget tbody tr.selected td.col-budget,
+.paper.show-4col table.budget tbody tr.selected td.col-spend,
+.paper.show-4col table.budget tbody tr.selected td.col-pct,
+.paper.show-4col table.budget tbody tr.selected td.col-remain{background:var(--pri-lt10)}
+.paper.show-4col table.budget tbody tr.selected:hover td.col-budget,
+.paper.show-4col table.budget tbody tr.selected:hover td.col-spend,
+.paper.show-4col table.budget tbody tr.selected:hover td.col-pct,
+.paper.show-4col table.budget tbody tr.selected:hover td.col-remain{background:var(--pri-lt20)}
+/* 2-col edit-mode annual block: Total + Spend (Spend reuses .col-spend class but at different left position).
+   Total stays at left:244 (width 120, same as standalone .col-total).
+   Spend sits right after Total at left:364 (244+120), becomes the rightmost sticky col → gets border-right. */
+.paper.show-2col table.budget .col-spend{left:364px;border-right:2px solid var(--g200)}
+.paper.show-2col table.budget tbody tr.selected td.col-total,
+.paper.show-2col table.budget tbody tr.selected td.col-spend{background:var(--pri-lt10)}
+.paper.show-2col table.budget tbody tr.selected:hover td.col-total,
+.paper.show-2col table.budget tbody tr.selected:hover td.col-spend{background:var(--pri-lt20)}
+.empty-cell{color:var(--g400)}
+/* Critical: Remaining negative, Spend > Budget, Card Annual > Allocated — red text + bold (no bg tint — too noisy per design review).
+   Specificity boost needed for each target because parent selectors override plain `.over-budget` (0,1,0):
+   - `table.budget td` (0,1,2) — table cells
+   - `.orgcell .ov` (0,2,0) — org card big numbers */
+.over-budget{color:var(--err);font-weight:600}
+table.budget td.over-budget{color:var(--err);font-weight:600}
+.orgcell .ov.over-budget{color:var(--err);font-weight:700}
+
+/* === Warning visual system (PRD §7.3 / §9) ===
+   Three warning scenarios, unified color semantics, different visual carriers:
+   - Amber (warn): 規劃衝突 / 預警 (e.g., 下層 sum > 上層 cap, Spent% 70-99%)
+   - Red (critical): 已超支 (e.g., Remaining < 0, Spent% >= 100%, actual Spend > Budget)
+   All warnings: don't block save, hover tooltip reveals details.
+
+   1. Month cell amber dot (規劃衝突) — top-right corner indicator
+      Trigger: T2 sum > T1 cap for that month (Budget mode only)
+      Shows on: T1 group row (Admin view) or Total row (T1 Manager view)
+      ⚠ Data trigger not wired in prototype — CSS ready, JS logic depends on per-month cap data structure
+   2. Remaining 負數 → over-budget class (already implemented above) — red text + minus sign
+   3. Spent% bar dynamic color — handled by .pct-meter.warn / .pct-meter.danger (above) */
+.col-mon.month-warn{position:relative}
+.col-mon.month-warn::after{
+  content:'';position:absolute;top:6px;right:6px;
+  width:6px;height:6px;border-radius:50%;
+  background:var(--warn);box-shadow:0 0 0 1px #fff;
+  pointer-events:none;
+}
+
+/* Total row (sticky to bottom) */
+table.budget tbody tr.totalrow td{
+  background:var(--pri-lt10)!important;
+  font-weight:700;
+  border-top:1px solid var(--g300);
+  position:sticky;bottom:0;z-index:3;
+}
+table.budget tbody tr.totalrow td.fix{z-index:4}
+/* Allocated row (sticky above total in T1 view) — PRD §7.4 rename; CSS class `.expectedrow` kept for back-compat */
+table.budget tbody tr.expectedrow td{
+  background:#FAFAFA!important;
+  color:var(--g500);font-weight:500;font-style:italic;
+  border-top:1px solid var(--g200);
+  position:sticky;bottom:50px;z-index:3;
+}
+table.budget tbody tr.expectedrow td.fix{z-index:4}
+
+/* ==== Cell input (edit mode) ==== */
+.cell-input{display:inline-flex;align-items:center;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff;padding:0 8px;height:32px;width:100%;transition:border-color .15s,box-shadow .2s}
+.cell-input .dollar{font-size:13px;color:var(--g500);margin-right:4px}
+.cell-input input{border:none;outline:none;background:transparent;width:100%;text-align:right;font-size:14px;color:var(--g700);min-width:0;padding:0}
+.cell-input:hover{border-color:var(--g400)}
+.cell-input:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
+.cell-input.err{border-color:var(--err)}
+.cell-input.err:focus-within{box-shadow:0 0 0 3px rgba(255,64,61,.1)}
+
+/* ==== Gear action button ==== */
+.gear-btn{width:30px;height:30px;border-radius:var(--r-sm);background:none;color:var(--g500);display:inline-flex;align-items:center;justify-content:center;transition:all .15s;border:none;padding:0;cursor:pointer}
+.gear-btn:hover{background:var(--g100);color:var(--g700)}
+.gear-btn.open{background:var(--pri-lt10);color:var(--pri)}
+.gear-btn .material-symbols-outlined{font-size:18px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 18}
+
+/* ==== Popover (single row + bulk action) ==== */
+.pop{position:absolute;background:#fff;border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.1);z-index:60;min-width:420px;width:max-content;max-width:480px;padding:16px;display:none}
+.pop.open{display:block}
+.pop-radios{display:flex;gap:18px;margin-bottom:14px;flex-wrap:wrap}
+.pop-radio{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--g700);cursor:pointer;line-height:1.5}
+.pop-radio input{accent-color:var(--pri);cursor:pointer}
+.pop-field-row{display:flex;gap:10px;align-items:flex-end}
+.pop-field{flex:1;min-width:0}
+.pop-field .pop-lbl{font-size:12px;font-weight:700;color:var(--g700);margin-bottom:6px}
+.pop-input{display:flex;align-items:center;border:1px solid var(--tf-border);border-radius:var(--r-sm);padding:0 10px;height:36px;background:#fff;transition:border-color .15s,box-shadow .2s}
+.pop-input .dollar{color:var(--g500);font-size:14px;margin-right:6px}
+.pop-input input{border:none;outline:none;background:transparent;width:100%;font-size:14px;color:var(--g700);padding:0}
+.pop-input:hover{border-color:var(--g400)}
+.pop-input:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
+.pop-input.err{border-color:var(--err)}
+.pop-input.err:focus-within{box-shadow:0 0 0 3px rgba(255,64,61,.1)}
+.pop-select{padding:0 10px;border:1px solid var(--tf-border);border-radius:var(--r-sm);font-size:14px;background:#fff;height:36px;color:var(--g700);font-family:inherit;cursor:pointer;outline:none;min-width:180px}
+.pop-select:hover{border-color:var(--g400)}
+.pop-select:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
+.pop-hint{font-size:12px;color:var(--g500);margin-top:8px;line-height:1.5}
+.pop-err-msg{font-size:12px;color:var(--err);margin-top:8px;display:none}
+.pop-err-msg.show{display:block}
+.pop-actions{display:flex;justify-content:flex-end;margin-top:16px}
+.pop-actions .btn{min-width:80px}
+
+/* ==== Bottom save bar ==== */
+.savebar{display:none;position:fixed;bottom:0;left:var(--sw);right:0;background:var(--pri-lt10);border-top:1px solid var(--g200);padding:14px 32px;align-items:center;justify-content:space-between;z-index:40;gap:16px}
+.editing-mode .savebar{display:flex}
+.savebar-l{font-size:13px;color:var(--g500)}
+.savebar-r{display:flex;gap:12px}
+
+/* ==== Modal ==== */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+.mo.active{display:flex}
+/* CMDS spec: .modal--left (form modals, default) = 660px / min 640px; .modal--center = 460px; .modal--xs = 340px.
+   Here .modal is the default M/Left Aligned variant (660px), .modal-sm is the XS variant (340px) for confirm dialogs. */
+.modal{background:#fff;border-radius:var(--r-lg);padding:24px 28px;width:660px;min-width:640px;max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.modal-sm{width:440px;min-width:0}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.mt{font-size:18px;font-weight:700;color:var(--g900)}
+.mx{color:var(--g400);cursor:pointer;display:flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:50%;background:none;border:none;padding:0}
+.mx:hover{background:var(--g100);color:var(--g700)}
+.mdesc{font-size:13px;color:var(--g500);margin-bottom:16px;line-height:1.6}
+.mb{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-right:4px;min-height:0}
+.mf{display:flex;justify-content:flex-end;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--g200)}
+.mf .btn{min-width:100px}
+
+/* Alert modal specifics */
+.thr-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.thr-input{display:flex;align-items:center;border:1px solid var(--tf-border);border-radius:var(--r-sm);padding:0 8px;height:36px;background:#fff;width:100px}
+.thr-input input{border:none;outline:none;background:transparent;width:100%;font-size:14px;color:var(--g700);padding:0}
+.thr-input .pct{font-size:13px;color:var(--g500)}
+.thr-input:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
+.thr-input.err{border-color:var(--err)}
+.thr-del{width:30px;height:30px;border-radius:var(--r-sm);color:var(--g400);display:inline-flex;align-items:center;justify-content:center;background:none;border:none;padding:0;cursor:pointer}
+.thr-del:hover{background:var(--err-lt);color:var(--err)}
+.thr-del .material-symbols-outlined{font-size:18px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 18}
+.thr-add{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--pri);padding:6px 6px;font-weight:500;margin-top:6px;background:none;border:none;cursor:pointer;font-family:inherit;border-radius:var(--r-sm)}
+.thr-add:hover .thr-add-text{text-decoration:underline}
+.thr-add:hover{background:var(--g50)}
+.thr-add .material-symbols-outlined{font-size:18px}
+.thr-add:disabled{color:var(--g300);cursor:not-allowed}
+.thr-add:disabled:hover{background:none}
+.thr-add:disabled:hover .thr-add-text{text-decoration:none}
+.thr-hint{font-size:12px;color:var(--g500);margin-bottom:10px}
+.thr-err{font-size:12px;color:var(--err);margin-top:4px;display:none;align-items:center;gap:4px}
+.thr-err.show{display:flex}
+.thr-err .material-symbols-outlined{font-size:14px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 14}
+
+.notif-block{margin-top:16px;padding:16px;background:var(--g50);border-radius:var(--r-md);transition:opacity .15s}
+.notif-block.dis{opacity:.5;pointer-events:none}
+.notif-title{font-size:14px;font-weight:700;color:var(--g700);margin-bottom:4px}
+.notif-desc{font-size:12px;color:var(--g500);margin-bottom:14px;line-height:1.5}
+.notif-role{margin-bottom:12px}
+.notif-role:last-child{margin-bottom:0}
+.notif-role-lbl{font-size:12px;font-weight:700;color:var(--g700);margin-bottom:6px}
+.notif-toggles{display:flex;flex-wrap:wrap;gap:18px}
+.notif-toggle{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--g700);cursor:pointer;user-select:none}
+
+/* ==== Toast ==== */
+.tc{position:fixed;bottom:24px;left:24px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast{color:#fff;padding:12px 18px;border-radius:var(--r-md);font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,.2);min-width:280px;animation:sIn .25s ease}
+.toast.tok{background:var(--ok)}
+.toast.terr{background:var(--err)}
+.toast .material-symbols-outlined{font-size:20px}
+@keyframes sIn{from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ==== Footer ==== */
+.footer{padding:16px 32px;background:var(--pri-lt10);display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--g500);border-top:1px solid var(--g200)}
+.footer a,.footer .text-link{color:var(--pri);font-weight:500;background:none;border:none;cursor:pointer;font-family:inherit;font-size:12px;padding:0}
+.footer .text-link:hover{text-decoration:underline}
+.footer-version{font-weight:500;color:#262626}
+.footer-version .ver-tag{background:#34B5D9;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}
+.footer-credit{color:#676767;font-size:12px}
+
+/* ==== Empty State (CMDS spec) ==== */
+/* CMDS Empty State 規格（Lumiture-Guideline.md 「Empty State」段）:
+   - Icon: Material Symbols FILL 0 (Outlined) + Primary Light 30 #9ED7FF（全站例外，其他都用 FILL 1）
+   - 三尺寸 S/M/L → icon 48/64/80px、title 14/16/20px、desc 12/13-14/14px
+   - Title bold 700、Desc color g700 (#676767)
+   - 結構：icon→ 12px gap →title→ 4-8px gap →desc→ 12-16px gap →button */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:12px;background:#fff;border-radius:var(--r-md)}
+/* Use direct-child selector so the styling only hits the main empty-state icon, NOT icons inside buttons */
+.empty-state > .material-symbols-outlined{
+  color:#9ED7FF; /* Primary Light 30 — CMDS 規定淡藍 outlined */
+  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48;
+  line-height:1;
+}
+.empty-state-title{font-weight:700;color:var(--g900);margin:0;line-height:1.4}
+.empty-state-sub{color:#676767;margin:0;line-height:1.6;max-width:480px}
+.empty-state .btn{margin-top:4px} /* 既有 gap 12px + 4px = 16px desc→button */
+
+/* Size variants — sizes apply only to direct-child icon */
+.empty-state--s{padding:24px}
+.empty-state--s > .material-symbols-outlined{font-size:48px}
+.empty-state--s .empty-state-title{font-size:14px}
+.empty-state--s .empty-state-sub{font-size:12px}
+
+.empty-state--m{padding:32px 24px}
+.empty-state--m > .material-symbols-outlined{font-size:64px}
+.empty-state--m .empty-state-title{font-size:16px}
+.empty-state--m .empty-state-sub{font-size:14px}
+
+.empty-state--l{padding:80px 24px}
+.empty-state--l > .material-symbols-outlined{font-size:80px}
+.empty-state--l .empty-state-title{font-size:20px}
+.empty-state--l .empty-state-sub{font-size:14px}
+
+/* Skeleton shimmer */
+@keyframes sk-shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+.skeleton{background:linear-gradient(90deg,var(--g100) 25%,var(--g200) 37%,var(--g100) 63%);background-size:1200px 100%;animation:sk-shimmer 1.4s ease infinite;border-radius:4px;display:inline-block}
+.sk-row td{padding:10px 12px;height:50px;border-bottom:1px solid var(--g100)}
+.sk-text{height:14px;width:80%}
+.sk-text-sm{height:12px;width:60%}
+.sk-text-num{height:32px;width:140px}
+.sk-cell{height:14px;width:60px;display:inline-block}
+
+/* When entering edit mode, sidebar collapse syncs --sw — savebar stays aligned. */
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="lt-sidebar"></aside>
+  <div class="main">
+    <header id="lt-topbar"></header>
+
+    <div class="content" id="content">
+      <div class="pg-hdr">
+        <div class="pg-title">General Budget</div>
+        <div class="pg-hdr-r">
+          <!-- Page-level actions live here. FY context now lives inline in Section 1 paper-period (EI pattern).
+               Export CSV moved here from Section 2 in v2 — clearer separation of page-level vs table-level actions. -->
+          <button class="btn btn-o" id="btn-csv" style="display:none"><span class="material-symbols-outlined">download</span>Export CSV</button>
+          <div id="fy-picker"></div>
+        </div>
+      </div>
+
+      <div class="paper" id="paper">
+        <!-- Section 1: Organization / Group Annual Budget -->
+        <div class="paper-section-row">
+          <div class="paper-section-title" id="paper-title">Organization Annual Budget</div>
+          <div class="paper-meta" id="paper-period">Period: 2026</div>
+        </div>
+        <div class="paper-desc">All budgets on this page are based on actual spend, with the <b>EXCLUSION OF CREDITS</b>.</div>
+        <div class="orgrow" id="orgrow"></div>
+        <div class="curr-row">
+          <button class="toggle" id="curr-toggle" aria-label="Toggle currency converter"></button>
+          <span class="toggle-label" onclick="document.getElementById('curr-toggle').click()">Display converted amounts in other currency</span>
+          <div class="curr-trigger-wrap" id="curr-trigger-wrap">
+            <button class="curr-btn" id="curr-btn" onclick="openCurrPicker(this)">
+              <span class="curr-flag" id="curr-flag">🇹🇼</span>
+              <span class="curr-code" id="curr-code">TWD</span>
+              <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16">expand_more</span>
+            </button>
+          </div>
+        </div>
+        <div class="disclaimer">*Please note that this total only presents values that have been entered, and does not include values with no input.</div>
+
+        <div class="paper-sep"></div>
+
+        <!-- Section 2: Group Budget table — only Edit Budget here (CSV moved to top page header) -->
+        <div class="paper-section-row" id="sec2-row" style="align-items:center">
+          <div class="paper-section-title" id="sec2-title">Tier 1 Group Budget</div>
+          <div class="pg-hdr-r">
+            <button class="btn btn-p" id="btn-edit"><span class="material-symbols-outlined">edit</span>Edit Budget</button>
+          </div>
+        </div>
+        <div class="alert-bar" id="alert-bar"></div>
+
+        <div class="tabs-row">
+          <div class="tabs" id="tabs"></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px">
+          <div class="unit" style="margin-bottom:0">(USD)</div>
+          <div class="seg-wrap" id="seg-wrap">
+            <span class="seg-label">Monthly view:</span>
+            <div class="seg-ctrl" id="seg-ctrl" role="tablist" aria-label="Monthly view">
+              <button class="seg-btn active" data-mode="budget" type="button">Budget</button>
+              <button class="seg-btn" data-mode="spend" type="button">Spend</button>
+              <button class="seg-btn" data-mode="remaining" type="button">Remaining</button>
+              <button class="seg-btn" data-mode="trend" type="button">Trend</button>
+            </div>
+            <span class="seg-hint material-symbols-outlined" data-tip-tip="Budget, Spend, Remaining switch which metric the monthly cells show. Trend shows the 12-month budget vs spend chart. Hover any cell for the full breakdown.">info</span>
+            <div class="seg-edit-label"><span class="material-symbols-outlined">lock</span>Editing Budget</div>
+          </div>
+        </div>
+
+        <div class="bulkbar" id="bulkbar">
+          <div class="bulkbar-l">
+            <span class="bulkbar-tip" id="bulkbar-tip">Select multiple groups to set budgets at once.</span>
+            <span class="chip" id="bulkchip" style="display:none"><span id="bulkchip-n">0</span> Selected<button class="chip-x" onclick="clearSel()" aria-label="Clear selection">×</button></span>
+          </div>
+          <div class="bulkbar-r">
+            <button class="btn btn-o btn-sm" id="btn-clearbudget" disabled data-tip-tip="Select groups first.">Clear Budget</button>
+            <button class="btn btn-p btn-sm" id="btn-setbudgets" disabled data-tip-tip="Select groups first."><span class="material-symbols-outlined">settings</span>Set Budgets<span class="arr-down material-symbols-outlined">expand_more</span></button>
+          </div>
+        </div>
+
+        <div class="tblwrap" id="tblwrap">
+          <div class="tblscroll" id="tblscroll">
+            <table class="budget" id="tbl"></table>
+          </div>
+        </div>
+
+        <div class="disclaimer" style="margin-top:8px;text-align:center">*When the budget input field is left blank or shows '--', it indicates that no budget limit has been set (unlimited).</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span class="footer-version">General Budget Prototype<span class="ver-tag">v2 · Fiscal Year &amp; Annual Summary</span></span>
+      <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
+    </div>
+  </div>
+</div>
+
+<!-- Save bar (edit mode) -->
+<div class="savebar" id="savebar">
+  <div class="savebar-l" id="savebar-l"></div>
+  <div class="savebar-r">
+    <button class="btn btn-o" id="btn-cancel">Cancel</button>
+    <button class="btn btn-p" id="btn-save">Save Change</button>
+  </div>
+</div>
+
+<!-- Single Row / Bulk Popover -->
+<div class="pop" id="pop"></div>
+
+<!-- Alert Settings Modal -->
+<div class="mo" id="mo-alert"><div class="modal">
+  <div class="mh">
+    <div class="mt">Alert Settings</div>
+    <button class="mx" onclick="closeAlert()"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">close</span></button>
+  </div>
+  <div class="mdesc">Admin can set overall alerts to notify the Admin, group managers, and members via email in real time when spending exceeds configured thresholds.</div>
+  <div class="mb">
+    <div style="font-size:14px;font-weight:700;color:var(--g700);margin-bottom:6px">Thresholds</div>
+    <div class="thr-hint">You can set up to 3 thresholds. Allowed values: 1~1000</div>
+    <div id="thr-list"></div>
+    <div class="thr-err" id="thr-err"><span class="material-symbols-outlined">error</span><span id="thr-err-msg"></span></div>
+    <button class="thr-add" id="thr-add"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">add_circle</span><span class="thr-add-text">Add Threshold</span></button>
+
+    <div class="notif-block" id="notif-block">
+      <div class="notif-title">Notification Settings</div>
+      <div class="notif-desc">Each role will be able to receive alerts for budget exceedance at the configured threshold when its notifications are enabled.</div>
+      <div class="notif-role"><div class="notif-role-lbl">Admin</div><div class="notif-toggles">
+        <label class="notif-toggle"><button class="toggle on"></button>Organization</label>
+        <label class="notif-toggle"><button class="toggle on"></button>All Tier 1 groups</label>
+      </div></div>
+      <div class="notif-role"><div class="notif-role-lbl">Tier 1 Manager</div><div class="notif-toggles">
+        <label class="notif-toggle"><button class="toggle on"></button>Their own group</label>
+        <label class="notif-toggle"><button class="toggle on"></button>Their Tier 2 groups</label>
+      </div></div>
+      <div class="notif-role"><div class="notif-role-lbl">Tier 1 Member</div><div class="notif-toggles">
+        <label class="notif-toggle"><button class="toggle on"></button>Their own group</label>
+        <label class="notif-toggle"><button class="toggle"></button>Their Tier 2 groups</label>
+      </div></div>
+      <div class="notif-role"><div class="notif-role-lbl">Tier 2 Manager</div><div class="notif-toggles">
+        <label class="notif-toggle"><button class="toggle on"></button>Their own group</label>
+      </div></div>
+      <div class="notif-role"><div class="notif-role-lbl">Tier 2 Member</div><div class="notif-toggles">
+        <label class="notif-toggle"><button class="toggle on"></button>Their own group</label>
+      </div></div>
+    </div>
+  </div>
+  <div class="mf">
+    <button class="btn btn-o" onclick="closeAlert()">Cancel</button>
+    <button class="btn btn-p" onclick="saveAlert()">Save</button>
+  </div>
+</div></div>
+
+<!-- Discard modal -->
+<div class="mo" id="mo-discard"><div class="modal modal-sm">
+  <div class="mh"><div class="mt">Discard unsaved changes?</div><button class="mx" onclick="document.getElementById('mo-discard').classList.remove('active')"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">close</span></button></div>
+  <div class="mdesc">You have unsaved changes. If you leave now, your changes will be lost.</div>
+  <div class="mf">
+    <button class="btn btn-o" onclick="document.getElementById('mo-discard').classList.remove('active')">Cancel</button>
+    <button class="btn btn-err" onclick="confirmDiscard()">Discard Changes</button>
+  </div>
+</div></div>
+
+<!-- Set Fiscal Start Month modal (B+D direction, admin-only)
+     Aligned with Executive Insights "Set Fiscal Start Month" pattern.
+     Width: CMDS default .modal 560px (not .modal-sm 440px).
+     Only Month selector — Year is implicit current year. Year selection belongs to a separate "FY view switcher" feature (future scope). -->
+<div class="mo" id="mo-fy"><div class="modal">
+  <div class="mh">
+    <div class="mt">Set Fiscal Start Month</div>
+    <button class="mx" onclick="closeFYModal()"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">close</span></button>
+  </div>
+  <div class="mdesc">Configure your organization's fiscal year start month. This setting applies to all users and affects both General Budget and Executive Insights.</div>
+  <div class="mb">
+    <div style="margin-bottom:16px;max-width:240px">
+      <label class="fy-field-label" for="fy-modal-month">Start Month</label>
+      <select id="fy-modal-month" class="fy-select"></select>
+    </div>
+    <div class="fy-preview">Resulting fiscal year: <strong id="fy-preview-label">FY2026</strong> <span id="fy-preview-range" style="color:var(--g500)"></span></div>
+    <div class="fy-warning">
+      <span class="material-symbols-outlined">info</span>
+      <span>Existing monthly data is preserved. FY-based aggregations will be recalculated and the change will reflect across all dashboards (including Executive Insights).</span>
+    </div>
+  </div>
+  <div class="mf">
+    <button class="btn btn-o" onclick="closeFYModal()">Cancel</button>
+    <button class="btn btn-p" onclick="confirmFY()">Save</button>
+  </div>
+</div></div>
+
+<div id="tc" class="tc"></div>
+
+<script>
+// ===== State =====
+// PRD §7.3 / §9 — warningOn 控制 amber-dot 警示落在哪一 row（依 viewer 角色相對改變）：
+//   'group-row'      → Admin 視角：警示出現在 T1 group row（Admin 設給該 T1 的 cap 不夠下層分配）
+//   'allocated-row'  → T1 Manager 視角：警示出現在 Allocated row（T1 Manager 配給 T2 的 sum 超 Admin cap）
+//   null             → T2 唯讀無權編預算，看警示無意義 → 不顯示（避免越權揭露上層數字）
+const ROLES = {
+  admin:  { card1Title:'Organization Annual Budget', secTitle:'Tier 1 Group Budget', editable:true,  showExpected:false, currentLabel:'Total Annual Budget', warningOn:'group-row' },
+  t1m:    { card1Title:'BU-Healthcare Annual Budget', secTitle:'Tier 2 Group Budget', editable:true,  showExpected:true,  currentLabel:'Total Annual Budget', warningOn:'allocated-row' },
+  t1mb:   { card1Title:'BU-Healthcare Annual Budget', secTitle:'Tier 2 Group Budget', editable:false, showExpected:true,  currentLabel:'Total Annual Budget', warningOn:'allocated-row' },
+  t2m:    { card1Title:'Team-Genomics Annual Budget', secTitle:'',                     editable:false, showExpected:false, currentLabel:'Total Annual Budget', warningOn:null },
+  t2mb:   { card1Title:'Team-Genomics Annual Budget', secTitle:'',                     editable:false, showExpected:false, currentLabel:'Total Annual Budget', warningOn:null },
+};
+
+const PROVIDERS = [
+  { key:'total', label:'Total', icon:'public', cls:'csp-total', synthetic:true },
+  { key:'gcp',   label:'Google Cloud', badge:'G',  cls:'csp-gcp' },
+  { key:'aws',   label:'AWS',   badge:'a',  cls:'csp-aws' },
+  { key:'azure', label:'Azure', badge:'Az', cls:'csp-azure' },
+];
+
+const MONTHS = ['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
+// PRD §7 B+D direction: admin-locked org FY (single source of truth, no per-user toggle)
+const FY_START_MONTHS = [
+  {idx:0,label:'Jan'},{idx:1,label:'Feb'},{idx:2,label:'Mar'},{idx:3,label:'Apr'},
+  {idx:4,label:'May'},{idx:5,label:'Jun'},{idx:6,label:'Jul'},{idx:7,label:'Aug'},
+  {idx:8,label:'Sep'},{idx:9,label:'Oct'},{idx:10,label:'Nov'},{idx:11,label:'Dec'},
+];
+
+const GROUPS_GCP = [
+  { name:'Monogenic Network',              total:null, months:[567, 567, 765, null,  345, 789, 432, 765, 543, null,  654, 432] },
+  { name:'Complex Disease Programs',       total:8357, months:[109, 654, 901, 210, 432, 567, 210, 432, 654, 765, 432, 991] },
+  { name:'Project Proposal Andromeda',     total:5059, months:[987, 765, 543, 198, 321, 654, 198, 432, 567, 198, 432, null] },
+  { name:'Sample Prioritization',          total:9211, months:[678, 883, 177, 456, 567, 654, 901, 678, 765, 543, 891, 1018] },
+  { name:'Complex Disease Cohort',         total:1339, months:[432, 890, 678, 456, 345, 876, 456, 345, 678, 456, 123, 104] },
+  { name:'Operations and Compliance',      total:3516, months:[765, 876, 901, 876, 543, 234, 876, 543, 234, 543, 876, 543] },
+  { name:'Underrepresented Cohorts',       total:9830, months:[876, 654, 0,   987, 987, 765, 987, 876, 987, 765, 654, 887] },
+  { name:'Steering Committee',             total:null, months:[null,null,null,null,null,null,null,null,null,null,null,null] },
+  { name:'Portal Development',             total:4199, months:[123, 654, 432, 432, 234, 567, 432, 654, 432, 432, 432, 1085] },
+  { name:'Training, Networking & Outreach',total:3167, months:[789, 987, 432, 432, 765, 210, 432, 234, 567, 432, 234, 553] },
+  { name:'Education & Capacity Building',  total:1594, months:[298, 130, 432, 432, 210, 567, 432, null,null,null,null,25] },
+];
+const GROUPS_AWS = [
+  { name:'Monogenic Network',              total:null, months:[null,null,null,null,null,null,null,null,null,null,null,null] },
+  { name:'Complex Disease Programs',       total:6800, months:[400, 500, 800, 200, 400, 500, 200, 400, 500, 600, 400, 1900] },
+  { name:'Project Proposal Andromeda',     total:3200, months:[400, 300, 200, 100, 200, 400, 100, 300, 400, 100, 200, 500] },
+  { name:'Sample Prioritization',          total:null, months:[null,null,null,null,null,null,null,null,null,null,null,null] },
+  { name:'Complex Disease Cohort',         total:1200, months:[100, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100] },
+  { name:'Operations and Compliance',      total:2000, months:[200, 200, 200, 200, 100, 100, 200, 100, 100, 100, 200, 300] },
+  { name:'Underrepresented Cohorts',       total:5300, months:[500, 400, 400, 500, 500, 400, 500, 400, 500, 400, 400, 400] },
+  { name:'Steering Committee',             total:null, months:[null,null,null,null,null,null,null,null,null,null,null,null] },
+  { name:'Portal Development',             total:3500, months:[300, 300, 300, 300, 300, 200, 300, 300, 300, 300, 300, 300] },
+  { name:'Training, Networking & Outreach',total:2700, months:[200, 300, 200, 200, 300, 100, 200, 200, 200, 300, 200, 300] },
+  { name:'Education & Capacity Building',  total:1107, months:[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 107] },
+];
+const GROUPS_AZURE = [
+  { name:'Monogenic Network',              total:null, months:[null,null,null,null,null,null,null,null,null,null,null,null] },
+  { name:'Complex Disease Programs',       total:2400, months:[200, 200, 300, 100, 200, 200, 100, 200, 200, 200, 200, 300] },
+  { name:'Project Proposal Andromeda',     total:null, months:[null,null,null,null,null,null,null,null,null,null,null,null] },
+  { name:'Sample Prioritization',          total:1800, months:[150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150] },
+  { name:'Complex Disease Cohort',         total:null, months:[null,null,null,null,null,null,null,null,null,null,null,null] },
+  { name:'Operations and Compliance',      total:1500, months:[100, 100, 150, 100, 100, 150, 150, 100, 150, 150, 100, 150] },
+  { name:'Underrepresented Cohorts',       total:2200, months:[200, 200, 200, 200, 200, 200, 200, 200, 100, 200, 100, 200] },
+  { name:'Steering Committee',             total:null, months:[null,null,null,null,null,null,null,null,null,null,null,null] },
+  { name:'Portal Development',             total:null, months:[null,null,null,null,null,null,null,null,null,null,null,null] },
+  { name:'Training, Networking & Outreach',total:1200, months:[100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100] },
+  { name:'Education & Capacity Building',  total:null, months:[null,null,null,null,null,null,null,null,null,null,null,null] },
+];
+const ALL_GROUPS = { gcp:GROUPS_GCP, aws:GROUPS_AWS, azure:GROUPS_AZURE };
+
+// Per-month Expected (Admin's per-month cap for the T1 group — values DO vary by month in real product,
+// not just annual/12 uniform distribution). Figma #05-1 shows variance: 3167, 7901, 3516, 9993, 3516, 9475, 4010, …
+const EXPECTED_MONTHLY = {
+  gcp:   [3167, 7901, 3516, 9993, 3516, 9475, 4010, 3500, 3800, 3500, 3500, 3700],
+  aws:   [3200, 4500, 3500, 5500, 3800, 4200, 4000, 3500, 3800, 3500, 3500, 3700],
+  azure: [1000, 1200, 1100, 1800, 1200, 1300, 1300, 1100, 1200, 1100, 1100, 1100],
+};
+const EXPECTED = Object.fromEntries(
+  Object.entries(EXPECTED_MONTHLY).map(([k, v]) => [k, v.reduce((a, b) => a + b, 0)])
+);
+
+const FX_RATES = { USD:1, TWD:31.5, HKD:7.78, IDR:15750, MYR:4.45, PHP:56.8, SGD:1.34 };
+
+let state = {
+  role: 'admin',
+  pageState: 'set',
+  editing: false,
+  showConv: false,
+  currency: 'TWD',
+  currentTab: 'gcp',
+  showSegCtrl: true, // v2 default: FY integration + 4-col annual summary always on (no longer gated as "proposal")
+  warningPreset: 'normal', // 'normal' | 'approaching' | 'over' | 'cap-conflict' | 'mixed'
+  monthlyView: 'budget', // 'budget' | 'spend' | 'remaining' | 'trend'（Trend=sparkline，segment 第四選項）。Edit Mode 永遠回 grid
+  selected: new Set(),
+  draft: null,
+  thresholds: [60, 80, 90],
+  // PRD §7 B+D direction: admin-locked org FY (single source of truth)
+  fyStartYear: 2026,
+  fyStartMonth: 0, // 0 = Jan (calendar year default)
+};
+// FY label (verbose form for display): FY2026 · Apr. 2026 – Mar. 2027
+// Designer's preferred format (clearer than PRD's slash notation FY2026/2027)
+// — full year + explicit start/end range removes ambiguity about "結束年命名/開始年命名"
+function fyLabel(){
+  const startY = state.fyStartYear;
+  const startMIdx = state.fyStartMonth;
+  const startMLabel = FY_START_MONTHS[startMIdx].label;
+  const endMIdx = (startMIdx + 11) % 12;
+  const endMLabel = FY_START_MONTHS[endMIdx].label;
+  const endY = startMIdx === 0 ? startY : startY + 1;
+  return `FY${startY} · ${startMLabel}. ${startY} – ${endMLabel}. ${endY}`;
+}
+// Compact FY identifier for CSV filenames and other dense contexts
+function fyLabelShort(){
+  const startY = state.fyStartYear;
+  if(state.fyStartMonth === 0) return `FY${startY}`;
+  return `FY${startY}-${startY + 1}`;
+}
+
+// ===== Sparkline (方向Y proposal — Demo only) =====
+// 雙線 mini chart：藍線=逐月 Budget，綠/紅線=逐月 Spend。兩線 gap 視覺上=Remaining。
+// 任一月 spend > budget → spend 線轉紅。僅 View Mode 使用，Edit Mode 永遠用月份格。
+// Split a 12-value series into continuous segments (breaks on null) → 空值斷線
+function sparkSegments(arr){
+  const segs = []; let cur = [];
+  arr.forEach((v,i)=>{
+    if(v===null||v===undefined){ if(cur.length){ segs.push(cur); cur=[]; } }
+    else cur.push({i, v});
+  });
+  if(cur.length) segs.push(cur);
+  return segs;
+}
+// Core renderer — budget[] + spend[] (12, null=no value) + pixel width W.
+// budget = dashed line (plan/cap)，spend = solid line (actual)；spend 線在「任一月超 budget」時轉紅。
+// 每月一個 data point（圓點）+ 透明 hover hit-rect 顯示該月 tooltip。空值斷線。
+function pairSparklineSVG(budgets, spends, W){
+  // Trend = 純趨勢概覽（做減法 5/27）：只 budget vs spend 雙線 + 超支紅點。
+  // cap-conflict / 超 Allocated 等狀態警示全部回歸 grid（Budget/Spend/Remaining segment）的 amber dot + 紅字。
+  const allVals = [...budgets, ...spends].filter(v => v!==null && v!==undefined);
+  if(!allVals.length) return '<span class="empty-cell" data-tip-tip="No budget set (Unlimited)">--</span>';
+  const max = Math.max(...allVals) || 1;
+  const H=40, PADX=6, PADY=7;
+  const xStep = (W - PADX*2) / 11;
+  const yOf = v => +(H - PADY - (v/max)*(H-PADY*2)).toFixed(1);
+  const xOf = i => +(PADX + i*xStep).toFixed(1);
+  const segPoly = (arr, stroke, dash) => sparkSegments(arr).map(seg => {
+    const pts = seg.map(p=>`${xOf(p.i)},${yOf(p.v)}`).join(' ');
+    return `<polyline fill="none" stroke="${stroke}" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"${dash?` stroke-dasharray="${dash}"`:''} vector-effect="non-scaling-stroke" points="${pts}"/>`;
+  }).join('');
+  const spendColor = 'var(--ok)';
+  // budget dots: null=Unlimited → 線斷即可（不畫 marker）；else 藍小點。（amber cap 點已移除 — 做減法）
+  const budgetDots = budgets.map((v,i)=> (v==null) ? '' : `<circle cx="${xOf(i)}" cy="${yOf(v)}" r="1.8" fill="var(--pri)"/>`).join('');
+  // spend dots: green normally; red+larger+ring on over-budget months (pinpoint, not whole-line red)
+  const spendDots = spends.map((v,i)=>{
+    if(v==null) return '';
+    const over = budgets[i]!=null && v>budgets[i];
+    return over
+      ? `<circle cx="${xOf(i)}" cy="${yOf(v)}" r="3.4" fill="var(--err)" stroke="#fff" stroke-width="1.2"/>`
+      : `<circle cx="${xOf(i)}" cy="${yOf(v)}" r="1.8" fill="var(--ok)"/>`;
+  }).join('');
+  // per-month transparent hover hit-rect with multi-line tooltip
+  const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const yr = `'${String(state.fyStartYear).slice(-2)}`;
+  const hits = budgets.map((bv,i)=>{
+    const sv = spends[i];
+    const over = bv!=null && sv!=null && sv>bv;
+    const parts = [`${MN[i]} ${yr}`];
+    // over budget warning 標在 Spend 後（cap warning 已移除 — 回歸 grid 處理）
+    parts.push(bv!=null ? `• Budget: ${fmt(bv)}` : '• Budget: Unlimited');
+    if(sv!=null){
+      let spendLine = `• Spend: ${fmt(sv)}`;
+      if(over) spendLine += '　⚠ over budget';
+      parts.push(spendLine);
+    }
+    if(bv!=null && sv!=null && bv>0) parts.push(`• Spent: ${(sv/bv*100).toFixed(2)}%`);
+    if(bv!=null && sv!=null){ const r=bv-sv; parts.push(`• Remaining: ${r<0?'-':''}${fmt(Math.abs(r))}`); }
+    const cx = xOf(i);
+    return `<rect x="${(cx - xStep/2).toFixed(1)}" y="0" width="${xStep.toFixed(1)}" height="${H}" fill="transparent" data-tip-tip="${parts.join('\n')}"/>`;
+  }).join('');
+  return `<svg class="spark-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    ${segPoly(budgets, 'var(--pri)', '3,2')}
+    ${segPoly(spends, spendColor, null)}
+    ${budgetDots}${spendDots}
+    ${hits}
+  </svg>`;
+}
+// True only in View Mode + sparkline display toggle (Demo). Edit Mode 強制 grid.
+function useSparkline(){ return state.monthlyView === 'trend' && !state.editing && state.showSegCtrl; }
+// Month header: month is primary visual, year suffix subdued (11px g500) — only when FY scenario on
+// User scrolling the table loses main title from viewport; year suffix prevents "Jan. 屬於哪年" 心算
+// Designer's deviation from PRD §5 (which proposed plain 'YY same-size suffix)
+function monthHeader(mi){
+  if(!state.showSegCtrl) return MONTHS[mi];
+  const actualMonthIdx = (state.fyStartMonth + mi) % 12;
+  const year = state.fyStartYear + Math.floor((state.fyStartMonth + mi) / 12);
+  return `${MONTHS[actualMonthIdx]}<span class="mon-year">'${String(year).slice(-2)}</span>`;
+}
+
+// ===== Helpers =====
+const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
+function fmt(n){ if(n===null||n===undefined) return null; return '$'+Math.round(n).toLocaleString(); }
+function sumMonths(months){ let s=null; for(const v of months){ if(v!==null&&v!==undefined){ s=(s||0)+v; } } return s; }
+function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+function toast(msg, type='ok'){
+  const t=document.createElement('div'); t.className='toast t'+type;
+  t.innerHTML='<span class="material-symbols-outlined">'+(type==='ok'?'check_circle':'error')+'</span>'+msg;
+  $('#tc').appendChild(t); setTimeout(()=>t.remove(), 3000);
+}
+
+// ===== Render: Org cards =====
+function getAllData(){
+  return state.editing && state.draft ? state.draft : { gcp:GROUPS_GCP, aws:GROUPS_AWS, azure:GROUPS_AZURE };
+}
+// PRD §6: Total tab is synthesized from gcp+aws+azure (read-only, hidden in edit mode)
+function getTotalData(){
+  const data = getAllData();
+  return GROUPS_GCP.map((g, gi) => ({
+    name: g.name,
+    months: MONTHS.map((_, mi) => {
+      let s = null, hasAny = false;
+      ['gcp','aws','azure'].forEach(k => {
+        const v = data[k][gi]?.months[mi];
+        if(v !== null && v !== undefined){ s = (s||0) + v; hasAny = true; }
+      });
+      return hasAny ? s : null;
+    }),
+  }));
+}
+function getData(){
+  if(state.currentTab === 'total') return getTotalData();
+  return getAllData()[state.currentTab];
+}
+function calcOrgTotals(){
+  const data = getAllData();
+  const totals = {};
+  // Only actual providers (not synthetic 'total') contribute to totals
+  PROVIDERS.filter(p => !p.synthetic).forEach(p => {
+    totals[p.key] = data[p.key].reduce((acc,g) => acc + (sumMonths(g.months) || 0), 0);
+  });
+  totals.current = Object.keys(totals).reduce((acc,k) => acc + totals[k], 0);
+  return totals;
+}
+function renderOrgCards(){
+  const role = ROLES[state.role];
+  const totals = calcOrgTotals();
+  const row = $('#orgrow');
+  if(state.pageState==='nodata'){
+    row.style.display='block';
+    row.innerHTML = '<div class="empty-state empty-state--m" style="background:transparent;padding:32px 0;grid-column:1/-1"><span class="material-symbols-outlined">error_outline</span><div class="empty-state-title">Something went wrong</div><div class="empty-state-sub">Failed to load. Please try again later.</div></div>';
+    return;
+  }
+  if(state.pageState==='loading'){
+    row.style.display='grid';
+    row.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    row.innerHTML = Array(4).fill(0).map(()=>
+      '<div class="orgcell"><div class="ol"><span class="skeleton sk-text-sm" style="width:140px"></span></div><div class="ov"><span class="skeleton sk-text-num"></span></div></div>'
+    ).join('');
+    return;
+  }
+  if(state.pageState==='no-auth'){
+    // Org cards still show — only the active provider tab is locked. Render normally below.
+  }
+  row.style.display='grid';
+  const cards = [
+    { key:'current', label:role.currentLabel,            value:totals.current, badge:null },
+    { key:'gcp',     label:'Google Cloud Annual Budget', value:totals.gcp,     badge:{cls:'csp-gcp',   t:'G'} },
+    { key:'aws',     label:'AWS Annual Budget',          value:totals.aws,     badge:{cls:'csp-aws',   t:'a'} },
+    { key:'azure',   label:'Azure Annual Budget',        value:totals.azure,   badge:{cls:'csp-azure', t:'Az'} },
+  ];
+  // For 4 cards, switch to 4-col grid
+  row.style.gridTemplateColumns = 'repeat(4, 1fr)';
+  row.innerHTML = '';
+  cards.forEach(c => {
+    const cell = document.createElement('div');
+    cell.className = 'orgcell';
+    const isEmpty = (state.pageState==='empty') || (c.value === 0);
+    const convVal = state.showConv && !isEmpty ? Math.round(c.value * (FX_RATES[state.currency]||1)).toLocaleString() : null;
+    const currCode = state.currency;
+    const expectedKey = c.key === 'current' ? null : c.key;
+    const expectedVal = expectedKey ? EXPECTED[expectedKey] : (EXPECTED.gcp + EXPECTED.aws + EXPECTED.azure);
+    // Figma #05-1 Hover (T1): when allocated budget > Allocated cap, card's Annual Budget number turns red + hover tooltip
+    const cardOverExpected = role.showExpected && !isEmpty && c.key !== 'current' && c.value > expectedVal;
+    const ovOverCls = cardOverExpected ? ' over-budget' : '';
+    const ovOverTip = cardOverExpected ? ' data-tip-tip="The budget cannot be empty and must not exceed the Allocated cap."' : '';
+    // Info tooltip on Allocated pill (Figma #05-1) — PRD §7.4 rename
+    const expectedInfoTip = 'data-tip-tip="The budget cap allocated by the group&apos;s supervisor or the organization&apos;s Admin."';
+    cell.innerHTML = `
+      <div class="ol">${c.badge?`<span class="csp-ic ${c.badge.cls}">${c.badge.t}</span>`:''}<span>${c.label}</span></div>
+      <div class="ov${ovOverCls}"${ovOverTip}>${isEmpty?'<span class="empty-val">--</span>':Math.round(c.value).toLocaleString()}<span class="ou">USD</span></div>
+      <div class="conv">${isEmpty?'<span class="empty-val">--</span>':('≈ '+convVal+' '+currCode)}</div>
+      ${role.showExpected && c.key !== 'current' ?`<div class="expected" ${expectedInfoTip}><span class="material-symbols-outlined">flag</span>Allocated Budget ${expectedVal.toLocaleString()} USD</div>`:''}
+    `;
+    row.appendChild(cell);
+  });
+}
+
+// ===== Render: Tabs =====
+function renderTabs(){
+  const tabs = $('#tabs');
+  // Hide Total tab in edit mode (PRD §6/§7.5) OR when PRD scenario is off (current prod state)
+  const visibleProviders = (state.editing || !state.showSegCtrl) ? PROVIDERS.filter(p => !p.synthetic) : PROVIDERS;
+  tabs.innerHTML = visibleProviders.map(p => {
+    const iconHtml = p.icon
+      ? `<span class="csp-ic ${p.cls}"><span class="material-symbols-outlined">${p.icon}</span></span>`
+      : `<span class="csp-ic ${p.cls}">${p.badge}</span>`;
+    return `<button class="tab ${state.currentTab===p.key?'active':''}" data-tab="${p.key}">${iconHtml}${p.label}</button>`;
+  }).join('');
+  tabs.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    state.currentTab = t.dataset.tab;
+    state.selected.clear();
+    updateBulkBar();
+    renderTabs();
+    renderTable();
+  }));
+}
+
+// ===== Render: Table =====
+function renderTable(){
+  const role = ROLES[state.role];
+  const data = getData();
+  const wrap = $('#tblwrap');
+  const tbl = $('#tbl');
+
+  if(state.pageState==='nodata'){
+    wrap.innerHTML = '<div class="empty-state empty-state--l"><span class="material-symbols-outlined">error_outline</span><div class="empty-state-title">Something went wrong</div><div class="empty-state-sub">Failed to load budget data. Please try again later.</div><button class="btn btn-p" onclick="toast(\'(Demo) Would refresh data.\')"><span class="material-symbols-outlined">refresh</span>Retry</button></div>';
+    return;
+  }
+  if(state.pageState==='empty'){
+    wrap.innerHTML = '<div class="empty-state empty-state--l"><span class="material-symbols-outlined">group</span><div class="empty-state-title">No groups created yet</div><div class="empty-state-sub">Create a group in Organization Settings to start setting up budgets.</div><button class="btn btn-p" onclick="toast(\'(Demo) Would navigate to Organization Settings.\')"><span class="material-symbols-outlined">add</span>Create Group</button></div>';
+    return;
+  }
+  if(state.pageState==='loading'){
+    // Skeleton table — 6 placeholder rows
+    let h = '<table class="budget"><thead><tr><th class="fix col-name tx-left"><span class="skeleton sk-text-sm" style="width:90px"></span></th><th class="fix col-total"><span class="skeleton sk-cell"></span></th>';
+    for(let i=0;i<12;i++) h += '<th class="col-mon"><span class="skeleton sk-cell" style="width:40px"></span></th>';
+    h += '</tr></thead><tbody>';
+    for(let r=0;r<6;r++){
+      h += '<tr class="sk-row"><td class="fix col-name tx-left"><span class="skeleton sk-text"></span></td><td class="fix col-total"><span class="skeleton sk-cell"></span></td>';
+      for(let i=0;i<12;i++) h += '<td class="col-mon"><span class="skeleton sk-cell"></span></td>';
+      h += '</tr>';
+    }
+    h += '</tbody></table>';
+    wrap.innerHTML = '<div class="tblscroll">'+h+'</div>';
+    return;
+  }
+  if(state.pageState==='no-auth'){
+    const csp = PROVIDERS.find(p=>p.key===state.currentTab);
+    if(role.editable){
+      // Admin: Authorize CTA
+      wrap.innerHTML = `<div class="empty-state empty-state--l"><span class="material-symbols-outlined">link_off</span><div class="empty-state-title">${csp.label} is not authorized</div><div class="empty-state-sub">To set up budgets for ${csp.label}, connect your ${csp.label} account first. Once authorized, budget tracking will be available here.</div><button class="btn btn-p" onclick="toast('(Demo) Would navigate to Authorization Settings.')"><span class="material-symbols-outlined">link</span>Authorize ${csp.label}</button></div>`;
+    } else {
+      // T1/T2: contact admin message, no CTA
+      wrap.innerHTML = `<div class="empty-state empty-state--l"><span class="material-symbols-outlined">link_off</span><div class="empty-state-title">${csp.label} is not authorized</div><div class="empty-state-sub">Budget tracking for ${csp.label} is unavailable until your organization authorizes this cloud account. Please reach out to your administrator to set up access.</div></div>`;
+    }
+    return;
+  }
+  if(!wrap.querySelector('#tblscroll')){
+    wrap.innerHTML = '<div class="tblscroll" id="tblscroll"><table class="budget" id="tbl"></table></div>';
+  }
+  const showCheckbox = state.editing && role.editable;
+  const showGear = state.editing && role.editable;
+  const newTbl = $('#tbl');
+  newTbl.className = 'budget' + (showCheckbox?'':' no-cb') + (showGear?'':' no-gear');
+
+  // PRD §5 + Kabin 5/22 refinement: Annual summary block has TWO modes
+  //   - View mode (show4col): 4 cols (Budget / Spend / Spent% / Remaining) — full monitoring
+  //   - Edit mode (show2col): 2 cols (Total / Spend) — keep Spend independent so it's easy to scan
+  //     while editing; if Total < Spend (over-spending), Spend turns red (warning, doesn't block save).
+  //   Spent% / Remaining are derived from Budget — when Budget is dirty (editing), showing them
+  //   would be misleading, so they're hidden.
+  const show4col = state.showSegCtrl && !state.editing;
+  const show2col = state.showSegCtrl && state.editing;
+  const view = state.monthlyView; // 'budget' | 'spend' | 'remaining'
+  // Sync paper class so CSS can position col-spend correctly per mode
+  const _paper = $('#paper');
+  if(_paper){
+    _paper.classList.toggle('show-seg', state.showSegCtrl);
+    _paper.classList.toggle('show-4col', show4col);
+    _paper.classList.toggle('show-2col', show2col);
+  }
+
+  // Helper: render Spent % segmented meter (5 blocks × 20% steps, reuses LumiTag Coverage pattern)
+  // Threshold for budget context: <70% ok / 70-99% warn / >=100% danger
+  // Each block fills 0-100% based on which 20% step the actual % falls into
+  function pctBar(spent, budget){
+    if(budget === null || budget === 0) return '<span class="empty-cell" data-tip-tip="No budget set (Unlimited). cannot compute %">—</span>';
+    if(spent === null) return '<span class="empty-cell" data-tip-tip="Missing actual data">—</span>';
+    const pct = Math.round(spent / budget * 100);
+    let cls = '';
+    if(pct >= 100) cls = 'danger';
+    else if(pct >= 70) cls = 'warn';
+    const SEG = 5, STEP = 20;
+    let segs = '';
+    for(let i = 0; i < SEG; i++){
+      const segStart = i * STEP;
+      const segEnd = segStart + STEP;
+      let fill;
+      if(pct >= segEnd) fill = 100;
+      else if(pct <= segStart) fill = 0;
+      else fill = Math.round((pct - segStart) / STEP * 100);
+      segs += `<span class="pct-seg"><span class="pct-seg-fill" style="width:${fill}%"></span></span>`;
+    }
+    return `<span class="pct-meter ${cls}"><span class="pct-meter-bar">${segs}</span><span class="pct-text">${pct}%</span></span>`;
+  }
+
+  // Header — order: Budget → Spend → Spent % → Remaining (PRD §7.1; 4 欄全保留 view/edit 一致)
+  let h = '<thead><tr>';
+  if(showCheckbox) h += '<th class="fix col-cb"><input type="checkbox" id="cb-all"></th>';
+  h += '<th class="fix col-name tx-left">Group Name</th>';
+  if(showGear) h += '<th class="fix col-gear"></th>';
+  if(show4col){
+    h += '<th class="fix col-budget">Budget</th>';
+    h += '<th class="fix col-spend">Spend</th>';
+    h += '<th class="fix col-pct">Spent %</th>';
+    h += '<th class="fix col-remain">Remaining</th>';
+  }else if(show2col){
+    // Edit mode: Total + Spend (independent col for easy scanning during budget editing)
+    h += '<th class="fix col-total">Total</th>';
+    h += '<th class="fix col-spend">Spend</th>';
+  }else{
+    h += '<th class="fix col-total">Total</th>';
+  }
+  if(useSparkline()){
+    h += '<th class="col-spark-head tx-left">12-Month Budget vs Spend</th>';
+  }else{
+    MONTHS.forEach((_, mi) => h += `<th class="col-mon">${monthHeader(mi)}</th>`);
+  }
+  h += '</tr></thead>';
+
+  // Body
+  let b = '<tbody>';
+  const sparkSpecs = []; // {sel, budgets[], spends[]} collected in first pass; drawn after measure (方向Y)
+  data.forEach((g, gi) => {
+    const total = sumMonths(g.months);
+    const overExpected = role.showExpected && total !== null && total > (EXPECTED[state.currentTab] || Infinity);
+    const sel = state.selected.has(gi);
+    // Compute annual Spend + Remaining for 4-col mode (sum past spend only)
+    let annualSpend = 0;
+    let hasAnySpend = false;
+    g.months.forEach((mv, mi) => {
+      const sv = getSpend(gi, mi, mv);
+      if(sv !== null && sv !== undefined){ annualSpend += sv; hasAnySpend = true; }
+    });
+    const annualSpendVal = hasAnySpend ? annualSpend : null;
+    const annualRemain = (total !== null && annualSpendVal !== null) ? (total - annualSpendVal) : null;
+    b += `<tr data-gi="${gi}" class="${sel?'selected':''}">`;
+    if(showCheckbox) b += `<td class="fix col-cb"><input type="checkbox" class="cb-row" data-gi="${gi}" ${sel?'checked':''}></td>`;
+    b += `<td class="fix col-name tx-left" data-tip-tip="${g.name}">${g.name}</td>`;
+    if(showGear) b += `<td class="fix col-gear"><button class="gear-btn" data-gi="${gi}" aria-label="Row actions"><span class="material-symbols-outlined">settings</span></button></td>`;
+    if(show4col){
+      // Order: Budget → Spend → Spent % → Remaining (PRD §7.1; 4 欄全保留)
+      // Build a unified detail tooltip — hover any annual cell to see full breakdown
+      const detailParts4 = [];
+      if(total !== null) detailParts4.push(`Budget ${fmt(total)}`);
+      if(annualSpendVal !== null) detailParts4.push(`Spent ${fmt(annualSpendVal)}`);
+      if(annualRemain !== null) detailParts4.push(`Remaining ${annualRemain<0?'-':''}${fmt(Math.abs(annualRemain))}`);
+      const detail4 = detailParts4.join(' · ');
+      // Budget col
+      if(total === null) b += `<td class="fix col-budget"><span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">—</span></td>`;
+      else b += `<td class="fix col-budget${overExpected?' over-budget':''}" data-tip-tip="${overExpected?`Exceeds Allocated budget cap · ${detail4}`:detail4}">${fmt(total)}</td>`;
+      // Spend col
+      if(annualSpendVal === null) b += `<td class="fix col-spend"><span class="empty-cell">—</span></td>`;
+      else b += `<td class="fix col-spend" data-tip-tip="${detail4}">${fmt(annualSpendVal)}</td>`;
+      // Spent %
+      b += `<td class="fix col-pct" data-tip-tip="${detail4}">${pctBar(annualSpendVal, total)}</td>`;
+      // Remaining (negative → red via over-budget class)
+      if(annualRemain === null) b += `<td class="fix col-remain"><span class="empty-cell">—</span></td>`;
+      else b += `<td class="fix col-remain${annualRemain < 0 ? ' over-budget':''}" data-tip-tip="${detail4}">${annualRemain < 0 ? '-' : ''}${fmt(Math.abs(annualRemain))}</td>`;
+    }else if(show2col){
+      // Edit mode: Total + Spend (independent col for budget-editing context)
+      // Spend turns red when Total < Spend (over-spending warning, doesn't block save)
+      const overSpend = total !== null && annualSpendVal !== null && total < annualSpendVal;
+      // Detail tooltip — always available so user can hover any cell to see full breakdown
+      const remVal = (total !== null && annualSpendVal !== null) ? total - annualSpendVal : null;
+      const detailParts = [];
+      if(total !== null) detailParts.push(`Budget ${fmt(total)}`);
+      if(annualSpendVal !== null) detailParts.push(`Spent ${fmt(annualSpendVal)}`);
+      if(remVal !== null) detailParts.push(`Remaining ${remVal<0?'-':''}${fmt(Math.abs(remVal))}`);
+      const detailTipStr = detailParts.join(' · ');
+      // Total cell
+      if(total === null) b += `<td class="fix col-total"><span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">—</span></td>`;
+      else {
+        const totalTipText = overExpected ? `Exceeds Allocated budget cap · ${detailTipStr}` : detailTipStr;
+        b += `<td class="fix col-total${overExpected?' over-budget':''}" data-tip-tip="${totalTipText}">${fmt(total)}</td>`;
+      }
+      // Spend cell
+      if(annualSpendVal === null) b += `<td class="fix col-spend"><span class="empty-cell">—</span></td>`;
+      else {
+        const spendTipText = overSpend ? `Spent more than the budget you\'re setting (save not blocked) · ${detailTipStr}` : detailTipStr;
+        b += `<td class="fix col-spend${overSpend?' over-budget':''}" data-tip-tip="${spendTipText}">${fmt(annualSpendVal)}</td>`;
+      }
+    }else{
+      // Original single Total column
+      if(total === null) b += `<td class="fix col-total"><span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">--</span></td>`;
+      else b += `<td class="fix col-total${overExpected?' over-budget':''}"${overExpected?' data-tip-tip="The total exceeds the Allocated budget cap."':''}>${fmt(total)}</td>`;
+    }
+    // Months — sparkline (Demo 方向Y) replaces 12 month cells in View Mode; otherwise per-month grid
+    if(useSparkline()){
+      const sel = `g${gi}`;
+      sparkSpecs.push({ sel,
+        budgets: g.months.map(m => (m==null?null:m)),
+        spends:  g.months.map((m,mi)=>{ const sv=getSpend(gi,mi,m); return sv==null?null:sv; }) });
+      b += `<td class="col-spark" data-spark="${sel}"></td>`;
+    }else{
+    g.months.forEach((mv, mi) => {
+      // PRD §7.3/§9: amber dot on month cell when child-tier sum > current-tier cap (Budget view only)
+      // Role-aware row placement:
+      //   - Admin (warningOn:'group-row')     → warning on T1 group row（這裡的 group row）
+      //   - T1 Manager (warningOn:'allocated-row') → warning 移到 Allocated row（見下方 Allocated row 段落）
+      //   - T2 (warningOn:null)               → 不顯示（T2 唯讀無權編預算，看警示無意義）
+      const capConflict = !state.editing && view === 'budget' && role.warningOn === 'group-row' && isCapConflict(gi, mi);
+      const warnCls = capConflict ? ' month-warn' : '';
+      const warnTip = capConflict ? ` data-tip-tip="Sub-allocations exceed the cap for this period. Existing values are preserved; review the allocations or adjust the cap as needed. (This can also occur when an upper-level cap is reduced after allocations are made.)"` : '';
+      if(state.editing && role.editable){
+        // Edit mode always edits Budget value (per PRD §8)
+        b += `<td class="col-mon"><span class="cell-input"><span class="dollar">$</span><input type="text" data-gi="${gi}" data-mi="${mi}" value="${mv!==null&&mv!==undefined?Math.round(mv):''}" inputmode="numeric"></span></td>`;
+      }else if(view === 'spend' && show4col){
+        const sv = getSpend(gi, mi, mv);
+        // Empty / future / missing — show -- placeholder (was blank; user feedback 5/22)
+        if(sv === undefined) b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Future month — no spend data yet">--</span></td>`;
+        else if(sv === null) b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Missing actual data">--</span></td>`;
+        else b += `<td class="col-mon">${fmt(sv)}</td>`;
+      }else if(view === 'remaining' && show4col){
+        if(mv === null || mv === undefined){ b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Unlimited. no remaining">—</span></td>`; return; }
+        const sv = getSpend(gi, mi, mv);
+        if(sv === undefined){ b += `<td class="col-mon">${fmt(mv)}</td>`; return; } // future = full budget remaining
+        if(sv === null){ b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Missing actual data">—</span></td>`; return; }
+        const rem = mv - sv;
+        b += `<td class="col-mon${rem < 0 ? ' over-budget' : ''}">${rem < 0 ? '-' : ''}${fmt(Math.abs(rem))}</td>`;
+      }else{
+        // Budget view (default + view mode behavior) — 方向 A：純 Budget 數字單行，
+        // Spent% 全靠 hover tooltip 顯示，視覺最乾淨；既有 over-budget red text + amber dot 警示
+        // 不再跟 bar 互打。Row 50px 維持。
+        if(mv===null||mv===undefined){
+          b += `<td class="col-mon${warnCls}"${warnTip}><span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">--</span></td>`;
+        }else if(show4col){
+          // View mode + show4col：加 hover detail tooltip 補充 Spent / Remaining
+          const sv = getSpend(gi, mi, mv);
+          const hasSpend = sv !== null && sv !== undefined;
+          let tipText;
+          if(hasSpend){
+            const rem = mv - sv;
+            const pct = mv > 0 ? Math.round(sv/mv*100) : 0;
+            tipText = `Budget ${fmt(mv)} · Spent ${fmt(sv)} (${pct}%) · Remaining ${rem<0?'-':''}${fmt(Math.abs(rem))}`;
+          } else if(sv === undefined){
+            tipText = `Budget ${fmt(mv)} · Future month`;
+          } else {
+            tipText = `Budget ${fmt(mv)} · Spend data missing`;
+          }
+          // Merge with cap-conflict warning if present
+          const finalTip = capConflict
+            ? `Sub-allocations exceed the cap for this period · ${tipText}`
+            : tipText;
+          b += `<td class="col-mon${warnCls}" data-tip-tip="${finalTip}">${fmt(mv)}</td>`;
+        }else{
+          b += `<td class="col-mon${warnCls}"${warnTip}>${fmt(mv)}</td>`;
+        }
+      }
+    });
+    }
+    b += '</tr>';
+  });
+
+  // Total row
+  const monthTotals = MONTHS.map((_,mi) => {
+    let s = null;
+    data.forEach(g => { if(g.months[mi]!==null&&g.months[mi]!==undefined){ s=(s||0)+g.months[mi]; } });
+    return s;
+  });
+  const grandTotal = monthTotals.reduce((acc,v) => acc + (v||0), 0);
+  // Compute Total row's annual spend + remaining (for 4-col mode)
+  let totSpend = 0, totSpendHas = false;
+  data.forEach((g, gi) => {
+    g.months.forEach((mv, mi) => {
+      const sv = getSpend(gi, mi, mv);
+      if(sv !== null && sv !== undefined){ totSpend += sv; totSpendHas = true; }
+    });
+  });
+  const totSpendVal = totSpendHas ? totSpend : null;
+  const totRemain = (grandTotal !== null && totSpendVal !== null) ? (grandTotal - totSpendVal) : null;
+  // Allocated row (T1 only) — render BEFORE Total row so it appears above Total in the DOM/visual order.
+  // PRD §7.4 — 命名「Allocated」取代舊「Expected Total Budget」（Expected 含糊；Allocated 直白指上層配下來的 cap）
+  // 內部變數仍用 EXPECTED_* 維持向後相容，使用者看到的字串一律 "Allocated"
+  // Sticky: bottom:50px (堆在 Total row 50px 上方)；DOM 必須在 Total 之前才能 visually 在上方。
+  if(role.showExpected){
+    const expected = EXPECTED[state.currentTab] || 0;
+    const monthlyExpArr = EXPECTED_MONTHLY[state.currentTab] || new Array(12).fill(Math.round(expected / 12));
+    b += '<tr class="expectedrow">';
+    if(showCheckbox) b += '<td class="fix col-cb"></td>';
+    b += '<td class="fix col-name tx-left">Allocated</td>';
+    if(showGear) b += '<td class="fix col-gear"></td>';
+    if(show4col){
+      // Order: Budget → Spend → Spent % → Remaining (PRD §7.1; 4 欄全保留)
+      b += `<td class="fix col-budget">${fmt(expected)}</td>`;
+      b += `<td class="fix col-spend">—</td>`;
+      b += `<td class="fix col-pct">—</td>`;
+      b += `<td class="fix col-remain">—</td>`;
+    }else if(show2col){
+      b += `<td class="fix col-total">${fmt(expected)}</td>`;
+      b += `<td class="fix col-spend">—</td>`;
+    }else{
+      b += `<td class="fix col-total">${fmt(expected)}</td>`;
+    }
+    // PRD §7.3 — T1 Manager 視角的 amber dot 落在 Allocated row 月份格（不在下方 T2 group rows）
+    if(useSparkline()){
+      // Allocated is a single cap line — budget-only sparkline (no spend)
+      sparkSpecs.push({ sel:'alloc', budgets: monthlyExpArr.slice(), spends: new Array(12).fill(null) });
+      b += `<td class="col-spark" data-spark="alloc"></td>`;
+    }else{
+    for(let i=0;i<12;i++){
+      const allocConflict = !state.editing && view === 'budget' && role.warningOn === 'allocated-row' && isMonthCapConflictAggregate(i);
+      const allocWarnCls = allocConflict ? ' month-warn' : '';
+      const allocWarnTip = allocConflict ? ` data-tip-tip="Your sub-allocations exceed the Allocated cap for this period. Existing values are preserved; review the allocations or contact Admin to adjust the cap."` : '';
+      b += `<td class="col-mon${allocWarnCls}"${allocWarnTip}>${fmt(monthlyExpArr[i])}</td>`;
+    }
+    }
+    b += '</tr>';
+  }
+
+  // Total row — always last in tbody so sticky bottom:0 anchors it to the very bottom.
+  b += '<tr class="totalrow">';
+  if(showCheckbox) b += '<td class="fix col-cb"></td>';
+  b += '<td class="fix col-name tx-left">Total</td>';
+  if(showGear) b += '<td class="fix col-gear"></td>';
+  if(show4col){
+    // Order: Budget → Spend → Spent % → Remaining (PRD §7.1; 4 欄全保留)
+    b += `<td class="fix col-budget">${fmt(grandTotal)}</td>`;
+    b += `<td class="fix col-spend">${totSpendVal===null?'<span class="empty-cell">—</span>':fmt(totSpendVal)}</td>`;
+    b += `<td class="fix col-pct">${pctBar(totSpendVal, grandTotal)}</td>`;
+    b += `<td class="fix col-remain${totRemain<0?' over-budget':''}">${totRemain===null?'<span class="empty-cell">—</span>':(totRemain<0?'-':'')+fmt(Math.abs(totRemain))}</td>`;
+  }else if(show2col){
+    // Edit mode total row: Total + Spend, with red on Spend when Total < Spend
+    const totOverSpend = grandTotal !== null && totSpendVal !== null && grandTotal < totSpendVal;
+    b += `<td class="fix col-total">${fmt(grandTotal)}</td>`;
+    if(totSpendVal === null) b += `<td class="fix col-spend"><span class="empty-cell">—</span></td>`;
+    else b += `<td class="fix col-spend${totOverSpend?' over-budget':''}"${totOverSpend?' data-tip-tip="Total spend already exceeds the total budget you\'re setting (save is not blocked)."':''}>${fmt(totSpendVal)}</td>`;
+  }else{
+    b += `<td class="fix col-total">${fmt(grandTotal)}</td>`;
+  }
+  // Monthly cells for Total row — respect monthlyView (or sparkline in Demo 方向Y)
+  if(useSparkline()){
+    const spendTotals = MONTHS.map((_,mi)=>{ let s=null; data.forEach((g,gi)=>{ const sv=getSpend(gi,mi,g.months[mi]); if(sv!=null){ s=(s||0)+sv; } }); return s; });
+    sparkSpecs.push({ sel:'total', budgets: monthTotals.slice(), spends: spendTotals });
+    b += `<td class="col-spark" data-spark="total"></td>`;
+  }else{
+  monthTotals.forEach((mt, mi) => {
+    if(view === 'spend' && show4col){
+      let s = null, hasAny = false;
+      data.forEach((g, gi) => {
+        const sv = getSpend(gi, mi, g.months[mi]);
+        if(sv !== null && sv !== undefined){ s=(s||0)+sv; hasAny = true; }
+      });
+      // -- placeholder for future / no-data (was blank for future; user feedback 5/22)
+      if(mi > PROTO_NOW_IDX) b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Future month — no spend data yet">--</span></td>`;
+      else if(!hasAny) b += `<td class="col-mon"><span class="empty-cell">--</span></td>`;
+      else b += `<td class="col-mon">${fmt(s)}</td>`;
+    }else if(view === 'remaining' && show4col){
+      let s = null, hasAny = false;
+      data.forEach((g, gi) => {
+        const sv = getSpend(gi, mi, g.months[mi]);
+        if(sv !== null && sv !== undefined){ s=(s||0)+sv; hasAny = true; }
+      });
+      if(mt === null){ b += `<td class="col-mon"><span class="empty-cell">—</span></td>`; return; }
+      if(mi > PROTO_NOW_IDX){ b += `<td class="col-mon">${fmt(mt)}</td>`; return; }
+      if(!hasAny){ b += `<td class="col-mon"><span class="empty-cell">—</span></td>`; return; }
+      const rem = mt - s;
+      b += `<td class="col-mon${rem<0?' over-budget':''}">${rem<0?'-':''}${fmt(Math.abs(rem))}</td>`;
+    }else{
+      // Budget view: Figma #05-1 — Total monthly cell turns red when exceeds monthly Allocated cap (T1 view only)
+      const monthlyExp = role.showExpected ? (EXPECTED_MONTHLY[state.currentTab]?.[mi] ?? null) : null;
+      const overMonthlyExp = monthlyExp !== null && mt !== null && mt > monthlyExp;
+      const overCls = overMonthlyExp ? ' over-budget' : '';
+      const overTip = overMonthlyExp ? ' data-tip-tip="This month\'s total exceeds the monthly Allocated cap set by Admin."' : '';
+      b += `<td class="col-mon${overCls}"${overTip}>${mt===null?'<span class="empty-cell">--</span>':fmt(mt)}</td>`;
+    }
+  });
+  }
+  b += '</tr>';
+  b += '</tbody>';
+  newTbl.innerHTML = h + b;
+
+  // 方向Y — second pass: measure each sparkline cell's real width, then draw responsive SVG.
+  // Two-pass needed because SVG needs the cell's rendered width (filling remaining space).
+  if(useSparkline() && sparkSpecs.length){
+    const drawSparks = () => {
+      sparkSpecs.forEach(spec => {
+        const cell = newTbl.querySelector(`td.col-spark[data-spark="${spec.sel}"]`);
+        if(!cell) return;
+        const w = Math.max(140, cell.clientWidth - 40); // minus L/R padding (24+16)
+        cell.innerHTML = pairSparklineSVG(spec.budgets, spec.spends, w);
+      });
+    };
+    // Draw synchronously — reading clientWidth forces reflow so width is already correct.
+    // (Was requestAnimationFrame, but that gets throttled in background tabs → blank sparklines.)
+    drawSparks();
+    // Redraw on window resize (responsive width). Guard against duplicate listeners.
+    if(!window.__sparkResizeWired){
+      window.__sparkResizeWired = true;
+      let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if(useSparkline()) renderTable(); }, 150); });
+    }
+  }
+
+  // Wire checkbox handlers
+  if(showCheckbox){
+    const all = $('#cb-all');
+    all.checked = state.selected.size === data.length && data.length > 0;
+    all.addEventListener('change', e => {
+      if(e.target.checked){ data.forEach((_,i)=>state.selected.add(i)); }
+      else { state.selected.clear(); }
+      updateBulkBar();
+      renderTable();
+    });
+    $$('.cb-row').forEach(cb => cb.addEventListener('change', e => {
+      const gi = parseInt(e.target.dataset.gi);
+      if(e.target.checked) state.selected.add(gi); else state.selected.delete(gi);
+      updateBulkBar();
+      const tr = e.target.closest('tr');
+      tr.classList.toggle('selected', state.selected.has(gi));
+    }));
+  }
+  if(showGear){
+    $$('.gear-btn').forEach(b => b.addEventListener('click', e => {
+      e.stopPropagation();
+      openSingleRowPop(parseInt(e.currentTarget.dataset.gi), e.currentTarget);
+    }));
+  }
+  if(state.editing){
+    $$('input[data-mi]').forEach(inp => {
+      inp.addEventListener('input', e => {
+        const gi = parseInt(e.target.dataset.gi), mi = parseInt(e.target.dataset.mi);
+        let v = e.target.value.replace(/[^\d]/g,'').slice(0,9);
+        e.target.value = v;
+        state.draft[state.currentTab][gi].months[mi] = v === '' ? null : parseInt(v);
+        updateAfterCellEdit();
+      });
+    });
+  }
+}
+
+function updateAfterCellEdit(){
+  const focused = document.activeElement;
+  const focusKey = focused && focused.dataset && focused.dataset.gi !== undefined ? {gi:focused.dataset.gi, mi:focused.dataset.mi, ss:focused.selectionStart} : null;
+  renderTable();
+  renderOrgCards();
+  if(focusKey){
+    const el = document.querySelector(`input[data-gi="${focusKey.gi}"][data-mi="${focusKey.mi}"]`);
+    if(el){ el.focus(); try{ el.setSelectionRange(focusKey.ss, focusKey.ss); }catch(e){} }
+  }
+}
+
+function updateBulkBar(){
+  const n = state.selected.size;
+  const chip = $('#bulkchip');
+  const tip = $('#bulkbar-tip');
+  if(n > 0){
+    chip.style.display = 'inline-flex';
+    $('#bulkchip-n').textContent = n;
+    tip.style.display = 'none';
+    $('#btn-clearbudget').disabled = false;
+    $('#btn-setbudgets').disabled = false;
+  }else{
+    chip.style.display = 'none';
+    tip.style.display = 'inline';
+    $('#btn-clearbudget').disabled = true;
+    $('#btn-setbudgets').disabled = true;
+  }
+}
+function clearSel(){ state.selected.clear(); updateBulkBar(); renderTable(); }
+
+// ===== FY entry render (B+D direction: aligned with Executive Insights inline pattern) =====
+// EI pattern: 📅 Fiscal Year Start: February  ⚙ Set Fiscal Start Month (inline label + text link)
+// Located in section subtitle area, NOT a primary button at top. Gated behind PRD scenario.
+function renderFYPicker(){
+  // Page header right area: hosts page-level actions (Export CSV in v2).
+  // FY context is rendered inline in Section 1 paper-period (EI pattern), not here.
+  // Hide the area only if there's nothing visible inside (defensive — Export CSV may be hidden by state).
+  const wrap = document.querySelector('.pg-hdr .pg-hdr-r');
+  if(!wrap) return;
+  const csv = wrap.querySelector('#btn-csv');
+  const csvVisible = csv && csv.style.display !== 'none';
+  wrap.style.display = csvVisible ? '' : 'none';
+}
+// Dynamic FY display in Organization Annual Budget section header (paper-period)
+// - Default (no scenario): plain "Period: 2026" (current prod baseline)
+// - Proposal scenario + Admin: 📅 Fiscal Year Start: {Month} · ⚙ Set Fiscal Start Month
+// - Proposal scenario + non-Admin: 📅 Fiscal Year Start: {Month} (set by Admin)
+function updatePeriodLabel(){
+  const el = $('#paper-period');
+  if(!el) return;
+  if(!state.showSegCtrl){
+    el.className = 'paper-meta';
+    el.textContent = `Period: ${state.fyStartYear}`;
+    return;
+  }
+  const startM = FY_START_MONTHS[state.fyStartMonth].label;
+  const isAdmin = state.role === 'admin';
+  el.className = 'fy-inline';
+  if(isAdmin){
+    el.innerHTML = `
+      <span class="fy-display"><span class="material-symbols-outlined">event</span>Fiscal Year Start: <strong>${startM}</strong></span>
+      <button class="fy-set-link" id="fy-btn"><span class="material-symbols-outlined">settings</span><span class="fy-set-link-text">Set Fiscal Start Month</span></button>
+    `;
+    $('#fy-btn').onclick = openFYModal;
+  }else{
+    el.innerHTML = `<span class="fy-display"><span class="material-symbols-outlined">event</span>Fiscal Year Start: <strong>${startM}</strong><span class="fy-note">(set by Admin)</span></span>`;
+  }
+  // Cross-prototype entry：如果 URL hash 帶 #open-fy（由 Executive Insights 連過來），自動開啟 FY modal
+  // 並 scroll 到 fy-inline 區塊讓使用者看到上下文
+  if (typeof openFYModal === 'function' && window.location.hash === '#open-fy') {
+    setTimeout(()=>{
+      const fyEl = document.querySelector('.fy-inline');
+      if (fyEl) fyEl.scrollIntoView({block:'center',behavior:'smooth'});
+      openFYModal();
+      // 清掉 hash，避免 reload 時 re-trigger
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }, 400);
+  }
+}
+
+// ===== FY modal handlers =====
+// Year is implicit (current year). Only start month is configurable.
+// Multi-year browsing belongs to a future "FY view switcher" feature (out of scope).
+function openFYModal(){
+  const monthSel = $('#fy-modal-month');
+  monthSel.innerHTML = '';
+  FY_START_MONTHS.forEach(m => {
+    monthSel.innerHTML += `<option value="${m.idx}" ${m.idx === state.fyStartMonth ? 'selected' : ''}>${m.label}</option>`;
+  });
+  updateFYPreview();
+  monthSel.onchange = updateFYPreview;
+  $('#mo-fy').classList.add('active');
+}
+function closeFYModal(){ $('#mo-fy').classList.remove('active'); }
+function updateFYPreview(){
+  // Use the same verbose FY label format as fyLabel() for visual consistency
+  const y = state.fyStartYear; // implicit — always current year
+  const m = parseInt($('#fy-modal-month').value);
+  const monthLabel = FY_START_MONTHS[m].label;
+  const endMonth = FY_START_MONTHS[(m + 11) % 12].label;
+  const endY = m === 0 ? y : y + 1;
+  const label = `FY${y}`;
+  const range = `(${monthLabel}. ${y} – ${endMonth}. ${endY})`;
+  $('#fy-preview-label').textContent = label;
+  $('#fy-preview-range').textContent = range;
+}
+function confirmFY(){
+  const m = parseInt($('#fy-modal-month').value);
+  state.fyStartMonth = m;
+  closeFYModal();
+  toast(`Fiscal start month updated to ${FY_START_MONTHS[m].label}`);
+  renderAll();
+}
+
+// ===== Edit mode =====
+function enterEdit(){
+  if(!ROLES[state.role].editable) return;
+  // PRD §6/§7.5: Total tab is read-only — auto-switch to single provider on edit entry
+  if(state.currentTab === 'total'){
+    state.currentTab = 'gcp';
+    toast('Total is read-only in edit mode. Switched to Google Cloud tab.');
+  }
+  state.editing = true;
+  state.draft = { gcp:deepClone(GROUPS_GCP), aws:deepClone(GROUPS_AWS), azure:deepClone(GROUPS_AZURE) };
+  state.selected.clear();
+  document.body.classList.add('editing-mode');
+  $('#paper').classList.add('editing');
+  $('#content').classList.add('has-savebar');
+  $('#btn-edit').style.display = 'none';
+  // PRD §8 / §9: Export CSV hidden in edit mode (draft 尚未 save, 匯出無意義)
+  if($('#btn-csv')) $('#btn-csv').style.display = 'none';
+  $('#bulkbar').style.display = 'flex';
+  updateBulkBar();
+  renderAll();
+}
+function cancelEdit(){
+  if(JSON.stringify(state.draft) !== JSON.stringify({gcp:GROUPS_GCP,aws:GROUPS_AWS,azure:GROUPS_AZURE})){
+    $('#mo-discard').classList.add('active');
+  }else{
+    exitEdit();
+  }
+}
+function confirmDiscard(){ $('#mo-discard').classList.remove('active'); exitEdit(); }
+function exitEdit(){
+  state.editing = false;
+  state.draft = null;
+  state.selected.clear();
+  document.body.classList.remove('editing-mode');
+  $('#paper').classList.remove('editing');
+  $('#content').classList.remove('has-savebar');
+  $('#btn-edit').style.display = ROLES[state.role].editable ? 'inline-flex' : 'none';
+  if($('#btn-csv')) $('#btn-csv').style.display = '';
+  $('#bulkbar').style.display = '';
+  closePop();
+  renderAll();
+}
+function saveEdit(){
+  PROVIDERS.filter(p => !p.synthetic).forEach(p => state.draft[p.key].forEach((g,i)=> ALL_GROUPS[p.key][i] = deepClone(g)));
+  toast('Budget settings saved successfully.');
+  exitEdit();
+}
+
+// ===== Popover =====
+let popCtx = null;
+function openSingleRowPop(gi, anchor){
+  closePop();
+  popCtx = { mode:'single', gi, mode2:'allocate', anchor };
+  buildPop();
+  positionPop(anchor);
+  anchor.classList.add('open');
+}
+function openBulkPop(anchor){
+  closePop();
+  popCtx = { mode:'bulk', mode2:'allocate', anchor };
+  buildPop();
+  positionPop(anchor);
+}
+function buildPop(){
+  if(!popCtx) return;
+  const p = $('#pop');
+  const isBulk = popCtx.mode === 'bulk';
+  const m2 = popCtx.mode2;
+  let html = '<div class="pop-radios">';
+  ['allocate','fill','rebalance'].forEach(opt => {
+    const lbl = opt==='allocate'?'Allocate':opt==='fill'?'Fill':'Rebalance within the group';
+    html += `<label class="pop-radio"><input type="radio" name="popm2" value="${opt}" ${m2===opt?'checked':''}>${lbl}</label>`;
+  });
+  html += '</div>';
+  if(m2 === 'rebalance'){
+    html += `<div class="pop-hint">${isBulk?'Sum the budget within each selected group, then evenly distribute across 12 months.':'Sum the budget of this group, then evenly distribute across 12 months.'}</div>`;
+  }else{
+    html += '<div class="pop-field-row">';
+    html += `<div class="pop-field"><div class="pop-lbl">Amount</div><div class="pop-input"><span class="dollar">$</span><input type="text" id="pop-amt" inputmode="numeric" placeholder="0"></div></div>`;
+    if(isBulk && m2==='allocate'){
+      html += `<div class="pop-field" style="flex:0 0 180px"><div class="pop-lbl">&nbsp;</div><select class="pop-select" id="pop-mode"><option value="each">Each group</option><option value="distribute">Distribute to groups</option></select></div>`;
+    }
+    html += '</div>';
+    if(m2 === 'allocate') html += '<div class="pop-hint">The amount will be evenly allocated to the 12 months. The amounts will be rounded down to the nearest whole number.</div>';
+    html += '<div class="pop-err-msg" id="pop-err"></div>';
+  }
+  const btnLabel = m2==='allocate'?'Allocate':m2==='fill'?'Fill':'Rebalance';
+  html += `<div class="pop-actions"><button class="btn btn-p btn-sm" id="pop-go" ${m2!=='rebalance'?'disabled':''}>${btnLabel}</button></div>`;
+  p.innerHTML = html;
+  p.classList.add('open');
+  p.querySelectorAll('input[name=popm2]').forEach(r => r.addEventListener('change', e => {
+    popCtx.mode2 = e.target.value;
+    buildPop();
+    positionPop(popCtx.anchor);
+  }));
+  const amt = p.querySelector('#pop-amt');
+  if(amt){
+    amt.addEventListener('input', e => {
+      e.target.value = e.target.value.replace(/[^\d]/g,'').slice(0,9);
+      const v = e.target.value;
+      $('#pop-go').disabled = !v || parseInt(v) <= 0;
+      $('#pop-err').classList.remove('show');
+      amt.parentElement.classList.remove('err');
+    });
+    amt.focus();
+  }
+  $('#pop-go').addEventListener('click', applyPop);
+}
+function positionPop(anchor){
+  const p = $('#pop');
+  const r = anchor.getBoundingClientRect();
+  // Pop is already display:block (.open). offsetWidth / offsetHeight are valid now.
+  const pw = p.offsetWidth, ph = p.offsetHeight;
+  let left, top;
+  if(popCtx && popCtx.mode === 'bulk'){
+    // Bulk action: below trigger, right-aligned to button (Figma #04)
+    left = r.right - pw;
+    top  = r.bottom + 8;
+  } else {
+    // Single-row gear: open to the right of the gear (Figma #03)
+    left = r.right + 8;
+    top  = r.top;
+  }
+  // Clamp to viewport
+  if(left + pw > window.innerWidth - 16) left = window.innerWidth - pw - 16;
+  if(left < 16) left = 16;
+  if(top + ph > window.innerHeight - 16) top = Math.max(16, window.innerHeight - ph - 16);
+  if(top < 16) top = 16;
+  p.style.left = (left + window.scrollX) + 'px';
+  p.style.top  = (top + window.scrollY) + 'px';
+}
+function closePop(){
+  $('#pop').classList.remove('open');
+  $('#pop').innerHTML = '';
+  $$('.gear-btn.open').forEach(b => b.classList.remove('open'));
+  popCtx = null;
+}
+function applyPop(){
+  if(!popCtx || !state.draft) return;
+  const m2 = popCtx.mode2;
+  const tab = state.currentTab;
+  const tgtList = popCtx.mode === 'single' ? [popCtx.gi] : Array.from(state.selected);
+  if(popCtx.mode === 'bulk' && tgtList.length === 0){ closePop(); return; }
+  if(m2 === 'rebalance'){
+    tgtList.forEach(gi => {
+      const g = state.draft[tab][gi];
+      const per = Math.floor((sumMonths(g.months) || 0) / 12);
+      g.months = Array(12).fill(per);
+    });
+  }else{
+    const amt = parseInt($('#pop-amt').value);
+    if(!amt || amt <= 0){ closePop(); return; }
+    if(m2 === 'allocate'){
+      let perGroupAmt = amt;
+      const distMode = $('#pop-mode') ? $('#pop-mode').value : null;
+      if(popCtx.mode === 'bulk' && distMode === 'distribute'){
+        const minNeeded = 12 * tgtList.length;
+        if(amt < minNeeded){
+          $('#pop-err').textContent = `Minimum required to allocate at least $1 to each month: $${minNeeded}.`;
+          $('#pop-err').classList.add('show');
+          $('#pop-amt').parentElement.classList.add('err');
+          return;
+        }
+        perGroupAmt = Math.floor(amt / tgtList.length);
+      }
+      if(perGroupAmt < 12){
+        $('#pop-err').textContent = `Minimum allocate amount per group: $12 (so each month gets ≥ $1).`;
+        $('#pop-err').classList.add('show');
+        $('#pop-amt').parentElement.classList.add('err');
+        return;
+      }
+      const per = Math.floor(perGroupAmt / 12);
+      tgtList.forEach(gi => { state.draft[tab][gi].months = Array(12).fill(per); });
+    }else if(m2 === 'fill'){
+      tgtList.forEach(gi => { state.draft[tab][gi].months = Array(12).fill(amt); });
+    }
+  }
+  toast(popCtx.mode==='single' ? 'Budget applied to the group.' : `Budget applied to ${tgtList.length} groups.`);
+  closePop();
+  renderTable();
+  renderOrgCards();
+}
+
+// ===== Alert Settings =====
+function openAlert(){ renderThresholds(); $('#mo-alert').classList.add('active'); }
+function closeAlert(){ $('#mo-alert').classList.remove('active'); }
+function renderThresholds(){
+  const list = $('#thr-list'); list.innerHTML = '';
+  state.thresholds.forEach((v, i) => {
+    const row = document.createElement('div');
+    row.className = 'thr-row';
+    row.innerHTML = `<span class="thr-input"><input type="text" data-i="${i}" value="${v||''}" inputmode="numeric" maxlength="4"><span class="pct">%</span></span><button class="thr-del" data-i="${i}" aria-label="Remove threshold"><span class="material-symbols-outlined">delete</span></button>`;
+    list.appendChild(row);
+  });
+  $('#thr-add').disabled = state.thresholds.length >= 3;
+  $('#notif-block').classList.toggle('dis', state.thresholds.length === 0);
+  list.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const i = parseInt(e.target.dataset.i);
+      let v = e.target.value.replace(/[^\d]/g,'');
+      e.target.value = v;
+      state.thresholds[i] = v === '' ? null : parseInt(v);
+      validateThresholds();
+    });
+  });
+  list.querySelectorAll('.thr-del').forEach(b => b.addEventListener('click', e => {
+    state.thresholds.splice(parseInt(e.currentTarget.dataset.i),1);
+    renderThresholds(); validateThresholds();
+  }));
+}
+function validateThresholds(){
+  let err = '';
+  for(const v of state.thresholds){
+    if(v === null || v === '' || v === undefined){ err = 'Threshold value cannot be empty.'; break; }
+    if(v < 1 || v > 1000){ err = 'Allowed values: 1~1000'; break; }
+  }
+  if(!err){
+    const seen = new Set();
+    for(const v of state.thresholds){ if(seen.has(v)){ err = 'Thresholds must be unique.'; break; } seen.add(v); }
+  }
+  $('#thr-err-msg').textContent = err;
+  $('#thr-err').classList.toggle('show', !!err);
+  return !err;
+}
+function saveAlert(){
+  if(!validateThresholds()){ toast('Please fix threshold errors.','err'); return; }
+  state.thresholds = state.thresholds.filter(v => v!==null && v!=='');
+  renderAlertBar();
+  closeAlert();
+  toast('Alert settings saved successfully.');
+}
+
+// ===== Currency =====
+function openCurrPicker(triggerEl){
+  if(!window.CurrencyPicker) return;
+  CurrencyPicker.open(triggerEl, state.currency, code => {
+    state.currency = code;
+    const c = CurrencyPicker.CURRENCIES.find(c => c.code === code);
+    $('#curr-flag').textContent = c?.flag || '';
+    $('#curr-code').textContent = code;
+    renderOrgCards();
+  });
+}
+
+// ===== Role / page-state switch (via Demo FAB) =====
+function setRole(r){
+  state.role = r;
+  if(state.editing) exitEdit();
+  const role = ROLES[state.role];
+  $('#paper-title').textContent = role.card1Title;
+  $('#sec2-title').textContent = role.secTitle || '';
+  $('#sec2-title').style.display = role.secTitle ? '' : 'none';
+  $('#btn-edit').style.display = role.editable && state.pageState==='set' ? 'inline-flex' : 'none';
+  // Section 2 row only renders when it has actual content (title and/or Edit Budget button).
+  // For T2 roles (no secTitle + no Edit), hide the entire row to avoid an empty 8px gap.
+  const sec2Row = $('#sec2-row');
+  if(sec2Row) sec2Row.style.display = (role.secTitle || role.editable) ? '' : 'none';
+  renderAll();
+}
+function setPageState(s){
+  state.pageState = s;
+  if(state.editing) exitEdit();
+  // Edit Budget enabled only when role can edit AND page is in normal "set" state
+  $('#btn-edit').style.display = (ROLES[state.role].editable && s==='set') ? 'inline-flex' : 'none';
+  // CSV button — only show in 'set' state + PRD scenario active (gated)
+  if($('#btn-csv')) $('#btn-csv').style.display = (s==='set' && state.showSegCtrl) ? '' : 'none';
+  renderAll();
+}
+
+function setAlertState(empty){
+  state.thresholds = empty ? [] : [60, 80, 90];
+  renderAlertBar();
+}
+
+function renderAlertBar(){
+  const bar = $('#alert-bar');
+  if(!state.thresholds || state.thresholds.length === 0){
+    bar.innerHTML = '<span class="material-symbols-outlined">notifications_off</span><span>No alerts have been set yet.</span><button class="alert-link" onclick="openAlert()"><span class="material-symbols-outlined">settings</span><span class="alert-link-text">Alert Settings</span></button>';
+  } else {
+    bar.innerHTML = '<span class="material-symbols-outlined">notifications_active</span><span>You will receive alert when the cost reach</span><b>'+state.thresholds.join(', ')+'</b><span>% of the monthly budget.</span><button class="alert-link" onclick="openAlert()"><span class="material-symbols-outlined">settings</span><span class="alert-link-text">Alert Settings</span></button>';
+  }
+}
+
+function renderAll(){ renderFYPicker(); updatePeriodLabel(); renderOrgCards(); renderTabs(); renderTable(); renderAlertBar(); }
+
+// ===== Wire =====
+$('#btn-edit').addEventListener('click', enterEdit);
+// PRD §9: Export CSV — demo only (no actual download)
+$('#btn-csv').addEventListener('click', () => {
+  const fy = fyLabelShort();
+  const csp = state.currentTab === 'total' ? 'total' : state.currentTab;
+  toast(`(Demo) Would download general-budget-${csp}-${fy}-2026-05-20.csv`);
+});
+$('#btn-cancel').addEventListener('click', cancelEdit);
+$('#btn-save').addEventListener('click', saveEdit);
+$('#curr-toggle').addEventListener('click', e => {
+  e.currentTarget.classList.toggle('on');
+  state.showConv = e.currentTarget.classList.contains('on');
+  document.body.classList.toggle('show-conv', state.showConv);
+  renderOrgCards();
+});
+$('#btn-setbudgets').addEventListener('click', e => openBulkPop(e.currentTarget));
+$('#btn-clearbudget').addEventListener('click', () => {
+  if(!state.draft) return;
+  Array.from(state.selected).forEach(gi => state.draft[state.currentTab][gi].months = Array(12).fill(null));
+  toast('Budget cleared for selected groups.');
+  renderTable();
+  renderOrgCards();
+});
+$('#thr-add').addEventListener('click', () => {
+  if(state.thresholds.length < 3){ state.thresholds.push(null); renderThresholds(); }
+});
+
+// Notification settings toggles (visual only, inside modal)
+document.addEventListener('click', e => {
+  const t = e.target.closest('.notif-block .toggle');
+  if(t){ e.preventDefault(); t.classList.toggle('on'); }
+});
+
+// Click outside popover closes it
+document.addEventListener('click', e => {
+  if(!e.target.closest('#pop') && !e.target.closest('.gear-btn') && !e.target.closest('#btn-setbudgets')){
+    if(popCtx) closePop();
+  }
+});
+
+// ===== Segmented Control (Monthly view: Budget/Spend/Remaining) =====
+// PROTO_NOW: late May 2026 — past = Jan~May (idx 0-4), future = Jun~Dec (idx 5-11)
+const PROTO_NOW_IDX = 4;
+// Warning presets: per-group monthly spend ratio (× monthly budget). 5 months elapsed × ratio = annual Spent%
+// Annual budget normalized to 12 months, so Spent% ≈ ratio × 5/12 × 100
+// e.g., ratio 1.9 → 5×1.9/12 = 79% (warn zone), ratio 2.5 → 5×2.5/12 = 104% (danger zone)
+const WARNING_PRESETS = {
+  normal:       [0.85, 1.15, 0.90, 0.95, 0.75, 1.00, 0.65, 1.00, 0.88, 0.92, 1.05], // <70% all green
+  approaching:  [1.95, 2.10, 1.85, 2.05, 1.75, 2.00, 1.90, 1.95, 1.80, 2.00, 1.90], // 70-90% amber
+  over:         [2.50, 2.75, 2.40, 2.65, 2.30, 2.80, 2.45, 2.60, 2.55, 2.70, 2.50], // 95-115% red + 負數
+  mixed:        [0.85, 2.65, 1.95, 0.95, 2.55, 1.85, 0.75, 2.70, 1.90, 0.92, 2.45], // 混合三種色階
+};
+const SPEND_RATIO = WARNING_PRESETS.normal; // legacy alias
+// Cap-conflict demo cells: groupIdx → [monthIdx, ...] where T2 sum > T1 cap (amber dot on month cell)
+// In real prod, this is computed from per-month cap data; here it's hard-coded for visual demo.
+const CAP_CONFLICT_CELLS = {
+  1: [0, 1, 2], // Complex Disease Programs: Jan/Feb/Mar — 連續 3 月超 cap
+  3: [3, 4],    // Sample Prioritization: Apr/May — 近月超 cap
+  6: [0, 3],    // Underrepresented Cohorts: Jan + Apr 散發
+};
+function isCapConflict(groupIdx, monthIdx){
+  if(state.warningPreset !== 'cap-conflict' && state.warningPreset !== 'mixed') return false;
+  return (CAP_CONFLICT_CELLS[groupIdx] || []).includes(monthIdx);
+}
+// PRD §7.3 — T1 Manager 視角的聚合警示：任何 T2 group 在該月 conflict → Allocated row 該月顯示 amber dot
+// 語意：「我 (T1 Manager) 之前配給 T2 的 sum 超過 Admin 給我的 cap」
+function isMonthCapConflictAggregate(monthIdx){
+  if(state.warningPreset !== 'cap-conflict' && state.warningPreset !== 'mixed') return false;
+  for(const gi of Object.keys(CAP_CONFLICT_CELLS)){
+    if(CAP_CONFLICT_CELLS[gi].includes(monthIdx)) return true;
+  }
+  return false;
+}
+function getSpend(groupIdx, monthIdx, budgetVal){
+  if(budgetVal === null || budgetVal === undefined) return null; // unlimited budget → no spend tracking yet
+  if(monthIdx > PROTO_NOW_IDX) return undefined; // future month
+  // Simulate missing past data on group 5 month 1 (Feb) for the "—" warning state
+  if(groupIdx === 5 && monthIdx === 1) return null;
+  const preset = WARNING_PRESETS[state.warningPreset] || WARNING_PRESETS.normal;
+  const ratio = preset[groupIdx % preset.length] || 0.85;
+  return Math.round(budgetVal * ratio);
+}
+function setWarningPreset(preset){
+  state.warningPreset = preset;
+  if(state.editing) exitEdit();
+  renderTable();
+  renderOrgCards();
+}
+function toggleSegCtrl(show){
+  state.showSegCtrl = show;
+  const paper = $('#paper');
+  paper.classList.toggle('show-seg', show);
+  paper.classList.toggle('show-4col', show);
+  // PRD-only elements gating: CSV button only when scenario active + view mode + 'set' state
+  if($('#btn-csv')){
+    $('#btn-csv').style.display = (show && !state.editing && state.pageState === 'set') ? '' : 'none';
+  }
+  // If turning off scenario while on Total tab, fallback to GCP (Total tab only exists in PRD scenario)
+  if(!show && state.currentTab === 'total') state.currentTab = 'gcp';
+  renderAll(); // FY picker + tabs + table + cards all need re-render
+}
+$('#seg-ctrl').addEventListener('click', e => {
+  const b = e.target.closest('.seg-btn');
+  if(!b || b.classList.contains('active')) return;
+  state.monthlyView = b.dataset.mode;
+  document.querySelectorAll('.seg-btn').forEach(btn => btn.classList.toggle('active', btn === b));
+  renderTable(); // re-render month cells with new view
+});
+
+// Tooltip handler (uses #gl-tip from shared demo-fab.js — fallback if not loaded)
+document.addEventListener('mouseover', e => {
+  const t = e.target.closest('[data-tip-tip]');
+  if(!t) return;
+  let tip = document.getElementById('gl-tip');
+  if(!tip){
+    tip = document.createElement('div'); tip.id = 'gl-tip';
+    tip.style.cssText = 'position:fixed;background:#3C3C3C;color:#fff;font-size:13px;padding:8px 12px;border-radius:8px;pointer-events:none;z-index:9999;display:none;max-width:320px;line-height:1.5;box-shadow:0 4px 12px rgba(0,0,0,.2);white-space:pre-line';
+    document.body.appendChild(tip);
+  }
+  tip.textContent = t.getAttribute('data-tip-tip');
+  // Force pre-line so multi-line tooltips (含 \n，如 sparkline 月份明細) 正確換行。
+  // shared/demo-fab.js 的 #gl-tip CSS 是 white-space:normal 會把 \n collapse 成空格，
+  // inline style 覆蓋它（不動 shared 檔案，對單行 tooltip 無副作用）。
+  tip.style.whiteSpace = 'pre-line';
+  tip.style.display = 'block';
+  const r = t.getBoundingClientRect();
+  tip.style.left = Math.max(8, Math.min(window.innerWidth - tip.offsetWidth - 8, r.left + r.width/2 - tip.offsetWidth/2)) + 'px';
+  tip.style.top = (r.bottom + 8) + 'px';
+});
+document.addEventListener('mouseout', e => {
+  const t = e.target.closest('[data-tip-tip]');
+  if(t){ const tip = document.getElementById('gl-tip'); if(tip) tip.style.display = 'none'; }
+});
+
+// ===== Demo FAB config =====
+window.DEMO_PAGES = [
+  { id:'role',  label:'Role',  icon:'person' },
+  { id:'state', label:'State', icon:'layers' },
+  { id:'alert', label:'Alert', icon:'notifications' },
+  { id:'warning', label:'Warning', icon:'warning' },
+];
+window.DEMO_SCENARIOS = [
+  // Role
+  { id:'admin', page:'role', label:'Admin (CRUD all)',      icon:'admin_panel_settings', tip:'Admin：可編輯 Org 預算與 Tier 1 分配，看完整 3 個 provider 的全組 budget' },
+  { id:'t1m',   page:'role', label:'T1 Manager',             icon:'supervisor_account',   tip:'T1 Manager：可編輯自己組內的 Tier 2 分配（標題切為「BU-Healthcare Annual Budget」+ 「Tier 2 Group Budget」+ Allocated row）' },
+  { id:'t1mb',  page:'role', label:'T1 Member',              icon:'badge',                tip:'T1 Member：純檢視自己組與底下 T2，無 Edit 按鈕' },
+  { id:'t2m',   page:'role', label:'T2 Manager',             icon:'person',               tip:'T2 Manager：純檢視自己組的 12 個月預算，無 Tier 2 表格' },
+  { id:'t2mb',  page:'role', label:'T2 Member',              icon:'person_outline',       tip:'T2 Member：同 T2 Manager，純檢視' },
+  // State — normal
+  { id:'set',      page:'state', label:'With data (預設)',          icon:'check_circle',   tip:'正常狀態，11 個 groups 已輸入部分預算' },
+  // State — no data
+  { id:'loading',  page:'state', label:'Loading (Skeleton)',         icon:'hourglass_top',   isNoData:true, tip:'Skeleton Loading：資料載入中。Cards 與表格以 shimmer 取代數值，Edit Budget 按鈕隱藏。' },
+  { id:'empty',    page:'state', label:'No groups created',          icon:'group_off',       isNoData:true, tip:'尚未建立任何 group，表格呈空狀態，引導前往 Organization Settings 建立組別。' },
+  { id:'no-auth',  page:'state', label:'CSP not authorized',         icon:'lock',            isNoData:true, tip:'當前 provider 未授權。Admin 看到 Authorize CTA，T1/T2 看到「請聯絡管理員」提示。切 Role 看差異。' },
+  { id:'nodata',   page:'state', label:'Error (API failure)',        icon:'cloud_off',       isNoData:true, tip:'資料無法載入。Org 卡片與表格都呈現 error 空狀態。' },
+  // Alert
+  { id:'alert-set',   page:'alert', label:'Alerts set (60/80/90)', icon:'notifications_active', tip:'已設定 3 個 threshold，一般狀態。' },
+  { id:'alert-empty', page:'alert', label:'No alerts set',          icon:'notifications_off',    tip:'尚未設定任何 alert threshold，提示文案改為「No alerts have been set yet.」並切換 icon。Alert Settings 仍可點開設定。' },
+  // Warning — PRD §7.3 / §9 警示視覺體系：Spent% 色階 + Remaining 負數紅字 + 月份格 amber dot
+  { id:'warn-normal',      page:'warning', label:'All under budget (default)', icon:'check_circle', tip:'所有 group Spent % < 70%（綠色區間）、Remaining 為正、無 cap-conflict。為 v2 預設狀態。' },
+  { id:'warn-approaching', page:'warning', label:'Approaching budget',         icon:'trending_up',  tip:'部分 group Spent % 達 70-90%（amber warn），progress bar 變橘。Remaining 仍為正、尚無 cap 衝突。' },
+  { id:'warn-over',        page:'warning', label:'Over budget · Remaining negative', icon:'priority_high',tip:'部分 group 實際 Spend > Budget：Spent % >= 100% 變紅 + Remaining 為負數（紅字 + 負號 + 微紅底色強化）。切到 Remaining monthly view 可看到月份格也有紅色負數。常與 cap-conflict 並存。' },
+  { id:'warn-cap-conflict',page:'warning', label:'T2 sum > T1 cap',            icon:'warning',      tip:'下屬 T2 加總超過上層 T1 月額度：amber dot 在月份格右上角（Budget view 才顯示）。Hover dot 看 tooltip。Admin 降低 cap 時也會觸發此情境。' },
+  { id:'warn-mixed',       page:'warning', label:'Mixed warnings (full demo)', icon:'release_alert',tip:'三種警示同時呈現：部分 group approaching、部分 over、特定月份格 cap-conflict。一次看完整警示體系。' },
+  // Display — 月份逐月呈現方式（方向Y 提案：給前端評估用）
+];
+window.DEMO_DEFAULT = 'admin';
+window.DEMO_APPLY = function(id){
+  if(['admin','t1m','t1mb','t2m','t2mb'].includes(id)){
+    // Role switch acts as soft-reset: also clears page state + warning preset so the role demos cleanly
+    // (Reset to Default fires DEMO_APPLY('admin'), so this path is also the canonical reset)
+    if(state.pageState !== 'set') setPageState('set');
+    if(state.warningPreset !== 'normal') setWarningPreset('normal');
+    setRole(id);
+  }
+  else if(['set','empty','nodata','loading','no-auth'].includes(id)) setPageState(id);
+  else if(id === 'alert-set')   setAlertState(false);
+  else if(id === 'alert-empty') setAlertState(true);
+  else if(id === 'warn-normal')       setWarningPreset('normal');
+  else if(id === 'warn-approaching')  setWarningPreset('approaching');
+  else if(id === 'warn-over')         setWarningPreset('over');
+  else if(id === 'warn-cap-conflict') setWarningPreset('cap-conflict');
+  else if(id === 'warn-mixed')        setWarningPreset('mixed');
+};
+
+// ===== Sidebar nav — NAV definition is in shared/lumiture-nav.js (single source of truth) =====
+window.LUMITURE_ACTIVE = 'general-budget';
+
+// Initial render
+setRole(state.role);
+// Ensure CSV button visibility reflects v2 default (showSegCtrl=true, pageState='set')
+if($('#btn-csv')) $('#btn-csv').style.display = (state.pageState==='set' && state.showSegCtrl && !state.editing) ? '' : 'none';
+// Re-render FY picker wrapper so the page-top .pg-hdr-r picks up the now-visible CSV button
+renderFYPicker();
+</script>
+
+<!-- Shared components — order matters: nav data must load BEFORE sidebar renderer.
+     ?v=... is a cache-buster; bump when shared scripts change to force refetch. -->
+<script>
+/* === Inlined: shared/currency-picker.js === */
+/*!
+ * currency-picker.js — Lumiture Shared Currency Picker v3
+ *
+ * Design spec: CMDS Component Library > Currency Switch (H=30px)
+ *   - Normal: transparent bg, no border; Hover: subtle gray bg; Focus: focus ring
+ *   - Trigger format: [flag] [CODE] [expand_more]
+ *   - Dropdown gap: 4px from trigger bottom
+ *   - Dropdown items: "Full Name (CODE)", selected = gray bg, no checkmark
+ *
+ * Design spec: Figma #01-4 Overview: Change Currency
+ *   - 7 currencies from PRD, sorted alphabetically by full name
+ *
+ * Usage (inline onclick pattern, works with dynamically rendered triggers):
+ *
+ *   HTML trigger (static):
+ *     <button class="curr-btn"
+ *             onclick="CurrencyPicker.open(this, currentCode, onChangeFn)">
+ *       <span class="curr-flag">🇺🇸</span>
+ *       <span class="curr-code">USD</span>
+ *       <span class="material-symbols-outlined">expand_more</span>
+ *     </button>
+ *
+ *   HTML trigger (dynamic, inside JS template):
+ *     const c = CurrencyPicker.CURRENCIES.find(c => c.code === currentCode);
+ *     `<button class="curr-btn" onclick="CurrencyPicker.open(this,'${currentCode}',fn)">
+ *       <span class="curr-flag">${c?.flag || ''}</span>
+ *       <span class="curr-code">${currentCode}</span>
+ *       <span class="material-symbols-outlined">expand_more</span>
+ *     </button>`
+ *
+ *   Update trigger on currency change (setCurrency callback):
+ *     const c = CurrencyPicker.CURRENCIES.find(c => c.code === newCode);
+ *     document.getElementById('currency-flag').textContent = c?.flag || '';
+ *     document.getElementById('currency-code').textContent = newCode;
+ *
+ * Exposes:
+ *   window.CurrencyPicker.CURRENCIES   — [{code, name, flag}]
+ *   window.CurrencyPicker.open(triggerEl, currentCode, onChangeFn)
+ *   window.CurrencyPicker.close()
+ */
+(function () {
+  'use strict';
+
+  /* Sorted alphabetically by full name, per Figma spec + PRD */
+  var CURRENCIES = [
+    { code: 'HKD', name: 'Hong Kong dollar',      flag: '🇭🇰' },
+    { code: 'IDR', name: 'Indonesian rupiah',      flag: '🇮🇩' },
+    { code: 'MYR', name: 'Malaysian ringgit',      flag: '🇲🇾' },
+    { code: 'TWD', name: 'New Taiwan dollar',      flag: '🇹🇼' },
+    { code: 'PHP', name: 'Philippine peso',        flag: '🇵🇭' },
+    { code: 'SGD', name: 'Singapore dollar',       flag: '🇸🇬' },
+    { code: 'USD', name: 'United States dollar',   flag: '🇺🇸' },
+  ];
+
+  /* ===== CSS ===== */
+  var CSS = [
+    /* Trigger button — Normal: transparent, no border; H=30px per CMDS spec */
+    '.curr-btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 8px;',
+    'font-size:13px;color:#262626;',
+    'cursor:pointer;background:transparent;border:none;border-radius:6px;',
+    'font-family:inherit;line-height:1;white-space:nowrap;',
+    'transition:background .12s}',
+    /* Hover: subtle gray wash */
+    '.curr-btn:hover{background:rgba(0,0,0,.06)}',
+    /* Active/open: same wash + arrow flipped */
+    '.curr-btn.cp-open{background:rgba(0,0,0,.06)}',
+    /* Focus: blue focus ring (keyboard nav / Active state ring per CMDS) */
+    '.curr-btn:focus-visible{outline:2px solid #004FB0;outline-offset:1px}',
+    /* Flag + code */
+    '.curr-flag{font-size:15px;line-height:1;flex-shrink:0}',
+    '.curr-code{font-size:13px;color:#262626}',
+    /* Arrow icon */
+    '.curr-btn .material-symbols-outlined{font-size:16px;',
+    'color:#676767;flex-shrink:0;transition:transform .15s}',
+    '.curr-btn.cp-open .material-symbols-outlined{transform:rotate(180deg)}',
+
+    /* Dropdown container — 4px gap per CMDS spec */
+    '.curr-dd{position:absolute;top:calc(100% + 4px);right:0;left:auto;',
+    'background:#fff;border:1px solid #DCE3EC;',
+    'border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);',
+    'z-index:300;min-width:220px;width:max-content;',
+    'overflow:hidden;overscroll-behavior:contain}',
+
+    /* Dropdown items — full name + (CODE), no flag */
+    '.curr-dd-item{display:flex;align-items:center;padding:9px 14px;width:100%;',
+    'font-size:13px;border:none;background:none;cursor:pointer;',
+    'font-family:inherit;color:#262626;text-align:left;',
+    'transition:background .1s;line-height:1.4;white-space:nowrap}',
+    '.curr-dd-item:hover{background:#F5F5F5}',
+    /* Selected: gray bg per Figma, no color/weight change */
+    '.curr-dd-item.cp-active{background:#F0F0F0}',
+  ].join('');
+
+  var style = document.createElement('style');
+  style.textContent = CSS;
+  document.head.appendChild(style);
+
+  /* ===== STATE ===== */
+  var _activeTrigger = null;
+
+  /* ===== INTERNAL ===== */
+  function _close() {
+    var dd = document.getElementById('_curr-dd');
+    if (dd) dd.remove();
+    if (_activeTrigger) {
+      _activeTrigger.classList.remove('cp-open');
+      _activeTrigger = null;
+    }
+  }
+
+  function _open(triggerEl, currentCode, onChange) {
+    _activeTrigger = triggerEl;
+    triggerEl.classList.add('cp-open');
+
+    /* Ensure parent is positioned */
+    var wrap = triggerEl.parentElement;
+    if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+
+    var dd = document.createElement('div');
+    dd.className = 'curr-dd';
+    dd.id = '_curr-dd';
+    dd.innerHTML = CURRENCIES.map(function (c) {
+      var isActive = c.code === currentCode;
+      return '<button class="curr-dd-item' + (isActive ? ' cp-active' : '') + '">' +
+        c.name + ' (' + c.code + ')' +
+        '</button>';
+    }).join('');
+
+    dd.querySelectorAll('.curr-dd-item').forEach(function (btn, i) {
+      btn.addEventListener('click', function () {
+        _close();
+        onChange(CURRENCIES[i].code);
+      });
+    });
+
+    wrap.appendChild(dd);
+
+    /* Outside click to close */
+    setTimeout(function () {
+      document.addEventListener('click', function _outsideClose(e) {
+        if (!dd.contains(e.target) && e.target !== triggerEl) {
+          _close();
+          document.removeEventListener('click', _outsideClose, true);
+        }
+      }, true);
+    }, 0);
+  }
+
+  /* ===== PUBLIC API ===== */
+  window.CurrencyPicker = {
+    CURRENCIES: CURRENCIES,
+
+    /**
+     * Toggle dropdown open / close.
+     * @param {Element}  triggerEl   — the .curr-btn element
+     * @param {string}   currentCode — e.g. 'USD'
+     * @param {Function} onChange    — called with new code when user picks
+     */
+    open: function (triggerEl, currentCode, onChange) {
+      if (_activeTrigger === triggerEl) {
+        _close();
+      } else {
+        _close();
+        _open(triggerEl, currentCode, onChange);
+      }
+    },
+
+    close: _close,
+  };
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-nav.js === */
+/*!
+ * lumiture-nav.js — Canonical Sidebar Navigation (Single Source of Truth)
+ *
+ * Defines window.LUMITURE_NAV used by shared/lumiture-sidebar.js.
+ * All Lumiture prototypes share the same nav structure — this file is the
+ * single source. Each prototype only needs to set window.LUMITURE_ACTIVE.
+ *
+ * Usage in prototype HTML:
+ *   <aside id="lt-sidebar"></aside>
+ *   <script>window.LUMITURE_ACTIVE = 'general-budget';<\/script>
+ *   <script src="../shared/lumiture-nav.js"><\/script>    ← MUST load BEFORE sidebar
+ *   <script src="../shared/lumiture-sidebar.js"><\/script>
+ *
+ * Rules:
+ *   - Items with `href` → rendered as <a> links (clickable, cross-prototype navigation)
+ *   - Items with `disabled:true` → rendered as <div> with .lt-dis class (greyed, not clickable)
+ *   - The item matching LUMITURE_ACTIVE → href automatically stripped by lumiture-sidebar.js
+ *     so the "current page" item won't self-link
+ *
+ * To add a new prototype:
+ *   1. Update the relevant entry below — change `disabled:true` to `href:'../{name}/{name}-prototype-v{N}.html'`
+ *   2. All 3 (or more) prototypes will automatically reflect the new link via this shared script
+ *   3. The new prototype only needs to set LUMITURE_ACTIVE = its own id
+ */
+(function () {
+  'use strict';
+
+  window.LUMITURE_NAV = [
+    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', disabled: true },
+
+    { type: 'group', id: 'dashboard', label: 'Dashboard', items: [
+      { id: 'cost-dashboard',     label: 'Cost Dashboard',     icon: 'dashboard',    href: './cost-dashboard.html' },
+      { id: 'executive-insights', label: 'Executive Insights', icon: 'auto_awesome', href: './executive-insights.html' },
+    ]},
+
+    { type: 'group', id: 'optimization', label: 'Optimization', items: [
+      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', disabled: true },
+    ]},
+
+    { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
+      { id: 'general-budget',    label: 'General Budget',    icon: 'savings',              href: './general-budget.html' },
+      { id: 'customized-budget', label: 'Customized Budget', icon: 'tune',                 disabled: true },
+      { id: 'anomaly-detection', label: 'Anomaly Detection', icon: 'notifications_active', disabled: true },
+    ]},
+
+    { type: 'group', id: 'org', label: 'Organization Settings', items: [
+      { id: 'lumitag',            label: 'LumiTag',            icon: 'sell',            href: './lumitag.html' },
+      { id: 'group-list',         label: 'Group List',         icon: 'groups',          disabled: true },
+      { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
+      { id: 'authorization-list', label: 'Authorization List', icon: 'link',            disabled: true },
+      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
+    ]},
+  ];
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-sidebar.js === */
+/*!
+ * lumiture-sidebar.js — Lumiture Shared Sidebar (with canonical logo)
+ *
+ * Auto-injects:
+ *   - Sidebar CSS (logo, nav items, group collapse, active state)
+ *   - Canonical Lumiture logo (concentric circles + PROTOTYPE tag + LumiTure.ai wordmark)
+ *
+ * Usage in prototype HTML:
+ *   1. Define window.LUMITURE_NAV = [...]   (see schema below)
+ *   2. Define window.LUMITURE_ACTIVE = 'item-id'  (which item is highlighted)
+ *   3. Add mount point: <aside id="lt-sidebar"></aside>
+ *   4. <script src="../shared/lumiture-sidebar.js"><\/script>
+ *
+ * NAV schema:
+ *   window.LUMITURE_NAV = [
+ *     // Top-level item (no group)
+ *     { type: 'item', id: 'overview', label: 'Overview', icon: 'home', href: '#' },
+ *     // Group with children (expanded by default unless `collapsed: true`)
+ *     { type: 'group', id: 'dashboard', label: 'Dashboard', expanded: true, items: [
+ *       { id: 'cost-dashboard', label: 'Cost Dashboard', icon: 'dashboard', href: '#' },
+ *       { id: 'exec-insights',  label: 'Executive Insights', icon: 'monitoring', disabled: true },
+ *     ]},
+ *   ];
+ *   window.LUMITURE_ACTIVE = 'cost-dashboard';  // which item is active
+ *
+ * API:
+ *   window.LumitureSidebar.toggleGroup(groupId)
+ *   window.LumitureSidebar.toggleCollapse()    — collapse the whole sidebar (icon-only)
+ *   window.LumitureSidebar.setActive(itemId)
+ */
+(function () {
+  'use strict';
+
+  // ===== CSS =====
+  var CSS = [
+    /* CSS variables — sidebar 用 Primary Dark #002663（per Lumiture-Guideline.md，2026-05-08 設計師確認） */
+    ':root{--lt-sb-w:264px;--lt-sb-bg:#002663;--lt-sb-hov:rgba(255,255,255,.06);',
+    '--lt-sb-active:#004FB0;--lt-sb-text:rgba(255,255,255,.85);--lt-sb-text-muted:rgba(255,255,255,.5);',
+    '--lt-sb-border:rgba(255,255,255,.1)}',
+
+    /* Sidebar container — 採 sticky positioning：父層 .app 用 flex 或 grid 都能適應
+       min-width:0 是必要的：flex 子元素預設 min-width:auto 會被內容 min-content size 撐住，導致 collapse 失效 */
+    '.lt-sidebar{width:var(--lt-sb-w);min-width:0;background:var(--lt-sb-bg);color:#fff;',
+    'position:sticky;top:0;height:100vh;z-index:100;overflow:hidden;',
+    'flex-shrink:0;',
+    'display:flex;flex-direction:column;transition:width .2s ease;scrollbar-width:none}',
+    '.lt-sidebar::-webkit-scrollbar{display:none}',
+    '.lt-sidebar.lt-collapsed{width:64px}',
+
+    /* Logo block */
+    '.lt-sb-logo{padding:16px 20px;display:flex;align-items:center;gap:10px;',
+    'font-size:18px;font-weight:700;color:#fff;border-bottom:1px solid var(--lt-sb-border);',
+    'min-height:68px;box-sizing:border-box;white-space:nowrap;overflow:hidden;flex-shrink:0}',
+    '.lt-sb-logo-wrap{position:relative;width:32px;height:32px;flex-shrink:0}',
+    '.lt-sb-logo-wrap svg{width:32px;height:32px;display:block}',
+    /* PROTOTYPE tag — cyan caps below the icon */
+    '.lt-sb-proto{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);',
+    'background:var(--lt-sb-bg);color:#34B5D9;font-size:6px;font-weight:700;',
+    'padding:1px 3px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px;',
+    'line-height:1.2;white-space:nowrap}',
+    '.lt-sb-logo-text{transition:opacity .2s}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo-text{opacity:0;width:0;overflow:hidden}',
+    '.lt-sidebar.lt-collapsed .lt-sb-proto{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo{padding:16px;justify-content:center;gap:0}',
+
+    /* Nav scroll area — 內部捲動，sidebar 外層不捲（寬敞 padding 對齊原始設計） */
+    '.lt-sb-nav{flex:1;padding:8px 12px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}',
+    '.lt-sb-nav::-webkit-scrollbar{width:6px}',
+    '.lt-sb-nav::-webkit-scrollbar-track{background:transparent}',
+    '.lt-sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}',
+    '.lt-sb-nav::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.25)}',
+
+    /* Top-level item (no group) — 寬敞 padding，font-size 14px */
+    '.lt-sb-item{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;',
+    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden;margin-bottom:2px}',
+    '.lt-sb-item:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sb-item.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-item.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
+    '.lt-sb-item .material-symbols-outlined{font-size:20px;opacity:.9;flex-shrink:0}',
+
+    /* Group section */
+    '.lt-sb-group{margin-bottom:4px}',
+    '.lt-sb-group-hdr{display:flex;align-items:center;justify-content:space-between;',
+    'padding:18px 14px 10px;font-size:14px;font-weight:700;color:#fff;',
+    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:.2px}',
+    '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
+    '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
+    '.lt-sb-group-arrow{font-size:18px;transition:transform .18s;opacity:.85;flex-shrink:0}',
+    '.lt-sb-group.lt-collapsed .lt-sb-group-arrow{transform:rotate(180deg)}',
+    '.lt-sb-group.lt-collapsed .lt-sb-group-children{display:none}',
+
+    /* Sub-item (inside group) — 一致 14px font，11px 垂直 padding */
+    '.lt-sb-subitem{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;',
+    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden}',
+    '.lt-sb-subitem:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sb-subitem.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-subitem.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
+    '.lt-sb-subitem .material-symbols-outlined{font-size:18px;opacity:.9;flex-shrink:0}',
+
+    /* Collapsed state — hide labels, center icons */
+    '.lt-sidebar.lt-collapsed .lt-sb-item span:not(.material-symbols-outlined),',
+    '.lt-sidebar.lt-collapsed .lt-sb-subitem span:not(.material-symbols-outlined){display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-item,',
+    '.lt-sidebar.lt-collapsed .lt-sb-subitem{padding:10px 0;justify-content:center;border-radius:0}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-hdr > span:first-child{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-arrow{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-hdr{padding:8px 0;justify-content:center}',
+    /* In collapsed mode, always show children */
+    '.lt-sidebar.lt-collapsed .lt-sb-group.lt-collapsed .lt-sb-group-children{display:block}',
+    '.lt-sidebar.lt-collapsed .lt-sb-nav{padding:8px 4px}',
+
+    /* Collapse toggle button at bottom */
+    '.lt-sb-collapse-btn{padding:12px;display:flex;justify-content:flex-end;',
+    'border-top:1px solid var(--lt-sb-border);flex-shrink:0}',
+    '.lt-sb-collapse-btn button{color:var(--lt-sb-text-muted);background:none;border:0;cursor:pointer;',
+    'display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:4px;',
+    'transition:all .15s}',
+    '.lt-sb-collapse-btn button:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sidebar.lt-collapsed .lt-sb-collapse-btn{justify-content:center}',
+    '.lt-sidebar.lt-collapsed .lt-sb-collapse-btn .material-symbols-outlined{transform:rotate(180deg)}'
+  ].join('');
+
+  function _injectCSS() {
+    if (document.getElementById('lt-sidebar-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-sidebar-css';
+    s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  // ===== Canonical Logo (concentric circles + PROTOTYPE tag + LumiTure.ai) =====
+  var LOGO_HTML =
+    '<div class="lt-sb-logo">' +
+      '<div class="lt-sb-logo-wrap">' +
+        '<svg viewBox="0 0 32 32" fill="none" aria-hidden="true">' +
+          '<circle cx="16" cy="16" r="13" stroke="#FFF" stroke-width="2" fill="none"/>' +
+          '<circle cx="16" cy="16" r="7" stroke="#FFF" stroke-width="2" fill="none"/>' +
+          '<circle cx="16" cy="16" r="3" fill="#FFF"/>' +
+        '</svg>' +
+        '<span class="lt-sb-proto">PROTOTYPE</span>' +
+      '</div>' +
+      '<span class="lt-sb-logo-text">LumiTure.ai</span>' +
+    '</div>';
+
+  // ===== Helpers =====
+  function _esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  function _renderItem(item, isSub) {
+    var cls = isSub ? 'lt-sb-subitem' : 'lt-sb-item';
+    var isActive = (item.id === window.LUMITURE_ACTIVE);
+    var active = isActive ? ' lt-active' : '';
+    var dis = item.disabled ? ' lt-dis' : '';
+    // Active item: render as <div> (no self-link). Disabled item: also no href.
+    var useHref = item.href && !isActive && !item.disabled;
+    var tag = useHref ? 'a' : 'div';
+    var hrefAttr = useHref ? ' href="' + _esc(item.href) + '"' : '';
+    var dataId = ' data-nav-id="' + _esc(item.id) + '"';
+    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + '>' +
+             '<span class="material-symbols-outlined">' + _esc(item.icon || 'circle') + '</span>' +
+             '<span>' + _esc(item.label) + '</span>' +
+           '</' + tag + '>';
+  }
+
+  function _renderGroup(grp) {
+    var collapsed = grp.collapsed ? ' lt-collapsed' : '';
+    var children = (grp.items || []).map(function (item) {
+      return _renderItem(item, true);
+    }).join('');
+    return '<div class="lt-sb-group' + collapsed + '" data-group-id="' + _esc(grp.id) + '">' +
+             '<div class="lt-sb-group-hdr">' +
+               '<span>' + _esc(grp.label) + '</span>' +
+               '<span class="material-symbols-outlined lt-sb-group-arrow">keyboard_arrow_up</span>' +
+             '</div>' +
+             '<div class="lt-sb-group-children">' + children + '</div>' +
+           '</div>';
+  }
+
+  function _renderNav() {
+    var nav = window.LUMITURE_NAV || [];
+    var html = '<div class="lt-sb-nav">';
+    nav.forEach(function (entry) {
+      if (entry.type === 'group') {
+        html += _renderGroup(entry);
+      } else {
+        html += _renderItem(entry, false);
+      }
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function _renderCollapseBtn() {
+    return '<div class="lt-sb-collapse-btn">' +
+             '<button type="button" data-action="toggle-collapse" title="Collapse sidebar">' +
+               '<span class="material-symbols-outlined">chevron_left</span>' +
+             '</button>' +
+           '</div>';
+  }
+
+  // ===== Mount =====
+  function _render() {
+    var mount = document.getElementById('lt-sidebar');
+    if (!mount) {
+      console.warn('[lumiture-sidebar] Mount point #lt-sidebar not found');
+      return;
+    }
+    // If mount is not already a sidebar, wrap it
+    mount.classList.add('lt-sidebar');
+    mount.innerHTML = LOGO_HTML + _renderNav() + _renderCollapseBtn();
+
+    // Group toggle
+    mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
+      hdr.addEventListener('click', function () {
+        var grp = hdr.parentElement;
+        if (grp) grp.classList.toggle('lt-collapsed');
+      });
+    });
+    // Collapse the whole sidebar
+    var btn = mount.querySelector('[data-action="toggle-collapse"]');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        window.LumitureSidebar.toggleCollapse();
+      });
+    }
+  }
+
+  // ===== Public API =====
+  window.LumitureSidebar = {
+    toggleGroup: function (groupId) {
+      var grp = document.querySelector('[data-group-id="' + groupId + '"]');
+      if (grp) grp.classList.toggle('lt-collapsed');
+    },
+    toggleCollapse: function () {
+      var sb = document.getElementById('lt-sidebar');
+      var main = document.querySelector('.lt-main, .main, main');
+      if (sb) sb.classList.toggle('lt-collapsed');
+      if (main) main.classList.toggle('lt-sidebar-collapsed');
+      // Sync legacy CSS vars (--sw) for prototypes that reference them in topbar / footer
+      var w = sb && sb.classList.contains('lt-collapsed') ? '64px' : '264px';
+      document.documentElement.style.setProperty('--sw', w);
+      document.documentElement.style.setProperty('--lt-sb-w', w);
+    },
+    setActive: function (itemId) {
+      window.LUMITURE_ACTIVE = itemId;
+      document.querySelectorAll('.lt-sb-item, .lt-sb-subitem').forEach(function (el) {
+        el.classList.toggle('lt-active', el.dataset.navId === itemId);
+      });
+    },
+    rerender: _render,
+  };
+
+  // ===== INIT =====
+  function _init() {
+    _injectCSS();
+    _render();
+    // Dispatch resize so chart libraries (ECharts 等) 重新測量容器
+    // —— 避免 inline script 已先 init chart 後，shared CSS 才 inject 導致 layout shift
+    requestAnimationFrame(function () {
+      window.dispatchEvent(new Event('resize'));
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else {
+    _init();
+  }
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-topbar.js === */
+/*!
+ * lumiture-topbar.js — Lumiture Shared Topbar (Navy bar with icons + user chip)
+ *
+ * 用途：把 navy bg topbar（右側 icons + KY user chip）抽成共用模組。
+ * 跟 sidebar 一樣統一所有 prototype 的 header 視覺。
+ *
+ * Usage in prototype HTML:
+ *   1. (Optional) Define window.LUMITURE_USER       — default { name:'Kabin Yang', role:'Owner / Admin', initials:'KY' }
+ *   2. (Optional) Define window.LUMITURE_TOPBAR_ICONS — array of {icon, title, onclick, badge?}
+ *   3. Add mount point: <header id="lt-topbar"></header>
+ *   4. <script src="../shared/lumiture-topbar.js?v=YYYY-MM-DD"><\/script>
+ *
+ * Schema:
+ *   window.LUMITURE_USER = {
+ *     name:     'Kabin Yang',
+ *     role:     'Owner / Admin',
+ *     initials: 'KY',        // shown inside avatar circle
+ *     // gradient: 'linear-gradient(135deg,#34B5D9,#004FB0)',  // optional avatar bg override
+ *   };
+ *   window.LUMITURE_TOPBAR_ICONS = [
+ *     { icon:'notifications', title:'Notifications', badge:true,  onclick:'fn()' },
+ *     { icon:'help',          title:'Help' },
+ *     { icon:'settings',      title:'Settings' },
+ *   ];
+ *
+ * Public API:
+ *   window.LumitureTopbar.setUser({name, role, initials})  — update user chip dynamically
+ *   window.LumitureTopbar.rerender()
+ */
+(function () {
+  'use strict';
+
+  // ===== Defaults =====
+  var DEFAULT_USER = {
+    name: 'Kabin Yang',
+    role: 'Owner / Admin',
+    initials: 'KY',
+  };
+
+  var DEFAULT_ICONS = [
+    { icon: 'notifications', title: 'Notifications' },
+    { icon: 'help',          title: 'Help' },
+    { icon: 'settings',      title: 'Settings' },
+  ];
+
+  // ===== CSS =====
+  var CSS = [
+    /* Topbar container — Primary Dark (#002663) navy bar to match sidebar */
+    '.lt-topbar{background:#002663;padding:14px 32px;display:flex;align-items:center;justify-content:flex-end;gap:16px;',
+    'position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px;box-sizing:border-box}',
+
+    /* Icon button */
+    '.lt-tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;',
+    'cursor:pointer;color:rgba(255,255,255,.7);background:none;border:none;padding:0;position:relative;font-family:inherit;transition:background .15s,color .15s}',
+    '.lt-tb-ic:hover{background:rgba(255,255,255,.08);color:#fff}',
+    '.lt-tb-ic .material-symbols-outlined{font-size:22px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 22}',
+
+    /* Badge dot on icon (for notifications) */
+    '.lt-tb-ic .lt-tb-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:#FF403D;',
+    'border:2px solid #002663;border-radius:50%}',
+
+    /* User chip — avatar + name + role */
+    '.lt-tb-user{display:flex;align-items:center;gap:10px;padding-left:16px;margin-left:0;',
+    'border-left:1px solid rgba(255,255,255,.1);color:#fff;cursor:pointer;transition:opacity .15s}',
+    '.lt-tb-user:hover{opacity:.92}',
+    '.lt-tb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#34B5D9,#004FB0);',
+    'display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;',
+    'letter-spacing:.3px;font-family:\'Noto Sans\',sans-serif}',
+    '.lt-tb-user-text{display:flex;flex-direction:column;font-size:12px;line-height:1.3;min-width:0;font-family:\'Noto Sans\',sans-serif}',
+    '.lt-tb-user-name{font-weight:600;color:#fff;white-space:nowrap}',
+    '.lt-tb-user-role{color:rgba(255,255,255,.6);font-size:11px;white-space:nowrap}',
+  ].join('');
+
+  function _injectCSS() {
+    if (document.getElementById('lt-topbar-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-topbar-css';
+    s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  // ===== Helpers =====
+  function _esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  function _renderIcon(item) {
+    var attrs = ' class="lt-tb-ic" title="' + _esc(item.title || '') + '"';
+    if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
+    var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
+    return '<button type="button"' + attrs + '>' +
+             '<span class="material-symbols-outlined">' + _esc(item.icon) + '</span>' +
+             badge +
+           '</button>';
+  }
+
+  function _renderUser(user) {
+    var avatarStyle = user.gradient ? ' style="background:' + _esc(user.gradient) + '"' : '';
+    return '<div class="lt-tb-user" id="lt-tb-user" title="' + _esc(user.name) + ' · ' + _esc(user.role) + '">' +
+             '<div class="lt-tb-avatar"' + avatarStyle + '>' + _esc(user.initials) + '</div>' +
+             '<div class="lt-tb-user-text">' +
+               '<span class="lt-tb-user-name">' + _esc(user.name) + '</span>' +
+               '<span class="lt-tb-user-role" id="lt-tb-user-role">' + _esc(user.role) + '</span>' +
+             '</div>' +
+           '</div>';
+  }
+
+  // ===== Mount =====
+  function _render() {
+    var mount = document.getElementById('lt-topbar');
+    if (!mount) {
+      console.warn('[lumiture-topbar] Mount point #lt-topbar not found');
+      return;
+    }
+
+    var user = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
+    var icons = window.LUMITURE_TOPBAR_ICONS || DEFAULT_ICONS;
+
+    mount.classList.add('lt-topbar');
+    mount.innerHTML = icons.map(_renderIcon).join('') + _renderUser(user);
+  }
+
+  // ===== Public API =====
+  window.LumitureTopbar = {
+    setUser: function (user) {
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, user || {});
+      _render();
+    },
+    setRole: function (role) {
+      // Lightweight role-only update — used by Demo FAB role switching
+      var el = document.getElementById('lt-tb-user-role');
+      if (el) el.textContent = role;
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, { role: role });
+    },
+    rerender: _render,
+  };
+
+  // ===== INIT =====
+  function _init() {
+    _injectCSS();
+    _render();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else {
+    _init();
+  }
+})();
+
+</script>
+<script>
+/* === Inlined: shared/demo-fab.js === */
+/*!
+ * demo-fab.js — Lumiture Designer Demo Scenarios (Shared Module v2)
+ *
+ * Auto-injects:
+ *   - .demo-fab (FAB button, bottom-left)
+ *   - .demo-popover (480px tall × 390px wide popover)
+ *   - #gl-tip (body-level fixed tooltip — required for demo button hover tips)
+ *
+ * Required globals:
+ *   window.DEMO_SCENARIOS = [...]   — scenario list
+ *   window.DEMO_APPLY     = fn      — called with (id, btn) when scenario clicked
+ *
+ * Optional globals:
+ *   window.DEMO_PAGES = [{id, label, icon}]      — page tabs (top row, pill style)
+ *   window.DEMO_CATEGORIES = [{id, label, icon, hint}]  — category tabs (underline style)
+ *   window.DEMO_DEFAULT = 'scenario-id'           — initial active scenario
+ *
+ * Rendering modes (auto-detected):
+ *   1. No pages, no categories → flat list of buttons
+ *   2. Pages only (LumiTag pattern) → underline tabs at top, scenarios filtered by page
+ *   3. Categories only (single-page Cost Dashboard pattern) → underline tabs, scenarios filtered by category
+ *   4. Pages + Categories → two-layer: pill page tabs (top) + underline category tabs (bottom)
+ *
+ * Scenario schema:
+ *   {
+ *     id:        string,           // unique
+ *     label:     string,
+ *     icon:      string,           // Material Symbols name
+ *     tip:       string?,          // hover tooltip (rendered via #gl-tip, NOT ::after)
+ *     page:      string?,          // matches DEMO_PAGES[].id (alias: 'tab' for backwards compat)
+ *     category:  string?,          // matches DEMO_CATEGORIES[].id
+ *     isNoData:  boolean?,         // groups under "no data" sub-divider
+ *     disabled:  boolean?,         // shows "Soon" badge, not clickable
+ *   }
+ *
+ * Programmatic API:
+ *   window.demoFabSwitchTab(pageId)    // switch to a specific page tab (called on navigation)
+ *   window._demoFabToggle()            // open/close popover
+ *   window._demoFabApply(id, btn)      // apply a scenario (internal)
+ */
+(function () {
+  'use strict';
+
+  // ===== MODULE STATE =====
+  var _activePage = null;         // null until first scenario filtered
+  var _activeCategory = null;
+  var _activeScenario = null;
+
+  // ===== CSS INJECTION =====
+  var CSS = [
+    /* FAB button */
+    '.demo-fab{position:fixed;bottom:18px;left:18px;width:48px;height:48px;border-radius:50%;',
+    'background:radial-gradient(circle at 78% 68%,#D9CC4A 0%,rgba(217,204,74,0) 42%),',
+    'radial-gradient(circle at 30% 28%,#4D8DDB 0%,rgba(77,141,219,0) 52%),',
+    'radial-gradient(circle at 25% 78%,#001A52 0%,rgba(0,26,82,0) 58%),',
+    'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);',
+    'color:#fff;box-shadow:0 4px 14px rgba(13,27,62,.36);z-index:999;cursor:pointer;',
+    'display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;border:0}',
+    '.demo-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(13,27,62,.45)}',
+    '.demo-fab:active{transform:scale(.96)}',
+    '.demo-fab .material-symbols-outlined{font-size:24px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}',
+    '.demo-fab.popped{box-shadow:0 4px 14px rgba(13,27,62,.36),inset 0 2px 6px rgba(0,0,0,.28)}',
+    '.demo-fab .demo-pulse{position:absolute;top:5px;right:5px;width:9px;height:9px;background:#FF403D;',
+    'border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 0 rgba(255,64,61,.6);animation:demoPulse 1.6s ease-in-out infinite}',
+    '@keyframes demoPulse{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,64,61,.6)}',
+    '70%{transform:scale(1.1);box-shadow:0 0 0 8px rgba(255,64,61,0)}',
+    '100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,64,61,0)}}',
+
+    /* Popover shell — 全站固定 390 × 480 */
+    '.demo-popover{position:fixed;bottom:78px;left:18px;width:390px;height:480px;background:#fff;',
+    'border:1px solid rgba(14,58,130,.18);border-radius:12px;box-shadow:0 8px 24px rgba(13,27,62,.16);',
+    'z-index:998;padding:0;opacity:0;transform:translateY(8px);pointer-events:none;',
+    'transition:opacity .18s,transform .18s;display:flex;flex-direction:column;overflow:hidden}',
+    '.demo-popover.show{opacity:1;transform:translateY(0);pointer-events:auto}',
+    '.demo-popover::before{content:\'\';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;',
+    'background:radial-gradient(circle at 78% 50%,#D9CC4A 0%,rgba(217,204,74,0) 32%),',
+    'radial-gradient(circle at 30% 50%,#4D8DDB 0%,rgba(77,141,219,0) 42%),',
+    'linear-gradient(90deg,#0D1B3E 0%,#0E3A82 100%)}',
+
+    /* Popover header */
+    '.demo-popover-hdr{display:flex;align-items:center;justify-content:space-between;',
+    'padding:14px 16px 10px;flex-shrink:0}',
+    '.demo-popover-title{font-size:12px;font-weight:700;color:#0E3A82;text-transform:uppercase;',
+    'letter-spacing:.5px;display:flex;align-items:center;gap:6px}',
+    '.demo-popover-close{color:#B0B7C0;cursor:pointer;padding:2px;border-radius:4px;',
+    'display:flex;align-items:center;background:none;border:none}',
+    '.demo-popover-close:hover{color:#0E3A82;background:rgba(14,58,130,.08)}',
+
+    /* Reset link */
+    '.demo-reset-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#676767;',
+    'font-weight:500;background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:4px;',
+    'font-family:inherit;margin:0 16px 6px}',
+    '.demo-reset-link:hover{color:#004FB0;background:#F2FAFF}',
+    '.demo-reset-link .material-symbols-outlined{font-size:14px}',
+
+    /* Page tabs (Layer 1 — pill / segmented style，only when both layers exist) */
+    '.demo-page-tabs{display:flex;gap:4px;padding:0 16px 8px;flex-shrink:0;overflow-x:auto;scrollbar-width:none}',
+    '.demo-page-tabs::-webkit-scrollbar{display:none}',
+    '.demo-page-tab{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;height:26px;',
+    'background:#F2F2F2;color:#676767;border:none;border-radius:13px;font-size:11px;font-weight:600;',
+    'font-family:inherit;cursor:pointer;transition:all .15s;white-space:nowrap}',
+    '.demo-page-tab:hover{color:#262626;background:#E6E6E6}',
+    '.demo-page-tab.active{background:#fff;color:#004FB0;box-shadow:inset 0 0 0 1px #004FB0}',
+    '.demo-page-tab .material-symbols-outlined{font-size:13px}',
+
+    /* Category tabs (Layer 2，or single-layer underline mode) */
+    '.demo-cat-tabs{display:flex;border-bottom:2px solid #E6E6E6;padding:0 12px;flex-shrink:0;',
+    'overflow-x:auto;scrollbar-width:none}',
+    '.demo-cat-tabs::-webkit-scrollbar{display:none}',
+    '.demo-cat-tab{display:inline-flex;align-items:center;gap:4px;padding:7px 10px;font-size:11px;',
+    'font-weight:600;color:#676767;border:none;background:none;border-bottom:2px solid transparent;',
+    'margin-bottom:-2px;cursor:pointer;letter-spacing:.3px;transition:all .15s;font-family:inherit;white-space:nowrap}',
+    '.demo-cat-tab .material-symbols-outlined{font-size:14px}',
+    '.demo-cat-tab:hover{color:#262626}',
+    '.demo-cat-tab.active{color:#004FB0;border-bottom-color:#004FB0}',
+
+    /* Hint block (淡藍底 + 左藍邊條) */
+    '.demo-pane-hint{font-size:11px;color:#676767;line-height:1.5;margin:0 0 8px;',
+    'padding:8px 10px;background:#F2FAFF;border-left:2px solid #004FB0;border-radius:4px}',
+
+    /* Scroll area (flex 1, hidden scrollbar) */
+    '.demo-popover-scroll{overflow-y:auto;overscroll-behavior:contain;flex:1;min-height:0;',
+    'padding:8px 16px 14px;transition:opacity .12s ease;scrollbar-width:none}',
+    '.demo-popover-scroll::-webkit-scrollbar{display:none}',
+
+    /* Sub-separator (no data divider) */
+    '.demo-sub-sep{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;',
+    'color:#9CAEC4;letter-spacing:.4px;text-transform:uppercase;margin:10px 0 6px}',
+    '.demo-sub-sep::before,.demo-sub-sep::after{content:\'\';flex:1;height:1px;background:rgba(14,58,130,.1)}',
+
+    /* Button group */
+    '.demo-buttons{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}',
+
+    /* Scenario button */
+    '.demo-btn{background:#fff;border:1px solid rgba(14,58,130,.25);color:#0E3A82;',
+    'padding:8px 12px;border-radius:8px;font-size:12px;font-weight:500;',
+    'display:flex;align-items:center;gap:6px;text-align:left;width:100%;',
+    'transition:all .15s;position:relative;cursor:pointer;font-family:inherit}',
+    '.demo-btn:hover{background:rgba(14,58,130,.05);border-color:rgba(14,58,130,.5)}',
+    '.demo-btn.active{background:radial-gradient(circle at 88% 70%,#D9CC4A 0%,rgba(217,204,74,0) 42%),',
+    'radial-gradient(circle at 22% 35%,#4D8DDB 0%,rgba(77,141,219,0) 50%),',
+    'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);color:#fff;border-color:transparent;',
+    'box-shadow:0 2px 6px rgba(13,27,62,.25)}',
+    '.demo-btn .material-symbols-outlined{font-size:16px;flex-shrink:0}',
+
+    /* Disabled button */
+    '.demo-btn.demo-dis{opacity:.42;cursor:not-allowed}',
+    '.demo-btn.demo-dis:hover{background:#fff!important;border-color:rgba(14,58,130,.25)!important}',
+    '.demo-cs{margin-left:auto;font-size:9px;font-weight:700;color:#9CAEC4;',
+    'background:rgba(14,58,130,.06);border-radius:3px;padding:1px 5px;letter-spacing:.3px;flex-shrink:0}',
+
+    /* Empty state when no scenarios match current filters */
+    '.demo-empty{padding:24px 8px;text-align:center;color:#9CAEC4;font-size:12px;line-height:1.5}',
+
+    /* ⚠️ Suppress any global CSS [data-tip]::after on demo elements.
+       Tooltips MUST be handled by #gl-tip (auto-injected below) — pseudo-tooltips
+       get clipped by .demo-popover { overflow: hidden }. */
+    '.demo-btn[data-tip]::after,.demo-btn[data-tip]::before,',
+    '.demo-page-tab[data-tip]::after,.demo-cat-tab[data-tip]::after{display:none!important}',
+
+    /* #gl-tip — body-level fixed tooltip (auto-injected) */
+    '#gl-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:12px;line-height:1.4;',
+    'padding:6px 10px;border-radius:4px;max-width:320px;white-space:normal;',
+    'pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25);',
+    'font-family:\'Noto Sans\',sans-serif}'
+  ].join('');
+
+  var style = document.createElement('style');
+  style.textContent = CSS;
+  document.head.appendChild(style);
+
+  // ===== HELPERS =====
+  function _esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  // Normalise scenario: tab → page (backwards compat)
+  function _normalizedScenarios() {
+    return (window.DEMO_SCENARIOS || []).map(function (s) {
+      return Object.assign({}, s, { page: s.page || s.tab || null });
+    });
+  }
+
+  // Detect rendering mode based on what's configured
+  function _detectMode() {
+    var scenarios = _normalizedScenarios();
+    var hasPages = (window.DEMO_PAGES && window.DEMO_PAGES.length) ||
+                   scenarios.some(function (s) { return !!s.page; });
+    var hasCats  = (window.DEMO_CATEGORIES && window.DEMO_CATEGORIES.length) ||
+                   scenarios.some(function (s) { return !!s.category; });
+    if (hasPages && hasCats) return 'two-layer';
+    if (hasPages) return 'pages-only';
+    if (hasCats)  return 'categories-only';
+    return 'flat';
+  }
+
+  // Auto-derive page list if DEMO_PAGES not provided
+  function _getPages() {
+    if (window.DEMO_PAGES && window.DEMO_PAGES.length) return window.DEMO_PAGES;
+    var seen = {};
+    var pages = [];
+    _normalizedScenarios().forEach(function (s) {
+      if (s.page && !seen[s.page]) {
+        seen[s.page] = true;
+        pages.push({ id: s.page, label: s.page.charAt(0).toUpperCase() + s.page.slice(1), icon: 'tab' });
+      }
+    });
+    return pages;
+  }
+
+  function _getCategories() {
+    return window.DEMO_CATEGORIES || [];
+  }
+
+  // Filter scenarios for current page + category
+  function _filterScenarios() {
+    var scenarios = _normalizedScenarios();
+    return scenarios.filter(function (s) {
+      if (_activePage && s.page && s.page !== _activePage) return false;
+      if (_activePage && !s.page) return false; // page-tab mode requires scenario to have page
+      if (_activeCategory && s.category && s.category !== _activeCategory) return false;
+      if (_activeCategory && !s.category) return false; // cat-tab mode requires scenario to have category
+      return true;
+    });
+  }
+
+  // ===== HTML BUILDERS =====
+  function _renderButtons(scenarios) {
+    if (!scenarios.length) {
+      return '<div class="demo-empty">No scenarios in this view.</div>';
+    }
+    var normal = scenarios.filter(function (s) { return !s.isNoData; });
+    var noData = scenarios.filter(function (s) { return s.isNoData; });
+    var html = _renderGroup(normal);
+    if (noData.length) {
+      html += '<div class="demo-sub-sep">no data</div>' + _renderGroup(noData);
+    }
+    return html;
+  }
+
+  function _renderGroup(scenarios) {
+    if (!scenarios.length) return '';
+    var btns = scenarios.map(function (s) {
+      var dis = s.disabled ? ' demo-dis' : '';
+      var act = s.id === _activeScenario ? ' active' : '';
+      var tip = s.tip ? ' data-tip="' + _esc(s.tip) + '"' : '';
+      var cs = s.disabled ? '<span class="demo-cs">Soon</span>' : '';
+      return '<button class="demo-btn' + dis + act + '"' + tip +
+             ' data-scenario="' + _esc(s.id) + '">' +
+             '<span class="material-symbols-outlined">' + _esc(s.icon || 'play_arrow') + '</span>' +
+             '<span>' + _esc(s.label) + '</span>' + cs + '</button>';
+    }).join('');
+    return '<div class="demo-buttons">' + btns + '</div>';
+  }
+
+  function _renderPageTabs(mode) {
+    var pages = _getPages();
+    if (!pages.length) return '';
+    // 雙層模式：page tabs 用 pill style 放最上面
+    // 單層 pages-only 模式：page tabs 用 underline style（跟 cat-tabs 一致），無第二層
+    var isTwoLayer = mode === 'two-layer';
+    var wrapClass = isTwoLayer ? 'demo-page-tabs' : 'demo-cat-tabs';
+    var tabClass  = isTwoLayer ? 'demo-page-tab' : 'demo-cat-tab';
+    return '<div class="' + wrapClass + '">' + pages.map(function (p) {
+      var act = p.id === _activePage ? ' active' : '';
+      return '<button class="' + tabClass + act + '" data-page="' + _esc(p.id) + '">' +
+             (p.icon ? '<span class="material-symbols-outlined">' + _esc(p.icon) + '</span>' : '') +
+             _esc(p.label) +
+             '</button>';
+    }).join('') + '</div>';
+  }
+
+  function _renderCategoryTabs() {
+    var cats = _getCategories();
+    if (!cats.length) return '';
+    return '<div class="demo-cat-tabs">' + cats.map(function (c) {
+      var act = c.id === _activeCategory ? ' active' : '';
+      return '<button class="demo-cat-tab' + act + '" data-category="' + _esc(c.id) + '">' +
+             (c.icon ? '<span class="material-symbols-outlined">' + _esc(c.icon) + '</span>' : '') +
+             _esc(c.label) +
+             '</button>';
+    }).join('') + '</div>';
+  }
+
+  function _renderHint() {
+    if (!_activeCategory) return '';
+    var cat = _getCategories().find(function (c) { return c.id === _activeCategory; });
+    if (!cat || !cat.hint) return '';
+    return '<div class="demo-pane-hint">' + _esc(cat.hint) + '</div>';
+  }
+
+  function _renderScrollArea() {
+    return _renderHint() + _renderButtons(_filterScenarios());
+  }
+
+  // ===== DOM MOUNTING =====
+  function _render() {
+    if (document.getElementById('demo-fab')) return;
+
+    // Auto-detect first page & category
+    var mode = _detectMode();
+    var pages = _getPages();
+    var cats = _getCategories();
+    if (!_activePage && pages.length) _activePage = pages[0].id;
+    if (!_activeCategory && cats.length) _activeCategory = cats[0].id;
+    if (mode === 'flat') { _activePage = null; _activeCategory = null; }
+    if (mode === 'pages-only') _activeCategory = null;
+    if (mode === 'categories-only') _activePage = null;
+
+    // FAB
+    var fabEl = document.createElement('button');
+    fabEl.className = 'demo-fab';
+    fabEl.id = 'demo-fab';
+    fabEl.title = 'Designer Demo Scenarios';
+    fabEl.innerHTML =
+      '<span class="material-symbols-outlined">science</span>' +
+      '<span class="demo-pulse" id="demo-fab-pulse"></span>';
+    fabEl.addEventListener('click', function () { window._demoFabToggle(); });
+
+    // Popover
+    var popEl = document.createElement('div');
+    popEl.className = 'demo-popover';
+    popEl.id = 'demo-popover';
+    popEl.innerHTML =
+      '<div class="demo-popover-hdr">' +
+        '<div class="demo-popover-title">' +
+          '<span class="material-symbols-outlined" style="font-size:16px">science</span>' +
+          'Demo Scenarios' +
+        '</div>' +
+        '<button class="demo-popover-close" id="demo-pop-close">' +
+          '<span class="material-symbols-outlined" style="font-size:18px">close</span>' +
+        '</button>' +
+      '</div>' +
+      (window.DEMO_DEFAULT
+        ? '<button class="demo-reset-link" id="demo-reset-link">' +
+            '<span class="material-symbols-outlined">refresh</span>Reset to Default</button>'
+        : '') +
+      _renderPageTabs(mode) +
+      _renderCategoryTabs() +
+      '<div class="demo-popover-scroll" id="demo-popover-scroll">' +
+        _renderScrollArea() +
+      '</div>';
+
+    document.body.appendChild(fabEl);
+    document.body.appendChild(popEl);
+
+    // === Event wiring ===
+    document.getElementById('demo-pop-close').addEventListener('click', function () {
+      window._demoFabToggle();
+    });
+
+    // Reset link
+    var resetLink = document.getElementById('demo-reset-link');
+    if (resetLink && window.DEMO_DEFAULT) {
+      resetLink.addEventListener('click', function () {
+        window._demoFabApply(window.DEMO_DEFAULT, null);
+      });
+    }
+
+    // Page tabs
+    popEl.querySelectorAll('.demo-page-tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        window._demoFabSetPage(t.dataset.page);
+      });
+    });
+
+    // Category tabs (also handles page tabs in pages-only mode, where they use demo-cat-tab class)
+    popEl.querySelectorAll('.demo-cat-tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        if (t.dataset.page) {
+          window._demoFabSetPage(t.dataset.page);
+        } else {
+          window._demoFabSetCategory(t.dataset.category);
+        }
+      });
+    });
+
+    // Scenario button clicks (event delegation on scroll area)
+    document.getElementById('demo-popover-scroll').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-scenario]');
+      if (!btn || btn.classList.contains('demo-dis')) return;
+      window._demoFabApply(btn.dataset.scenario, btn);
+    });
+
+    // Outside click to close
+    document.addEventListener('click', function (e) {
+      var pop = document.getElementById('demo-popover');
+      var fab = document.getElementById('demo-fab');
+      if (!pop || !fab) return;
+      if (!pop.contains(e.target) && !fab.contains(e.target) && pop.classList.contains('show')) {
+        pop.classList.remove('show');
+        fab.classList.remove('popped');
+      }
+    });
+
+    _injectGlobalTooltip();
+  }
+
+  // ===== #gl-tip auto-injection =====
+  function _injectGlobalTooltip() {
+    if (document.getElementById('gl-tip')) return; // host page already provides one
+    var tip = document.createElement('div');
+    tip.id = 'gl-tip';
+    document.body.appendChild(tip);
+    var cur = null;
+    document.addEventListener('mouseover', function (e) {
+      var el = e.target.closest('[data-tip]');
+      if (!el || el === cur) return;
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block';
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!cur) return;
+      var tw = tip.offsetWidth, th = tip.offsetHeight;
+      var x = e.clientX - tw / 2, y = e.clientY - th - 10;
+      if (x < 8) x = 8;
+      if (x + tw > window.innerWidth - 8) x = window.innerWidth - tw - 8;
+      if (y < 8) y = e.clientY + 16;
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    });
+    document.addEventListener('mouseout', function (e) {
+      var el = e.target.closest('[data-tip]');
+      if (el && el === cur) { cur = null; tip.style.display = 'none'; }
+    });
+  }
+
+  // ===== PUBLIC API =====
+  function _refreshScrollArea() {
+    var scroll = document.getElementById('demo-popover-scroll');
+    if (!scroll) return;
+    scroll.style.opacity = '0';
+    setTimeout(function () {
+      scroll.innerHTML = _renderScrollArea();
+      scroll.style.opacity = '1';
+    }, 120);
+  }
+
+  function _refreshTabs() {
+    var pop = document.getElementById('demo-popover');
+    if (!pop) return;
+    pop.querySelectorAll('.demo-page-tab').forEach(function (t) {
+      t.classList.toggle('active', t.dataset.page === _activePage);
+    });
+    pop.querySelectorAll('.demo-cat-tab').forEach(function (t) {
+      // In pages-only mode, cat-tab elements carry data-page (not data-category)
+      if (t.dataset.page) {
+        t.classList.toggle('active', t.dataset.page === _activePage);
+      } else {
+        t.classList.toggle('active', t.dataset.category === _activeCategory);
+      }
+    });
+  }
+
+  /** Toggle popover open/close */
+  window._demoFabToggle = function () {
+    var pop = document.getElementById('demo-popover');
+    var fab = document.getElementById('demo-fab');
+    var pulse = document.getElementById('demo-fab-pulse');
+    var opening = !pop.classList.contains('show');
+    pop.classList.toggle('show');
+    fab.classList.toggle('popped');
+    if (opening && pulse) pulse.style.display = 'none';
+  };
+
+  /** Set active page tab (internal + external) */
+  window._demoFabSetPage = function (pageId) {
+    if (_activePage === pageId) return;
+    _activePage = pageId;
+    _refreshTabs();
+    _refreshScrollArea();
+  };
+
+  /** Set active category tab */
+  window._demoFabSetCategory = function (catId) {
+    if (_activeCategory === catId) return;
+    _activeCategory = catId;
+    _refreshTabs();
+    _refreshScrollArea();
+  };
+
+  /**
+   * Called from prototype's navigation function to auto-switch the page tab.
+   * Only switches if the popover doesn't need to stay on current tab.
+   */
+  window.demoFabSwitchTab = function (pageId) {
+    window._demoFabSetPage(pageId);
+  };
+
+  /** Apply a scenario — called via event delegation or by host */
+  window._demoFabApply = function (id, btn) {
+    _activeScenario = id;
+    document.querySelectorAll('.demo-btn').forEach(function (b) {
+      b.classList.remove('active');
+    });
+    if (btn) {
+      btn.classList.add('active');
+    } else {
+      // No btn provided (e.g. Reset link) — find scenario in DOM
+      var found = document.querySelector('[data-scenario="' + id + '"]');
+      if (found) found.classList.add('active');
+    }
+    if (typeof window.DEMO_APPLY === 'function') {
+      window.DEMO_APPLY(id, btn);
+    }
+  };
+
+  // ===== INIT =====
+  function _init() {
+    if (_activeScenario === null && window.DEMO_DEFAULT) {
+      _activeScenario = window.DEMO_DEFAULT;
+    }
+    _render();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else {
+    _init();
+  }
+})();
+
+</script>
+</body>
+</html>
