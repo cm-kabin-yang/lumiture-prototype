@@ -41,7 +41,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 
 /* ==== Paper (card) — wraps the whole page content ==== */
 .paper{background:#fff;border-radius:var(--r-md);padding:28px 32px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);border:1px solid transparent;transition:border-color .15s,box-shadow .15s}
-.paper.editing{border-color:var(--pri-lt30);box-shadow:0 0 0 1px var(--pri-lt30),0 1px 3px rgba(0,0,0,.08)}
+/* 編輯模式不再用藍色外框（PM 反饋分散注意力；實際只有下方表格可編輯，Save/Cancel bar 已足夠指示編輯狀態）*/
 .paper-section-title{font-size:18px;font-weight:700;color:var(--g900);line-height:1.5}
 .paper-section-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:16px}
 /* When section title is hidden (T2 roles), force action buttons (Export CSV / Edit) to stay right-aligned
@@ -143,6 +143,9 @@ input,select,textarea{font-family:inherit;font-size:14px}
 /* Info hint icon — clarifies when to use segment vs hover tooltip */
 .seg-hint{font-size:16px;color:var(--g400);cursor:help;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16;transition:color .12s}
 .seg-hint:hover{color:var(--g700)}
+/* Trend 是提案（先不上）：superscript 標記 + 虛線底暗示實驗性，hover tooltip 說明 */
+.seg-btn-proposal{border-bottom:1px dashed var(--g400)}
+.seg-proposal{font-size:7px;font-weight:600;color:var(--g400);margin-left:2px;text-transform:lowercase;letter-spacing:0;vertical-align:top}
 .seg-ctrl{display:inline-flex;background:var(--g100);border-radius:var(--r-sm);padding:2px;gap:0}
 .seg-btn{padding:5px 14px;font-size:13px;font-weight:500;color:var(--g500);background:none;border:none;border-radius:calc(var(--r-sm) - 1px);cursor:pointer;font-family:inherit;line-height:1.4;letter-spacing:0;transition:background .12s,color .12s,box-shadow .12s}
 .seg-btn:hover:not(.active){color:var(--g700)}
@@ -567,7 +570,7 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
               <button class="seg-btn active" data-mode="budget" type="button">Budget</button>
               <button class="seg-btn" data-mode="spend" type="button">Spend</button>
               <button class="seg-btn" data-mode="remaining" type="button">Remaining</button>
-              <button class="seg-btn" data-mode="trend" type="button">Trend</button>
+              <button class="seg-btn seg-btn-proposal" data-mode="trend" type="button" data-tip-tip="Proposal — 趨勢視角提案，尚未確定上線，先忽略。Budget vs Spend 12 個月走勢，超支月份標紅點。">Trend<sup class="seg-proposal">beta</sup></button>
             </div>
             <span class="seg-hint material-symbols-outlined" data-tip-tip="Budget, Spend, Remaining switch which metric the monthly cells show. Trend shows the 12-month budget vs spend chart. Hover any cell for the full breakdown.">info</span>
             <div class="seg-edit-label"><span class="material-symbols-outlined">lock</span>Editing Budget</div>
@@ -818,6 +821,21 @@ function fyLabelShort(){
 // ===== Sparkline (方向Y proposal — Demo only) =====
 // 雙線 mini chart：藍線=逐月 Budget，綠/紅線=逐月 Spend。兩線 gap 視覺上=Remaining。
 // 任一月 spend > budget → spend 線轉紅。僅 View Mode 使用，Edit Mode 永遠用月份格。
+// Catmull-Rom spline → cubic bezier，把折線變平滑曲線（tension 小=柔和）。pts=[{x,y}]
+function smoothPath(pts){
+  if(!pts.length) return '';
+  if(pts.length===1) return `M${pts[0].x},${pts[0].y}`;
+  if(pts.length===2) return `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y}`;
+  const t=0.16;
+  let d=`M${pts[0].x},${pts[0].y}`;
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[i-1]||pts[i], p1=pts[i], p2=pts[i+1], p3=pts[i+2]||p2;
+    const c1x=(p1.x+(p2.x-p0.x)*t).toFixed(1), c1y=(p1.y+(p2.y-p0.y)*t).toFixed(1);
+    const c2x=(p2.x-(p3.x-p1.x)*t).toFixed(1), c2y=(p2.y-(p3.y-p1.y)*t).toFixed(1);
+    d+=` C${c1x},${c1y} ${c2x},${c2y} ${p2.x},${p2.y}`;
+  }
+  return d;
+}
 // Split a 12-value series into continuous segments (breaks on null) → 空值斷線
 function sparkSegments(arr){
   const segs = []; let cur = [];
@@ -842,19 +860,20 @@ function pairSparklineSVG(budgets, spends, W){
   const yOf = v => +(H - PADY - (v/max)*(H-PADY*2)).toFixed(1);
   const xOf = i => +(PADX + i*xStep).toFixed(1);
   const segPoly = (arr, stroke, dash) => sparkSegments(arr).map(seg => {
-    const pts = seg.map(p=>`${xOf(p.i)},${yOf(p.v)}`).join(' ');
-    return `<polyline fill="none" stroke="${stroke}" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"${dash?` stroke-dasharray="${dash}"`:''} vector-effect="non-scaling-stroke" points="${pts}"/>`;
+    const pts = seg.map(p=>({x:xOf(p.i), y:yOf(p.v)}));
+    return `<path fill="none" stroke="${stroke}" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"${dash?` stroke-dasharray="${dash}"`:''} vector-effect="non-scaling-stroke" d="${smoothPath(pts)}"/>`;
   }).join('');
-  const spendColor = 'var(--ok)';
-  // budget dots: null=Unlimited → 線斷即可（不畫 marker）；else 藍小點。（amber cap 點已移除 — 做減法）
-  const budgetDots = budgets.map((v,i)=> (v==null) ? '' : `<circle cx="${xOf(i)}" cy="${yOf(v)}" r="1.8" fill="var(--pri)"/>`).join('');
-  // spend dots: green normally; red+larger+ring on over-budget months (pinpoint, not whole-line red)
+  // spend = 中性深灰 g500（不用綠，避免跟超支紅點搶色）；超支才紅點 pinpoint
+  const spendColor = 'var(--g500)';
+  // budget dots: null=Unlimited → 線斷即可；else 淡灰小點（比 spend 淡）
+  const budgetDots = budgets.map((v,i)=> (v==null) ? '' : `<circle cx="${xOf(i)}" cy="${yOf(v)}" r="1.8" fill="var(--g400)"/>`).join('');
+  // spend dots: 中性深灰 normally；red+larger+ring on over-budget months (pinpoint, not whole-line red)
   const spendDots = spends.map((v,i)=>{
     if(v==null) return '';
     const over = budgets[i]!=null && v>budgets[i];
     return over
       ? `<circle cx="${xOf(i)}" cy="${yOf(v)}" r="3.4" fill="var(--err)" stroke="#fff" stroke-width="1.2"/>`
-      : `<circle cx="${xOf(i)}" cy="${yOf(v)}" r="1.8" fill="var(--ok)"/>`;
+      : `<circle cx="${xOf(i)}" cy="${yOf(v)}" r="1.8" fill="var(--g500)"/>`;
   }).join('');
   // per-month transparent hover hit-rect with multi-line tooltip
   const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -876,7 +895,7 @@ function pairSparklineSVG(budgets, spends, W){
     return `<rect x="${(cx - xStep/2).toFixed(1)}" y="0" width="${xStep.toFixed(1)}" height="${H}" fill="transparent" data-tip-tip="${parts.join('\n')}"/>`;
   }).join('');
   return `<svg class="spark-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
-    ${segPoly(budgets, 'var(--pri)', '3,2')}
+    ${segPoly(budgets, 'var(--g400)', '2,3')}
     ${segPoly(spends, spendColor, null)}
     ${budgetDots}${spendDots}
     ${hits}
