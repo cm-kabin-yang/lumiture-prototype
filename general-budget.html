@@ -76,6 +76,11 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .orgcell .ol{font-size:13px;font-weight:500;color:var(--g700);display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .csp-ic{width:20px;height:20px;border-radius:4px;font-size:10px;font-weight:700;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:.2px}
 .csp-gcp{background:#34A853}.csp-aws{background:#FF9900}.csp-azure{background:#308CE3}.csp-focus{background:#7E55D9}
+/* 品牌 SVG logo container — 無底色，純 svg 呈現官方品牌色 */
+.csp-logo{width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:none}
+.csp-logo svg{width:100%;height:100%}
+/* Total icon — gradient bg + Lumiture brand SVG (white + cyan accent inside) */
+.csp-ic.csp-total svg{width:14px;height:auto}
 .csp-total{background:linear-gradient(135deg,#7E55D9 0%,#34B5D9 100%);font-size:13px}
 .csp-total .material-symbols-outlined{font-size:14px;color:#fff;font-variation-settings:'FILL' 1,'wght' 500}
 
@@ -93,10 +98,16 @@ input,select,textarea{font-family:inherit;font-size:14px}
 /* FY modal — select fields + preview chip + warning callout */
 .fy-select{width:100%;height:40px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);font-family:inherit;font-size:14px;color:var(--g900);background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%23676767'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 12px center;appearance:none;cursor:pointer;outline:none;letter-spacing:0}
 .fy-select:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
-.fy-preview{padding:12px 16px;background:var(--pri-lt10);border:1px solid var(--pri-lt20);border-radius:var(--r-sm);font-size:13px;color:var(--g700);line-height:1.5}
+/* Preview chip — Figma 設計稿是純文字無底色（不是 pill）— 2026-06-04 對齊 */
+.fy-preview{font-size:14px;font-weight:500;color:var(--g900);line-height:1.75;margin-bottom:16px}
 .fy-preview strong{color:var(--g900);font-weight:700}
-.fy-warning{display:flex;gap:10px;padding:12px 14px;background:var(--warn-lt);border-radius:var(--r-sm);font-size:12px;color:var(--g700);margin-top:12px;align-items:flex-start;line-height:1.5}
-.fy-warning .material-symbols-outlined{font-size:18px;color:var(--warn);flex-shrink:0;font-variation-settings:'FILL' 1,'wght' 500}
+/* Figma 對齊：bg #FEF3E1、文字色 #EC6F09 (Warning Dark)、14px Regular、24.5px line-height、padding 16px、rounded 8px、gap 4px */
+.fy-warning{display:flex;gap:8px;padding:16px;background:#fef3e1;border-radius:8px;font-size:14px;color:#ec6f09;margin-top:0;align-items:flex-start;line-height:1.75}
+.fy-warning .material-symbols-outlined{font-size:20px;color:#ec6f09;flex-shrink:0;font-variation-settings:'FILL' 1,'wght' 500;margin-top:2px}
+.fy-warning-content{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.fy-warning-title{font-weight:400;color:#ec6f09;line-height:1.75}
+.fy-warning-list{margin:0;padding-left:28px;font-size:14px;line-height:1.75;color:#ec6f09;list-style:disc}
+.fy-warning-list li{margin-bottom:0}
 .fy-field-label{display:block;font-size:13px;font-weight:500;color:var(--g700);margin-bottom:6px}
 .orgcell .ov{font-size:36px;font-weight:700;color:var(--g900);line-height:1.1;letter-spacing:-.5px}
 .orgcell .ou{font-size:12px;font-weight:500;color:var(--g500);margin-left:6px}
@@ -150,10 +161,17 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .seg-btn{padding:5px 14px;font-size:13px;font-weight:500;color:var(--g500);background:none;border:none;border-radius:calc(var(--r-sm) - 1px);cursor:pointer;font-family:inherit;line-height:1.4;letter-spacing:0;transition:background .12s,color .12s,box-shadow .12s}
 .seg-btn:hover:not(.active){color:var(--g700)}
 .seg-btn.active{background:#fff;color:var(--g900);box-shadow:0 1px 2px rgba(0,0,0,.1)}
-.seg-edit-label{display:none;align-items:center;gap:6px;padding:6px 12px;font-size:13px;font-weight:500;color:var(--g500);background:var(--g50);border-radius:var(--r-sm);border:1px dashed var(--g300);line-height:1.4}
-.seg-edit-label .material-symbols-outlined{font-size:16px;color:var(--g500);font-variation-settings:'FILL' 1,'wght' 500}
-.paper.editing.show-seg .seg-ctrl{display:none}
-.paper.editing.show-seg .seg-edit-label{display:inline-flex}
+/* Locked Budget pill (edit mode) — Figma 設計稿對齊：seg-ctrl 仍顯示，但只剩 Budget 一顆 locked pill */
+.seg-lock-icon{display:none;font-size:14px;margin-right:4px;vertical-align:middle;font-variation-settings:'FILL' 1,'wght' 500;color:inherit}
+/* Edit mode: 留下 locked Budget pill，其他 3 顆 + info icon 隱藏 */
+.paper.editing.show-seg .seg-btn[data-mode="spend"],
+.paper.editing.show-seg .seg-btn[data-mode="remaining"],
+.paper.editing.show-seg .seg-btn[data-mode="trend"],
+.paper.editing.show-seg .seg-hint{display:none}
+.paper.editing.show-seg .seg-btn[data-mode="budget"]{
+  color:var(--g500);background:var(--g100);box-shadow:none;cursor:not-allowed;
+}
+.paper.editing.show-seg .seg-btn[data-mode="budget"] .seg-lock-icon{display:inline-flex}
 
 /* ==== Bulk bar (edit mode) ==== */
 .bulkbar{display:none;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--pri-lt10);border:1px solid var(--pri-lt20);border-radius:var(--r-md);font-size:13px;margin-bottom:12px;flex-wrap:wrap;gap:10px}
@@ -338,20 +356,22 @@ table.budget td.over-budget{color:var(--err);font-weight:600}
   pointer-events:none;
 }
 
-/* Total row (sticky to bottom) */
+/* Total row — sticky bottom: 預設 0（無 Allocated 時，如 Admin/T2），有 Allocated 時加 .has-alloc-below 改 50px
+   修 user feedback 5/27：Admin role 沒 Allocated row 時，Total bottom:50 會留 50px 空隙讓下面 row 露出 */
 table.budget tbody tr.totalrow td{
   background:var(--pri-lt10)!important;
   font-weight:700;
   border-top:1px solid var(--g300);
   position:sticky;bottom:0;z-index:3;
 }
+table.budget tbody tr.totalrow.has-alloc-below td{bottom:50px}
 table.budget tbody tr.totalrow td.fix{z-index:4}
-/* Allocated row (sticky above total in T1 view) — PRD §7.4 rename; CSS class `.expectedrow` kept for back-compat */
+/* Allocated row — sticky 在最底（Total 之下）。CSS class `.expectedrow` 保留為 PRD §7.4 rename 的向後相容名稱 */
 table.budget tbody tr.expectedrow td{
   background:#FAFAFA!important;
   color:var(--g500);font-weight:500;font-style:italic;
   border-top:1px solid var(--g200);
-  position:sticky;bottom:50px;z-index:3;
+  position:sticky;bottom:0;z-index:3;
 }
 table.budget tbody tr.expectedrow td.fix{z-index:4}
 
@@ -406,24 +426,28 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
 .mo.active{display:flex}
 /* CMDS spec: .modal--left (form modals, default) = 660px / min 640px; .modal--center = 460px; .modal--xs = 340px.
    Here .modal is the default M/Left Aligned variant (660px), .modal-sm is the XS variant (340px) for confirm dialogs. */
-.modal{background:#fff;border-radius:var(--r-lg);padding:24px 28px;width:660px;min-width:640px;max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.modal{background:#fff;border-radius:var(--r-lg);padding:24px 32px;width:655px;min-width:640px;max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.2)}
 .modal-sm{width:440px;min-width:0}
 .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.mt{font-size:18px;font-weight:700;color:var(--g900)}
+.mt{font-size:20px;font-weight:700;color:var(--g900);line-height:1.5}
 .mx{color:var(--g400);cursor:pointer;display:flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:50%;background:none;border:none;padding:0}
 .mx:hover{background:var(--g100);color:var(--g700)}
-.mdesc{font-size:13px;color:var(--g500);margin-bottom:16px;line-height:1.6}
+.mdesc{font-size:14px;color:var(--g900);margin-bottom:16px;line-height:1.75}
 .mb{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-right:4px;min-height:0}
 .mf{display:flex;justify-content:flex-end;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--g200)}
 .mf .btn{min-width:100px}
 
 /* Alert modal specifics */
-.thr-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.thr-item{margin-bottom:8px}
+.thr-row{display:flex;align-items:center;gap:8px}
+.thr-msg{font-size:12px;color:var(--err);margin-top:4px;display:none;line-height:1.5}
+.thr-msg.show{display:block}
 .thr-input{display:flex;align-items:center;border:1px solid var(--tf-border);border-radius:var(--r-sm);padding:0 8px;height:36px;background:#fff;width:100px}
 .thr-input input{border:none;outline:none;background:transparent;width:100%;font-size:14px;color:var(--g700);padding:0}
 .thr-input .pct{font-size:13px;color:var(--g500)}
 .thr-input:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 .thr-input.err{border-color:var(--err)}
+.thr-input.err:focus-within{box-shadow:0 0 0 3px rgba(255,64,61,.1)}
 .thr-del{width:30px;height:30px;border-radius:var(--r-sm);color:var(--g400);display:inline-flex;align-items:center;justify-content:center;background:none;border:none;padding:0;cursor:pointer}
 .thr-del:hover{background:var(--err-lt);color:var(--err)}
 .thr-del .material-symbols-outlined{font-size:18px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 18}
@@ -440,7 +464,9 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
 .thr-err .material-symbols-outlined{font-size:14px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 14}
 
 .notif-block{margin-top:16px;padding:16px;background:var(--g50);border-radius:var(--r-md);transition:opacity .15s}
-.notif-block.dis{opacity:.5;pointer-events:none}
+.notif-block.dis{opacity:.5}
+.notif-block.dis .notif-toggle{cursor:not-allowed}
+.thr-empty-msg{padding:24px;background:var(--g50);border-radius:var(--r-sm);text-align:center;color:var(--g500);font-size:13px;margin-bottom:8px}
 .notif-title{font-size:14px;font-weight:700;color:var(--g700);margin-bottom:4px}
 .notif-desc{font-size:12px;color:var(--g500);margin-bottom:14px;line-height:1.5}
 .notif-role{margin-bottom:12px}
@@ -563,17 +589,15 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
           <div class="tabs" id="tabs"></div>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px">
-          <div class="unit" style="margin-bottom:0">(USD)</div>
+          <div class="paper-meta" id="paper-viewing" style="font-style:italic"></div>
           <div class="seg-wrap" id="seg-wrap">
             <span class="seg-label">Monthly view:</span>
             <div class="seg-ctrl" id="seg-ctrl" role="tablist" aria-label="Monthly view">
-              <button class="seg-btn active" data-mode="budget" type="button">Budget</button>
+              <button class="seg-btn active" data-mode="budget" type="button"><span class="material-symbols-outlined seg-lock-icon">lock</span>Budget</button>
               <button class="seg-btn" data-mode="spend" type="button">Spend</button>
               <button class="seg-btn" data-mode="remaining" type="button">Remaining</button>
               <button class="seg-btn seg-btn-proposal" data-mode="trend" type="button" data-tip-tip="Proposal — 趨勢視角提案，尚未確定上線，先忽略。Budget vs Spend 12 個月走勢，超支月份標紅點。">Trend<sup class="seg-proposal">beta</sup></button>
             </div>
-            <span class="seg-hint material-symbols-outlined" data-tip-tip="Budget, Spend, Remaining switch which metric the monthly cells show. Trend shows the 12-month budget vs spend chart. Hover any cell for the full breakdown.">info</span>
-            <div class="seg-edit-label"><span class="material-symbols-outlined">lock</span>Editing Budget</div>
           </div>
         </div>
 
@@ -583,8 +607,8 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
             <span class="chip" id="bulkchip" style="display:none"><span id="bulkchip-n">0</span> Selected<button class="chip-x" onclick="clearSel()" aria-label="Clear selection">×</button></span>
           </div>
           <div class="bulkbar-r">
-            <button class="btn btn-o btn-sm" id="btn-clearbudget" disabled data-tip-tip="Select groups first.">Clear Budget</button>
-            <button class="btn btn-p btn-sm" id="btn-setbudgets" disabled data-tip-tip="Select groups first."><span class="material-symbols-outlined">settings</span>Set Budgets<span class="arr-down material-symbols-outlined">expand_more</span></button>
+            <button class="btn btn-o btn-sm" id="btn-clearbudget" disabled data-tip-tip="Select multiple groups to set budgets at once.">Clear Budget</button>
+            <button class="btn btn-p btn-sm" id="btn-setbudgets" disabled data-tip-tip="Select multiple groups to set budgets at once."><span class="material-symbols-outlined">settings</span>Set Budgets<span class="arr-down material-symbols-outlined">expand_more</span></button>
           </div>
         </div>
 
@@ -626,9 +650,8 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
   <div class="mdesc">Admin can set overall alerts to notify the Admin, group managers, and members via email in real time when spending exceeds configured thresholds.</div>
   <div class="mb">
     <div style="font-size:14px;font-weight:700;color:var(--g700);margin-bottom:6px">Thresholds</div>
-    <div class="thr-hint">You can set up to 3 thresholds. Allowed values: 1~1000</div>
+    <div class="thr-hint">You can set up to 3 thresholds. Allowed values: 1–1000</div>
     <div id="thr-list"></div>
-    <div class="thr-err" id="thr-err"><span class="material-symbols-outlined">error</span><span id="thr-err-msg"></span></div>
     <button class="thr-add" id="thr-add"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">add_circle</span><span class="thr-add-text">Add Threshold</span></button>
 
     <div class="notif-block" id="notif-block">
@@ -660,13 +683,13 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
   </div>
 </div></div>
 
-<!-- Discard modal -->
+<!-- Discard modal — aligned to Figma #02-6 (2026-06-04) -->
 <div class="mo" id="mo-discard"><div class="modal modal-sm">
-  <div class="mh"><div class="mt">Discard unsaved changes?</div><button class="mx" onclick="document.getElementById('mo-discard').classList.remove('active')"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">close</span></button></div>
-  <div class="mdesc">You have unsaved changes. If you leave now, your changes will be lost.</div>
+  <div class="mh"><div class="mt">Confirmation</div><button class="mx" onclick="document.getElementById('mo-discard').classList.remove('active')"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">close</span></button></div>
+  <div class="mdesc">Unsaved changes will be lost. Are you sure you want to leave?</div>
   <div class="mf">
     <button class="btn btn-o" onclick="document.getElementById('mo-discard').classList.remove('active')">Cancel</button>
-    <button class="btn btn-err" onclick="confirmDiscard()">Discard Changes</button>
+    <button class="btn btn-p" onclick="confirmDiscard()">Discard Changes</button>
   </div>
 </div></div>
 
@@ -676,10 +699,10 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
      Only Month selector — Year is implicit current year. Year selection belongs to a separate "FY view switcher" feature (future scope). -->
 <div class="mo" id="mo-fy"><div class="modal">
   <div class="mh">
-    <div class="mt">Set Fiscal Start Month</div>
+    <div class="mt">Edit Start Month</div>
     <button class="mx" onclick="closeFYModal()"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">close</span></button>
   </div>
-  <div class="mdesc">Configure your organization's fiscal year start month. This setting applies to all users and affects both General Budget and Executive Insights.</div>
+  <div class="mdesc">Please select your organization's fiscal year start month.</div>
   <div class="mb">
     <div style="margin-bottom:16px;max-width:240px">
       <label class="fy-field-label" for="fy-modal-month">Start Month</label>
@@ -688,7 +711,15 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
     <div class="fy-preview">Resulting fiscal year: <strong id="fy-preview-label">FY2026</strong> <span id="fy-preview-range" style="color:var(--g500)"></span></div>
     <div class="fy-warning">
       <span class="material-symbols-outlined">info</span>
-      <span>Existing monthly data is preserved. FY-based aggregations will be recalculated and the change will reflect across all dashboards (including Executive Insights).</span>
+      <div class="fy-warning-content">
+        <div class="fy-warning-title">When you change the fiscal start month:</div>
+        <ul class="fy-warning-list">
+          <li>Your existing monthly data is preserved and remapped to the new FY range.</li>
+          <li>FY-based aggregations are recalculated automatically.</li>
+          <li>The change syncs across all dashboards. (Including <strong>Executive Insights</strong>)</li>
+          <li>If any required fields are incomplete, some dashboards may not display correctly.</li>
+        </ul>
+      </div>
     </div>
   </div>
   <div class="mf">
@@ -713,11 +744,19 @@ const ROLES = {
   t2mb:   { card1Title:'Team-Genomics Annual Budget', secTitle:'',                     editable:false, showExpected:false, currentLabel:'Total Annual Budget', warningOn:null },
 };
 
+// CSP 品牌 SVG — 從 LumiTure-FE/src/lumiture-ui/SvgIcon/Platform.tsx 200x200 高解析官方版本（GCP / AWS / Azure 含官方 gradient）
+// Total: 用 Lumiture-ai/logo.svg（同 favicon source）作為 Total aggregation 識別 — 對齊品牌
+const CSP_LOGOS = {
+  total: `<svg viewBox="0 0 112 80" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M71.5454 72C89.2185 72 103.545 57.6731 103.545 40C103.545 22.3269 89.2185 8 71.5454 8C53.8723 8 39.5454 22.3269 39.5454 40C39.5454 57.6731 53.8723 72 71.5454 72ZM71.5454 80C93.6368 80 111.545 62.0914 111.545 40C111.545 17.9086 93.6368 0 71.5454 0C62.7772 0 54.6679 2.82121 48.0758 7.6054C47.9028 7.73098 47.6949 7.7998 47.4811 7.7998H19.1193C18.3618 7.7998 17.6693 8.22781 17.3305 8.90538L13.6069 16.3526C13.2744 17.0175 13.7579 17.7998 14.5013 17.7998H36.3952C37.1944 17.7998 37.6759 18.6947 37.2633 19.3792C36.1571 21.2143 35.1941 23.1454 34.3898 25.157C34.2356 25.5426 33.8646 25.7998 33.4493 25.7998H6.11932C5.36178 25.7998 4.66925 26.2278 4.33047 26.9054L0.606863 34.3526C0.274413 35.0175 0.757908 35.7998 1.50129 35.7998H30.6535C31.2468 35.7998 31.7086 36.3134 31.6633 36.905C31.5852 37.9264 31.5454 38.9586 31.5454 40C31.5454 40.909 31.5757 41.8109 31.6354 42.7047C31.6746 43.2928 31.2142 43.7998 30.6248 43.7998H1.00129C0.257908 43.7998 -0.22559 44.5821 0.106861 45.247L3.83047 52.6942C4.16925 53.3718 4.86178 53.7998 5.61932 53.7998H33.2918C33.711 53.7998 34.0846 54.0618 34.2361 54.4527C35.0153 56.4626 35.9521 58.394 37.0316 60.2315C37.4337 60.9159 36.9515 61.7998 36.1576 61.7998H25.5013C24.7579 61.7998 24.2744 62.5821 24.6069 63.247L28.3305 70.6942C28.6693 71.3718 29.3618 71.7998 30.1193 71.7998H46.9389C47.1584 71.7998 47.3715 71.8723 47.547 72.0041C54.232 77.0249 62.5412 80 71.5454 80Z" fill="#004FB0"/><path d="M18.4361 62.9054C18.0973 62.2278 17.4048 61.7998 16.6472 61.7998H9.50134C8.75795 61.7998 8.27446 62.5821 8.60691 63.247L12.3305 70.6942C12.6693 71.3718 13.3618 71.7998 14.1194 71.7998H21.2653C22.0086 71.7998 22.4921 71.0175 22.1597 70.3526L18.4361 62.9054Z" fill="#4ADFFF"/><path fill-rule="evenodd" clip-rule="evenodd" d="M71.5454 64C84.8002 64 95.5454 53.2548 95.5454 40C95.5454 26.7452 84.8002 16 71.5454 16C58.2906 16 47.5454 26.7452 47.5454 40C47.5454 53.2548 58.2906 64 71.5454 64ZM87.5454 40C87.5454 48.8366 80.382 56 71.5454 56C62.7089 56 55.5454 48.8366 55.5454 40C55.5454 37.1848 56.2725 34.5393 57.5491 32.2413C57.6615 35.4562 60.3031 38.0279 63.5454 38.0279C66.8591 38.0279 69.5454 35.3416 69.5454 32.0279C69.5454 28.7786 66.9625 26.1326 63.7379 26.0309C66.0473 24.7374 68.7102 24 71.5454 24C80.382 24 87.5454 31.1634 87.5454 40Z" fill="#004FB0"/></svg>`,
+  gcp: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path fill="#FBBC05" d="M60.86 71.21a51.69 51.69 0 0 0-29.69 9.38 49.88 49.88 0 0 0-18.52 24.56 48.75 48.75 0 0 0-.4 30.51 49.8 49.8 0 0 0 17.9 25.01l22.68-22.2a19.51 19.51 0 0 1-7.38-5.64 18.74 18.74 0 0 1-3.3-17.5 19.14 19.14 0 0 1 4.85-7.84c2.24-2.2 5-3.82 8.02-4.75a20 20 0 0 1 17.9 3.2 19.21 19.21 0 0 1 5.78 7.22l22.68-22.2A50.55 50.55 0 0 0 83.5 76.42a51.72 51.72 0 0 0-22.64-5.2Z"/><path fill="#EA4335" d="m124.52 68.2 5.77.1 15.67-15.36.75-6.5A71.01 71.01 0 0 0 99.95 29c-32.5 0-59.86 21.62-67.97 50.91 1.7-1.17 5.37-.3 5.37-.3l31.31-5.03s1.63-2.6 2.42-2.46A39.33 39.33 0 0 1 97 59.75a39.58 39.58 0 0 1 27.52 8.42v.02Z"/><path fill="#4285F4" d="M168.02 79.99a68.84 68.84 0 0 0-21.26-33.54l-22.2 21.72a38.4 38.4 0 0 1 10.76 13.28 37.56 37.56 0 0 1 3.84 16.51v3.84a19.8 19.8 0 0 1 13.84 5.6 18.94 18.94 0 0 1 5.73 13.54c0 5.08-2.06 9.95-5.73 13.54a19.8 19.8 0 0 1-13.84 5.61h-39.14l-3.91 3.86v22.98l3.91 3.81h39.13a51.68 51.68 0 0 0 30.15-9.7 49.83 49.83 0 0 0 18.4-25.3 48.75 48.75 0 0 0-.49-31.03 49.92 49.92 0 0 0-19.19-24.72Z"/><path fill="#34A853" d="M60.83 170.77h39.1v-30.64h-39.1a19.8 19.8 0 0 1-8.05-1.71l-5.64 1.69-15.67 15.33-1.37 5.18a51.36 51.36 0 0 0 30.73 10.15Z"/></svg>`,
+  aws: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path fill="#252F3E" d="M61.51 86.28c-.05 1.77.17 3.52.67 5.22a27.22 27.22 0 0 0 1.9 4.19c.26.4.4.86.43 1.33a2.25 2.25 0 0 1-1.13 1.73l-3.52 2.46a3 3 0 0 1-1.55.53 2.44 2.44 0 0 1-1.73-.8 13.82 13.82 0 0 1-2.1-2.72 34.67 34.67 0 0 1-1.8-3.52 21.62 21.62 0 0 1-17.22 8.1 15.99 15.99 0 0 1-11.7-4.2 15.03 15.03 0 0 1-4.29-11.26 15.07 15.07 0 0 1 5.14-11.97 21.34 21.34 0 0 1 14.37-4.54c2.07 0 4.14.16 6.2.46 2.16.3 4.4.72 6.72 1.26v-4.3c.34-3.36-.66-6.72-2.78-9.36a13.41 13.41 0 0 0-9.54-2.7c-2.13 0-4.24.26-6.3.77a44.99 44.99 0 0 0-6.3 2 16 16 0 0 1-2.05.78h-.91c-.83 0-1.24-.61-1.24-1.83v-2.79c-.05-.7.1-1.4.43-2.04a4.23 4.23 0 0 1 1.65-1.23 38.3 38.3 0 0 1 16.48-3.77 21.13 21.13 0 0 1 15.31 4.76 19.33 19.33 0 0 1 4.86 14.4v19.04ZM37.75 95.2c2.06-.03 4.1-.4 6.05-1.09a12.78 12.78 0 0 0 5.53-3.77 9.23 9.23 0 0 0 1.97-3.52c.4-1.66.6-3.36.57-5.07v-2.46a50.52 50.52 0 0 0-5.4-.99 43.57 43.57 0 0 0-5.48-.35 13.5 13.5 0 0 0-8.7 2.36 8.24 8.24 0 0 0-2.78 6.51 8.28 8.28 0 0 0 2.15 6.2 8.45 8.45 0 0 0 6.09 2.18Zm47 6.34c-.8.07-1.59-.13-2.25-.56a4.57 4.57 0 0 1-1.24-2.3L67.56 53.4c-.26-.76-.43-1.56-.52-2.36a1.27 1.27 0 0 1 1.44-1.44h5.74c.8-.08 1.62.11 2.3.56.57.65.98 1.44 1.15 2.29l9.83 38.73 9.12-38.73c.14-.86.54-1.64 1.16-2.25.7-.44 1.53-.64 2.36-.57h4.72c.82-.07 1.65.13 2.35.57.61.62 1 1.42 1.13 2.28l9.19 39.23 10.14-39.23a4.9 4.9 0 0 1 1.2-2.28 3.52 3.52 0 0 1 2.29-.57h5.42a1.27 1.27 0 0 1 1.44 1.45c.03.3.03.6 0 .91-.11.49-.25.97-.42 1.44l-14.08 45.28a4.68 4.68 0 0 1-1.24 2.3 3.5 3.5 0 0 1-2.25.55h-5.14a3.52 3.52 0 0 1-2.36-.6c-.6-.65-1-1.47-1.13-2.35l-9.12-37.71-9 37.67c-.14.88-.53 1.7-1.14 2.36a3.5 3.5 0 0 1-2.35.6h-5.04Zm75.2 1.55c-3.03 0-6.05-.34-9-1.02a26.2 26.2 0 0 1-6.77-2.36 3.52 3.52 0 0 1-2.14-3.28v-2.95c0-1.22.44-1.83 1.33-1.83.38 0 .75.07 1.1.2l1.47.6c2.07.92 4.23 1.6 6.45 2.05 2.31.47 4.67.71 7.04.7 2.98.18 5.94-.5 8.56-1.93a6.2 6.2 0 0 0 3.02-5.53 5.67 5.67 0 0 0-1.58-4.09 15.1 15.1 0 0 0-6.13-3.1l-8.48-2.67c-3.58-1-6.76-3.06-9.12-5.92a13.87 13.87 0 0 1-2.92-8.48c-.05-2.27.5-4.52 1.58-6.51a15.73 15.73 0 0 1 4.19-4.83 18.76 18.76 0 0 1 5.98-3.03 26.2 26.2 0 0 1 7.36-1.02 35.48 35.48 0 0 1 7.75.92c1.2.28 2.31.58 3.34.91.85.27 1.68.61 2.47 1.02a5.6 5.6 0 0 1 1.72 1.45c.38.57.56 1.25.53 1.93v2.79c0 1.22-.44 1.83-1.34 1.83a6.2 6.2 0 0 1-2.25-.7 27.25 27.25 0 0 0-11.27-2.26c-2.69-.14-5.37.43-7.78 1.65a5.63 5.63 0 0 0-2.78 5.22 5.57 5.57 0 0 0 1.73 4.15 17.4 17.4 0 0 0 6.44 3.24l8.3 2.5c3.53.91 6.68 2.88 9.06 5.63a13.24 13.24 0 0 1 2.74 8.45 14.83 14.83 0 0 1-5.8 11.97 19.12 19.12 0 0 1-6.52 3.28c-2.7.73-5.48 1.08-8.27 1.02Z"/><path fill="#F90" fill-rule="evenodd" clip-rule="evenodd" d="M171.12 131.49c-19.26 14.22-47.22 21.8-71.1 21.8a129 129 0 0 1-87.24-33.2c-1.8-1.63-.21-3.84 1.97-2.61a175.27 175.27 0 0 0 87.14 23.13 173.13 173.13 0 0 0 66.44-13.63c3.24-1.37 5.99 2.15 2.78 4.51Z"/><path fill="#F90" fill-rule="evenodd" clip-rule="evenodd" d="M179.14 122.34c-2.46-3.17-16.3-1.48-22.5-.74-1.86.2-2.18-1.41-.49-2.6 11.02-7.75 29.12-5.54 31.2-2.93 2.08 2.6-.57 20.74-10.88 29.4-1.59 1.34-3.1.63-2.4-1.13 2.33-5.84 7.54-18.84 5.07-22Z"/></svg>`,
+  azure: `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="paint0_linear_azure" x1="88.1713" y1="13.9645" x2="26.7396" y2="195.438" gradientUnits="userSpaceOnUse"><stop stop-color="#114A8B"/><stop offset="1" stop-color="#0669BC"/></linearGradient><linearGradient id="paint1_linear_azure" x1="107.328" y1="98.5156" x2="93.1186" y2="103.335" gradientUnits="userSpaceOnUse"><stop stop-opacity="0.3"/><stop offset="0.1" stop-opacity="0.2"/><stop offset="0.3" stop-opacity="0.1"/><stop offset="0.6" stop-opacity="0.1"/><stop offset="1" stop-opacity="0"/></linearGradient><linearGradient id="paint2_linear_azure" x1="99.4863" y1="8.66537" x2="166.911" y2="188.291" gradientUnits="userSpaceOnUse"><stop stop-color="#3CCBF4"/><stop offset="1" stop-color="#2892DF"/></linearGradient></defs><path fill="url(#paint0_linear_azure)" d="M66.598.005h59.112L64.345 181.928a9.447 9.447 0 0 1-3.433 4.645 9.4 9.4 0 0 1-2.61 1.316 9.471 9.471 0 0 1-2.887.454H9.411a9.371 9.371 0 0 1-4.295-1.039c-1.33.318-2.478-.672-3.349-1.886-.871-1.215-1.441-1.62-1.663-2.098-.222-.479-.087-1.587.39-2.405l57.171-174.5A9.432 9.432 0 0 1 66.595 0v.002l.003.003Z"/><path fill="#0078D4" d="M175.569 188.345h-53.078a9.477 9.477 0 0 1-5.057-1.461 9.52 9.52 0 0 1-1.406-1.084l-60.233-56.252a4.339 4.339 0 0 1 2.962-7.517h93.735l23.072 66.317.005-.003Z"/><path fill="url(#paint1_linear_azure)" d="m125.925.117-41.38 121.92 67.611-.015 23.191 66.316h-52.878a9.748 9.748 0 0 1-1.634-.152 9.357 9.357 0 0 1-1.583-.43 9.598 9.598 0 0 1-2.837-1.625l-40.66-37.948-11.382 33.568c-.295.839-.7 1.635-1.204 2.367-1.01 1.472-2.093 2.65-4.008 3.414a9.994 9.994 0 0 1-2.53.806H9.442a9.39 9.39 0 0 1-7.704-3.983c-.87-1.234-1.43-1.659-1.632-2.155-.203-.497-.043-2.021.467-2.443L57.65 6.537A9.365 9.365 0 0 1 63.684.455c.941-.304 1.928-.503 2.92-.337h59.323-.002Z"/><path fill="url(#paint2_linear_azure)" d="M199.273 175.91a9.447 9.447 0 0 1 .392 4.405 9.41 9.41 0 0 1-5.009 6.984c-1.329.682-1.801 1.039-3.296 1.039h-66.881a9.425 9.425 0 0 0 7.646-3.925 9.425 9.425 0 0 0 1.274-8.503L76.225 6.405A9.418 9.418 0 0 0 70.19.452 9.418 9.418 0 0 0 67.31 0h65.879a9.431 9.431 0 0 1 5.491 1.766 9.47 9.47 0 0 1 2.078 2.05 9.456 9.456 0 0 1 1.351 2.59l57.174 169.504h-.01Z"/></svg>`,
+};
 const PROVIDERS = [
-  { key:'total', label:'Total', icon:'public', cls:'csp-total', synthetic:true },
-  { key:'gcp',   label:'Google Cloud', badge:'G',  cls:'csp-gcp' },
-  { key:'aws',   label:'AWS',   badge:'a',  cls:'csp-aws' },
-  { key:'azure', label:'Azure', badge:'Az', cls:'csp-azure' },
+  { key:'total', label:'Total', logo:CSP_LOGOS.total, cls:'csp-logo', synthetic:true },
+  { key:'gcp',   label:'Google Cloud', logo:CSP_LOGOS.gcp,   cls:'csp-logo' },
+  { key:'aws',   label:'AWS',          logo:CSP_LOGOS.aws,   cls:'csp-logo' },
+  { key:'azure', label:'Azure',        logo:CSP_LOGOS.azure, cls:'csp-logo' },
 ];
 
 const MONTHS = ['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
@@ -797,7 +836,7 @@ let state = {
   thresholds: [60, 80, 90],
   // PRD §7 B+D direction: admin-locked org FY (single source of truth)
   fyStartYear: 2026,
-  fyStartMonth: 0, // 0 = Jan (calendar year default)
+  fyStartMonth: 1, // 1 = Feb (user mockup demo: non-calendar FY 演示)
 };
 // FY label (verbose form for display): FY2026 · Apr. 2026 – Mar. 2027
 // Designer's preferred format (clearer than PRD's slash notation FY2026/2027)
@@ -916,7 +955,33 @@ function monthHeader(mi){
 // ===== Helpers =====
 const $ = sel => document.querySelector(sel);
 const $$ = sel => document.querySelectorAll(sel);
-function fmt(n){ if(n===null||n===undefined) return null; return '$'+Math.round(n).toLocaleString(); }
+// Figma #01：金額顯示規則 — 超過 100K 用 K、>1M 用 M、>1B 用 B。Hover tooltip 顯示完整數值（見 numTip 輔助）
+function fmt(n){
+  if(n===null||n===undefined) return null;
+  const abs = Math.abs(n);
+  const sign = n < 0 ? '-' : '';
+  if(abs >= 1e9) return `${sign}$${(abs/1e9).toFixed(2).replace(/\.?0+$/,'')}B`;
+  if(abs >= 1e6) return `${sign}$${(abs/1e6).toFixed(2).replace(/\.?0+$/,'')}M`;
+  if(abs >= 1e5) return `${sign}$${(abs/1e3).toFixed(1).replace(/\.?0+$/,'')}K`;
+  return `${sign}$${Math.round(abs).toLocaleString()}`;
+}
+function fmtFull(n){
+  if(n===null||n===undefined) return null;
+  const abs = Math.abs(n);
+  return `${n < 0 ? '-' : ''}$${Math.round(abs).toLocaleString()}`;
+}
+// 數值縮寫時，給 cell 加 tooltip 顯示完整數值；未縮寫時不加 tooltip
+function isAbbreviated(n){ return n !== null && n !== undefined && Math.abs(n) >= 1e5; }
+// Card 用（無 $ prefix，因 USD 在後綴）— Figma #01 K/M/B 同 rule
+function fmtCardNum(n){
+  if(n===null||n===undefined) return '--';
+  const abs = Math.abs(n);
+  const sign = n < 0 ? '-' : '';
+  if(abs >= 1e9) return `${sign}${(abs/1e9).toFixed(2).replace(/\.?0+$/,'')}B`;
+  if(abs >= 1e6) return `${sign}${(abs/1e6).toFixed(2).replace(/\.?0+$/,'')}M`;
+  if(abs >= 1e5) return `${sign}${(abs/1e3).toFixed(1).replace(/\.?0+$/,'')}K`;
+  return `${sign}${Math.round(abs).toLocaleString()}`;
+}
 function sumMonths(months){ let s=null; for(const v of months){ if(v!==null&&v!==undefined){ s=(s||0)+v; } } return s; }
 function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
 function toast(msg, type='ok'){
@@ -946,7 +1011,13 @@ function getTotalData(){
 }
 function getData(){
   if(state.currentTab === 'total') return getTotalData();
-  return getAllData()[state.currentTab];
+  const data = getAllData()[state.currentTab];
+  // Figma #07: T2 視角下只看自己組（per PM confirm 2026-06-04）
+  // Mockup demo：hardcode 自己 = Monogenic Network (gi=0)。Production 用 user-group 對應
+  if(state.role === 't2m' || state.role === 't2mb'){
+    return [data[0]];
+  }
+  return data;
 }
 function calcOrgTotals(){
   const data = getAllData();
@@ -980,10 +1051,10 @@ function renderOrgCards(){
   }
   row.style.display='grid';
   const cards = [
-    { key:'current', label:role.currentLabel,            value:totals.current, badge:null },
-    { key:'gcp',     label:'Google Cloud Annual Budget', value:totals.gcp,     badge:{cls:'csp-gcp',   t:'G'} },
-    { key:'aws',     label:'AWS Annual Budget',          value:totals.aws,     badge:{cls:'csp-aws',   t:'a'} },
-    { key:'azure',   label:'Azure Annual Budget',        value:totals.azure,   badge:{cls:'csp-azure', t:'Az'} },
+    { key:'current', label:role.currentLabel,            value:totals.current, badge:{cls:'csp-logo', logo:CSP_LOGOS.total} },
+    { key:'gcp',     label:'Google Cloud Annual Budget', value:totals.gcp,     badge:{cls:'csp-logo', logo:CSP_LOGOS.gcp} },
+    { key:'aws',     label:'AWS Annual Budget',          value:totals.aws,     badge:{cls:'csp-logo', logo:CSP_LOGOS.aws} },
+    { key:'azure',   label:'Azure Annual Budget',        value:totals.azure,   badge:{cls:'csp-logo', logo:CSP_LOGOS.azure} },
   ];
   // For 4 cards, switch to 4-col grid
   row.style.gridTemplateColumns = 'repeat(4, 1fr)';
@@ -992,7 +1063,7 @@ function renderOrgCards(){
     const cell = document.createElement('div');
     cell.className = 'orgcell';
     const isEmpty = (state.pageState==='empty') || (c.value === 0);
-    const convVal = state.showConv && !isEmpty ? Math.round(c.value * (FX_RATES[state.currency]||1)).toLocaleString() : null;
+    const convVal = state.showConv && !isEmpty ? fmtCardNum(c.value * (FX_RATES[state.currency]||1)) : null;
     const currCode = state.currency;
     const expectedKey = c.key === 'current' ? null : c.key;
     const expectedVal = expectedKey ? EXPECTED[expectedKey] : (EXPECTED.gcp + EXPECTED.aws + EXPECTED.azure);
@@ -1001,12 +1072,12 @@ function renderOrgCards(){
     const ovOverCls = cardOverExpected ? ' over-budget' : '';
     const ovOverTip = cardOverExpected ? ' data-tip-tip="The budget cannot be empty and must not exceed the Allocated cap."' : '';
     // Info tooltip on Allocated pill (Figma #05-1) — PRD §7.4 rename
-    const expectedInfoTip = 'data-tip-tip="The budget cap allocated by the group&apos;s supervisor or the organization&apos;s Admin."';
+    const expectedInfoTip = ''; // H2 拿掉：pill 文字「Allocated Budget」+ 數字已自我說明，不需 hover (per Kabin 2026-06-04)
     cell.innerHTML = `
-      <div class="ol">${c.badge?`<span class="csp-ic ${c.badge.cls}">${c.badge.t}</span>`:''}<span>${c.label}</span></div>
-      <div class="ov${ovOverCls}"${ovOverTip}>${isEmpty?'<span class="empty-val">--</span>':Math.round(c.value).toLocaleString()}<span class="ou">USD</span></div>
+      <div class="ol">${c.badge?`<span class="${c.badge.cls === 'csp-logo' ? c.badge.cls : 'csp-ic '+c.badge.cls}">${c.badge.logo || (c.badge.icon?`<span class="material-symbols-outlined">${c.badge.icon}</span>`:(c.badge.t||''))}</span>`:''}<span>${c.label}</span></div>
+      <div class="ov${ovOverCls}"${ovOverTip || (isAbbreviated(c.value) ? ' data-tip-tip="'+Math.round(c.value).toLocaleString()+' USD"' : '')}>${isEmpty?'<span class="empty-val">--</span>':fmtCardNum(c.value)}<span class="ou">USD</span></div>
       <div class="conv">${isEmpty?'<span class="empty-val">--</span>':('≈ '+convVal+' '+currCode)}</div>
-      ${role.showExpected && c.key !== 'current' ?`<div class="expected" ${expectedInfoTip}><span class="material-symbols-outlined">flag</span>Allocated Budget ${expectedVal.toLocaleString()} USD</div>`:''}
+      ${role.showExpected && c.key !== 'current' ?`<div class="expected"${isAbbreviated(expectedVal) ? ' data-tip-tip="'+expectedVal.toLocaleString()+' USD"' : ''}><span class="material-symbols-outlined">flag</span>Allocated Budget ${fmtCardNum(expectedVal)} USD</div>`:''}
     `;
     row.appendChild(cell);
   });
@@ -1018,9 +1089,12 @@ function renderTabs(){
   // Hide Total tab in edit mode (PRD §6/§7.5) OR when PRD scenario is off (current prod state)
   const visibleProviders = (state.editing || !state.showSegCtrl) ? PROVIDERS.filter(p => !p.synthetic) : PROVIDERS;
   tabs.innerHTML = visibleProviders.map(p => {
-    const iconHtml = p.icon
-      ? `<span class="csp-ic ${p.cls}"><span class="material-symbols-outlined">${p.icon}</span></span>`
-      : `<span class="csp-ic ${p.cls}">${p.badge}</span>`;
+    // 統一 csp-logo（transparent bg、brand SVG 自己有顏色）— GCP/AWS/Azure/Total 全部走同樣 path
+    const iconHtml = p.logo
+      ? `<span class="${p.cls}">${p.logo}</span>`
+      : p.icon
+        ? `<span class="csp-ic ${p.cls}"><span class="material-symbols-outlined">${p.icon}</span></span>`
+        : `<span class="csp-ic ${p.cls}">${p.badge}</span>`;
     return `<button class="tab ${state.currentTab===p.key?'active':''}" data-tab="${p.key}">${iconHtml}${p.label}</button>`;
   }).join('');
   tabs.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
@@ -1167,46 +1241,29 @@ function renderTable(){
     if(showGear) b += `<td class="fix col-gear"><button class="gear-btn" data-gi="${gi}" aria-label="Row actions"><span class="material-symbols-outlined">settings</span></button></td>`;
     if(show4col){
       // Order: Budget → Spend → Spent % → Remaining (PRD §7.1; 4 欄全保留)
-      // Build a unified detail tooltip — hover any annual cell to see full breakdown
-      const detailParts4 = [];
-      if(total !== null) detailParts4.push(`Budget ${fmt(total)}`);
-      if(annualSpendVal !== null) detailParts4.push(`Spent ${fmt(annualSpendVal)}`);
-      if(annualRemain !== null) detailParts4.push(`Remaining ${annualRemain<0?'-':''}${fmt(Math.abs(annualRemain))}`);
-      const detail4 = detailParts4.join(' · ');
+      // Per Kabin 2026-06-04：4-in-1 detail hover 拿掉，只保留「紅字超標」通用 tooltip
       // Budget col
       if(total === null) b += `<td class="fix col-budget"><span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">—</span></td>`;
-      else b += `<td class="fix col-budget${overExpected?' over-budget':''}" data-tip-tip="${overExpected?`Exceeds Allocated budget cap · ${detail4}`:detail4}">${fmt(total)}</td>`;
-      // Spend col
-      if(annualSpendVal === null) b += `<td class="fix col-spend"><span class="empty-cell">—</span></td>`;
-      else b += `<td class="fix col-spend" data-tip-tip="${detail4}">${fmt(annualSpendVal)}</td>`;
-      // Spent %
-      b += `<td class="fix col-pct" data-tip-tip="${detail4}">${pctBar(annualSpendVal, total)}</td>`;
-      // Remaining (negative → red via over-budget class)
-      if(annualRemain === null) b += `<td class="fix col-remain"><span class="empty-cell">—</span></td>`;
-      else b += `<td class="fix col-remain${annualRemain < 0 ? ' over-budget':''}" data-tip-tip="${detail4}">${annualRemain < 0 ? '-' : ''}${fmt(Math.abs(annualRemain))}</td>`;
+      else b += `<td class="fix col-budget${overExpected?' over-budget':''}"${overExpected?' data-tip-tip="Budget exceeds Allocated cap."':''}>${fmt(total)}</td>`;
+      // Spend col — turns red when Spend > Budget
+      const annualOverSpend = total !== null && annualSpendVal !== null && annualSpendVal > total;
+      if(annualSpendVal === null) b += `<td class="fix col-spend"><span class="empty-cell" data-tip-tip="Missing actual data">—</span></td>`;
+      else b += `<td class="fix col-spend${annualOverSpend?' over-budget':''}"${annualOverSpend?' data-tip-tip="Spend exceeds annual budget."':''}>${fmt(annualSpendVal)}</td>`;
+      // Spent % — no hover (per Kabin H8 取消)
+      b += `<td class="fix col-pct">${pctBar(annualSpendVal, total)}</td>`;
+      // Remaining (negative → red via over-budget class; empty → Unable to calculate)
+      if(annualRemain === null) b += `<td class="fix col-remain"><span class="empty-cell" data-tip-tip="Unable to calculate (no budget or no data)">—</span></td>`;
+      else b += `<td class="fix col-remain${annualRemain < 0 ? ' over-budget':''}">${annualRemain < 0 ? '-' : ''}${fmt(Math.abs(annualRemain))}</td>`;
     }else if(show2col){
       // Edit mode: Total + Spend (independent col for budget-editing context)
-      // Spend turns red when Total < Spend (over-spending warning, doesn't block save)
+      // 4-in-1 detail hover 拿掉，編輯模式仍保留 over-Allocated / over-Spend 警示文案（actionable info）
       const overSpend = total !== null && annualSpendVal !== null && total < annualSpendVal;
-      // Detail tooltip — always available so user can hover any cell to see full breakdown
-      const remVal = (total !== null && annualSpendVal !== null) ? total - annualSpendVal : null;
-      const detailParts = [];
-      if(total !== null) detailParts.push(`Budget ${fmt(total)}`);
-      if(annualSpendVal !== null) detailParts.push(`Spent ${fmt(annualSpendVal)}`);
-      if(remVal !== null) detailParts.push(`Remaining ${remVal<0?'-':''}${fmt(Math.abs(remVal))}`);
-      const detailTipStr = detailParts.join(' · ');
       // Total cell
       if(total === null) b += `<td class="fix col-total"><span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">—</span></td>`;
-      else {
-        const totalTipText = overExpected ? `Exceeds Allocated budget cap · ${detailTipStr}` : detailTipStr;
-        b += `<td class="fix col-total${overExpected?' over-budget':''}" data-tip-tip="${totalTipText}">${fmt(total)}</td>`;
-      }
+      else b += `<td class="fix col-total${overExpected?' over-budget':''}"${overExpected?' data-tip-tip="Budget exceeds Allocated cap."':''}>${fmt(total)}</td>`;
       // Spend cell
-      if(annualSpendVal === null) b += `<td class="fix col-spend"><span class="empty-cell">—</span></td>`;
-      else {
-        const spendTipText = overSpend ? `Spent more than the budget you\'re setting (save not blocked) · ${detailTipStr}` : detailTipStr;
-        b += `<td class="fix col-spend${overSpend?' over-budget':''}" data-tip-tip="${spendTipText}">${fmt(annualSpendVal)}</td>`;
-      }
+      if(annualSpendVal === null) b += `<td class="fix col-spend"><span class="empty-cell" data-tip-tip="Missing actual data">—</span></td>`;
+      else b += `<td class="fix col-spend${overSpend?' over-budget':''}"${overSpend?' data-tip-tip="Spent more than the budget you\'re setting (save not blocked)."':''}>${fmt(annualSpendVal)}</td>`;
     }else{
       // Original single Total column
       if(total === null) b += `<td class="fix col-total"><span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">--</span></td>`;
@@ -1221,28 +1278,44 @@ function renderTable(){
       b += `<td class="col-spark" data-spark="${sel}"></td>`;
     }else{
     g.months.forEach((mv, mi) => {
-      // PRD §7.3/§9: amber dot on month cell when child-tier sum > current-tier cap (Budget view only)
-      // Role-aware row placement:
-      //   - Admin (warningOn:'group-row')     → warning on T1 group row（這裡的 group row）
-      //   - T1 Manager (warningOn:'allocated-row') → warning 移到 Allocated row（見下方 Allocated row 段落）
-      //   - T2 (warningOn:null)               → 不顯示（T2 唯讀無權編預算，看警示無意義）
-      const capConflict = !state.editing && view === 'budget' && role.warningOn === 'group-row' && isCapConflict(gi, mi);
+      // PRD §7.3/§9: Budget view only — supervisor 看下層 subordinate 的 budget > 自己設給他的 cap
+      // 看下視角 (looking-down)：role-aware tier label
+      //   - Admin (warningOn:'group-row')         → 看到 "Tier 1 Budget Over Your Cap"
+      //   - T1 Manager (warningOn:'allocated-row') → 看到 "Tier 2 Budget Over Your Cap"
+      //   - T2 (warningOn:'total-row')            → 不顯示 group row dot（T2 只在 Total row 看 looking-up 警示）
+      // 觸發目的：「初始設定剛好但上層砍 cap 後變超」的 timely reminder（也涵蓋初始超 cap 場景）
+      const capConflict = !state.editing && view === 'budget'
+        && (role.warningOn === 'group-row' || role.warningOn === 'allocated-row')
+        && isCapConflict(gi, mi);
       const warnCls = capConflict ? ' month-warn' : '';
-      const warnTip = capConflict ? ` data-tip-tip="Sub-allocations exceed the cap for this period. Existing values are preserved; review the allocations or adjust the cap as needed. (This can also occur when an upper-level cap is reduced after allocations are made.)"` : '';
+      let warnTipContent = '';
+      if(capConflict && mv !== null && mv !== undefined){
+        const tierLabel = role.warningOn === 'group-row' ? 'Tier 1' : 'Tier 2';
+        const fakeCap = Math.round(mv * 0.4);
+        const overAmt = mv - fakeCap;
+        const overPct = fakeCap > 0 ? Math.round((overAmt / fakeCap) * 100) : 0;
+        warnTipContent = `${tierLabel} Budget Over Your Cap\n• ${tierLabel} Planned: ${fmt(mv)}\n• Your Allocated cap: ${fmt(fakeCap)}\n• Over by ${fmt(overAmt)} (${overPct}% of your cap)`;
+      }
+      const warnTip = warnTipContent ? ` data-tip-tip="${warnTipContent}"` : '';
       if(state.editing && role.editable){
         // Edit mode always edits Budget value (per PRD §8)
         b += `<td class="col-mon"><span class="cell-input"><span class="dollar">$</span><input type="text" data-gi="${gi}" data-mi="${mi}" value="${mv!==null&&mv!==undefined?Math.round(mv):''}" inputmode="numeric"></span></td>`;
       }else if(view === 'spend' && show4col){
         const sv = getSpend(gi, mi, mv);
-        // Empty / future / missing — show -- placeholder (was blank; user feedback 5/22)
-        if(sv === undefined) b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Future month — no spend data yet">--</span></td>`;
-        else if(sv === null) b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Missing actual data">--</span></td>`;
-        else b += `<td class="col-mon">${fmt(sv)}</td>`;
+        // null = 未填寫/無資料 → --；其他（含 0）→ 數字（$0 = 尚未花錢/沒花錢）
+        if(sv === null) b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Missing actual data">--</span></td>`;
+        else {
+          // spend 超過該月 budget → 紅字（user feedback 5/27）
+          const overSpend = mv !== null && mv !== undefined && sv > mv;
+          b += `<td class="col-mon${overSpend?' over-budget':''}"${overSpend?' data-tip-tip="Spend exceeds this month\'s budget."':''}>${fmt(sv)}</td>`;
+        }
       }else if(view === 'remaining' && show4col){
-        if(mv === null || mv === undefined){ b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Unlimited. no remaining">—</span></td>`; return; }
+        // Remaining 欄 -- 統一 tooltip：Unable to calculate (no budget or no data)
+        // 適用情境：budget = null (unlimited) 或 spend = null (missing data)
+        if(mv === null || mv === undefined){ b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Unable to calculate (no budget or no data)">—</span></td>`; return; }
         const sv = getSpend(gi, mi, mv);
         if(sv === undefined){ b += `<td class="col-mon">${fmt(mv)}</td>`; return; } // future = full budget remaining
-        if(sv === null){ b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Missing actual data">—</span></td>`; return; }
+        if(sv === null){ b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Unable to calculate (no budget or no data)">—</span></td>`; return; }
         const rem = mv - sv;
         b += `<td class="col-mon${rem < 0 ? ' over-budget' : ''}">${rem < 0 ? '-' : ''}${fmt(Math.abs(rem))}</td>`;
       }else{
@@ -1252,24 +1325,10 @@ function renderTable(){
         if(mv===null||mv===undefined){
           b += `<td class="col-mon${warnCls}"${warnTip}><span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">--</span></td>`;
         }else if(show4col){
-          // View mode + show4col：加 hover detail tooltip 補充 Spent / Remaining
-          const sv = getSpend(gi, mi, mv);
-          const hasSpend = sv !== null && sv !== undefined;
-          let tipText;
-          if(hasSpend){
-            const rem = mv - sv;
-            const pct = mv > 0 ? Math.round(sv/mv*100) : 0;
-            tipText = `Budget ${fmt(mv)} · Spent ${fmt(sv)} (${pct}%) · Remaining ${rem<0?'-':''}${fmt(Math.abs(rem))}`;
-          } else if(sv === undefined){
-            tipText = `Budget ${fmt(mv)} · Future month`;
-          } else {
-            tipText = `Budget ${fmt(mv)} · Spend data missing`;
-          }
-          // Merge with cap-conflict warning if present
-          const finalTip = capConflict
-            ? `Sub-allocations exceed the cap for this period · ${tipText}`
-            : tipText;
-          b += `<td class="col-mon${warnCls}" data-tip-tip="${finalTip}">${fmt(mv)}</td>`;
+          // 只有 cap-conflict 才顯示 tooltip（multi-line bullet）。4-in-1 detail hover 拿掉
+          // per Kabin 2026-06-04：切視角就能看完整 Budget/Spend/Remaining，cell hover 多餘
+          const tipAttr = warnTipContent ? ` data-tip-tip="${warnTipContent}"` : '';
+          b += `<td class="col-mon${warnCls}"${tipAttr}>${fmt(mv)}</td>`;
         }else{
           b += `<td class="col-mon${warnCls}"${warnTip}>${fmt(mv)}</td>`;
         }
@@ -1286,6 +1345,15 @@ function renderTable(){
     return s;
   });
   const grandTotal = monthTotals.reduce((acc,v) => acc + (v||0), 0);
+  // Per-month Total Spend — 用於 Allocated row 月份格 amber dot 判定（Spend > Cap）
+  const monthlySpendTotals = MONTHS.map((_,mi) => {
+    let s = 0, has = false;
+    data.forEach((g, gi) => {
+      const sv = getSpend(gi, mi, g.months[mi]);
+      if(sv !== null && sv !== undefined){ s += sv; has = true; }
+    });
+    return has ? s : null;
+  });
   // Compute Total row's annual spend + remaining (for 4-col mode)
   let totSpend = 0, totSpendHas = false;
   data.forEach((g, gi) => {
@@ -1296,54 +1364,23 @@ function renderTable(){
   });
   const totSpendVal = totSpendHas ? totSpend : null;
   const totRemain = (grandTotal !== null && totSpendVal !== null) ? (grandTotal - totSpendVal) : null;
-  // Allocated row (T1 only) — render BEFORE Total row so it appears above Total in the DOM/visual order.
-  // PRD §7.4 — 命名「Allocated」取代舊「Expected Total Budget」（Expected 含糊；Allocated 直白指上層配下來的 cap）
-  // 內部變數仍用 EXPECTED_* 維持向後相容，使用者看到的字串一律 "Allocated"
-  // Sticky: bottom:50px (堆在 Total row 50px 上方)；DOM 必須在 Total 之前才能 visually 在上方。
-  if(role.showExpected){
-    const expected = EXPECTED[state.currentTab] || 0;
-    const monthlyExpArr = EXPECTED_MONTHLY[state.currentTab] || new Array(12).fill(Math.round(expected / 12));
-    b += '<tr class="expectedrow">';
-    if(showCheckbox) b += '<td class="fix col-cb"></td>';
-    b += '<td class="fix col-name tx-left">Allocated</td>';
-    if(showGear) b += '<td class="fix col-gear"></td>';
-    if(show4col){
-      // Order: Budget → Spend → Spent % → Remaining (PRD §7.1; 4 欄全保留)
-      b += `<td class="fix col-budget">${fmt(expected)}</td>`;
-      b += `<td class="fix col-spend">—</td>`;
-      b += `<td class="fix col-pct">—</td>`;
-      b += `<td class="fix col-remain">—</td>`;
-    }else if(show2col){
-      b += `<td class="fix col-total">${fmt(expected)}</td>`;
-      b += `<td class="fix col-spend">—</td>`;
-    }else{
-      b += `<td class="fix col-total">${fmt(expected)}</td>`;
-    }
-    // PRD §7.3 — T1 Manager 視角的 amber dot 落在 Allocated row 月份格（不在下方 T2 group rows）
-    if(useSparkline()){
-      // Allocated is a single cap line — budget-only sparkline (no spend)
-      sparkSpecs.push({ sel:'alloc', budgets: monthlyExpArr.slice(), spends: new Array(12).fill(null) });
-      b += `<td class="col-spark" data-spark="alloc"></td>`;
-    }else{
-    for(let i=0;i<12;i++){
-      const allocConflict = !state.editing && view === 'budget' && role.warningOn === 'allocated-row' && isMonthCapConflictAggregate(i);
-      const allocWarnCls = allocConflict ? ' month-warn' : '';
-      const allocWarnTip = allocConflict ? ` data-tip-tip="Your sub-allocations exceed the Allocated cap for this period. Existing values are preserved; review the allocations or contact Admin to adjust the cap."` : '';
-      b += `<td class="col-mon${allocWarnCls}"${allocWarnTip}>${fmt(monthlyExpArr[i])}</td>`;
-    }
-    }
-    b += '</tr>';
-  }
+  // Total row — render BEFORE Allocated so it appears above in DOM/visual order.
+  // Sticky bottom:50px（Allocated 高 50px 在下方）。
+  // Allocated row 在下方（最底），見本段下方。
 
-  // Total row — always last in tbody so sticky bottom:0 anchors it to the very bottom.
-  b += '<tr class="totalrow">';
+  // T2 視角下只看自己組，Total row redundant → hide
+  const hideTotalRow = (state.role === 't2m' || state.role === 't2mb');
+  if(!hideTotalRow){
+  b += `<tr class="totalrow${role.showExpected?' has-alloc-below':''}">`;
   if(showCheckbox) b += '<td class="fix col-cb"></td>';
   b += '<td class="fix col-name tx-left">Total</td>';
   if(showGear) b += '<td class="fix col-gear"></td>';
   if(show4col){
     // Order: Budget → Spend → Spent % → Remaining (PRD §7.1; 4 欄全保留)
+    // Spend turns red when Total Spend > Total Budget (consistent with group rows + monthly cells)
+    const totOverSpend4 = grandTotal !== null && totSpendVal !== null && totSpendVal > grandTotal;
     b += `<td class="fix col-budget">${fmt(grandTotal)}</td>`;
-    b += `<td class="fix col-spend">${totSpendVal===null?'<span class="empty-cell">—</span>':fmt(totSpendVal)}</td>`;
+    b += `<td class="fix col-spend${totOverSpend4?' over-budget':''}"${totOverSpend4?' data-tip-tip="Total spend exceeds total budget."':''}>${totSpendVal===null?'<span class="empty-cell">—</span>':fmt(totSpendVal)}</td>`;
     b += `<td class="fix col-pct">${pctBar(totSpendVal, grandTotal)}</td>`;
     b += `<td class="fix col-remain${totRemain<0?' over-budget':''}">${totRemain===null?'<span class="empty-cell">—</span>':(totRemain<0?'-':'')+fmt(Math.abs(totRemain))}</td>`;
   }else if(show2col){
@@ -1362,16 +1399,30 @@ function renderTable(){
     b += `<td class="col-spark" data-spark="total"></td>`;
   }else{
   monthTotals.forEach((mt, mi) => {
+    // T2 視角 (warningOn:'total-row') · Budget view only · looking-up perspective
+    // 「我（T2）的 budget 加總 > 主管（T1）給我的 cap」— 跟 over-budget 紅字並存（疊加 amber dot）
+    // 觸發目的：catch「sub-allocations 一開始剛好但 T1 砍 cap 後變超」（per Kabin 2026-06-04 — Budget view only）
+    const t2BudgetTip = (budgetVal) => {
+      const cap = EXPECTED_MONTHLY[state.currentTab]?.[mi] ?? null;
+      if(role.warningOn !== 'total-row' || cap === null || cap <= 0 || budgetVal === null || budgetVal <= cap) return {cls:'', tip:''};
+      const overAmt = budgetVal - cap;
+      const overPct = Math.round((overAmt / cap) * 100);
+      const tip = `Your Budget Over T1 Cap\n• Your budget: ${fmt(budgetVal)}\n• Cap from your manager: ${fmt(cap)}\n• Over by ${fmt(overAmt)} (${overPct}% of cap)`;
+      return {cls:' month-warn', tip:` data-tip-tip="${tip}"`};
+    };
     if(view === 'spend' && show4col){
-      let s = null, hasAny = false;
+      let s = 0, hasAny = false;
       data.forEach((g, gi) => {
         const sv = getSpend(gi, mi, g.months[mi]);
-        if(sv !== null && sv !== undefined){ s=(s||0)+sv; hasAny = true; }
+        if(sv !== null && sv !== undefined){ s += sv; hasAny = true; }
       });
-      // -- placeholder for future / no-data (was blank for future; user feedback 5/22)
-      if(mi > PROTO_NOW_IDX) b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Future month — no spend data yet">--</span></td>`;
-      else if(!hasAny) b += `<td class="col-mon"><span class="empty-cell">--</span></td>`;
-      else b += `<td class="col-mon">${fmt(s)}</td>`;
+      // 新定義：-- 只在「所有 group 都 null（含無上限）」才出現；過去/未來月份正常累加（含 $0）
+      if(!hasAny) b += `<td class="col-mon"><span class="empty-cell">--</span></td>`;
+      else {
+        const overSpend = monthTotals[mi] !== null && s > monthTotals[mi];
+        // Spend view 不顯示 cap dot（per Kabin 2026-06-04）— 只 over-budget 紅字
+        b += `<td class="col-mon${overSpend?' over-budget':''}"${overSpend?' data-tip-tip="Total spend exceeds total budget for this month."':''}>${fmt(s)}</td>`;
+      }
     }else if(view === 'remaining' && show4col){
       let s = null, hasAny = false;
       data.forEach((g, gi) => {
@@ -1382,18 +1433,60 @@ function renderTable(){
       if(mi > PROTO_NOW_IDX){ b += `<td class="col-mon">${fmt(mt)}</td>`; return; }
       if(!hasAny){ b += `<td class="col-mon"><span class="empty-cell">—</span></td>`; return; }
       const rem = mt - s;
+      // Remaining view 不顯示 cap dot（per Kabin 2026-06-04）— 只負數紅字
       b += `<td class="col-mon${rem<0?' over-budget':''}">${rem<0?'-':''}${fmt(Math.abs(rem))}</td>`;
     }else{
-      // Budget view: Figma #05-1 — Total monthly cell turns red when exceeds monthly Allocated cap (T1 view only)
+      // Budget view: Figma #05-1 — Total monthly cell turns red when exceeds monthly Allocated cap (T1 view)
       const monthlyExp = role.showExpected ? (EXPECTED_MONTHLY[state.currentTab]?.[mi] ?? null) : null;
       const overMonthlyExp = monthlyExp !== null && mt !== null && mt > monthlyExp;
       const overCls = overMonthlyExp ? ' over-budget' : '';
-      const overTip = overMonthlyExp ? ' data-tip-tip="This month\'s total exceeds the monthly Allocated cap set by Admin."' : '';
-      b += `<td class="col-mon${overCls}"${overTip}>${mt===null?'<span class="empty-cell">--</span>':fmt(mt)}</td>`;
+      const overTip = overMonthlyExp ? ' data-tip-tip="Total exceeds Allocated cap."' : ''; // generic 紅字 rule
+      // T2 視角 (warningOn:'total-row') 才加 cap dot：「我超主管 cap」
+      const t2 = t2BudgetTip(mt);
+      const cls = overCls + t2.cls;
+      const tip = t2.tip || overTip;
+      b += `<td class="col-mon${cls}"${tip}>${mt===null?'<span class="empty-cell" data-tip-tip="Unable to calculate the total, as some monthly budgets are not set.">--</span>':fmt(mt)}</td>`;
     }
   });
   }
   b += '</tr>';
+  } // end if(!hideTotalRow)
+
+  // Allocated row (T1 only) — render AFTER Total，sticky bottom:0 在最底（user feedback 5/27 對齊 Figma）
+  // PRD §7.4 — 命名「Allocated」取代舊「Expected Total Budget」。內部變數仍用 EXPECTED_* 維持向後相容
+  if(role.showExpected){
+    const expected = EXPECTED[state.currentTab] || 0;
+    const monthlyExpArr = EXPECTED_MONTHLY[state.currentTab] || new Array(12).fill(Math.round(expected / 12));
+    b += '<tr class="expectedrow">';
+    if(showCheckbox) b += '<td class="fix col-cb"></td>';
+    b += '<td class="fix col-name tx-left">Allocated</td>';
+    if(showGear) b += '<td class="fix col-gear"></td>';
+    if(show4col){
+      b += `<td class="fix col-budget">${fmt(expected)}</td>`;
+      b += `<td class="fix col-spend">—</td>`;
+      b += `<td class="fix col-pct">—</td>`;
+      b += `<td class="fix col-remain">—</td>`;
+    }else if(show2col){
+      b += `<td class="fix col-total">${fmt(expected)}</td>`;
+      b += `<td class="fix col-spend">—</td>`;
+    }else{
+      b += `<td class="fix col-total">${fmt(expected)}</td>`;
+    }
+    // PRD §7.3 — T1 Manager 視角 Allocated row 月份格純顯示 cap 數字，**不再標 dot**（per Kabin 2026-06-04）
+    // Rationale：T1 視角焦點是 supervisor looking-down，警示集中在 T2 row dot；
+    // 「T1 整體超 Admin cap」是 Admin 視角的事（Admin 看 T1 group row 會自己標 dot），
+    // 避免 looking-up + looking-down 兩種 perspective 在同一 view 混淆。
+    // Allocated row 仍顯示 cap 數字（業界 invariant reference 慣例），只是不加 dot。
+    if(useSparkline()){
+      sparkSpecs.push({ sel:'alloc', budgets: monthlyExpArr.slice(), spends: new Array(12).fill(null) });
+      b += `<td class="col-spark" data-spark="alloc"></td>`;
+    }else{
+      for(let i=0;i<12;i++){
+        b += `<td class="col-mon">${fmt(monthlyExpArr[i])}</td>`;
+      }
+    }
+    b += '</tr>';
+  }
   b += '</tbody>';
   newTbl.innerHTML = h + b;
 
@@ -1460,9 +1553,61 @@ function updateAfterCellEdit(){
   const focusKey = focused && focused.dataset && focused.dataset.gi !== undefined ? {gi:focused.dataset.gi, mi:focused.dataset.mi, ss:focused.selectionStart} : null;
   renderTable();
   renderOrgCards();
+  updateSaveBarState();
   if(focusKey){
     const el = document.querySelector(`input[data-gi="${focusKey.gi}"][data-mi="${focusKey.mi}"]`);
     if(el){ el.focus(); try{ el.setSelectionRange(focusKey.ss, focusKey.ss); }catch(e){} }
+  }
+}
+
+// Figma #06-1: T1 編輯時，任一組總預算/月份總預算 > Allocated cap → 不可儲存
+// Return { ok: boolean, reason: '...' } for savebar message
+function validateT1Save(){
+  const role = ROLES[state.role];
+  if(!role.showExpected || !state.editing || !state.draft) return {ok:true, reason:''};
+  const data = state.draft[state.currentTab] || [];
+  const expectedAnnual = EXPECTED[state.currentTab] || 0;
+  const expectedMonthly = EXPECTED_MONTHLY[state.currentTab] || [];
+  // 1. Any group annual budget > Allocated annual?
+  for(const g of data){
+    const total = sumMonths(g.months);
+    if(total !== null && total > expectedAnnual) return {ok:false, reason:'A group\'s annual budget exceeds the Allocated cap.'};
+  }
+  // 2. Any month: sum of T2 budgets > Allocated for that month?
+  for(let mi=0; mi<12; mi++){
+    let monthSum = null;
+    data.forEach(g => { if(g.months[mi]!==null&&g.months[mi]!==undefined){ monthSum=(monthSum||0)+g.months[mi]; } });
+    const cap = expectedMonthly[mi];
+    if(monthSum !== null && cap !== null && cap !== undefined && monthSum > cap){
+      return {ok:false, reason:'Monthly total exceeds the Allocated cap.'};
+    }
+  }
+  return {ok:true, reason:''};
+}
+
+function updateSaveBarState(){
+  const role = ROLES[state.role];
+  const saveBtn = $('#btn-save');
+  const savebarL = $('#savebar-l');
+  if(!state.editing){ return; }
+  if(role.showExpected){
+    // T1 view: validate + show info text
+    const v = validateT1Save();
+    if(saveBtn){
+      saveBtn.disabled = !v.ok;
+      saveBtn.setAttribute('data-tip-tip', v.ok ? '' : v.reason);
+      if(v.ok) saveBtn.removeAttribute('data-tip-tip');
+    }
+    if(savebarL){
+      savebarL.innerHTML = v.ok
+        ? '<span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;color:var(--g500);font-variation-settings:\'FILL\' 0,\'wght\' 400;margin-right:6px">info</span>The budget of all groups should not exceed the assigned budget.'
+        : '<span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;color:var(--err);font-variation-settings:\'FILL\' 1,\'wght\' 500;margin-right:6px">error</span>' + v.reason;
+      savebarL.style.color = v.ok ? '' : 'var(--err)';
+    }
+  } else {
+    // Admin / T2 view: clear
+    if(saveBtn){ saveBtn.disabled = false; saveBtn.removeAttribute('data-tip-tip'); }
+    if(savebarL){ savebarL.innerHTML = ''; savebarL.style.color = ''; }
   }
 }
 
@@ -1503,6 +1648,21 @@ function renderFYPicker(){
 // - Proposal scenario + Admin: 📅 Fiscal Year Start: {Month} · ⚙ Set Fiscal Start Month
 // - Proposal scenario + non-Admin: 📅 Fiscal Year Start: {Month} (set by Admin)
 function updatePeriodLabel(){
+  // Figma #01: tabs 下方 "Viewing: FY{year} · {Mon}. 'YY – {Mon}. 'YY+1 (USD)"
+  const viewing = $('#paper-viewing');
+  if(viewing){
+    if(state.showSegCtrl){
+      const y = state.fyStartYear;
+      const m = state.fyStartMonth;
+      const startMLabel = FY_START_MONTHS[m].label;
+      const endY = m === 0 ? y : y + 1;
+      const yy = String(y).slice(-2);
+      const eyy = String(endY).slice(-2);
+      viewing.textContent = `Viewing: FY${y} · ${startMLabel}. '${yy} – ${startMLabel}. '${eyy} (USD)`;
+    } else {
+      viewing.textContent = '(USD)';
+    }
+  }
   const el = $('#paper-period');
   if(!el) return;
   if(!state.showSegCtrl){
@@ -1516,7 +1676,7 @@ function updatePeriodLabel(){
   if(isAdmin){
     el.innerHTML = `
       <span class="fy-display"><span class="material-symbols-outlined">event</span>Fiscal Year Start: <strong>${startM}</strong></span>
-      <button class="fy-set-link" id="fy-btn"><span class="material-symbols-outlined">settings</span><span class="fy-set-link-text">Set Fiscal Start Month</span></button>
+      <button class="fy-set-link" id="fy-btn"><span class="material-symbols-outlined">settings</span><span class="fy-set-link-text">Edit Start Month</span></button>
     `;
     $('#fy-btn').onclick = openFYModal;
   }else{
@@ -1565,7 +1725,7 @@ function confirmFY(){
   const m = parseInt($('#fy-modal-month').value);
   state.fyStartMonth = m;
   closeFYModal();
-  toast(`Fiscal start month updated to ${FY_START_MONTHS[m].label}`);
+  toast('Fiscal Start Month updated successfully.');
   renderAll();
 }
 
@@ -1588,7 +1748,11 @@ function enterEdit(){
   if($('#btn-csv')) $('#btn-csv').style.display = 'none';
   $('#bulkbar').style.display = 'flex';
   updateBulkBar();
+  // Locked Budget pill — tooltip 解釋為何鎖 + 如何解鎖（per Kabin 2026-06-04）
+  const budgetSegBtn = document.querySelector('.seg-btn[data-mode="budget"]');
+  if(budgetSegBtn) budgetSegBtn.setAttribute('data-tip-tip', 'Save your budget to unlock Spend / Remaining views');
   renderAll();
+  updateSaveBarState();
 }
 function cancelEdit(){
   if(JSON.stringify(state.draft) !== JSON.stringify({gcp:GROUPS_GCP,aws:GROUPS_AWS,azure:GROUPS_AZURE})){
@@ -1608,12 +1772,18 @@ function exitEdit(){
   $('#btn-edit').style.display = ROLES[state.role].editable ? 'inline-flex' : 'none';
   if($('#btn-csv')) $('#btn-csv').style.display = '';
   $('#bulkbar').style.display = '';
+  // Remove locked Budget pill tooltip
+  const budgetSegBtn = document.querySelector('.seg-btn[data-mode="budget"]');
+  if(budgetSegBtn) budgetSegBtn.removeAttribute('data-tip-tip');
   closePop();
   renderAll();
 }
 function saveEdit(){
+  // Guard：T1 不能存超 Allocated 的 budget（per Figma #06-1）
+  const v = validateT1Save();
+  if(!v.ok){ toast(v.reason, 'err'); return; }
   PROVIDERS.filter(p => !p.synthetic).forEach(p => state.draft[p.key].forEach((g,i)=> ALL_GROUPS[p.key][i] = deepClone(g)));
-  toast('Budget settings saved successfully.');
+  toast('Budget updated successfully.');
   exitEdit();
 }
 
@@ -1727,7 +1897,8 @@ function applyPop(){
       if(popCtx.mode === 'bulk' && distMode === 'distribute'){
         const minNeeded = 12 * tgtList.length;
         if(amt < minNeeded){
-          $('#pop-err').textContent = `Minimum required to allocate at least $1 to each month: $${minNeeded}.`;
+          // Figma #03-1: "The current amount must exceed $X to be allocated successfully."
+          $('#pop-err').textContent = `The current amount must exceed $${minNeeded} to be allocated successfully.`;
           $('#pop-err').classList.add('show');
           $('#pop-amt').parentElement.classList.add('err');
           return;
@@ -1735,7 +1906,7 @@ function applyPop(){
         perGroupAmt = Math.floor(amt / tgtList.length);
       }
       if(perGroupAmt < 12){
-        $('#pop-err').textContent = `Minimum allocate amount per group: $12 (so each month gets ≥ $1).`;
+        $('#pop-err').textContent = `The current amount must exceed $12 to be allocated successfully.`;
         $('#pop-err').classList.add('show');
         $('#pop-amt').parentElement.classList.add('err');
         return;
@@ -1746,7 +1917,7 @@ function applyPop(){
       tgtList.forEach(gi => { state.draft[tab][gi].months = Array(12).fill(amt); });
     }
   }
-  toast(popCtx.mode==='single' ? 'Budget applied to the group.' : `Budget applied to ${tgtList.length} groups.`);
+  toast('Amount applied successfully.');
   closePop();
   renderTable();
   renderOrgCards();
@@ -1757,14 +1928,31 @@ function openAlert(){ renderThresholds(); $('#mo-alert').classList.add('active')
 function closeAlert(){ $('#mo-alert').classList.remove('active'); }
 function renderThresholds(){
   const list = $('#thr-list'); list.innerHTML = '';
+  // Figma #09-4: empty state placeholder
+  if(state.thresholds.length === 0){
+    list.innerHTML = '<div class="thr-empty-msg">Set thresholds to receive budget exceedance alerts</div>';
+  }
   state.thresholds.forEach((v, i) => {
-    const row = document.createElement('div');
-    row.className = 'thr-row';
-    row.innerHTML = `<span class="thr-input"><input type="text" data-i="${i}" value="${v||''}" inputmode="numeric" maxlength="4"><span class="pct">%</span></span><button class="thr-del" data-i="${i}" aria-label="Remove threshold"><span class="material-symbols-outlined">delete</span></button>`;
-    list.appendChild(row);
+    const item = document.createElement('div');
+    item.className = 'thr-item';
+    item.innerHTML = `
+      <div class="thr-row">
+        <span class="thr-input"><input type="text" data-i="${i}" value="${v||''}" inputmode="numeric" maxlength="4"><span class="pct">%</span></span>
+        <button class="thr-del" data-i="${i}" aria-label="Remove threshold"><span class="material-symbols-outlined">delete</span></button>
+      </div>
+      <div class="thr-msg" data-i="${i}"></div>
+    `;
+    list.appendChild(item);
   });
   $('#thr-add').disabled = state.thresholds.length >= 3;
-  $('#notif-block').classList.toggle('dis', state.thresholds.length === 0);
+  const dis = state.thresholds.length === 0;
+  $('#notif-block').classList.toggle('dis', dis);
+  // Figma #09-4: disabled state hover tooltip
+  if(dis){
+    $('#notif-block').setAttribute('data-tip-tip', 'Set threshold to adjust notification settings.');
+  } else {
+    $('#notif-block').removeAttribute('data-tip-tip');
+  }
   list.querySelectorAll('input').forEach(inp => {
     inp.addEventListener('input', e => {
       const i = parseInt(e.target.dataset.i);
@@ -1778,27 +1966,51 @@ function renderThresholds(){
     state.thresholds.splice(parseInt(e.currentTarget.dataset.i),1);
     renderThresholds(); validateThresholds();
   }));
+  validateThresholds();
 }
+// Figma #09-2 / #09-3: per-input error display + Save button disabled state
 function validateThresholds(){
-  let err = '';
-  for(const v of state.thresholds){
-    if(v === null || v === '' || v === undefined){ err = 'Threshold value cannot be empty.'; break; }
-    if(v < 1 || v > 1000){ err = 'Allowed values: 1~1000'; break; }
+  // Compute per-index error messages
+  const errs = state.thresholds.map((v) => {
+    if(v === null || v === '' || v === undefined) return 'Threshold cannot be empty.';
+    if(v < 1 || v > 1000) return 'Please enter a number from 1 to 1000.';
+    return '';
+  });
+  // Duplicate detection — mark ALL duplicates
+  const counts = {};
+  state.thresholds.forEach(v => { if(v != null && v !== '') counts[v] = (counts[v]||0)+1; });
+  state.thresholds.forEach((v, i) => {
+    if(!errs[i] && counts[v] > 1) errs[i] = 'Please do not enter duplicate thresholds.';
+  });
+  // Render per-input error + border red
+  const list = $('#thr-list');
+  if(list){
+    list.querySelectorAll('.thr-item').forEach((item, i) => {
+      const msg = item.querySelector('.thr-msg');
+      const input = item.querySelector('.thr-input');
+      if(errs[i]){
+        msg.textContent = errs[i];
+        msg.classList.add('show');
+        input.classList.add('err');
+      }else{
+        msg.textContent = '';
+        msg.classList.remove('show');
+        input.classList.remove('err');
+      }
+    });
   }
-  if(!err){
-    const seen = new Set();
-    for(const v of state.thresholds){ if(seen.has(v)){ err = 'Thresholds must be unique.'; break; } seen.add(v); }
-  }
-  $('#thr-err-msg').textContent = err;
-  $('#thr-err').classList.toggle('show', !!err);
-  return !err;
+  const ok = errs.every(e => !e);
+  // Disable Save button when any error
+  const saveBtn = document.querySelector('#mo-alert .mf .btn-p');
+  if(saveBtn) saveBtn.disabled = !ok;
+  return ok;
 }
 function saveAlert(){
   if(!validateThresholds()){ toast('Please fix threshold errors.','err'); return; }
   state.thresholds = state.thresholds.filter(v => v!==null && v!=='');
   renderAlertBar();
   closeAlert();
-  toast('Alert settings saved successfully.');
+  toast('Alert settings updated successfully.');
 }
 
 // ===== Currency =====
@@ -1845,10 +2057,13 @@ function setAlertState(empty){
 
 function renderAlertBar(){
   const bar = $('#alert-bar');
+  // Figma #05/#07：T1 / T2 看得到 threshold info 但「Alert Settings」按鈕僅 Admin 可見
+  const isAdmin = state.role === 'admin';
+  const linkHtml = isAdmin ? '<button class="alert-link" onclick="openAlert()"><span class="material-symbols-outlined">settings</span><span class="alert-link-text">Alert Settings</span></button>' : '';
   if(!state.thresholds || state.thresholds.length === 0){
-    bar.innerHTML = '<span class="material-symbols-outlined">notifications_off</span><span>No alerts have been set yet.</span><button class="alert-link" onclick="openAlert()"><span class="material-symbols-outlined">settings</span><span class="alert-link-text">Alert Settings</span></button>';
+    bar.innerHTML = '<span class="material-symbols-outlined">notifications_off</span><span>No alerts have been set yet.</span>' + linkHtml;
   } else {
-    bar.innerHTML = '<span class="material-symbols-outlined">notifications_active</span><span>You will receive alert when the cost reach</span><b>'+state.thresholds.join(', ')+'</b><span>% of the monthly budget.</span><button class="alert-link" onclick="openAlert()"><span class="material-symbols-outlined">settings</span><span class="alert-link-text">Alert Settings</span></button>';
+    bar.innerHTML = '<span class="material-symbols-outlined">notifications_active</span><span>You will receive alert when the cost reach</span><b>'+state.thresholds.join(', ')+'</b><span>% of the monthly budget.</span>' + linkHtml;
   }
 }
 
@@ -1896,17 +2111,36 @@ document.addEventListener('click', e => {
 });
 
 // ===== Segmented Control (Monthly view: Budget/Spend/Remaining) =====
-// PROTO_NOW: late May 2026 — past = Jan~May (idx 0-4), future = Jun~Dec (idx 5-11)
-const PROTO_NOW_IDX = 4;
+// PROTO_NOW: late May 2026 — past = Feb/Mar/Apr/May (idx 0-3), future = Jun~Jan'27 (idx 4-11)
+// FY Feb start; past 4 months matches mockup polished demo (user 2026-06-03 v2: May 集中型)
+const PROTO_NOW_IDX = 3;
 // Warning presets: per-group monthly spend ratio (× monthly budget). 5 months elapsed × ratio = annual Spent%
 // Annual budget normalized to 12 months, so Spent% ≈ ratio × 5/12 × 100
 // e.g., ratio 1.9 → 5×1.9/12 = 79% (warn zone), ratio 2.5 → 5×2.5/12 = 104% (danger zone)
 const WARNING_PRESETS = {
+  // Spend = monthlyBudget × ratio。對 5/12 過去月份，annual Spent% ≈ ratio × 5/12 × 100。
+  // 註：mixed preset 為了演示 annual Spent% 範圍 25~146%（綠/黃/紅 mixed），單月 spend 可能達 budget × 2.7
+  // user mockup 已基於這組數字完成 budget mode，保留以維持 mockup 一致性
   normal:       [0.85, 1.15, 0.90, 0.95, 0.75, 1.00, 0.65, 1.00, 0.88, 0.92, 1.05], // <70% all green
   approaching:  [1.95, 2.10, 1.85, 2.05, 1.75, 2.00, 1.90, 1.95, 1.80, 2.00, 1.90], // 70-90% amber
   over:         [2.50, 2.75, 2.40, 2.65, 2.30, 2.80, 2.45, 2.60, 2.55, 2.70, 2.50], // 95-115% red + 負數
-  mixed:        [0.85, 2.65, 1.95, 0.95, 2.55, 1.85, 0.75, 2.70, 1.90, 0.92, 2.45], // 混合三種色階
+  mixed:        [0.85, 2.65, 1.95, 0.95, 2.55, 1.85, 0.75, 2.70, 1.90, 0.92, 2.45], // unused for mixed (see MOCKUP_SPEND_MIXED)
 };
+// Polished mockup spend values for warn-mixed preset — aligned with specs/2026-05-27-general-budget-mockup-content-reel.md
+// Each row = [Feb, Mar, Apr, May] spend ($). Designed to: (a) preserve annual Spend totals; (b) concentrate red in May; (c) Feb/Mar/Apr almost all green
+const MOCKUP_SPEND_MIXED = [
+  [487, 523, 897, null],     // 0  Monogenic Network              (annual $1,907; May budget=null → spend --; 1 紅 in Apr due to May null)
+  [87, 612, 874, 4539],      // 1  Complex Disease Programs        (annual $6,112; 1 紅 May)
+  [923, 748, 528, 3289],     // 2  Project Proposal Andromeda      (annual $5,488; 1 紅 May)
+  [621, 843, 164, 995],      // 3  Sample Prioritization           (annual $2,623; 1 紅 May)
+  [412, 867, 643, 5222],     // 4  Complex Disease Cohort          (annual $7,144; 1 紅 May)
+  [738, null, 887, 4083],    // 5  Operations and Compliance       (annual $5,708; Mar = demo missing data; 1 紅 May)
+  [843, 632, 0, 1153],       // 6  Underrepresented Cohorts        (annual $2,628; Apr $0 = budget exact; 1 紅 May)
+  [null, null, null, null],  // 7  Steering Committee              (unlimited / no spend)
+  [118, 631, 423, 2392],     // 8  Portal Development              (annual $3,564; 1 紅 May)
+  [743, 912, 407, 1070],     // 9  Training, Networking & Outreach (annual $3,132; 1 紅 May)
+  [263, 118, 389, 2910],     // 10 Education & Capacity Building   (annual $3,680; 1 紅 May)
+];
 const SPEND_RATIO = WARNING_PRESETS.normal; // legacy alias
 // Cap-conflict demo cells: groupIdx → [monthIdx, ...] where T2 sum > T1 cap (amber dot on month cell)
 // In real prod, this is computed from per-month cap data; here it's hard-coded for visual demo.
@@ -1929,9 +2163,18 @@ function isMonthCapConflictAggregate(monthIdx){
   return false;
 }
 function getSpend(groupIdx, monthIdx, budgetVal){
-  if(budgetVal === null || budgetVal === undefined) return null; // unlimited budget → no spend tracking yet
-  if(monthIdx > PROTO_NOW_IDX) return undefined; // future month
-  // Simulate missing past data on group 5 month 1 (Feb) for the "—" warning state
+  // 顯示語意：$0 = 沒花錢；-- = 無資料（budget null 或 demo 故意 null）
+  if(budgetVal === null || budgetVal === undefined) return null; // unlimited budget → --
+  if(monthIdx > PROTO_NOW_IDX) return 0; // 未來月份 (May~Jan'27) → $0
+  // warn-mixed preset 走 mockup 表（polished demo for stakeholder mockup alignment）
+  if(state.warningPreset === 'mixed'){
+    const row = MOCKUP_SPEND_MIXED[groupIdx];
+    if(!row) return 0;
+    const v = row[monthIdx];
+    return (v === undefined) ? 0 : v; // null → 顯示 --（demo missing），number → spend
+  }
+  // 其他 preset 沿用 algorithmic ratio × monthly budget
+  // Simulate missing past data on group 5 month 1（Operations Mar）演示 "Missing actual data"
   if(groupIdx === 5 && monthIdx === 1) return null;
   const preset = WARNING_PRESETS[state.warningPreset] || WARNING_PRESETS.normal;
   const ratio = preset[groupIdx % preset.length] || 0.85;
@@ -1957,6 +2200,7 @@ function toggleSegCtrl(show){
   renderAll(); // FY picker + tabs + table + cards all need re-render
 }
 $('#seg-ctrl').addEventListener('click', e => {
+  if(state.editing) return; // 編輯模式下 segment 鎖住，點擊無效（hover 才顯示 unlock tooltip）
   const b = e.target.closest('.seg-btn');
   if(!b || b.classList.contains('active')) return;
   state.monthlyView = b.dataset.mode;
@@ -1995,6 +2239,8 @@ window.DEMO_PAGES = [
   { id:'state', label:'State', icon:'layers' },
   { id:'alert', label:'Alert', icon:'notifications' },
   { id:'warning', label:'Warning', icon:'warning' },
+  { id:'modal', label:'Modal', icon:'open_in_new' },
+  { id:'toast', label:'Toast', icon:'sms' },
 ];
 window.DEMO_SCENARIOS = [
   // Role
@@ -2019,7 +2265,18 @@ window.DEMO_SCENARIOS = [
   { id:'warn-over',        page:'warning', label:'Over budget · Remaining negative', icon:'priority_high',tip:'部分 group 實際 Spend > Budget：Spent % >= 100% 變紅 + Remaining 為負數（紅字 + 負號 + 微紅底色強化）。切到 Remaining monthly view 可看到月份格也有紅色負數。常與 cap-conflict 並存。' },
   { id:'warn-cap-conflict',page:'warning', label:'T2 sum > T1 cap',            icon:'warning',      tip:'下屬 T2 加總超過上層 T1 月額度：amber dot 在月份格右上角（Budget view 才顯示）。Hover dot 看 tooltip。Admin 降低 cap 時也會觸發此情境。' },
   { id:'warn-mixed',       page:'warning', label:'Mixed warnings (full demo)', icon:'release_alert',tip:'三種警示同時呈現：部分 group approaching、部分 over、特定月份格 cap-conflict。一次看完整警示體系。' },
-  // Display — 月份逐月呈現方式（方向Y 提案：給前端評估用）
+  // Modal — 直接打開 Figma 各個彈窗
+  { id:'modal-fy',          page:'modal', label:'Edit Start Month',           icon:'event',               tip:'Figma #11 — Edit Fiscal Start Month modal（含 preview chip + warning bullet）。' },
+  { id:'modal-alert-set',   page:'modal', label:'Alert Settings (with data)', icon:'notifications_active',tip:'Figma #09 — 已設定 3 個 threshold + Notification Settings 啟用。' },
+  { id:'modal-alert-empty', page:'modal', label:'Alert Settings (empty)',     icon:'notifications_off',   tip:'Figma #09-4 — 未設定 threshold，empty placeholder + Notification Settings disabled。' },
+  { id:'modal-alert-err',   page:'modal', label:'Alert Settings (errors)',    icon:'error',               tip:'Figma #09-2/#09-3 — 觸發 invalid (out of range) + duplicate 錯誤，每個 input 下方顯示錯誤訊息。' },
+  { id:'modal-discard',     page:'modal', label:'Discard Confirmation',       icon:'help_outline',        tip:'Figma #02-6 — 編輯模式 Cancel 時的捨棄確認彈窗。' },
+  // Toast — 觸發各種 Toast 文案演示
+  { id:'toast-budget-ok',   page:'toast', label:'Budget updated',             icon:'check_circle',        tip:'Figma #02-3 success toast' },
+  { id:'toast-budget-err',  page:'toast', label:'Unable to update budget',    icon:'error',               tip:'Figma #02-3 failure toast' },
+  { id:'toast-amount-ok',   page:'toast', label:'Amount applied',             icon:'check_circle',        tip:'Figma #03-4 single/bulk apply success toast' },
+  { id:'toast-alert-ok',    page:'toast', label:'Alert settings updated',     icon:'check_circle',        tip:'Figma #10 alert save success toast' },
+  { id:'toast-fy-ok',       page:'toast', label:'Fiscal Start Month updated', icon:'check_circle',        tip:'Figma #12 FY submit success toast' },
 ];
 window.DEMO_DEFAULT = 'admin';
 window.DEMO_APPLY = function(id){
@@ -2038,6 +2295,18 @@ window.DEMO_APPLY = function(id){
   else if(id === 'warn-over')         setWarningPreset('over');
   else if(id === 'warn-cap-conflict') setWarningPreset('cap-conflict');
   else if(id === 'warn-mixed')        setWarningPreset('mixed');
+  // Modal demos
+  else if(id === 'modal-fy')          $('#fy-btn')?.click();
+  else if(id === 'modal-alert-set')   { setAlertState(false); openAlert(); }
+  else if(id === 'modal-alert-empty') { setAlertState(true);  openAlert(); }
+  else if(id === 'modal-alert-err')   { setAlertState(false); state.thresholds = [78253, null, 70]; openAlert(); }
+  else if(id === 'modal-discard')     $('#mo-discard').classList.add('active');
+  // Toast demos
+  else if(id === 'toast-budget-ok')   toast('Budget updated successfully.');
+  else if(id === 'toast-budget-err')  toast('Unable to update budget. Please try again later.', 'err');
+  else if(id === 'toast-amount-ok')   toast('Amount applied successfully.');
+  else if(id === 'toast-alert-ok')    toast('Alert settings updated successfully.');
+  else if(id === 'toast-fy-ok')       toast('Fiscal Start Month updated successfully.');
 };
 
 // ===== Sidebar nav — NAV definition is in shared/lumiture-nav.js (single source of truth) =====
@@ -2573,7 +2842,7 @@ renderFYPicker();
  *   1. (Optional) Define window.LUMITURE_USER       — default { name:'Kabin Yang', role:'Owner / Admin', initials:'KY' }
  *   2. (Optional) Define window.LUMITURE_TOPBAR_ICONS — array of {icon, title, onclick, badge?}
  *   3. Add mount point: <header id="lt-topbar"></header>
- *   4. <script src="../shared/lumiture-topbar.js?v=YYYY-MM-DD"><\/script>
+ *   4. <script src="../shared/lumiture-topbar.js"><\/script>
  *
  * Schema:
  *   window.LUMITURE_USER = {
