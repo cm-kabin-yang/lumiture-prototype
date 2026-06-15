@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — Executive Insights v1 (C-Level KPIs + Fiscal Settings)</title>
+<title>Lumiture.ai — Executive Insights v2 (Add Fiscal Year + Empty State)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
@@ -354,24 +354,29 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .month-cell-input{display:flex;align-items:center;border:1px solid var(--tf-border);border-radius:var(--r-sm);height:36px;padding:0 10px;background:#fff;transition:border-color .15s,box-shadow .2s}
 .month-cell-input:hover{border-color:var(--g400)}
 .month-cell-input:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
-.month-cell-input .pre{font-size:13px;color:var(--g500);margin-right:4px;flex-shrink:0}
-.month-cell-input input{border:none;outline:none;background:transparent;width:100%;text-align:right;font-size:14px;color:var(--g700);padding:0;min-width:0;font-variant-numeric:tabular-nums}
+.month-cell-input .pre{font-size:13px;color:var(--g500);margin-right:4px;flex-shrink:0;transition:color .15s}
+.month-cell-input input{border:none;outline:none;background:transparent;width:100%;text-align:left;font-size:14px;color:var(--g700);padding:0;min-width:0;font-variant-numeric:tabular-nums}
 /* Placeholder 顯示 GB ref 值（per 2026-05-22 移除 Reset 後的替代設計） */
 .month-cell-input input::placeholder{color:var(--g400);font-style:italic;font-size:12px;letter-spacing:0}
+/* 空欄位狀態：$ 單位符號跟著 muted（與 placeholder 同色），讓「待填」整格讀成一體（dt-finance 2026-06-11）；有值時 $ 回實色 */
+.month-cell-input.is-empty .pre{color:var(--g400)}
 /* Modified cell visual cue — 邊框淺藍提示「user 自訂值與 GB 不同」 */
 .month-cell.modified .month-cell-input{border-color:#9ED7FF}
 
 /* Invalid Format state — required field empty (per Figma 5572-145436) */
 .month-cell.error .month-cell-input{border-color:var(--err);background:#FFF5F5}
 .month-cell.error .month-cell-input:focus-within{box-shadow:0 0 0 3px rgba(255,64,61,.12)}
-.field-error-msg{display:none;font-size:11px;color:var(--err);line-height:1.5;margin-top:6px;padding-left:2px}
-.field-error-msg .material-symbols-outlined{font-size:13px;vertical-align:-2px;color:var(--err)}
-.field-block.has-error .field-error-msg{display:block}
 .month-cell.error .month-cell-lbl{color:var(--err)}
+/* Per-cell error message (Figma: shows below each empty cell) */
+.month-cell-err{display:none;font-size:11px;color:var(--err);line-height:1.4;margin-top:3px;padding-left:1px}
+.month-cell.error .month-cell-err{display:block}
+/* Section-level field-error (only for inline single-field like CPC) */
+.field-error-msg{display:none;font-size:11px;color:var(--err);line-height:1.5;margin-top:4px;padding-left:1px}
+.field-error-msg .material-symbols-outlined{font-size:13px;vertical-align:-2px;color:var(--err)}
+.inline-field.has-error .field-error-msg{display:block}
 /* Inline-field error (Cost per Active Customer) */
 .inline-input.error{border-color:var(--err);background:#FFF5F5}
 .inline-input.error:focus-within{box-shadow:0 0 0 3px rgba(255,64,61,.12)}
-.inline-field.has-error .field-error-msg{display:block;margin-top:4px}
 /* Disabled / placeholder state for Industry Benchmark when not configured */
 .inline-select.benchmark-empty{color:var(--g400);font-style:italic}
 
@@ -382,7 +387,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .inline-input:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 .inline-input .pre{font-size:13px;color:var(--g500);margin-right:4px}
 .inline-input .post{font-size:13px;color:var(--g500);margin-left:4px}
-.inline-input input{border:none;outline:none;background:transparent;width:100%;text-align:right;font-size:14px;color:var(--g700);padding:0;min-width:0;font-variant-numeric:tabular-nums}
+.inline-input input{border:none;outline:none;background:transparent;width:100%;text-align:left;font-size:14px;color:var(--g700);padding:0;min-width:0;font-variant-numeric:tabular-nums}
 .inline-select{padding:0 32px 0 10px;border:1px solid var(--tf-border);border-radius:var(--r-sm);font-size:14px;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%23676767'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 8px center;height:36px;color:var(--g700);font-family:inherit;cursor:pointer;outline:none;appearance:none;min-width:200px}
 .inline-select:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 
@@ -401,10 +406,10 @@ body.state-settings.role-admin .savebar{display:flex}
 .modal{background:#fff;border-radius:var(--r-lg);padding:24px 28px;width:660px;max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.2)}
 .modal-sm{width:440px}
 .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.mt{font-size:18px;font-weight:700;color:var(--g900)}
+.mt{font-size:20px;font-weight:700;color:var(--g900)}
 .mx{color:var(--g400);cursor:pointer;display:flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:50%;background:none;border:none;padding:0}
 .mx:hover{background:var(--g100);color:var(--g700)}
-.mdesc{font-size:13px;color:var(--g500);margin-bottom:16px;line-height:1.6}
+.mdesc{font-size:14px;color:var(--g900);margin-bottom:16px;line-height:1.75}
 .mb{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-right:4px;min-height:0}
 .mf{display:flex;justify-content:flex-end;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--g200)}
 
@@ -739,7 +744,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
                   <div class="cvr-metrics-block" style="margin-top:18px">
                     <div class="cvr-metric">
                       <div class="cm-lbl">YTD Budget <span class="material-symbols-outlined ic-info" data-tip="Year-to-date Financial Budget. Set in Fiscal Settings; pre-filled from General Budget.">info</span></div>
-                      <div class="cm-val">8.50M<span class="cm-unit">USD</span></div>
+                      <div class="cm-val" data-tip="$8,500,000">8.50M<span class="cm-unit">USD</span></div>
                     </div>
                     <div class="cvr-metric">
                       <div class="cm-lbl">Expected ROI <span class="cm-month">(Sep.)</span></div>
@@ -747,19 +752,19 @@ Please try again in a few moments. If the problem persists, contact support.</di
                     </div>
                     <div class="cvr-metric">
                       <div class="cm-lbl">Expected Value <span class="material-symbols-outlined ic-info" data-tip="Expected Value = Financial Budget × (1 + Expected ROI).">info</span></div>
-                      <div class="cm-val">10.62M<span class="cm-unit">USD</span></div>
+                      <div class="cm-val" data-tip="$10,620,000">10.62M<span class="cm-unit">USD</span></div>
                     </div>
                     <div class="cvr-metric">
                       <div class="cm-lbl">YTD Actual Cost</div>
-                      <div class="cm-val">4.10M<span class="cm-unit">USD</span></div>
+                      <div class="cm-val" data-tip="$4,100,000">4.10M<span class="cm-unit">USD</span></div>
                     </div>
                     <div class="cvr-metric">
                       <div class="cm-lbl">Realized Value <span class="material-symbols-outlined ic-info" data-tip="Realized Value = YTD Actual Cost × (1 + Expected ROI).">info</span></div>
-                      <div class="cm-val">22.02M<span class="cm-unit">USD</span></div>
+                      <div class="cm-val" data-tip="$22,020,000">22.02M<span class="cm-unit">USD</span></div>
                     </div>
                     <div class="cvr-metric">
                       <div class="cm-lbl">Cost Variance <span class="material-symbols-outlined ic-info" data-tip="Cost Variance = YTD Budget − YTD Actual Cost. Positive = under budget.">info</span></div>
-                      <div class="cm-val">17.92M<span class="cm-unit">USD</span></div>
+                      <div class="cm-val" data-tip="$17,920,000">17.92M<span class="cm-unit">USD</span></div>
                     </div>
                   </div>
                 </div>
@@ -801,7 +806,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
                   <div class="trio-meta-row">
                     <div class="meta-cell">
                       <span class="meta-lbl">Revenue</span>
-                      <span class="meta-val">$185.93M</span>
+                      <span class="meta-val" data-tip="$185,930,000">$185.93M</span>
                     </div>
                     <div class="meta-cell">
                       <span class="meta-lbl">Industry Benchmark</span>
@@ -858,15 +863,15 @@ Please try again in a few moments. If the problem persists, contact support.</di
                   <div class="trio-meta-row three">
                     <div class="meta-cell">
                       <span class="meta-lbl">Your Forecast</span>
-                      <span class="meta-val">$4.50M</span>
+                      <span class="meta-val" data-tip="$4,500,000">$4.50M</span>
                     </div>
                     <div class="meta-cell">
                       <span class="meta-lbl">Actual Cost</span>
-                      <span class="meta-val">$4.10M</span>
+                      <span class="meta-val" data-tip="$4,100,000">$4.10M</span>
                     </div>
                     <div class="meta-cell">
                       <span class="meta-lbl">Variance</span>
-                      <span class="meta-val" id="variance-amount">$4.90M</span>
+                      <span class="meta-val" id="variance-amount" data-tip="$4,900,000">$4.90M</span>
                     </div>
                   </div>
                 </div>
@@ -990,13 +995,13 @@ Please try again in a few moments. If the problem persists, contact support.</di
           <div>
             <div class="pg-title">Fiscal Settings</div>
           </div>
-          <!-- Set Fiscal Start Month entry — per 2026-05-22 會議結論：Fiscal Settings 也能改 FY，兩邊聯動 -->
+          <!-- Edit Start Month entry — per 2026-05-22 會議結論：Fiscal Settings 也能改 FY，兩邊聯動。文案 2026-06-04 對齊 GB v2 「Edit Start Month」（拿掉 Fiscal） -->
           <div class="cvr-section-fy-r">
             <span class="material-symbols-outlined">calendar_today</span>
             <span>Fiscal Year Start: <strong>February</strong></span>
             <button class="cvr-section-fy-link" onclick="openFiscalStartDialog()">
               <span class="material-symbols-outlined">settings</span>
-              <span class="cvr-section-fy-link-text">Set Fiscal Start Month</span>
+              <span class="cvr-section-fy-link-text">Edit Start Month</span>
             </button>
           </div>
         </div>
@@ -1058,18 +1063,17 @@ Please try again in a few moments. If the problem persists, contact support.</di
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:4px">
                   <div class="field-block-lbl" style="margin-bottom:0">
                     Estimated Financial Budget <span class="req">*</span>
-                    <span class="material-symbols-outlined ic-info" data-tip="Pre-filled from General Budget monthly totals. Edits stay here only and don't affect General Budget.">info</span>
+                    <span class="material-symbols-outlined ic-info" data-tip="A forward-looking estimate of your monthly cloud budget. Pre-filled from General Budget monthly totals, but edits stay here only and won't affect the source. Use this to reflect your actual planned spending from a company-wide perspective, even if team budgets are incomplete or include buffers.">info</span>
                   </div>
                   <button class="btn btn-b" onclick="syncAllFromGB('budget-grid')" title="Reset every month back to its General Budget monthly total" style="flex-shrink:0">
                     <span class="material-symbols-outlined">sync</span>
                     <span class="btn-text">Sync all from General Budget</span>
                   </button>
                 </div>
-                <div class="field-block-hint">Your forward-looking <strong>estimate</strong> of monthly cloud spending.</div>
+                <div class="field-block-hint">Enter your organization's forward-looking monthly budget from a company-wide perspective. Currency in <strong>USD</strong>.</div>
                 <div class="month-grid" id="budget-grid">
                   <!-- Months populated by JS -->
                 </div>
-                <div class="field-error-msg" data-error-for="budget"><span class="material-symbols-outlined">error</span> Budget cannot be empty.</div>
               </div>
 
               <!-- Expected ROI — Figma 5572 文案保留為 hint；tooltip 補「組合 Expected Value 概念」(原本在 section-desc) -->
@@ -1082,7 +1086,6 @@ Please try again in a few moments. If the problem persists, contact support.</di
                 <div class="month-grid" id="roi-grid">
                   <!-- Months populated by JS -->
                 </div>
-                <div class="field-error-msg" data-error-for="roi"><span class="material-symbols-outlined">error</span> ROI cannot be empty.</div>
               </div>
             </div>
 
@@ -1101,11 +1104,13 @@ Please try again in a few moments. If the problem persists, contact support.</di
                   <span class="sub">Reference percentage from your industry (looked up from internal database).</span>
                 </div>
                 <select class="inline-select">
-                  <option>SaaS / B2B (12.5%)</option>
-                  <option>E-commerce (18.4%)</option>
-                  <option>FinTech (9.8%)</option>
-                  <option>Healthcare (7.2%)</option>
-                  <option>None</option>
+                  <option value="" disabled>Select Industry Benchmark</option>
+                  <option>Automotive</option>
+                  <option>Construction</option>
+                  <option>Energy</option>
+                  <option>Finance</option>
+                  <option>Technology</option>
+                  <option selected>None</option>
                 </select>
               </div>
 
@@ -1132,12 +1137,14 @@ Please try again in a few moments. If the problem persists, contact support.</di
                   Cost per Active Customer <span class="req">*</span>
                   <span class="sub">Currency in <strong>USD</strong>. This represents the standard of comparing <strong>Cloud Cost per Customer</strong>. Please refer to your past data or experience.</span>
                 </div>
-                <div class="inline-input" id="cpc-input-wrap">
-                  <span class="pre">$</span>
-                  <input type="text" id="cpc-input" value="45.00" />
+                <div style="display:flex;flex-direction:column;gap:4px">
+                  <div class="inline-input" id="cpc-input-wrap">
+                    <span class="pre">$</span>
+                    <input type="text" id="cpc-input" value="45.00" />
+                  </div>
+                  <div class="field-error-msg" data-error-for="cpc">Cloud Cost per Active Customer cannot be empty.</div>
                 </div>
               </div>
-              <div class="field-error-msg" data-error-for="cpc" style="margin-top:-8px;margin-bottom:16px"><span class="material-symbols-outlined">error</span> Cost per Active Customer cannot be empty.</div>
 
               <div class="field-block">
                 <div class="field-block-lbl">Monthly Active Customers</div>
@@ -1168,7 +1175,6 @@ Please try again in a few moments. If the problem persists, contact support.</di
                 <div class="month-grid" id="forecast-grid">
                   <!-- Months populated by JS -->
                 </div>
-                <div class="field-error-msg" data-error-for="forecast"><span class="material-symbols-outlined">error</span> Forecast cannot be empty.</div>
               </div>
             </div>
 
@@ -1200,7 +1206,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
 
     <!-- Footer -->
     <div class="footer">
-      <span class="footer-version">Executive Insights Prototype<span class="ver-tag">v1</span></span>
+      <span class="footer-version">Executive Insights Prototype<span class="ver-tag">v2 · Add Fiscal Year + Empty State</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
     </div>
 
@@ -1218,45 +1224,48 @@ Please try again in a few moments. If the problem persists, contact support.</di
   </div><!-- /.main -->
 </div><!-- /.app -->
 
-<!-- Fiscal Start Month Dialog — 對齊 Figma #09 (5574:147650) 精簡版 + 補 Synced 提示 -->
+<!-- Edit Start Month Dialog — 對齊 Figma #09 (5574:147650) 2026-06-12 全面對齊 -->
 <div class="mo" id="modal-fsm">
   <div class="modal">
     <div class="mh">
-      <div class="mt">Set Fiscal Start Month</div>
+      <div class="mt">Edit Start Month</div>
       <button class="mx" onclick="closeModal('modal-fsm')"><span class="material-symbols-outlined">close</span></button>
     </div>
     <div class="mdesc">Please select your organization's fiscal year start month.</div>
     <div class="mb">
       <div class="fsm-form">
-        <div>
-          <select class="inline-select" id="fsm-select" style="width:100%">
-            <option value="1">January</option>
-            <option value="2" selected>February</option>
-            <option value="3">March</option>
-            <option value="4">April</option>
-            <option value="5">May</option>
-            <option value="6">June</option>
-            <option value="7">July</option>
-            <option value="8">August</option>
-            <option value="9">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </select>
-          <div style="font-size:12px;color:var(--g500);line-height:1.6;margin-top:8px">
-            After making your selection, your previously saved data will be used, but with the new start month. If required fields are incomplete, the dashboard will not display correctly.
+        <select class="inline-select" id="fsm-select" style="width:100%" onchange="updateFSMResult()">
+          <option value="1">January</option>
+          <option value="2" selected>February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+        <p id="fsm-result" style="margin:0;font-size:14px;font-weight:500;color:var(--g900);line-height:1.75"></p>
+        <div style="background:#FEF3E1;border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="material-symbols-outlined" style="font-size:20px;color:#EC6F09;font-variation-settings:'FILL' 1">warning</span>
+            <span style="font-size:14px;color:#EC6F09;line-height:1.75">When you change the fiscal start month:</span>
           </div>
-        </div>
-        <!-- 附加：Synced 提示（會議結論補充，Figma 未涵蓋） -->
-        <div style="font-size:12px;color:var(--pri);line-height:1.5;display:flex;align-items:center;gap:6px;padding-top:4px">
-          <span class="material-symbols-outlined" style="font-size:14px;color:var(--pri)">link</span>
-          This setting is shared with <strong>General Budget</strong>. Changes apply to both pages.
+          <ul style="margin:0;padding-left:28px;color:#EC6F09;font-size:14px;line-height:1.75">
+            <li>Your existing monthly data is preserved and remapped to the new FY range.</li>
+            <li>FY-based aggregations are recalculated automatically.</li>
+            <li>Changes will sync across all features, including <strong>General Budget</strong>.</li>
+            <li>Incomplete required fields may affect data visibility on certain dashboards.</li>
+          </ul>
         </div>
       </div>
     </div>
     <div class="mf">
       <button class="btn btn-o" onclick="closeModal('modal-fsm')">Cancel</button>
-      <button class="btn btn-p" onclick="confirmFSM()">Set</button>
+      <button class="btn btn-p" onclick="confirmFSM()">Save</button>
     </div>
   </div>
 </div>
@@ -1643,159 +1652,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
 })();
 
 </script>
-<script>
-/* === Inlined: shared/lumiture-topbar.js === */
-/*!
- * lumiture-topbar.js — Lumiture Shared Topbar (Navy bar with icons + user chip)
- *
- * 用途：把 navy bg topbar（右側 icons + KY user chip）抽成共用模組。
- * 跟 sidebar 一樣統一所有 prototype 的 header 視覺。
- *
- * Usage in prototype HTML:
- *   1. (Optional) Define window.LUMITURE_USER       — default { name:'Kabin Yang', role:'Owner / Admin', initials:'KY' }
- *   2. (Optional) Define window.LUMITURE_TOPBAR_ICONS — array of {icon, title, onclick, badge?}
- *   3. Add mount point: <header id="lt-topbar"></header>
- *   4. <script src="../shared/lumiture-topbar.js?v=YYYY-MM-DD"><\/script>
- *
- * Schema:
- *   window.LUMITURE_USER = {
- *     name:     'Kabin Yang',
- *     role:     'Owner / Admin',
- *     initials: 'KY',        // shown inside avatar circle
- *     // gradient: 'linear-gradient(135deg,#34B5D9,#004FB0)',  // optional avatar bg override
- *   };
- *   window.LUMITURE_TOPBAR_ICONS = [
- *     { icon:'notifications', title:'Notifications', badge:true,  onclick:'fn()' },
- *     { icon:'help',          title:'Help' },
- *     { icon:'settings',      title:'Settings' },
- *   ];
- *
- * Public API:
- *   window.LumitureTopbar.setUser({name, role, initials})  — update user chip dynamically
- *   window.LumitureTopbar.rerender()
- */
-(function () {
-  'use strict';
-
-  // ===== Defaults =====
-  var DEFAULT_USER = {
-    name: 'Kabin Yang',
-    role: 'Owner / Admin',
-    initials: 'KY',
-  };
-
-  var DEFAULT_ICONS = [
-    { icon: 'notifications', title: 'Notifications' },
-    { icon: 'help',          title: 'Help' },
-    { icon: 'settings',      title: 'Settings' },
-  ];
-
-  // ===== CSS =====
-  var CSS = [
-    /* Topbar container — Primary Dark (#002663) navy bar to match sidebar */
-    '.lt-topbar{background:#002663;padding:14px 32px;display:flex;align-items:center;justify-content:flex-end;gap:16px;',
-    'position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px;box-sizing:border-box}',
-
-    /* Icon button */
-    '.lt-tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;',
-    'cursor:pointer;color:rgba(255,255,255,.7);background:none;border:none;padding:0;position:relative;font-family:inherit;transition:background .15s,color .15s}',
-    '.lt-tb-ic:hover{background:rgba(255,255,255,.08);color:#fff}',
-    '.lt-tb-ic .material-symbols-outlined{font-size:22px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 22}',
-
-    /* Badge dot on icon (for notifications) */
-    '.lt-tb-ic .lt-tb-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:#FF403D;',
-    'border:2px solid #002663;border-radius:50%}',
-
-    /* User chip — avatar + name + role */
-    '.lt-tb-user{display:flex;align-items:center;gap:10px;padding-left:16px;margin-left:0;',
-    'border-left:1px solid rgba(255,255,255,.1);color:#fff;cursor:pointer;transition:opacity .15s}',
-    '.lt-tb-user:hover{opacity:.92}',
-    '.lt-tb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#34B5D9,#004FB0);',
-    'display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;',
-    'letter-spacing:.3px;font-family:\'Noto Sans\',sans-serif}',
-    '.lt-tb-user-text{display:flex;flex-direction:column;font-size:12px;line-height:1.3;min-width:0;font-family:\'Noto Sans\',sans-serif}',
-    '.lt-tb-user-name{font-weight:600;color:#fff;white-space:nowrap}',
-    '.lt-tb-user-role{color:rgba(255,255,255,.6);font-size:11px;white-space:nowrap}',
-  ].join('');
-
-  function _injectCSS() {
-    if (document.getElementById('lt-topbar-css')) return;
-    var s = document.createElement('style');
-    s.id = 'lt-topbar-css';
-    s.textContent = CSS;
-    document.head.appendChild(s);
-  }
-
-  // ===== Helpers =====
-  function _esc(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-  }
-
-  function _renderIcon(item) {
-    var attrs = ' class="lt-tb-ic" title="' + _esc(item.title || '') + '"';
-    if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
-    var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
-    return '<button type="button"' + attrs + '>' +
-             '<span class="material-symbols-outlined">' + _esc(item.icon) + '</span>' +
-             badge +
-           '</button>';
-  }
-
-  function _renderUser(user) {
-    var avatarStyle = user.gradient ? ' style="background:' + _esc(user.gradient) + '"' : '';
-    return '<div class="lt-tb-user" id="lt-tb-user" title="' + _esc(user.name) + ' · ' + _esc(user.role) + '">' +
-             '<div class="lt-tb-avatar"' + avatarStyle + '>' + _esc(user.initials) + '</div>' +
-             '<div class="lt-tb-user-text">' +
-               '<span class="lt-tb-user-name">' + _esc(user.name) + '</span>' +
-               '<span class="lt-tb-user-role" id="lt-tb-user-role">' + _esc(user.role) + '</span>' +
-             '</div>' +
-           '</div>';
-  }
-
-  // ===== Mount =====
-  function _render() {
-    var mount = document.getElementById('lt-topbar');
-    if (!mount) {
-      console.warn('[lumiture-topbar] Mount point #lt-topbar not found');
-      return;
-    }
-
-    var user = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
-    var icons = window.LUMITURE_TOPBAR_ICONS || DEFAULT_ICONS;
-
-    mount.classList.add('lt-topbar');
-    mount.innerHTML = icons.map(_renderIcon).join('') + _renderUser(user);
-  }
-
-  // ===== Public API =====
-  window.LumitureTopbar = {
-    setUser: function (user) {
-      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, user || {});
-      _render();
-    },
-    setRole: function (role) {
-      // Lightweight role-only update — used by Demo FAB role switching
-      var el = document.getElementById('lt-tb-user-role');
-      if (el) el.textContent = role;
-      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, { role: role });
-    },
-    rerender: _render,
-  };
-
-  // ===== INIT =====
-  function _init() {
-    _injectCSS();
-    _render();
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', _init);
-  } else {
-    _init();
-  }
-})();
-
-</script>
+<script src="../shared/lumiture-topbar.js?v=2026-05-21"></script>
 <script>
 /* === Inlined: shared/currency-picker.js === */
 /*!
@@ -1970,324 +1827,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
 })();
 
 </script>
-<script>
-/* === Inlined: shared/focus-treemap.js === */
-/*!
- * focus-treemap.js — Lumiture Shared FOCUS Cost Treemap + Top10 Ranking
- *
- * 用途：把 cost-by-FOCUS-framework 區塊（左 Treemap + 右 Top10 表）
- * 抽成共用模組，給 Executive Insights / Cost Dashboard / 未來 prototype 共用。
- *
- * Source of truth:
- *   - 對齊 FE: src/features/CostByFOCUS/CostByFOCUSTreeMap.tsx + Top10CostByFOCUSTable.tsx
- *   - 設計：Figma Main Feature node 4103-40564 / 3873-84509（PM 註解規則）
- *
- * 規則（per PM 註解 2026-05-21）：
- *   - 顯示「所有」FOCUS 分類（202512 官方文件約 19+ 項）；花費為 0 不顯示
- *   - 不做 Top 9 + Others 收尾（如要顯示 Others 桶，由 caller 自行傳入）
- *   - 顏色順序按 ranking：rank 1→#2、rank 2→#4、rank 3→#6、rank 4→#10、
- *     rank 5→#9、rank 6→#8、rank 7→#7、rank 8→#5、rank 9→#3、rank 10→#1
- *     （CMDS Color Kit Main palette；參考 FE rankingColor array）
- *   - Treemap label 顯示「服務名 + 花費」，面積過小自動隱藏（ECharts 預設行為）
- *   - 底部 index / 下層 drill-down 暫不顯示（PM 指示）
- *   - Top10 排行榜 width 固定 452px；圖表 fill 剩餘 width
- *   - 雙方都需延展時 chart : ranking = 6 : 4（由 caller layout 控制 max-width）
- *
- * Usage:
- *   <div class="lt-focus-section">
- *     <div id="my-focus-treemap" class="lt-focus-treemap"></div>
- *     <div id="my-focus-table" class="lt-focus-table"></div>
- *   </div>
- *
- *   <script src="../shared/focus-treemap.js"><\/script>
- *   <script>
- *     LumitureFocusTreemap.render({
- *       treemapEl: '#my-focus-treemap',
- *       tableEl:   '#my-focus-table',
- *       data: [
- *         { name:'Compute',    spending:186400, share:0.346, changeRatio: 0.12 },
- *         { name:'Storage',    spending:94200,  share:0.175, changeRatio:-0.04 },
- *         // ... 19+ entries
- *       ],
- *       currency: 'USD',
- *       currencySymbol: '$',
- *     });
- *   <\/script>
- *
- * Data schema (per entry):
- *   { name, spending, share?, changeRatio? }
- *   - name        : FOCUS service category name
- *   - spending    : number (in selected currency)
- *   - share       : 0~1 (proportion of total) — 用於 Top10 表格 Share 欄
- *   - changeRatio : -1~+inf — 用於 Top10 表格 Change 欄（+ red / − green）
- *   - 不傳 share / changeRatio → 表格欄顯示 '--'
- */
-(function () {
-  'use strict';
-
-  // ===== CMDS Color Kit Main — ranking 1..10 color order =====
-  // 對齊 FE rankingColor array (CostByFOCUSTreeMap.tsx)
-  var RANK_COLORS = [
-    '#9ED7FF', // rank 1 → CMDS #2 Sky Blue 30
-    '#00DCC2', // rank 2 → CMDS #4 Green 60
-    '#F3BE68', // rank 3 → CMDS #6 Tangerine Orange 40
-    '#C096FF', // rank 4 → CMDS #10 Purple 40
-    '#FE89C1', // rank 5 → CMDS #9 Fuchsia 30
-    '#FFA4A9', // rank 6 → CMDS #8 Red 30
-    '#F4B581', // rank 7 → CMDS #7 Lantern Orange 50
-    '#94F29D', // rank 8 → CMDS #5 Emerald Green 40
-    '#9CF3FF', // rank 9 → CMDS #3 Turquoise Blue 40
-    '#7A8BA9', // rank 10 → CMDS #1 Navy Blue 50
-  ];
-  // Rank 11+ 按 RANK_COLORS 順序循環使用（不灰色 fallback）
-  function getRankColor(rank) {
-    if (rank < 1) return RANK_COLORS[0];
-    var idx = (rank - 1) % RANK_COLORS.length;
-    return RANK_COLORS[idx];
-  }
-
-  // ===== CSS injection =====
-  var CSS = [
-    /* Section wrapper: chart left + table right 452px fixed */
-    '.lt-focus-section{display:grid;grid-template-columns:1fr 452px;gap:24px;align-items:stretch}',
-    '.lt-focus-treemap{height:378px;background:#fff;border-radius:8px;overflow:hidden;position:relative;min-width:0}',
-    /* table-wrap 改 scrollable，table 內維持標準 layout 讓 border-spacing 正常運作 */
-    '.lt-focus-table-wrap{height:378px;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;min-width:0;scrollbar-width:thin}',
-    '.lt-focus-table-wrap::-webkit-scrollbar{width:6px}',
-    '.lt-focus-table-wrap::-webkit-scrollbar-thumb{background:#CCCCCC;border-radius:3px}',
-    '.lt-focus-table-wrap::-webkit-scrollbar-track{background:transparent}',
-    /* Table — design spec 規範：row 25px 高 + 8px 間隔（per Kabin 2026-05-22）
-       使用標準 table layout + border-spacing：8px（同 Top10）
-       Scroll 由 wrap container 負責；thead 用 position:sticky 維持頂部固定 */
-    '.lt-focus-table{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:12px;table-layout:fixed}',
-    '.lt-focus-table thead th{position:sticky;top:0;z-index:2}',
-    '.lt-focus-table thead th{padding:0 10px;height:32px;text-align:left;font-weight:700;color:#262626;font-size:11px;background:#F2FAFF;border-bottom:none;letter-spacing:.2px;white-space:nowrap}',
-    '.lt-focus-table thead tr th:first-child{border-radius:4px 0 0 4px}',
-    '.lt-focus-table thead tr th:last-child{border-radius:0 4px 4px 0}',
-    '.lt-focus-table thead th.tx-right{text-align:right}',
-    '.lt-focus-table thead th.col-rank{width:60px;white-space:nowrap}',
-    '.lt-focus-table thead th.col-name{width:auto}',
-    '.lt-focus-table thead th.col-spend{width:80px}',
-    '.lt-focus-table thead th.col-share{width:60px}',
-    /* tbody / tr 維持標準 table layout（display:table-row-group / display:table-row）讓 border-spacing 生效 */
-    '.lt-focus-table td{padding:0 10px;height:25px;border-bottom:none;font-size:12px;color:#676767;vertical-align:middle;background:#fff}',
-    '.lt-focus-table td.tx-right{text-align:right;font-weight:700}',
-    '.lt-focus-table td.col-rank{color:#676767;font-weight:700;font-size:11px;width:60px;white-space:nowrap;letter-spacing:.2px}',
-    '.lt-focus-table td.col-name{width:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;color:#262626}',
-    '.lt-focus-table td.col-spend{width:80px;color:#0B6DD7;font-weight:700}',
-    '.lt-focus-table td.col-share{width:60px;color:#262626;font-weight:700}',
-    '.lt-focus-table tbody tr:hover td{background:#F6F6F6}',
-    /* Tooltip styling for ECharts */
-    '.lt-focus-tooltip{font-family:\'Noto Sans\',sans-serif;font-size:12px;line-height:1.5}',
-    '.lt-focus-tooltip-name{font-weight:700;color:#262626;margin-bottom:4px;font-size:13px}',
-    '.lt-focus-tooltip-val{color:#676767}',
-    '.lt-focus-tooltip-val strong{color:#262626;font-weight:700}',
-    /* Empty state for no-data */
-    '.lt-focus-treemap.empty{display:flex;align-items:center;justify-content:center;background:#FAFCFE;border:1px dashed #E6E6E6;color:#B3B3B3;font-size:13px}',
-    /* Responsive: stack on narrow screens */
-    '@media(max-width:1200px){.lt-focus-section{grid-template-columns:1fr}.lt-focus-table-wrap{height:auto}.lt-focus-table tbody{max-height:none}}',
-  ].join('');
-
-  function _injectCSS() {
-    if (document.getElementById('lt-focus-treemap-css')) return;
-    var s = document.createElement('style');
-    s.id = 'lt-focus-treemap-css';
-    s.textContent = CSS;
-    document.head.appendChild(s);
-  }
-
-  // ===== Helpers =====
-  function _esc(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-  }
-
-  // Number abbreviation: 1234567 → "1.23M"; 12345 → "12.3K"; <1000 → "1234.56"
-  function nFormat(n, fixed) {
-    if (n === null || n === undefined || isNaN(n)) return '--';
-    var abs = Math.abs(n);
-    var sign = n < 0 ? '-' : '';
-    var d = fixed === undefined ? 2 : fixed;
-    if (abs >= 1e12) return sign + (abs / 1e12).toFixed(d) + 'T';
-    if (abs >= 1e9)  return sign + (abs / 1e9 ).toFixed(d) + 'B';
-    if (abs >= 1e6)  return sign + (abs / 1e6 ).toFixed(d) + 'M';
-    if (abs >= 1e3)  return sign + (abs / 1e3 ).toFixed(d) + 'K';
-    return sign + abs.toFixed(d);
-  }
-
-  function _resolveEl(elOrSelector) {
-    if (typeof elOrSelector === 'string') return document.querySelector(elOrSelector);
-    return elOrSelector;
-  }
-
-  // ===== Treemap render =====
-  function _renderTreemap(el, data, opts) {
-    if (typeof echarts === 'undefined') {
-      console.error('[focus-treemap] ECharts not loaded — please include https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js');
-      el.classList.add('empty');
-      el.textContent = 'ECharts not loaded';
-      return null;
-    }
-
-    // Exclude zero-cost entries (per PM rule)
-    var nonZero = data.filter(function (d) { return d.spending > 0; });
-    // Sort by spending descending to derive ranking
-    nonZero.sort(function (a, b) { return b.spending - a.spending; });
-
-    if (!nonZero.length) {
-      el.classList.add('empty');
-      el.textContent = opts.emptyText || 'No FOCUS cost data available';
-      return null;
-    }
-
-    el.classList.remove('empty');
-
-    var formattedData = nonZero.map(function (d, i) {
-      var rank = i + 1;
-      return {
-        name: d.name,
-        value: d.spending,
-        _rank: rank,
-        _share: d.share,
-        itemStyle: { color: getRankColor(rank) },
-      };
-    });
-
-    var chart = echarts.init(el);
-    var symbol = opts.currencySymbol || '$';
-    var currencyCode = opts.currency || '';
-
-    chart.setOption({
-      tooltip: {
-        show: true,
-        trigger: 'item',
-        confine: true,
-        borderWidth: 0,
-        backgroundColor: '#FFFFFF',
-        textStyle: { color: '#262626', fontSize: 12 },
-        extraCssText: 'border-radius:6px;padding:10px 12px;max-width:280px;box-shadow:0 4px 16px rgba(0,0,0,.12)',
-        formatter: function (p) {
-          var d = p.data;
-          var share = (d._share != null) ? (d._share * 100).toFixed(2) + '%' : '--';
-          return '<div class="lt-focus-tooltip">' +
-                 '<div class="lt-focus-tooltip-name" style="color:#262626;font-weight:700;font-size:13px;margin-bottom:6px">' + _esc(d.name) + '</div>' +
-                 '<div style="color:#676767;line-height:1.6">Spending: <strong style="color:#0B6DD7">' + symbol + nFormat(d.value) + ' ' + _esc(currencyCode) + '</strong></div>' +
-                 '<div style="color:#676767;line-height:1.6">Share: <strong style="color:#262626">' + share + '</strong></div>' +
-                 '<div style="color:#676767;line-height:1.6">Rank: <strong style="color:#262626">Top ' + d._rank + '</strong></div>' +
-                 '</div>';
-        },
-      },
-      series: [{
-        type: 'treemap',
-        data: formattedData,
-        roam: false,
-        nodeClick: false,
-        breadcrumb: { show: false },          // 底部 index 不顯示
-        top: 0, left: 0, right: 0, bottom: 0,
-        width: '100%', height: '100%',
-        itemStyle: { gapWidth: 4, borderRadius: 4, borderColor: '#fff', borderWidth: 0 },
-        label: {
-          show: true,
-          position: 'inside',
-          align: 'center',
-          verticalAlign: 'middle',
-          fontSize: 12, fontWeight: 700,
-          color: '#FFFFFF',
-          lineHeight: 18,
-          // 面積過小 ECharts 預設會自動隱藏 label（min font size constraint）
-          formatter: function (p) {
-            return p.name + '\n' + symbol + nFormat(p.value);
-          },
-        },
-        // 不做 drill-down upper label
-        upperLabel: { show: false },
-        levels: [{
-          itemStyle: { borderColor: '#FFFFFF', borderWidth: 2, gapWidth: 2 },
-        }],
-      }],
-    });
-    return chart;
-  }
-
-  // ===== Top10 Table render =====
-  function _renderTable(el, data, opts) {
-    var nonZero = data.filter(function (d) { return d.spending > 0; });
-    nonZero.sort(function (a, b) { return b.spending - a.spending; });
-    // Default: show all (not just top 10). caller can pass limit
-    var rows = opts.limit ? nonZero.slice(0, opts.limit) : nonZero;
-
-    var symbol = opts.currencySymbol || '$';
-
-    if (!rows.length) {
-      el.innerHTML = '<div style="padding:24px;text-align:center;color:#B3B3B3;font-size:12px">No data</div>';
-      return;
-    }
-
-    var thead =
-      '<thead><tr>' +
-        '<th class="col-rank">Rank</th>' +
-        '<th class="col-name">Service Category</th>' +
-        '<th class="col-spend tx-right">Spending</th>' +
-        '<th class="col-share tx-right">Share</th>' +
-      '</tr></thead>';
-
-    var tbody = '<tbody>' + rows.map(function (d, i) {
-      var rank = i + 1;
-      var rankStr = 'Top ' + String(rank).padStart(2, '0');
-      var spending = symbol + nFormat(d.spending);
-      var share = (d.share != null) ? (d.share * 100).toFixed(2) + '%' : '--';
-      return '<tr>' +
-               '<td class="col-rank">' + _esc(rankStr) + '</td>' +
-               '<td class="col-name" title="' + _esc(d.name) + '">' + _esc(d.name) + '</td>' +
-               '<td class="col-spend tx-right">' + _esc(spending) + '</td>' +
-               '<td class="col-share tx-right">' + _esc(share) + '</td>' +
-             '</tr>';
-    }).join('') + '</tbody>';
-
-    el.innerHTML = '<table class="lt-focus-table">' + thead + tbody + '</table>';
-  }
-
-  // ===== Public API =====
-  var _instances = [];
-
-  function render(config) {
-    _injectCSS();
-    var tEl = _resolveEl(config.treemapEl);
-    var bEl = _resolveEl(config.tableEl);
-    if (!tEl) { console.warn('[focus-treemap] treemapEl not found'); return null; }
-    if (!bEl) { console.warn('[focus-treemap] tableEl not found'); return null; }
-
-    var chart = _renderTreemap(tEl, config.data || [], {
-      currency: config.currency,
-      currencySymbol: config.currencySymbol,
-      emptyText: config.emptyText,
-    });
-
-    _renderTable(bEl, config.data || [], {
-      currency: config.currency,
-      currencySymbol: config.currencySymbol,
-      limit: config.tableLimit, // optional — default show all
-    });
-
-    var instance = { chart: chart, treemapEl: tEl, tableEl: bEl, config: config };
-    _instances.push(instance);
-    return instance;
-  }
-
-  function resizeAll() {
-    _instances.forEach(function (i) { if (i.chart) i.chart.resize(); });
-  }
-
-  window.addEventListener('resize', resizeAll);
-
-  window.LumitureFocusTreemap = {
-    render: render,
-    resizeAll: resizeAll,
-    RANK_COLORS: RANK_COLORS,
-    getRankColor: getRankColor,
-  };
-})();
-
-</script>
+<script src="../shared/focus-treemap.js?v=2026-05-22c"></script>
 
 <script>
 /* ============================================================
@@ -2299,6 +1839,35 @@ const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
  * （跟 General Budget 設定同步；最後 1 個月 Jan. '27 跨年）
  */
 const FY_MONTHS = ['Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan'];
+
+/* ===== 金額顯示規則（2026-06-04 對齊 GB v2）=====
+ * 規則：>=100K 用 K、>=1M 用 M、>=1B 用 B；hover 顯示完整數值
+ * 用法：fmt(n) → '$1.2M'；fmtCardNum(n) → '1.2M' (無 $)；isAbbreviated(n) 判斷要不要加 hover tooltip
+ */
+function fmt(n){
+  if(n===null||n===undefined) return null;
+  const abs = Math.abs(n);
+  const sign = n < 0 ? '-' : '';
+  if(abs >= 1e9) return `${sign}$${(abs/1e9).toFixed(2).replace(/\.?0+$/,'')}B`;
+  if(abs >= 1e6) return `${sign}$${(abs/1e6).toFixed(2).replace(/\.?0+$/,'')}M`;
+  if(abs >= 1e5) return `${sign}$${(abs/1e3).toFixed(1).replace(/\.?0+$/,'')}K`;
+  return `${sign}$${Math.round(abs).toLocaleString()}`;
+}
+function fmtFull(n){
+  if(n===null||n===undefined) return null;
+  const abs = Math.abs(n);
+  return `${n < 0 ? '-' : ''}$${Math.round(abs).toLocaleString()}`;
+}
+function isAbbreviated(n){ return n !== null && n !== undefined && Math.abs(n) >= 1e5; }
+function fmtCardNum(n){
+  if(n===null||n===undefined) return '--';
+  const abs = Math.abs(n);
+  const sign = n < 0 ? '-' : '';
+  if(abs >= 1e9) return `${sign}${(abs/1e9).toFixed(2).replace(/\.?0+$/,'')}B`;
+  if(abs >= 1e6) return `${sign}${(abs/1e6).toFixed(2).replace(/\.?0+$/,'')}M`;
+  if(abs >= 1e5) return `${sign}${(abs/1e3).toFixed(1).replace(/\.?0+$/,'')}K`;
+  return `${sign}${Math.round(abs).toLocaleString()}`;
+}
 const FY_YEARS  = [ "'26","'26","'26","'26","'26","'26","'26","'26","'26","'26","'26","'27"];
 
 /* ===== Page switching ===== */
@@ -2347,19 +1916,84 @@ function takeScreenshot(){
 /* ===== Fiscal Start Month Dialog ===== */
 function openFiscalStartDialog(){
   document.getElementById('modal-fsm').classList.add('active');
+  updateFSMResult();
+}
+function updateFSMResult(){
+  const sel = document.getElementById('fsm-select');
+  if (!sel) return;
+  const m = parseInt(sel.value); // 1-12
+  const ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const startAbbr = ABBR[m - 1];
+  const endAbbr = ABBR[(m + 10) % 12]; // month before start (0-based)
+  const endYear = m === 1 ? 2026 : 2027;
+  const el = document.getElementById('fsm-result');
+  if (el) el.textContent = 'Resulting fiscal year: FY2026 (' + startAbbr + '. 2026 – ' + endAbbr + '. ' + endYear + ')';
 }
 function confirmFSM(){
   closeModal('modal-fsm');
-  showToast('Fiscal start month saved. Also updated in General Budget.','info');
+  showToast('Fiscal Start Month updated successfully.');
   // 若目前是 firsttime state 才導去 Settings 開始填資料；其他情況留原頁
   const isFirstTime = document.querySelector('.state-view[data-state="firsttime"]') &&
                       getComputedStyle(document.querySelector('.state-view[data-state="firsttime"]')).display !== 'none';
   if (isFirstTime) setTimeout(goToSettings,500);
 }
-function addFY(){ document.getElementById('modal-add-fy').classList.add('active'); }
+function addFY(){
+  const sel = document.getElementById('add-fy-select');
+  // 無可新增年份 → 提示並擋掉（避免開出空 modal）
+  if (!sel || sel.options.length === 0){
+    showToast('No more fiscal years available to add.','info');
+    return;
+  }
+  document.getElementById('modal-add-fy').classList.add('active');
+}
 function confirmAddFY(){
+  const sel = document.getElementById('add-fy-select');
+  if (!sel || sel.options.length === 0){ closeModal('modal-add-fy'); return; }
+  const opt = sel.options[sel.selectedIndex];
+  const year = sel.value;                 // e.g. "2027"
+  const periodLabel = opt.text;           // "FY2027 · Feb. 2027 – Jan. 2028"
   closeModal('modal-add-fy');
-  showToast('Fiscal year added. Switch to it from the toolbar above.');
+
+  const toggleGroup = document.querySelector('.fy-toggle');
+  if (!toggleGroup) return;
+
+  // 已存在同年 toggle 就不重複加（防呆）
+  let newBtn = [...toggleGroup.querySelectorAll('.fy-toggle-btn')]
+                 .find(b => b.textContent.trim() === 'FY'+year);
+  if (!newBtn){
+    newBtn = document.createElement('button');
+    newBtn.className = 'fy-toggle-btn';
+    newBtn.textContent = 'FY'+year;
+    newBtn.setAttribute('onclick', `switchFY(this,'${year}','${periodLabel.replace(/'/g,"\\'")}')`);
+    toggleGroup.appendChild(newBtn);
+    // 該年已設定 → 從下拉移除
+    sel.remove(sel.selectedIndex);
+  }
+
+  // 標記為「空資料」並切換過去 → 呈現全空白表單情境
+  FY_EMPTY.add(year);
+  switchFY(newBtn, year, periodLabel);
+  showToast('FY'+year+' added. Fill in the baseline data below to activate insights.');
+}
+
+/* Demo FAB「Newly Added FY (no data)」一鍵情境 — idempotent，重複點不會一直加按鈕 */
+function demoShowNewFY(){
+  const year = '2027';
+  const periodLabel = 'FY2027 · Feb. 2027 – Jan. 2028';
+  const toggleGroup = document.querySelector('.fy-toggle');
+  if (!toggleGroup) return;
+  let btn = [...toggleGroup.querySelectorAll('.fy-toggle-btn')].find(b=>b.textContent.trim()==='FY'+year);
+  if (!btn){
+    btn = document.createElement('button');
+    btn.className = 'fy-toggle-btn';
+    btn.textContent = 'FY'+year;
+    btn.setAttribute('onclick', `switchFY(this,'${year}','${periodLabel}')`);
+    toggleGroup.appendChild(btn);
+    const sel = document.getElementById('add-fy-select');
+    if (sel) [...sel.options].forEach(o=>{ if(o.value===year) sel.remove(o.index); });
+  }
+  FY_EMPTY.add(year);
+  switchFY(btn, year, periodLabel);
 }
 function discardChanges(){ document.getElementById('modal-discard').classList.add('active'); }
 function confirmDiscard(){ closeModal('modal-discard'); goToDashboard(); showToast('Changes discarded','warn'); }
@@ -2372,7 +2006,7 @@ function saveChanges(){
     errors[0].el.scrollIntoView({block:'center',behavior:'smooth'});
     return;
   }
-  showToast('Fiscal Settings saved');
+  showToast('Fiscal Settings updated successfully.');
   setTimeout(goToDashboard,500);
 }
 
@@ -2468,7 +2102,19 @@ function showToast(msg,type){
   setTimeout(()=>{t.style.transition='opacity .3s';t.style.opacity='0';setTimeout(()=>t.remove(),300);},2800);
 }
 
-/* ===== Fiscal Year toggle ===== */
+/* ===== Fiscal Year toggle =====
+ * FY_EMPTY: 標記哪些年份「新增、尚未填資料」。
+ * 切換時：新 FY → loadNewFYData()（依 PRD：Financial Budget 從 General Budget 預填、其餘 section 留空）；
+ *         已設定年份 → 從 snapshot 還原。
+ */
+const FY_EMPTY = new Set();
+let FISCAL_SNAPSHOT = null;
+
+/* General Budget 月度配額（source of truth = General Budget）。新增 FY 的 Financial Budget 依 PRD 從此預填。
+ * 對應 handoff 2026-05-27 line 19/50：「預填 GB monthly total」「換 FY 後新增月份從 GB 補」。
+ * 數值鏡射 init budget-grid 的 refs（prototype 單一 GB mock dataset）。 */
+const GB_MONTHLY_BUDGET = ['$78,420','$83,150','$88,000','$93,275','$98,840','$103,500','$108,930','$106,200','$100,640','$96,820','$90,540','$83,910'];
+
 function switchFY(btn,year,periodLabel){
   btn.parentElement.querySelectorAll('.fy-toggle-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
@@ -2476,7 +2122,125 @@ function switchFY(btn,year,periodLabel){
     const lbl = document.getElementById('fy-period-label');
     if (lbl) lbl.textContent = periodLabel;
   }
-  showToast('Loaded FY'+year+' settings','info');
+  // 更新月份格上的年份小標（Feb. 'YY → Jan. '(YY+1)）
+  updateMonthYearLabels(parseInt(year,10));
+  // 載入該 FY 的資料：新 FY → Budget 預填 GB + 其餘留空；已設定年份 → 還原 snapshot
+  if (FY_EMPTY.has(year)) {
+    loadNewFYData();
+    showToast('Loaded FY'+year+'. Financial Budget pre-filled from General Budget.','info');
+  } else {
+    restoreFiscalSnapshot();
+    showToast('Loaded FY'+year+' settings','info');
+  }
+}
+
+/* 依 fiscal start year 計算 12 個月份的年份小標：Feb..Dec = 'YY，Jan = '(YY+1) */
+function computeFYYearSuffixes(startYear){
+  const a = String(startYear).slice(-2);
+  const b = String(startYear + 1).slice(-2);
+  // FY_MONTHS = [Feb..Dec(11), Jan(1)] → 前 11 個用 startYear，最後 1 個（Jan）用 startYear+1
+  return FY_MONTHS.map((m,i)=> "'" + (m === 'Jan' ? b : a));
+}
+function updateMonthYearLabels(startYear){
+  if (!startYear || isNaN(startYear)) return;
+  const suffixes = computeFYYearSuffixes(startYear);
+  document.querySelectorAll('#page-settings .month-grid').forEach(grid=>{
+    grid.querySelectorAll('.month-cell-year').forEach((span,i)=>{
+      if (suffixes[i]) span.textContent = suffixes[i];
+    });
+  });
+}
+
+/* 把目前（已填好的）表單值存成 snapshot，供切回已設定年份時還原 */
+function captureFiscalSnapshot(){
+  const grab = id => [...(document.getElementById(id)?.querySelectorAll('input')||[])].map(inp=>inp.value);
+  // budget-grid 另存 placeholder / GB ref / source tip，供切回時還原（空 FY 會把它們清掉）
+  const budgetMeta = [...(document.getElementById('budget-grid')?.querySelectorAll('input')||[])].map(inp=>({
+    placeholder: inp.getAttribute('placeholder') || '',
+    gbRef: inp.dataset.gbRef || '',
+    sourceTip: inp.dataset.sourceTip || '',
+  }));
+  FISCAL_SNAPSHOT = {
+    budget:    grab('budget-grid'),
+    budgetMeta,
+    roi:       grab('roi-grid'),
+    revenue:   grab('revenue-grid'),
+    customers: grab('customers-grid'),
+    forecast:  grab('forecast-grid'),
+    cpc:       document.getElementById('cpc-input')?.value || '',
+    benchmark: (()=>{ const s=document.querySelector('#page-settings .inline-select'); return s? s.selectedIndex : 0; })(),
+  };
+}
+function restoreFiscalSnapshot(){
+  if (!FISCAL_SNAPSHOT) return;
+  const put = (id, arr) => {
+    const inputs = document.getElementById(id)?.querySelectorAll('input');
+    if (!inputs) return;
+    inputs.forEach((inp,i)=>{ inp.value = (arr && arr[i] != null) ? arr[i] : ''; onMonthCellInput(inp); });
+  };
+  put('budget-grid',    FISCAL_SNAPSHOT.budget);
+  // 還原 budget-grid 的 placeholder / GB ref / source tip
+  if (FISCAL_SNAPSHOT.budgetMeta){
+    document.getElementById('budget-grid')?.querySelectorAll('input').forEach((inp,i)=>{
+      const meta = FISCAL_SNAPSHOT.budgetMeta[i];
+      if (!meta) return;
+      inp.setAttribute('placeholder', meta.placeholder);
+      if (meta.gbRef) inp.dataset.gbRef = meta.gbRef; else delete inp.dataset.gbRef;
+      if (meta.sourceTip) inp.dataset.sourceTip = meta.sourceTip; else delete inp.dataset.sourceTip;
+      onMonthCellInput(inp);
+    });
+  }
+  put('roi-grid',       FISCAL_SNAPSHOT.roi);
+  put('revenue-grid',   FISCAL_SNAPSHOT.revenue);
+  put('customers-grid', FISCAL_SNAPSHOT.customers);
+  put('forecast-grid',  FISCAL_SNAPSHOT.forecast);
+  const cpc = document.getElementById('cpc-input');
+  if (cpc) cpc.value = FISCAL_SNAPSHOT.cpc;
+  const sel = document.querySelector('#page-settings .inline-select');
+  if (sel) sel.selectedIndex = FISCAL_SNAPSHOT.benchmark;
+  // 清掉任何 invalid 錯誤殘留並更新 completion chips
+  document.querySelectorAll('#page-settings .month-cell.error,#page-settings .field-block.has-error,#page-settings .inline-field.has-error,#page-settings .inline-input.error')
+    .forEach(el=>el.classList.remove('error','has-error'));
+  updateCompletionChips();
+}
+
+/* 載入「新增 FY」的資料（依 PRD）：
+ *   - Financial Budget：從 General Budget 預填（保留 GB ref + source tip，Sync 才有來源可同步）
+ *   - 其餘 section（ROI / Cost per Customer / Forecast / Revenue / Active Customers）：留空，等 user 自己填
+ * 對應 handoff 2026-05-27 line 19/50（預填 GB monthly total、新增月份從 GB 補）。 */
+function loadNewFYData(){
+  // 1) Financial Budget ← General Budget 預填
+  document.getElementById('budget-grid')?.querySelectorAll('input').forEach((inp,i)=>{
+    const gb = GB_MONTHLY_BUDGET[i] || '--';
+    inp.value = gb;
+    if (gb && gb !== '--'){
+      inp.dataset.gbRef = gb;
+      inp.dataset.sourceTip = 'Source value from General Budget: '+gb;
+      inp.setAttribute('placeholder', gb);
+    }
+    inp.closest('.month-cell')?.classList.remove('modified');
+    onMonthCellInput(inp); // 更新 is-empty / modified 狀態
+  });
+  // 2) Expected ROI 預填 1（依 Figma #07-4 最終規格，無 $ 前綴）
+  document.getElementById('roi-grid')?.querySelectorAll('input').forEach(inp=>{
+    inp.value='1'; inp.setAttribute('placeholder',''); onMonthCellInput(inp);
+  });
+  // 3) 其餘 section 留空（revenue / customers / forecast 非必填或無預設來源）
+  ['revenue-grid','customers-grid','forecast-grid'].forEach(id=>{
+    document.getElementById(id)?.querySelectorAll('input').forEach(inp=>{ inp.value=''; onMonthCellInput(inp); });
+  });
+  ['forecast-grid'].forEach(id=>{
+    document.getElementById(id)?.querySelectorAll('input').forEach(inp=>{ inp.setAttribute('placeholder',''); });
+  });
+  const cpc = document.getElementById('cpc-input');
+  if (cpc) cpc.value='';
+  // Industry Benchmark 回到「None」（最後一個 option，benchmark 為 optional）
+  const sel = document.querySelector('#page-settings .inline-select');
+  if (sel) sel.selectedIndex = sel.options.length - 1;
+  // 清掉錯誤殘留 + 重算 completion chips（Budget 完整、其餘空 → 視 section 而定）
+  document.querySelectorAll('#page-settings .month-cell.error,#page-settings .field-block.has-error,#page-settings .inline-field.has-error,#page-settings .inline-input.error')
+    .forEach(el=>el.classList.remove('error','has-error'));
+  updateCompletionChips();
 }
 
 /* ===== Generate month input grids =====
@@ -2512,9 +2276,15 @@ function buildMonthGrid(containerId, opts){
         (opts.prefix?'<span class="pre">'+opts.prefix+'</span>':'')+
         '<input type="text" value="'+displayVal+'" data-gb-ref="'+(ref||'')+'"'+(ref?' data-source-tip="Source value from General Budget: '+ref+'"':'')+' oninput="onMonthCellInput(this)" onfocus="showSourceTip(this)" onblur="hideSourceTip(this)" placeholder="'+placeholder+'" />'+
         (opts.suffix?'<span class="pre" style="margin-left:4px;margin-right:0">'+opts.suffix+'</span>':'')+
-      '</div>';
+      '</div>'+
+      (opts.errorMsg?'<div class="month-cell-err">'+opts.errorMsg+'</div>':'');
     c.appendChild(cell);
   }
+  // 初始 is-empty 狀態（空值 → $ muted），涵蓋所有 grid（含 ROI / Forecast / Revenue）
+  c.querySelectorAll('.month-cell-input').forEach(w=>{
+    const inp = w.querySelector('input');
+    if (inp) w.classList.toggle('is-empty', inp.value.trim() === '');
+  });
 }
 
 /* Source tooltip — 顯示在 input cell 上方，focus 時自動跳出（per Gemini Option 6 + Kabin's B+C 補強）
@@ -2561,6 +2331,9 @@ function hideSourceTip(){
 /* Detect if input value differs from GB ref → toggle .modified class */
 function onMonthCellInput(input){
   const cell = input.closest('.month-cell');
+  // 空值 → 整格 muted（含 $ 單位符號）；有值 → 回實色。先處理，不受 gbRef 早退影響
+  const wrap = input.closest('.month-cell-input');
+  if (wrap) wrap.classList.toggle('is-empty', input.value.trim() === '');
   const gbRef = input.dataset.gbRef || '';
   if (gbRef === '') return; // no GB ref means no diff to track
   if (input.value.trim() !== gbRef) {
@@ -2686,7 +2459,9 @@ function renderTop10(data, opts){
         const orig = data[item.dataIndex];
         if (opts.kind === 'overspend') {
           const pct = orig.budget ? ((orig.val/orig.budget)*100).toFixed(0) : '--';
-          return `<div style="font-weight:700;color:#262626;margin-bottom:6px;font-size:13px">${orig.name}</div>
+          // Hover 規則 1（2026-06-04）：紅字超標 → {Subject} exceeds {Reference}.
+          return `<div style="font-weight:700;color:#262626;margin-bottom:4px;font-size:13px">${orig.name}</div>
+                  <div style="color:#B8302E;font-size:11px;font-weight:600;margin-bottom:6px">Spend exceeds team budget.</div>
                   <div style="color:#676767;font-size:12px;line-height:1.6">Overrun: <strong style="color:#B8302E">+$${(orig.val/1000).toFixed(1)}K</strong> (+${pct}%)</div>
                   <div style="color:#676767;font-size:12px;line-height:1.6">Budget: <strong style="color:#262626">$${(orig.budget/1000).toFixed(1)}K</strong></div>`;
         } else {
@@ -2743,10 +2518,10 @@ function initCharts(){
       tooltip:{trigger:'axis',axisPointer:{type:'shadow'},
         backgroundColor:'#FFFFFF',borderWidth:0,textStyle:{color:'#262626',fontSize:12},
         extraCssText:'box-shadow:0 4px 16px rgba(0,0,0,.12);border-radius:6px;padding:10px 12px',
-        formatter:(p)=>'<div style="font-weight:700;color:#262626;margin-bottom:6px;font-size:13px">'+p[0].axisValue+'</div>'+p.map(x=>'<div style="display:flex;gap:8px;align-items:center;color:#676767;font-size:12px;line-height:1.6"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+x.color+'"></span>'+x.seriesName+': <strong style="color:#262626">$'+(x.value/1e6).toFixed(2)+'M</strong></div>').join('')},
+        formatter:(p)=>'<div style="font-weight:700;color:#262626;margin-bottom:6px;font-size:13px">'+p[0].axisValue+'</div>'+p.map(x=>'<div style="display:flex;gap:8px;align-items:center;color:#676767;font-size:12px;line-height:1.6"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+x.color+'"></span>'+x.seriesName+': <strong style="color:#262626">'+fmt(x.value)+'</strong></div>').join('')},
       legend:{show:true,bottom:0,icon:'roundRect',itemWidth:14,itemHeight:8,itemGap:18,textStyle:{color:'#676767',fontSize:12}},
       xAxis:{type:'category',data:FY_MONTHS.map((m,i)=>m+'.'),axisLine:{lineStyle:{color:'#E6E6E6'}},axisLabel:{color:'#676767',fontSize:11}},
-      yAxis:{type:'value',axisLine:{show:false},axisTick:{show:false},splitLine:{lineStyle:{color:'#F2F2F2',type:'dashed'}},axisLabel:{color:'#676767',fontSize:11,formatter:(v)=>(v/1e6).toFixed(2)+'M'}},
+      yAxis:{type:'value',axisLine:{show:false},axisTick:{show:false},splitLine:{lineStyle:{color:'#F2F2F2',type:'dashed'}},axisLabel:{color:'#676767',fontSize:11,formatter:fmt}},
       series:[
         // FY2026 Feb. – Jan. (12 months): all values in USD; Expected Value (dashed blue), Realized Value (green), Actual Cost (navy)
         {name:'Expected Value',type:'line',smooth:true,symbol:'none',
@@ -2917,14 +2692,16 @@ function setVarianceState(state){
   frame.className = 'metric-frame ' + cssState;
   val.className = 'mf-val ' + cssState;
   meaning.className = 'mf-meaning ' + cssState;
-  const m = { ok:['+3.29%','mood','Your variance to forecast is Accurate.','$120K'],
-              warn:['-8.90%','warning','Your variance to forecast is Moderate.','$400K'],
-              over:['+16.68%','warning','Your variance to forecast is High.','$750K'],
-              'over-strong':['+53.29%','dangerous','Your variance to forecast is Inaccurate.','$2.40M'] }[state];
+  // 4th element = abbreviated display, 5th = full value for hover restore (規則 #4 hover restore)
+  const m = { ok:['+3.29%','mood','Your variance to forecast is Accurate.','$120K','$120,000'],
+              warn:['-8.90%','warning','Your variance to forecast is Moderate.','$400K','$400,000'],
+              over:['+16.68%','warning','Your variance to forecast is High.','$750K','$750,000'],
+              'over-strong':['+53.29%','dangerous','Your variance to forecast is Inaccurate.','$2.40M','$2,400,000'] }[state];
   if (m) {
     val.textContent = m[0];
     meaning.innerHTML = '<span class="material-symbols-outlined">'+m[1]+'</span><span>'+m[2]+'</span>';
     amount.textContent = m[3];
+    amount.setAttribute('data-tip', m[4]);
   }
 }
 
@@ -2934,6 +2711,8 @@ window.DEMO_PAGES = [
   { id:'settings',  label:'Settings',  icon:'tune' },
   { id:'card-state',label:'Card State',icon:'palette' },
   { id:'role',      label:'Role',      icon:'person' },
+  { id:'modal',     label:'Modal',     icon:'open_in_new' },
+  { id:'toast',     label:'Toast',     icon:'sms' },
 ];
 
 window.DEMO_SCENARIOS = [
@@ -2952,6 +2731,7 @@ window.DEMO_SCENARIOS = [
   { id:'s-invalid', page:'settings', label:'Invalid Format',      icon:'error',         tip:'Required fields empty: red borders, error messages, Section "Incomplete" chip (per Figma 5572)' },
   { id:'s-loading', page:'settings', label:'Loading',             icon:'hourglass_top', isNoData:true, tip:'Skeleton while settings load' },
   { id:'s-empty',   page:'settings', label:'No Fiscal Year Yet',  icon:'add_circle',   isNoData:true, tip:'No fiscal year configured. Prompt to add first FY.' },
+  { id:'s-new-fy',  page:'settings', label:'Newly Added FY', icon:'event_upcoming', isNoData:true, tip:'新增 fiscal year 後切到該年：Financial Budget 依 PRD 從 General Budget 預填，其餘 section（ROI / CPC / Forecast / Revenue / Customers）留空待填，chips = Incomplete。' },
 
   // Card state scenarios — Figma 5749-141112
   { id:'cs-cvr-ok',     page:'card-state', label:'CVR: Above Target (2.28×)',       icon:'trending_up',  tip:'Realized cloud value exceeds expectations (green gradient)' },
@@ -2969,6 +2749,20 @@ window.DEMO_SCENARIOS = [
   // Role scenarios
   { id:'r-admin',    page:'role', label:'Owner / Admin',     icon:'admin_panel_settings', tip:'Full access (can view + edit Executive Insights and Fiscal Settings)' },
   { id:'r-nonadmin', page:'role', label:'Non-Admin (T1/T2)', icon:'lock',                 tip:'T1 / T2 Manager / Member (cannot enter Executive Insights at all, per new PRD)' },
+
+  // Modal scenarios — 一鍵開啟各 modal（GB v2 對齊）
+  { id:'modal-edit-start', page:'modal', label:'Edit Start Month',         icon:'event',     tip:'Figma #09 — 改 Fiscal Year start month modal（warning box + 動態 Resulting FY 文字）。' },
+  { id:'modal-add-fy',     page:'modal', label:'Add Fiscal Year',          icon:'add_circle',tip:'新增 Fiscal Year modal（CMDS form modal 660px）。' },
+  { id:'modal-discard',    page:'modal', label:'Discard unsaved changes?', icon:'warning',   tip:'Settings 有未存改動時離開的 confirm dialog。' },
+
+  // Toast scenarios — 演示文案（GB v2 對齊句型「X updated successfully.」/「Unable to update X.」）
+  { id:'toast-settings-ok',  page:'toast', label:'Settings updated (ok)',  icon:'check_circle',tip:'Fiscal Settings updated successfully.' },
+  { id:'toast-settings-err', page:'toast', label:'Settings update failed', icon:'error',       tip:'Unable to update Fiscal Settings. Please try again later.' },
+  { id:'toast-fsm-ok',       page:'toast', label:'Start month saved (ok)', icon:'check_circle',tip:'Fiscal Start Month updated successfully.' },
+  { id:'toast-fsm-err',      page:'toast', label:'Start month save failed',icon:'error',       tip:'Unable to update Fiscal Start Month. Please try again later.' },
+  { id:'toast-fy-ok',        page:'toast', label:'Fiscal year updated',    icon:'event_available', tip:'Fiscal year updated successfully. Also synced to General Budget.' },
+  { id:'toast-fy-load',      page:'toast', label:'Loaded FY (info)',       icon:'info',        tip:'Loaded FY2026 settings (info, 切換 FY 時用)。' },
+  { id:'toast-discard',      page:'toast', label:'Changes discarded',      icon:'warning',     tip:'Changes discarded (warn)。' },
 ];
 
 window.DEMO_DEFAULT = 'd-set';
@@ -2987,6 +2781,7 @@ window.DEMO_APPLY = function(id, btn){
   if(id==='s-set')     { setRole('admin'); goToSettings(); setSettingsState('set');     }
   if(id==='s-loading') { setRole('admin'); goToSettings(); setSettingsState('loading'); }
   if(id==='s-empty')   { setRole('admin'); goToSettings(); setSettingsState('empty');   }
+  if(id==='s-new-fy')  { setRole('admin'); goToSettings(); setSettingsState('set'); setTimeout(demoShowNewFY,100); }
   if(id==='s-invalid') {
     setRole('admin'); goToSettings(); setSettingsState('set');
     // 故意清空幾個必填欄位來觸發 invalid state
@@ -3027,26 +2822,37 @@ window.DEMO_APPLY = function(id, btn){
   // Role scenarios
   if(id==='r-admin')    { setRole('admin');    goToDashboard(); setState('set'); }
   if(id==='r-nonadmin') { setRole('nonadmin'); }
+
+  // Modal scenarios — 一鍵開 modal（先確保到對應頁面再開）
+  const openModalById = (mid)=>{ const m=document.getElementById(mid); if(m) m.classList.add('active'); };
+  if(id==='modal-edit-start') { setRole('admin'); goToDashboard(); setState('set'); openModalById('modal-fsm'); }
+  if(id==='modal-add-fy')     { setRole('admin'); goToSettings(); setSettingsState('set'); openModalById('modal-add-fy'); }
+  if(id==='modal-discard')    { setRole('admin'); goToSettings(); setSettingsState('set'); openModalById('modal-discard'); }
+
+  // Toast scenarios — 演示各 toast 文案（GB v2 對齊句型）
+  if(id==='toast-settings-ok')  { showToast('Fiscal Settings updated successfully.'); }
+  if(id==='toast-settings-err') { showToast('Unable to update Fiscal Settings. Please try again later.','err'); }
+  if(id==='toast-fsm-ok')       { showToast('Fiscal Start Month updated successfully.'); }
+  if(id==='toast-fsm-err')      { showToast('Unable to update Fiscal Start Month. Please try again later.','err'); }
+  if(id==='toast-fy-ok')        { showToast('Fiscal year updated successfully. Also synced to General Budget.','info'); }
+  if(id==='toast-fy-load')      { showToast('Loaded FY2026 settings','info'); }
+  if(id==='toast-discard')      { showToast('Changes discarded.','warn'); }
 };
 
 /* ===== Init ===== */
 document.addEventListener('DOMContentLoaded',()=>{
   // FY2026 Feb. 2026 – Jan. 2027；Apr/Jul 故意 empty 示意「user 清空 → placeholder 顯示 GB ref 值」
   // 對應 2026-05-22 PM/RD 結論：移除 per-cell Reset，改用 placeholder 機制
-  // index:        Feb        Mar       Apr   May        Jun        Jul   Aug         Sep         Oct         Nov         Dec        Jan
+  // index:        Feb        Mar       Apr        May        Jun        Jul        Aug         Sep         Oct         Nov         Dec        Jan
+  // FY2026 預設為「完整」showcase：12 格全填（Apr/Jul 對齊 GB 值）。空欄位 / placeholder 機制改由新增 FY 的空資料情境展示
   buildMonthGrid('budget-grid',{
-    prefix:'$', placeholder:'0',
-    values:[ '$78,420', '$83,150', '',  '$93,275', '$98,840', '',  '$108,930', '$106,200', '$100,640', '$96,820', '$90,540', '$83,910' ],
-    refs:[   '$78,420', '$83,150', '$88,000', '$93,275', '$98,840', '$103,500','$108,930', '$106,200', '$100,640', '$96,820', '$90,540', '$83,910' ]
-  });
-  // 強制清空 Apr (i=2) 和 Jul (i=5) 以展示 placeholder mechanism（buildMonthGrid 預設會用 ref fallback fill）
-  document.querySelectorAll('#budget-grid input').forEach((inp,i)=>{
-    if (i===2 || i===5) inp.value = '';
-    onMonthCellInput(inp);
+    prefix:'$', placeholder:'0', errorMsg:'Budget cannot be empty.',
+    values:[ '$78,420', '$83,150', '$88,000', '$93,275', '$98,840', '$103,500', '$108,930', '$106,200', '$100,640', '$96,820', '$90,540', '$83,910' ],
+    refs:[   '$78,420', '$83,150', '$88,000', '$93,275', '$98,840', '$103,500', '$108,930', '$106,200', '$100,640', '$96,820', '$90,540', '$83,910' ]
   });
   buildMonthGrid('roi-grid',{
-    prefix:'$', placeholder:'0',
-    values:['120,000','127,500','135,000','142,500','150,000','157,500','165,000','162,000','153,000','147,000','138,000','127,500']
+    placeholder:'1', errorMsg:'ROI cannot be empty.',
+    values:['1.20','1.27','1.35','1.43','1.50','1.58','1.65','1.62','1.53','1.47','1.38','1.28']
   });
   buildMonthGrid('revenue-grid',{
     prefix:'$', placeholder:'optional',
@@ -3057,9 +2863,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     values:['22,400','22,800','23,200','23,600','24,000','24,400','24,820','24,600','24,300','24,100','23,800','23,500']
   });
   buildMonthGrid('forecast-grid',{
-    prefix:'$', placeholder:'0',
+    prefix:'$', placeholder:'0', errorMsg:'Forecast cannot be empty.',
     values:['82,000','87,000','92,000','97,000','102,000','107,000','112,000','110,000','104,000','100,000','94,000','87,000']
   });
+
+  // 存下這份「已填好」的資料 snapshot，供切回已設定年份 (FY2025/FY2026) 時還原
+  captureFiscalSnapshot();
 
   // Render Top10 Overspend (table + vertical bar chart) — overrun amount + % over budget
   // Figma 註釋: >=30% 深紅，其他橘色 — 此處有 4 個 >=30% (Engineering 50%, Data Pipeline 52%, Customer 42%, ML 42%)
