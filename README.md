@@ -6,10 +6,10 @@ Kabin Yang 的 Lumiture.ai 設計 prototype 部署 repo，透過 GitHub Pages �
 
 | Prototype | 說明 |
 |---|---|
-| [LumiTag](https://cm-kabin-yang.github.io/LumiTure-Prototype/lumitag.html) | Virtual Tags 設定模組 |
-| [Cost Dashboard](https://cm-kabin-yang.github.io/LumiTure-Prototype/cost-dashboard.html) | Showback / Chargeback 接線 |
-| [Executive Insights](https://cm-kabin-yang.github.io/LumiTure-Prototype/executive-insights.html) | C-Level KPIs + Fiscal Settings |
-| [General Budget](https://cm-kabin-yang.github.io/LumiTure-Prototype/general-budget.html) | 預算管理、Fiscal Year、Annual Summary |
+| [LumiTag](https://cm-kabin-yang.github.io/lumiture-prototype/lumitag.html) | Virtual Tags 設定模組 |
+| [Cost Dashboard](https://cm-kabin-yang.github.io/lumiture-prototype/cost-dashboard.html) | Showback / Chargeback 接線 |
+| [Executive Insights](https://cm-kabin-yang.github.io/lumiture-prototype/executive-insights.html) | C-Level KPIs + Fiscal Settings |
+| [General Budget](https://cm-kabin-yang.github.io/lumiture-prototype/general-budget.html) | 預算管理、Fiscal Year、Annual Summary |
 
 ## 關於這個 repo
 
