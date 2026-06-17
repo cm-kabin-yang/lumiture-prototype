@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — General Budget v2 (Fiscal Year & Annual Summary)</title>
+<title>Lumiture.ai — General Budget v2 (Fiscal Year & Annual Summary + FY Switcher)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
@@ -58,6 +58,41 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .fy-set-link:hover{background:var(--pri-lt10)}
 .fy-set-link:hover .fy-set-link-text{text-decoration:underline}
 .fy-set-link .material-symbols-outlined{font-size:16px;color:var(--pri);font-variation-settings:'FILL' 0,'wght' 500}
+/* 編輯模式凍結：Edit Start Month 灰掉（改 FY 定義會 remap 整頁，與草稿衝突） */
+.fy-set-link:disabled{color:var(--g400);cursor:not-allowed;pointer-events:none}
+.fy-set-link:disabled .material-symbols-outlined{color:var(--g400)}
+
+/* ==== FY year switcher（頁首右上，page-level 導覽；往前兩年/往後一年）==== */
+.fy-sw{position:relative;display:inline-block}
+.fy-sw-trigger{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:1px solid var(--g300);border-radius:var(--r-sm);background:#fff;font-family:inherit;font-size:13px;font-weight:600;color:var(--g900);cursor:pointer;line-height:1;transition:border-color .12s,background .12s,box-shadow .12s}
+.fy-sw-trigger:hover{border-color:var(--pri);background:var(--pri-lt10)}
+.fy-sw.open .fy-sw-trigger{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
+.fy-sw-trigger:disabled{color:var(--g400);background:var(--g100);border-color:var(--g200);cursor:not-allowed}
+.fy-sw-trigger:disabled .fy-sw-cal{color:var(--g400)}
+.fy-sw-cal{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400}
+.fy-sw-val{letter-spacing:0}
+.fy-sw-arr{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400;transition:transform .15s;margin-left:2px}
+.fy-sw.open .fy-sw-arr{transform:rotate(180deg)}
+/* 狀態 tag（trigger 與 option 共用） */
+.fy-sw-tag{font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;letter-spacing:.02em;line-height:1.5;text-transform:none;white-space:nowrap}
+.fy-sw-tag-current{background:var(--pri-lt10);color:var(--pri)}
+.fy-sw-tag-future{background:#fef3e1;color:#ec6f09}
+/* 過去年：trigger 數字轉中性灰，暗示「非當年」（但不鎖，仍可編輯） */
+.fy-sw.past .fy-sw-trigger{color:var(--g600)}
+.fy-sw.past .fy-sw-val{color:var(--g600)}
+.fy-sw.future .fy-sw-trigger{color:var(--g900)}
+/* 下拉選單 */
+.fy-sw-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:248px;background:#fff;border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.1);padding:6px;z-index:60;display:none;overscroll-behavior:contain}
+.fy-sw.open .fy-sw-menu{display:block}
+.fy-sw-menu-hd{font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.04em;padding:6px 10px 4px}
+.fy-sw-opt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:8px 10px;border:none;background:none;border-radius:var(--r-sm);cursor:pointer;font-family:inherit;text-align:left;position:relative;transition:background .1s}
+.fy-sw-opt:hover{background:var(--g100)}
+.fy-sw-opt.sel{background:var(--pri-lt10)}
+.fy-sw-opt-main{display:inline-flex;align-items:center;gap:6px}
+.fy-sw-opt-fy{font-size:14px;font-weight:600;color:var(--g900);line-height:1.3}
+.fy-sw-opt.sel .fy-sw-opt-fy{color:var(--pri)}
+.fy-sw-opt-range{font-size:12px;color:var(--g500);line-height:1.4}
+.fy-sw-check{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--pri);font-variation-settings:'FILL' 1,'wght' 500}
 .paper-desc{font-size:12px;color:var(--g500);margin-bottom:24px}
 .paper-desc b{color:var(--g700);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:11px}
 
@@ -623,7 +658,7 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
     </div>
 
     <div class="footer">
-      <span class="footer-version">General Budget Prototype<span class="ver-tag">v2 · Fiscal Year &amp; Annual Summary</span></span>
+      <span class="footer-version">General Budget Prototype<span class="ver-tag">v2 · FY Switcher</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
     </div>
   </div>
@@ -813,6 +848,46 @@ const GROUPS_AZURE = [
 ];
 const ALL_GROUPS = { gcp:GROUPS_GCP, aws:GROUPS_AWS, azure:GROUPS_AZURE };
 
+// ===== FY view window (改朝換代後新定義：往前兩年、往後一年) =====
+// 舊定義只看「當下那年」；新定義可檢視 CURRENT_FY-2 ~ CURRENT_FY+1（共 4 個 FY）。
+// 過去年 = 歷史 actuals（團隊決定仍可編輯，方便做報告）；未來年 = Planning（已設預算、尚無 actuals）。
+// ⚠️ 必須宣告在 YEAR_DATA 之前（top-level 順序執行，const 有 TDZ）。
+const CURRENT_FY = 2026;          // 機構「當下」的會計年度（switcher 預設、Current 標記基準）
+const FY_VIEW_BACK = 2;           // 可往前看幾年
+const FY_VIEW_FWD = 1;            // 可往後看幾年
+const FY_VIEW_MIN = CURRENT_FY - FY_VIEW_BACK;
+const FY_VIEW_MAX = CURRENT_FY + FY_VIEW_FWD;
+
+// ===== Per-year data store (年份切換器資料來源) =====
+// CURRENT_FY 直接共用 ALL_GROUPS 的引用 → Edit/Save 操作當年資料即寫回 canonical（向後相容）。
+// 其他年份 = 依年度比例縮放的 deep clone（demo 用，讓切年時數字「真的不一樣」、可信）。
+//   過去年：機構規模較小 → 縮小；未來年（Planning）：預算照設、但 actuals(spend) 留空（尚未發生）。
+// 年度規模係數（g.months = 每月「預算」；spend 另由 getSpend() 依同係數縮放，見下）。
+// 未來年（Planning）：預算照設（×1.12），但 actuals 由 getSpend 回 $0（尚未花費）→ 不在此清空 months。
+const _yearScale = { [CURRENT_FY-2]:0.72, [CURRENT_FY-1]:0.86, [CURRENT_FY]:1, [CURRENT_FY+1]:1.12 };
+function _scaleGroups(groups, factor){
+  return groups.map(g => ({
+    name: g.name,
+    total: g.total == null ? null : Math.round(g.total * factor),
+    months: g.months.map(v => v == null ? null : Math.round(v * factor)) // 每月預算依年度縮放
+  }));
+}
+const YEAR_DATA = {};
+for(let y = FY_VIEW_MIN; y <= FY_VIEW_MAX; y++){
+  if(y === CURRENT_FY){
+    YEAR_DATA[y] = ALL_GROUPS; // 共用 canonical refs（Edit/Save 寫回當年即寫回 canonical）
+  } else {
+    const f = _yearScale[y] ?? 1;
+    YEAR_DATA[y] = {
+      gcp: _scaleGroups(GROUPS_GCP, f),
+      aws: _scaleGroups(GROUPS_AWS, f),
+      azure: _scaleGroups(GROUPS_AZURE, f),
+    };
+  }
+}
+// 目前檢視年份的資料（view mode 用；edit mode 走 state.draft）
+function curYearData(){ return YEAR_DATA[state.viewYear] || ALL_GROUPS; }
+
 // Per-month Expected (Admin's per-month cap for the T1 group — values DO vary by month in real product,
 // not just annual/12 uniform distribution). Figma #05-1 shows variance: 3167, 7901, 3516, 9993, 3516, 9475, 4010, …
 const EXPECTED_MONTHLY = {
@@ -838,16 +913,18 @@ let state = {
   monthlyView: 'budget', // 'budget' | 'spend' | 'remaining' | 'trend'（Trend=sparkline，segment 第四選項）。Edit Mode 永遠回 grid
   selected: new Set(),
   draft: null,
+  editBaseline: null, // enterEdit 時的 snapshot（discard 比對用，與 viewYear 解耦）
   thresholds: [60, 80, 90],
   // PRD §7 B+D direction: admin-locked org FY (single source of truth)
-  fyStartYear: 2026,
+  fyStartYear: 2026,  // 機構會計年度定義的「年」（Edit Start Month 修改的對象，恆為 canonical）
+  viewYear: CURRENT_FY, // 目前正在檢視的 FY（年份切換器控制，預設 = 當年）
   fyStartMonth: 1, // 1 = Feb (user mockup demo: non-calendar FY 演示)
 };
 // FY label (verbose form for display): FY2026 · Apr. 2026 – Mar. 2027
 // Designer's preferred format (clearer than PRD's slash notation FY2026/2027)
 // — full year + explicit start/end range removes ambiguity about "結束年命名/開始年命名"
 function fyLabel(){
-  const startY = state.fyStartYear;
+  const startY = state.viewYear;
   const startMIdx = state.fyStartMonth;
   const startMLabel = FY_START_MONTHS[startMIdx].label;
   const endMIdx = (startMIdx + 11) % 12;
@@ -857,7 +934,7 @@ function fyLabel(){
 }
 // Compact FY identifier for CSV filenames and other dense contexts
 function fyLabelShort(){
-  const startY = state.fyStartYear;
+  const startY = state.viewYear;
   if(state.fyStartMonth === 0) return `FY${startY}`;
   return `FY${startY}-${startY + 1}`;
 }
@@ -921,7 +998,7 @@ function pairSparklineSVG(budgets, spends, W){
   }).join('');
   // per-month transparent hover hit-rect with multi-line tooltip
   const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const yr = `'${String(state.fyStartYear).slice(-2)}`;
+  const yr = `'${String(state.viewYear).slice(-2)}`;
   const hits = budgets.map((bv,i)=>{
     const sv = spends[i];
     const over = bv!=null && sv!=null && sv>bv;
@@ -953,7 +1030,7 @@ function useSparkline(){ return state.monthlyView === 'trend' && !state.editing 
 function monthHeader(mi){
   if(!state.showSegCtrl) return MONTHS[mi];
   const actualMonthIdx = (state.fyStartMonth + mi) % 12;
-  const year = state.fyStartYear + Math.floor((state.fyStartMonth + mi) / 12);
+  const year = state.viewYear + Math.floor((state.fyStartMonth + mi) / 12);
   return `${MONTHS[actualMonthIdx]}<span class="mon-year">'${String(year).slice(-2)}</span>`;
 }
 
@@ -997,7 +1074,7 @@ function toast(msg, type='ok'){
 
 // ===== Render: Org cards =====
 function getAllData(){
-  return state.editing && state.draft ? state.draft : { gcp:GROUPS_GCP, aws:GROUPS_AWS, azure:GROUPS_AZURE };
+  return state.editing && state.draft ? state.draft : curYearData();
 }
 // PRD §6: Total tab is synthesized from gcp+aws+azure (read-only, hidden in edit mode)
 function getTotalData(){
@@ -1635,19 +1712,89 @@ function updateBulkBar(){
 }
 function clearSel(){ state.selected.clear(); updateBulkBar(); renderTable(); }
 
-// ===== FY entry render (B+D direction: aligned with Executive Insights inline pattern) =====
-// EI pattern: 📅 Fiscal Year Start: February  ⚙ Set Fiscal Start Month (inline label + text link)
-// Located in section subtitle area, NOT a primary button at top. Gated behind PRD scenario.
-function renderFYPicker(){
-  // Page header right area: hosts page-level actions (Export CSV in v2).
-  // FY context is rendered inline in Section 1 paper-period (EI pattern), not here.
-  // Hide the area only if there's nothing visible inside (defensive — Export CSV may be hidden by state).
-  const wrap = document.querySelector('.pg-hdr .pg-hdr-r');
-  if(!wrap) return;
-  const csv = wrap.querySelector('#btn-csv');
-  const csvVisible = csv && csv.style.display !== 'none';
-  wrap.style.display = csvVisible ? '' : 'none';
+// ===== FY year switcher (頁面層導覽：改朝換代後新需求「往前兩年、往後一年」) =====
+// 放頁首右上 = page-level scope（影響整頁 org cards + 表格），與 Section 1 inline 的
+// 「Edit Start Month」（FY 定義/設定，破壞性）刻意分開位置，避免「看 vs 改」語意混淆。
+// 編輯模式中整顆 disable：未存草稿時切年會遺失/語意不明（事前預防）。
+// 過去年 = 歷史 actuals（仍可編輯，團隊報告用）；未來年 = Planning（已設預算、無 actuals）。
+function fyRangeFor(y){
+  const m = state.fyStartMonth;
+  const startMLabel = FY_START_MONTHS[m].label;
+  const endMLabel = FY_START_MONTHS[(m + 11) % 12].label;
+  const endY = m === 0 ? y : y + 1;
+  return `${startMLabel} '${String(y).slice(-2)} – ${endMLabel} '${String(endY).slice(-2)}`;
 }
+function fyStatusOf(y){
+  if(y === CURRENT_FY) return {key:'current', tag:'Current'};
+  if(y > CURRENT_FY)   return {key:'future',  tag:'Planning'};
+  return {key:'past', tag:''}; // 過去年：中性灰，不標「locked」（團隊決定可編輯）
+}
+function renderFYPicker(){
+  const host = $('#fy-picker');
+  if(!host) return;
+  if(!state.showSegCtrl){ host.innerHTML = ''; return; }
+  const y = state.viewYear;
+  const st = fyStatusOf(y);
+  const locked = state.editing; // 編輯模式凍結
+  const tagHtml = st.tag ? `<span class="fy-sw-tag fy-sw-tag-${st.key}">${st.tag}</span>` : '';
+  // options 由新到舊：未來 → 當年 → 過去
+  let opts = '';
+  for(let oy = FY_VIEW_MAX; oy >= FY_VIEW_MIN; oy--){
+    const ost = fyStatusOf(oy);
+    const otag = ost.tag ? `<span class="fy-sw-tag fy-sw-tag-${ost.key}">${ost.tag}</span>` : '';
+    opts += `<button type="button" class="fy-sw-opt${oy===y?' sel':''}" role="option" aria-selected="${oy===y}" onclick="selectViewYear(${oy})">
+      <span class="fy-sw-opt-main"><span class="fy-sw-opt-fy">FY${oy}</span>${otag}</span>
+      <span class="fy-sw-opt-range">${fyRangeFor(oy)}</span>
+      ${oy===y?'<span class="material-symbols-outlined fy-sw-check">check</span>':''}
+    </button>`;
+  }
+  host.innerHTML = `
+    <div class="fy-sw ${st.key}${locked?' locked':''}" id="fy-sw">
+      <button type="button" class="fy-sw-trigger" id="fy-sw-trigger"
+        ${locked ? 'disabled data-tip-tip="Finish editing budgets first"' : 'aria-haspopup="listbox" aria-expanded="false"'}
+        onclick="toggleFYSwitcher(event)">
+        <span class="material-symbols-outlined fy-sw-cal">calendar_month</span>
+        <span class="fy-sw-val">FY${y}</span>${tagHtml}
+        <span class="material-symbols-outlined fy-sw-arr">expand_more</span>
+      </button>
+      <div class="fy-sw-menu" id="fy-sw-menu" role="listbox" aria-label="Select fiscal year">
+        <div class="fy-sw-menu-hd">Fiscal Year</div>
+        ${opts}
+      </div>
+    </div>`;
+  // 頁首區可見性（Export CSV 或 switcher 任一可見就顯示）
+  const wrap = document.querySelector('.pg-hdr .pg-hdr-r');
+  if(wrap) wrap.style.display = '';
+}
+function toggleFYSwitcher(e){
+  if(e) e.stopPropagation();
+  const sw = $('#fy-sw');
+  if(!sw || sw.classList.contains('locked')) return;
+  const open = sw.classList.toggle('open');
+  const trig = $('#fy-sw-trigger');
+  if(trig) trig.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function closeFYSwitcher(){
+  const sw = $('#fy-sw');
+  if(sw) sw.classList.remove('open');
+  const trig = $('#fy-sw-trigger');
+  if(trig) trig.setAttribute('aria-expanded', 'false');
+}
+function selectViewYear(y){
+  closeFYSwitcher();
+  if(y === state.viewYear) return;
+  state.viewYear = y;
+  // 切年回到 Budget 視角（避免停在某 view 卻換了整批資料的閱讀斷層），並重繪整頁
+  renderAll();
+  const st = fyStatusOf(y);
+  const tail = st.key === 'current' ? '' : (st.key === 'future' ? ' (Planning)' : ' (Historical)');
+  toast(`Viewing FY${y}${tail}.`);
+}
+// 點外面關閉 switcher（與 closePop 同精神，單獨一個輕量 listener）
+document.addEventListener('click', e => {
+  const sw = $('#fy-sw');
+  if(sw && sw.classList.contains('open') && !sw.contains(e.target)) closeFYSwitcher();
+});
 // Dynamic FY display in Organization Annual Budget section header (paper-period)
 // - Default (no scenario): plain "Period: 2026" (current prod baseline)
 // - Proposal scenario + Admin: 📅 Fiscal Year Start: {Month} · ⚙ Set Fiscal Start Month
@@ -1657,7 +1804,7 @@ function updatePeriodLabel(){
   const viewing = $('#paper-viewing');
   if(viewing){
     if(state.showSegCtrl){
-      const y = state.fyStartYear;
+      const y = state.viewYear;
       const m = state.fyStartMonth;
       const startMLabel = FY_START_MONTHS[m].label;
       const endY = m === 0 ? y : y + 1;
@@ -1672,18 +1819,20 @@ function updatePeriodLabel(){
   if(!el) return;
   if(!state.showSegCtrl){
     el.className = 'paper-meta';
-    el.textContent = `Period: ${state.fyStartYear}`;
+    el.textContent = `Period: ${state.viewYear}`;
     return;
   }
   const startM = FY_START_MONTHS[state.fyStartMonth].label;
   const isAdmin = state.role === 'admin';
   el.className = 'fy-inline';
   if(isAdmin){
+    // 編輯模式中 Edit Start Month 凍結：改 FY 起算月會 remap 整頁資料，與未存草稿衝突（事前預防 > 事後攔截）
+    const locked = state.editing;
     el.innerHTML = `
       <span class="fy-display"><span class="material-symbols-outlined">event</span>Fiscal Year Start: <strong>${startM}</strong></span>
-      <button class="fy-set-link" id="fy-btn"><span class="material-symbols-outlined">settings</span><span class="fy-set-link-text">Edit Start Month</span></button>
+      <button class="fy-set-link" id="fy-btn"${locked ? ' disabled data-tip-tip="Finish editing budgets first"' : ''}><span class="material-symbols-outlined">settings</span><span class="fy-set-link-text">Edit Start Month</span></button>
     `;
-    $('#fy-btn').onclick = openFYModalGuarded;
+    if(!locked) $('#fy-btn').onclick = openFYModalGuarded;
   }else{
     el.innerHTML = `<span class="fy-display"><span class="material-symbols-outlined">event</span>Fiscal Year Start: <strong>${startM}</strong><span class="fy-note">(set by Admin)</span></span>`;
   }
@@ -1755,7 +1904,10 @@ function enterEdit(){
     toast('Total is read-only in edit mode. Switched to Google Cloud tab.');
   }
   state.editing = true;
-  state.draft = { gcp:deepClone(GROUPS_GCP), aws:deepClone(GROUPS_AWS), azure:deepClone(GROUPS_AZURE) };
+  // 草稿 + baseline 都取自「目前檢視年份」的資料（與 viewYear 解耦，支援編輯過去/未來年）
+  const base = curYearData();
+  state.draft = { gcp:deepClone(base.gcp), aws:deepClone(base.aws), azure:deepClone(base.azure) };
+  state.editBaseline = JSON.stringify(state.draft);
   state.selected.clear();
   document.body.classList.add('editing-mode');
   $('#paper').classList.add('editing');
@@ -1784,11 +1936,11 @@ function closeAllModals(){
 let _pendingDiscardAction = null;
 function hasDraftChanges(){
   return state.editing && state.draft &&
-    JSON.stringify(state.draft) !== JSON.stringify({gcp:GROUPS_GCP,aws:GROUPS_AWS,azure:GROUPS_AZURE});
+    JSON.stringify(state.draft) !== state.editBaseline;
 }
 
 function cancelEdit(){
-  if(JSON.stringify(state.draft) !== JSON.stringify({gcp:GROUPS_GCP,aws:GROUPS_AWS,azure:GROUPS_AZURE})){
+  if(JSON.stringify(state.draft) !== state.editBaseline){
     _pendingDiscardAction = null; // [Cancel] just exits edit — no follow-up action
     closeAllModals();
     $('#mo-discard').classList.add('active');
@@ -1810,6 +1962,7 @@ function confirmDiscard(){
 function exitEdit(){
   state.editing = false;
   state.draft = null;
+  state.editBaseline = null;
   state.selected.clear();
   document.body.classList.remove('editing-mode');
   $('#paper').classList.remove('editing');
@@ -1827,7 +1980,9 @@ function saveEdit(){
   // Guard：T1 不能存超 Allocated 的 budget（per Figma #06-1）
   const v = validateT1Save();
   if(!v.ok){ toast(v.reason, 'err'); return; }
-  PROVIDERS.filter(p => !p.synthetic).forEach(p => state.draft[p.key].forEach((g,i)=> ALL_GROUPS[p.key][i] = deepClone(g)));
+  // 寫回「目前檢視年份」的資料倉庫（current 年共用 ALL_GROUPS 引用 → 同步寫回 canonical）
+  const store = curYearData();
+  PROVIDERS.filter(p => !p.synthetic).forEach(p => state.draft[p.key].forEach((g,i)=> store[p.key][i] = deepClone(g)));
   toast('Budget updated successfully.');
   exitEdit();
 }
@@ -2210,15 +2365,23 @@ function isMonthCapConflictAggregate(monthIdx){
 function getSpend(groupIdx, monthIdx, budgetVal){
   // 顯示語意：$0 = 沒花錢；-- = 無資料（budget null 或 demo 故意 null）
   if(budgetVal === null || budgetVal === undefined) return null; // unlimited budget → --
-  if(monthIdx > PROTO_NOW_IDX) return 0; // 未來月份 (May~Jan'27) → $0
+  // ── 年份感知（年份切換器）──────────────────────────────────────
+  // 未來年（Planning）：預算照設、actuals 尚未發生 → 全年 $0（語意：沒花錢，非無資料）
+  if(state.viewYear > CURRENT_FY) return 0;
+  // 當年：PROTO_NOW_IDX 之後是未到的未來月 → $0；過去年：12 月皆完成，不套此切點
+  if(state.viewYear === CURRENT_FY && monthIdx > PROTO_NOW_IDX) return 0;
+  const f = _yearScale[state.viewYear] ?? 1; // 過去年依年度規模縮放 mockup 絕對值
+  // ────────────────────────────────────────────────────────────
   // warn-mixed preset 走 mockup 表（polished demo for stakeholder mockup alignment）
   if(state.warningPreset === 'mixed'){
     const row = MOCKUP_SPEND_MIXED[groupIdx];
     if(!row) return 0;
     const v = row[monthIdx];
-    return (v === undefined) ? 0 : v; // null → 顯示 --（demo missing），number → spend
+    if(v === undefined) return 0;            // mockup 未涵蓋的月 → $0
+    if(v === null) return null;              // null → 顯示 --（demo missing）
+    return Math.round(v * f);                // number → spend，依年度係數縮放
   }
-  // 其他 preset 沿用 algorithmic ratio × monthly budget
+  // 其他 preset 沿用 algorithmic ratio × monthly budget（budgetVal 已年度縮放 → 不重複乘 f）
   // Simulate missing past data on group 5 month 1（Operations Mar）演示 "Missing actual data"
   if(groupIdx === 5 && monthIdx === 1) return null;
   const preset = WARNING_PRESETS[state.warningPreset] || WARNING_PRESETS.normal;
@@ -2580,6 +2743,7 @@ renderFYPicker();
 
     { type: 'group', id: 'optimization', label: 'Optimization', items: [
       { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', disabled: true },
+      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'sell', disabled: true },
     ]},
 
     { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
@@ -2875,7 +3039,7 @@ renderFYPicker();
 })();
 
 </script>
-<script src="../shared/lumiture-topbar.js?v=2026-05-21"></script>
+<script src="../shared/lumiture-topbar.js?v=2026-06-15b"></script>
 <script>
 /* === Inlined: shared/demo-fab.js === */
 /*!
