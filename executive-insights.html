@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — Executive Insights v2 (Add Fiscal Year + Empty State)</title>
+<title>Lumiture.ai — Executive Insights v2 (FY Selector 對齊 General Budget)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
@@ -285,7 +285,27 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .month-picker-btn{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;background:#fff;border:1px solid var(--tf-border);border-radius:var(--r-sm);font-size:13px;color:var(--g700);font-family:inherit;cursor:pointer;line-height:1.4;transition:border-color .12s,background .12s}
 .month-picker-btn:hover{border-color:var(--pri);background:var(--pri-lt10)}
 .month-picker-btn .material-symbols-outlined{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 18}
+.month-picker-btn .mp-cal{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 18}
 .month-picker-btn .mp-val{color:var(--g900);font-weight:500}
+
+/* ===== Month picker popover (interactive) ===== */
+.mp-wrap{position:relative;display:inline-block}
+.mp-pop{position:absolute;top:calc(100% + 6px);right:0;width:320px;background:#fff;border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.1);z-index:60;overscroll-behavior:contain;display:none}
+.mp-wrap.open .mp-pop{display:block}
+.mp-pop-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--g200)}
+.mp-pop-title{font-size:14px;font-weight:700;color:var(--g900);line-height:1.4;text-align:center;flex:1}
+.mp-pop-nav{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:none;background:none;border-radius:var(--r-sm);cursor:pointer;color:var(--g700);flex:0 0 auto}
+.mp-pop-nav:hover{background:var(--g100)}
+.mp-pop-nav.hidden{visibility:hidden;pointer-events:none}
+.mp-pop-nav .material-symbols-outlined{font-size:20px;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20}
+.mp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:14px}
+.mp-cell{height:38px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--r-sm);font-family:inherit;font-size:13px;font-weight:500;color:var(--g900);cursor:pointer;transition:background .1s}
+.mp-cell:hover{background:var(--g100)}
+.mp-cell.sel{background:var(--pri);color:#fff}
+.mp-cell.sel:hover{background:var(--pri)}
+.mp-cell.disabled{color:var(--g400);cursor:not-allowed;background:none}
+.mp-pop-ftr{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border-top:1px solid var(--g200)}
+.mp-pop-ftr .mp-ftr-right{display:flex;align-items:center;gap:8px}
 
 /* Currency selector — 由 shared/currency-picker.js 提供樣式（CMDS Component Library Currency Switch H=30px） */
 
@@ -295,20 +315,30 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .gobk:hover .gobk-text{text-decoration:underline}
 .gobk .material-symbols-outlined{font-size:18px;color:var(--pri);font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 18}
 
-/* FY toolbar — 對齊 Figma 5572-145436：inline 顯示，無 bg/border */
-.fy-toolbar{display:flex;align-items:center;justify-content:space-between;padding:0 4px;background:none;border:none;border-radius:0;margin-bottom:20px;flex-wrap:wrap;gap:12px}
-.fy-toolbar-l{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.fy-toolbar-r{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.fy-period{font-size:14px;color:var(--g700);font-weight:600;display:flex;align-items:center;gap:8px}
-.fy-period .material-symbols-outlined{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 18}
-/* Button group 對齊 contained button 36px 高度 */
-.fy-toggle{display:inline-flex;background:#fff;border:1px solid var(--g300);border-radius:var(--r-sm);padding:2px;gap:0;height:36px;box-sizing:border-box;align-items:center}
-.fy-toggle-btn{height:30px;padding:0 14px;font-size:13px;font-weight:500;color:var(--g500);background:none;border:none;border-radius:calc(var(--r-sm) - 1px);cursor:pointer;font-family:inherit;line-height:1;letter-spacing:0;transition:all .12s;display:inline-flex;align-items:center}
-.fy-toggle-btn:hover:not(.active){color:var(--g700);background:var(--g50)}
-.fy-toggle-btn.active{background:var(--pri);color:#fff;font-weight:600}
-.fy-add{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 14px;background:var(--pri);color:#fff;border:none;border-radius:var(--r-sm);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1.5;transition:all .12s}
-.fy-add:hover{background:var(--pri-lt)}
-.fy-add .material-symbols-outlined{font-size:18px;font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 20;color:#fff}
+/* ==== FY year switcher（頁首右上，page-level 導覽；往前兩年/往後一年。移植自 General Budget v2）==== */
+.fy-sw{position:relative;display:inline-block}
+.fy-sw-trigger{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:1px solid var(--g300);border-radius:var(--r-sm);background:#fff;font-family:inherit;font-size:13px;font-weight:600;color:var(--g900);cursor:pointer;line-height:1;transition:border-color .12s,background .12s,box-shadow .12s}
+.fy-sw-trigger:hover{border-color:var(--pri);background:var(--pri-lt10)}
+.fy-sw.open .fy-sw-trigger{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
+.fy-sw-trigger:disabled{color:var(--g400);background:var(--g100);border-color:var(--g200);cursor:not-allowed}
+.fy-sw-trigger:disabled .fy-sw-cal{color:var(--g400)}
+.fy-sw-cal{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400}
+.fy-sw-val{letter-spacing:0}
+.fy-sw-trigger-range{font-size:13px;font-weight:400;color:var(--g500);letter-spacing:0;white-space:nowrap}
+.fy-sw-arr{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400;transition:transform .15s;margin-left:2px}
+.fy-sw.open .fy-sw-arr{transform:rotate(180deg)}
+/* dropdown 行內 chip（實心、白字）：Incomplete = 青色（Secondary）*/
+.fy-sw-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;letter-spacing:.02em;line-height:1.5;text-transform:none;white-space:nowrap;color:#fff}
+.fy-sw-tag-incomplete{background:#34B5D9}
+/* 下拉選單（無標題列、無底部 link）*/
+.fy-sw-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:280px;background:#fff;border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.1);padding:6px;z-index:60;display:none;overscroll-behavior:contain}
+.fy-sw.open .fy-sw-menu{display:block}
+/* item 單行：FY（固定）+ range（中段佔滿、灰）+ pill（靠右）*/
+.fy-sw-opt{display:flex;flex-direction:row;align-items:center;gap:10px;width:100%;padding:9px 12px;border:none;background:none;border-radius:var(--r-sm);cursor:pointer;font-family:inherit;text-align:left;transition:background .1s}
+.fy-sw-opt:hover{background:var(--g100)}
+.fy-sw-opt.sel{background:var(--g100)}
+.fy-sw-opt-fy{font-size:14px;font-weight:600;color:var(--g900);line-height:1.3;white-space:nowrap}
+.fy-sw-opt-range{flex:1;font-size:12px;color:var(--g500);line-height:1.4;white-space:nowrap}
 
 /* Settings page description — 把 GB 提示融入 narrative 而非外掛 banner
  * 設計原則：reduce visual weight by integrating context into the same paragraph that explains the page
@@ -504,10 +534,14 @@ If you need access, please reach out to your administrator.</div>
               <span class="curr-code" id="curr-code">USD</span>
               <span class="material-symbols-outlined">expand_more</span>
             </button>
-            <button class="month-picker-btn" onclick="openMonthPicker()" title="Select month">
-              <span class="mp-val" id="mp-val">Sep. 2026</span>
-              <span class="material-symbols-outlined">expand_more</span>
-            </button>
+            <div class="mp-wrap" id="mp-wrap">
+              <button class="month-picker-btn" id="mp-trigger" onclick="toggleMonthPicker(event)" title="Select month" aria-haspopup="true" aria-expanded="false">
+                <span class="material-symbols-outlined mp-cal">calendar_month</span>
+                <span class="mp-val" id="mp-val">Sep. 2026</span>
+                <span class="material-symbols-outlined">expand_more</span>
+              </button>
+              <div class="mp-pop" id="mp-pop"></div>
+            </div>
             <button class="btn btn-p" onclick="goToSettings()">
               <span class="material-symbols-outlined">settings</span>
               Fiscal Settings
@@ -995,14 +1029,14 @@ Please try again in a few moments. If the problem persists, contact support.</di
           <div>
             <div class="pg-title">Fiscal Settings</div>
           </div>
-          <!-- Edit Start Month entry — per 2026-05-22 會議結論：Fiscal Settings 也能改 FY，兩邊聯動。文案 2026-06-04 對齊 GB v2 「Edit Start Month」（拿掉 Fiscal） -->
+          <!-- 頁首右上並排：[Edit Start Month link] + [FY selector dropdown]（對齊 General Budget v2 #01）。
+               FY context（年 + range）改由 dropdown trigger 承載，故移除原「Fiscal Year Start: February」重複文字。 -->
           <div class="cvr-section-fy-r">
-            <span class="material-symbols-outlined">calendar_today</span>
-            <span>Fiscal Year Start: <strong>February</strong></span>
             <button class="cvr-section-fy-link" onclick="openFiscalStartDialog()">
               <span class="material-symbols-outlined">settings</span>
               <span class="cvr-section-fy-link-text">Edit Start Month</span>
             </button>
+            <span id="fy-picker"></span>
           </div>
         </div>
 
@@ -1024,25 +1058,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
 
 <!-- (Slim GB hint removed — info now lives in page description) -->
 
-            <!-- FY toolbar — 對齊 Figma 5572-145436 + GB session 結論
-                 Format: FY{N} · {Start month} {Year A} – {End month} {Year B}
-                 Switching: button group (configured years only) + Add Fiscal Year for unconfigured -->
-            <div class="fy-toolbar">
-              <div class="fy-period">
-                <span class="material-symbols-outlined">calendar_month</span>
-                <span id="fy-period-label">FY2026 · Feb. 2026 – Jan. 2027</span>
-              </div>
-              <div class="fy-toolbar-r">
-                <div class="fy-toggle" role="tablist">
-                  <button class="fy-toggle-btn" onclick="switchFY(this,'2025','FY2025 · Feb. 2025 – Jan. 2026')">FY2025</button>
-                  <button class="fy-toggle-btn active" onclick="switchFY(this,'2026','FY2026 · Feb. 2026 – Jan. 2027')">FY2026</button>
-                </div>
-                <button class="fy-add" onclick="addFY()">
-                  Add Fiscal Year
-                  <span class="material-symbols-outlined" style="font-size:16px;margin-left:2px">expand_more</span>
-                </button>
-              </div>
-            </div>
+            <!-- FY 切換已移到頁首右上的 FY selector dropdown（renderFYPicker 注入 #fy-picker），對齊 General Budget v2 #01 -->
 
             <!-- ============ CVR Section ============ -->
             <div class="section-card">
@@ -1062,14 +1078,14 @@ Please try again in a few moments. If the problem persists, contact support.</di
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:4px">
                   <div class="field-block-lbl" style="margin-bottom:0">
                     Estimated Financial Budget <span class="req">*</span>
-                    <span class="material-symbols-outlined ic-info" data-tip="A forward-looking estimate of your monthly cloud budget. Pre-filled from General Budget monthly totals, but edits stay here only and won't affect the source. Use this to reflect your actual planned spending from a company-wide perspective, even if team budgets are incomplete or include buffers.">info</span>
+                    <span class="material-symbols-outlined ic-info" data-tip="A forward-looking estimate of your monthly cloud budget. Pre-filled from General Budget monthly totals, but edits stay here only and won't affect General Budget. Use this to reflect your actual planned spending from a company-wide perspective, even if team budgets are incomplete or include buffers.">info</span>
                   </div>
                   <button class="btn btn-b" onclick="syncAllFromGB('budget-grid')" title="Reset every month back to its General Budget monthly total" style="flex-shrink:0">
                     <span class="material-symbols-outlined">sync</span>
                     <span class="btn-text">Sync all from General Budget</span>
                   </button>
                 </div>
-                <div class="field-block-hint">Enter your organization's forward-looking monthly budget from a company-wide perspective. Currency in <strong>USD</strong>.</div>
+                <div class="field-block-hint">Enter your organization's forward-looking monthly budget from a company-wide perspective. Edits here won't affect your General Budget. Currency in <strong>USD</strong>.</div>
                 <div class="month-grid" id="budget-grid">
                   <!-- Months populated by JS -->
                 </div>
@@ -1192,7 +1208,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
                 <div class="state-title">No fiscal year configured yet</div>
                 <div class="state-desc">Add your first fiscal year to start filling in baseline data: budget, ROI, revenue, customers, and forecast.</div>
                 <div class="state-actions">
-                  <button class="btn btn-p" onclick="addFY()"><span class="material-symbols-outlined">add</span>Add Fiscal Year</button>
+                  <button class="btn btn-p" onclick="openFiscalStartDialog()"><span class="material-symbols-outlined">edit_calendar</span>Set Fiscal Year Start</button>
                 </div>
               </div>
             </div>
@@ -1205,7 +1221,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
 
     <!-- Footer -->
     <div class="footer">
-      <span class="footer-version">Executive Insights Prototype<span class="ver-tag">v2 · Add Fiscal Year + Empty State</span></span>
+      <span class="footer-version">Executive Insights Prototype<span class="ver-tag">v2 · FY Selector</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
     </div>
 
@@ -1269,28 +1285,18 @@ Please try again in a few moments. If the problem persists, contact support.</di
   </div>
 </div>
 
-<!-- Add Fiscal Year Dialog — CMDS form modal 預設 660px -->
-<div class="mo" id="modal-add-fy">
-  <div class="modal">
+<!-- Switch-Year Guard Confirm — 切換 FY 時若有未存編輯先防呆（CMDS confirm dialog 440px）。
+     與「離開頁面用」的 #modal-discard 流程分開：這顆確認後繼續切年，不跳回 Dashboard。 -->
+<div class="mo" id="modal-switch-year">
+  <div class="modal modal-sm">
     <div class="mh">
-      <div class="mt">Add Fiscal Year</div>
-      <button class="mx" onclick="closeModal('modal-add-fy')"><span class="material-symbols-outlined">close</span></button>
+      <div class="mt">Discard unsaved changes?</div>
+      <button class="mx" onclick="closeModal('modal-switch-year')"><span class="material-symbols-outlined">close</span></button>
     </div>
-    <div class="mdesc">Select an unconfigured fiscal year to add. Data retention covers the selected year plus the next 2 years.</div>
-    <div class="mb">
-      <div class="fsm-form">
-        <div>
-          <div class="fsm-lbl">Fiscal Year</div>
-          <select class="inline-select" id="add-fy-select" style="width:100%">
-            <option value="2027">FY2027 · Feb. 2027 – Jan. 2028</option>
-            <option value="2028">FY2028 · Feb. 2028 – Jan. 2029</option>
-          </select>
-        </div>
-      </div>
-    </div>
+    <div class="mdesc">Switching the fiscal year will discard the changes you've made to the current year. This action cannot be undone.</div>
     <div class="mf">
-      <button class="btn btn-o" onclick="closeModal('modal-add-fy')">Cancel</button>
-      <button class="btn btn-p" onclick="confirmAddFY()">Add</button>
+      <button class="btn btn-o" onclick="closeModal('modal-switch-year')">Keep Editing</button>
+      <button class="btn btn-p" onclick="confirmSwitchYear()">Discard and Switch</button>
     </div>
   </div>
 </div>
@@ -1355,7 +1361,8 @@ Please try again in a few moments. If the problem persists, contact support.</di
     ]},
 
     { type: 'group', id: 'optimization', label: 'Optimization', items: [
-      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', disabled: true },
+      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', href: './rightsizing.html' },
+      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'sell', href: './rate-optimization.html' },
     ]},
 
     { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
@@ -1651,7 +1658,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
 })();
 
 </script>
-<script src="../shared/lumiture-topbar.js?v=2026-05-21"></script>
+<script src="../shared/lumiture-topbar.js?v=2026-06-15b"></script>
 <script>
 /* === Inlined: shared/currency-picker.js === */
 /*!
@@ -1902,10 +1909,113 @@ function setCurrency(code){
   showToast('Currency switched to '+code,'info');
 }
 
-/* ===== Month picker (demo) ===== */
-function openMonthPicker(){
-  showToast('Month picker (demo only)','info');
+/* ===== Month picker (interactive) ===== */
+const MP_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MP_NOW = {year:2026, month:9};        // prototype 「當下」
+const MP_MIN_YEAR = 2024, MP_MAX_YEAR = 2026;
+let mpAppliedYear = MP_NOW.year, mpAppliedMonth = MP_NOW.month; // month 1-based
+let mpViewYear = MP_NOW.year;               // 正在檢視的年
+let mpDraftYear = MP_NOW.year, mpDraftMonth = MP_NOW.month;     // 暫選（Apply 才套用）
+
+function mpIsDisabled(year, month){
+  return year > MP_NOW.year || (year === MP_NOW.year && month > MP_NOW.month);
 }
+function renderMonthPicker(){
+  const pop = document.getElementById('mp-pop');
+  if(!pop) return;
+  const prevHidden = mpViewYear <= MP_MIN_YEAR ? ' hidden' : '';
+  const nextHidden = mpViewYear >= MP_MAX_YEAR ? ' hidden' : '';
+  let cells = '';
+  for(let i=0;i<12;i++){
+    const m = i+1;
+    const disabled = mpIsDisabled(mpViewYear, m);
+    const sel = (!disabled && mpViewYear === mpDraftYear && m === mpDraftMonth);
+    if(disabled){
+      cells += `<button type="button" class="mp-cell disabled" disabled>${MP_MONTHS[i]}</button>`;
+    } else {
+      cells += `<button type="button" class="mp-cell${sel?' sel':''}" onclick="mpPickMonth(${m},event)">${MP_MONTHS[i]}</button>`;
+    }
+  }
+  pop.innerHTML = `
+    <div class="mp-pop-hdr">
+      <button type="button" class="mp-pop-nav${prevHidden}" onclick="mpStepYear(-1,event)" aria-label="Previous year"><span class="material-symbols-outlined">chevron_left</span></button>
+      <div class="mp-pop-title">${MP_MONTHS[mpDraftMonth-1]} ${mpDraftYear}</div>
+      <button type="button" class="mp-pop-nav${nextHidden}" onclick="mpStepYear(1,event)" aria-label="Next year"><span class="material-symbols-outlined">chevron_right</span></button>
+    </div>
+    <div class="mp-grid">${cells}</div>
+    <div class="mp-pop-ftr">
+      <button type="button" class="btn btn-b btn-sm" onclick="mpReset(event)"><span class="btn-text">Reset</span></button>
+      <div class="mp-ftr-right">
+        <button type="button" class="btn btn-o btn-sm" onclick="closeMonthPicker()">Cancel</button>
+        <button type="button" class="btn btn-p btn-sm" onclick="mpApply()">Apply</button>
+      </div>
+    </div>`;
+}
+function toggleMonthPicker(e){
+  if(e) e.stopPropagation();
+  const wrap = document.getElementById('mp-wrap');
+  if(!wrap) return;
+  if(wrap.classList.contains('open')){ closeMonthPicker(); return; }
+  // 開啟時：檢視年 = 已套用年，暫選 = 已套用月
+  mpViewYear = mpAppliedYear;
+  mpDraftYear = mpAppliedYear;
+  mpDraftMonth = mpAppliedMonth;
+  renderMonthPicker();
+  wrap.classList.add('open');
+  const trig = document.getElementById('mp-trigger');
+  if(trig) trig.setAttribute('aria-expanded','true');
+}
+function closeMonthPicker(){
+  const wrap = document.getElementById('mp-wrap');
+  if(wrap) wrap.classList.remove('open');
+  const trig = document.getElementById('mp-trigger');
+  if(trig) trig.setAttribute('aria-expanded','false');
+}
+function mpStepYear(delta,e){
+  if(e) e.stopPropagation();
+  const ny = mpViewYear + delta;
+  if(ny < MP_MIN_YEAR || ny > MP_MAX_YEAR) return;
+  mpViewYear = ny;
+  // 暫選跟著檢視年走：若該年該月不可選，落到該年最後一個可選月
+  let m = mpDraftMonth;
+  if(mpIsDisabled(mpViewYear, m)) m = MP_NOW.month; // 當年才會發生，回落到當月
+  mpDraftYear = mpViewYear;
+  mpDraftMonth = m;
+  renderMonthPicker();
+}
+function mpPickMonth(m,e){
+  if(e) e.stopPropagation();
+  if(mpIsDisabled(mpViewYear, m)) return;
+  mpDraftYear = mpViewYear;
+  mpDraftMonth = m;
+  renderMonthPicker();
+}
+function mpReset(e){
+  if(e) e.stopPropagation();
+  mpDraftYear = MP_NOW.year;
+  mpDraftMonth = MP_NOW.month;
+  mpViewYear = MP_NOW.year;
+  renderMonthPicker();
+}
+function mpApply(){
+  mpAppliedYear = mpDraftYear;
+  mpAppliedMonth = mpDraftMonth;
+  const label = `${MP_MONTHS[mpAppliedMonth-1]}. ${mpAppliedYear}`;
+  const valEl = document.getElementById('mp-val');
+  if(valEl) valEl.textContent = label;
+  // 同步所有 Period 標籤（.paper-sub-period 與 含「Period:」的 .paper-sub）；不動 .cvr-section-sub
+  document.querySelectorAll('.paper-sub-period').forEach(el => { el.textContent = 'Period: ' + label; });
+  document.querySelectorAll('.paper-sub').forEach(el => {
+    if(/^\s*Period:/.test(el.textContent)) el.textContent = 'Period: ' + label;
+  });
+  closeMonthPicker();
+  showToast('Viewing ' + label, 'info');
+}
+/* 點外面 = Cancel（放棄暫選、關閉） */
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('mp-wrap');
+  if(wrap && wrap.classList.contains('open') && !wrap.contains(e.target)) closeMonthPicker();
+});
 
 /* ===== Take screenshot (demo only) ===== */
 function takeScreenshot(){
@@ -1936,66 +2046,8 @@ function confirmFSM(){
                       getComputedStyle(document.querySelector('.state-view[data-state="firsttime"]')).display !== 'none';
   if (isFirstTime) setTimeout(goToSettings,500);
 }
-function addFY(){
-  const sel = document.getElementById('add-fy-select');
-  // 無可新增年份 → 提示並擋掉（避免開出空 modal）
-  if (!sel || sel.options.length === 0){
-    showToast('No more fiscal years available to add.','info');
-    return;
-  }
-  document.getElementById('modal-add-fy').classList.add('active');
-}
-function confirmAddFY(){
-  const sel = document.getElementById('add-fy-select');
-  if (!sel || sel.options.length === 0){ closeModal('modal-add-fy'); return; }
-  const opt = sel.options[sel.selectedIndex];
-  const year = sel.value;                 // e.g. "2027"
-  const periodLabel = opt.text;           // "FY2027 · Feb. 2027 – Jan. 2028"
-  closeModal('modal-add-fy');
-
-  const toggleGroup = document.querySelector('.fy-toggle');
-  if (!toggleGroup) return;
-
-  // 已存在同年 toggle 就不重複加（防呆）
-  let newBtn = [...toggleGroup.querySelectorAll('.fy-toggle-btn')]
-                 .find(b => b.textContent.trim() === 'FY'+year);
-  if (!newBtn){
-    newBtn = document.createElement('button');
-    newBtn.className = 'fy-toggle-btn';
-    newBtn.textContent = 'FY'+year;
-    newBtn.setAttribute('onclick', `switchFY(this,'${year}','${periodLabel.replace(/'/g,"\\'")}')`);
-    toggleGroup.appendChild(newBtn);
-    // 該年已設定 → 從下拉移除
-    sel.remove(sel.selectedIndex);
-  }
-
-  // 標記為「空資料」並切換過去 → 呈現全空白表單情境
-  FY_EMPTY.add(year);
-  switchFY(newBtn, year, periodLabel);
-  showToast('FY'+year+' added. Fill in the baseline data below to activate insights.');
-}
-
-/* Demo FAB「Newly Added FY (no data)」一鍵情境 — idempotent，重複點不會一直加按鈕 */
-function demoShowNewFY(){
-  const year = '2027';
-  const periodLabel = 'FY2027 · Feb. 2027 – Jan. 2028';
-  const toggleGroup = document.querySelector('.fy-toggle');
-  if (!toggleGroup) return;
-  let btn = [...toggleGroup.querySelectorAll('.fy-toggle-btn')].find(b=>b.textContent.trim()==='FY'+year);
-  if (!btn){
-    btn = document.createElement('button');
-    btn.className = 'fy-toggle-btn';
-    btn.textContent = 'FY'+year;
-    btn.setAttribute('onclick', `switchFY(this,'${year}','${periodLabel}')`);
-    toggleGroup.appendChild(btn);
-    const sel = document.getElementById('add-fy-select');
-    if (sel) [...sel.options].forEach(o=>{ if(o.value===year) sel.remove(o.index); });
-  }
-  FY_EMPTY.add(year);
-  switchFY(btn, year, periodLabel);
-}
 function discardChanges(){ document.getElementById('modal-discard').classList.add('active'); }
-function confirmDiscard(){ closeModal('modal-discard'); goToDashboard(); showToast('Changes discarded','warn'); }
+function confirmDiscard(){ closeModal('modal-discard'); eiDirty=false; goToDashboard(); showToast('Changes discarded','warn'); }
 function saveChanges(){
   // Validate Invalid Format state — Figma 5572-145436 spec
   const errors = validateFiscalSettings();
@@ -2005,6 +2057,7 @@ function saveChanges(){
     errors[0].el.scrollIntoView({block:'center',behavior:'smooth'});
     return;
   }
+  eiDirty = false;
   showToast('Fiscal Settings updated successfully.');
   setTimeout(goToDashboard,500);
 }
@@ -2101,37 +2154,122 @@ function showToast(msg,type){
   setTimeout(()=>{t.style.transition='opacity .3s';t.style.opacity='0';setTimeout(()=>t.remove(),300);},2800);
 }
 
-/* ===== Fiscal Year toggle =====
- * FY_EMPTY: 標記哪些年份「新增、尚未填資料」。
- * 切換時：新 FY → loadNewFYData()（依 PRD：Financial Budget 從 General Budget 預填、其餘 section 留空）；
- *         已設定年份 → 從 snapshot 還原。
+/* ===== FY year switcher (頁面層導覽，對齊 General Budget v2「往前兩年、往後一年」) =====
+ * 頁首右上並排 [Edit Start Month link] + [FY selector trigger]。trigger 點開下拉：4 個 FY 單行
+ * （FY + range + 未填年的 Incomplete chip），由新到舊排（FY_MAX→FY_MIN）。
+ * 切年時若有未存編輯（eiDirty）→ 先開防呆 modal（confirmSwitchYear 確認後續切）。
+ * 資料策略（prototype 簡化）：FY2026 = 既有預設 dataset（snapshot）；FY2024/FY2025 = 視為已填完整（沿用 snapshot）；
+ *   FY2027 = 未填，loadNewFYData()（Budget 從 General Budget、其餘空），dropdown 顯示 Incomplete chip。
  */
-const FY_EMPTY = new Set();
+const EI_CURRENT_FY = 2026;
+const EI_FY_MIN = EI_CURRENT_FY - 2;   // 2024
+const EI_FY_MAX = EI_CURRENT_FY + 1;   // 2027
+let eiViewYear = EI_CURRENT_FY;
+let eiPendingYear = null;               // 切年防呆 modal 確認後要切到的目標年
+let eiDirty = false;                    // 是否有未儲存的 Fiscal Settings 編輯
+// 完成度 demo：true = 該年未填完（dropdown 顯示 Incomplete chip）
+// 完成度（dropdown Incomplete chip + 切年時 loadNewFYData vs restoreSnapshot）。
+// FY2026 = 完整 showcase（6 section 全填）→ 誠實標 complete（無 chip）。
+// 「剛選到、未填」情境由空的未來年 FY2027 呈現（對應 Figma #07-4 freshly-selected 情境）。
+const EI_FY_INCOMPLETE = { 2024:false, 2025:false, 2026:false, 2027:true };
+
 let FISCAL_SNAPSHOT = null;
+
+/* range 格式對齊 General Budget #01-10：「Feb. '26 - Jan. '27」（EI fiscal start 固定 February）*/
+function fyRangeFor(y){
+  const yy  = String(y).slice(-2);
+  const eyy = String(y + 1).slice(-2);
+  return `Feb. '${yy} - Jan. '${eyy}`;
+}
+
+/* 注入頁首 #fy-picker 的 FY selector dropdown */
+function renderFYPicker(){
+  const host = document.getElementById('fy-picker');
+  if(!host) return;
+  const y = eiViewYear;
+  let opts = '';
+  for(let oy = EI_FY_MAX; oy >= EI_FY_MIN; oy--){
+    const tag = EI_FY_INCOMPLETE[oy] ? '<span class="fy-sw-tag fy-sw-tag-incomplete">Incomplete</span>' : '';
+    opts += `<button type="button" class="fy-sw-opt${oy===y?' sel':''}" role="option" aria-selected="${oy===y}" onclick="selectViewYear(${oy})">
+      <span class="fy-sw-opt-fy">FY ${oy}</span>
+      <span class="fy-sw-opt-range">${fyRangeFor(oy)}</span>
+      ${tag}
+    </button>`;
+  }
+  host.innerHTML = `
+    <div class="fy-sw" id="fy-sw">
+      <button type="button" class="fy-sw-trigger" id="fy-sw-trigger"
+        aria-haspopup="listbox" aria-expanded="false" onclick="toggleFYSwitcher(event)">
+        <span class="material-symbols-outlined fy-sw-cal">calendar_month</span>
+        <span class="fy-sw-val">FY ${y}</span>
+        <span class="fy-sw-trigger-range">· ${fyRangeFor(y)}</span>
+        <span class="material-symbols-outlined fy-sw-arr">expand_more</span>
+      </button>
+      <div class="fy-sw-menu" id="fy-sw-menu" role="listbox" aria-label="Select fiscal year">
+        ${opts}
+      </div>
+    </div>`;
+}
+function toggleFYSwitcher(e){
+  if(e) e.stopPropagation();
+  const sw = document.getElementById('fy-sw');
+  if(!sw) return;
+  const open = sw.classList.toggle('open');
+  const trig = document.getElementById('fy-sw-trigger');
+  if(trig) trig.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function closeFYSwitcher(){
+  const sw = document.getElementById('fy-sw');
+  if(sw) sw.classList.remove('open');
+  const trig = document.getElementById('fy-sw-trigger');
+  if(trig) trig.setAttribute('aria-expanded', 'false');
+}
+/* 點外面關閉 switcher */
+document.addEventListener('click', e => {
+  const sw = document.getElementById('fy-sw');
+  if(sw && sw.classList.contains('open') && !sw.contains(e.target)) closeFYSwitcher();
+});
+
+function selectViewYear(y){
+  closeFYSwitcher();
+  if(y === eiViewYear) return;
+  // 有未存編輯 → 先防呆確認（確認後 confirmSwitchYear 才真的切）
+  if(eiDirty){
+    eiPendingYear = y;
+    document.getElementById('modal-switch-year').classList.add('active');
+    return;
+  }
+  applyViewYear(y);
+}
+function confirmSwitchYear(){
+  closeModal('modal-switch-year');
+  eiDirty = false;
+  if(eiPendingYear != null){ applyViewYear(eiPendingYear); eiPendingYear = null; }
+}
+function applyViewYear(y){
+  eiViewYear = y;
+  updateMonthYearLabels(y);
+  // 未填年（demo：FY2027）→ Budget 從 General Budget 預填、其餘空；其他年 → 沿用既有 snapshot
+  if(EI_FY_INCOMPLETE[y]){
+    loadNewFYData();
+  } else {
+    restoreFiscalSnapshot();
+  }
+  updateCompletionChips();
+  renderFYPicker();
+  eiDirty = false;
+  const tail = y === EI_CURRENT_FY ? '' : (y > EI_CURRENT_FY ? ' (Planning)' : ' (Historical)');
+  if(EI_FY_INCOMPLETE[y]){
+    showToast(`Viewing FY${y}${tail}. Financial Budget pre-filled from General Budget.`,'info');
+  } else {
+    showToast(`Viewing FY${y}${tail}.`,'info');
+  }
+}
 
 /* General Budget 月度配額（source of truth = General Budget）。新增 FY 的 Financial Budget 依 PRD 從此預填。
  * 對應 handoff 2026-05-27 line 19/50：「預填 GB monthly total」「換 FY 後新增月份從 GB 補」。
  * 數值鏡射 init budget-grid 的 refs（prototype 單一 GB mock dataset）。 */
-const GB_MONTHLY_BUDGET = ['$78,420','$83,150','$88,000','$93,275','$98,840','$103,500','$108,930','$106,200','$100,640','$96,820','$90,540','$83,910'];
-
-function switchFY(btn,year,periodLabel){
-  btn.parentElement.querySelectorAll('.fy-toggle-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if (periodLabel) {
-    const lbl = document.getElementById('fy-period-label');
-    if (lbl) lbl.textContent = periodLabel;
-  }
-  // 更新月份格上的年份小標（Feb. 'YY → Jan. '(YY+1)）
-  updateMonthYearLabels(parseInt(year,10));
-  // 載入該 FY 的資料：新 FY → Budget 預填 GB + 其餘留空；已設定年份 → 還原 snapshot
-  if (FY_EMPTY.has(year)) {
-    loadNewFYData();
-    showToast('Loaded FY'+year+'. Financial Budget pre-filled from General Budget.','info');
-  } else {
-    restoreFiscalSnapshot();
-    showToast('Loaded FY'+year+' settings','info');
-  }
-}
+const GB_MONTHLY_BUDGET = ['78420','83150','88000','93275','98840','103500','108930','106200','100640','96820','90540','83910'];
 
 /* 依 fiscal start year 計算 12 個月份的年份小標：Feb..Dec = 'YY，Jan = '(YY+1) */
 function computeFYYearSuffixes(startYear){
@@ -2214,7 +2352,7 @@ function loadNewFYData(){
     inp.value = gb;
     if (gb && gb !== '--'){
       inp.dataset.gbRef = gb;
-      inp.dataset.sourceTip = 'Source value from General Budget: '+gb;
+      inp.dataset.sourceTip = 'Source value from General Budget: $'+gb;
       inp.setAttribute('placeholder', gb);
     }
     inp.closest('.month-cell')?.classList.remove('modified');
@@ -2273,7 +2411,7 @@ function buildMonthGrid(containerId, opts){
       '<div class="month-cell-lbl">'+lbl+'<span class="month-cell-year">'+yearSuffix+'</span></div>'+
       '<div class="month-cell-input">'+
         (opts.prefix?'<span class="pre">'+opts.prefix+'</span>':'')+
-        '<input type="text" value="'+displayVal+'" data-gb-ref="'+(ref||'')+'"'+(ref?' data-source-tip="Source value from General Budget: '+ref+'"':'')+' oninput="onMonthCellInput(this)" onfocus="showSourceTip(this)" onblur="hideSourceTip(this)" placeholder="'+placeholder+'" />'+
+        '<input type="text" value="'+displayVal+'" data-gb-ref="'+(ref||'')+'"'+(ref?' data-source-tip="Source value from General Budget: $'+ref+'"':'')+' oninput="onMonthCellInput(this)" onfocus="showSourceTip(this)" onblur="hideSourceTip(this)" placeholder="'+placeholder+'" />'+
         (opts.suffix?'<span class="pre" style="margin-left:4px;margin-right:0">'+opts.suffix+'</span>':'')+
       '</div>'+
       (opts.errorMsg?'<div class="month-cell-err">'+opts.errorMsg+'</div>':'');
@@ -2368,7 +2506,7 @@ function syncAllFromGB(gridId){
       count++;
     }
   });
-  showToast(count>0 ? `Synced ${count} month${count>1?'s':''} from General Budget` : 'All months already match General Budget','info');
+  showToast('All Estimated Financial Budgets synced successfully.');
 }
 
 /* (toggleGBRef removed — no longer needed, inline ref display removed entirely) */
@@ -2730,7 +2868,7 @@ window.DEMO_SCENARIOS = [
   { id:'s-invalid', page:'settings', label:'Invalid Format',      icon:'error',         tip:'Required fields empty: red borders, error messages, Section "Incomplete" chip (per Figma 5572)' },
   { id:'s-loading', page:'settings', label:'Loading',             icon:'hourglass_top', isNoData:true, tip:'Skeleton while settings load' },
   { id:'s-empty',   page:'settings', label:'No Fiscal Year Yet',  icon:'add_circle',   isNoData:true, tip:'No fiscal year configured. Prompt to add first FY.' },
-  { id:'s-new-fy',  page:'settings', label:'Newly Added FY', icon:'event_upcoming', isNoData:true, tip:'新增 fiscal year 後切到該年：Financial Budget 依 PRD 從 General Budget 預填，其餘 section（ROI / CPC / Forecast / Revenue / Customers）留空待填，chips = Incomplete。' },
+  { id:'s-new-fy',  page:'settings', label:'Newly Added FY', icon:'event_upcoming', isNoData:true, tip:'切到未填的 FY2027：Financial Budget 依 PRD 從 General Budget 預填、Expected ROI 預設 1，其餘 section（CPC / Forecast / Revenue / Customers）留空待填，dropdown chip = Incomplete。' },
 
   // Card state scenarios — Figma 5749-141112
   { id:'cs-cvr-ok',     page:'card-state', label:'CVR: Above Target (2.28×)',       icon:'trending_up',  tip:'Realized cloud value exceeds expectations (green gradient)' },
@@ -2751,7 +2889,7 @@ window.DEMO_SCENARIOS = [
 
   // Modal scenarios — 一鍵開啟各 modal（GB v2 對齊）
   { id:'modal-edit-start', page:'modal', label:'Edit Start Month',         icon:'event',     tip:'Figma #09 — 改 Fiscal Year start month modal（warning box + 動態 Resulting FY 文字）。' },
-  { id:'modal-add-fy',     page:'modal', label:'Add Fiscal Year',          icon:'add_circle',tip:'新增 Fiscal Year modal（CMDS form modal 660px）。' },
+  { id:'modal-switch-year',page:'modal', label:'Switch Year (guard)',      icon:'warning',   tip:'切換 FY 時若有未存編輯的防呆 confirm dialog（確認後續切年，不跳回 Dashboard）。' },
   { id:'modal-discard',    page:'modal', label:'Discard unsaved changes?', icon:'warning',   tip:'Settings 有未存改動時離開的 confirm dialog。' },
 
   // Toast scenarios — 演示文案（GB v2 對齊句型「X updated successfully.」/「Unable to update X.」）
@@ -2759,6 +2897,8 @@ window.DEMO_SCENARIOS = [
   { id:'toast-settings-err', page:'toast', label:'Settings update failed', icon:'error',       tip:'Unable to update Fiscal Settings. Please try again later.' },
   { id:'toast-fsm-ok',       page:'toast', label:'Start month saved (ok)', icon:'check_circle',tip:'Fiscal Start Month updated successfully.' },
   { id:'toast-fsm-err',      page:'toast', label:'Start month save failed',icon:'error',       tip:'Unable to update Fiscal Start Month. Please try again later.' },
+  { id:'toast-sync-ok',      page:'toast', label:'Budget synced (ok)',     icon:'check_circle',tip:'All Estimated Financial Budgets synced successfully.' },
+  { id:'toast-sync-err',     page:'toast', label:'Budget sync failed',     icon:'error',       tip:'Unable to sync budget. Please try again later.' },
   { id:'toast-fy-ok',        page:'toast', label:'Fiscal year updated',    icon:'event_available', tip:'Fiscal year updated successfully. Also synced to General Budget.' },
   { id:'toast-fy-load',      page:'toast', label:'Loaded FY (info)',       icon:'info',        tip:'Loaded FY2026 settings (info, 切換 FY 時用)。' },
   { id:'toast-discard',      page:'toast', label:'Changes discarded',      icon:'warning',     tip:'Changes discarded (warn)。' },
@@ -2780,7 +2920,7 @@ window.DEMO_APPLY = function(id, btn){
   if(id==='s-set')     { setRole('admin'); goToSettings(); setSettingsState('set');     }
   if(id==='s-loading') { setRole('admin'); goToSettings(); setSettingsState('loading'); }
   if(id==='s-empty')   { setRole('admin'); goToSettings(); setSettingsState('empty');   }
-  if(id==='s-new-fy')  { setRole('admin'); goToSettings(); setSettingsState('set'); setTimeout(demoShowNewFY,100); }
+  if(id==='s-new-fy')  { setRole('admin'); goToSettings(); setSettingsState('set'); eiDirty=false; setTimeout(()=>applyViewYear(2027),100); }
   if(id==='s-invalid') {
     setRole('admin'); goToSettings(); setSettingsState('set');
     // 故意清空幾個必填欄位來觸發 invalid state
@@ -2825,7 +2965,7 @@ window.DEMO_APPLY = function(id, btn){
   // Modal scenarios — 一鍵開 modal（先確保到對應頁面再開）
   const openModalById = (mid)=>{ const m=document.getElementById(mid); if(m) m.classList.add('active'); };
   if(id==='modal-edit-start') { setRole('admin'); goToDashboard(); setState('set'); openModalById('modal-fsm'); }
-  if(id==='modal-add-fy')     { setRole('admin'); goToSettings(); setSettingsState('set'); openModalById('modal-add-fy'); }
+  if(id==='modal-switch-year'){ setRole('admin'); goToSettings(); setSettingsState('set'); openModalById('modal-switch-year'); }
   if(id==='modal-discard')    { setRole('admin'); goToSettings(); setSettingsState('set'); openModalById('modal-discard'); }
 
   // Toast scenarios — 演示各 toast 文案（GB v2 對齊句型）
@@ -2833,6 +2973,8 @@ window.DEMO_APPLY = function(id, btn){
   if(id==='toast-settings-err') { showToast('Unable to update Fiscal Settings. Please try again later.','err'); }
   if(id==='toast-fsm-ok')       { showToast('Fiscal Start Month updated successfully.'); }
   if(id==='toast-fsm-err')      { showToast('Unable to update Fiscal Start Month. Please try again later.','err'); }
+  if(id==='toast-sync-ok')      { showToast('All Estimated Financial Budgets synced successfully.'); }
+  if(id==='toast-sync-err')     { showToast('Unable to sync budget. Please try again later.','err'); }
   if(id==='toast-fy-ok')        { showToast('Fiscal year updated successfully. Also synced to General Budget.','info'); }
   if(id==='toast-fy-load')      { showToast('Loaded FY2026 settings','info'); }
   if(id==='toast-discard')      { showToast('Changes discarded.','warn'); }
@@ -2846,8 +2988,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   // FY2026 預設為「完整」showcase：12 格全填（Apr/Jul 對齊 GB 值）。空欄位 / placeholder 機制改由新增 FY 的空資料情境展示
   buildMonthGrid('budget-grid',{
     prefix:'$', placeholder:'0', errorMsg:'Budget cannot be empty.',
-    values:[ '$78,420', '$83,150', '$88,000', '$93,275', '$98,840', '$103,500', '$108,930', '$106,200', '$100,640', '$96,820', '$90,540', '$83,910' ],
-    refs:[   '$78,420', '$83,150', '$88,000', '$93,275', '$98,840', '$103,500', '$108,930', '$106,200', '$100,640', '$96,820', '$90,540', '$83,910' ]
+    values:[ '78420', '83150', '88000', '93275', '98840', '103500', '108930', '106200', '100640', '96820', '90540', '83910' ],
+    refs:[   '78420', '83150', '88000', '93275', '98840', '103500', '108930', '106200', '100640', '96820', '90540', '83910' ]
   });
   buildMonthGrid('roi-grid',{
     placeholder:'1', errorMsg:'ROI cannot be empty.',
@@ -2855,19 +2997,30 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   buildMonthGrid('revenue-grid',{
     prefix:'$', placeholder:'optional',
-    values:['920,000','945,000','968,000','992,000','1,015,000','1,038,000','1,055,000','1,047,000','1,029,000','1,012,000','985,000','962,000']
+    values:['920000','945000','968000','992000','1015000','1038000','1055000','1047000','1029000','1012000','985000','962000']
   });
   buildMonthGrid('customers-grid',{
     placeholder:'optional',
-    values:['22,400','22,800','23,200','23,600','24,000','24,400','24,820','24,600','24,300','24,100','23,800','23,500']
+    values:['22400','22800','23200','23600','24000','24400','24820','24600','24300','24100','23800','23500']
   });
   buildMonthGrid('forecast-grid',{
     prefix:'$', placeholder:'0', errorMsg:'Forecast cannot be empty.',
-    values:['82,000','87,000','92,000','97,000','102,000','107,000','112,000','110,000','104,000','100,000','94,000','87,000']
+    values:['82000','87000','92000','97000','102000','107000','112000','110000','104000','100000','94000','87000']
   });
 
-  // 存下這份「已填好」的資料 snapshot，供切回已設定年份 (FY2025/FY2026) 時還原
+  // 存下這份「已填好」的資料 snapshot，供切回已設定年份 (FY2024/FY2025/FY2026) 時還原
   captureFiscalSnapshot();
+
+  // FY selector dropdown（頁首右上）初次渲染
+  renderFYPicker();
+
+  // 髒旗標：使用者一動 Fiscal Settings 任何 input/select 就標 dirty（切年防呆用）
+  const settingsContent = document.getElementById('settings-content');
+  if(settingsContent){
+    const markDirty = ()=>{ eiDirty = true; };
+    settingsContent.addEventListener('input', markDirty);
+    settingsContent.addEventListener('change', markDirty);
+  }
 
   // Render Top10 Overspend (table + vertical bar chart) — overrun amount + % over budget
   // Figma 註釋: >=30% 深紅，其他橘色 — 此處有 4 個 >=30% (Engineering 50%, Data Pipeline 52%, Customer 42%, ML 42%)
