@@ -44,7 +44,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 /* 編輯模式不再用藍色外框（PM 反饋分散注意力；實際只有下方表格可編輯，Save/Cancel bar 已足夠指示編輯狀態）*/
 .paper-section-title{font-size:18px;font-weight:700;color:var(--g900);line-height:1.5}
 .paper-section-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:16px}
-/* When section title is hidden (T2 roles), force action buttons (Export CSV / Edit) to stay right-aligned
+/* When section title is hidden (T2 roles), force action buttons (Download CSV / Edit) to stay right-aligned
    instead of collapsing to the left edge of the row. */
 .paper-section-row > .pg-hdr-r{margin-left:auto}
 .paper-meta{font-size:12px;color:var(--g500);font-style:italic;white-space:nowrap}
@@ -583,9 +583,6 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
       <div class="pg-hdr">
         <div class="pg-title">General Budget</div>
         <div class="pg-hdr-r">
-          <!-- Page-level actions live here. FY context now lives inline in Section 1 paper-period (EI pattern).
-               Export CSV moved here from Section 2 in v2 — clearer separation of page-level vs table-level actions. -->
-          <button class="btn btn-o" id="btn-csv" style="display:none"><span class="material-symbols-outlined">download</span>Export CSV</button>
           <div id="fy-picker"></div>
         </div>
       </div>
@@ -613,10 +610,11 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
 
         <div class="paper-sep"></div>
 
-        <!-- Section 2: Group Budget table — only Edit Budget here (CSV moved to top page header) -->
+        <!-- Section 2: Group Budget table -->
         <div class="paper-section-row" id="sec2-row" style="align-items:center">
           <div class="paper-section-title" id="sec2-title">Tier 1 Group Budget</div>
           <div class="pg-hdr-r">
+            <button class="btn btn-o" id="btn-csv" style="display:none"><span class="material-symbols-outlined">download</span>Download CSV</button>
             <button class="btn btn-p" id="btn-edit"><span class="material-symbols-outlined">edit</span>Edit Budget</button>
           </div>
         </div>
@@ -2537,7 +2535,6 @@ window.LUMITURE_ACTIVE = 'general-budget';
 setRole(state.role);
 // Ensure CSV button visibility reflects v2 default (showSegCtrl=true, pageState='set')
 if($('#btn-csv')) $('#btn-csv').style.display = (state.pageState==='set' && state.showSegCtrl && !state.editing) ? '' : 'none';
-// Re-render FY picker wrapper so the page-top .pg-hdr-r picks up the now-visible CSV button
 renderFYPicker();
 </script>
 
@@ -2755,8 +2752,8 @@ renderFYPicker();
     ]},
 
     { type: 'group', id: 'optimization', label: 'Optimization', items: [
-      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', href: '../rightsizing/rightsizing-prototype-v1.html' },
-      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'sell', href: '../rate-optimization/rate-optimization-prototype-v1.html' },
+      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', href: './rightsizing.html' },
+      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'sell', href: './rate-optimization.html' },
     ]},
 
     { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
