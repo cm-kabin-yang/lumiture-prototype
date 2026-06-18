@@ -63,6 +63,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .fy-set-link:disabled .material-symbols-outlined{color:var(--g400)}
 
 /* ==== FY year switcher（頁首右上，page-level 導覽；往前兩年/往後一年）==== */
+#fy-picker{display:inline-flex;align-items:center;gap:12px} /* Edit Start Month link + FY selector 並排 */
 .fy-sw{position:relative;display:inline-block}
 .fy-sw-trigger{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:1px solid var(--g300);border-radius:var(--r-sm);background:#fff;font-family:inherit;font-size:13px;font-weight:600;color:var(--g900);cursor:pointer;line-height:1;transition:border-color .12s,background .12s,box-shadow .12s}
 .fy-sw-trigger:hover{border-color:var(--pri);background:var(--pri-lt10)}
@@ -71,28 +72,27 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .fy-sw-trigger:disabled .fy-sw-cal{color:var(--g400)}
 .fy-sw-cal{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400}
 .fy-sw-val{letter-spacing:0}
+/* trigger 上的 range（設計稿 #01：FY + range 直接寫在按鈕上）—— 次級灰、normal weight */
+.fy-sw-trigger-range{font-size:13px;font-weight:400;color:var(--g500);letter-spacing:0;white-space:nowrap}
 .fy-sw-arr{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400;transition:transform .15s;margin-left:2px}
 .fy-sw.open .fy-sw-arr{transform:rotate(180deg)}
-/* 狀態 tag（trigger 與 option 共用） */
-.fy-sw-tag{font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;letter-spacing:.02em;line-height:1.5;text-transform:none;white-space:nowrap}
-.fy-sw-tag-current{background:var(--pri-lt10);color:var(--pri)}
-.fy-sw-tag-future{background:#fef3e1;color:#ec6f09}
+/* 狀態 pill（設計稿 #01-10：實心、白字）：Current=藍 / Planning=青 */
+.fy-sw-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;letter-spacing:.02em;line-height:1.5;text-transform:none;white-space:nowrap;color:#fff}
+.fy-sw-tag-current{background:var(--pri)}
+.fy-sw-tag-future{background:#34B5D9}
 /* 過去年：trigger 數字轉中性灰，暗示「非當年」（但不鎖，仍可編輯） */
 .fy-sw.past .fy-sw-trigger{color:var(--g600)}
 .fy-sw.past .fy-sw-val{color:var(--g600)}
 .fy-sw.future .fy-sw-trigger{color:var(--g900)}
-/* 下拉選單 */
-.fy-sw-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:248px;background:#fff;border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.1);padding:6px;z-index:60;display:none;overscroll-behavior:contain}
+/* 下拉選單（無標題列、無底部 Edit link —— 那是設計備份）*/
+.fy-sw-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:280px;background:#fff;border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.1);padding:6px;z-index:60;display:none;overscroll-behavior:contain}
 .fy-sw.open .fy-sw-menu{display:block}
-.fy-sw-menu-hd{font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.04em;padding:6px 10px 4px}
-.fy-sw-opt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:8px 10px;border:none;background:none;border-radius:var(--r-sm);cursor:pointer;font-family:inherit;text-align:left;position:relative;transition:background .1s}
+/* item 單行：FY（固定）+ range（中段佔滿、灰）+ pill（靠右）*/
+.fy-sw-opt{display:flex;flex-direction:row;align-items:center;gap:10px;width:100%;padding:9px 12px;border:none;background:none;border-radius:var(--r-sm);cursor:pointer;font-family:inherit;text-align:left;transition:background .1s}
 .fy-sw-opt:hover{background:var(--g100)}
-.fy-sw-opt.sel{background:var(--pri-lt10)}
-.fy-sw-opt-main{display:inline-flex;align-items:center;gap:6px}
-.fy-sw-opt-fy{font-size:14px;font-weight:600;color:var(--g900);line-height:1.3}
-.fy-sw-opt.sel .fy-sw-opt-fy{color:var(--pri)}
-.fy-sw-opt-range{font-size:12px;color:var(--g500);line-height:1.4}
-.fy-sw-check{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--pri);font-variation-settings:'FILL' 1,'wght' 500}
+.fy-sw-opt.sel{background:var(--g100)}
+.fy-sw-opt-fy{font-size:14px;font-weight:600;color:var(--g900);line-height:1.3;white-space:nowrap}
+.fy-sw-opt-range{flex:1;font-size:12px;color:var(--g500);line-height:1.4;white-space:nowrap}
 .paper-desc{font-size:12px;color:var(--g500);margin-bottom:24px}
 .paper-desc b{color:var(--g700);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:11px}
 
@@ -137,11 +137,13 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .fy-preview{font-size:14px;font-weight:500;color:var(--g900);line-height:1.75;margin-bottom:16px}
 .fy-preview strong{color:var(--g900);font-weight:700}
 /* Figma 對齊：bg #FEF3E1、文字色 #EC6F09 (Warning Dark)、14px Regular、24.5px line-height、padding 16px、rounded 8px、gap 4px */
-.fy-warning{display:flex;gap:8px;padding:16px;background:#fef3e1;border-radius:8px;font-size:14px;color:#ec6f09;margin-top:0;align-items:flex-start;line-height:1.75}
-.fy-warning .material-symbols-outlined{font-size:20px;color:#ec6f09;flex-shrink:0;font-variation-settings:'FILL' 1,'wght' 500;margin-top:2px}
+/* warn-dark：警告文字在 warn-light 底上的深琥珀（對比足夠），收成 token 避免 hardcode */
+:root{--warn-dark:#ec6f09;--warn-light:#fef3e1}
+.fy-warning{display:flex;gap:8px;padding:16px;background:var(--warn-light);border-radius:8px;font-size:14px;color:var(--warn-dark);margin-top:0;align-items:flex-start;line-height:1.75}
+.fy-warning .material-symbols-outlined{font-size:20px;color:var(--warn-dark);flex-shrink:0;font-variation-settings:'FILL' 1,'wght' 500;margin-top:2px}
 .fy-warning-content{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
-.fy-warning-title{font-weight:400;color:#ec6f09;line-height:1.75}
-.fy-warning-list{margin:0;padding-left:28px;font-size:14px;line-height:1.75;color:#ec6f09;list-style:disc}
+.fy-warning-title{font-weight:400;color:var(--warn-dark);line-height:1.75}
+.fy-warning-list{margin:0;padding-left:28px;font-size:14px;line-height:1.75;color:var(--warn-dark);list-style:disc}
 .fy-warning-list li{margin-bottom:0}
 .fy-field-label{display:block;font-size:13px;font-weight:500;color:var(--g700);margin-bottom:6px}
 .orgcell .ov{font-size:36px;font-weight:700;color:var(--g900);line-height:1.1;letter-spacing:-.5px}
@@ -333,7 +335,7 @@ table.budget tbody tr.selected:hover td.fix{background:var(--pri-lt20)}
 /* Spent % segmented meter — reuses lumi-tag "Coverage" 5-block pattern.
    Shared visual language across dashboards. Each consumer sets its own threshold + color mapping:
    - lumi-tag Coverage: high = good（>=70% ok / 40-69% warn / <40% low）
-   - budget Spent %:    high = bad（<70% ok / 70-99% warn / >=100% danger）
+   - budget Spent %:    high = bad（0-79 ok / 80-99 warn / >=100% danger）
    Same 5-segment structure, color semantics inverted by intent. Worth extracting via /dc-make. */
 .pct-meter{display:inline-flex;align-items:center;gap:4px;vertical-align:middle}
 .pct-meter-bar{display:inline-flex;gap:1.5px;flex-shrink:0}
@@ -744,8 +746,7 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
   <div class="mdesc">Please select your organization's fiscal year start month.</div>
   <div class="mb">
     <div style="margin-bottom:16px;max-width:240px">
-      <label class="fy-field-label" for="fy-modal-month">Start Month</label>
-      <select id="fy-modal-month" class="fy-select"></select>
+      <select id="fy-modal-month" class="fy-select" aria-label="Fiscal year start month"></select>
     </div>
     <div class="fy-preview">Resulting fiscal year: <strong id="fy-preview-label">FY2026</strong> <span id="fy-preview-range" style="color:var(--g500)"></span></div>
     <div class="fy-warning">
@@ -801,10 +802,11 @@ const PROVIDERS = [
 
 const MONTHS = ['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
 // PRD §7 B+D direction: admin-locked org FY (single source of truth, no per-user toggle)
+// label = 縮寫（range / 月份 header / Viewing 行用）；full = 完整月名（#11 Edit Start Month 下拉用，依設計稿）
 const FY_START_MONTHS = [
-  {idx:0,label:'Jan'},{idx:1,label:'Feb'},{idx:2,label:'Mar'},{idx:3,label:'Apr'},
-  {idx:4,label:'May'},{idx:5,label:'Jun'},{idx:6,label:'Jul'},{idx:7,label:'Aug'},
-  {idx:8,label:'Sep'},{idx:9,label:'Oct'},{idx:10,label:'Nov'},{idx:11,label:'Dec'},
+  {idx:0,label:'Jan',full:'January'},{idx:1,label:'Feb',full:'February'},{idx:2,label:'Mar',full:'March'},{idx:3,label:'Apr',full:'April'},
+  {idx:4,label:'May',full:'May'},{idx:5,label:'Jun',full:'June'},{idx:6,label:'Jul',full:'July'},{idx:7,label:'Aug',full:'August'},
+  {idx:8,label:'Sep',full:'September'},{idx:9,label:'Oct',full:'October'},{idx:10,label:'Nov',full:'November'},{idx:11,label:'Dec',full:'December'},
 ];
 
 const GROUPS_GCP = [
@@ -857,6 +859,7 @@ const FY_VIEW_BACK = 2;           // 可往前看幾年
 const FY_VIEW_FWD = 1;            // 可往後看幾年
 const FY_VIEW_MIN = CURRENT_FY - FY_VIEW_BACK;
 const FY_VIEW_MAX = CURRENT_FY + FY_VIEW_FWD;
+const BUDGET_MAX = 999999; // 每月預算上限（PRD）；輸入超過自動跳回此值
 
 // ===== Per-year data store (年份切換器資料來源) =====
 // CURRENT_FY 直接共用 ALL_GROUPS 的引用 → Edit/Save 操作當年資料即寫回 canonical（向後相容）。
@@ -974,7 +977,7 @@ function pairSparklineSVG(budgets, spends, W){
   // Trend = 純趨勢概覽（做減法 5/27）：只 budget vs spend 雙線 + 超支紅點。
   // cap-conflict / 超 Allocated 等狀態警示全部回歸 grid（Budget/Spend/Remaining segment）的 amber dot + 紅字。
   const allVals = [...budgets, ...spends].filter(v => v!==null && v!==undefined);
-  if(!allVals.length) return '<span class="empty-cell" data-tip-tip="No budget set (Unlimited)">--</span>';
+  if(!allVals.length) return '<span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">--</span>';
   const max = Math.max(...allVals) || 1;
   const H=40, PADX=6, PADY=7;
   const xStep = (W - PADX*2) / 11;
@@ -1145,12 +1148,16 @@ function renderOrgCards(){
     const cell = document.createElement('div');
     cell.className = 'orgcell';
     const isEmpty = (state.pageState==='empty') || (c.value === 0);
-    const convVal = state.showConv && !isEmpty ? fmtCardNum(c.value * (FX_RATES[state.currency]||1)) : null;
+    // 換算值是次要參考、設計稿 #01-7 要完整整數含千分位（不套 K/M/B 縮寫）
+    const convVal = state.showConv && !isEmpty ? Math.round(c.value * (FX_RATES[state.currency]||1)).toLocaleString('en-US') : null;
     const currCode = state.currency;
     const expectedKey = c.key === 'current' ? null : c.key;
     const expectedVal = expectedKey ? EXPECTED[expectedKey] : (EXPECTED.gcp + EXPECTED.aws + EXPECTED.azure);
+    const expectedSet = expectedVal != null; // #05：Admin 未配 Allocated 時為 null → 顯示 --
+    // #05-2：開換算時 Allocated（預期預算）也顯示換算值（同總預算，完整整數）；未設定則無換算
+    const expectedConv = (state.showConv && expectedSet) ? Math.round(expectedVal * (FX_RATES[state.currency]||1)).toLocaleString('en-US') : null;
     // Figma #05-1 Hover (T1): when allocated budget > Allocated cap, card's Annual Budget number turns red + hover tooltip
-    const cardOverExpected = role.showExpected && !isEmpty && c.key !== 'current' && c.value > expectedVal;
+    const cardOverExpected = role.showExpected && !isEmpty && c.key !== 'current' && expectedSet && c.value > expectedVal;
     const ovOverCls = cardOverExpected ? ' over-budget' : '';
     const ovOverTip = cardOverExpected ? ' data-tip-tip="The budget cannot be empty and must not exceed the Allocated cap."' : '';
     // Info tooltip on Allocated pill (Figma #05-1) — PRD §7.4 rename
@@ -1159,7 +1166,8 @@ function renderOrgCards(){
       <div class="ol">${c.badge?`<span class="${c.badge.cls === 'csp-logo' ? c.badge.cls : 'csp-ic '+c.badge.cls}">${c.badge.logo || (c.badge.icon?`<span class="material-symbols-outlined">${c.badge.icon}</span>`:(c.badge.t||''))}</span>`:''}<span>${c.label}</span></div>
       <div class="ov${ovOverCls}"${ovOverTip || (isAbbreviated(c.value) ? ' data-tip-tip="'+Math.round(c.value).toLocaleString()+' USD"' : '')}>${isEmpty?'<span class="empty-val">--</span>':fmtCardNum(c.value)}<span class="ou">USD</span></div>
       <div class="conv">${isEmpty?'<span class="empty-val">--</span>':('≈ '+convVal+' '+currCode)}</div>
-      ${role.showExpected && c.key !== 'current' ?`<div class="expected"${isAbbreviated(expectedVal) ? ' data-tip-tip="'+expectedVal.toLocaleString()+' USD"' : ''}><span class="material-symbols-outlined">flag</span>Allocated Budget ${fmtCardNum(expectedVal)} USD</div>`:''}
+      ${role.showExpected && c.key !== 'current' ?`<div class="expected"${(expectedSet && isAbbreviated(expectedVal)) ? ' data-tip-tip="'+expectedVal.toLocaleString()+' USD"' : ''}><span class="material-symbols-outlined">flag</span>Allocated Budget ${expectedSet ? fmtCardNum(expectedVal)+' USD' : '<span class="empty-val" data-tip-tip="Allocated budget not set by Admin">--</span>'}</div>`:''}
+      ${role.showExpected && c.key !== 'current' && expectedSet ?`<div class="conv expected-conv">≈ ${expectedConv} ${currCode}</div>`:''}
     `;
     row.appendChild(cell);
   });
@@ -1254,15 +1262,15 @@ function renderTable(){
   }
 
   // Helper: render Spent % segmented meter (5 blocks × 20% steps, reuses LumiTag Coverage pattern)
-  // Threshold for budget context: <70% ok / 70-99% warn / >=100% danger
+  // Threshold for budget context (設計稿 #01)：0-79 Successful / 80-99 Warning / 100+ Error
   // Each block fills 0-100% based on which 20% step the actual % falls into
   function pctBar(spent, budget){
-    if(budget === null || budget === 0) return '<span class="empty-cell" data-tip-tip="No budget set (Unlimited). cannot compute %">—</span>';
-    if(spent === null) return '<span class="empty-cell" data-tip-tip="Missing actual data">—</span>';
+    if(budget === null || budget === 0) return '<span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">--</span>';
+    if(spent === null) return '<span class="empty-cell" data-tip-tip="Missing actual data">--</span>';
     const pct = Math.round(spent / budget * 100);
     let cls = '';
     if(pct >= 100) cls = 'danger';
-    else if(pct >= 70) cls = 'warn';
+    else if(pct >= 80) cls = 'warn';
     const SEG = 5, STEP = 20;
     let segs = '';
     for(let i = 0; i < SEG; i++){
@@ -1304,7 +1312,14 @@ function renderTable(){
   // Body
   let b = '<tbody>';
   const sparkSpecs = []; // {sel, budgets[], spends[]} collected in first pass; drawn after measure (方向Y)
-  data.forEach((g, gi) => {
+  // 列排序：依年度 Budget 由大到小（設計稿 #01；spec 文字寫「字母」為筆誤，2026-06-17 Kabin 確認）。
+  // 未設定預算（null）排最後。僅 View 模式排序；編輯模式維持原序（避免打字觸發 renderTable 時列跳動）。
+  // gi 永遠保留 canonical index，確保 getSpend / 編輯寫回 state.draft 對到正確的組。
+  const _budgetOf = g => { const t = sumMonths(g.months); return t === null ? -1 : t; };
+  const rowOrder = state.editing
+    ? data.map((g, gi) => ({ g, gi }))
+    : data.map((g, gi) => ({ g, gi })).sort((a, b) => _budgetOf(b.g) - _budgetOf(a.g));
+  rowOrder.forEach(({ g, gi }) => {
     const total = sumMonths(g.months);
     const overExpected = role.showExpected && total !== null && total > (EXPECTED[state.currentTab] || Infinity);
     const sel = state.selected.has(gi);
@@ -1325,31 +1340,31 @@ function renderTable(){
       // Order: Budget → Spend → Spent % → Remaining (PRD §7.1; 4 欄全保留)
       // Per Kabin 2026-06-04：4-in-1 detail hover 拿掉，只保留「紅字超標」通用 tooltip
       // Budget col
-      if(total === null) b += `<td class="fix col-budget"><span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">—</span></td>`;
+      if(total === null) b += `<td class="fix col-budget"><span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">--</span></td>`;
       else b += `<td class="fix col-budget${overExpected?' over-budget':''}"${overExpected?' data-tip-tip="Budget exceeds Allocated cap."':''}>${fmt(total)}</td>`;
       // Spend col — turns red when Spend > Budget
       const annualOverSpend = total !== null && annualSpendVal !== null && annualSpendVal > total;
-      if(annualSpendVal === null) b += `<td class="fix col-spend"><span class="empty-cell" data-tip-tip="Missing actual data">—</span></td>`;
+      if(annualSpendVal === null) b += `<td class="fix col-spend"><span class="empty-cell" data-tip-tip="Missing actual data">--</span></td>`;
       else b += `<td class="fix col-spend${annualOverSpend?' over-budget':''}"${annualOverSpend?' data-tip-tip="Spend exceeds annual budget."':''}>${fmt(annualSpendVal)}</td>`;
       // Spent % — no hover (per Kabin H8 取消)
       b += `<td class="fix col-pct">${pctBar(annualSpendVal, total)}</td>`;
       // Remaining (negative → red via over-budget class; empty → Unable to calculate)
-      if(annualRemain === null) b += `<td class="fix col-remain"><span class="empty-cell" data-tip-tip="Unable to calculate (no budget or no data)">—</span></td>`;
+      if(annualRemain === null) b += `<td class="fix col-remain"><span class="empty-cell" data-tip-tip="Unable to calculate (no budget or no data)">--</span></td>`;
       else b += `<td class="fix col-remain${annualRemain < 0 ? ' over-budget':''}">${annualRemain < 0 ? '-' : ''}${fmt(Math.abs(annualRemain))}</td>`;
     }else if(show2col){
       // Edit mode: Total + Spend (independent col for budget-editing context)
       // 4-in-1 detail hover 拿掉，編輯模式仍保留 over-Allocated / over-Spend 警示文案（actionable info）
       const overSpend = total !== null && annualSpendVal !== null && total < annualSpendVal;
       // Total cell
-      if(total === null) b += `<td class="fix col-total"><span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">—</span></td>`;
+      if(total === null) b += `<td class="fix col-total"><span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">--</span></td>`;
       else b += `<td class="fix col-total${overExpected?' over-budget':''}"${overExpected?' data-tip-tip="Budget exceeds Allocated cap."':''}>${fmt(total)}</td>`;
       // Spend cell
-      if(annualSpendVal === null) b += `<td class="fix col-spend"><span class="empty-cell" data-tip-tip="Missing actual data">—</span></td>`;
+      if(annualSpendVal === null) b += `<td class="fix col-spend"><span class="empty-cell" data-tip-tip="Missing actual data">--</span></td>`;
       else b += `<td class="fix col-spend${overSpend?' over-budget':''}"${overSpend?' data-tip-tip="Spent more than the budget you\'re setting (save not blocked)."':''}>${fmt(annualSpendVal)}</td>`;
     }else{
       // Original single Total column
       if(total === null) b += `<td class="fix col-total"><span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">--</span></td>`;
-      else b += `<td class="fix col-total${overExpected?' over-budget':''}"${overExpected?' data-tip-tip="The total exceeds the Allocated budget cap."':''}>${fmt(total)}</td>`;
+      else b += `<td class="fix col-total${overExpected?' over-budget':''}"${overExpected?' data-tip-tip="Budget exceeds Allocated cap."':''}>${fmt(total)}</td>`;
     }
     // Months — sparkline (Demo 方向Y) replaces 12 month cells in View Mode; otherwise per-month grid
     if(useSparkline()){
@@ -1394,10 +1409,10 @@ function renderTable(){
       }else if(view === 'remaining' && show4col){
         // Remaining 欄 -- 統一 tooltip：Unable to calculate (no budget or no data)
         // 適用情境：budget = null (unlimited) 或 spend = null (missing data)
-        if(mv === null || mv === undefined){ b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Unable to calculate (no budget or no data)">—</span></td>`; return; }
+        if(mv === null || mv === undefined){ b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Unable to calculate (no budget or no data)">--</span></td>`; return; }
         const sv = getSpend(gi, mi, mv);
         if(sv === undefined){ b += `<td class="col-mon">${fmt(mv)}</td>`; return; } // future = full budget remaining
-        if(sv === null){ b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Unable to calculate (no budget or no data)">—</span></td>`; return; }
+        if(sv === null){ b += `<td class="col-mon"><span class="empty-cell" data-tip-tip="Unable to calculate (no budget or no data)">--</span></td>`; return; }
         const rem = mv - sv;
         b += `<td class="col-mon${rem < 0 ? ' over-budget' : ''}">${rem < 0 ? '-' : ''}${fmt(Math.abs(rem))}</td>`;
       }else{
@@ -1426,7 +1441,10 @@ function renderTable(){
     data.forEach(g => { if(g.months[mi]!==null&&g.months[mi]!==undefined){ s=(s||0)+g.months[mi]; } });
     return s;
   });
-  const grandTotal = monthTotals.reduce((acc,v) => acc + (v||0), 0);
+  // 全部 group 皆未設定預算（#00 情境）→ Total Budget 顯 --（依設計稿 mockup，Kabin 2026-06-17 裁示）；
+  // 部分設定則照常加總已輸入值（與 org card disclaimer「only presents values entered」一致）
+  const grandTotal = monthTotals.every(v => v === null) ? null : monthTotals.reduce((acc,v) => acc + (v||0), 0);
+  const TOTAL_BUDGET_EMPTY = '<span class="empty-cell" data-tip-tip="Unable to calculate the total, as some monthly budgets are not set.">--</span>';
   // Per-month Total Spend — 用於 Allocated row 月份格 amber dot 判定（Spend > Cap）
   const monthlySpendTotals = MONTHS.map((_,mi) => {
     let s = 0, has = false;
@@ -1461,18 +1479,18 @@ function renderTable(){
     // Order: Budget → Spend → Spent % → Remaining (PRD §7.1; 4 欄全保留)
     // Spend turns red when Total Spend > Total Budget (consistent with group rows + monthly cells)
     const totOverSpend4 = grandTotal !== null && totSpendVal !== null && totSpendVal > grandTotal;
-    b += `<td class="fix col-budget">${fmt(grandTotal)}</td>`;
-    b += `<td class="fix col-spend${totOverSpend4?' over-budget':''}"${totOverSpend4?' data-tip-tip="Total spend exceeds total budget."':''}>${totSpendVal===null?'<span class="empty-cell">—</span>':fmt(totSpendVal)}</td>`;
+    b += `<td class="fix col-budget">${grandTotal===null?TOTAL_BUDGET_EMPTY:fmt(grandTotal)}</td>`;
+    b += `<td class="fix col-spend${totOverSpend4?' over-budget':''}"${totOverSpend4?' data-tip-tip="Total spend exceeds total budget."':''}>${totSpendVal===null?'<span class="empty-cell">--</span>':fmt(totSpendVal)}</td>`;
     b += `<td class="fix col-pct">${pctBar(totSpendVal, grandTotal)}</td>`;
-    b += `<td class="fix col-remain${totRemain<0?' over-budget':''}">${totRemain===null?'<span class="empty-cell">—</span>':(totRemain<0?'-':'')+fmt(Math.abs(totRemain))}</td>`;
+    b += `<td class="fix col-remain${totRemain<0?' over-budget':''}">${totRemain===null?'<span class="empty-cell">--</span>':(totRemain<0?'-':'')+fmt(Math.abs(totRemain))}</td>`;
   }else if(show2col){
     // Edit mode total row: Total + Spend, with red on Spend when Total < Spend
     const totOverSpend = grandTotal !== null && totSpendVal !== null && grandTotal < totSpendVal;
-    b += `<td class="fix col-total">${fmt(grandTotal)}</td>`;
-    if(totSpendVal === null) b += `<td class="fix col-spend"><span class="empty-cell">—</span></td>`;
+    b += `<td class="fix col-total">${grandTotal===null?TOTAL_BUDGET_EMPTY:fmt(grandTotal)}</td>`;
+    if(totSpendVal === null) b += `<td class="fix col-spend"><span class="empty-cell">--</span></td>`;
     else b += `<td class="fix col-spend${totOverSpend?' over-budget':''}"${totOverSpend?' data-tip-tip="Total spend already exceeds the total budget you\'re setting (save is not blocked)."':''}>${fmt(totSpendVal)}</td>`;
   }else{
-    b += `<td class="fix col-total">${fmt(grandTotal)}</td>`;
+    b += `<td class="fix col-total">${grandTotal===null?TOTAL_BUDGET_EMPTY:fmt(grandTotal)}</td>`;
   }
   // Monthly cells for Total row — respect monthlyView (or sparkline in Demo 方向Y)
   if(useSparkline()){
@@ -1511,9 +1529,9 @@ function renderTable(){
         const sv = getSpend(gi, mi, g.months[mi]);
         if(sv !== null && sv !== undefined){ s=(s||0)+sv; hasAny = true; }
       });
-      if(mt === null){ b += `<td class="col-mon"><span class="empty-cell">—</span></td>`; return; }
+      if(mt === null){ b += `<td class="col-mon"><span class="empty-cell">--</span></td>`; return; }
       if(mi > PROTO_NOW_IDX){ b += `<td class="col-mon">${fmt(mt)}</td>`; return; }
-      if(!hasAny){ b += `<td class="col-mon"><span class="empty-cell">—</span></td>`; return; }
+      if(!hasAny){ b += `<td class="col-mon"><span class="empty-cell">--</span></td>`; return; }
       const rem = mt - s;
       // Remaining view 不顯示 cap dot（per Kabin 2026-06-04）— 只負數紅字
       b += `<td class="col-mon${rem<0?' over-budget':''}">${rem<0?'-':''}${fmt(Math.abs(rem))}</td>`;
@@ -1545,12 +1563,12 @@ function renderTable(){
     if(showGear) b += '<td class="fix col-gear"></td>';
     if(show4col){
       b += `<td class="fix col-budget">${fmt(expected)}</td>`;
-      b += `<td class="fix col-spend">—</td>`;
-      b += `<td class="fix col-pct">—</td>`;
-      b += `<td class="fix col-remain">—</td>`;
+      b += `<td class="fix col-spend">--</td>`;
+      b += `<td class="fix col-pct">--</td>`;
+      b += `<td class="fix col-remain">--</td>`;
     }else if(show2col){
       b += `<td class="fix col-total">${fmt(expected)}</td>`;
-      b += `<td class="fix col-spend">—</td>`;
+      b += `<td class="fix col-spend">--</td>`;
     }else{
       b += `<td class="fix col-total">${fmt(expected)}</td>`;
     }
@@ -1622,6 +1640,7 @@ function renderTable(){
       inp.addEventListener('input', e => {
         const gi = parseInt(e.target.dataset.gi), mi = parseInt(e.target.dataset.mi);
         let v = e.target.value.replace(/[^\d]/g,'').slice(0,9);
+        if(v !== '' && parseInt(v) > BUDGET_MAX) v = String(BUDGET_MAX); // 超上限跳回最大值（PRD 999,999）
         e.target.value = v;
         state.draft[state.currentTab][gi].months[mi] = v === '' ? null : parseInt(v);
         updateAfterCellEdit();
@@ -1713,16 +1732,17 @@ function updateBulkBar(){
 function clearSel(){ state.selected.clear(); updateBulkBar(); renderTable(); }
 
 // ===== FY year switcher (頁面層導覽：改朝換代後新需求「往前兩年、往後一年」) =====
-// 放頁首右上 = page-level scope（影響整頁 org cards + 表格），與 Section 1 inline 的
-// 「Edit Start Month」（FY 定義/設定，破壞性）刻意分開位置，避免「看 vs 改」語意混淆。
-// 編輯模式中整顆 disable：未存草稿時切年會遺失/語意不明（事前預防）。
-// 過去年 = 歷史 actuals（仍可編輯，團隊報告用）；未來年 = Planning（已設預算、無 actuals）。
+// 設計稿 #01 現況：頁首右上並排 [Edit Start Month link] + [FY selector trigger]（FY + range）。
+// trigger 點開下拉（#01-10）：4 個 FY 單行（FY + range + Current/Planning pill），無標題列、無底部 link。
+// 編輯模式中 FY selector + Edit Start Month 兩者皆 disable：未存草稿時切年/改 FY 定義會遺失或語意不明（事前預防）。
+// 過去年 = 歷史 actuals（仍可編輯，團隊報告用）；未來年 = Planning（已設預算、actuals $0）。
 function fyRangeFor(y){
+  // 設計稿 #01-10 格式：「Feb. '36 - Jan. '37」（月份後加點、半形連字號）
   const m = state.fyStartMonth;
   const startMLabel = FY_START_MONTHS[m].label;
   const endMLabel = FY_START_MONTHS[(m + 11) % 12].label;
   const endY = m === 0 ? y : y + 1;
-  return `${startMLabel} '${String(y).slice(-2)} – ${endMLabel} '${String(endY).slice(-2)}`;
+  return `${startMLabel}. '${String(y).slice(-2)} - ${endMLabel}. '${String(endY).slice(-2)}`;
 }
 function fyStatusOf(y){
   if(y === CURRENT_FY) return {key:'current', tag:'Current'};
@@ -1735,34 +1755,41 @@ function renderFYPicker(){
   if(!state.showSegCtrl){ host.innerHTML = ''; return; }
   const y = state.viewYear;
   const st = fyStatusOf(y);
-  const locked = state.editing; // 編輯模式凍結
-  const tagHtml = st.tag ? `<span class="fy-sw-tag fy-sw-tag-${st.key}">${st.tag}</span>` : '';
-  // options 由新到舊：未來 → 當年 → 過去
+  // 凍結 FY selector + Edit Start Month：編輯模式，或 loading/error（資料未就緒，切年/改起始月無意義且會算錯）
+  const locked = state.editing || state.pageState === 'loading' || state.pageState === 'nodata';
+  const lockTip = state.editing ? 'Finish editing budgets first' : 'Available once data has loaded';
+  const isAdmin = state.role === 'admin';
+  // 下拉選項（設計稿 #01-10）：由新到舊，單行 = FY + range + pill。無標題列、無底部 Edit link（那是設計備份）
   let opts = '';
   for(let oy = FY_VIEW_MAX; oy >= FY_VIEW_MIN; oy--){
     const ost = fyStatusOf(oy);
     const otag = ost.tag ? `<span class="fy-sw-tag fy-sw-tag-${ost.key}">${ost.tag}</span>` : '';
     opts += `<button type="button" class="fy-sw-opt${oy===y?' sel':''}" role="option" aria-selected="${oy===y}" onclick="selectViewYear(${oy})">
-      <span class="fy-sw-opt-main"><span class="fy-sw-opt-fy">FY${oy}</span>${otag}</span>
+      <span class="fy-sw-opt-fy">FY ${oy}</span>
       <span class="fy-sw-opt-range">${fyRangeFor(oy)}</span>
-      ${oy===y?'<span class="material-symbols-outlined fy-sw-check">check</span>':''}
+      ${otag}
     </button>`;
   }
+  // Edit Start Month：設計稿 #01 現況移到頁首右上（緊鄰 FY selector），admin only，編輯態凍結
+  const editLink = isAdmin
+    ? `<button class="fy-set-link" id="fy-btn"${locked ? ' disabled data-tip-tip="'+lockTip+'"' : ''}><span class="material-symbols-outlined">settings</span><span class="fy-set-link-text">Edit Start Month</span></button>`
+    : '';
   host.innerHTML = `
+    ${editLink}
     <div class="fy-sw ${st.key}${locked?' locked':''}" id="fy-sw">
       <button type="button" class="fy-sw-trigger" id="fy-sw-trigger"
-        ${locked ? 'disabled data-tip-tip="Finish editing budgets first"' : 'aria-haspopup="listbox" aria-expanded="false"'}
+        ${locked ? 'disabled data-tip-tip="'+lockTip+'"' : 'aria-haspopup="listbox" aria-expanded="false"'}
         onclick="toggleFYSwitcher(event)">
         <span class="material-symbols-outlined fy-sw-cal">calendar_month</span>
-        <span class="fy-sw-val">FY${y}</span>${tagHtml}
+        <span class="fy-sw-val">FY ${y}</span>
+        <span class="fy-sw-trigger-range">· ${fyRangeFor(y)}</span>
         <span class="material-symbols-outlined fy-sw-arr">expand_more</span>
       </button>
       <div class="fy-sw-menu" id="fy-sw-menu" role="listbox" aria-label="Select fiscal year">
-        <div class="fy-sw-menu-hd">Fiscal Year</div>
         ${opts}
       </div>
     </div>`;
-  // 頁首區可見性（Export CSV 或 switcher 任一可見就顯示）
+  if(isAdmin && !locked){ const b = $('#fy-btn'); if(b) b.onclick = openFYModalGuarded; }
   const wrap = document.querySelector('.pg-hdr .pg-hdr-r');
   if(wrap) wrap.style.display = '';
 }
@@ -1815,36 +1842,14 @@ function updatePeriodLabel(){
       viewing.textContent = '(USD)';
     }
   }
+  // Section 1 不再放 FY inline / Edit Start Month（設計稿 #01 現況：FY context + Edit 全移到頁首右上）
   const el = $('#paper-period');
-  if(!el) return;
-  if(!state.showSegCtrl){
-    el.className = 'paper-meta';
-    el.textContent = `Period: ${state.viewYear}`;
-    return;
-  }
-  const startM = FY_START_MONTHS[state.fyStartMonth].label;
-  const isAdmin = state.role === 'admin';
-  el.className = 'fy-inline';
-  if(isAdmin){
-    // 編輯模式中 Edit Start Month 凍結：改 FY 起算月會 remap 整頁資料，與未存草稿衝突（事前預防 > 事後攔截）
-    const locked = state.editing;
-    el.innerHTML = `
-      <span class="fy-display"><span class="material-symbols-outlined">event</span>Fiscal Year Start: <strong>${startM}</strong></span>
-      <button class="fy-set-link" id="fy-btn"${locked ? ' disabled data-tip-tip="Finish editing budgets first"' : ''}><span class="material-symbols-outlined">settings</span><span class="fy-set-link-text">Edit Start Month</span></button>
-    `;
-    if(!locked) $('#fy-btn').onclick = openFYModalGuarded;
-  }else{
-    el.innerHTML = `<span class="fy-display"><span class="material-symbols-outlined">event</span>Fiscal Year Start: <strong>${startM}</strong><span class="fy-note">(set by Admin)</span></span>`;
-  }
-  // Cross-prototype entry：如果 URL hash 帶 #open-fy（由 Executive Insights 連過來），自動開啟 FY modal
-  // 並 scroll 到 fy-inline 區塊讓使用者看到上下文
+  if(el){ el.className = 'paper-meta'; el.textContent = ''; }
+  // Cross-prototype entry：URL hash 帶 #open-fy（由 Executive Insights 連過來）→ 直接開 FY modal
   if (typeof openFYModal === 'function' && window.location.hash === '#open-fy') {
     setTimeout(()=>{
-      const fyEl = document.querySelector('.fy-inline');
-      if (fyEl) fyEl.scrollIntoView({block:'center',behavior:'smooth'});
       openFYModal();
-      // 清掉 hash，避免 reload 時 re-trigger
-      history.replaceState(null, '', window.location.pathname + window.location.search);
+      history.replaceState(null, '', window.location.pathname + window.location.search); // 清 hash 避免 reload re-trigger
     }, 400);
   }
 }
@@ -1868,7 +1873,7 @@ function openFYModal(){
   const monthSel = $('#fy-modal-month');
   monthSel.innerHTML = '';
   FY_START_MONTHS.forEach(m => {
-    monthSel.innerHTML += `<option value="${m.idx}" ${m.idx === state.fyStartMonth ? 'selected' : ''}>${m.label}</option>`;
+    monthSel.innerHTML += `<option value="${m.idx}" ${m.idx === state.fyStartMonth ? 'selected' : ''}>${m.full}</option>`;
   });
   updateFYPreview();
   monthSel.onchange = updateFYPreview;
@@ -2037,7 +2042,9 @@ function buildPop(){
   const amt = p.querySelector('#pop-amt');
   if(amt){
     amt.addEventListener('input', e => {
-      e.target.value = e.target.value.replace(/[^\d]/g,'').slice(0,9);
+      let _v = e.target.value.replace(/[^\d]/g,'').slice(0,9);
+      if(_v !== '' && parseInt(_v) > BUDGET_MAX) _v = String(BUDGET_MAX); // 超上限跳回最大值（PRD 999,999）
+      e.target.value = _v;
       const v = e.target.value;
       $('#pop-go').disabled = !v || parseInt(v) <= 0;
       $('#pop-err').classList.remove('show');
@@ -2126,6 +2133,7 @@ function applyPop(){
 // ===== Alert Settings =====
 function openAlert(){ closeAllModals(); renderThresholds(); $('#mo-alert').classList.add('active'); }
 function closeAlert(){ $('#mo-alert').classList.remove('active'); }
+let _notifSaved = null; // #09-4：notification 停用前記住的開關狀態，再啟用時還原
 function renderThresholds(){
   const list = $('#thr-list'); list.innerHTML = '';
   // Figma #09-4: empty state placeholder
@@ -2147,10 +2155,15 @@ function renderThresholds(){
   $('#thr-add').disabled = state.thresholds.length >= 3;
   const dis = state.thresholds.length === 0;
   $('#notif-block').classList.toggle('dis', dis);
-  // Figma #09-4: disabled state hover tooltip
+  // Figma #09-4: 未設 Threshold 時 Notification Settings disable，且所有 Switch 一律顯示 OFF
+  // （表示通知不會寄出）；再次加入 Threshold 時還原上次設定。
+  const notifToggles = $('#notif-block').querySelectorAll('.toggle');
   if(dis){
+    if(!_notifSaved) _notifSaved = Array.from(notifToggles).map(t => t.classList.contains('on'));
+    notifToggles.forEach(t => t.classList.remove('on')); // 強制顯示 OFF
     $('#notif-block').setAttribute('data-tip-tip', 'Set threshold to adjust notification settings.');
   } else {
+    if(_notifSaved){ notifToggles.forEach((t,i) => t.classList.toggle('on', !!_notifSaved[i])); _notifSaved = null; } // 還原上次
     $('#notif-block').removeAttribute('data-tip-tip');
   }
   list.querySelectorAll('input').forEach(inp => {
@@ -2468,8 +2481,8 @@ window.DEMO_SCENARIOS = [
   { id:'alert-set',   page:'alert', label:'Alerts set (60/80/90)', icon:'notifications_active', tip:'已設定 3 個 threshold，一般狀態。' },
   { id:'alert-empty', page:'alert', label:'No alerts set',          icon:'notifications_off',    tip:'尚未設定任何 alert threshold，提示文案改為「No alerts have been set yet.」並切換 icon。Alert Settings 仍可點開設定。' },
   // Warning — PRD §7.3 / §9 警示視覺體系：Spent% 色階 + Remaining 負數紅字 + 月份格 amber dot
-  { id:'warn-normal',      page:'warning', label:'All under budget (default)', icon:'check_circle', tip:'所有 group Spent % < 70%（綠色區間）、Remaining 為正、無 cap-conflict。為 v2 預設狀態。' },
-  { id:'warn-approaching', page:'warning', label:'Approaching budget',         icon:'trending_up',  tip:'部分 group Spent % 達 70-90%（amber warn），progress bar 變橘。Remaining 仍為正、尚無 cap 衝突。' },
+  { id:'warn-normal',      page:'warning', label:'All under budget (default)', icon:'check_circle', tip:'所有 group Spent % 0-79%（綠色區間）、Remaining 為正、無 cap-conflict。為 v2 預設狀態。' },
+  { id:'warn-approaching', page:'warning', label:'Approaching budget',         icon:'trending_up',  tip:'部分 group Spent % 達 80-99%（amber warn），progress bar 變橘。Remaining 仍為正、尚無 cap 衝突。' },
   { id:'warn-over',        page:'warning', label:'Over budget · Remaining negative', icon:'priority_high',tip:'部分 group 實際 Spend > Budget：Spent % >= 100% 變紅 + Remaining 為負數（紅字 + 負號 + 微紅底色強化）。切到 Remaining monthly view 可看到月份格也有紅色負數。常與 cap-conflict 並存。' },
   { id:'warn-cap-conflict',page:'warning', label:'T2 sum > T1 cap',            icon:'warning',      tip:'下屬 T2 加總超過上層 T1 月額度：amber dot 在月份格右上角（Budget view 才顯示）。Hover dot 看 tooltip。Admin 降低 cap 時也會觸發此情境。' },
   { id:'warn-mixed',       page:'warning', label:'Mixed warnings (full demo)', icon:'release_alert',tip:'三種警示同時呈現：部分 group approaching、部分 over、特定月份格 cap-conflict。一次看完整警示體系。' },
@@ -2511,7 +2524,7 @@ window.DEMO_APPLY = function(id){
   else if(id === 'modal-discard')     { closeAllModals(); $('#mo-discard').classList.add('active'); }
   // Toast demos
   else if(id === 'toast-budget-ok')   toast('Budget updated successfully.');
-  else if(id === 'toast-budget-err')  toast('Unable to update budget. Please try again later.', 'err');
+  else if(id === 'toast-budget-err')  toast('Unable to update budget. Please try later.', 'err');
   else if(id === 'toast-amount-ok')   toast('Amount applied successfully.');
   else if(id === 'toast-alert-ok')    toast('Alert settings updated successfully.');
   else if(id === 'toast-fy-ok')       toast('Fiscal Start Month updated successfully.');
