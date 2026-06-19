@@ -1,0 +1,2765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumiture.ai — Rate Optimization v1 (Recommendation List + Active Commitments + Scope Settings)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pri:#004FB0;--pri-dk:#002663;--pri-lt:#0B6DD7;--pri-lt30:#9ED7FF;--pri-lt20:#D1EEFF;--pri-lt10:#F2FAFF;
+  --sec:#34B5D9;--sec-dk:#228EB3;--sec-lt:#4ADFFF;
+  --wh:#FFF;--g50:#F6F6F6;--g100:#F2F2F2;--g200:#E6E6E6;--g300:#CCCCCC;--g400:#B3B3B3;--g500:#676767;--g700:#262626;--g900:#262626;
+  --ok:#00B5A6;--ok-lt:#E6FFF8;--ok-dk:#008F88;--warn:#FC9A0F;--warn-lt:#FEF3E1;--err:#FF403D;--err-lt:#FFEBEF;--info-lt:#E6F6FF;
+  --r-sm:5px;--r-md:8px;--r-lg:12px;
+  --tf-border:#DCE3EC;
+  --sw:264px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overscroll-behavior:none}
+body{font-family:'Noto Sans',sans-serif;font-size:14px;line-height:1.75;color:var(--g700);background:var(--pri-lt10);letter-spacing:0}
+a{color:var(--pri);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:14px;letter-spacing:0}
+input,select,textarea{font-family:inherit;font-size:14px}
+.material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;vertical-align:middle}
+
+/* ==== App layout ==== */
+.app{display:flex;min-height:100vh}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{background:var(--pri-dk);padding:14px 32px;display:flex;align-items:center;justify-content:flex-end;gap:16px;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px}
+.content{padding:24px 32px;flex:1;position:relative}
+.content.has-savebar{padding-bottom:96px}
+
+/* ==== Page header ==== */
+.pg-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap}
+.pg-title{font-size:20px;font-weight:700;color:var(--g900);line-height:1.5;display:flex;align-items:center;gap:8px}
+.pg-hdr-r{display:flex;align-items:center;gap:20px}
+.upd{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--g500)}
+.upd b{font-weight:500;color:var(--g500)}
+.ico-info{font-size:16px;color:var(--g500);cursor:help;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16}
+
+/* ==== Buttons (CMDS) ==== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:80px;padding:0 16px;height:36px;border-radius:var(--r-sm);font-weight:500;font-size:14px;transition:background-color .15s,border-color .15s,color .15s,box-shadow .2s;line-height:1.5;white-space:nowrap;border:1px solid transparent;font-family:inherit}
+.btn-p{background:var(--pri);color:#fff}
+.btn-p:hover{background:var(--pri-lt)}
+.btn-p:active{background:var(--pri-dk)}
+.btn-o{background:#fff;color:var(--pri);border-color:var(--pri)}
+.btn-o:hover{background:var(--g50);color:var(--pri-lt);border-color:var(--pri-lt)}
+.btn-o:active{background:var(--g200);color:var(--pri-dk);border-color:var(--pri-dk)}
+.btn-b{background:transparent;color:var(--pri);min-width:auto;padding:0 8px}
+.btn-b:hover{background:var(--g50);color:var(--pri-lt)}
+.btn-sm{height:30px;padding:0 12px;font-size:14px}
+.btn .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 16}
+.btn:disabled{background:var(--g100)!important;color:var(--g300)!important;border-color:transparent!important;cursor:not-allowed}
+.btn-o:disabled{background:transparent!important;border-color:var(--g300)!important}
+.btn-b .btn-text{transition:text-decoration .15s}
+.btn-b:hover .btn-text{text-decoration:underline}
+
+/* ==== Summary cards ==== */
+.rs-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.rs-card{background:#fff;border-radius:var(--r-md);box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);padding:20px 24px;min-height:126px;display:flex;flex-direction:column;gap:6px}
+.rs-card .lbl{font-size:12px;font-weight:700;color:var(--g500);display:flex;align-items:center;gap:6px;line-height:1.4}
+.rs-card .lbl .ico-info{font-size:16px}
+.rs-card .val{font-size:36px;font-weight:700;color:var(--g900);line-height:1.1;display:flex;align-items:baseline;gap:6px;letter-spacing:-.5px}
+.rs-card .val .unit{font-size:13px;font-weight:700;color:var(--g500);letter-spacing:0}
+.rs-card .val .slash{font-size:18px;font-weight:500;color:var(--g400);letter-spacing:0}
+.rs-card.nd .val{color:var(--g400);font-size:28px}
+.rs-card .sub{font-size:12px;color:var(--g500);margin-top:auto;text-align:right;line-height:1.4}
+.rs-card .sub.pos{color:var(--ok-dk)}
+.rs-card .sub.neg{color:var(--err)}
+.rs-card .sub .seg{margin:0 2px}
+
+/* ==== Info banner ==== */
+.rs-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:20px}
+.rs-banner-desc{font-size:12px;color:var(--g500);line-height:1.7;max-width:820px}
+.rs-banner-desc b{color:var(--g700);font-weight:700;letter-spacing:.4px}
+.rs-learn{color:var(--pri);text-decoration:underline;cursor:help;font-weight:500}
+.rs-banner-r{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.curr-btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff;color:var(--g700);cursor:pointer}
+.curr-btn:hover{border-color:var(--g400)}
+
+/* ==== Paper ==== */
+.paper{background:#fff;border-radius:var(--r-md);padding:24px 28px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06)}
+.paper-section-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:4px}
+.paper-section-title{font-size:18px;font-weight:700;color:var(--g900);line-height:1.5;display:flex;align-items:center;gap:8px}
+.paper-desc{font-size:12px;color:var(--g500);margin-bottom:16px;line-height:1.5}
+
+/* ==== View switch (Recommendations | Active Commitments) ==== */
+.rs-viewseg{display:inline-flex;background:var(--g100);border-radius:var(--r-sm);padding:3px;margin-bottom:18px}
+.rs-viewseg button{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;font-size:14px;font-weight:500;color:var(--g500);border-radius:calc(var(--r-sm) - 1px);background:none;border:none;cursor:pointer;line-height:1.5}
+.rs-viewseg button.active{background:#fff;color:var(--pri);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.rs-viewseg .seg-badge{font-size:11px;font-weight:700;background:var(--warn-lt);color:#B26A00;border-radius:10px;padding:1px 7px;line-height:1.5}
+.rs-viewseg button.active .seg-badge{background:var(--warn);color:#fff}
+
+/* ==== Tabs + action area ==== */
+.tabs-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:2px solid var(--g200);margin-bottom:16px}
+.tabs{display:flex;gap:0}
+.tab{padding:8px 14px;font-size:14px;font-weight:500;color:var(--g500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;display:flex;align-items:center;gap:8px;background:none;border-left:none;border-right:none;border-top:none;font-family:inherit;line-height:1.5}
+.tab:hover{color:var(--g700)}
+.tab.active{color:var(--pri);border-bottom-color:var(--pri)}
+.tab-badge{font-size:11px;font-weight:700;background:var(--g200);color:var(--g500);border-radius:10px;padding:1px 7px;line-height:1.5;min-width:20px;text-align:center}
+.tab.active .tab-badge{background:var(--pri);color:#fff}
+.rs-actions-row{display:flex;align-items:center;gap:10px;padding-bottom:6px}
+
+/* ==== Filter row ==== */
+.rs-filter{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.rs-sel{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff;color:var(--g700);font-size:14px;cursor:pointer;white-space:nowrap}
+.rs-sel .lead{color:var(--g500);font-size:16px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16}
+.rs-sel .material-symbols-outlined.tail{color:var(--g500);font-size:18px;font-variation-settings:'FILL' 0}
+.rs-sel:hover{border-color:var(--g400)}
+.rs-search{margin-left:auto;display:flex;align-items:center;gap:6px;height:36px;width:280px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff}
+.rs-search:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
+.rs-search .material-symbols-outlined{font-size:18px;color:var(--g400);font-variation-settings:'FILL' 0}
+.rs-search input{border:none;outline:none;background:none;width:100%;font-size:14px;color:var(--g700)}
+
+/* ==== Table ==== */
+.rs-tblwrap{border:1px solid var(--g200);border-radius:var(--r-md);overflow:hidden;background:#fff}
+.rs-tblscroll{overflow:auto;max-height:580px;position:relative;overscroll-behavior:contain}
+.rs-tblscroll::-webkit-scrollbar{width:9px;height:9px}
+.rs-tblscroll::-webkit-scrollbar-thumb{background:var(--g300);border-radius:5px}
+.rs-tblscroll::-webkit-scrollbar-track{background:transparent}
+table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;min-width:1480px}
+table.rstbl.acttbl{min-width:1080px}
+.rstbl thead th{background:var(--pri-lt10);height:50px;padding:0 12px;text-align:left;font-weight:700;font-size:13px;color:var(--g700);position:sticky;top:0;z-index:3;box-shadow:inset 0 -1px 0 var(--g300);white-space:nowrap;vertical-align:middle}
+.rstbl td{height:50px;padding:0 12px;border-bottom:1px solid var(--g100);background:#fff;color:var(--g700);vertical-align:middle;white-space:nowrap}
+.rstbl tbody tr{cursor:pointer}
+.rstbl tbody tr:hover td{background:var(--g50)}
+.rstbl tbody tr.sel td{background:var(--pri-lt10)}
+.rstbl tbody tr.sel:hover td{background:var(--pri-lt20)}
+.rstbl th.fix,.rstbl td.fix{position:sticky;z-index:2}
+.rstbl thead th.fix{z-index:4}
+.rstbl tbody tr:hover td.fix{background:var(--g50)}
+.rstbl tbody tr.sel td.fix{background:var(--pri-lt10)}
+.rstbl tbody tr.sel:hover td.fix{background:var(--pri-lt20)}
+.rs-c-sel{width:48px;min-width:48px;left:0;text-align:center;padding:0 8px!important}
+.rs-c-sel input{accent-color:var(--pri);width:16px;height:16px;cursor:pointer;margin:0;vertical-align:middle}
+.rs-c-target{width:256px;min-width:256px;left:48px;box-shadow:inset -1px 0 0 var(--g200)}
+.rstbl thead th.rs-c-target{box-shadow:inset 0 -1px 0 var(--g300),inset -1px 0 0 var(--g200)}
+/* Active table sticky first col (no checkbox) */
+.acttbl .rs-c-cid{width:230px;min-width:230px;left:0;box-shadow:inset -1px 0 0 var(--g200)}
+.acttbl thead th.rs-c-cid{box-shadow:inset 0 -1px 0 var(--g300),inset -1px 0 0 var(--g200)}
+.th-sort{display:inline-flex;align-items:center;gap:3px;cursor:pointer}
+.th-sort .material-symbols-outlined{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 0,'wght' 500}
+.th-sort.on .material-symbols-outlined{color:var(--pri)}
+/* cells */
+.rs-prov{width:22px;height:22px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;background:transparent}
+.rs-prov svg{width:100%;height:100%}
+.rs-two{display:flex;align-items:center;gap:10px;min-width:0}
+.rs-two-txt{display:flex;flex-direction:column;line-height:1.3;min-width:0}
+.rs-two-txt .nm{font-size:14px;color:var(--g700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:210px}
+.rs-two-txt .id{font-size:12px;color:var(--g500);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:210px}
+.rs-impact{display:inline-flex;align-items:center;gap:8px}
+.rs-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.rs-dot.low{background:var(--ok)}.rs-dot.medium{background:var(--warn)}.rs-dot.high{background:var(--err)}
+.rs-chip{display:inline-block;padding:1px 8px;border-radius:4px;border:1px solid;font-size:12px;font-weight:500;line-height:1.6}
+.rs-chip.todo{border-color:var(--g300);background:var(--g50);color:var(--g500)}
+.rs-chip.changed{border-color:var(--ok);background:var(--ok-lt);color:var(--ok-dk)}
+.rs-chip.error{border-color:#FFB0AE;background:var(--err-lt);color:#E5403D}
+/* commitment-type chip */
+.rs-type{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:4px;border:1px solid var(--pri-lt30);background:var(--info-lt);color:var(--pri);font-size:12px;font-weight:500;line-height:1.6;white-space:nowrap}
+.rs-save{display:flex;flex-direction:column;line-height:1.3}
+.rs-save .amt{font-size:14px;color:var(--g700);font-variant-numeric:tabular-nums}
+.rs-save .rate{font-size:12px}
+.rs-save .rate.pos{color:var(--ok-dk)}.rs-save .rate.zero{color:var(--g400)}
+.rs-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;font-size:14px;line-height:1.4;max-width:100%}
+.rs-muted{color:var(--g400)}
+.rs-c-rec,.rs-c-crit{white-space:normal!important}
+.rs-c-rec{width:300px;min-width:300px}.rs-c-crit{width:260px;min-width:260px}
+.rs-c-group{width:170px;min-width:170px}
+.rs-tag-cell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px;display:block}
+.rs-num{font-variant-numeric:tabular-nums}
+/* utilization cell (active table) — over-committed coloring */
+.rs-util{display:inline-flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums}
+.rs-util .bar{width:54px;height:6px;border-radius:3px;background:var(--g200);overflow:hidden;position:relative}
+.rs-util .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--ok)}
+.rs-util.low .bar i{background:var(--warn)}
+.rs-util.low .pct{color:#B26A00;font-weight:500}
+.rs-exp{display:inline-flex;align-items:center;gap:4px;margin-left:8px;padding:1px 8px;border-radius:10px;border:1px solid var(--warn);background:var(--warn-lt);color:#B26A00;font-size:11px;font-weight:700;line-height:1.6}
+.rs-exp .material-symbols-outlined{font-size:13px}
+
+/* ==== Empty / states ==== */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:64px 24px;gap:12px;background:#fff;border-radius:var(--r-md)}
+.empty-state > .material-symbols-outlined{color:var(--pri-lt30);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 64;font-size:64px;line-height:1}
+.empty-state-title{font-weight:700;color:var(--g900);margin:0;line-height:1.4;font-size:18px}
+.empty-state-sub{color:var(--g500);margin:0;line-height:1.6;max-width:520px;font-size:14px}
+.empty-state .btn{margin-top:4px}
+.rs-tbl-empty{padding:72px 24px}
+.rs-tbl-empty > .material-symbols-outlined{font-size:56px}
+
+/* No-auth / first-time full card */
+.rs-fullcard{background:#fff;border-radius:var(--r-md);box-shadow:0 1px 3px rgba(0,0,0,.08);min-height:420px;display:flex;align-items:center;justify-content:center;padding:48px}
+.rs-ft{position:relative}
+.rs-ft-blur{filter:blur(4px);opacity:.55;pointer-events:none;user-select:none}
+.rs-ft-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.35);border-radius:var(--r-md)}
+.rs-ft-card{background:#fff;border-radius:var(--r-lg);box-shadow:0 12px 40px rgba(0,38,99,.18);padding:40px 48px;text-align:center;max-width:560px}
+.rs-ft-card .ico{width:64px;height:64px;border-radius:50%;background:var(--pri-lt10);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.rs-ft-card .ico .material-symbols-outlined{font-size:34px;color:var(--pri)}
+.rs-ft-card h3{font-size:22px;font-weight:700;color:var(--g900);margin-bottom:10px}
+.rs-ft-card p{font-size:14px;color:var(--g500);line-height:1.6;margin-bottom:24px}
+
+/* Skeleton */
+@keyframes sk-shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+.skeleton{background:linear-gradient(90deg,var(--g100) 25%,var(--g200) 37%,var(--g100) 63%);background-size:1200px 100%;animation:sk-shimmer 1.4s ease infinite;border-radius:4px;display:inline-block}
+.sk-row td{height:50px;border-bottom:1px solid var(--g100)}
+.sk-line{height:14px;border-radius:4px}
+
+/* ==== Modal ==== */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:24px}
+.mo.active{display:flex}
+.modal{background:#fff;border-radius:var(--r-lg);padding:24px 32px;width:720px;max-width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.modal-sm{width:480px}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:12px}
+.mt{font-size:20px;font-weight:700;color:var(--g900);line-height:1.5;display:flex;align-items:center;gap:10px}
+.mt .material-symbols-outlined.warn-ic{color:var(--err);font-size:24px}
+.mx{color:var(--g400);cursor:pointer;display:flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:50%;background:none;border:none;padding:0;flex-shrink:0}
+.mx:hover{background:var(--g100);color:var(--g700)}
+.mdesc{font-size:14px;color:var(--g700);margin-bottom:16px;line-height:1.7}
+.mb{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-right:6px;min-height:0}
+.mf{display:flex;justify-content:flex-end;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--g200);align-items:center}
+.mf .btn{min-width:100px}
+.mf-left{margin-right:auto}
+
+/* Detail modal */
+.dt-head{border:1px solid var(--g200);border-radius:var(--r-md);padding:16px 24px;margin-bottom:18px;text-align:center;background:var(--g50)}
+.dt-target{font-size:14px;font-weight:500;color:var(--g500);margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:8px}
+.dt-saving{font-size:20px;font-weight:700;color:var(--pri);line-height:1.3}
+.dt-change{font-size:14px;color:var(--g700);margin-top:8px}
+.dt-sec{margin-top:18px}
+.dt-sec-t{font-size:16px;font-weight:700;color:var(--g700);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.dt-kv{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 24px}
+.dt-kv-item{display:flex;flex-direction:column;gap:3px}
+.dt-kv-item.full{grid-column:1/-1}
+.dt-kv-item .k{font-size:12px;font-weight:700;color:var(--g500)}
+.dt-kv-item .v{font-size:14px;font-weight:500;color:var(--g700)}
+.dt-kv-item .v.muted{color:var(--g400)}
+.dt-rec-text{font-size:14px;color:var(--g700);line-height:1.6}
+.dt-crit{font-size:13px;color:var(--g700);line-height:1.9;padding-left:2px}
+.dt-crit li{list-style:none;display:flex;gap:8px}
+.dt-crit li::before{content:'•';color:var(--pri)}
+/* netting box */
+.dt-net{border:1px solid var(--g200);border-radius:var(--r-md);padding:16px 20px;background:#fff}
+.dt-net-hint{font-size:12px;color:var(--g500);line-height:1.6;margin-bottom:10px}
+.dt-net-sum{font-size:14px;font-weight:700;color:var(--g700);margin-bottom:8px}
+.dt-net-row{font-size:13px;color:var(--g700);line-height:1.8;display:flex;gap:8px;font-variant-numeric:tabular-nums}
+.dt-net-row::before{content:'•';color:var(--g400)}
+/* advisory + console link */
+.dt-advisory{display:flex;align-items:flex-start;gap:8px;border:1px solid var(--pri-lt30);background:var(--info-lt);border-radius:var(--r-md);padding:12px 16px;font-size:13px;color:var(--g700);line-height:1.6;margin-top:18px}
+.dt-advisory .material-symbols-outlined{font-size:18px;color:var(--pri);flex-shrink:0;margin-top:1px}
+.dt-console{display:inline-flex;align-items:center;gap:4px;color:var(--pri);font-weight:500;margin-top:4px}
+.dt-console:hover{text-decoration:underline}
+.dt-console .material-symbols-outlined{font-size:15px;font-variation-settings:'FILL' 0}
+/* expiring banner (commitment) */
+.dt-expbanner{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--warn);background:var(--warn-lt);border-radius:var(--r-md);padding:12px 16px;margin-bottom:16px}
+.dt-expbanner .material-symbols-outlined{font-size:20px;color:var(--warn);flex-shrink:0}
+.dt-expbanner .t{font-size:14px;font-weight:700;color:#B26A00;line-height:1.5}
+.dt-expbanner .d{font-size:13px;color:var(--g700);line-height:1.6;margin-top:2px}
+/* utilization trend svg */
+.dt-trend{margin-top:6px}
+.dt-trend svg{width:100%;height:160px;display:block}
+.dt-trend .axis{font-size:10px;fill:var(--g400)}
+.dt-trend-legend{font-size:12px;color:var(--g500);display:flex;align-items:center;gap:16px;margin-top:6px}
+.dt-trend-legend i{display:inline-block;width:14px;height:0;border-top:2px dashed var(--warn);margin-right:5px;vertical-align:middle}
+
+/* Dismiss modal radios */
+.dm-opt{display:flex;align-items:flex-start;gap:10px;padding:9px 4px;cursor:pointer;border-radius:var(--r-sm)}
+.dm-opt:hover{background:var(--g50)}
+.dm-opt input{margin-top:5px;accent-color:var(--pri);width:16px;height:16px;flex-shrink:0}
+.dm-opt .o-t{font-size:14px;color:var(--g900);font-weight:500}
+.dm-opt .o-d{font-size:12px;color:var(--g500);line-height:1.4}
+.dm-textarea{width:100%;border:1px solid var(--tf-border);border-radius:var(--r-sm);padding:10px 12px;font-size:14px;color:var(--g700);min-height:96px;resize:vertical;margin-top:8px;outline:none;font-family:inherit}
+.dm-textarea:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
+.dm-textarea:disabled{background:var(--g50);color:var(--g400);cursor:not-allowed}
+.dm-err{font-size:12px;color:var(--err);margin-top:4px;display:none}
+.dm-err.show{display:block}
+
+/* Remove modal list */
+.rm-list{border:1px solid var(--g200);border-radius:var(--r-sm);padding:12px 16px;max-height:200px;overflow:auto;overscroll-behavior:contain}
+.rm-list li{list-style:none;font-size:14px;color:var(--pri);line-height:1.9;display:flex;gap:8px}
+.rm-list li::before{content:'•';color:var(--g400)}
+
+/* ==== Scope Settings page ==== */
+.sc-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.sc-back{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--pri);font-weight:500;background:none;border:none;cursor:pointer;margin-bottom:8px}
+.sc-back:hover .bt{text-decoration:underline}
+.sc-back .material-symbols-outlined{font-size:18px;font-variation-settings:'FILL' 0}
+.sc-scopetabs{display:flex;align-items:center;gap:8px}
+.sc-scopetab{height:34px;padding:0 16px;border-radius:var(--r-sm);border:1px solid var(--pri);background:#fff;color:var(--pri);font-size:14px;font-weight:500;display:inline-flex;align-items:center;cursor:pointer}
+.sc-scopetab.active{background:var(--pri);color:#fff}
+.sc-card{background:#fff;border-radius:var(--r-md);box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);padding:24px 28px;margin-bottom:16px}
+.sc-card-h{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sc-card-t{font-size:16px;font-weight:700;color:var(--g900)}
+.sc-status{font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px;line-height:1.6}
+.sc-status.done{background:var(--ok-lt);color:var(--ok-dk)}
+.sc-status.todo{background:var(--warn-lt);color:#B26A00}
+.sc-card-d{font-size:12px;color:var(--g500);line-height:1.6;margin-bottom:16px;max-width:780px}
+.sc-field{margin-bottom:16px}
+.sc-label{display:block;font-size:13px;font-weight:500;color:var(--g700);margin-bottom:6px}
+.sc-input,.sc-select{width:100%;height:40px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);font-size:14px;color:var(--g900);background:#fff;outline:none}
+.sc-select{appearance:none;cursor:pointer;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%23676767'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 12px center}
+.sc-input:focus,.sc-select:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
+.sc-prov-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.sc-prov{border:1px solid var(--g200);border-radius:var(--r-md);padding:16px}
+.sc-prov-h{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-weight:700;font-size:14px;color:var(--g900)}
+.sc-vmtab{display:inline-flex;background:var(--g100);border-radius:var(--r-sm);padding:2px;margin-bottom:16px;flex-wrap:wrap}
+.sc-vmtab button{padding:5px 14px;font-size:13px;font-weight:500;color:var(--g500);border-radius:calc(var(--r-sm) - 1px);background:none;border:none;cursor:pointer}
+.sc-vmtab button.active{background:#fff;color:var(--g900);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.sc-rule{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;color:var(--g700);margin-bottom:12px}
+.sc-num{width:72px;height:36px;text-align:center;border:1px solid var(--tf-border);border-radius:var(--r-sm);outline:none;font-size:14px;color:var(--g900)}
+.sc-num:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
+.sc-sub-t{font-size:14px;font-weight:700;color:var(--g700);margin:18px 0 12px}
+.sc-grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sc-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+
+/* Save bar */
+.savebar{display:none;position:fixed;left:var(--sw);right:0;bottom:0;background:#fff;border-top:1px solid var(--g200);padding:14px 32px;align-items:center;justify-content:space-between;z-index:60;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+.app.savebar-on .savebar{display:flex}
+.savebar-l{font-size:13px;color:var(--g500);display:flex;align-items:center;gap:8px}
+.savebar-l .material-symbols-outlined{font-size:18px;color:var(--g400);font-variation-settings:'FILL' 0}
+.savebar-r{display:flex;gap:12px}
+
+/* ==== Toast ==== */
+.tc{position:fixed;bottom:24px;left:24px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast{color:#fff;padding:12px 18px;border-radius:var(--r-md);font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,.2);min-width:280px;animation:sIn .25s ease}
+.toast.tok{background:var(--ok)}
+.toast.terr{background:var(--err)}
+.toast .material-symbols-outlined{font-size:20px}
+@keyframes sIn{from{transform:translateX(-110%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ==== Tooltip ==== */
+.rs-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:12px;line-height:1.6;padding:8px 11px;border-radius:6px;max-width:340px;z-index:400;pointer-events:none;opacity:0;transition:opacity .12s;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.rs-tip.show{opacity:1}
+.rs-tip b{font-weight:700}
+
+/* ==== Footer ==== */
+.footer{padding:16px 32px;background:var(--pri-lt10);display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--g500);border-top:1px solid var(--g200)}
+.footer-version{font-weight:500;color:#262626}
+.footer-version .ver-tag{background:#34B5D9;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}
+.footer-credit{color:#676767;font-size:12px}
+
+.hide{display:none!important}
+.curr-flag{font-size:15px}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <aside id="lt-sidebar"></aside>
+  <div class="main">
+    <header id="lt-topbar"></header>
+
+    <!-- ============ PAGE: Recommendation List + Active Commitments ============ -->
+    <div class="content" id="page-list">
+      <div class="pg-hdr">
+        <div class="pg-title">Rate Optimization</div>
+        <div class="pg-hdr-r" id="updwrap">
+          <div class="upd"><b>Last Updated</b><span>09/06/2026 11:30</span></div>
+          <div class="upd"><b>Next Update</b><span>10/06/2026 11:30 (UTC+0)</span>
+            <span class="material-symbols-outlined ico-info" data-tip="Billing & usage data is refreshed daily (T+1). Figures here may differ slightly from the cloud provider console due to time zones, currency, and credit exclusion.">info</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="rs-normal">
+      <!-- Summary cards -->
+      <div class="rs-cards" id="rs-cards"></div>
+
+      <!-- Info banner -->
+      <div class="rs-banner" id="rs-banner">
+        <div class="rs-banner-desc">
+          Lower your cloud unit rates through commitment discounts — Savings Plans, CUDs, and Reservations.
+          <b>LumiTure is advisory</b>: it detects opportunities and tracks your portfolio, but does not purchase commitments — you execute in the provider console.
+          Values may differ slightly from your console due to time zone, currency, and <b>CREDIT EXCLUSION</b>.
+          (<span class="rs-learn" data-tip="Commitments only reduce unit price; they do not remove waste. Run Usage Optimization (rightsizing) first, then commit on the clean baseline.">Learn More</span>)
+        </div>
+        <div class="rs-banner-r">
+          <button class="curr-btn" id="curr-btn" onclick="openCurrPicker(this)">
+            <span class="curr-flag" id="curr-flag">🇺🇸</span>
+            <span class="curr-code" id="curr-code">USD</span>
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16">expand_more</span>
+          </button>
+          <button class="btn btn-o" id="scope-btn" onclick="showPage('scope')"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">settings</span>Scope Settings</button>
+        </div>
+      </div>
+
+      <!-- Main paper -->
+      <div class="paper" id="rs-paper">
+        <div class="paper-section-row">
+          <div class="paper-section-title" id="rs-paper-title">Rate Optimization
+            <span class="material-symbols-outlined ico-info" data-tip="<b>Recommendations</b> are surfaced from each provider's own engine (AWS Cost Explorer, GCP CUD Recommender, Azure). LumiTure aggregates, tracks lifecycle, and reports coverage / utilization / realized savings across providers.">info</span>
+          </div>
+        </div>
+        <div class="paper-desc">Commitments lock in pricing for a term. Review the criteria and your current coverage before purchasing in the provider console.</div>
+
+        <!-- View switch: Recommendations | Active Commitments -->
+        <div class="rs-viewseg" id="rs-viewseg"></div>
+
+        <!-- ===== Recommendations view ===== -->
+        <div id="rs-recview">
+          <div class="tabs-row">
+            <div class="tabs" id="rs-tabs"></div>
+            <div class="rs-actions-row" id="rs-actions-row">
+              <div id="rs-actions" style="display:flex;gap:10px"></div>
+              <button class="btn btn-o" onclick="toast('(Demo) Exporting current view to CSV…')"><span class="material-symbols-outlined">download</span>Export CSV</button>
+            </div>
+          </div>
+          <div class="rs-filter" id="rs-filter">
+            <div class="rs-sel" onclick="toast('(Demo) Cloud Service Provider filter')"><span class="material-symbols-outlined lead">cloud</span>All Cloud Service Providers<span class="material-symbols-outlined tail">expand_more</span></div>
+            <div class="rs-sel" onclick="toast('(Demo) Commitment type filter')"><span class="material-symbols-outlined lead">sell</span>All Commitment Types<span class="material-symbols-outlined tail">expand_more</span></div>
+            <div class="rs-sel" onclick="toast('(Demo) Group filter')"><span class="material-symbols-outlined lead">groups</span>All Groups<span class="material-symbols-outlined tail">expand_more</span></div>
+            <div class="rs-search"><span class="material-symbols-outlined">search</span><input id="rs-search-input" placeholder="Search target, type, or recommendation" oninput="renderTable()"></div>
+          </div>
+          <div id="rs-tablearea"></div>
+        </div>
+
+        <!-- ===== Active Commitments view ===== -->
+        <div id="rs-actview" class="hide">
+          <div class="rs-filter">
+            <div class="rs-sel" onclick="toast('(Demo) Cloud Service Provider filter')"><span class="material-symbols-outlined lead">cloud</span>All Cloud Service Providers<span class="material-symbols-outlined tail">expand_more</span></div>
+            <div class="rs-sel" onclick="toast('(Demo) Commitment type filter')"><span class="material-symbols-outlined lead">sell</span>All Commitment Types<span class="material-symbols-outlined tail">expand_more</span></div>
+            <div class="rs-search"><span class="material-symbols-outlined">search</span><input id="rs-act-search" placeholder="Search commitment ID or service" oninput="renderActiveTable()"></div>
+          </div>
+          <div id="rs-acttablearea"></div>
+        </div>
+
+      </div>
+      </div><!-- /#rs-normal -->
+    </div>
+
+    <!-- ============ PAGE: Scope Settings ============ -->
+    <div class="content has-savebar hide" id="page-scope">
+      <button class="sc-back" onclick="showPage('list')"><span class="material-symbols-outlined">arrow_back</span><span class="bt">Back to Rate Optimization</span></button>
+      <div class="sc-head">
+        <div class="pg-title">Scope Settings</div>
+        <div class="sc-scopetabs">
+          <button class="sc-scopetab active">Scope 1</button>
+          <button class="btn btn-p btn-sm" onclick="toast('(Demo) Add a new scope')"><span class="material-symbols-outlined">add</span>Add New Scope</button>
+        </div>
+      </div>
+
+      <!-- Detection Scope -->
+      <div class="sc-card">
+        <div class="sc-card-h"><div class="sc-card-t">Detection Scope</div><span class="sc-status done">Completed</span></div>
+        <div class="sc-card-d">Select the groups and billing accounts to analyze for commitment opportunities. Commitment recommendations require <b>billing-account-level access</b> (AWS payer / management account, GCP Billing Account, Azure billing scope). A resource can only belong to one scope at a time.</div>
+        <div class="sc-field">
+          <label class="sc-label">Groups</label>
+          <select class="sc-select"><option>5 of 11 Selected</option></select>
+        </div>
+        <div class="sc-prov-row">
+          <div class="sc-prov">
+            <div class="sc-prov-h"><span class="rs-prov" id="scope-aws-badge"></span>AWS</div>
+            <label class="sc-label">Payer / Management Accounts</label>
+            <select class="sc-select"><option>2 of 4 Selected</option></select>
+          </div>
+          <div class="sc-prov">
+            <div class="sc-prov-h"><span class="rs-prov" id="scope-gcp-badge"></span>Google Cloud</div>
+            <label class="sc-label">Billing Accounts</label>
+            <select class="sc-select"><option>3 of 6 Selected</option></select>
+          </div>
+          <div class="sc-prov">
+            <div class="sc-prov-h"><span class="rs-prov" id="scope-azure-badge"></span>Azure</div>
+            <label class="sc-label">Billing Scopes</label>
+            <select class="sc-select"><option>1 of 2 Selected</option></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trigger Criteria -->
+      <div class="sc-card">
+        <div class="sc-card-h"><div class="sc-card-t">Trigger Criteria</div><span class="sc-status done">Completed</span></div>
+        <div class="sc-card-d">Commitment recommendations are generated when the following conditions are met, per commitment type.</div>
+        <div class="sc-vmtab">
+          <button class="active">Savings Plans</button>
+          <button>Reserved Instances</button>
+          <button>Committed Use Discounts</button>
+        </div>
+        <div class="sc-rule">Look back over the past <input class="sc-num" value="60"> day(s) of on-demand usage.</div>
+        <div class="sc-rule">Recommend when on-demand spend is stable within <input class="sc-num" value="6"> % and the coverage gap exceeds <input class="sc-num" value="20"> %.</div>
+        <div class="sc-rule">Require a steady baseline of at least <input class="sc-num" value="30"> day(s) before recommending.</div>
+      </div>
+
+      <!-- Tracking & Impact -->
+      <div class="sc-card">
+        <div class="sc-card-h"><div class="sc-card-t">Tracking &amp; Impact</div><span class="sc-status done">Completed</span></div>
+        <div class="sc-card-d">Fine-tune tracking behaviour and how impact levels are classified.</div>
+        <div class="sc-sub-t">Tracking Configuration</div>
+        <div class="sc-grid2">
+          <div class="sc-field"><label class="sc-label">Dismissal Period</label><select class="sc-select"><option>30 days</option><option>60 days</option><option>90 days</option></select></div>
+          <div class="sc-field"><label class="sc-label">End of Tracking</label><select class="sc-select"><option>End of Month</option><option>End of Quarter</option><option>End of Year</option><option>Customized</option></select></div>
+        </div>
+        <div class="sc-sub-t">Impact Settings</div>
+        <div class="sc-field"><label class="sc-label">Impact Criteria Type</label><select class="sc-select"><option>Estimated Monthly Savings</option><option>Savings Rate (%)</option></select></div>
+        <div class="sc-grid3">
+          <div class="sc-field"><label class="sc-label">High Threshold (≥)</label><input class="sc-input" value="800"></div>
+          <div class="sc-field"><label class="sc-label">Medium Threshold (≥)</label><input class="sc-input" value="300"></div>
+          <div class="sc-field"><label class="sc-label">Low Threshold (≥)</label><input class="sc-input" value="0"></div>
+        </div>
+        <div class="sc-sub-t">Utilization Target</div>
+        <div class="sc-rule">Flag active commitments running below <input class="sc-num" value="80"> % utilization as under-utilized.</div>
+      </div>
+    </div>
+
+    <!-- Save bar (scope page) -->
+    <div class="savebar" id="savebar">
+      <div class="savebar-l"><span class="material-symbols-outlined">info</span>Changes apply to the next recommendation refresh.</div>
+      <div class="savebar-r">
+        <button class="btn btn-o" onclick="toast('Changes discarded.')">Discard Changes</button>
+        <button class="btn btn-p" onclick="toast('Scope settings saved successfully.')">Save</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span class="footer-version">Rate Optimization Prototype<span class="ver-tag">v1</span></span>
+      <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Modals ============ -->
+<!-- Recommendation Details (read-only) -->
+<div class="mo" id="mo-detail">
+  <div class="modal">
+    <div class="mh"><div class="mt">Recommendation Details</div><button class="mx" onclick="closeModals()"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="mb" id="dt-body"></div>
+  </div>
+</div>
+
+<!-- Commitment Details (read-only) -->
+<div class="mo" id="mo-commit">
+  <div class="modal">
+    <div class="mh"><div class="mt">Commitment Details</div><button class="mx" onclick="closeModals()"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="mb" id="cm-body"></div>
+  </div>
+</div>
+
+<!-- Dismiss Recommendations -->
+<div class="mo" id="mo-dismiss">
+  <div class="modal">
+    <div class="mh"><div class="mt">Dismiss Recommendations</div><button class="mx" onclick="closeModals()"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="mdesc">Dismiss duration is determined by your <b>Scope Settings</b>. Please choose a reason before dismissing these recommendations:</div>
+    <div class="mb" id="dm-body"></div>
+    <div class="mf">
+      <button class="btn btn-b mf-left" onclick="confirmDismiss(true)"><span class="btn-text">Skip and Dismiss</span></button>
+      <button class="btn btn-o" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-p" onclick="confirmDismiss(false)">Dismiss Recommendations</button>
+    </div>
+  </div>
+</div>
+
+<!-- Remove Recommendation -->
+<div class="mo" id="mo-remove">
+  <div class="modal modal-sm">
+    <div class="mh"><div class="mt"><span class="material-symbols-outlined warn-ic">error</span><span id="rm-title">Remove 1 Recommendation(s)</span></div><button class="mx" onclick="closeModals()"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="mdesc">Are you sure you want to remove the selected recommendation(s)? This action is irreversible.</div>
+    <div class="mb"><ul class="rm-list" id="rm-list"></ul></div>
+    <div class="mf">
+      <button class="btn btn-o" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-p" onclick="confirmRemove()">Remove Recommendation</button>
+    </div>
+  </div>
+</div>
+
+<div class="tc" id="toast-container"></div>
+<div class="rs-tip" id="rs-tip"></div>
+
+<script>
+/* ============================================================
+   STATE
+============================================================ */
+var state = {
+  role: 'admin',          // admin | t1m | t1mb | t2m | t2mb
+  pageState: 'set',       // set | loading | first-time | empty | nodata | no-auth
+  page: 'list',           // list | scope
+  view: 'rec',            // rec | active
+  tab: 'rec',             // rec | done | dismiss | archived
+  currency: 'USD',
+  sort: { key:null, dir:1 },
+  actSort: { key:null, dir:1 },
+  selection: {},          // recId -> true
+};
+var $ = function(s,r){ return (r||document).querySelector(s); };
+
+/* ============================================================
+   HELPERS (provider logos)
+============================================================ */
+var PROV_LABEL = {gcp:'Google Cloud Platform', aws:'Amazon Web Services', azure:'Microsoft Azure'};
+var CONSOLE_LABEL = {gcp:'GCP', aws:'AWS', azure:'Azure'};
+var CSP_LOGOS = {
+  gcp: '<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path fill="#FBBC05" d="M60.86 71.21a51.69 51.69 0 0 0-29.69 9.38 49.88 49.88 0 0 0-18.52 24.56 48.75 48.75 0 0 0-.4 30.51 49.8 49.8 0 0 0 17.9 25.01l22.68-22.2a19.51 19.51 0 0 1-7.38-5.64 18.74 18.74 0 0 1-3.3-17.5 19.14 19.14 0 0 1 4.85-7.84c2.24-2.2 5-3.82 8.02-4.75a20 20 0 0 1 17.9 3.2 19.21 19.21 0 0 1 5.78 7.22l22.68-22.2A50.55 50.55 0 0 0 83.5 76.42a51.72 51.72 0 0 0-22.64-5.2Z"/><path fill="#EA4335" d="m124.52 68.2 5.77.1 15.67-15.36.75-6.5A71.01 71.01 0 0 0 99.95 29c-32.5 0-59.86 21.62-67.97 50.91 1.7-1.17 5.37-.3 5.37-.3l31.31-5.03s1.63-2.6 2.42-2.46A39.33 39.33 0 0 1 97 59.75a39.58 39.58 0 0 1 27.52 8.42v.02Z"/><path fill="#4285F4" d="M168.02 79.99a68.84 68.84 0 0 0-21.26-33.54l-22.2 21.72a38.4 38.4 0 0 1 10.76 13.28 37.56 37.56 0 0 1 3.84 16.51v3.84a19.8 19.8 0 0 1 13.84 5.6 18.94 18.94 0 0 1 5.73 13.54c0 5.08-2.06 9.95-5.73 13.54a19.8 19.8 0 0 1-13.84 5.61h-39.14l-3.91 3.86v22.98l3.91 3.81h39.13a51.68 51.68 0 0 0 30.15-9.7 49.83 49.83 0 0 0 18.4-25.3 48.75 48.75 0 0 0-.49-31.03 49.92 49.92 0 0 0-19.19-24.72Z"/><path fill="#34A853" d="M60.83 170.77h39.1v-30.64h-39.1a19.8 19.8 0 0 1-8.05-1.71l-5.64 1.69-15.67 15.33-1.37 5.18a51.36 51.36 0 0 0 30.73 10.15Z"/></svg>',
+  aws: '<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path fill="#252F3E" d="M61.51 86.28c-.05 1.77.17 3.52.67 5.22a27.22 27.22 0 0 0 1.9 4.19c.26.4.4.86.43 1.33a2.25 2.25 0 0 1-1.13 1.73l-3.52 2.46a3 3 0 0 1-1.55.53 2.44 2.44 0 0 1-1.73-.8 13.82 13.82 0 0 1-2.1-2.72 34.67 34.67 0 0 1-1.8-3.52 21.62 21.62 0 0 1-17.22 8.1 15.99 15.99 0 0 1-11.7-4.2 15.03 15.03 0 0 1-4.29-11.26 15.07 15.07 0 0 1 5.14-11.97 21.34 21.34 0 0 1 14.37-4.54c2.07 0 4.14.16 6.2.46 2.16.3 4.4.72 6.72 1.26v-4.3c.34-3.36-.66-6.72-2.78-9.36a13.41 13.41 0 0 0-9.54-2.7c-2.13 0-4.24.26-6.3.77a44.99 44.99 0 0 0-6.3 2 16 16 0 0 1-2.05.78h-.91c-.83 0-1.24-.61-1.24-1.83v-2.79c-.05-.7.1-1.4.43-2.04a4.23 4.23 0 0 1 1.65-1.23 38.3 38.3 0 0 1 16.48-3.77 21.13 21.13 0 0 1 15.31 4.76 19.33 19.33 0 0 1 4.86 14.4v19.04ZM37.75 95.2c2.06-.03 4.1-.4 6.05-1.09a12.78 12.78 0 0 0 5.53-3.77 9.23 9.23 0 0 0 1.97-3.52c.4-1.66.6-3.36.57-5.07v-2.46a50.52 50.52 0 0 0-5.4-.99 43.57 43.57 0 0 0-5.48-.35 13.5 13.5 0 0 0-8.7 2.36 8.24 8.24 0 0 0-2.78 6.51 8.28 8.28 0 0 0 2.15 6.2 8.45 8.45 0 0 0 6.09 2.18Zm47 6.34c-.8.07-1.59-.13-2.25-.56a4.57 4.57 0 0 1-1.24-2.3L67.56 53.4c-.26-.76-.43-1.56-.52-2.36a1.27 1.27 0 0 1 1.44-1.44h5.74c.8-.08 1.62.11 2.3.56.57.65.98 1.44 1.15 2.29l9.83 38.73 9.12-38.73c.14-.86.54-1.64 1.16-2.25.7-.44 1.53-.64 2.36-.57h4.72c.82-.07 1.65.13 2.35.57.61.62 1 1.42 1.13 2.28l9.19 39.23 10.14-39.23a4.9 4.9 0 0 1 1.2-2.28 3.52 3.52 0 0 1 2.29-.57h5.42a1.27 1.27 0 0 1 1.44 1.45c.03.3.03.6 0 .91-.11.49-.25.97-.42 1.44l-14.08 45.28a4.68 4.68 0 0 1-1.24 2.3 3.5 3.5 0 0 1-2.25.55h-5.14a3.52 3.52 0 0 1-2.36-.6c-.6-.65-1-1.47-1.13-2.35l-9.12-37.71-9 37.67c-.14.88-.53 1.7-1.14 2.36a3.5 3.5 0 0 1-2.35.6h-5.04Zm75.2 1.55c-3.03 0-6.05-.34-9-1.02a26.2 26.2 0 0 1-6.77-2.36 3.52 3.52 0 0 1-2.14-3.28v-2.95c0-1.22.44-1.83 1.33-1.83.38 0 .75.07 1.1.2l1.47.6c2.07.92 4.23 1.6 6.45 2.05 2.31.47 4.67.71 7.04.7 2.98.18 5.94-.5 8.56-1.93a6.2 6.2 0 0 0 3.02-5.53 5.67 5.67 0 0 0-1.58-4.09 15.1 15.1 0 0 0-6.13-3.1l-8.48-2.67c-3.58-1-6.76-3.06-9.12-5.92a13.87 13.87 0 0 1-2.92-8.48c-.05-2.27.5-4.52 1.58-6.51a15.73 15.73 0 0 1 4.19-4.83 18.76 18.76 0 0 1 5.98-3.03 26.2 26.2 0 0 1 7.36-1.02 35.48 35.48 0 0 1 7.75.92c1.2.28 2.31.58 3.34.91.85.27 1.68.61 2.47 1.02a5.6 5.6 0 0 1 1.72 1.45c.38.57.56 1.25.53 1.93v2.79c0 1.22-.44 1.83-1.34 1.83a6.2 6.2 0 0 1-2.25-.7 27.25 27.25 0 0 0-11.27-2.26c-2.69-.14-5.37.43-7.78 1.65a5.63 5.63 0 0 0-2.78 5.22 5.57 5.57 0 0 0 1.73 4.15 17.4 17.4 0 0 0 6.44 3.24l8.3 2.5c3.53.91 6.68 2.88 9.06 5.63a13.24 13.24 0 0 1 2.74 8.45 14.83 14.83 0 0 1-5.8 11.97 19.12 19.12 0 0 1-6.52 3.28c-2.7.73-5.48 1.08-8.27 1.02Z"/><path fill="#F90" fill-rule="evenodd" clip-rule="evenodd" d="M171.12 131.49c-19.26 14.22-47.22 21.8-71.1 21.8a129 129 0 0 1-87.24-33.2c-1.8-1.63-.21-3.84 1.97-2.61a175.27 175.27 0 0 0 87.14 23.13 173.13 173.13 0 0 0 66.44-13.63c3.24-1.37 5.99 2.15 2.78 4.51Z"/><path fill="#F90" fill-rule="evenodd" clip-rule="evenodd" d="M179.14 122.34c-2.46-3.17-16.3-1.48-22.5-.74-1.86.2-2.18-1.41-.49-2.6 11.02-7.75 29.12-5.54 31.2-2.93 2.08 2.6-.57 20.74-10.88 29.4-1.59 1.34-3.1.63-2.4-1.13 2.33-5.84 7.54-18.84 5.07-22Z"/></svg>',
+  azure: '<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rspaint0" x1="88.1713" y1="13.9645" x2="26.7396" y2="195.438" gradientUnits="userSpaceOnUse"><stop stop-color="#114A8B"/><stop offset="1" stop-color="#0669BC"/></linearGradient><linearGradient id="rspaint2" x1="99.4863" y1="8.66537" x2="166.911" y2="188.291" gradientUnits="userSpaceOnUse"><stop stop-color="#3CCBF4"/><stop offset="1" stop-color="#2892DF"/></linearGradient></defs><path fill="url(#rspaint0)" d="M66.598.005h59.112L64.345 181.928a9.447 9.447 0 0 1-3.433 4.645 9.4 9.4 0 0 1-2.61 1.316 9.471 9.471 0 0 1-2.887.454H9.411a9.371 9.371 0 0 1-4.295-1.039c-1.33.318-2.478-.672-3.349-1.886-.871-1.215-1.441-1.62-1.663-2.098-.222-.479-.087-1.587.39-2.405l57.171-174.5A9.432 9.432 0 0 1 66.595 0v.002l.003.003Z"/><path fill="#0078D4" d="M175.569 188.345h-53.078a9.477 9.477 0 0 1-5.057-1.461 9.52 9.52 0 0 1-1.406-1.084l-60.233-56.252a4.339 4.339 0 0 1 2.962-7.517h93.735l23.072 66.317.005-.003Z"/><path fill="url(#rspaint2)" d="M199.273 175.91a9.447 9.447 0 0 1 .392 4.405 9.41 9.41 0 0 1-5.009 6.984c-1.329.682-1.801 1.039-3.296 1.039h-66.881a9.425 9.425 0 0 0 7.646-3.925 9.425 9.425 0 0 0 1.274-8.503L76.225 6.405A9.418 9.418 0 0 0 70.19.452 9.418 9.418 0 0 0 67.31 0h65.879a9.431 9.431 0 0 1 5.491 1.766 9.47 9.47 0 0 1 2.078 2.05 9.456 9.456 0 0 1 1.351 2.59l57.174 169.504h-.01Z"/></svg>',
+};
+function provBadge(prov){ return '<span class="rs-prov" data-tip="'+PROV_LABEL[prov]+'">'+CSP_LOGOS[prov]+'</span>'; }
+function nFmt(n){
+  var a = Math.abs(n);
+  if(a >= 1e6) return (n/1e6).toFixed(2)+'M';
+  if(a >= 1e3) return (n/1e3).toFixed(2)+'K';
+  return n.toFixed(2);
+}
+function impactCell(v){
+  var map = {0:['low','Low'],1:['medium','Medium'],2:['high','High']};
+  var m = map[v];
+  return '<span class="rs-impact"><span class="rs-dot '+m[0]+'"></span>'+m[1]+'</span>';
+}
+function statusCell(v){
+  var map = {0:['todo','To-Do'],1:['changed','Changed'],2:['error','Error']};
+  var m = map[v];
+  return '<span class="rs-chip '+m[0]+'">'+m[1]+'</span>';
+}
+function typeChip(t){ return '<span class="rs-type">'+t+'</span>'; }
+function saveCell(amt, rate){
+  var cls = rate>0?'pos':'zero';
+  return '<span class="rs-save"><span class="amt">'+state.currency+' '+nFmt(amt)+'</span><span class="rate '+cls+'">Save '+(rate*100).toFixed(1)+'%</span></span>';
+}
+function utilCell(pct, target){
+  var low = pct < (target||80);
+  return '<span class="rs-util'+(low?' low':'')+'"><span class="bar"><i style="width:'+Math.min(pct,100)+'%"></i></span><span class="pct">'+pct+'%</span></span>';
+}
+function escTip(s){ return (s||'').replace(/"/g,'&quot;'); }
+
+/* ============================================================
+   DATA — recommendations
+============================================================ */
+function rec(o){
+  return Object.assign({ impact:0, status:0, criteria:[], group:'—' }, o);
+}
+var DATA = {
+  rec: [
+    rec({recId:'r1', prov:'aws', target:'Compute (EC2 / Fargate / Lambda)', tid:'compute-sp-global', type:'Compute SP', impact:2, status:0, estAmt:1230, estRate:0.320, recDate:'05/06/2026', eot:'End of Month', group:'Platform Team',
+      recommendation:'Purchase Compute Savings Plan — 3yr · All Upfront · $4.20/hr commitment',
+      criteria:['60-day on-demand spend stable (±6%)','Coverage gap 38%','≥30 days of steady baseline'],
+      net:{count:2, avgUtil:93, items:['sp-0a1b2c3d · 96% util · expires 01/07/2026','sp-9f8e7d6c · 89% util · expires 15/02/2028']} }),
+    rec({recId:'r2', prov:'aws', target:'Compute (EC2 m6i family)', tid:'compute-sp-m6i', type:'Compute SP', impact:1, status:0, estAmt:540, estRate:0.210, recDate:'04/06/2026', eot:'End of Month', group:'Platform Team',
+      recommendation:'Purchase Compute Savings Plan — 1yr · No Upfront · $1.80/hr commitment',
+      criteria:['30-day on-demand spend stable','Coverage gap 22%'],
+      net:{count:2, avgUtil:93, items:['sp-0a1b2c3d · 96% util','sp-9f8e7d6c · 89% util']} }),
+    rec({recId:'r3', prov:'aws', target:'Compute (Fargate)', tid:'compute-sp-fargate', type:'Compute SP', impact:0, status:1, estAmt:180, estRate:0.110, recDate:'05/06/2026', eot:'End of Month', group:'—',
+      recommendation:'Purchase Compute Savings Plan — 1yr · Partial Upfront · $0.60/hr commitment',
+      criteria:['30-day spend stable','Coverage gap 9%'],
+      net:{count:2, avgUtil:93, items:['sp-0a1b2c3d · 96% util · expires 01/07/2026','sp-9f8e7d6c · 89% util · expires 15/02/2028']} }),
+    rec({recId:'r4', prov:'gcp', target:'Compute Engine · us-central1', tid:'cud-central1', type:'Resource CUD', impact:2, status:0, estAmt:1480, estRate:0.370, recDate:'04/06/2026', eot:'End of Quarter', group:'Data Platform',
+      recommendation:'Commit 120 vCPU + 480 GB memory · us-central1 · 1yr',
+      criteria:['Sustained vCPU usage ≥ 110 for 60 days','Coverage gap 44%','Resource-based CUD eligible'],
+      net:{count:1, avgUtil:88, items:['cud-central1-vcpu · 88% util · expires 25/06/2026']} }),
+    rec({recId:'r5', prov:'gcp', target:'Compute Engine · asia-east1', tid:'cud-asia1', type:'Resource CUD', impact:1, status:0, estAmt:620, estRate:0.240, recDate:'03/06/2026', eot:'End of Quarter', group:'Analytics',
+      recommendation:'Commit 48 vCPU + 192 GB memory · asia-east1 · 1yr',
+      criteria:['Sustained vCPU usage ≥ 44 for 30 days','Coverage gap 26%'],
+      net:{count:1, avgUtil:74, items:['cud-asia1-mem · 74% util · expires 01/09/2028']} }),
+    rec({recId:'r6', prov:'azure', target:'Virtual Machines · West US 2', tid:'res-westus2', type:'Reservation', impact:2, status:0, estAmt:880, estRate:0.280, recDate:'04/06/2026', eot:'End of Year', group:'Infra',
+      recommendation:'Purchase Reservation — Standard_D4s_v5 × 8 · West US 2 · 3yr · Shared scope',
+      criteria:['7-day VM usage stable','Shared-scope coverage gap 32%','Instance flexibility group matched'],
+      net:{count:1, avgUtil:82, items:['azure-res-d4sv5 · 82% util · expires 01/10/2027']} }),
+    rec({recId:'r7', prov:'azure', target:'Compute · West US 2', tid:'sp-westus2', type:'Savings Plan', impact:1, status:0, estAmt:470, estRate:0.190, recDate:'03/06/2026', eot:'End of Month', group:'Infra',
+      recommendation:'Purchase Compute Savings Plan — 1yr · $2.10/hr hourly commitment',
+      criteria:['30-day compute spend stable','Coverage gap 24%'],
+      net:{count:1, avgUtil:79, items:['azure-sp-compute · 79% util · expires 20/06/2026']} }),
+  ],
+  done: [
+    rec({recId:'d1', prov:'aws', target:'Compute (EC2 c-family)', tid:'done-aws-1', type:'Compute SP', impact:1, status:1, estAmt:430, estRate:0.260, recDate:'02/03/2026', eot:'End of Month', group:'Platform Team',
+      recommendation:'Purchased Compute Savings Plan — 1yr · Partial Upfront', criteria:['Coverage gap closed'], net:{count:0, avgUtil:0, items:[]} }),
+    rec({recId:'d2', prov:'gcp', target:'Compute Engine · europe-west1', tid:'done-gcp-1', type:'Resource CUD', impact:0, status:1, estAmt:210, estRate:0.140, recDate:'18/02/2026', eot:'End of Quarter', group:'Backend Squad',
+      recommendation:'Committed 24 vCPU + 96 GB · europe-west1 · 1yr', criteria:['Coverage gap closed'], net:{count:0, avgUtil:0, items:[]} }),
+  ],
+  dismiss: [
+    rec({recId:'x1', prov:'azure', target:'Virtual Machines · East US', tid:'dis-az-1', type:'Reservation', impact:0, status:0, estAmt:150, estRate:0.090, recDate:'12/05/2026', eot:'30 days', group:'Research',
+      recommendation:'Purchase Reservation — Standard_D2s_v5 × 4 · East US · 1yr', criteria:['Coverage gap 14%'], net:{count:0, avgUtil:0, items:[]} }),
+  ],
+  archived: [
+    rec({recId:'a1', prov:'gcp', target:'Compute Engine · us-west1 (removed)', tid:'arc-gcp-1', type:'Resource CUD', impact:0, status:1, estAmt:90, estRate:0.060, recDate:'08/01/2026', eot:'End of Year', group:'SRE',
+      recommendation:'Commit 16 vCPU · us-west1 · 1yr', criteria:['Workload decommissioned — no longer applicable'], net:{count:0, avgUtil:0, items:[]} }),
+  ],
+};
+
+/* ============================================================
+   DATA — active commitments
+============================================================ */
+var ACTIVE = [
+  {cid:'sp-0a1b2c3d',   prov:'aws',   type:'Compute Savings Plan', service:'Compute (EC2/Fargate/Lambda)', term:'1 Year',  payment:'All Upfront',     hourly:3.50, util:96, start:'01/07/2025', expiry:'01/07/2026', exp:true,  realized:18420 },
+  {cid:'sp-9f8e7d6c',   prov:'aws',   type:'Compute Savings Plan', service:'Compute (EC2)',                 term:'3 Years', payment:'Partial Upfront', hourly:5.20, util:89, start:'15/02/2025', expiry:'15/02/2028', exp:false, realized:31200 },
+  {cid:'cud-central1-vcpu', prov:'gcp', type:'Resource CUD',       service:'Compute Engine · us-central1', term:'1 Year',  payment:'Monthly',         hourly:2.80, util:88, start:'25/06/2025', expiry:'25/06/2026', exp:true,  realized:9600 },
+  {cid:'cud-asia1-mem', prov:'gcp',   type:'Resource CUD',         service:'Compute Engine · asia-east1',  term:'3 Years', payment:'Monthly',         hourly:1.90, util:74, start:'01/09/2025', expiry:'01/09/2028', exp:false, realized:7300 },
+  {cid:'azure-res-d4sv5', prov:'azure', type:'Reservation',        service:'Virtual Machines · West US 2', term:'3 Years', payment:'All Upfront',     hourly:4.10, util:82, start:'01/10/2024', expiry:'01/10/2027', exp:false, realized:26800 },
+  {cid:'azure-sp-compute', prov:'azure', type:'Savings Plan',      service:'Compute · West US 2',          term:'1 Year',  payment:'Monthly',         hourly:2.10, util:79, start:'20/06/2025', expiry:'20/06/2026', exp:true,  realized:6100 },
+];
+var UTIL_TARGET = 80;
+
+/* ============================================================
+   VIEW SWITCH + TABS
+============================================================ */
+var VIEWS = [
+  { id:'rec',    label:'Recommendations', icon:'lightbulb' },
+  { id:'active', label:'Active Commitments', icon:'inventory_2' },
+];
+var TABS = [
+  { id:'rec',      label:'Recommendations', badge:'7' },
+  { id:'done',     label:'Done',            badge:'2' },
+  { id:'dismiss',  label:'Dismiss',         badge:'1' },
+  { id:'archived', label:'Archived',        badge:'' },
+];
+var TAB_ACTIONS = {
+  rec:      [ {label:'Done', icon:'check', act:'done', tip:"Mark as purchased in the provider console — items move to 'Done'."},
+              {label:'Dismiss', icon:'block', act:'dismiss', tip:"Choose a reason, then move the items to 'Dismiss'."},
+              {label:'Archive', icon:'archive', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
+  done:     [ {label:'Undo Completion', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
+              {label:'Archive', icon:'archive', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
+  dismiss:  [ {label:'Undo', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
+              {label:'Remove', icon:'delete', act:'remove', tip:'Permanently remove the selected items.'} ],
+  archived: [ {label:'Remove', icon:'delete', act:'remove', tip:'Permanently remove the selected items.'} ],
+};
+var READONLY_ROLES = ['t1m','t1mb','t2m','t2mb'];
+function canEdit(){ return state.role==='admin'; }
+
+/* ============================================================
+   RENDER — summary cards
+============================================================ */
+function renderCards(){
+  var nd = (state.pageState==='empty' || state.pageState==='nodata');
+  var loading = state.pageState==='loading';
+  var c = state.currency;
+  var cards;
+  if(loading){
+    cards = [0,1,2,3].map(function(){
+      return '<div class="rs-card"><span class="skeleton sk-line" style="width:120px;height:12px"></span>'
+        +'<span class="skeleton sk-line" style="width:90px;height:30px;margin-top:8px"></span>'
+        +'<span class="skeleton sk-line" style="width:140px;height:12px;margin-top:auto;align-self:flex-end"></span></div>';
+    }).join('');
+  } else if(nd){
+    var labels = ['Coverage','Utilization','Savings to Date','Potential Monthly Savings'];
+    var subs = ['Not yet calculated','Not yet calculated','Start date not set','No recommendations yet'];
+    cards = labels.map(function(l,i){
+      return '<div class="rs-card nd"><span class="lbl">'+l+'</span><span class="val">No Data</span><span class="sub">'+subs[i]+'</span></div>';
+    }).join('');
+  } else {
+    cards =
+      '<div class="rs-card"><span class="lbl">Coverage <span class="material-symbols-outlined ico-info" data-tip="<b>Coverage</b> = eligible spend covered by commitments (weighted average across providers).">info</span></span>'
+        +'<span class="val">60<span class="unit">%</span></span><span class="sub">AWS 58%<span class="seg">·</span>GCP 72%<span class="seg">·</span>Azure 45%</span></div>'
+      +'<div class="rs-card"><span class="lbl">Utilization <span class="material-symbols-outlined ico-info" data-tip="<b>Utilization</b> = purchased commitment capacity actually used (weighted average).">info</span></span>'
+        +'<span class="val">89<span class="unit">%</span></span><span class="sub">AWS 93%<span class="seg">·</span>GCP 88%<span class="seg">·</span>Azure 84%</span></div>'
+      +'<div class="rs-card"><span class="lbl">Savings to Date</span>'
+        +'<span class="val rs-num">55.50K <span class="unit">'+c+'</span></span><span class="sub">Year to date</span></div>'
+      +'<div class="rs-card"><span class="lbl">Potential Monthly Savings <span class="material-symbols-outlined ico-info" data-tip="Estimated monthly savings if all open recommendations are adopted.">info</span></span>'
+        +'<span class="val rs-num">8.04K <span class="unit">'+c+'</span></span><span class="sub pos">If all recommendations adopted</span></div>';
+  }
+  $('#rs-cards').innerHTML = cards;
+}
+
+/* ============================================================
+   RENDER — view switch
+============================================================ */
+function renderViewSeg(){
+  var expCount = ACTIVE.filter(function(a){return a.exp;}).length;
+  $('#rs-viewseg').innerHTML = VIEWS.map(function(v){
+    var active = v.id===state.view?' active':'';
+    var badge = (v.id==='active' && expCount>0) ? '<span class="seg-badge">'+expCount+' expiring</span>' : '';
+    return '<button class="'+active.trim()+'" onclick="setView(\''+v.id+'\')"><span class="material-symbols-outlined" style="font-size:18px;font-variation-settings:\'FILL\' 0">'+v.icon+'</span>'+v.label+badge+'</button>';
+  }).join('');
+}
+function setView(v){
+  state.view = v;
+  state.selection = {};
+  $('#rs-recview').classList.toggle('hide', v!=='rec');
+  $('#rs-actview').classList.toggle('hide', v!=='active');
+  renderViewSeg();
+  if(v==='rec'){ renderTabs(); renderActions(); renderTable(); }
+  else { renderActiveTable(); }
+}
+
+/* ============================================================
+   RENDER — tabs + actions
+============================================================ */
+function renderTabs(){
+  $('#rs-tabs').innerHTML = TABS.map(function(t){
+    var active = t.id===state.tab?' active':'';
+    var badge = t.badge!==''?'<span class="tab-badge">'+t.badge+'</span>':'';
+    return '<button class="tab'+active+'" onclick="setTab(\''+t.id+'\')">'+t.label+badge+'</button>';
+  }).join('');
+}
+function renderActions(){
+  var selCount = Object.keys(state.selection).length;
+  var box = $('#rs-actions');
+  if(selCount===0 || state.pageState!=='set' || !canEdit()){ box.innerHTML=''; return; }
+  var acts = TAB_ACTIONS[state.tab] || [];
+  box.innerHTML = acts.map(function(a){
+    return '<button class="btn btn-o" data-tip="'+escTip(a.tip)+'" onclick="doAction(\''+a.act+'\')"><span class="material-symbols-outlined" style="font-variation-settings:\'FILL\' 0">'+a.icon+'</span>'+a.label+'</button>';
+  }).join('');
+  bindTips();
+}
+
+/* ============================================================
+   RENDER — recommendation table
+============================================================ */
+var COLS = [
+  {h:'Type'}, {h:'Impact', sort:'impact'}, {h:'Status', sort:'status'}, {h:'Est. Savings', sort:'estAmt'},
+  {h:'Assigned to Group'}, {h:'Recommendation'}, {h:'Criteria'}
+];
+function renderTable(){
+  var area = $('#rs-tablearea');
+  if(state.pageState==='loading'){ area.innerHTML = skeletonTable(); return; }
+  if(state.pageState==='empty' || state.pageState==='nodata'){
+    area.innerHTML = '<div class="rs-tblwrap"><div class="empty-state rs-tbl-empty"><span class="material-symbols-outlined">table_chart</span>'
+      +'<div class="empty-state-title">No Data Available</div><div class="empty-state-sub">Recommendations will appear once enough billing history has accumulated.</div></div></div>';
+    return;
+  }
+  var rows = DATA[state.tab].slice();
+  var q = ($('#rs-search-input') && $('#rs-search-input').value || '').toLowerCase().trim();
+  if(q){
+    rows = rows.filter(function(r){
+      return (r.target+' '+r.type+' '+r.recommendation+' '+r.group+' '+r.criteria.join(' ')).toLowerCase().indexOf(q)>=0;
+    });
+  }
+  if(state.sort.key){
+    var k = state.sort.key, d = state.sort.dir;
+    rows.sort(function(a,b){ var va=a[k], vb=b[k]; if(va<vb) return -1*d; if(va>vb) return 1*d; return 0; });
+  }
+  var showSel = canEdit();
+  var ths = (showSel?'<th class="fix rs-c-sel"><input type="checkbox" id="rs-selall" onchange="toggleAll(this.checked)"></th>':'')
+    +'<th class="fix rs-c-target">Target Item</th>'
+    + COLS.map(function(c){
+        if(c.sort){
+          var on = state.sort.key===c.sort?' on':'';
+          var arrow = state.sort.key!==c.sort?'swap_vert':(state.sort.dir===1?'arrow_upward':'arrow_downward');
+          return '<th><span class="th-sort'+on+'" onclick="setSort(\''+c.sort+'\')">'+c.h+'<span class="material-symbols-outlined">'+arrow+'</span></span></th>';
+        }
+        return '<th>'+c.h+'</th>';
+      }).join('');
+  if(showSel) $('.rs-c-target') && null;
+  var trs = rows.map(function(r){
+    var sel = state.selection[r.recId]?'sel':'';
+    var checked = state.selection[r.recId]?' checked':'';
+    var groupTxt = (r.group==='—') ? '<span class="rs-muted">—</span>' : r.group;
+    return '<tr class="'+sel+'" onclick="openDetail(\''+r.recId+'\')">'
+      +(showSel?'<td class="fix rs-c-sel" onclick="event.stopPropagation()"><input type="checkbox"'+checked+' onchange="toggleRow(\''+r.recId+'\',this.checked)"></td>':'')
+      +'<td class="fix rs-c-target"><span class="rs-two">'+provBadge(r.prov)+'<span class="rs-two-txt"><span class="nm" data-tip="'+escTip(r.target)+'">'+r.target+'</span></span></span></td>'
+      +'<td>'+typeChip(r.type)+'</td>'
+      +'<td>'+impactCell(r.impact)+'</td>'
+      +'<td>'+statusCell(r.status)+'</td>'
+      +'<td>'+saveCell(r.estAmt, r.estRate)+'</td>'
+      +'<td class="rs-c-group"><span class="rs-tag-cell">'+groupTxt+'</span></td>'
+      +'<td class="rs-c-rec"><div class="rs-clamp">'+r.recommendation+'</div></td>'
+      +'<td class="rs-c-crit"><div class="rs-clamp">'+r.criteria.join(' · ')+'</div></td>'
+      +'</tr>';
+  }).join('');
+  if(rows.length===0){
+    area.innerHTML = '<div class="rs-tblwrap"><div class="empty-state rs-tbl-empty"><span class="material-symbols-outlined">'+(q?'search_off':'inbox')+'</span>'
+      +'<div class="empty-state-title">'+(q?'No matching recommendations':'No items in this category')+'</div>'+(q?'<div class="empty-state-sub">Try adjusting your search or filters.</div>':'')+'</div></div>';
+    return;
+  }
+  area.innerHTML = '<div class="rs-tblwrap"><div class="rs-tblscroll"><table class="rstbl"><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div></div>';
+  bindTips();
+}
+function skeletonTable(){
+  var cells = '';
+  for(var c=0;c<9;c++) cells += '<td><span class="skeleton sk-line" style="width:'+(c<2?70:90)+'%"></span></td>';
+  var rows='';
+  for(var i=0;i<7;i++) rows += '<tr class="sk-row">'+cells+'</tr>';
+  return '<div class="rs-tblwrap"><div class="rs-tblscroll"><table class="rstbl"><tbody>'+rows+'</tbody></table></div></div>';
+}
+
+/* ============================================================
+   RENDER — active commitments table
+============================================================ */
+var ACT_COLS = [
+  {h:'Type'}, {h:'Service'}, {h:'Term'}, {h:'Payment'}, {h:'Hourly Cost', sort:'hourly'}, {h:'Utilization', sort:'util'}, {h:'Expiry', sort:'expSort'}
+];
+function dateNum(s){ var p=s.split('/'); return new Date(p[2],p[1]-1,p[0]).getTime(); }
+function renderActiveTable(){
+  var area = $('#rs-acttablearea');
+  if(state.pageState==='loading'){ area.innerHTML = skeletonTable(); return; }
+  if(state.pageState==='empty' || state.pageState==='nodata'){
+    area.innerHTML = '<div class="rs-tblwrap"><div class="empty-state rs-tbl-empty"><span class="material-symbols-outlined">inventory_2</span>'
+      +'<div class="empty-state-title">No Active Commitments</div><div class="empty-state-sub">Commitments you hold will appear here once connected.</div></div></div>';
+    return;
+  }
+  var rows = ACTIVE.slice();
+  var q = ($('#rs-act-search') && $('#rs-act-search').value || '').toLowerCase().trim();
+  if(q){ rows = rows.filter(function(a){ return (a.cid+' '+a.service+' '+a.type).toLowerCase().indexOf(q)>=0; }); }
+  // default sort: expiry ascending (soonest first)
+  var sk = state.actSort.key || 'expSort';
+  var sd = state.actSort.key ? state.actSort.dir : 1;
+  rows.sort(function(a,b){
+    var va = sk==='expSort'?dateNum(a.expiry):a[sk];
+    var vb = sk==='expSort'?dateNum(b.expiry):b[sk];
+    if(va<vb) return -1*sd; if(va>vb) return 1*sd; return 0;
+  });
+  var ths = '<th class="fix rs-c-cid">Commitment ID</th>'
+    + ACT_COLS.map(function(c){
+        if(c.sort){
+          var on = state.actSort.key===c.sort?' on':'';
+          var arrow = state.actSort.key!==c.sort?'swap_vert':(state.actSort.dir===1?'arrow_upward':'arrow_downward');
+          return '<th><span class="th-sort'+on+'" onclick="setActSort(\''+c.sort+'\')">'+c.h+'<span class="material-symbols-outlined">'+arrow+'</span></span></th>';
+        }
+        return '<th>'+c.h+'</th>';
+      }).join('');
+  var trs = rows.map(function(a){
+    var expBadge = a.exp ? '<span class="rs-exp"><span class="material-symbols-outlined">schedule</span>Expiring Soon</span>' : '';
+    return '<tr onclick="openCommitment(\''+a.cid+'\')">'
+      +'<td class="fix rs-c-cid"><span class="rs-two">'+provBadge(a.prov)+'<span class="rs-two-txt"><span class="nm">'+a.cid+'</span></span></span></td>'
+      +'<td>'+typeChip(a.type)+'</td>'
+      +'<td><span class="rs-tag-cell" data-tip="'+escTip(a.service)+'">'+a.service+'</span></td>'
+      +'<td>'+a.term+'</td>'
+      +'<td>'+a.payment+'</td>'
+      +'<td class="rs-num">'+state.currency+' '+a.hourly.toFixed(2)+'</td>'
+      +'<td>'+utilCell(a.util, UTIL_TARGET)+'</td>'
+      +'<td><span class="rs-num">'+a.expiry+'</span>'+expBadge+'</td>'
+      +'</tr>';
+  }).join('');
+  if(rows.length===0){
+    area.innerHTML = '<div class="rs-tblwrap"><div class="empty-state rs-tbl-empty"><span class="material-symbols-outlined">search_off</span><div class="empty-state-title">No matching commitments</div></div></div>';
+    return;
+  }
+  area.innerHTML = '<div class="rs-tblwrap"><div class="rs-tblscroll"><table class="rstbl acttbl"><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div></div>';
+  bindTips();
+}
+function setActSort(k){
+  if(state.actSort.key===k) state.actSort.dir*=-1; else { state.actSort.key=k; state.actSort.dir=1; }
+  renderActiveTable();
+}
+
+/* ============================================================
+   SELECTION + ACTIONS
+============================================================ */
+function toggleRow(id, on){ if(on) state.selection[id]=true; else delete state.selection[id]; renderTable(); renderActions(); }
+function toggleAll(on){
+  state.selection = {};
+  if(on) DATA[state.tab].forEach(function(r){ state.selection[r.recId]=true; });
+  renderTable(); renderActions();
+}
+function setTab(t){ state.tab=t; state.selection={}; state.sort={key:null,dir:1}; renderTabs(); renderActions(); renderTable(); }
+function setSort(k){
+  if(state.sort.key===k) state.sort.dir*=-1; else { state.sort.key=k; state.sort.dir=1; }
+  renderTable();
+}
+function doAction(act){
+  var ids = Object.keys(state.selection);
+  if(ids.length===0) return;
+  if(act==='dismiss'){ openDismiss(); return; }
+  if(act==='remove'){ openRemove(); return; }
+  var map = {done:"moved to 'Done'", undo:"restored to 'Recommendations'", archive:"transferred to 'Archived'"};
+  toast(ids.length+' recommendation(s) '+map[act]+'.');
+  state.selection={}; renderTable(); renderActions();
+}
+
+/* ============================================================
+   MODALS — recommendation detail (read-only)
+============================================================ */
+function findRec(id){
+  var all = DATA.rec.concat(DATA.done, DATA.dismiss, DATA.archived);
+  return all.filter(function(r){return r.recId===id;})[0];
+}
+function openDetail(id){
+  if(state.pageState!=='set') return;
+  var r = findRec(id); if(!r) return;
+  renderDetail(r);
+  openModal('mo-detail');
+}
+function renderDetail(r){
+  var c = state.currency;
+  var net = r.net || {count:0, items:[]};
+  var netHtml = '';
+  if(net.count>0){
+    netHtml = '<div class="dt-sec"><div class="dt-sec-t">Current coverage — '+CONSOLE_LABEL[r.prov]+'</div>'
+      +'<div class="dt-net"><div class="dt-net-hint">What you already hold in this scope. Existing commitments are netted out of this recommendation, so it only covers the remaining gap.</div>'
+      +'<div class="dt-net-sum">'+net.count+' active commitment'+(net.count>1?'s':'')+' · avg '+net.avgUtil+'% utilization</div>'
+      + net.items.map(function(it){return '<div class="dt-net-row">'+it+'</div>';}).join('')
+      +'</div></div>';
+  }
+  $('#dt-body').innerHTML =
+    '<div class="dt-head">'
+      +'<div class="dt-target">'+provBadge(r.prov)+r.target+'</div>'
+      +'<div class="dt-saving">Estimated Savings: '+c+' '+nFmt(r.estAmt)+' / month <span style="font-size:14px;color:var(--ok-dk);font-weight:700">(Save '+(r.estRate*100).toFixed(1)+'%)</span></div>'
+      +'<div class="dt-change">'+typeChip(r.type)+' &nbsp;·&nbsp; Impact '+['Low','Medium','High'][r.impact]+'</div>'
+    +'</div>'
+    +'<div class="dt-sec"><div class="dt-kv">'
+      +'<div class="dt-kv-item"><span class="k">Type</span><span class="v">'+r.type+'</span></div>'
+      +'<div class="dt-kv-item"><span class="k">Rec. Date</span><span class="v">'+r.recDate+'</span></div>'
+      +'<div class="dt-kv-item"><span class="k">End of Tracking</span><span class="v">'+r.eot+'</span></div>'
+      +'<div class="dt-kv-item"><span class="k">Assigned to Group</span><span class="v'+(r.group==='—'?' muted':'')+'">'+r.group+'</span></div>'
+      +'<div class="dt-kv-item"><span class="k">Status</span><span class="v">'+['To-Do','Changed','Error'][r.status]+'</span></div>'
+    +'</div></div>'
+    +'<div class="dt-sec"><div class="dt-sec-t">Recommendation</div><div class="dt-rec-text">'+r.recommendation+'</div></div>'
+    +'<div class="dt-sec"><div class="dt-sec-t">Criteria <span class="material-symbols-outlined ico-info" data-tip="The conditions that triggered this recommendation, based on observed historical usage.">info</span></div>'
+      +'<ul class="dt-crit">'+r.criteria.map(function(c){return '<li>'+c+'</li>';}).join('')+'</ul></div>'
+    + netHtml
+    +'<div class="dt-advisory"><span class="material-symbols-outlined">info</span><div>LumiTure is advisory — it does not purchase commitments. Review the criteria above, then complete the purchase in your provider console.'
+      +'<br><a class="dt-console" onclick="toast(\'(Demo) Would open the '+CONSOLE_LABEL[r.prov]+' purchase console in a new tab.\')">View in '+CONSOLE_LABEL[r.prov]+' console<span class="material-symbols-outlined">open_in_new</span></a></div></div>';
+  bindTips();
+}
+
+/* ============================================================
+   MODALS — commitment detail (read-only) + utilization trend
+============================================================ */
+function trendSvg(end){
+  // generate a gently declining 12-month utilization series ending near `end`
+  var pts = [], n=12, base = Math.min(98, end+8);
+  for(var i=0;i<n;i++){ var v = base - (base-end)*(i/(n-1)) + (i%2?1.2:-1.0); pts.push(Math.max(40, Math.min(100, v))); }
+  pts[n-1]=end;
+  var W=620,H=160,padL=34,padB=20,padT=8, plotW=W-padL-8, plotH=H-padB-padT;
+  function x(i){ return padL + plotW*(i/(n-1)); }
+  function y(v){ return padT + plotH*(1-(v/100)); }
+  var line='', area='M'+x(0)+' '+y(pts[0]);
+  pts.forEach(function(v,i){ var cmd=(i===0?'M':'L')+x(i)+' '+y(v); line+=cmd+' '; if(i>0) area+=' L'+x(i)+' '+y(v); });
+  area += ' L'+x(n-1)+' '+(padT+plotH)+' L'+x(0)+' '+(padT+plotH)+' Z';
+  var months=['Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'];
+  var grid=''; [0,25,50,75,100].forEach(function(g){ var yy=y(g); grid+='<line x1="'+padL+'" y1="'+yy+'" x2="'+W+'" y2="'+yy+'" stroke="#E6E6E6" stroke-dasharray="3 3"/><text class="axis" x="'+(padL-6)+'" y="'+(yy+3)+'" text-anchor="end">'+g+'%</text>'; });
+  var tgtY=y(UTIL_TARGET);
+  var xlabels = months.map(function(m,i){ return '<text class="axis" x="'+x(i)+'" y="'+(H-4)+'" text-anchor="middle">'+m+'</text>'; }).join('');
+  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">'
+    + grid
+    + '<path d="'+area+'" fill="rgba(0,79,176,.08)"/>'
+    + '<path d="'+line.trim()+'" fill="none" stroke="#004FB0" stroke-width="2"/>'
+    + '<line x1="'+padL+'" y1="'+tgtY+'" x2="'+W+'" y2="'+tgtY+'" stroke="#FC9A0F" stroke-width="1.5" stroke-dasharray="5 4"/>'
+    + '<text class="axis" x="'+(W-4)+'" y="'+(tgtY-4)+'" text-anchor="end" fill="#FC9A0F">Target '+UTIL_TARGET+'%</text>'
+    + xlabels
+    + '</svg>';
+}
+function openCommitment(cid){
+  if(state.pageState!=='set') return;
+  var a = ACTIVE.filter(function(x){return x.cid===cid;})[0]; if(!a) return;
+  var c = state.currency;
+  var low = a.util < UTIL_TARGET;
+  var banner = a.exp
+    ? '<div class="dt-expbanner"><span class="material-symbols-outlined">schedule</span><div><div class="t">Expiring soon</div><div class="d">Renew in the '+CONSOLE_LABEL[a.prov]+' console before it expires to avoid reverting to on-demand rates. (LumiTure is advisory — it does not purchase commitments.)</div></div></div>'
+    : '';
+  var lowNote = (low && !a.exp)
+    ? '<div class="dt-expbanner" style="border-color:var(--warn)"><span class="material-symbols-outlined">trending_down</span><div><div class="t">Under-utilized</div><div class="d">Running below the '+UTIL_TARGET+'% target — part of this commitment may be wasted. Consider this when planning renewals.</div></div></div>'
+    : '';
+  $('#cm-body').innerHTML =
+    '<div class="dt-head" style="text-align:left">'
+      +'<div class="dt-target" style="justify-content:flex-start">'+provBadge(a.prov)+'<b style="color:var(--g900);font-weight:700">'+a.cid+'</b></div>'
+      +'<div style="font-size:13px;color:var(--g500)">'+CONSOLE_LABEL[a.prov]+' · '+a.type+'</div>'
+    +'</div>'
+    + banner + lowNote
+    +'<div class="dt-sec"><div class="dt-kv">'
+      +'<div class="dt-kv-item"><span class="k">Service</span><span class="v">'+a.service+'</span></div>'
+      +'<div class="dt-kv-item"><span class="k">Term</span><span class="v">'+a.term+'</span></div>'
+      +'<div class="dt-kv-item"><span class="k">Payment</span><span class="v">'+a.payment+'</span></div>'
+      +'<div class="dt-kv-item"><span class="k">Hourly Cost</span><span class="v rs-num">'+c+' '+a.hourly.toFixed(2)+'</span></div>'
+      +'<div class="dt-kv-item"><span class="k">Start</span><span class="v">'+a.start+'</span></div>'
+      +'<div class="dt-kv-item"><span class="k">Expiry</span><span class="v">'+a.expiry+'</span></div>'
+      +'<div class="dt-kv-item"><span class="k">Current Utilization</span><span class="v" style="color:'+(low?'#B26A00':'var(--ok-dk)')+'">'+a.util+'%</span></div>'
+      +'<div class="dt-kv-item"><span class="k">Realized Savings to Date</span><span class="v rs-num">'+c+' '+nFmt(a.realized)+'</span></div>'
+    +'</div></div>'
+    +'<div class="dt-sec"><div class="dt-sec-t">Utilization Trend</div>'
+      +'<div class="dt-trend">'+trendSvg(a.util)+'</div>'
+      +'<div class="dt-trend-legend"><span><i></i>Target '+UTIL_TARGET+'%</span></div></div>';
+  openModal('mo-commit');
+  bindTips();
+}
+
+/* ============================================================
+   MODALS — dismiss
+============================================================ */
+var DISMISS_REASONS = [
+  ['Workload not stable enough','On-demand spend fluctuates too much to commit'],
+  ['Planned migration / decommission','Resource will change or be removed soon'],
+  ['Pending budget approval','Commitment purchase not yet approved'],
+  ['Covered by another agreement','Already covered by an EDP or negotiated discount'],
+  ['Unreasonable recommendation','Not aligned with actual usage patterns'],
+  ['Other','Please specify your reason'],
+];
+function openDismiss(){
+  $('#dm-body').innerHTML = DISMISS_REASONS.map(function(r,i){
+    var isOther = (r[0]==='Other');
+    return '<label class="dm-opt"><input type="radio" name="dm-reason" value="'+i+'" onchange="onDismissReason('+isOther+')">'
+      +'<span><span class="o-t">'+r[0]+'</span><span class="o-d">: '+r[1]+'</span></span></label>';
+  }).join('')
+  + '<textarea class="dm-textarea" id="dm-text" placeholder="Please provide a brief explanation" disabled></textarea>'
+  + '<div class="dm-err" id="dm-err">Reason cannot be empty.</div>';
+  openModal('mo-dismiss');
+}
+function onDismissReason(isOther){
+  var ta = $('#dm-text');
+  ta.disabled = !isOther;
+  if(isOther) ta.focus(); else { ta.value=''; $('#dm-err').classList.remove('show'); }
+}
+function confirmDismiss(skip){
+  if(!skip){
+    var picked = document.querySelector('input[name="dm-reason"]:checked');
+    if(!picked){ toast('Please choose a reason before dismissing.', 'err'); return; }
+    if(DISMISS_REASONS[+picked.value][0]==='Other' && !$('#dm-text').value.trim()){
+      $('#dm-err').classList.add('show'); return;
+    }
+  }
+  var n = Object.keys(state.selection).length || 1;
+  closeModals(); toast(n+" recommendation(s) moved to 'Dismiss'.");
+  state.selection={}; renderTable(); renderActions();
+}
+
+/* MODALS — remove */
+function openRemove(){
+  var ids = Object.keys(state.selection);
+  var recs = ids.map(findRec).filter(Boolean);
+  if(recs.length===0) recs = [DATA[state.tab][0]];
+  $('#rm-title').textContent = 'Remove '+recs.length+' Recommendation(s)';
+  $('#rm-list').innerHTML = recs.map(function(r){return '<li>'+r.target+' — '+r.type+'</li>';}).join('');
+  openModal('mo-remove');
+}
+function confirmRemove(){
+  var n = Object.keys(state.selection).length || 1;
+  closeModals(); toast(n+' recommendation(s) removed.');
+  state.selection={}; renderTable(); renderActions();
+}
+
+function openModal(id){ closeModals(); $('#'+id).classList.add('active'); }
+function closeModals(){ document.querySelectorAll('.mo.active').forEach(function(m){m.classList.remove('active');}); }
+document.querySelectorAll('.mo').forEach(function(m){ m.addEventListener('click', function(e){ if(e.target===m) closeModals(); }); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModals(); });
+
+/* ============================================================
+   PAGE STATE
+============================================================ */
+function setPageState(s){ state.pageState=s; renderListPage(); }
+function renderListPage(){
+  var content = $('#page-list');
+  var normalBox = $('#rs-normal');
+  var auth = $('#rs-statefull'); if(auth) auth.remove();
+  var ov = $('#rs-ft-overlay'); if(ov) ov.remove();
+  normalBox.classList.remove('rs-ft-blur', 'hide');
+  $('#updwrap').classList.remove('hide');
+
+  var scopeBtn = $('#scope-btn');
+  if(scopeBtn) scopeBtn.classList.toggle('hide', !canEdit());
+
+  if(state.pageState==='no-auth'){
+    normalBox.classList.add('hide');
+    $('#updwrap').classList.add('hide');
+    content.insertAdjacentHTML('beforeend', authState());
+    bindTips();
+    return;
+  }
+  renderCards(); renderViewSeg();
+  if(state.view==='rec'){ renderTabs(); renderActions(); renderTable(); }
+  else { renderActiveTable(); }
+  $('#rs-recview').classList.toggle('hide', state.view!=='rec');
+  $('#rs-actview').classList.toggle('hide', state.view!=='active');
+
+  if(state.pageState==='first-time'){
+    normalBox.classList.add('rs-ft-blur');
+    content.insertAdjacentHTML('beforeend',
+      '<div class="rs-ft-overlay" id="rs-ft-overlay"><div class="rs-ft-card"><div class="ico"><span class="material-symbols-outlined">savings</span></div>'
+      +'<h3>Start Lowering Your Cloud Rates</h3>'
+      +'<p>Connect your billing accounts and set a detection scope to unlock commitment recommendations — and see how much you could save on the rates you already pay.</p>'
+      +'<button class="btn btn-p" onclick="showPage(\'scope\')">Set Up Scope Settings</button></div></div>');
+  }
+}
+function authState(){
+  var admin = canEdit();
+  var sub = admin
+    ? "Commitment recommendations require billing-account-level access (AWS payer/management account, GCP Billing Account, Azure billing scope). Authorize your billing data to start detecting Savings Plan, Reserved Instance, and CUD opportunities across providers."
+    : "To start optimizing your cloud rates, please ask your organization's administrator to authorize billing-account access.";
+  var cta = admin ? '<button class="btn btn-p" onclick="toast(\'(Demo) Would navigate to Authorization Settings.\')"><span class="material-symbols-outlined">add</span>Add Your Authorization</button>' : '';
+  return '<div id="rs-statefull" class="rs-fullcard"><div class="empty-state" style="padding:0">'
+    +'<span class="material-symbols-outlined">'+(admin?'lock_open':'lock')+'</span>'
+    +'<div class="empty-state-title">Connect Your Billing Data to Unlock Rate Optimization</div>'
+    +'<div class="empty-state-sub">'+sub+'</div>'+cta+'</div></div>';
+}
+
+/* ============================================================
+   PAGE NAV (list <-> scope)
+============================================================ */
+function showPage(p){
+  state.page = p;
+  $('#page-list').classList.toggle('hide', p!=='list');
+  $('#page-scope').classList.toggle('hide', p!=='scope');
+  $('#app').classList.toggle('savebar-on', p==='scope');
+  closeModals();
+}
+function setRole(r){ state.role = r; state.selection={}; renderListPage(); }
+
+/* ============================================================
+   TOAST
+============================================================ */
+function toast(msg, type){
+  var tc = $('#toast-container');
+  var el = document.createElement('div');
+  el.className = 'toast '+(type==='err'?'terr':'tok');
+  el.innerHTML = '<span class="material-symbols-outlined">'+(type==='err'?'error':'check_circle')+'</span>'+msg;
+  tc.appendChild(el);
+  setTimeout(function(){ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(function(){el.remove();},300); }, 2600);
+}
+
+/* ============================================================
+   TOOLTIP
+============================================================ */
+function bindTips(){
+  document.querySelectorAll('[data-tip]').forEach(function(el){
+    if(el._tipBound) return; el._tipBound=true;
+    el.addEventListener('mouseenter', function(){ showTip(el); });
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('mousemove', moveTip);
+  });
+}
+var _tipEl;
+function showTip(el){ _tipEl = $('#rs-tip'); _tipEl.innerHTML = el.getAttribute('data-tip'); _tipEl.classList.add('show'); moveTipFor(el); }
+function moveTip(e){ if(_tipEl && _tipEl.classList.contains('show')) positionTip(e.clientX, e.clientY); }
+function moveTipFor(el){ var r=el.getBoundingClientRect(); positionTip(r.left+r.width/2, r.top); }
+function positionTip(x,y){
+  if(!_tipEl) return;
+  var w=_tipEl.offsetWidth, h=_tipEl.offsetHeight;
+  var left = Math.min(Math.max(8, x-w/2), window.innerWidth-w-8);
+  var top = y-h-10; if(top<8) top = y+18;
+  _tipEl.style.left=left+'px'; _tipEl.style.top=top+'px';
+}
+function hideTip(){ if(_tipEl) _tipEl.classList.remove('show'); }
+
+/* ============================================================
+   CURRENCY
+============================================================ */
+function openCurrPicker(triggerEl){
+  if(!window.CurrencyPicker) return;
+  CurrencyPicker.open(triggerEl, state.currency, function(code){
+    state.currency = code;
+    var c = CurrencyPicker.CURRENCIES.filter(function(x){return x.code===code;})[0];
+    $('#curr-flag').textContent = c?c.flag:'';
+    $('#curr-code').textContent = code;
+    renderCards(); renderTable(); renderActiveTable();
+  });
+}
+
+/* ============================================================
+   DEMO FAB
+============================================================ */
+window.DEMO_PAGES = [
+  { id:'view',  label:'View',  icon:'tab' },
+  { id:'role',  label:'Role',  icon:'person' },
+  { id:'state', label:'State', icon:'layers' },
+  { id:'modal', label:'Modal', icon:'open_in_new' },
+];
+window.DEMO_SCENARIOS = [
+  // View
+  { id:'view-rec',    page:'view', label:'Recommendations',    icon:'lightbulb',   tip:'主畫面：4 張 KPI 卡 + 推薦列表（Recommendations/Done/Dismiss/Archived 4 tab）。' },
+  { id:'view-active', page:'view', label:'Active Commitments', icon:'inventory_2', tip:'現有承諾組合：利用率 + 到期追蹤，依到期日排序，30 天內到期標 Expiring Soon。' },
+  { id:'view-scope',  page:'view', label:'Scope Settings',     icon:'settings',    tip:'範圍設定頁：Detection Scope + Trigger Criteria + Tracking & Impact + Utilization Target。' },
+  // Role
+  { id:'admin', page:'role', label:'Admin',      icon:'admin_panel_settings', tip:'Owner/Admin：可採納/忽略/封存 + 指派 group（bulk-select + toolbar 動作）。可進 Scope Settings。' },
+  { id:'t1m',   page:'role', label:'T1 Manager', icon:'supervisor_account',   tip:'T1 Manager：唯讀（無 checkbox、無動作列、無 Scope 按鈕）。' },
+  { id:'t1mb',  page:'role', label:'T1 Member',  icon:'badge',                tip:'T1 Member：唯讀。' },
+  { id:'t2m',   page:'role', label:'T2 Manager', icon:'person',               tip:'T2 Manager：唯讀，授權範圍內。' },
+  { id:'t2mb',  page:'role', label:'T2 Member',  icon:'person_outline',       tip:'T2 Member：唯讀。' },
+  // State
+  { id:'set',        page:'state', label:'With data (預設)',    icon:'check_circle',  tip:'正常狀態：KPI 有值、推薦與承諾可操作。' },
+  { id:'loading',    page:'state', label:'Loading (Skeleton)',  icon:'hourglass_top', isNoData:true, tip:'資料載入中：cards 與表格以 shimmer 取代。' },
+  { id:'first-time', page:'state', label:'First-Time use',      icon:'savings',       isNoData:true, tip:'第一次使用：模糊預覽 + 引導至 Scope Settings 連線帳單。' },
+  { id:'empty',      page:'state', label:'No data created',     icon:'inbox',         isNoData:true, tip:'已連線但資料累積中：KPI 顯示 No Data、表格說明累積中。' },
+  { id:'no-auth',    page:'state', label:'No authorization',    icon:'lock',          isNoData:true, tip:'帳單帳戶尚未授權。Admin 看到 CTA；T1/T2 看到「請聯絡管理員」。切 Role 看差異。' },
+  { id:'nodata',     page:'state', label:'Error (API failure)', icon:'cloud_off',     isNoData:true, tip:'載入失敗，與 No Data 共用呈現。' },
+  // Modal
+  { id:'modal-detail',  page:'modal', label:'Recommendation Details', icon:'analytics',   tip:'唯讀推薦細節：Type/Impact/Savings + Criteria + Current coverage(netting) + advisory & console 連結。無動作按鈕。' },
+  { id:'modal-commit',  page:'modal', label:'Commitment Details',     icon:'inventory_2', tip:'唯讀承諾細節：到期提醒 + Realized Savings + Utilization Trend 圖（含 Target 線）。' },
+  { id:'modal-dismiss', page:'modal', label:'Dismiss Recommendations',icon:'block',       tip:'Dismiss 原因單選彈窗（選 Other 才開放輸入）— 由 toolbar 動作觸發。' },
+  { id:'modal-remove',  page:'modal', label:'Remove Recommendation',  icon:'delete',      tip:'刪除確認彈窗（列出即將刪除的項目）。' },
+];
+window.DEMO_DEFAULT = 'set';
+window.DEMO_APPLY = function(id){
+  if(id==='view-rec'){ showPage('list'); setView('rec'); return; }
+  if(id==='view-active'){ showPage('list'); setView('active'); return; }
+  if(id==='view-scope'){ showPage('scope'); return; }
+  if(['admin','t1m','t1mb','t2m','t2mb'].indexOf(id)>=0){ setRole(id); return; }
+  if(['set','loading','first-time','empty','nodata','no-auth'].indexOf(id)>=0){ showPage('list'); setPageState(id); return; }
+  if(id==='modal-detail'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); setView('rec'); openDetail('r1'); return; }
+  if(id==='modal-commit'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); setView('active'); openCommitment('cud-central1-vcpu'); return; }
+  if(id==='modal-dismiss'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); if(!canEdit()) setRole('admin'); setView('rec'); state.selection={}; state.selection['r1']=true; openDismiss(); return; }
+  if(id==='modal-remove'){ showPage('list'); if(!canEdit()) setRole('admin'); setView('rec'); state.tab='dismiss'; renderTabs(); state.selection={}; state.selection['x1']=true; renderTable(); openRemove(); return; }
+};
+
+/* ============================================================
+   SIDEBAR
+============================================================ */
+window.LUMITURE_ACTIVE = 'rate-optimization';
+
+/* ============================================================
+   INIT
+============================================================ */
+renderListPage();
+bindTips();
+(function(){
+  var a=document.getElementById('scope-aws-badge'), g=document.getElementById('scope-gcp-badge'), z=document.getElementById('scope-azure-badge');
+  if(a) a.innerHTML = CSP_LOGOS.aws;
+  if(g) g.innerHTML = CSP_LOGOS.gcp;
+  if(z) z.innerHTML = CSP_LOGOS.azure;
+})();
+</script>
+
+<!-- Shared components — nav data MUST load before sidebar renderer -->
+<script>
+/* === Inlined: shared/currency-picker.js === */
+/*!
+ * currency-picker.js — Lumiture Shared Currency Picker v3
+ *
+ * Design spec: CMDS Component Library > Currency Switch (H=30px)
+ *   - Normal: transparent bg, no border; Hover: subtle gray bg; Focus: focus ring
+ *   - Trigger format: [flag] [CODE] [expand_more]
+ *   - Dropdown gap: 4px from trigger bottom
+ *   - Dropdown items: "Full Name (CODE)", selected = gray bg, no checkmark
+ *
+ * Design spec: Figma #01-4 Overview: Change Currency
+ *   - 7 currencies from PRD, sorted alphabetically by full name
+ *
+ * Usage (inline onclick pattern, works with dynamically rendered triggers):
+ *
+ *   HTML trigger (static):
+ *     <button class="curr-btn"
+ *             onclick="CurrencyPicker.open(this, currentCode, onChangeFn)">
+ *       <span class="curr-flag">🇺🇸</span>
+ *       <span class="curr-code">USD</span>
+ *       <span class="material-symbols-outlined">expand_more</span>
+ *     </button>
+ *
+ *   HTML trigger (dynamic, inside JS template):
+ *     const c = CurrencyPicker.CURRENCIES.find(c => c.code === currentCode);
+ *     `<button class="curr-btn" onclick="CurrencyPicker.open(this,'${currentCode}',fn)">
+ *       <span class="curr-flag">${c?.flag || ''}</span>
+ *       <span class="curr-code">${currentCode}</span>
+ *       <span class="material-symbols-outlined">expand_more</span>
+ *     </button>`
+ *
+ *   Update trigger on currency change (setCurrency callback):
+ *     const c = CurrencyPicker.CURRENCIES.find(c => c.code === newCode);
+ *     document.getElementById('currency-flag').textContent = c?.flag || '';
+ *     document.getElementById('currency-code').textContent = newCode;
+ *
+ * Exposes:
+ *   window.CurrencyPicker.CURRENCIES   — [{code, name, flag}]
+ *   window.CurrencyPicker.open(triggerEl, currentCode, onChangeFn)
+ *   window.CurrencyPicker.close()
+ */
+(function () {
+  'use strict';
+
+  /* Sorted alphabetically by full name, per Figma spec + PRD */
+  var CURRENCIES = [
+    { code: 'HKD', name: 'Hong Kong dollar',      flag: '🇭🇰' },
+    { code: 'IDR', name: 'Indonesian rupiah',      flag: '🇮🇩' },
+    { code: 'MYR', name: 'Malaysian ringgit',      flag: '🇲🇾' },
+    { code: 'TWD', name: 'New Taiwan dollar',      flag: '🇹🇼' },
+    { code: 'PHP', name: 'Philippine peso',        flag: '🇵🇭' },
+    { code: 'SGD', name: 'Singapore dollar',       flag: '🇸🇬' },
+    { code: 'USD', name: 'United States dollar',   flag: '🇺🇸' },
+  ];
+
+  /* ===== CSS ===== */
+  var CSS = [
+    /* Trigger button — Normal: transparent, no border; H=30px per CMDS spec */
+    '.curr-btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 8px;',
+    'font-size:13px;color:#262626;',
+    'cursor:pointer;background:transparent;border:none;border-radius:6px;',
+    'font-family:inherit;line-height:1;white-space:nowrap;',
+    'transition:background .12s}',
+    /* Hover: subtle gray wash */
+    '.curr-btn:hover{background:rgba(0,0,0,.06)}',
+    /* Active/open: same wash + arrow flipped */
+    '.curr-btn.cp-open{background:rgba(0,0,0,.06)}',
+    /* Focus: blue focus ring (keyboard nav / Active state ring per CMDS) */
+    '.curr-btn:focus-visible{outline:2px solid #004FB0;outline-offset:1px}',
+    /* Flag + code */
+    '.curr-flag{font-size:15px;line-height:1;flex-shrink:0}',
+    '.curr-code{font-size:13px;color:#262626}',
+    /* Arrow icon */
+    '.curr-btn .material-symbols-outlined{font-size:16px;',
+    'color:#676767;flex-shrink:0;transition:transform .15s}',
+    '.curr-btn.cp-open .material-symbols-outlined{transform:rotate(180deg)}',
+
+    /* Dropdown container — 4px gap per CMDS spec */
+    '.curr-dd{position:absolute;top:calc(100% + 4px);right:0;left:auto;',
+    'background:#fff;border:1px solid #DCE3EC;',
+    'border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);',
+    'z-index:300;min-width:220px;width:max-content;',
+    'overflow:hidden;overscroll-behavior:contain}',
+
+    /* Dropdown items — full name + (CODE), no flag */
+    '.curr-dd-item{display:flex;align-items:center;padding:9px 14px;width:100%;',
+    'font-size:13px;border:none;background:none;cursor:pointer;',
+    'font-family:inherit;color:#262626;text-align:left;',
+    'transition:background .1s;line-height:1.4;white-space:nowrap}',
+    '.curr-dd-item:hover{background:#F5F5F5}',
+    /* Selected: gray bg per Figma, no color/weight change */
+    '.curr-dd-item.cp-active{background:#F0F0F0}',
+  ].join('');
+
+  var style = document.createElement('style');
+  style.textContent = CSS;
+  document.head.appendChild(style);
+
+  /* ===== STATE ===== */
+  var _activeTrigger = null;
+
+  /* ===== INTERNAL ===== */
+  function _close() {
+    var dd = document.getElementById('_curr-dd');
+    if (dd) dd.remove();
+    if (_activeTrigger) {
+      _activeTrigger.classList.remove('cp-open');
+      _activeTrigger = null;
+    }
+  }
+
+  function _open(triggerEl, currentCode, onChange) {
+    _activeTrigger = triggerEl;
+    triggerEl.classList.add('cp-open');
+
+    /* Ensure parent is positioned */
+    var wrap = triggerEl.parentElement;
+    if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+
+    var dd = document.createElement('div');
+    dd.className = 'curr-dd';
+    dd.id = '_curr-dd';
+    dd.innerHTML = CURRENCIES.map(function (c) {
+      var isActive = c.code === currentCode;
+      return '<button class="curr-dd-item' + (isActive ? ' cp-active' : '') + '">' +
+        c.name + ' (' + c.code + ')' +
+        '</button>';
+    }).join('');
+
+    dd.querySelectorAll('.curr-dd-item').forEach(function (btn, i) {
+      btn.addEventListener('click', function () {
+        _close();
+        onChange(CURRENCIES[i].code);
+      });
+    });
+
+    wrap.appendChild(dd);
+
+    /* Outside click to close */
+    setTimeout(function () {
+      document.addEventListener('click', function _outsideClose(e) {
+        if (!dd.contains(e.target) && e.target !== triggerEl) {
+          _close();
+          document.removeEventListener('click', _outsideClose, true);
+        }
+      }, true);
+    }, 0);
+  }
+
+  /* ===== PUBLIC API ===== */
+  window.CurrencyPicker = {
+    CURRENCIES: CURRENCIES,
+
+    /**
+     * Toggle dropdown open / close.
+     * @param {Element}  triggerEl   — the .curr-btn element
+     * @param {string}   currentCode — e.g. 'USD'
+     * @param {Function} onChange    — called with new code when user picks
+     */
+    open: function (triggerEl, currentCode, onChange) {
+      if (_activeTrigger === triggerEl) {
+        _close();
+      } else {
+        _close();
+        _open(triggerEl, currentCode, onChange);
+      }
+    },
+
+    close: _close,
+  };
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-nav.js === */
+/*!
+ * lumiture-nav.js — Canonical Sidebar Navigation (Single Source of Truth)
+ *
+ * Defines window.LUMITURE_NAV used by shared/lumiture-sidebar.js.
+ * All Lumiture prototypes share the same nav structure — this file is the
+ * single source. Each prototype only needs to set window.LUMITURE_ACTIVE.
+ *
+ * Usage in prototype HTML:
+ *   <aside id="lt-sidebar"></aside>
+ *   <script>window.LUMITURE_ACTIVE = 'general-budget';<\/script>
+ *   <script src="../shared/lumiture-nav.js"><\/script>    ← MUST load BEFORE sidebar
+ *   <script src="../shared/lumiture-sidebar.js"><\/script>
+ *
+ * Rules:
+ *   - Items with `href` → rendered as <a> links (clickable, cross-prototype navigation)
+ *   - Items with `disabled:true` → rendered as <div> with .lt-dis class (greyed, not clickable)
+ *   - The item matching LUMITURE_ACTIVE → href automatically stripped by lumiture-sidebar.js
+ *     so the "current page" item won't self-link
+ *
+ * To add a new prototype:
+ *   1. Update the relevant entry below — change `disabled:true` to `href:'../{name}/{name}-prototype-v{N}.html'`
+ *   2. All 3 (or more) prototypes will automatically reflect the new link via this shared script
+ *   3. The new prototype only needs to set LUMITURE_ACTIVE = its own id
+ */
+(function () {
+  'use strict';
+
+  window.LUMITURE_NAV = [
+    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', disabled: true },
+
+    { type: 'group', id: 'dashboard', label: 'Dashboard', items: [
+      { id: 'cost-dashboard',     label: 'Cost Dashboard',     icon: 'dashboard',    href: './cost-dashboard.html' },
+      { id: 'executive-insights', label: 'Executive Insights', icon: 'auto_awesome', href: './executive-insights.html' },
+    ]},
+
+    { type: 'group', id: 'optimization', label: 'Optimization', items: [
+      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', href: './rightsizing.html' },
+      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'sell', href: './rate-optimization.html' },
+    ]},
+
+    { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
+      { id: 'general-budget',    label: 'General Budget',    icon: 'savings',              href: './general-budget.html' },
+      { id: 'group-list',         label: 'Group List',         icon: 'groups',          disabled: true },
+      { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
+      { id: 'authorization-list', label: 'Authorization List', icon: 'link',            disabled: true },
+      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
+    ]},
+  ];
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-sidebar.js === */
+/*!
+ * lumiture-sidebar.js — Lumiture Shared Sidebar (with canonical logo)
+ *
+ * Auto-injects:
+ *   - Sidebar CSS (logo, nav items, group collapse, active state)
+ *   - Canonical Lumiture logo (concentric circles + PROTOTYPE tag + LumiTure.ai wordmark)
+ *
+ * Usage in prototype HTML:
+ *   1. Define window.LUMITURE_NAV = [...]   (see schema below)
+ *   2. Define window.LUMITURE_ACTIVE = 'item-id'  (which item is highlighted)
+ *   3. Add mount point: <aside id="lt-sidebar"></aside>
+ *   4. <script src="../shared/lumiture-sidebar.js"><\/script>
+ *
+ * NAV schema:
+ *   window.LUMITURE_NAV = [
+ *     // Top-level item (no group)
+ *     { type: 'item', id: 'overview', label: 'Overview', icon: 'home', href: '#' },
+ *     // Group with children (expanded by default unless `collapsed: true`)
+ *     { type: 'group', id: 'dashboard', label: 'Dashboard', expanded: true, items: [
+ *       { id: 'cost-dashboard', label: 'Cost Dashboard', icon: 'dashboard', href: '#' },
+ *       { id: 'exec-insights',  label: 'Executive Insights', icon: 'monitoring', disabled: true },
+ *     ]},
+ *   ];
+ *   window.LUMITURE_ACTIVE = 'cost-dashboard';  // which item is active
+ *
+ * API:
+ *   window.LumitureSidebar.toggleGroup(groupId)
+ *   window.LumitureSidebar.toggleCollapse()    — collapse the whole sidebar (icon-only)
+ *   window.LumitureSidebar.setActive(itemId)
+ */
+(function () {
+  'use strict';
+
+  // ===== CSS =====
+  var CSS = [
+    /* CSS variables — sidebar 用 Primary Dark #002663（per Lumiture-Guideline.md，2026-05-08 設計師確認） */
+    ':root{--lt-sb-w:264px;--lt-sb-bg:#002663;--lt-sb-hov:rgba(255,255,255,.06);',
+    '--lt-sb-active:#004FB0;--lt-sb-text:rgba(255,255,255,.85);--lt-sb-text-muted:rgba(255,255,255,.5);',
+    '--lt-sb-border:rgba(255,255,255,.1)}',
+
+    /* Sidebar container — 採 sticky positioning：父層 .app 用 flex 或 grid 都能適應
+       min-width:0 是必要的：flex 子元素預設 min-width:auto 會被內容 min-content size 撐住，導致 collapse 失效 */
+    '.lt-sidebar{width:var(--lt-sb-w);min-width:0;background:var(--lt-sb-bg);color:#fff;',
+    'position:sticky;top:0;height:100vh;z-index:100;overflow:hidden;',
+    'flex-shrink:0;',
+    'display:flex;flex-direction:column;transition:width .2s ease;scrollbar-width:none}',
+    '.lt-sidebar::-webkit-scrollbar{display:none}',
+    '.lt-sidebar.lt-collapsed{width:64px}',
+
+    /* Logo block */
+    '.lt-sb-logo{padding:16px 20px;display:flex;align-items:center;gap:10px;',
+    'font-size:18px;font-weight:700;color:#fff;border-bottom:1px solid var(--lt-sb-border);',
+    'min-height:68px;box-sizing:border-box;white-space:nowrap;overflow:hidden;flex-shrink:0}',
+    '.lt-sb-logo-wrap{position:relative;width:32px;height:32px;flex-shrink:0}',
+    '.lt-sb-logo-wrap svg{width:32px;height:32px;display:block}',
+    /* PROTOTYPE tag — cyan caps below the icon */
+    '.lt-sb-proto{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);',
+    'background:var(--lt-sb-bg);color:#34B5D9;font-size:6px;font-weight:700;',
+    'padding:1px 3px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px;',
+    'line-height:1.2;white-space:nowrap}',
+    '.lt-sb-logo-text{transition:opacity .2s}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo-text{opacity:0;width:0;overflow:hidden}',
+    '.lt-sidebar.lt-collapsed .lt-sb-proto{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo{padding:16px;justify-content:center;gap:0}',
+
+    /* Nav scroll area — 內部捲動，sidebar 外層不捲（寬敞 padding 對齊原始設計） */
+    '.lt-sb-nav{flex:1;padding:8px 12px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}',
+    '.lt-sb-nav::-webkit-scrollbar{width:6px}',
+    '.lt-sb-nav::-webkit-scrollbar-track{background:transparent}',
+    '.lt-sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}',
+    '.lt-sb-nav::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.25)}',
+
+    /* Top-level item (no group) — 寬敞 padding，font-size 14px */
+    '.lt-sb-item{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;',
+    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden;margin-bottom:2px}',
+    '.lt-sb-item:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sb-item.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-item.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
+    '.lt-sb-item .material-symbols-outlined{font-size:20px;opacity:.9;flex-shrink:0}',
+
+    /* Group section */
+    '.lt-sb-group{margin-bottom:4px}',
+    '.lt-sb-group-hdr{display:flex;align-items:center;justify-content:space-between;',
+    'padding:18px 14px 10px;font-size:14px;font-weight:700;color:#fff;',
+    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:.2px}',
+    '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
+    '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
+    '.lt-sb-group-arrow{font-size:18px;transition:transform .18s;opacity:.85;flex-shrink:0}',
+    '.lt-sb-group.lt-collapsed .lt-sb-group-arrow{transform:rotate(180deg)}',
+    '.lt-sb-group.lt-collapsed .lt-sb-group-children{display:none}',
+
+    /* Sub-item (inside group) — 一致 14px font，11px 垂直 padding */
+    '.lt-sb-subitem{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;',
+    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden}',
+    '.lt-sb-subitem:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sb-subitem.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-subitem.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
+    '.lt-sb-subitem .material-symbols-outlined{font-size:18px;opacity:.9;flex-shrink:0}',
+
+    /* Collapsed state — hide labels, center icons */
+    '.lt-sidebar.lt-collapsed .lt-sb-item span:not(.material-symbols-outlined),',
+    '.lt-sidebar.lt-collapsed .lt-sb-subitem span:not(.material-symbols-outlined){display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-item,',
+    '.lt-sidebar.lt-collapsed .lt-sb-subitem{padding:10px 0;justify-content:center;border-radius:0}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-hdr > span:first-child{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-arrow{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-hdr{padding:8px 0;justify-content:center}',
+    /* In collapsed mode, always show children */
+    '.lt-sidebar.lt-collapsed .lt-sb-group.lt-collapsed .lt-sb-group-children{display:block}',
+    '.lt-sidebar.lt-collapsed .lt-sb-nav{padding:8px 4px}',
+
+    /* Collapse toggle button at bottom */
+    '.lt-sb-collapse-btn{padding:12px;display:flex;justify-content:flex-end;',
+    'border-top:1px solid var(--lt-sb-border);flex-shrink:0}',
+    '.lt-sb-collapse-btn button{color:var(--lt-sb-text-muted);background:none;border:0;cursor:pointer;',
+    'display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:4px;',
+    'transition:all .15s}',
+    '.lt-sb-collapse-btn button:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sidebar.lt-collapsed .lt-sb-collapse-btn{justify-content:center}',
+    '.lt-sidebar.lt-collapsed .lt-sb-collapse-btn .material-symbols-outlined{transform:rotate(180deg)}'
+  ].join('');
+
+  function _injectCSS() {
+    if (document.getElementById('lt-sidebar-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-sidebar-css';
+    s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  // ===== Canonical Logo (concentric circles + PROTOTYPE tag + LumiTure.ai) =====
+  var LOGO_HTML =
+    '<div class="lt-sb-logo">' +
+      '<div class="lt-sb-logo-wrap">' +
+        '<svg viewBox="0 0 32 32" fill="none" aria-hidden="true">' +
+          '<circle cx="16" cy="16" r="13" stroke="#FFF" stroke-width="2" fill="none"/>' +
+          '<circle cx="16" cy="16" r="7" stroke="#FFF" stroke-width="2" fill="none"/>' +
+          '<circle cx="16" cy="16" r="3" fill="#FFF"/>' +
+        '</svg>' +
+        '<span class="lt-sb-proto">PROTOTYPE</span>' +
+      '</div>' +
+      '<span class="lt-sb-logo-text">LumiTure.ai</span>' +
+    '</div>';
+
+  // ===== Helpers =====
+  function _esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  function _renderItem(item, isSub) {
+    var cls = isSub ? 'lt-sb-subitem' : 'lt-sb-item';
+    var isActive = (item.id === window.LUMITURE_ACTIVE);
+    var active = isActive ? ' lt-active' : '';
+    var dis = item.disabled ? ' lt-dis' : '';
+    // Active item: render as <div> (no self-link). Disabled item: also no href.
+    var useHref = item.href && !isActive && !item.disabled;
+    var tag = useHref ? 'a' : 'div';
+    var hrefAttr = useHref ? ' href="' + _esc(item.href) + '"' : '';
+    var dataId = ' data-nav-id="' + _esc(item.id) + '"';
+    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + '>' +
+             '<span class="material-symbols-outlined">' + _esc(item.icon || 'circle') + '</span>' +
+             '<span>' + _esc(item.label) + '</span>' +
+           '</' + tag + '>';
+  }
+
+  function _renderGroup(grp) {
+    var collapsed = grp.collapsed ? ' lt-collapsed' : '';
+    var children = (grp.items || []).map(function (item) {
+      return _renderItem(item, true);
+    }).join('');
+    return '<div class="lt-sb-group' + collapsed + '" data-group-id="' + _esc(grp.id) + '">' +
+             '<div class="lt-sb-group-hdr">' +
+               '<span>' + _esc(grp.label) + '</span>' +
+               '<span class="material-symbols-outlined lt-sb-group-arrow">keyboard_arrow_up</span>' +
+             '</div>' +
+             '<div class="lt-sb-group-children">' + children + '</div>' +
+           '</div>';
+  }
+
+  function _renderNav() {
+    var nav = window.LUMITURE_NAV || [];
+    var html = '<div class="lt-sb-nav">';
+    nav.forEach(function (entry) {
+      if (entry.type === 'group') {
+        html += _renderGroup(entry);
+      } else {
+        html += _renderItem(entry, false);
+      }
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function _renderCollapseBtn() {
+    return '<div class="lt-sb-collapse-btn">' +
+             '<button type="button" data-action="toggle-collapse" title="Collapse sidebar">' +
+               '<span class="material-symbols-outlined">chevron_left</span>' +
+             '</button>' +
+           '</div>';
+  }
+
+  // ===== Mount =====
+  function _render() {
+    var mount = document.getElementById('lt-sidebar');
+    if (!mount) {
+      console.warn('[lumiture-sidebar] Mount point #lt-sidebar not found');
+      return;
+    }
+    // If mount is not already a sidebar, wrap it
+    mount.classList.add('lt-sidebar');
+    mount.innerHTML = LOGO_HTML + _renderNav() + _renderCollapseBtn();
+
+    // Group toggle
+    mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
+      hdr.addEventListener('click', function () {
+        var grp = hdr.parentElement;
+        if (grp) grp.classList.toggle('lt-collapsed');
+      });
+    });
+    // Collapse the whole sidebar
+    var btn = mount.querySelector('[data-action="toggle-collapse"]');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        window.LumitureSidebar.toggleCollapse();
+      });
+    }
+  }
+
+  // ===== Public API =====
+  window.LumitureSidebar = {
+    toggleGroup: function (groupId) {
+      var grp = document.querySelector('[data-group-id="' + groupId + '"]');
+      if (grp) grp.classList.toggle('lt-collapsed');
+    },
+    toggleCollapse: function () {
+      var sb = document.getElementById('lt-sidebar');
+      var main = document.querySelector('.lt-main, .main, main');
+      if (sb) sb.classList.toggle('lt-collapsed');
+      if (main) main.classList.toggle('lt-sidebar-collapsed');
+      // Sync legacy CSS vars (--sw) for prototypes that reference them in topbar / footer
+      var w = sb && sb.classList.contains('lt-collapsed') ? '64px' : '264px';
+      document.documentElement.style.setProperty('--sw', w);
+      document.documentElement.style.setProperty('--lt-sb-w', w);
+    },
+    setActive: function (itemId) {
+      window.LUMITURE_ACTIVE = itemId;
+      document.querySelectorAll('.lt-sb-item, .lt-sb-subitem').forEach(function (el) {
+        el.classList.toggle('lt-active', el.dataset.navId === itemId);
+      });
+    },
+    rerender: _render,
+  };
+
+  // ===== INIT =====
+  function _init() {
+    _injectCSS();
+    _render();
+    // Dispatch resize so chart libraries (ECharts 等) 重新測量容器
+    // —— 避免 inline script 已先 init chart 後，shared CSS 才 inject 導致 layout shift
+    requestAnimationFrame(function () {
+      window.dispatchEvent(new Event('resize'));
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else {
+    _init();
+  }
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-topbar.js === */
+/*!
+ * lumiture-topbar.js — Lumiture Shared Topbar + Account Menu
+ *
+ * 用途：navy topbar（右側 icons + user chip）+ 點 user chip 展開的 Account Menu popover。
+ * Account Menu 對齊 Figma General Behavior #01-3 / #01-4，並加上 LT-3138/LT-3140
+ * (User Menu + AI Quota) v1.19.0 範圍的兩個新項目：Software version 列 + AI Quota box。
+ *
+ * 共用即一致：所有 prototype 只要載入這支檔，user chip 點開就是同一版 menu。
+ *
+ * Usage in prototype HTML:
+ *   1. (Optional) Define window.LUMITURE_USER       — 見下方 Schema，沒設就吃預設
+ *   2. (Optional) Define window.LUMITURE_TOPBAR_ICONS — array of {icon, title, onclick, badge?}
+ *   3. Add mount point: <header id="lt-topbar"></header>
+ *   4. <script src="../shared/lumiture-topbar.js?v=YYYY-MM-DD"><\/script>
+ *
+ * Schema (所有欄位皆 optional，未填吃 DEFAULT_USER)：
+ *   window.LUMITURE_USER = {
+ *     name:        'Kabin Yang',
+ *     email:       'kabin.yang@mile.cloud',
+ *     role:        'Admin',                 // role chip 文字（Admin 無群組後綴；其餘 'Manager - Cost Center'）
+ *     initials:    'KY',                    // avatar 圓圈內字
+ *     gradient:    'linear-gradient(...)',  // optional avatar bg override
+ *     canSwitchRole: true,                  // false → 隱藏「View as Another Role」(只有可切換角色者顯示)
+ *     plan:        'Standard',              // Essential | Starter | Standard | Premium | none  (決定 AI Quota box 顯示哪些項目)
+ *     planDateRange: '2 Aug 2025 ~ 2 Aug 2035',
+ *     product:     'LumiTure.ai',
+ *     version:     'v1.19.0',               // Software version 列
+ *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
+ *     quota: {                              // AI Quota box 數據；total 已含 add-on
+ *       refreshDate: 'Jul 1, 2026',         // 下次重置日（= 自然月下月 1 號）
+ *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
+ *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
+ *     },
+ *   };
+ *
+ * Public API:
+ *   window.LumitureTopbar.setUser({...})          — 更新並 rerender
+ *   window.LumitureTopbar.setRole('Manager - ...')— 只更新 role chip（Demo FAB role 切換用）
+ *   window.LumitureTopbar.setPlan('Essential')    — 切 plan（連動 AI Quota box 顯示項目）
+ *   window.LumitureTopbar.setQuota({analyses:{...}, rightsizing:{...}, refreshDate, addonPacks})
+ *   window.LumitureTopbar.openMenu() / closeMenu() / toggleMenu()
+ *   window.LumitureTopbar.openLimitReached('analyses'|'rightsizing')
+ *   window.LumitureTopbar.rerender()
+ */
+(function () {
+  'use strict';
+
+  // ===== Defaults ===== (預設給 Standard plan + Normal 狀態，所有既有 prototype 直接吃，不破版)
+  var DEFAULT_USER = {
+    name: 'Kabin Yang',
+    email: 'kabin.yang@mile.cloud',
+    role: 'Admin',
+    initials: 'KY',
+    canSwitchRole: true,
+    plan: 'Standard',
+    planDateRange: '2 Aug 2025 ~ 2 Aug 2035',
+    product: 'LumiTure.ai',
+    version: 'v1.19.0',
+    addonPacks: 0,
+    quota: {
+      refreshDate: 'Jul 1, 2026',
+      analyses:    { used: 32,  total: 80 },
+      rightsizing: { used: 410, total: 1000 },
+    },
+  };
+
+  var DEFAULT_ICONS = [
+    { icon: 'notifications', title: 'Notifications', badge: true },
+    { icon: 'help',          title: 'Help' },
+  ];
+
+  // plan → 顯示哪些 quota 項目（per specs/user-menu ai-quota README 邊界情況）
+  //   Essential = 只 rightsizing；Starter = 只 analyses；Standard = 兩項；Premium/none = 不顯示 box
+  var PLAN_QUOTA_ITEMS = {
+    Essential: ['rightsizing'],
+    Starter:   ['analyses'],
+    Standard:  ['analyses', 'rightsizing'],
+    Premium:   [],
+    none:      [],
+  };
+
+  // quota key → 顯示用標籤 / Limit Reached 對話框文案變數
+  var QUOTA_META = {
+    analyses:    { label: 'AI-Powered Analyses',  dialogLabel: 'Cost Dashboard',     unit: 'AI-powered analyses' },
+    rightsizing: { label: 'Rightsizing',          dialogLabel: 'Usage Optimization', unit: 'resources (Rightsizing)' },
+  };
+
+  // plan banner 配色（對齊 Figma #01-4：Essential 灰 / Starter 藍 / Standard 深藍 / Premium 金）
+  var PLAN_BANNER = {
+    Essential: 'background:#5B6B7F',
+    Starter:   'background:#2E6DB4',
+    Standard:  'background:#16407C',
+    Premium:   'background:linear-gradient(90deg,#B8901F 0%,#E3BC55 100%)',
+    none:      'background:#5B6B7F',
+  };
+
+  // ===== CSS =====
+  var CSS = [
+    /* ---------- Topbar 容器 ---------- */
+    '.lt-topbar{background:#002663;padding:14px 32px;display:flex;align-items:center;justify-content:flex-end;gap:16px;',
+    'position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px;box-sizing:border-box}',
+
+    /* Icon button */
+    '.lt-tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;',
+    'cursor:pointer;color:rgba(255,255,255,.7);background:none;border:none;padding:0;position:relative;font-family:inherit;transition:background .15s,color .15s}',
+    '.lt-tb-ic:hover{background:rgba(255,255,255,.08);color:#fff}',
+    '.lt-tb-ic .material-symbols-outlined{font-size:22px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 22}',
+    '.lt-tb-ic .lt-tb-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:#FF403D;',
+    'border:2px solid #002663;border-radius:50%}',
+
+    /* User chip — avatar + name + role + chevron */
+    '.lt-tb-user{display:flex;align-items:center;gap:10px;padding-left:16px;margin-left:0;',
+    'border-left:1px solid rgba(255,255,255,.1);color:#fff;cursor:pointer;transition:opacity .15s;background:none;border-top:none;border-right:none;border-bottom:none}',
+    '.lt-tb-user:hover{opacity:.92}',
+    '.lt-tb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#34B5D9,#004FB0);',
+    'display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;',
+    'letter-spacing:.3px;font-family:\'Noto Sans\',sans-serif}',
+    '.lt-tb-user-text{display:flex;flex-direction:column;font-size:12px;line-height:1.3;min-width:0;font-family:\'Noto Sans\',sans-serif;text-align:left}',
+    '.lt-tb-user-name{font-weight:600;color:#fff;white-space:nowrap}',
+    '.lt-tb-user-role{color:rgba(255,255,255,.6);font-size:11px;white-space:nowrap}',
+    '.lt-tb-chev{color:rgba(255,255,255,.6);font-size:20px;transition:transform .18s}',
+    '.lt-tb-user.is-open .lt-tb-chev{transform:rotate(180deg)}',
+
+    /* ---------- Account Menu popover ---------- */
+    '.lt-am-backdrop{position:fixed;inset:0;z-index:1000;background:transparent}',
+    '.lt-am{position:fixed;top:62px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
+    'box-shadow:0 4px 16px rgba(0,0,0,.28);overflow:hidden;font-family:\'Noto Sans\',sans-serif;color:#fff;',
+    'animation:lt-am-in .14s ease;transform-origin:top right}',
+    '@keyframes lt-am-in{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}',
+    '.lt-am-hidden{display:none!important}',
+
+    /* Plan banner */
+    '.lt-am-plan{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;color:#fff}',
+    '.lt-am-plan-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-plan-date{font-size:11px;font-weight:500;opacity:.85;white-space:nowrap;letter-spacing:.2px}',
+
+    /* User identity */
+    '.lt-am-id{padding:14px 16px 12px}',
+    '.lt-am-id-name{font-size:15px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-id-email{font-size:12px;color:rgba(255,255,255,.62);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-chip{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:3px 10px 3px 8px;',
+    'background:#1E5FA8;border-radius:9999px;font-size:11px;font-weight:600;color:#fff}',
+    '.lt-am-chip .material-symbols-outlined{font-size:14px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 14}',
+
+    /* Software version 列 */
+    '.lt-am-ver{padding:0 16px 12px;font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.2px}',
+
+    /* ---------- AI Quota box (淺色卡片內嵌深底，確保彩色狀態對比) ---------- */
+    '.lt-q{margin:0 12px 12px;background:#fff;border-radius:8px;padding:12px 12px 10px;box-shadow:0 1px 3px rgba(0,0,0,.18)}',
+    '.lt-q-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}',
+    '.lt-q-title{font-size:13px;font-weight:700;color:#262626}',
+    '.lt-q-orgwide{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;background:#EAF1F8;color:#004FB0;',
+    'border-radius:9999px;font-size:10px;font-weight:600;cursor:default}',
+    '.lt-q-orgwide .material-symbols-outlined{font-size:12px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 12}',
+    /* quota item — 大小固定，不論可點與否（per spec：切狀態版面不跳動） */
+    '.lt-q-item{padding:8px;border-radius:6px;border:1px solid transparent;transition:background .12s,border-color .12s}',
+    '.lt-q-item + .lt-q-item{margin-top:2px}',
+    '.lt-q-item.is-depleted{cursor:pointer}',
+    '.lt-q-item.is-depleted:hover{background:#FFF2F2;border-color:#FFD0CF}',
+    '.lt-q-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px}',
+    '.lt-q-label{font-size:12.5px;font-weight:500;color:#262626;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-q-val{font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0}',
+    '.lt-q-bar{height:5px;border-radius:9999px;background:#EDEFF2;margin-top:6px;overflow:hidden}',
+    '.lt-q-fill{height:100%;border-radius:9999px;transition:width .2s}',
+    /* 狀態色 */
+    '.lt-q-item.is-active   .lt-q-val{color:#00B5A6}', '.lt-q-item.is-active   .lt-q-fill{background:#00B5A6}',
+    '.lt-q-item.is-warning  .lt-q-val{color:#C77700}', '.lt-q-item.is-warning  .lt-q-fill{background:#FC9A0F}',
+    '.lt-q-item.is-depleted .lt-q-val{color:#FF403D}', '.lt-q-item.is-depleted .lt-q-fill{background:#FF403D}',
+    '.lt-q-foot{display:flex;align-items:center;gap:5px;margin-top:9px;padding-top:8px;border-top:1px solid #EDEFF2;',
+    'font-size:11px;color:#676767}',
+    '.lt-q-foot .material-symbols-outlined{font-size:13px;color:#9AA3B0;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 13}',
+
+    /* ---------- Menu action items ---------- */
+    '.lt-am-div{height:1px;background:rgba(255,255,255,.1)}',
+    '.lt-am-item{display:flex;align-items:center;gap:12px;padding:12px 16px;color:#fff;cursor:pointer;',
+    'background:none;border:none;width:100%;font-family:inherit;font-size:13.5px;text-align:left;transition:background .12s}',
+    '.lt-am-item:hover{background:rgba(255,255,255,.07)}',
+    '.lt-am-item .material-symbols-outlined{font-size:20px;color:rgba(255,255,255,.85);',
+    'font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20}',
+
+    /* ---------- Limit Reached confirm dialog (440px confirm-style) ---------- */
+    '.lt-lr-backdrop{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);display:flex;',
+    'align-items:center;justify-content:center;padding:24px;animation:lt-lr-fade .14s ease}',
+    '@keyframes lt-lr-fade{from{opacity:0}to{opacity:1}}',
+    '.lt-lr{width:440px;max-width:100%;background:#fff;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.22);',
+    'overflow:hidden;font-family:\'Noto Sans\',sans-serif;color:#262626}',
+    '.lt-lr-body{padding:24px 24px 20px}',
+    '.lt-lr-icon{width:44px;height:44px;border-radius:9999px;background:#FFEBEF;display:flex;align-items:center;',
+    'justify-content:center;margin-bottom:14px}',
+    '.lt-lr-icon .material-symbols-outlined{font-size:26px;color:#FF403D;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 26}',
+    '.lt-lr-title{font-size:18px;font-weight:700;margin-bottom:8px}',
+    '.lt-lr-text{font-size:13.5px;line-height:1.6;color:#3C3C3C}',
+    '.lt-lr-aux{margin-top:14px;padding:10px 12px;background:#F6F8FA;border-radius:8px;font-size:12px;color:#676767;',
+    'display:flex;flex-direction:column;gap:4px}',
+    '.lt-lr-aux b{color:#262626;font-weight:600}',
+    '.lt-lr-foot{display:flex;justify-content:flex-end;gap:10px;padding:0 24px 22px}',
+    '.lt-lr-btn{padding:9px 18px;border-radius:4px;font-size:13.5px;font-weight:600;cursor:pointer;border:none;font-family:inherit}',
+    '.lt-lr-btn-text{background:none;color:#676767}', '.lt-lr-btn-text:hover{background:#F2F2F2}',
+    '.lt-lr-btn-primary{background:#004FB0;color:#fff;display:inline-flex;align-items:center;gap:6px;text-decoration:none}',
+    '.lt-lr-btn-primary:hover{background:#0B6DD7}',
+    '.lt-lr-btn-primary .material-symbols-outlined{font-size:18px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 18}',
+  ].join('');
+
+  function _injectCSS() {
+    if (document.getElementById('lt-topbar-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-topbar-css';
+    s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  // ===== Helpers =====
+  function _esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+  function _user() {
+    var u = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
+    u.quota = Object.assign({}, DEFAULT_USER.quota, (window.LUMITURE_USER || {}).quota || {});
+    return u;
+  }
+  function _status(used, total) {
+    if (!total || total <= 0) return 'active';
+    var pct = used / total * 100;
+    if (pct >= 100) return 'depleted';
+    if (pct >= 80)  return 'warning';
+    return 'active';
+  }
+  function _planItems(plan) {
+    return PLAN_QUOTA_ITEMS[plan] != null ? PLAN_QUOTA_ITEMS[plan] : PLAN_QUOTA_ITEMS.Standard;
+  }
+  function _showQuotaBox(u) {
+    return _planItems(u.plan).length > 0;
+  }
+
+  // ===== Renderers =====
+  function _renderIcon(item) {
+    var attrs = ' class="lt-tb-ic" title="' + _esc(item.title || '') + '"';
+    if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
+    var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
+    return '<button type="button"' + attrs + '>' +
+             '<span class="material-symbols-outlined">' + _esc(item.icon) + '</span>' + badge +
+           '</button>';
+  }
+
+  function _renderUserChip(u) {
+    var avatarStyle = u.gradient ? ' style="background:' + _esc(u.gradient) + '"' : '';
+    return '<button type="button" class="lt-tb-user" id="lt-tb-user" aria-haspopup="true" aria-expanded="false">' +
+             '<div class="lt-tb-avatar"' + avatarStyle + '>' + _esc(u.initials) + '</div>' +
+             '<div class="lt-tb-user-text">' +
+               '<span class="lt-tb-user-name">' + _esc(u.name) + '</span>' +
+               '<span class="lt-tb-user-role" id="lt-tb-user-role">' + _esc(u.role) + '</span>' +
+             '</div>' +
+             '<span class="material-symbols-outlined lt-tb-chev">keyboard_arrow_down</span>' +
+           '</button>';
+  }
+
+  function _renderQuotaItem(key, q) {
+    var meta = QUOTA_META[key];
+    var used = q.used || 0, total = q.total || 0;
+    var remaining = Math.max(0, total - used);
+    var st = _status(used, total);
+    var pct = total > 0 ? Math.min(100, used / total * 100) : 0;
+    var clickable = st === 'depleted';
+    var attrs = ' class="lt-q-item is-' + st + '"';
+    if (clickable) attrs += ' onclick="window.LumitureTopbar.openLimitReached(\'' + key + '\')" role="button" tabindex="0"';
+    return '<div' + attrs + '>' +
+             '<div class="lt-q-row">' +
+               '<span class="lt-q-label">' + _esc(meta.label) + '</span>' +
+               '<span class="lt-q-val">' + remaining.toLocaleString() + ' / ' + total.toLocaleString() + ' left</span>' +
+             '</div>' +
+             '<div class="lt-q-bar"><div class="lt-q-fill" style="width:' + pct + '%"></div></div>' +
+           '</div>';
+  }
+
+  function _renderQuotaBox(u) {
+    var items = _planItems(u.plan);
+    if (!items.length) return '';
+    var rows = items.map(function (k) { return _renderQuotaItem(k, u.quota[k] || {}); }).join('');
+    return '<div class="lt-q">' +
+             '<div class="lt-q-head">' +
+               '<span class="lt-q-title">AI Quota</span>' +
+               '<span class="lt-q-orgwide" title="Shared across your whole organization, not per user">' +
+                 '<span class="material-symbols-outlined">groups</span>Org-wide</span>' +
+             '</div>' +
+             rows +
+             '<div class="lt-q-foot"><span class="material-symbols-outlined">autorenew</span>' +
+               'Refresh on ' + _esc(u.quota.refreshDate) + '</div>' +
+           '</div>';
+  }
+
+  function _renderMenu(u) {
+    var planName = _esc(u.plan) + ' Plan';
+    var bannerStyle = PLAN_BANNER[u.plan] || PLAN_BANNER.Standard;
+    var ver = '<div class="lt-am-ver">' + _esc(u.product) + ' · ' + _esc(u.version) + '</div>';
+    var viewAs = u.canSwitchRole
+      ? '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'View as Another Role\')">' +
+          '<span class="material-symbols-outlined">sync_alt</span>View as Another Role</button>' +
+        '<div class="lt-am-div"></div>'
+      : '';
+    return '<div class="lt-am-backdrop" id="lt-am-backdrop" onclick="window.LumitureTopbar.closeMenu()"></div>' +
+           '<div class="lt-am" id="lt-am" role="menu">' +
+             '<div class="lt-am-plan" style="' + bannerStyle + '">' +
+               '<span class="lt-am-plan-name">' + planName + '</span>' +
+               '<span class="lt-am-plan-date">' + _esc(u.planDateRange) + '</span>' +
+             '</div>' +
+             '<div class="lt-am-id">' +
+               '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
+               '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
+               '<span class="lt-am-chip"><span class="material-symbols-outlined">badge</span>' + _esc(u.role) + '</span>' +
+             '</div>' +
+             ver +
+             _renderQuotaBox(u) +
+             '<div class="lt-am-div"></div>' +
+             viewAs +
+             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Profile\')">' +
+               '<span class="material-symbols-outlined">person</span>Profile</button>' +
+             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Settings\')">' +
+               '<span class="material-symbols-outlined">settings</span>Settings</button>' +
+             '<div class="lt-am-div"></div>' +
+             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Log out\')">' +
+               '<span class="material-symbols-outlined">logout</span>Log out</button>' +
+           '</div>';
+  }
+
+  function _renderLimitReached(key, u) {
+    var meta = QUOTA_META[key];
+    var q = u.quota[key] || {};
+    var total = (q.total || 0).toLocaleString();
+    var used = (q.used || 0).toLocaleString();
+    var mailto = 'mailto:sales@mile.cloud?subject=' + encodeURIComponent('AI Quota Add-on request — ' + meta.dialogLabel);
+    return '<div class="lt-lr-backdrop" id="lt-lr-backdrop" onclick="if(event.target===this)window.LumitureTopbar.closeLimitReached()">' +
+             '<div class="lt-lr" role="alertdialog" aria-labelledby="lt-lr-title">' +
+               '<div class="lt-lr-body">' +
+                 '<div class="lt-lr-icon"><span class="material-symbols-outlined">error</span></div>' +
+                 '<div class="lt-lr-title" id="lt-lr-title">Limit Reached</div>' +
+                 '<div class="lt-lr-text">Your monthly limit (<b>' + total + ' ' + _esc(meta.unit) + '</b>) ' +
+                   'has been reached for <b>' + _esc(meta.dialogLabel) + '</b>. Please contact your LumiTure ' +
+                   'representative to increase your quota for this billing cycle.</div>' +
+                 '<div class="lt-lr-aux">' +
+                   '<span>Used: <b>' + used + ' / ' + total + '</b></span>' +
+                   '<span>Refresh on: <b>' + _esc(u.quota.refreshDate) + '</b></span>' +
+                 '</div>' +
+               '</div>' +
+               '<div class="lt-lr-foot">' +
+                 '<button type="button" class="lt-lr-btn lt-lr-btn-text" onclick="window.LumitureTopbar.closeLimitReached()">Dismiss</button>' +
+                 '<a class="lt-lr-btn lt-lr-btn-primary" href="' + mailto + '">' +
+                   '<span class="material-symbols-outlined">mail</span>Contact Sales</a>' +
+               '</div>' +
+             '</div>' +
+           '</div>';
+  }
+
+  // ===== Mount / state =====
+  var _menuOpen = false;
+
+  function _render() {
+    var mount = document.getElementById('lt-topbar');
+    if (!mount) { console.warn('[lumiture-topbar] Mount point #lt-topbar not found'); return; }
+    var u = _user();
+    var icons = window.LUMITURE_TOPBAR_ICONS || DEFAULT_ICONS;
+    mount.classList.add('lt-topbar');
+    mount.innerHTML = icons.map(_renderIcon).join('') + _renderUserChip(u);
+    var chip = document.getElementById('lt-tb-user');
+    if (chip) chip.addEventListener('click', function (e) { e.stopPropagation(); _toggleMenu(); });
+    _menuOpen = false;
+  }
+
+  function _menuHost() {
+    var host = document.getElementById('lt-am-host');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'lt-am-host';
+      document.body.appendChild(host);
+    }
+    return host;
+  }
+
+  function _openMenu() {
+    var u = _user();
+    _menuHost().innerHTML = _renderMenu(u);
+    _menuOpen = true;
+    var chip = document.getElementById('lt-tb-user');
+    if (chip) { chip.classList.add('is-open'); chip.setAttribute('aria-expanded', 'true'); }
+  }
+  function _closeMenu() {
+    _menuHost().innerHTML = '';
+    _menuOpen = false;
+    var chip = document.getElementById('lt-tb-user');
+    if (chip) { chip.classList.remove('is-open'); chip.setAttribute('aria-expanded', 'false'); }
+  }
+  function _toggleMenu() { _menuOpen ? _closeMenu() : _openMenu(); }
+
+  function _lrHost() {
+    var host = document.getElementById('lt-lr-host');
+    if (!host) { host = document.createElement('div'); host.id = 'lt-lr-host'; document.body.appendChild(host); }
+    return host;
+  }
+  function _openLimitReached(key) {
+    _lrHost().innerHTML = _renderLimitReached(key, _user());
+  }
+  function _closeLimitReached() { _lrHost().innerHTML = ''; }
+
+  // Esc 關閉（dialog 優先於 menu）
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (document.getElementById('lt-lr-backdrop')) { _closeLimitReached(); return; }
+    if (_menuOpen) _closeMenu();
+  });
+
+  // ===== Public API =====
+  window.LumitureTopbar = {
+    setUser: function (user) {
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, user || {});
+      _render(); if (_menuOpen) _openMenu();
+    },
+    setRole: function (role) {
+      var el = document.getElementById('lt-tb-user-role');
+      if (el) el.textContent = role;
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, { role: role });
+      if (_menuOpen) _openMenu();
+    },
+    setPlan: function (plan) {
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, { plan: plan });
+      if (_menuOpen) _openMenu();
+    },
+    setQuota: function (q) {
+      var cur = (window.LUMITURE_USER || {});
+      window.LUMITURE_USER = Object.assign({}, cur, {
+        quota: Object.assign({}, DEFAULT_USER.quota, cur.quota || {}, q || {}),
+      });
+      if (q && typeof q.addonPacks !== 'undefined') window.LUMITURE_USER.addonPacks = q.addonPacks;
+      if (_menuOpen) _openMenu();
+    },
+    openMenu: _openMenu,
+    closeMenu: _closeMenu,
+    toggleMenu: _toggleMenu,
+    openLimitReached: function (key) { _openLimitReached(key); },
+    closeLimitReached: _closeLimitReached,
+    rerender: function () { _render(); if (_menuOpen) _openMenu(); },
+    _noop: function (label) { /* 展示用：Profile/Settings/Log out/View as Another Role 點擊佔位 */
+      if (typeof window.LUMITURE_MENU_ACTION === 'function') window.LUMITURE_MENU_ACTION(label);
+    },
+  };
+
+  // ===== INIT =====
+  function _init() { _injectCSS(); _render(); }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else { _init(); }
+})();
+
+</script>
+<script>
+/* === Inlined: shared/demo-fab.js === */
+/*!
+ * demo-fab.js — Lumiture Designer Demo Scenarios (Shared Module v2)
+ *
+ * Auto-injects:
+ *   - .demo-fab (FAB button, bottom-left)
+ *   - .demo-popover (480px tall × 390px wide popover)
+ *   - #gl-tip (body-level fixed tooltip — required for demo button hover tips)
+ *
+ * Required globals:
+ *   window.DEMO_SCENARIOS = [...]   — scenario list
+ *   window.DEMO_APPLY     = fn      — called with (id, btn) when scenario clicked
+ *
+ * Optional globals:
+ *   window.DEMO_PAGES = [{id, label, icon}]      — page tabs (top row, pill style)
+ *   window.DEMO_CATEGORIES = [{id, label, icon, hint}]  — category tabs (underline style)
+ *   window.DEMO_DEFAULT = 'scenario-id'           — initial active scenario
+ *
+ * Rendering modes (auto-detected):
+ *   1. No pages, no categories → flat list of buttons
+ *   2. Pages only (LumiTag pattern) → underline tabs at top, scenarios filtered by page
+ *   3. Categories only (single-page Cost Dashboard pattern) → underline tabs, scenarios filtered by category
+ *   4. Pages + Categories → two-layer: pill page tabs (top) + underline category tabs (bottom)
+ *
+ * Scenario schema:
+ *   {
+ *     id:        string,           // unique
+ *     label:     string,
+ *     icon:      string,           // Material Symbols name
+ *     tip:       string?,          // hover tooltip (rendered via #gl-tip, NOT ::after)
+ *     page:      string?,          // matches DEMO_PAGES[].id (alias: 'tab' for backwards compat)
+ *     category:  string?,          // matches DEMO_CATEGORIES[].id
+ *     isNoData:  boolean?,         // groups under "no data" sub-divider
+ *     disabled:  boolean?,         // shows "Soon" badge, not clickable
+ *   }
+ *
+ * Programmatic API:
+ *   window.demoFabSwitchTab(pageId)    // switch to a specific page tab (called on navigation)
+ *   window._demoFabToggle()            // open/close popover
+ *   window._demoFabApply(id, btn)      // apply a scenario (internal)
+ */
+(function () {
+  'use strict';
+
+  // ===== MODULE STATE =====
+  var _activePage = null;         // null until first scenario filtered
+  var _activeCategory = null;
+  var _activeScenario = null;
+
+  // ===== CSS INJECTION =====
+  var CSS = [
+    /* FAB button */
+    '.demo-fab{position:fixed;bottom:18px;left:18px;width:48px;height:48px;border-radius:50%;',
+    'background:radial-gradient(circle at 78% 68%,#D9CC4A 0%,rgba(217,204,74,0) 42%),',
+    'radial-gradient(circle at 30% 28%,#4D8DDB 0%,rgba(77,141,219,0) 52%),',
+    'radial-gradient(circle at 25% 78%,#001A52 0%,rgba(0,26,82,0) 58%),',
+    'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);',
+    'color:#fff;box-shadow:0 4px 14px rgba(13,27,62,.36);z-index:999;cursor:pointer;',
+    'display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;border:0}',
+    '.demo-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(13,27,62,.45)}',
+    '.demo-fab:active{transform:scale(.96)}',
+    '.demo-fab .material-symbols-outlined{font-size:24px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}',
+    '.demo-fab.popped{box-shadow:0 4px 14px rgba(13,27,62,.36),inset 0 2px 6px rgba(0,0,0,.28)}',
+    '.demo-fab .demo-pulse{position:absolute;top:5px;right:5px;width:9px;height:9px;background:#FF403D;',
+    'border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 0 rgba(255,64,61,.6);animation:demoPulse 1.6s ease-in-out infinite}',
+    '@keyframes demoPulse{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,64,61,.6)}',
+    '70%{transform:scale(1.1);box-shadow:0 0 0 8px rgba(255,64,61,0)}',
+    '100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,64,61,0)}}',
+
+    /* Popover shell — 全站固定 390 × 480 */
+    '.demo-popover{position:fixed;bottom:78px;left:18px;width:390px;height:480px;background:#fff;',
+    'border:1px solid rgba(14,58,130,.18);border-radius:12px;box-shadow:0 8px 24px rgba(13,27,62,.16);',
+    'z-index:998;padding:0;opacity:0;transform:translateY(8px);pointer-events:none;',
+    'transition:opacity .18s,transform .18s;display:flex;flex-direction:column;overflow:hidden}',
+    '.demo-popover.show{opacity:1;transform:translateY(0);pointer-events:auto}',
+    '.demo-popover::before{content:\'\';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;',
+    'background:radial-gradient(circle at 78% 50%,#D9CC4A 0%,rgba(217,204,74,0) 32%),',
+    'radial-gradient(circle at 30% 50%,#4D8DDB 0%,rgba(77,141,219,0) 42%),',
+    'linear-gradient(90deg,#0D1B3E 0%,#0E3A82 100%)}',
+
+    /* Popover header */
+    '.demo-popover-hdr{display:flex;align-items:center;justify-content:space-between;',
+    'padding:14px 16px 10px;flex-shrink:0}',
+    '.demo-popover-title{font-size:12px;font-weight:700;color:#0E3A82;text-transform:uppercase;',
+    'letter-spacing:.5px;display:flex;align-items:center;gap:6px}',
+    '.demo-popover-close{color:#B0B7C0;cursor:pointer;padding:2px;border-radius:4px;',
+    'display:flex;align-items:center;background:none;border:none}',
+    '.demo-popover-close:hover{color:#0E3A82;background:rgba(14,58,130,.08)}',
+
+    /* Reset link */
+    '.demo-reset-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#676767;',
+    'font-weight:500;background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:4px;',
+    'font-family:inherit;margin:0 16px 6px}',
+    '.demo-reset-link:hover{color:#004FB0;background:#F2FAFF}',
+    '.demo-reset-link .material-symbols-outlined{font-size:14px}',
+
+    /* Page tabs (Layer 1 — pill / segmented style，only when both layers exist) */
+    '.demo-page-tabs{display:flex;gap:4px;padding:0 16px 8px;flex-shrink:0;overflow-x:auto;scrollbar-width:none}',
+    '.demo-page-tabs::-webkit-scrollbar{display:none}',
+    '.demo-page-tab{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;height:26px;',
+    'background:#F2F2F2;color:#676767;border:none;border-radius:13px;font-size:11px;font-weight:600;',
+    'font-family:inherit;cursor:pointer;transition:all .15s;white-space:nowrap}',
+    '.demo-page-tab:hover{color:#262626;background:#E6E6E6}',
+    '.demo-page-tab.active{background:#fff;color:#004FB0;box-shadow:inset 0 0 0 1px #004FB0}',
+    '.demo-page-tab .material-symbols-outlined{font-size:13px}',
+
+    /* Category tabs (Layer 2，or single-layer underline mode) */
+    '.demo-cat-tabs{display:flex;border-bottom:2px solid #E6E6E6;padding:0 12px;flex-shrink:0;',
+    'overflow-x:auto;scrollbar-width:none}',
+    '.demo-cat-tabs::-webkit-scrollbar{display:none}',
+    '.demo-cat-tab{display:inline-flex;align-items:center;gap:4px;padding:7px 10px;font-size:11px;',
+    'font-weight:600;color:#676767;border:none;background:none;border-bottom:2px solid transparent;',
+    'margin-bottom:-2px;cursor:pointer;letter-spacing:.3px;transition:all .15s;font-family:inherit;white-space:nowrap}',
+    '.demo-cat-tab .material-symbols-outlined{font-size:14px}',
+    '.demo-cat-tab:hover{color:#262626}',
+    '.demo-cat-tab.active{color:#004FB0;border-bottom-color:#004FB0}',
+
+    /* Hint block (淡藍底 + 左藍邊條) */
+    '.demo-pane-hint{font-size:11px;color:#676767;line-height:1.5;margin:0 0 8px;',
+    'padding:8px 10px;background:#F2FAFF;border-left:2px solid #004FB0;border-radius:4px}',
+
+    /* Scroll area (flex 1, hidden scrollbar) */
+    '.demo-popover-scroll{overflow-y:auto;overscroll-behavior:contain;flex:1;min-height:0;',
+    'padding:8px 16px 14px;transition:opacity .12s ease;scrollbar-width:none}',
+    '.demo-popover-scroll::-webkit-scrollbar{display:none}',
+
+    /* Sub-separator (no data divider) */
+    '.demo-sub-sep{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;',
+    'color:#9CAEC4;letter-spacing:.4px;text-transform:uppercase;margin:10px 0 6px}',
+    '.demo-sub-sep::before,.demo-sub-sep::after{content:\'\';flex:1;height:1px;background:rgba(14,58,130,.1)}',
+
+    /* Button group */
+    '.demo-buttons{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}',
+
+    /* Scenario button */
+    '.demo-btn{background:#fff;border:1px solid rgba(14,58,130,.25);color:#0E3A82;',
+    'padding:8px 12px;border-radius:8px;font-size:12px;font-weight:500;',
+    'display:flex;align-items:center;gap:6px;text-align:left;width:100%;',
+    'transition:all .15s;position:relative;cursor:pointer;font-family:inherit}',
+    '.demo-btn:hover{background:rgba(14,58,130,.05);border-color:rgba(14,58,130,.5)}',
+    '.demo-btn.active{background:radial-gradient(circle at 88% 70%,#D9CC4A 0%,rgba(217,204,74,0) 42%),',
+    'radial-gradient(circle at 22% 35%,#4D8DDB 0%,rgba(77,141,219,0) 50%),',
+    'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);color:#fff;border-color:transparent;',
+    'box-shadow:0 2px 6px rgba(13,27,62,.25)}',
+    '.demo-btn .material-symbols-outlined{font-size:16px;flex-shrink:0}',
+
+    /* Disabled button */
+    '.demo-btn.demo-dis{opacity:.42;cursor:not-allowed}',
+    '.demo-btn.demo-dis:hover{background:#fff!important;border-color:rgba(14,58,130,.25)!important}',
+    '.demo-cs{margin-left:auto;font-size:9px;font-weight:700;color:#9CAEC4;',
+    'background:rgba(14,58,130,.06);border-radius:3px;padding:1px 5px;letter-spacing:.3px;flex-shrink:0}',
+
+    /* Empty state when no scenarios match current filters */
+    '.demo-empty{padding:24px 8px;text-align:center;color:#9CAEC4;font-size:12px;line-height:1.5}',
+
+    /* ⚠️ Suppress any global CSS [data-tip]::after on demo elements.
+       Tooltips MUST be handled by #gl-tip (auto-injected below) — pseudo-tooltips
+       get clipped by .demo-popover { overflow: hidden }. */
+    '.demo-btn[data-tip]::after,.demo-btn[data-tip]::before,',
+    '.demo-page-tab[data-tip]::after,.demo-cat-tab[data-tip]::after{display:none!important}',
+
+    /* #gl-tip — body-level fixed tooltip (auto-injected) */
+    '#gl-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:12px;line-height:1.4;',
+    'padding:6px 10px;border-radius:4px;max-width:320px;white-space:normal;',
+    'pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25);',
+    'font-family:\'Noto Sans\',sans-serif}'
+  ].join('');
+
+  var style = document.createElement('style');
+  style.textContent = CSS;
+  document.head.appendChild(style);
+
+  // ===== HELPERS =====
+  function _esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  // Normalise scenario: tab → page (backwards compat)
+  function _normalizedScenarios() {
+    return (window.DEMO_SCENARIOS || []).map(function (s) {
+      return Object.assign({}, s, { page: s.page || s.tab || null });
+    });
+  }
+
+  // Detect rendering mode based on what's configured
+  function _detectMode() {
+    var scenarios = _normalizedScenarios();
+    var hasPages = (window.DEMO_PAGES && window.DEMO_PAGES.length) ||
+                   scenarios.some(function (s) { return !!s.page; });
+    var hasCats  = (window.DEMO_CATEGORIES && window.DEMO_CATEGORIES.length) ||
+                   scenarios.some(function (s) { return !!s.category; });
+    if (hasPages && hasCats) return 'two-layer';
+    if (hasPages) return 'pages-only';
+    if (hasCats)  return 'categories-only';
+    return 'flat';
+  }
+
+  // Auto-derive page list if DEMO_PAGES not provided
+  function _getPages() {
+    if (window.DEMO_PAGES && window.DEMO_PAGES.length) return window.DEMO_PAGES;
+    var seen = {};
+    var pages = [];
+    _normalizedScenarios().forEach(function (s) {
+      if (s.page && !seen[s.page]) {
+        seen[s.page] = true;
+        pages.push({ id: s.page, label: s.page.charAt(0).toUpperCase() + s.page.slice(1), icon: 'tab' });
+      }
+    });
+    return pages;
+  }
+
+  function _getCategories() {
+    return window.DEMO_CATEGORIES || [];
+  }
+
+  // Filter scenarios for current page + category
+  function _filterScenarios() {
+    var scenarios = _normalizedScenarios();
+    return scenarios.filter(function (s) {
+      if (_activePage && s.page && s.page !== _activePage) return false;
+      if (_activePage && !s.page) return false; // page-tab mode requires scenario to have page
+      if (_activeCategory && s.category && s.category !== _activeCategory) return false;
+      if (_activeCategory && !s.category) return false; // cat-tab mode requires scenario to have category
+      return true;
+    });
+  }
+
+  // ===== HTML BUILDERS =====
+  function _renderButtons(scenarios) {
+    if (!scenarios.length) {
+      return '<div class="demo-empty">No scenarios in this view.</div>';
+    }
+    var normal = scenarios.filter(function (s) { return !s.isNoData; });
+    var noData = scenarios.filter(function (s) { return s.isNoData; });
+    var html = _renderGroup(normal);
+    if (noData.length) {
+      html += '<div class="demo-sub-sep">no data</div>' + _renderGroup(noData);
+    }
+    return html;
+  }
+
+  function _renderGroup(scenarios) {
+    if (!scenarios.length) return '';
+    var btns = scenarios.map(function (s) {
+      var dis = s.disabled ? ' demo-dis' : '';
+      var act = s.id === _activeScenario ? ' active' : '';
+      var tip = s.tip ? ' data-tip="' + _esc(s.tip) + '"' : '';
+      var cs = s.disabled ? '<span class="demo-cs">Soon</span>' : '';
+      return '<button class="demo-btn' + dis + act + '"' + tip +
+             ' data-scenario="' + _esc(s.id) + '">' +
+             '<span class="material-symbols-outlined">' + _esc(s.icon || 'play_arrow') + '</span>' +
+             '<span>' + _esc(s.label) + '</span>' + cs + '</button>';
+    }).join('');
+    return '<div class="demo-buttons">' + btns + '</div>';
+  }
+
+  function _renderPageTabs(mode) {
+    var pages = _getPages();
+    if (!pages.length) return '';
+    // 雙層模式：page tabs 用 pill style 放最上面
+    // 單層 pages-only 模式：page tabs 用 underline style（跟 cat-tabs 一致），無第二層
+    var isTwoLayer = mode === 'two-layer';
+    var wrapClass = isTwoLayer ? 'demo-page-tabs' : 'demo-cat-tabs';
+    var tabClass  = isTwoLayer ? 'demo-page-tab' : 'demo-cat-tab';
+    return '<div class="' + wrapClass + '">' + pages.map(function (p) {
+      var act = p.id === _activePage ? ' active' : '';
+      return '<button class="' + tabClass + act + '" data-page="' + _esc(p.id) + '">' +
+             (p.icon ? '<span class="material-symbols-outlined">' + _esc(p.icon) + '</span>' : '') +
+             _esc(p.label) +
+             '</button>';
+    }).join('') + '</div>';
+  }
+
+  function _renderCategoryTabs() {
+    var cats = _getCategories();
+    if (!cats.length) return '';
+    return '<div class="demo-cat-tabs">' + cats.map(function (c) {
+      var act = c.id === _activeCategory ? ' active' : '';
+      return '<button class="demo-cat-tab' + act + '" data-category="' + _esc(c.id) + '">' +
+             (c.icon ? '<span class="material-symbols-outlined">' + _esc(c.icon) + '</span>' : '') +
+             _esc(c.label) +
+             '</button>';
+    }).join('') + '</div>';
+  }
+
+  function _renderHint() {
+    if (!_activeCategory) return '';
+    var cat = _getCategories().find(function (c) { return c.id === _activeCategory; });
+    if (!cat || !cat.hint) return '';
+    return '<div class="demo-pane-hint">' + _esc(cat.hint) + '</div>';
+  }
+
+  function _renderScrollArea() {
+    return _renderHint() + _renderButtons(_filterScenarios());
+  }
+
+  // ===== DOM MOUNTING =====
+  function _render() {
+    if (document.getElementById('demo-fab')) return;
+
+    // Auto-detect first page & category
+    var mode = _detectMode();
+    var pages = _getPages();
+    var cats = _getCategories();
+    if (!_activePage && pages.length) _activePage = pages[0].id;
+    if (!_activeCategory && cats.length) _activeCategory = cats[0].id;
+    if (mode === 'flat') { _activePage = null; _activeCategory = null; }
+    if (mode === 'pages-only') _activeCategory = null;
+    if (mode === 'categories-only') _activePage = null;
+
+    // FAB
+    var fabEl = document.createElement('button');
+    fabEl.className = 'demo-fab';
+    fabEl.id = 'demo-fab';
+    fabEl.title = 'Designer Demo Scenarios';
+    fabEl.innerHTML =
+      '<span class="material-symbols-outlined">science</span>' +
+      '<span class="demo-pulse" id="demo-fab-pulse"></span>';
+    fabEl.addEventListener('click', function () { window._demoFabToggle(); });
+
+    // Popover
+    var popEl = document.createElement('div');
+    popEl.className = 'demo-popover';
+    popEl.id = 'demo-popover';
+    popEl.innerHTML =
+      '<div class="demo-popover-hdr">' +
+        '<div class="demo-popover-title">' +
+          '<span class="material-symbols-outlined" style="font-size:16px">science</span>' +
+          'Demo Scenarios' +
+        '</div>' +
+        '<button class="demo-popover-close" id="demo-pop-close">' +
+          '<span class="material-symbols-outlined" style="font-size:18px">close</span>' +
+        '</button>' +
+      '</div>' +
+      (window.DEMO_DEFAULT
+        ? '<button class="demo-reset-link" id="demo-reset-link">' +
+            '<span class="material-symbols-outlined">refresh</span>Reset to Default</button>'
+        : '') +
+      _renderPageTabs(mode) +
+      _renderCategoryTabs() +
+      '<div class="demo-popover-scroll" id="demo-popover-scroll">' +
+        _renderScrollArea() +
+      '</div>';
+
+    document.body.appendChild(fabEl);
+    document.body.appendChild(popEl);
+
+    // === Event wiring ===
+    document.getElementById('demo-pop-close').addEventListener('click', function () {
+      window._demoFabToggle();
+    });
+
+    // Reset link
+    var resetLink = document.getElementById('demo-reset-link');
+    if (resetLink && window.DEMO_DEFAULT) {
+      resetLink.addEventListener('click', function () {
+        window._demoFabApply(window.DEMO_DEFAULT, null);
+      });
+    }
+
+    // Page tabs
+    popEl.querySelectorAll('.demo-page-tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        window._demoFabSetPage(t.dataset.page);
+      });
+    });
+
+    // Category tabs (also handles page tabs in pages-only mode, where they use demo-cat-tab class)
+    popEl.querySelectorAll('.demo-cat-tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        if (t.dataset.page) {
+          window._demoFabSetPage(t.dataset.page);
+        } else {
+          window._demoFabSetCategory(t.dataset.category);
+        }
+      });
+    });
+
+    // Scenario button clicks (event delegation on scroll area)
+    document.getElementById('demo-popover-scroll').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-scenario]');
+      if (!btn || btn.classList.contains('demo-dis')) return;
+      window._demoFabApply(btn.dataset.scenario, btn);
+    });
+
+    // Outside click to close
+    document.addEventListener('click', function (e) {
+      var pop = document.getElementById('demo-popover');
+      var fab = document.getElementById('demo-fab');
+      if (!pop || !fab) return;
+      if (!pop.contains(e.target) && !fab.contains(e.target) && pop.classList.contains('show')) {
+        pop.classList.remove('show');
+        fab.classList.remove('popped');
+      }
+    });
+
+    _injectGlobalTooltip();
+  }
+
+  // ===== #gl-tip auto-injection =====
+  function _injectGlobalTooltip() {
+    if (document.getElementById('gl-tip')) return; // host page already provides one
+    var tip = document.createElement('div');
+    tip.id = 'gl-tip';
+    document.body.appendChild(tip);
+    var cur = null;
+    document.addEventListener('mouseover', function (e) {
+      var el = e.target.closest('[data-tip]');
+      if (!el || el === cur) return;
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block';
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!cur) return;
+      var tw = tip.offsetWidth, th = tip.offsetHeight;
+      var x = e.clientX - tw / 2, y = e.clientY - th - 10;
+      if (x < 8) x = 8;
+      if (x + tw > window.innerWidth - 8) x = window.innerWidth - tw - 8;
+      if (y < 8) y = e.clientY + 16;
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    });
+    document.addEventListener('mouseout', function (e) {
+      var el = e.target.closest('[data-tip]');
+      if (el && el === cur) { cur = null; tip.style.display = 'none'; }
+    });
+  }
+
+  // ===== PUBLIC API =====
+  function _refreshScrollArea() {
+    var scroll = document.getElementById('demo-popover-scroll');
+    if (!scroll) return;
+    scroll.style.opacity = '0';
+    setTimeout(function () {
+      scroll.innerHTML = _renderScrollArea();
+      scroll.style.opacity = '1';
+    }, 120);
+  }
+
+  function _refreshTabs() {
+    var pop = document.getElementById('demo-popover');
+    if (!pop) return;
+    pop.querySelectorAll('.demo-page-tab').forEach(function (t) {
+      t.classList.toggle('active', t.dataset.page === _activePage);
+    });
+    pop.querySelectorAll('.demo-cat-tab').forEach(function (t) {
+      // In pages-only mode, cat-tab elements carry data-page (not data-category)
+      if (t.dataset.page) {
+        t.classList.toggle('active', t.dataset.page === _activePage);
+      } else {
+        t.classList.toggle('active', t.dataset.category === _activeCategory);
+      }
+    });
+  }
+
+  /** Toggle popover open/close */
+  window._demoFabToggle = function () {
+    var pop = document.getElementById('demo-popover');
+    var fab = document.getElementById('demo-fab');
+    var pulse = document.getElementById('demo-fab-pulse');
+    var opening = !pop.classList.contains('show');
+    pop.classList.toggle('show');
+    fab.classList.toggle('popped');
+    if (opening && pulse) pulse.style.display = 'none';
+  };
+
+  /** Set active page tab (internal + external) */
+  window._demoFabSetPage = function (pageId) {
+    if (_activePage === pageId) return;
+    _activePage = pageId;
+    _refreshTabs();
+    _refreshScrollArea();
+  };
+
+  /** Set active category tab */
+  window._demoFabSetCategory = function (catId) {
+    if (_activeCategory === catId) return;
+    _activeCategory = catId;
+    _refreshTabs();
+    _refreshScrollArea();
+  };
+
+  /**
+   * Called from prototype's navigation function to auto-switch the page tab.
+   * Only switches if the popover doesn't need to stay on current tab.
+   */
+  window.demoFabSwitchTab = function (pageId) {
+    window._demoFabSetPage(pageId);
+  };
+
+  /** Apply a scenario — called via event delegation or by host */
+  window._demoFabApply = function (id, btn) {
+    _activeScenario = id;
+    document.querySelectorAll('.demo-btn').forEach(function (b) {
+      b.classList.remove('active');
+    });
+    if (btn) {
+      btn.classList.add('active');
+    } else {
+      // No btn provided (e.g. Reset link) — find scenario in DOM
+      var found = document.querySelector('[data-scenario="' + id + '"]');
+      if (found) found.classList.add('active');
+    }
+    if (typeof window.DEMO_APPLY === 'function') {
+      window.DEMO_APPLY(id, btn);
+    }
+  };
+
+  // ===== INIT =====
+  function _init() {
+    if (_activeScenario === null && window.DEMO_DEFAULT) {
+      _activeScenario = window.DEMO_DEFAULT;
+    }
+    _render();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else {
+    _init();
+  }
+})();
+
+</script>
+</body>
+</html>
