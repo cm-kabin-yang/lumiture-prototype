@@ -1370,11 +1370,12 @@ function renderTable(){
     }else{
     g.months.forEach((mv, mi) => {
       // PRD §7.3/§9: Budget view only — supervisor 看下層 subordinate 的 budget > 自己設給他的 cap
-      // 看下視角 (looking-down)：
-      //   - Admin (warningOn:'group-row') → Tier 1 group row 月份格 amber dot "Tier 1 Budget Over Your Cap"
+      // 看下視角 (looking-down)。關鍵：per-month dot 只在「該層的分配粒度是逐月」時才有對應 cap 語意。
+      //   - Admin (warningOn:'group-row') → **保留 per-month dot**：Admin 是逐月設定每個 T1 組的 cap，
+      //       且拿得到 T1 往下分給 T2 的該月總和 → per-month 真的會打架 → dot 有對應基準（Kabin 2026-06-23 確認）。
       //   - T1 Manager (warningOn:'allocated-row') → **不顯示 per-month dot**（設計稿 #05-1，FE 回饋後團隊定案 2026-06-23）：
-      //       Admin 給 T1 是「整包年度預算」（非 per-month），T1 再整包分配給 T2，per-month 維度的超標
-      //       在這層沒有對應的 cap 語意 → dot 放錯維度反而誤導。T1 看 T2 超標統一收斂到 Total row 紅字 + tooltip。
+      //       T1 往 T2 是「整包分配」（非逐月），這層沒有 per-month cap → dot 找不到對應基準反而誤導。
+      //       T1 看 T2 的超標統一收斂到 Total row 紅字 + tooltip。
       //   - T2 (warningOn:'total-row') → 不顯示 group row dot（T2 只在 Total row 看 looking-up 警示）
       const capConflict = !state.editing && view === 'budget'
         && role.warningOn === 'group-row'
