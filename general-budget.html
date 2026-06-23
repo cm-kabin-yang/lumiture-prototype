@@ -1370,22 +1370,22 @@ function renderTable(){
     }else{
     g.months.forEach((mv, mi) => {
       // PRD §7.3/§9: Budget view only — supervisor 看下層 subordinate 的 budget > 自己設給他的 cap
-      // 看下視角 (looking-down)：role-aware tier label
-      //   - Admin (warningOn:'group-row')         → 看到 "Tier 1 Budget Over Your Cap"
-      //   - T1 Manager (warningOn:'allocated-row') → 看到 "Tier 2 Budget Over Your Cap"
-      //   - T2 (warningOn:'total-row')            → 不顯示 group row dot（T2 只在 Total row 看 looking-up 警示）
-      // 觸發目的：「初始設定剛好但上層砍 cap 後變超」的 timely reminder（也涵蓋初始超 cap 場景）
+      // 看下視角 (looking-down)：
+      //   - Admin (warningOn:'group-row') → Tier 1 group row 月份格 amber dot "Tier 1 Budget Over Your Cap"
+      //   - T1 Manager (warningOn:'allocated-row') → **不顯示 per-month dot**（設計稿 #05-1，FE 回饋後團隊定案 2026-06-23）：
+      //       Admin 給 T1 是「整包年度預算」（非 per-month），T1 再整包分配給 T2，per-month 維度的超標
+      //       在這層沒有對應的 cap 語意 → dot 放錯維度反而誤導。T1 看 T2 超標統一收斂到 Total row 紅字 + tooltip。
+      //   - T2 (warningOn:'total-row') → 不顯示 group row dot（T2 只在 Total row 看 looking-up 警示）
       const capConflict = !state.editing && view === 'budget'
-        && (role.warningOn === 'group-row' || role.warningOn === 'allocated-row')
+        && role.warningOn === 'group-row'
         && isCapConflict(gi, mi);
       const warnCls = capConflict ? ' month-warn' : '';
       let warnTipContent = '';
       if(capConflict && mv !== null && mv !== undefined){
-        const tierLabel = role.warningOn === 'group-row' ? 'Tier 1' : 'Tier 2';
         const fakeCap = Math.round(mv * 0.4);
         const overAmt = mv - fakeCap;
         const overPct = fakeCap > 0 ? Math.round((overAmt / fakeCap) * 100) : 0;
-        warnTipContent = `${tierLabel} Budget Over Your Cap\n• ${tierLabel} Planned: ${fmt(mv)}\n• Your Allocated cap: ${fmt(fakeCap)}\n• Over by ${fmt(overAmt)} (${overPct}% of your cap)`;
+        warnTipContent = `Tier 1 Budget Over Your Cap\n• Tier 1 Planned: ${fmt(mv)}\n• Your Allocated cap: ${fmt(fakeCap)}\n• Over by ${fmt(overAmt)} (${overPct}% of your cap)`;
       }
       const warnTip = warnTipContent ? ` data-tip-tip="${warnTipContent}"` : '';
       if(state.editing && role.editable){
@@ -2475,7 +2475,7 @@ window.DEMO_SCENARIOS = [
   { id:'warn-normal',      page:'warning', label:'All under budget (default)', icon:'check_circle', tip:'所有 group Spent % 0-79%（綠色區間）、Remaining 為正、無 cap-conflict。為 v2 預設狀態。' },
   { id:'warn-approaching', page:'warning', label:'Approaching budget',         icon:'trending_up',  tip:'部分 group Spent % 達 80-99%（amber warn），progress bar 變橘。Remaining 仍為正、尚無 cap 衝突。' },
   { id:'warn-over',        page:'warning', label:'Over budget · Remaining negative', icon:'priority_high',tip:'部分 group 實際 Spend > Budget：Spent % >= 100% 變紅 + Remaining 為負數（紅字 + 負號 + 微紅底色強化）。切到 Remaining monthly view 可看到月份格也有紅色負數。常與 cap-conflict 並存。' },
-  { id:'warn-cap-conflict',page:'warning', label:'T2 sum > T1 cap',            icon:'warning',      tip:'下屬 T2 加總超過上層 T1 月額度：amber dot 在月份格右上角（Budget view 才顯示）。Hover dot 看 tooltip。Admin 降低 cap 時也會觸發此情境。' },
+  { id:'warn-cap-conflict',page:'warning', label:'T1 month > Admin cap',        icon:'warning',      tip:'Admin 視角才有：T1 group 某月 budget 超過 Admin 設的月 cap → amber dot 在月份格右上角（Budget view）。Hover dot 看 tooltip。T1 看 T2 不再顯示 per-month dot（整包分配無 per-month cap 語意，改用 Total row 紅字，設計稿 #05-1）。' },
   { id:'warn-mixed',       page:'warning', label:'Mixed warnings (full demo)', icon:'release_alert',tip:'三種警示同時呈現：部分 group approaching、部分 over、特定月份格 cap-conflict。一次看完整警示體系。' },
   // Modal — 直接打開 Figma 各個彈窗
   { id:'modal-fy',          page:'modal', label:'Edit Start Month',           icon:'event',               tip:'Figma #11 — Edit Fiscal Start Month modal（含 preview chip + warning bullet）。' },
@@ -3042,7 +3042,7 @@ renderFYPicker();
 })();
 
 </script>
-<script src="../shared/lumiture-topbar.js?v=2026-06-22"></script>
+<script src="../shared/lumiture-topbar.js?v=2026-06-22c"></script>
 <script>
 /* === Inlined: shared/demo-fab.js === */
 /*!
