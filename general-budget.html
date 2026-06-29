@@ -3043,7 +3043,440 @@ renderFYPicker();
 })();
 
 </script>
-<script src="../shared/lumiture-topbar.js?v=2026-06-23f"></script>
+<script>
+/* === Inlined: shared/lumiture-topbar.js === */
+/*!
+ * lumiture-topbar.js — Lumiture Shared Topbar + Account Menu
+ *
+ * 用途：navy topbar（右側 icons + user chip）+ 點 user chip 展開的 Account Menu popover。
+ * Account Menu 對齊 Figma General Behavior #01-3 / #01-4，核心是 LT-3138/LT-3140
+ * (User Menu + AI Quota) v1.19.0 的 AI Quota box。
+ * Warning/Depleted 項目用 hover tooltip 說明（無 Contact Sales 動作 — PM 確認無 per-user 業務 email）。
+ *
+ * 共用即一致：所有 prototype 只要載入這支檔，user chip 點開就是同一版 menu。
+ *
+ * Usage in prototype HTML:
+ *   1. (Optional) Define window.LUMITURE_USER       — 見下方 Schema，沒設就吃預設
+ *   2. (Optional) Define window.LUMITURE_TOPBAR_ICONS — array of {icon, title, onclick, badge?}
+ *   3. Add mount point: <header id="lt-topbar"></header>
+ *   4. <script src="../shared/lumiture-topbar.js?v=YYYY-MM-DD"><\/script>
+ *
+ * Schema (所有欄位皆 optional，未填吃 DEFAULT_USER)：
+ *   window.LUMITURE_USER = {
+ *     name:        'Kabin Yang',
+ *     email:       'kabin.yang@mile.cloud',
+ *     role:        'Admin',                 // role chip 文字（Admin 無群組後綴；其餘 'Manager - Cost Center'）
+ *     initials:    'KY',                    // avatar 圓圈內字
+ *     gradient:    'linear-gradient(...)',  // optional avatar bg override
+ *     canSwitchRole: true,                  // false → 隱藏「View as Another Role」(只有可切換角色者顯示)
+ *     plan:        'Standard',              // Essential | Starter | Standard | Premium | none  (決定 AI Quota box 顯示哪些項目)
+ *     planDateRange: '2 Aug 2025 ~ 2 Aug 2035',
+ *     product:     'LumiTure.ai',
+ *     version:     'v1.19.0',               // Software version 列
+ *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
+ *     quota: {                              // AI Quota box 數據；total 已含 add-on
+ *       refreshDate: 'Jul 1, 2026',         // 下次重置日（= 自然月下月 1 號）
+ *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
+ *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
+ *     },
+ *   };
+ *
+ * Public API:
+ *   window.LumitureTopbar.setUser({...})          — 更新並 rerender
+ *   window.LumitureTopbar.setRole('Manager - ...')— 只更新 role chip（Demo FAB role 切換用）
+ *   window.LumitureTopbar.setPlan('Essential')    — 切 plan（連動 AI Quota box 顯示項目）
+ *   window.LumitureTopbar.setQuota({analyses:{...}, rightsizing:{...}, refreshDate, addonPacks})
+ *   window.LumitureTopbar.openMenu() / closeMenu() / toggleMenu()
+ *   window.LumitureTopbar.rerender()
+ */
+(function () {
+  'use strict';
+
+  // ===== Defaults ===== (預設給 Standard plan + Normal 狀態，所有既有 prototype 直接吃，不破版)
+  var DEFAULT_USER = {
+    name: 'Kabin Yang',
+    email: 'kabin.yang@mile.cloud',
+    role: 'Admin',
+    initials: 'KY',
+    canSwitchRole: true,
+    plan: 'Standard',
+    planDateRange: '2 Aug. 2025 ~ 2 Aug. 2035',
+    product: 'LumiTure.ai',
+    version: 'v1.19.0',
+    addonPacks: 0,
+    quota: {
+      refreshDate: '2 Jul. 2026',
+      analyses:    { used: 32,  total: 80 },
+      rightsizing: { used: 410, total: 1000 },
+    },
+  };
+
+  var DEFAULT_ICONS = [
+    { icon: 'notifications', title: 'Notifications', badge: true },
+  ];
+
+  // plan → 顯示哪些 quota 項目
+  //   Essential = 兩項（照 Notion PRD，2026-06-22 Kabin 拍板）；Starter = 只 analyses；
+  //   Standard = 兩項；Premium/none = 不顯示 box
+  //   ⚠ specs ai-quota README 說 Essential 只 rightsizing，與 PRD 衝突、待 PM 對齊；此處照 PRD
+  var PLAN_QUOTA_ITEMS = {
+    Essential: ['analyses', 'rightsizing'],
+    Starter:   ['analyses'],
+    Standard:  ['analyses', 'rightsizing'],
+    Premium:   [],
+    none:      [],
+  };
+
+  // quota key → 顯示用標籤 / Limit Reached 對話框文案變數（對齊最新 PRD：unit = Rightsizing scans）
+  var QUOTA_META = {
+    analyses:    { label: 'AI-Powered Analyses', dialogLabel: 'Cost Dashboard',     unit: 'AI-powered analyses' },
+    rightsizing: { label: 'Rightsizing Scans',   dialogLabel: 'Usage Optimization', unit: 'Rightsizing scans' },
+  };
+
+  // plan banner 配色（對齊 Figma #01-4：Essential 灰 / Starter 藍 / Standard 深藍 / Premium 金）
+  var PLAN_BANNER = {
+    Essential: 'background:#5B6B7F',
+    Starter:   'background:#2E6DB4',
+    Standard:  'background:#16407C',
+    Premium:   'background:linear-gradient(90deg,#B8901F 0%,#E3BC55 100%)',
+    none:      'background:#5B6B7F',
+  };
+
+  // ===== CSS =====
+  var CSS = [
+    /* ---------- Topbar 容器 ---------- */
+    '.lt-topbar{background:#002663;padding:14px 32px;display:flex;align-items:center;justify-content:flex-end;gap:16px;',
+    'position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px;box-sizing:border-box}',
+
+    /* Icon button */
+    '.lt-tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;',
+    'cursor:pointer;color:rgba(255,255,255,.7);background:none;border:none;padding:0;position:relative;font-family:inherit;transition:background .15s,color .15s}',
+    '.lt-tb-ic:hover{background:rgba(255,255,255,.08);color:#fff}',
+    '.lt-tb-ic .material-symbols-outlined{font-size:22px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 22}',
+    '.lt-tb-ic .lt-tb-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:#FF403D;',
+    'border:2px solid #002663;border-radius:50%}',
+
+    /* User chip — avatar + name + role + chevron */
+    '.lt-tb-user{display:flex;align-items:center;gap:10px;padding-left:16px;margin-left:0;',
+    'border-left:1px solid rgba(255,255,255,.1);color:#fff;cursor:pointer;transition:opacity .15s;background:none;border-top:none;border-right:none;border-bottom:none}',
+    '.lt-tb-user:hover{opacity:.92}',
+    '.lt-tb-avatar-ic{font-size:34px;color:#fff;flex-shrink:0;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 34}',
+    '.lt-tb-user-text{display:flex;flex-direction:column;font-size:12px;line-height:1.3;min-width:0;font-family:\'Noto Sans\',sans-serif;text-align:left}',
+    '.lt-tb-user-name{font-weight:600;color:#fff;white-space:nowrap}',
+    '.lt-tb-user-role{color:rgba(255,255,255,.6);font-size:11px;white-space:nowrap}',
+    '.lt-tb-chev{color:rgba(255,255,255,.6);font-size:20px;transition:transform .18s}',
+    '.lt-tb-user.is-open .lt-tb-chev{transform:rotate(180deg)}',
+
+    /* ---------- Account Menu popover ---------- */
+    '.lt-am-backdrop{position:fixed;inset:0;z-index:1000;background:transparent}',
+    '.lt-am{position:fixed;top:62px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
+    'box-shadow:0 4px 16px rgba(0,0,0,.28);overflow:hidden;font-family:\'Noto Sans\',sans-serif;color:#fff;',
+    'animation:lt-am-in .14s ease;transform-origin:top right}',
+    '@keyframes lt-am-in{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}',
+    '.lt-am-hidden{display:none!important}',
+
+    /* Plan banner */
+    '.lt-am-plan{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;color:#fff}',
+    '.lt-am-plan-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-plan-date{font-size:11px;font-weight:500;opacity:.85;white-space:nowrap;letter-spacing:.2px;text-transform:uppercase}',
+
+    /* User identity */
+    '.lt-am-id{padding:14px 16px 12px}',
+    '.lt-am-id-name{font-size:15px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-id-email{font-size:12px;color:rgba(255,255,255,.62);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-chip{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:3px 10px 3px 8px;',
+    'background:#1E5FA8;border-radius:9999px;font-size:11px;font-weight:600;color:#fff}',
+    '.lt-am-chip .material-symbols-outlined{font-size:14px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 14}',
+
+    /* ---------- AI Quota box (navy 內嵌，彩色圓點 + 提亮狀態色，對齊設計稿) ---------- */
+    '.lt-q{padding:12px 16px}',
+    '.lt-q-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}',
+    '.lt-q-title{font-size:13px;font-weight:700;color:#fff}',
+    '.lt-q-sub{font-size:11px;color:rgba(255,255,255,.5);white-space:nowrap;letter-spacing:.1px}',
+    /* quota item — 高度固定（per spec：切狀態版面不跳動）；warning/depleted 有 hover tooltip */
+    '.lt-q-item{display:flex;align-items:center;gap:9px;padding:5px 8px;margin:0 -8px;border-radius:6px;position:relative;transition:background .12s}',
+    '.lt-q-item.has-tip{cursor:help}',
+    '.lt-q-item.has-tip:hover{background:rgba(255,255,255,.07)}',
+    '.lt-q-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}',
+    '.lt-q-label{font-size:12.5px;color:rgba(255,255,255,.9);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-q-val{font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:3px}',
+    '.lt-q-val .material-symbols-outlined{font-size:13px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 13}',
+    /* hover tooltip（Lumiture 非圖表 tooltip 規範：#3C3C3C 深底白字） */
+    '.lt-q-tip{position:absolute;top:calc(100% + 2px);left:8px;right:8px;z-index:5;background:#3C3C3C;color:#fff;',
+    'font-size:11.5px;font-weight:400;line-height:1.45;padding:8px 10px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.3);',
+    'opacity:0;visibility:hidden;transform:translateY(-2px);transition:opacity .12s,transform .12s;pointer-events:none}',
+    '.lt-q-item.has-tip:hover .lt-q-tip,.lt-q-item.has-tip:focus-within .lt-q-tip{opacity:1;visibility:visible;transform:none}',
+    /* 狀態色（提亮一階給 navy 深底，dot + value 同色） */
+    '.lt-q-item.is-active    .lt-q-dot{background:#2DD4BF}', '.lt-q-item.is-active    .lt-q-val{color:#2DD4BF}',
+    '.lt-q-item.is-warning   .lt-q-dot{background:#FBBF24}', '.lt-q-item.is-warning   .lt-q-val{color:#FBBF24}',
+    '.lt-q-item.is-depleted  .lt-q-dot{background:#FF6B68}', '.lt-q-item.is-depleted  .lt-q-val{color:#FF6B68}',
+    '.lt-q-item.is-unlimited .lt-q-dot{background:#4ADFFF}', '.lt-q-item.is-unlimited .lt-q-val{color:#4ADFFF}',
+    /* add-on 行 */
+    '.lt-q-addon{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;color:#4ADFFF;font-weight:500}',
+    '.lt-q-addon .material-symbols-outlined{font-size:14px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 14}',
+    /* loading / error */
+    '.lt-q-skel{height:13px;border-radius:4px;margin:9px 0;background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.16),rgba(255,255,255,.08));background-size:200% 100%;animation:lt-q-shimmer 1.3s infinite}',
+    '.lt-q-skel-sub{width:120px;height:11px;margin:0;display:inline-block}',
+    '@keyframes lt-q-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}',
+    '.lt-q-err{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.75);padding:4px 0}',
+    '.lt-q-err-msg{flex:1;min-width:0}',
+    '.lt-q-err .material-symbols-outlined{font-size:16px;color:rgba(255,255,255,.55);font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 16}',
+    '.lt-q-err a{color:#4ADFFF;font-weight:600;cursor:pointer;flex-shrink:0}',
+
+    /* ---------- Menu action items ---------- */
+    '.lt-am-div{height:1px;background:rgba(255,255,255,.1)}',
+    '.lt-am-item{display:flex;align-items:center;gap:12px;padding:12px 16px;color:#fff;cursor:pointer;',
+    'background:none;border:none;width:100%;font-family:inherit;font-size:13.5px;text-align:left;transition:background .12s}',
+    '.lt-am-item:hover{background:rgba(255,255,255,.07)}',
+    '.lt-am-item .material-symbols-outlined{font-size:20px;color:rgba(255,255,255,.85);',
+    'font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20}',
+  ].join('');
+
+  function _injectCSS() {
+    if (document.getElementById('lt-topbar-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-topbar-css';
+    s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  // ===== Helpers =====
+  function _esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+  function _user() {
+    var u = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
+    u.quota = Object.assign({}, DEFAULT_USER.quota, (window.LUMITURE_USER || {}).quota || {});
+    return u;
+  }
+  function _status(used, total) {
+    if (!total || total <= 0) return 'active';
+    var pct = used / total * 100;
+    if (pct >= 100) return 'depleted';
+    if (pct >= 80)  return 'warning';
+    return 'active';
+  }
+  function _planItems(plan) {
+    return PLAN_QUOTA_ITEMS[plan] != null ? PLAN_QUOTA_ITEMS[plan] : PLAN_QUOTA_ITEMS.Standard;
+  }
+  function _showQuotaBox(u) {
+    return _planItems(u.plan).length > 0;
+  }
+
+  // ===== Renderers =====
+  function _renderIcon(item) {
+    var attrs = ' class="lt-tb-ic" title="' + _esc(item.title || '') + '"';
+    if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
+    var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
+    return '<button type="button"' + attrs + '>' +
+             '<span class="material-symbols-outlined">' + _esc(item.icon) + '</span>' + badge +
+           '</button>';
+  }
+
+  function _renderUserChip(u) {
+    return '<button type="button" class="lt-tb-user" id="lt-tb-user" aria-haspopup="true" aria-expanded="false">' +
+             '<span class="material-symbols-outlined lt-tb-avatar-ic">account_circle</span>' +
+             '<div class="lt-tb-user-text">' +
+               '<span class="lt-tb-user-name">' + _esc(u.name) + '</span>' +
+               '<span class="lt-tb-user-role" id="lt-tb-user-role">' + _esc(u.role) + '</span>' +
+             '</div>' +
+             '<span class="material-symbols-outlined lt-tb-chev">keyboard_arrow_down</span>' +
+           '</button>';
+  }
+
+  function _renderQuotaItem(key, q, opts) {
+    opts = opts || {};
+    var meta = QUOTA_META[key];
+    // Premium：unlimited（無 used/total，cyan + sparkle，不可點）
+    if (opts.unlimited) {
+      return '<div class="lt-q-item is-unlimited">' +
+               '<span class="lt-q-dot"></span>' +
+               '<span class="lt-q-label">' + _esc(meta.label) + '</span>' +
+               '<span class="lt-q-val">Unlimited<span class="material-symbols-outlined">auto_awesome</span></span>' +
+             '</div>';
+    }
+    var used = q.used || 0, total = q.total || 0;
+    var remaining = Math.max(0, total - used);
+    var st = _status(used, total);
+    // Warning / Depleted 才有 hover tooltip 說明（取代原本點開的 Limit Reached 對話框；
+    // PM 確認無法提供 per-user 業務 email，故改輕量懸停說明，無 Contact Sales 動作）
+    // 文案含變數 {total} {unit} {label}；{label}=Cost Dashboard / Usage Optimization
+    var tip = '';
+    if (st === 'depleted' || st === 'warning') {
+      var verb = st === 'depleted' ? 'has been reached' : 'is approaching';
+      var tipText = 'Your monthly limit (' + total.toLocaleString() + ' ' + meta.unit + ') ' + verb +
+        ' for ' + meta.dialogLabel + '. Please contact your LumiTure.ai representative to purchase ' +
+        'Add-ons to increase your quota for this billing cycle.';
+      tip = '<span class="lt-q-tip">' + _esc(tipText) + '</span>';
+    }
+    var hasTip = tip !== '';
+    return '<div class="lt-q-item is-' + st + (hasTip ? ' has-tip' : '') + '"' + (hasTip ? ' tabindex="0"' : '') + '>' +
+             '<span class="lt-q-dot"></span>' +
+             '<span class="lt-q-label">' + _esc(meta.label) + '</span>' +
+             '<span class="lt-q-val">' + remaining.toLocaleString() + ' / ' + total.toLocaleString() + ' left</span>' +
+             tip +
+           '</div>';
+  }
+
+  function _renderQuotaBox(u) {
+    var isPremium = u.plan === 'Premium';
+    var items = _planItems(u.plan);
+    if (!items.length && !isPremium) return '';   // 無有效 plan：不顯示（理論上不會發生）
+    // Premium（unlimited）不重置 → header 只顯示 Org-wide，不接 refresh 日
+    var sub = isPremium ? 'Org-wide' : 'Org-wide, refresh on ' + _esc(u.quota.refreshDate);
+    var head = '<div class="lt-q-head">' +
+                 '<span class="lt-q-title">AI Quota</span>' +
+                 '<span class="lt-q-sub">' + sub + '</span>' +
+               '</div>';
+    // loading（refresh 日也尚未載入 → sub 一併 skeleton）
+    if (u.quota.state === 'loading') {
+      return '<div class="lt-q">' +
+               '<div class="lt-q-head"><span class="lt-q-title">AI Quota</span>' +
+                 '<span class="lt-q-skel lt-q-skel-sub"></span></div>' +
+               '<div class="lt-q-skel" style="width:78%"></div><div class="lt-q-skel" style="width:62%"></div>' +
+             '</div>';
+    }
+    // error（partial degrade：只有這塊壞，menu 其他項照常）；refresh 日未載入 → sub 只顯示 Org-wide；Retry 右對齊
+    if (u.quota.state === 'error') {
+      var headErr = '<div class="lt-q-head"><span class="lt-q-title">AI Quota</span><span class="lt-q-sub">Org-wide</span></div>';
+      return '<div class="lt-q">' + headErr +
+               '<div class="lt-q-err"><span class="material-symbols-outlined">help</span>' +
+               '<span class="lt-q-err-msg">Couldn\'t load quota</span>' +
+               '<a onclick="window.LumitureTopbar.rerender()">Retry</a></div>' +
+             '</div>';
+    }
+    var rows = isPremium
+      ? ['analyses', 'rightsizing'].map(function (k) { return _renderQuotaItem(k, {}, { unlimited: true }); }).join('')
+      : items.map(function (k) { return _renderQuotaItem(k, u.quota[k] || {}); }).join('');
+    // add-on 行（packs>0，Premium 不適用）；naming 對齊 PRD：單數 "AI Quota Add-on × N"
+    var addon = (!isPremium && (u.addonPacks || 0) > 0)
+      ? '<div class="lt-q-addon"><span class="material-symbols-outlined">auto_awesome</span>' +
+          u.addonPacks + ' × AI Quota Add-ons Activated</div>'
+      : '';
+    return '<div class="lt-q">' + head + rows + addon + '</div>';
+  }
+
+  function _renderMenu(u) {
+    var planName = _esc(u.plan) + ' Plan';
+    var bannerStyle = PLAN_BANNER[u.plan] || PLAN_BANNER.Standard;
+    var viewAs = u.canSwitchRole
+      ? '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'View as Another Role\')">' +
+          '<span class="material-symbols-outlined">sync_alt</span>View as Another Role</button>' +
+        '<div class="lt-am-div"></div>'
+      : '';
+    var box = _renderQuotaBox(u);
+    var quotaSection = box
+      ? '<div class="lt-am-div"></div>' + box + '<div class="lt-am-div"></div>'
+      : '<div class="lt-am-div"></div>';
+    return '<div class="lt-am-backdrop" id="lt-am-backdrop" onclick="window.LumitureTopbar.closeMenu()"></div>' +
+           '<div class="lt-am" id="lt-am" role="menu">' +
+             '<div class="lt-am-plan" style="' + bannerStyle + '">' +
+               '<span class="lt-am-plan-name">' + planName + '</span>' +
+               '<span class="lt-am-plan-date">' + _esc(u.planDateRange) + '</span>' +
+             '</div>' +
+             '<div class="lt-am-id">' +
+               '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
+               '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
+               '<span class="lt-am-chip"><span class="material-symbols-outlined">account_circle</span>' + _esc(u.role) + '</span>' +
+             '</div>' +
+             quotaSection +
+             viewAs +
+             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Profile\')">' +
+               '<span class="material-symbols-outlined">person</span>Profile</button>' +
+             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Settings\')">' +
+               '<span class="material-symbols-outlined">settings</span>Settings</button>' +
+             '<div class="lt-am-div"></div>' +
+             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Log out\')">' +
+               '<span class="material-symbols-outlined">logout</span>Log out</button>' +
+           '</div>';
+  }
+
+  // ===== Mount / state =====
+  var _menuOpen = false;
+
+  function _render() {
+    var mount = document.getElementById('lt-topbar');
+    if (!mount) { console.warn('[lumiture-topbar] Mount point #lt-topbar not found'); return; }
+    var u = _user();
+    var icons = window.LUMITURE_TOPBAR_ICONS || DEFAULT_ICONS;
+    mount.classList.add('lt-topbar');
+    mount.innerHTML = icons.map(_renderIcon).join('') + _renderUserChip(u);
+    var chip = document.getElementById('lt-tb-user');
+    if (chip) chip.addEventListener('click', function (e) { e.stopPropagation(); _toggleMenu(); });
+    _menuOpen = false;
+  }
+
+  function _menuHost() {
+    var host = document.getElementById('lt-am-host');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'lt-am-host';
+      document.body.appendChild(host);
+    }
+    return host;
+  }
+
+  function _openMenu() {
+    var u = _user();
+    _menuHost().innerHTML = _renderMenu(u);
+    _menuOpen = true;
+    var chip = document.getElementById('lt-tb-user');
+    if (chip) { chip.classList.add('is-open'); chip.setAttribute('aria-expanded', 'true'); }
+  }
+  function _closeMenu() {
+    _menuHost().innerHTML = '';
+    _menuOpen = false;
+    var chip = document.getElementById('lt-tb-user');
+    if (chip) { chip.classList.remove('is-open'); chip.setAttribute('aria-expanded', 'false'); }
+  }
+  function _toggleMenu() { _menuOpen ? _closeMenu() : _openMenu(); }
+
+  // Esc 關閉 menu
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && _menuOpen) _closeMenu();
+  });
+
+  // ===== Public API =====
+  window.LumitureTopbar = {
+    setUser: function (user) {
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, user || {});
+      _render(); if (_menuOpen) _openMenu();
+    },
+    setRole: function (role) {
+      var el = document.getElementById('lt-tb-user-role');
+      if (el) el.textContent = role;
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, { role: role });
+      if (_menuOpen) _openMenu();
+    },
+    setPlan: function (plan) {
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, { plan: plan });
+      if (_menuOpen) _openMenu();
+    },
+    setQuota: function (q) {
+      var cur = (window.LUMITURE_USER || {});
+      window.LUMITURE_USER = Object.assign({}, cur, {
+        quota: Object.assign({}, DEFAULT_USER.quota, cur.quota || {}, q || {}),
+      });
+      if (q && typeof q.addonPacks !== 'undefined') window.LUMITURE_USER.addonPacks = q.addonPacks;
+      if (_menuOpen) _openMenu();
+    },
+    openMenu: _openMenu,
+    closeMenu: _closeMenu,
+    toggleMenu: _toggleMenu,
+    rerender: function () { _render(); if (_menuOpen) _openMenu(); },
+    _noop: function (label) { /* 展示用：Profile/Settings/Log out/View as Another Role 點擊佔位 */
+      if (typeof window.LUMITURE_MENU_ACTION === 'function') window.LUMITURE_MENU_ACTION(label);
+    },
+  };
+
+  // ===== INIT =====
+  function _init() { _injectCSS(); _render(); }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else { _init(); }
+})();
+
+</script>
 <script>
 /* === Inlined: shared/demo-fab.js === */
 /*!
