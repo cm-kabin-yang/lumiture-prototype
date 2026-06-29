@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumiture.ai — User Menu v1 (Account Menu + AI Quota)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+/* === Inlined: shared/tokens.css === */
+/* ============================================================
+ * Lumiture Design Tokens
+ * ============================================================
+ * 來源：Figma CMDS + prototype scan + 8 項設計決策 (2026-05-12)
+ * 命名規範：W3C Design Tokens spec（長名結構化 BEM）
+ * 三層架構：Primitive → Semantic → Component
+ * 完整決策紀錄：~/.claude/.../project_design_tokens_decisions.md
+ * ============================================================ */
+
+:root {
+
+  /* ============================================================
+   * LAYER 1 — PRIMITIVE
+   * 原子層：純色號 / 純數值；不直接給 component 用
+   * ============================================================ */
+
+  /* --- Color: Brand Sky Blue (對齊 Figma Theme: LumiTure.ai/Primary) --- */
+  --lt-blue-10: #F2FAFF;   /* Figma: Primary/Light 10 */
+  --lt-blue-20: #D1EEFF;   /* Figma: Primary/Light 20 */
+  --lt-blue-30: #9ED7FF;   /* Figma: Primary/Light 30 */
+  --lt-blue-60: #0B6DD7;   /* Figma: Primary/Light */
+  --lt-blue-70: #004FB0;   /* Figma: Primary/Main */
+  --lt-blue-90: #002663;   /* Figma: Primary/Dark */
+
+  /* --- Color: Brand Turquoise (對齊 Figma Theme: LumiTure.ai/Secondary) --- */
+  --lt-turquoise-10: #F0FFFF;   /* Figma: Turquoise 10 */
+  --lt-turquoise-20: #DBFDFF;   /* Figma: Turquoise 20 */
+  --lt-turquoise-30: #B0F8FF;   /* Figma: Turquoise 30 */
+  --lt-turquoise-60: #4ADFFF;   /* Figma: Turquoise 60 (Chart) */
+  --lt-turquoise-70: #34B5D9;   /* Figma: Secondary/Main */
+  --lt-turquoise-80: #228EB3;   /* Figma: Secondary/Dark */
+
+  /* --- Color: Grey (9 階；同值不同 token = 為未來情境換色保留彈性) --- */
+  --lt-grey-50:  #F6F6F6;
+  --lt-grey-100: #F2F2F2;
+  --lt-grey-200: #E6E6E6;
+  --lt-grey-300: #CCCCCC;
+  --lt-grey-400: #B3B3B3;
+  --lt-grey-500: #676767;
+  --lt-grey-600: #676767;   /* 暫同 500；保留為 icon-default 等情境獨立換色用 */
+  --lt-grey-700: #262626;
+  --lt-grey-800: #262626;   /* 暫同 700；保留為 heading 等情境獨立換色用 */
+  --lt-grey-900: #262626;   /* 暫同 700；保留為 highest contrast 情境用 */
+
+  /* --- Color: Black / White --- */
+  --lt-black: #000000;
+  --lt-white: #FFFFFF;
+
+  /* --- Color: Chart Palette (對齊 Figma General Behavior 規範)
+   * 來源：Figma file 🧞‍♂️-General-Behavior, node 1642-36013
+   * 使用規則：圖表配色一律按 1→10 順序套用；超過 10 個則循環使用
+   * 命名按官方 "#N Main" 編號 + 視覺色名註解
+   */
+  --lt-chart-1:  #7A8BA9;   /* CMDS Color Kit Main #1 — Navy Blue 50 */
+  --lt-chart-2:  #9ED7FF;   /* CMDS Color Kit Main #2 — Sky Blue 30 (corrected from #86CBFC 2026-05-21; #86CBFC is GCP brand color, not CMDS palette) */
+  --lt-chart-3:  #9CF3FF;   /* CMDS Color Kit Main #3 — Turquoise Blue 40 */
+  --lt-chart-4:  #00DCC2;   /* CMDS Color Kit Main #4 — Green 60 */
+  --lt-chart-5:  #94F29D;   /* CMDS Color Kit Main #5 — Emerald Green 40 */
+  --lt-chart-6:  #F3BE68;   /* CMDS Color Kit Main #6 — Tangerine Orange 40 */
+  --lt-chart-7:  #F4B581;   /* CMDS Color Kit Main #7 — Lantern Orange 50 */
+  --lt-chart-8:  #FFA4A9;   /* CMDS Color Kit Main #8 — Red 30 */
+  --lt-chart-9:  #FE89C1;   /* CMDS Color Kit Main #9 — Fuchsia 30 */
+  --lt-chart-10: #C096FF;   /* CMDS Color Kit Main #10 — Purple 40 */
+  --lt-chart-11: #B3B3B3;   /* CMDS Color Kit Main #11 — Gray 30 (for n+1 fallback) */
+
+  /* --- Color: Functional (TBC — Figma 未做 Variable，待下輪 audit) --- */
+  --lt-color-success-base:  #00B5A6;   /* TBC: Figma audit needed */
+  --lt-color-success-dark:  #008F88;   /* TBC: Figma audit needed */
+  --lt-color-success-light: #E6FFF8;   /* TBC: Figma audit needed */
+  --lt-color-error-base:    #FF403D;   /* TBC: Figma audit needed */
+  --lt-color-error-light:   #FFEBEF;   /* TBC: Figma audit needed */
+  --lt-color-warning-base:  #FC9A0F;   /* TBC: Figma audit needed */
+  --lt-color-warning-light: #FEF3E1;   /* TBC: Figma audit needed */
+  --lt-color-info-base:     #0B6DD7;   /* = blue-60，符合 Figma info usage */
+  --lt-color-info-light:    #E6F6FF;   /* TBC: Figma audit needed */
+
+  /* --- Spacing: 嚴格 8px grid，4px 為微間距例外 --- */
+  --lt-space-0:    0;
+  --lt-space-4:    4px;     /* 例外：僅限 icon-text gap、border-thin 等微間距 */
+  --lt-space-8:    8px;
+  --lt-space-16:   16px;
+  --lt-space-24:   24px;
+  --lt-space-32:   32px;
+  --lt-space-48:   48px;
+  --lt-space-64:   64px;
+  --lt-space-96:   96px;
+  --lt-space-128:  128px;
+
+  /* --- Radius --- */
+  --lt-radius-none:   0;
+  --lt-radius-xs:     3px;      /* chips / badges / 薄狀指示器 (源自 lumi-tag v7 5 處用法) */
+  --lt-radius-sm:     4px;
+  --lt-radius-md:     8px;
+  --lt-radius-lg:     12px;
+  --lt-radius-xl:     16px;
+  --lt-radius-pill:   9999px;   /* pill button / chip — 矩形元素的最大圓角 */
+  --lt-radius-circle: 50%;      /* 圓形 icon / avatar / toggle dot — 形狀無關 */
+
+  /* --- Typography: Font Family --- */
+  --lt-font-sans: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'PingFang TC', sans-serif;
+  --lt-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* --- Typography: Font Size (對齊 Figma 8 階；13px 為例外備用) --- */
+  --lt-fs-12: 12px;   /* Figma: Caption */
+  --lt-fs-13: 13px;   /* 例外：半 body 半 caption 過渡用；不在 Figma 主規範 */
+  --lt-fs-14: 14px;   /* Figma: Body / Button Regular 1 / Link */
+  --lt-fs-16: 16px;   /* Figma: H6 / Button 2 */
+  --lt-fs-18: 18px;   /* Figma: H5 / Subtitle */
+  --lt-fs-20: 20px;   /* Figma: H4 */
+  --lt-fs-24: 24px;   /* Figma: H3 */
+  --lt-fs-36: 36px;   /* Figma: H2 */
+  --lt-fs-48: 48px;   /* Figma: H1 */
+
+  /* --- Typography: Font Weight --- */
+  --lt-fw-regular:  400;
+  --lt-fw-medium:   500;
+  --lt-fw-semibold: 600;   /* Figma: Button Medium 2 */
+  --lt-fw-bold:     700;
+
+  /* --- Typography: Line Height (對齊 Figma; Body 系列 1.75) --- */
+  --lt-leading-heading: 1.25;   /* Figma: H1 */
+  --lt-leading-tight:   1.5;    /* Figma: H2-H6 / Caption / Button / Link */
+  --lt-leading-body:    1.75;   /* Figma: Body Regular/Medium/Bold */
+
+  /* --- Typography: Letter Spacing (對齊 Figma: 全部 0) --- */
+  --lt-tracking-normal: 0;
+
+  /* --- Shadow: 對齊 CMDS Figma 規範 (2026-05-12 audit)
+   * 來源：Figma node 20599-107518 — CMDS 4 個官方 shadow variables
+   * 命名按「用途」而非「強度」(Cell / Button / Chip / Dialog)，跟 Material/Tailwind 不同
+   * Overlay 系列為 Lumiture 補充規範（CMDS 未涵蓋的較強 floating overlay 場景）
+   */
+  --lt-shadow-cell:   0 2px 0 0 rgba(0, 0, 0, 0.2);              /* 銳邊，blur=0；table row 分隔線替代 */
+  --lt-shadow-button: 0 2px 14px 0 rgba(137, 174, 255, 0.2);     /* 藍色 tinted，#89AEFF；clickable elevation */
+  --lt-shadow-chip:   0 2px 4px 0 rgba(0, 0, 0, 0.3);            /* chip / tag 用，較深 opacity */
+  --lt-shadow-dialog: 0 0 6px 0 rgba(0, 0, 0, 0.2);              /* Card / Dialog / Dropdown 共用；無 offset */
+  --lt-shadow-overlay:        0 4px 12px rgba(0, 0, 0, 0.14);    /* CMDS 未涵蓋；popover / floating menu */
+  --lt-shadow-overlay-strong: 0 4px 16px rgba(0, 0, 0, 0.18);    /* CMDS 未涵蓋；drawer / 較重 overlay */
+
+  /* --- Transition --- */
+  --lt-transition-fast: .15s ease;
+  --lt-transition-base: .2s ease;
+  --lt-transition-slow: .3s ease;
+
+  /* --- Z-index --- */
+  --lt-z-base:     0;
+  --lt-z-elevated: 10;
+  --lt-z-sticky:   100;
+  --lt-z-dropdown: 1000;
+  --lt-z-modal:    2000;
+  --lt-z-tooltip:  3000;
+  --lt-z-toast:    4000;
+
+
+  /* ============================================================
+   * LAYER 2 — SEMANTIC
+   * 語意層：引用 primitive，描述用途；component 預設用此層
+   * ============================================================ */
+
+  /* --- Color: Brand --- */
+  --lt-color-primary:         var(--lt-blue-70);
+  --lt-color-primary-hover:   var(--lt-blue-60);
+  --lt-color-primary-active:  var(--lt-blue-90);
+  --lt-color-primary-bg:      var(--lt-blue-10);
+  --lt-color-primary-bg-emphasized: var(--lt-blue-20);
+
+  --lt-color-secondary:       var(--lt-turquoise-70);
+  --lt-color-secondary-hover: var(--lt-turquoise-60);
+  --lt-color-secondary-bg:    var(--lt-turquoise-10);
+
+  /* --- Color: Functional (alias) --- */
+  --lt-color-success: var(--lt-color-success-base);
+  --lt-color-error:   var(--lt-color-error-base);
+  --lt-color-warning: var(--lt-color-warning-base);
+  --lt-color-info:    var(--lt-color-info-base);
+
+  /* --- Color: Text --- */
+  --lt-color-text-primary:   var(--lt-grey-700);   /* 內文預設 */
+  --lt-color-text-secondary: var(--lt-grey-500);   /* 次要文字 */
+  --lt-color-text-tertiary:  var(--lt-grey-400);   /* hint / placeholder */
+  --lt-color-text-disabled:  var(--lt-grey-400);
+  --lt-color-text-inverse:   var(--lt-white);
+  --lt-color-text-link:      var(--lt-blue-60);
+  --lt-color-text-heading:   var(--lt-grey-800);   /* 為未來 heading 獨立換色預留 */
+  --lt-color-text-icon:      var(--lt-grey-600);   /* 為未來 icon 獨立換色預留 */
+
+  /* --- Color: Background --- */
+  --lt-color-bg-default:    var(--lt-white);
+  --lt-color-bg-subtle:     var(--lt-grey-50);
+  --lt-color-bg-emphasized: var(--lt-grey-100);
+  --lt-color-bg-disabled:   var(--lt-grey-100);
+  --lt-color-bg-inverse:    var(--lt-blue-90);
+  --lt-color-bg-overlay:    rgba(0, 0, 0, 0.5);
+
+  /* --- Color: Border --- */
+  --lt-color-border-default: var(--lt-grey-200);
+  --lt-color-border-strong:  var(--lt-grey-300);
+  --lt-color-border-focus:   var(--lt-color-primary);
+  --lt-color-border-input:   #DCE3EC;   /* prototype --tf-border；略不同於 grey-200 */
+  --lt-color-border-error:   var(--lt-color-error-base);
+
+
+  /* ============================================================
+   * LAYER 3 — COMPONENT
+   * 元件層：給特定元件使用；引用 semantic
+   * ============================================================ */
+
+  /* --- Sidebar (深海軍藍) --- */
+  --lt-sidebar-width:      264px;
+  --lt-sidebar-bg:         var(--lt-blue-90);
+  --lt-sidebar-text:       rgba(255, 255, 255, 0.85);
+  --lt-sidebar-text-muted: rgba(255, 255, 255, 0.50);
+  --lt-sidebar-hover-bg:   rgba(255, 255, 255, 0.06);
+  --lt-sidebar-active-bg:  var(--lt-color-primary);
+
+  /* --- Topbar --- */
+  --lt-topbar-bg:     var(--lt-white);
+  --lt-topbar-shadow: var(--lt-shadow-dialog);   /* CMDS Dialog shadow（Card 級別 elevation）*/
+
+  /* --- Card --- */
+  --lt-card-bg:      var(--lt-color-bg-default);
+  --lt-card-radius:  var(--lt-radius-md);
+  --lt-card-shadow:  var(--lt-shadow-dialog);    /* CMDS 明確規範 Card 用 Dialog shadow */
+  --lt-card-padding: var(--lt-space-24);
+
+  /* --- Button --- */
+  --lt-button-radius:     var(--lt-radius-sm);
+  --lt-button-padding-x:  var(--lt-space-16);
+  --lt-button-padding-y:  var(--lt-space-8);
+  --lt-button-focus-ring: 0 0 0 3px rgba(0, 79, 176, 0.10);
+
+  /* --- Input / Text Field --- */
+  --lt-input-bg:        var(--lt-color-bg-default);
+  --lt-input-border:    var(--lt-color-border-input);
+  --lt-input-radius:    var(--lt-radius-sm);
+  --lt-input-padding-x: var(--lt-space-16);
+  --lt-input-padding-y: var(--lt-space-8);
+
+  /* --- Modal --- */
+  --lt-modal-radius:   var(--lt-radius-lg);
+  --lt-modal-shadow:   var(--lt-shadow-dialog);  /* CMDS Dialog shadow（Modal = Dialog 同類）*/
+  --lt-modal-padding:  var(--lt-space-24);
+  --lt-modal-backdrop: rgba(0, 0, 0, 0.5);
+
+  /* --- Tooltip --- */
+  --lt-tooltip-bg:      #3C3C3C;            /* 對齊 Lumiture-Guideline.md 規範；非品牌色，刻意不引用 brand token */
+  --lt-tooltip-text:    var(--lt-white);
+  --lt-tooltip-radius:  var(--lt-radius-sm);
+  --lt-tooltip-padding: var(--lt-space-8);
+}
+
+
+/* ============================================================
+ * NOT YET DEFINED (Pass 3+)
+ * ============================================================
+ * - ~~Chart palette~~ ✅ 已加入（2026-05-12 從 Figma General Behavior file audit）
+ * - Gradient tokens (Figma 有 Lumiture.ai Blue / Orange / Lemon C 等)
+ * - Opacity tokens (Figma 有 CM Opacity Color 系列)
+ * - Composite typography tokens (--lt-type-h1, --lt-type-body 等 style sets)
+ * - Focus / Inset shadow 特殊變體
+ * - Dark mode 對應 token
+ *
+ * Shadow 結構待 Figma audit：v7/v8 用單層、tokens.css 主階用雙層；Overlay 已用單層作折衷
+ * ============================================================ */
+
+</style>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overscroll-behavior: none; }
+body {
+  font-family: var(--lt-font-sans);
+  font-size: var(--lt-fs-14); font-weight: 400; color: var(--lt-color-text-primary);
+  background: var(--lt-blue-10); letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: inherit; font-size: inherit; cursor: pointer; border: none; background: none; color: inherit; letter-spacing: 0; }
+a { color: inherit; text-decoration: none; }
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-size: 20px; line-height: 1; vertical-align: middle; user-select: none;
+}
+
+/* LAYOUT */
+.app { display: flex; min-height: 100vh; }
+#lt-sidebar { flex-shrink: 0; }
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.content { flex: 1; padding: 48px 32px; display: flex; align-items: flex-start; justify-content: center; }
+
+/* Hint card */
+.hint { max-width: 560px; background: #fff; border-radius: var(--lt-radius-md); box-shadow: var(--lt-shadow-dialog);
+  padding: 32px; text-align: center; }
+.hint-arrow { display: inline-flex; align-items: center; gap: 6px; color: var(--lt-color-primary);
+  font-weight: 600; font-size: 13px; margin-bottom: 16px; }
+.hint-arrow .material-symbols-outlined { font-size: 18px; }
+.hint h1 { font-size: var(--lt-fs-20); font-weight: 700; margin-bottom: 10px; color: var(--lt-color-text-heading); }
+.hint p { font-size: 13.5px; line-height: 1.7; color: var(--lt-color-text-secondary); margin-bottom: 14px; }
+.hint ul { text-align: left; font-size: 12.5px; line-height: 1.8; color: var(--lt-color-text-secondary);
+  list-style: none; display: inline-block; }
+.hint li { display: flex; gap: 8px; align-items: flex-start; }
+.hint li .material-symbols-outlined { font-size: 16px; color: var(--lt-color-secondary); margin-top: 2px; }
+
+/* FOOTER */
+.footer { display: flex; align-items: center; justify-content: space-between; padding: 14px 32px;
+  border-top: 1px solid var(--lt-color-border-default); background: #fff; font-size: 12px; color: var(--lt-color-text-secondary); }
+.footer-version { font-weight: 600; color: var(--lt-color-text-primary); display: inline-flex; align-items: center; gap: 8px; }
+.ver-tag { background: #34B5D9; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; }
+.footer-credit { color: #676767; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR — rendered by shared/lumiture-sidebar.js -->
+  <aside id="lt-sidebar"></aside>
+
+  <div class="main">
+    <!-- Shared topbar + Account Menu — see shared/lumiture-topbar.js -->
+    <header id="lt-topbar"></header>
+
+    <div class="content">
+      <div class="hint">
+        <div class="hint-arrow"><span class="material-symbols-outlined">north_east</span>點右上角頭像開啟 Account Menu</div>
+        <h1>User Menu + AI Quota</h1>
+        <p>這是 LT-3138 / LT-3140（v1.19.0）的共用 Account Menu。它掛在共用 topbar 上，所有 prototype 點開頭像都會看到同一版。用左下角的 <span class="material-symbols-outlined" style="font-size:16px; color:var(--lt-color-secondary); vertical-align:-3px;">science</span> Demo 切換情境：</p>
+        <ul>
+          <li><span class="material-symbols-outlined">layers</span>各方案（Essential / Starter / Standard / Premium）顯示哪些 quota 項目</li>
+          <li><span class="material-symbols-outlined">circle</span>Active（綠）/ Warning（琥珀）/ Depleted（紅）+ Loading / Error</li>
+          <li><span class="material-symbols-outlined">info</span>Warning / Depleted 項目 hover 顯示 tooltip 說明（無彈窗、無 Contact Sales）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span class="footer-version">User Menu Prototype<span class="ver-tag">v1</span></span>
+      <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
+    </div>
+  </div>
+</div>
+
+<!-- Demo Scenarios — rendered by shared/demo-fab.js -->
+
+<script>
+// =================================================================
+// DEMO SCENARIOS — 切換 Account Menu 各情境（數值對齊 specs §參考情境）
+// =================================================================
+window.DEMO_CATEGORIES = [
+  { id: 'plan',   label: 'Plan',    icon: 'layers',
+    hint: '不同方案決定 AI Quota box 顯示哪些項目。Standard=兩項（預設）；Essential=兩項（照 PRD）；Starter=只 analyses；Premium=兩項皆 Unlimited。' },
+  { id: 'state',  label: 'State',   icon: 'circle',
+    hint: '以 Standard（兩項）展示用量狀態與資料狀態：<80% 綠 / 80-99% 琥珀 / ≥100% 紅 / Loading / Error。數值取自 specs 參考情境表。' },
+  { id: 'special',label: 'Special', icon: 'tune',
+    hint: '混合狀態、加購後額度提升、角色 chip 變體、不可切換角色（隱藏 View as Another Role）。' },
+];
+
+window.DEMO_SCENARIOS = [
+  // === Plan ===
+  { id: 'plan-standard',  category: 'plan', label: 'Standard（預設・兩項）',  icon: 'workspace_premium',
+    tip: 'Standard plan：AI Quota box 顯示 AI-Powered Analyses + Rightsizing 兩項，皆綠色（32/80、410/1000）。三方資料皆一致，最適合設計稿參照。' },
+  { id: 'plan-essential', category: 'plan', label: 'Essential（兩項）', icon: 'eco',
+    tip: 'Essential plan：照 Notion PRD 顯示 AI-Powered Analyses + Rightsizing 兩項。⚠ specs ai-quota README 說只 rightsizing，與 PRD 衝突待 PM 對齊。' },
+  { id: 'plan-starter',   category: 'plan', label: 'Starter（只 analyses）',  icon: 'rocket_launch',
+    tip: 'Starter plan：只顯示 AI-Powered Analyses 項目（無 rightsizing）。' },
+  { id: 'plan-premium',   category: 'plan', label: 'Premium（Unlimited）',   icon: 'diamond',
+    tip: 'Premium plan：unlimited，兩項皆顯示 Unlimited ✨（cyan，不可點）。金色 plan banner。⚠ 偏離 PRD（PRD 說 Premium 不顯示 box），設計上更友善，待回推 PM。' },
+
+  // === State (Standard, 兩項) ===
+  { id: 'state-normal',   category: 'state', label: 'Normal（綠）',   icon: 'check_circle',
+    tip: 'Active：analyses 32/80、rightsizing 410/1000，皆 <80% 綠色、不可點。' },
+  { id: 'state-warning',  category: 'state', label: 'Warning（琥珀）', icon: 'warning',
+    tip: 'Warning：analyses 70/80 (87.5%)、rightsizing 850/1000 (85%)，皆 80-99% 琥珀色、純預警不可點。' },
+  { id: 'state-depleted', category: 'state', label: 'Depleted（紅）',  icon: 'error',
+    tip: 'Depleted：analyses 80/80、rightsizing 1000/1000，皆 ≥100% 紅色。hover 紅項顯示 tooltip 說明（取代原 Limit Reached 彈窗，無 Contact Sales）。' },
+  { id: 'state-loading',  category: 'state', label: 'Loading（載入中）', icon: 'hourglass_top',
+    tip: 'Quota 資料載入中：box 顯示 2 行 shimmer skeleton（避免 generic spinner）。menu 其他項照常。' },
+  { id: 'state-error',    category: 'state', label: 'Error（抓不到）',   icon: 'error',
+    tip: 'Quota 端點失敗：partial degrade — 只有 box 顯示「Couldn\'t load quota · Retry」，menu 其他項不受影響。' },
+
+  // === Special ===
+  { id: 'special-addon',  category: 'special', label: 'Add-on Active（加購 ×2）', icon: 'add_shopping_cart',
+    tip: '加購 2 包後 total 提升：analyses 92/160、rightsizing 1180/2000，皆回到綠色。（Billing 摘要為階段二，v1.19.0 僅反映在額度提升）' },
+  { id: 'special-mixed',  category: 'special', label: '混合狀態（琥珀+紅）',     icon: 'compare_arrows',
+    tip: 'analyses 琥珀 (72/80)、rightsizing 紅 (1000/1000)。驗證兩項獨立判斷、版面不跳動；hover 各自顯示對應 tooltip。' },
+  { id: 'special-manager',category: 'special', label: '角色 chip：Manager - Group', icon: 'badge',
+    tip: 'Manager 角色 chip 帶群組後綴「Manager - Cost Center」（Admin 以外才有後綴）。' },
+  { id: 'special-noswitch',category:'special', label: '不可切換角色',           icon: 'person_off',
+    tip: 'canSwitchRole=false → 隱藏「View as Another Role」（只有有其他角色可切換的帳號才顯示）。' },
+];
+
+window.DEMO_DEFAULT = 'plan-standard';
+window.DEMO_APPLY = applyScenario;
+
+// 共用 menu 動作佔位（Profile/Settings/Log out/View as Another Role）
+window.LUMITURE_MENU_ACTION = function (label) {
+  console.log('[user-menu demo] clicked:', label);
+};
+
+// 基礎 user
+function baseUser() {
+  return {
+    name: 'Isabella Izzy Rodriguez',
+    email: 'isabella.rc@tech-ventures.co',
+    role: 'Admin',
+    initials: 'IR',
+    canSwitchRole: true,
+    plan: 'Standard',
+    planDateRange: '2 Aug. 2025 ~ 2 Aug. 2035',
+    product: 'LumiTure.ai',
+    version: 'v1.19.0',
+    addonPacks: 0,
+    quota: {
+      refreshDate: '2 Apr. 2035',
+      analyses:    { used: 32,  total: 80 },
+      rightsizing: { used: 410, total: 1000 },
+    },
+  };
+}
+
+function applyScenario(id) {
+  var u = baseUser();
+
+  switch (id) {
+    // Plan
+    case 'plan-standard':  break;
+    case 'plan-essential': u.plan = 'Essential'; break;
+    case 'plan-starter':   u.plan = 'Starter';   break;
+    case 'plan-premium':   u.plan = 'Premium';   break;
+
+    // State
+    case 'state-normal':   break;
+    case 'state-warning':  u.quota.analyses = { used: 70, total: 80 };  u.quota.rightsizing = { used: 850, total: 1000 }; break;
+    case 'state-depleted': u.quota.analyses = { used: 80, total: 80 };  u.quota.rightsizing = { used: 1000, total: 1000 }; break;
+    case 'state-loading':  u.quota.state = 'loading'; break;
+    case 'state-error':    u.quota.state = 'error';   break;
+
+    // Special
+    case 'special-addon':  u.addonPacks = 2; u.quota.analyses = { used: 92, total: 160 }; u.quota.rightsizing = { used: 1180, total: 2000 }; break;
+    case 'special-mixed':  u.quota.analyses = { used: 72, total: 80 };  u.quota.rightsizing = { used: 1000, total: 1000 }; break;
+    case 'special-manager':u.role = 'Manager - Cost Center'; u.name = 'John Doue'; u.email = 'jdoe@email.com'; u.initials = 'JD'; break;
+    case 'special-noswitch': u.canSwitchRole = false; break;
+  }
+
+  window.LUMITURE_USER = u;
+  window.LumitureTopbar.rerender();
+  window.LumitureTopbar.openMenu();
+}
+
+// 初始載入即套預設情境並開啟 menu
+window.addEventListener('load', function () {
+  setTimeout(function () { applyScenario(window.DEMO_DEFAULT); }, 60);
+});
+
+// =================================================================
+// SIDEBAR NAV — definition in shared/lumiture-nav.js
+// =================================================================
+window.LUMITURE_ACTIVE = 'user-menu';
+</script>
+
+<!-- SHARED MODULES — nav 必須在 sidebar 前載入 -->
+<script>
+/* === Inlined: shared/lumiture-nav.js === */
+/*!
+ * lumiture-nav.js — Canonical Sidebar Navigation (Single Source of Truth)
+ *
+ * Defines window.LUMITURE_NAV used by shared/lumiture-sidebar.js.
+ * All Lumiture prototypes share the same nav structure — this file is the
+ * single source. Each prototype only needs to set window.LUMITURE_ACTIVE.
+ *
+ * Usage in prototype HTML:
+ *   <aside id="lt-sidebar"></aside>
+ *   <script>window.LUMITURE_ACTIVE = 'general-budget';<\/script>
+ *   <script src="../shared/lumiture-nav.js"><\/script>    ← MUST load BEFORE sidebar
+ *   <script src="../shared/lumiture-sidebar.js"><\/script>
+ *
+ * Rules:
+ *   - Items with `href` → rendered as <a> links (clickable, cross-prototype navigation)
+ *   - Items with `disabled:true` → rendered as <div> with .lt-dis class (greyed, not clickable)
+ *   - The item matching LUMITURE_ACTIVE → href automatically stripped by lumiture-sidebar.js
+ *     so the "current page" item won't self-link
+ *
+ * To add a new prototype:
+ *   1. Update the relevant entry below — change `disabled:true` to `href:'../{name}/{name}-prototype-v{N}.html'`
+ *   2. All 3 (or more) prototypes will automatically reflect the new link via this shared script
+ *   3. The new prototype only needs to set LUMITURE_ACTIVE = its own id
+ */
+(function () {
+  'use strict';
+
+  window.LUMITURE_NAV = [
+    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', disabled: true },
+
+    { type: 'group', id: 'dashboard', label: 'Dashboard', items: [
+      { id: 'cost-dashboard',     label: 'Cost Dashboard',     icon: 'dashboard',    href: './cost-dashboard.html' },
+      { id: 'executive-insights', label: 'Executive Insights', icon: 'auto_awesome', href: './executive-insights.html' },
+    ]},
+
+    { type: 'group', id: 'optimization', label: 'Optimization', items: [
+      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', href: '../rightsizing/rightsizing-prototype-v1.html' },
+      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'sell', href: '../rate-optimization/rate-optimization-prototype-v1.html' },
+    ]},
+
+    { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
+      { id: 'general-budget',    label: 'General Budget',    icon: 'savings',              href: './general-budget.html' },
+      { id: 'customized-budget', label: 'Customized Budget', icon: 'tune',                 disabled: true },
+      { id: 'anomaly-detection', label: 'Anomaly Detection', icon: 'notifications_active', disabled: true },
+    ]},
+
+    { type: 'group', id: 'org', label: 'Organization Settings', items: [
+      { id: 'lumitag',            label: 'LumiTag',            icon: 'sell',            href: './lumitag.html' },
+      { id: 'group-list',         label: 'Group List',         icon: 'groups',          disabled: true },
+      { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
+      { id: 'authorization-list', label: 'Authorization List', icon: 'link',            disabled: true },
+      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
+    ]},
+  ];
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-sidebar.js === */
+/*!
+ * lumiture-sidebar.js — Lumiture Shared Sidebar (with canonical logo)
+ *
+ * Auto-injects:
+ *   - Sidebar CSS (logo, nav items, group collapse, active state)
+ *   - Canonical Lumiture logo (concentric circles + PROTOTYPE tag + LumiTure.ai wordmark)
+ *
+ * Usage in prototype HTML:
+ *   1. Define window.LUMITURE_NAV = [...]   (see schema below)
+ *   2. Define window.LUMITURE_ACTIVE = 'item-id'  (which item is highlighted)
+ *   3. Add mount point: <aside id="lt-sidebar"></aside>
+ *   4. <script src="../shared/lumiture-sidebar.js"><\/script>
+ *
+ * NAV schema:
+ *   window.LUMITURE_NAV = [
+ *     // Top-level item (no group)
+ *     { type: 'item', id: 'overview', label: 'Overview', icon: 'home', href: '#' },
+ *     // Group with children (expanded by default unless `collapsed: true`)
+ *     { type: 'group', id: 'dashboard', label: 'Dashboard', expanded: true, items: [
+ *       { id: 'cost-dashboard', label: 'Cost Dashboard', icon: 'dashboard', href: '#' },
+ *       { id: 'exec-insights',  label: 'Executive Insights', icon: 'monitoring', disabled: true },
+ *     ]},
+ *   ];
+ *   window.LUMITURE_ACTIVE = 'cost-dashboard';  // which item is active
+ *
+ * API:
+ *   window.LumitureSidebar.toggleGroup(groupId)
+ *   window.LumitureSidebar.toggleCollapse()    — collapse the whole sidebar (icon-only)
+ *   window.LumitureSidebar.setActive(itemId)
+ */
+(function () {
+  'use strict';
+
+  // ===== CSS =====
+  var CSS = [
+    /* CSS variables — sidebar 用 Primary Dark #002663（per Lumiture-Guideline.md，2026-05-08 設計師確認） */
+    ':root{--lt-sb-w:264px;--lt-sb-bg:#002663;--lt-sb-hov:rgba(255,255,255,.06);',
+    '--lt-sb-active:#004FB0;--lt-sb-text:rgba(255,255,255,.85);--lt-sb-text-muted:rgba(255,255,255,.5);',
+    '--lt-sb-border:rgba(255,255,255,.1)}',
+
+    /* Sidebar container — 採 sticky positioning：父層 .app 用 flex 或 grid 都能適應
+       min-width:0 是必要的：flex 子元素預設 min-width:auto 會被內容 min-content size 撐住，導致 collapse 失效 */
+    '.lt-sidebar{width:var(--lt-sb-w);min-width:0;background:var(--lt-sb-bg);color:#fff;',
+    'position:sticky;top:0;height:100vh;z-index:100;overflow:hidden;',
+    'flex-shrink:0;',
+    'display:flex;flex-direction:column;transition:width .2s ease;scrollbar-width:none}',
+    '.lt-sidebar::-webkit-scrollbar{display:none}',
+    '.lt-sidebar.lt-collapsed{width:64px}',
+
+    /* Logo block */
+    '.lt-sb-logo{padding:16px 20px;display:flex;align-items:center;gap:10px;',
+    'font-size:18px;font-weight:700;color:#fff;border-bottom:1px solid var(--lt-sb-border);',
+    'min-height:68px;box-sizing:border-box;white-space:nowrap;overflow:hidden;flex-shrink:0}',
+    '.lt-sb-logo-wrap{position:relative;width:32px;height:32px;flex-shrink:0}',
+    '.lt-sb-logo-wrap svg{width:32px;height:32px;display:block}',
+    /* PROTOTYPE tag — cyan caps below the icon */
+    '.lt-sb-proto{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);',
+    'background:var(--lt-sb-bg);color:#34B5D9;font-size:6px;font-weight:700;',
+    'padding:1px 3px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px;',
+    'line-height:1.2;white-space:nowrap}',
+    '.lt-sb-logo-text{transition:opacity .2s}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo-text{opacity:0;width:0;overflow:hidden}',
+    '.lt-sidebar.lt-collapsed .lt-sb-proto{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo{padding:16px;justify-content:center;gap:0}',
+
+    /* Nav scroll area — 內部捲動，sidebar 外層不捲（寬敞 padding 對齊原始設計） */
+    '.lt-sb-nav{flex:1;padding:8px 12px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}',
+    '.lt-sb-nav::-webkit-scrollbar{width:6px}',
+    '.lt-sb-nav::-webkit-scrollbar-track{background:transparent}',
+    '.lt-sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}',
+    '.lt-sb-nav::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.25)}',
+
+    /* Top-level item (no group) — 寬敞 padding，font-size 14px */
+    '.lt-sb-item{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;',
+    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden;margin-bottom:2px}',
+    '.lt-sb-item:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sb-item.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-item.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
+    '.lt-sb-item .material-symbols-outlined{font-size:20px;opacity:.9;flex-shrink:0}',
+
+    /* Group section */
+    '.lt-sb-group{margin-bottom:4px}',
+    '.lt-sb-group-hdr{display:flex;align-items:center;justify-content:space-between;',
+    'padding:18px 14px 10px;font-size:14px;font-weight:700;color:#fff;',
+    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:.2px}',
+    '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
+    '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
+    '.lt-sb-group-arrow{font-size:18px;transition:transform .18s;opacity:.85;flex-shrink:0}',
+    '.lt-sb-group.lt-collapsed .lt-sb-group-arrow{transform:rotate(180deg)}',
+    '.lt-sb-group.lt-collapsed .lt-sb-group-children{display:none}',
+
+    /* Sub-item (inside group) — 一致 14px font，11px 垂直 padding */
+    '.lt-sb-subitem{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;',
+    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden}',
+    '.lt-sb-subitem:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sb-subitem.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-subitem.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
+    '.lt-sb-subitem .material-symbols-outlined{font-size:18px;opacity:.9;flex-shrink:0}',
+
+    /* Collapsed state — hide labels, center icons */
+    '.lt-sidebar.lt-collapsed .lt-sb-item span:not(.material-symbols-outlined),',
+    '.lt-sidebar.lt-collapsed .lt-sb-subitem span:not(.material-symbols-outlined){display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-item,',
+    '.lt-sidebar.lt-collapsed .lt-sb-subitem{padding:10px 0;justify-content:center;border-radius:0}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-hdr > span:first-child{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-arrow{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-hdr{padding:8px 0;justify-content:center}',
+    /* In collapsed mode, always show children */
+    '.lt-sidebar.lt-collapsed .lt-sb-group.lt-collapsed .lt-sb-group-children{display:block}',
+    '.lt-sidebar.lt-collapsed .lt-sb-nav{padding:8px 4px}',
+
+    /* Collapse toggle button at bottom */
+    '.lt-sb-collapse-btn{padding:12px;display:flex;justify-content:flex-end;',
+    'border-top:1px solid var(--lt-sb-border);flex-shrink:0}',
+    '.lt-sb-collapse-btn button{color:var(--lt-sb-text-muted);background:none;border:0;cursor:pointer;',
+    'display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:4px;',
+    'transition:all .15s}',
+    '.lt-sb-collapse-btn button:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sidebar.lt-collapsed .lt-sb-collapse-btn{justify-content:center}',
+    '.lt-sidebar.lt-collapsed .lt-sb-collapse-btn .material-symbols-outlined{transform:rotate(180deg)}'
+  ].join('');
+
+  function _injectCSS() {
+    if (document.getElementById('lt-sidebar-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-sidebar-css';
+    s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  // ===== Canonical Logo (concentric circles + PROTOTYPE tag + LumiTure.ai) =====
+  var LOGO_HTML =
+    '<div class="lt-sb-logo">' +
+      '<div class="lt-sb-logo-wrap">' +
+        '<svg viewBox="0 0 32 32" fill="none" aria-hidden="true">' +
+          '<circle cx="16" cy="16" r="13" stroke="#FFF" stroke-width="2" fill="none"/>' +
+          '<circle cx="16" cy="16" r="7" stroke="#FFF" stroke-width="2" fill="none"/>' +
+          '<circle cx="16" cy="16" r="3" fill="#FFF"/>' +
+        '</svg>' +
+        '<span class="lt-sb-proto">PROTOTYPE</span>' +
+      '</div>' +
+      '<span class="lt-sb-logo-text">LumiTure.ai</span>' +
+    '</div>';
+
+  // ===== Helpers =====
+  function _esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  function _renderItem(item, isSub) {
+    var cls = isSub ? 'lt-sb-subitem' : 'lt-sb-item';
+    var isActive = (item.id === window.LUMITURE_ACTIVE);
+    var active = isActive ? ' lt-active' : '';
+    var dis = item.disabled ? ' lt-dis' : '';
+    // Active item: render as <div> (no self-link). Disabled item: also no href.
+    var useHref = item.href && !isActive && !item.disabled;
+    var tag = useHref ? 'a' : 'div';
+    var hrefAttr = useHref ? ' href="' + _esc(item.href) + '"' : '';
+    var dataId = ' data-nav-id="' + _esc(item.id) + '"';
+    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + '>' +
+             '<span class="material-symbols-outlined">' + _esc(item.icon || 'circle') + '</span>' +
+             '<span>' + _esc(item.label) + '</span>' +
+           '</' + tag + '>';
+  }
+
+  function _renderGroup(grp) {
+    var collapsed = grp.collapsed ? ' lt-collapsed' : '';
+    var children = (grp.items || []).map(function (item) {
+      return _renderItem(item, true);
+    }).join('');
+    return '<div class="lt-sb-group' + collapsed + '" data-group-id="' + _esc(grp.id) + '">' +
+             '<div class="lt-sb-group-hdr">' +
+               '<span>' + _esc(grp.label) + '</span>' +
+               '<span class="material-symbols-outlined lt-sb-group-arrow">keyboard_arrow_up</span>' +
+             '</div>' +
+             '<div class="lt-sb-group-children">' + children + '</div>' +
+           '</div>';
+  }
+
+  function _renderNav() {
+    var nav = window.LUMITURE_NAV || [];
+    var html = '<div class="lt-sb-nav">';
+    nav.forEach(function (entry) {
+      if (entry.type === 'group') {
+        html += _renderGroup(entry);
+      } else {
+        html += _renderItem(entry, false);
+      }
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function _renderCollapseBtn() {
+    return '<div class="lt-sb-collapse-btn">' +
+             '<button type="button" data-action="toggle-collapse" title="Collapse sidebar">' +
+               '<span class="material-symbols-outlined">chevron_left</span>' +
+             '</button>' +
+           '</div>';
+  }
+
+  // ===== Mount =====
+  function _render() {
+    var mount = document.getElementById('lt-sidebar');
+    if (!mount) {
+      console.warn('[lumiture-sidebar] Mount point #lt-sidebar not found');
+      return;
+    }
+    // If mount is not already a sidebar, wrap it
+    mount.classList.add('lt-sidebar');
+    mount.innerHTML = LOGO_HTML + _renderNav() + _renderCollapseBtn();
+
+    // Group toggle
+    mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
+      hdr.addEventListener('click', function () {
+        var grp = hdr.parentElement;
+        if (grp) grp.classList.toggle('lt-collapsed');
+      });
+    });
+    // Collapse the whole sidebar
+    var btn = mount.querySelector('[data-action="toggle-collapse"]');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        window.LumitureSidebar.toggleCollapse();
+      });
+    }
+  }
+
+  // ===== Public API =====
+  window.LumitureSidebar = {
+    toggleGroup: function (groupId) {
+      var grp = document.querySelector('[data-group-id="' + groupId + '"]');
+      if (grp) grp.classList.toggle('lt-collapsed');
+    },
+    toggleCollapse: function () {
+      var sb = document.getElementById('lt-sidebar');
+      var main = document.querySelector('.lt-main, .main, main');
+      if (sb) sb.classList.toggle('lt-collapsed');
+      if (main) main.classList.toggle('lt-sidebar-collapsed');
+      // Sync legacy CSS vars (--sw) for prototypes that reference them in topbar / footer
+      var w = sb && sb.classList.contains('lt-collapsed') ? '64px' : '264px';
+      document.documentElement.style.setProperty('--sw', w);
+      document.documentElement.style.setProperty('--lt-sb-w', w);
+    },
+    setActive: function (itemId) {
+      window.LUMITURE_ACTIVE = itemId;
+      document.querySelectorAll('.lt-sb-item, .lt-sb-subitem').forEach(function (el) {
+        el.classList.toggle('lt-active', el.dataset.navId === itemId);
+      });
+    },
+    rerender: _render,
+  };
+
+  // ===== INIT =====
+  function _init() {
+    _injectCSS();
+    _render();
+    // Dispatch resize so chart libraries (ECharts 等) 重新測量容器
+    // —— 避免 inline script 已先 init chart 後，shared CSS 才 inject 導致 layout shift
+    requestAnimationFrame(function () {
+      window.dispatchEvent(new Event('resize'));
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else {
+    _init();
+  }
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-topbar.js === */
+/*!
+ * lumiture-topbar.js — Lumiture Shared Topbar + Account Menu
+ *
+ * 用途：navy topbar（右側 icons + user chip）+ 點 user chip 展開的 Account Menu popover。
+ * Account Menu 對齊 Figma General Behavior #01-3 / #01-4，核心是 LT-3138/LT-3140
+ * (User Menu + AI Quota) v1.19.0 的 AI Quota box。
+ * Warning/Depleted 項目用 hover tooltip 說明（無 Contact Sales 動作 — PM 確認無 per-user 業務 email）。
+ *
+ * 共用即一致：所有 prototype 只要載入這支檔，user chip 點開就是同一版 menu。
+ *
+ * Usage in prototype HTML:
+ *   1. (Optional) Define window.LUMITURE_USER       — 見下方 Schema，沒設就吃預設
+ *   2. (Optional) Define window.LUMITURE_TOPBAR_ICONS — array of {icon, title, onclick, badge?}
+ *   3. Add mount point: <header id="lt-topbar"></header>
+ *   4. <script src="../shared/lumiture-topbar.js?v=YYYY-MM-DD"><\/script>
+ *
+ * Schema (所有欄位皆 optional，未填吃 DEFAULT_USER)：
+ *   window.LUMITURE_USER = {
+ *     name:        'Kabin Yang',
+ *     email:       'kabin.yang@mile.cloud',
+ *     role:        'Admin',                 // role chip 文字（Admin 無群組後綴；其餘 'Manager - Cost Center'）
+ *     initials:    'KY',                    // avatar 圓圈內字
+ *     gradient:    'linear-gradient(...)',  // optional avatar bg override
+ *     canSwitchRole: true,                  // false → 隱藏「View as Another Role」(只有可切換角色者顯示)
+ *     plan:        'Standard',              // Essential | Starter | Standard | Premium | none  (決定 AI Quota box 顯示哪些項目)
+ *     planDateRange: '2 Aug 2025 ~ 2 Aug 2035',
+ *     product:     'LumiTure.ai',
+ *     version:     'v1.19.0',               // Software version 列
+ *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
+ *     quota: {                              // AI Quota box 數據；total 已含 add-on
+ *       refreshDate: 'Jul 1, 2026',         // 下次重置日（= 自然月下月 1 號）
+ *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
+ *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
+ *     },
+ *   };
+ *
+ * Public API:
+ *   window.LumitureTopbar.setUser({...})          — 更新並 rerender
+ *   window.LumitureTopbar.setRole('Manager - ...')— 只更新 role chip（Demo FAB role 切換用）
+ *   window.LumitureTopbar.setPlan('Essential')    — 切 plan（連動 AI Quota box 顯示項目）
+ *   window.LumitureTopbar.setQuota({analyses:{...}, rightsizing:{...}, refreshDate, addonPacks})
+ *   window.LumitureTopbar.openMenu() / closeMenu() / toggleMenu()
+ *   window.LumitureTopbar.rerender()
+ */
+(function () {
+  'use strict';
+
+  // ===== Defaults ===== (預設給 Standard plan + Normal 狀態，所有既有 prototype 直接吃，不破版)
+  var DEFAULT_USER = {
+    name: 'Kabin Yang',
+    email: 'kabin.yang@mile.cloud',
+    role: 'Admin',
+    initials: 'KY',
+    canSwitchRole: true,
+    plan: 'Standard',
+    planDateRange: '2 Aug. 2025 ~ 2 Aug. 2035',
+    product: 'LumiTure.ai',
+    version: 'v1.19.0',
+    addonPacks: 0,
+    quota: {
+      refreshDate: '2 Jul. 2026',
+      analyses:    { used: 32,  total: 80 },
+      rightsizing: { used: 410, total: 1000 },
+    },
+  };
+
+  var DEFAULT_ICONS = [
+    { icon: 'notifications', title: 'Notifications', badge: true },
+  ];
+
+  // plan → 顯示哪些 quota 項目
+  //   Essential = 兩項（照 Notion PRD，2026-06-22 Kabin 拍板）；Starter = 只 analyses；
+  //   Standard = 兩項；Premium/none = 不顯示 box
+  //   ⚠ specs ai-quota README 說 Essential 只 rightsizing，與 PRD 衝突、待 PM 對齊；此處照 PRD
+  var PLAN_QUOTA_ITEMS = {
+    Essential: ['analyses', 'rightsizing'],
+    Starter:   ['analyses'],
+    Standard:  ['analyses', 'rightsizing'],
+    Premium:   [],
+    none:      [],
+  };
+
+  // quota key → 顯示用標籤 / Limit Reached 對話框文案變數（對齊最新 PRD：unit = Rightsizing scans）
+  var QUOTA_META = {
+    analyses:    { label: 'AI-Powered Analyses', dialogLabel: 'Cost Dashboard',     unit: 'AI-powered analyses' },
+    rightsizing: { label: 'Rightsizing Scans',   dialogLabel: 'Usage Optimization', unit: 'Rightsizing scans' },
+  };
+
+  // plan banner 配色（對齊 Figma #01-4：Essential 灰 / Starter 藍 / Standard 深藍 / Premium 金）
+  var PLAN_BANNER = {
+    Essential: 'background:#5B6B7F',
+    Starter:   'background:#2E6DB4',
+    Standard:  'background:#16407C',
+    Premium:   'background:linear-gradient(90deg,#B8901F 0%,#E3BC55 100%)',
+    none:      'background:#5B6B7F',
+  };
+
+  // ===== CSS =====
+  var CSS = [
+    /* ---------- Topbar 容器 ---------- */
+    '.lt-topbar{background:#002663;padding:14px 32px;display:flex;align-items:center;justify-content:flex-end;gap:16px;',
+    'position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px;box-sizing:border-box}',
+
+    /* Icon button */
+    '.lt-tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;',
+    'cursor:pointer;color:rgba(255,255,255,.7);background:none;border:none;padding:0;position:relative;font-family:inherit;transition:background .15s,color .15s}',
+    '.lt-tb-ic:hover{background:rgba(255,255,255,.08);color:#fff}',
+    '.lt-tb-ic .material-symbols-outlined{font-size:22px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 22}',
+    '.lt-tb-ic .lt-tb-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:#FF403D;',
+    'border:2px solid #002663;border-radius:50%}',
+
+    /* User chip — avatar + name + role + chevron */
+    '.lt-tb-user{display:flex;align-items:center;gap:10px;padding-left:16px;margin-left:0;',
+    'border-left:1px solid rgba(255,255,255,.1);color:#fff;cursor:pointer;transition:opacity .15s;background:none;border-top:none;border-right:none;border-bottom:none}',
+    '.lt-tb-user:hover{opacity:.92}',
+    '.lt-tb-avatar-ic{font-size:34px;color:#fff;flex-shrink:0;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 34}',
+    '.lt-tb-user-text{display:flex;flex-direction:column;font-size:12px;line-height:1.3;min-width:0;font-family:\'Noto Sans\',sans-serif;text-align:left}',
+    '.lt-tb-user-name{font-weight:600;color:#fff;white-space:nowrap}',
+    '.lt-tb-user-role{color:rgba(255,255,255,.6);font-size:11px;white-space:nowrap}',
+    '.lt-tb-chev{color:rgba(255,255,255,.6);font-size:20px;transition:transform .18s}',
+    '.lt-tb-user.is-open .lt-tb-chev{transform:rotate(180deg)}',
+
+    /* ---------- Account Menu popover ---------- */
+    '.lt-am-backdrop{position:fixed;inset:0;z-index:1000;background:transparent}',
+    '.lt-am{position:fixed;top:62px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
+    'box-shadow:0 4px 16px rgba(0,0,0,.28);overflow:hidden;font-family:\'Noto Sans\',sans-serif;color:#fff;',
+    'animation:lt-am-in .14s ease;transform-origin:top right}',
+    '@keyframes lt-am-in{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}',
+    '.lt-am-hidden{display:none!important}',
+
+    /* Plan banner */
+    '.lt-am-plan{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;color:#fff}',
+    '.lt-am-plan-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-plan-date{font-size:11px;font-weight:500;opacity:.85;white-space:nowrap;letter-spacing:.2px;text-transform:uppercase}',
+
+    /* User identity */
+    '.lt-am-id{padding:14px 16px 12px}',
+    '.lt-am-id-name{font-size:15px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-id-email{font-size:12px;color:rgba(255,255,255,.62);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-chip{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:3px 10px 3px 8px;',
+    'background:#1E5FA8;border-radius:9999px;font-size:11px;font-weight:600;color:#fff}',
+    '.lt-am-chip .material-symbols-outlined{font-size:14px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 14}',
+
+    /* ---------- AI Quota box (navy 內嵌，彩色圓點 + 提亮狀態色，對齊設計稿) ---------- */
+    '.lt-q{padding:12px 16px}',
+    '.lt-q-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}',
+    '.lt-q-title{font-size:13px;font-weight:700;color:#fff}',
+    '.lt-q-sub{font-size:11px;color:rgba(255,255,255,.5);white-space:nowrap;letter-spacing:.1px}',
+    /* quota item — 高度固定（per spec：切狀態版面不跳動）；warning/depleted 有 hover tooltip */
+    '.lt-q-item{display:flex;align-items:center;gap:9px;padding:5px 8px;margin:0 -8px;border-radius:6px;position:relative;transition:background .12s}',
+    '.lt-q-item.has-tip{cursor:help}',
+    '.lt-q-item.has-tip:hover{background:rgba(255,255,255,.07)}',
+    '.lt-q-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}',
+    '.lt-q-label{font-size:12.5px;color:rgba(255,255,255,.9);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-q-val{font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:3px}',
+    '.lt-q-val .material-symbols-outlined{font-size:13px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 13}',
+    /* hover tooltip（Lumiture 非圖表 tooltip 規範：#3C3C3C 深底白字） */
+    '.lt-q-tip{position:absolute;top:calc(100% + 2px);left:8px;right:8px;z-index:5;background:#3C3C3C;color:#fff;',
+    'font-size:11.5px;font-weight:400;line-height:1.45;padding:8px 10px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.3);',
+    'opacity:0;visibility:hidden;transform:translateY(-2px);transition:opacity .12s,transform .12s;pointer-events:none}',
+    '.lt-q-item.has-tip:hover .lt-q-tip,.lt-q-item.has-tip:focus-within .lt-q-tip{opacity:1;visibility:visible;transform:none}',
+    /* 狀態色（提亮一階給 navy 深底，dot + value 同色） */
+    '.lt-q-item.is-active    .lt-q-dot{background:#2DD4BF}', '.lt-q-item.is-active    .lt-q-val{color:#2DD4BF}',
+    '.lt-q-item.is-warning   .lt-q-dot{background:#FBBF24}', '.lt-q-item.is-warning   .lt-q-val{color:#FBBF24}',
+    '.lt-q-item.is-depleted  .lt-q-dot{background:#FF6B68}', '.lt-q-item.is-depleted  .lt-q-val{color:#FF6B68}',
+    '.lt-q-item.is-unlimited .lt-q-dot{background:#4ADFFF}', '.lt-q-item.is-unlimited .lt-q-val{color:#4ADFFF}',
+    /* add-on 行 */
+    '.lt-q-addon{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;color:#4ADFFF;font-weight:500}',
+    '.lt-q-addon .material-symbols-outlined{font-size:14px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 14}',
+    /* loading / error */
+    '.lt-q-skel{height:13px;border-radius:4px;margin:9px 0;background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.16),rgba(255,255,255,.08));background-size:200% 100%;animation:lt-q-shimmer 1.3s infinite}',
+    '.lt-q-skel-sub{width:120px;height:11px;margin:0;display:inline-block}',
+    '@keyframes lt-q-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}',
+    '.lt-q-err{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.75);padding:4px 0}',
+    '.lt-q-err-msg{flex:1;min-width:0}',
+    '.lt-q-err .material-symbols-outlined{font-size:16px;color:rgba(255,255,255,.55);font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 16}',
+    '.lt-q-err a{color:#4ADFFF;font-weight:600;cursor:pointer;flex-shrink:0}',
+
+    /* ---------- Menu action items ---------- */
+    '.lt-am-div{height:1px;background:rgba(255,255,255,.1)}',
+    '.lt-am-item{display:flex;align-items:center;gap:12px;padding:12px 16px;color:#fff;cursor:pointer;',
+    'background:none;border:none;width:100%;font-family:inherit;font-size:13.5px;text-align:left;transition:background .12s}',
+    '.lt-am-item:hover{background:rgba(255,255,255,.07)}',
+    '.lt-am-item .material-symbols-outlined{font-size:20px;color:rgba(255,255,255,.85);',
+    'font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20}',
+  ].join('');
+
+  function _injectCSS() {
+    if (document.getElementById('lt-topbar-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-topbar-css';
+    s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  // ===== Helpers =====
+  function _esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+  function _user() {
+    var u = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
+    u.quota = Object.assign({}, DEFAULT_USER.quota, (window.LUMITURE_USER || {}).quota || {});
+    return u;
+  }
+  function _status(used, total) {
+    if (!total || total <= 0) return 'active';
+    var pct = used / total * 100;
+    if (pct >= 100) return 'depleted';
+    if (pct >= 80)  return 'warning';
+    return 'active';
+  }
+  function _planItems(plan) {
+    return PLAN_QUOTA_ITEMS[plan] != null ? PLAN_QUOTA_ITEMS[plan] : PLAN_QUOTA_ITEMS.Standard;
+  }
+  function _showQuotaBox(u) {
+    return _planItems(u.plan).length > 0;
+  }
+
+  // ===== Renderers =====
+  function _renderIcon(item) {
+    var attrs = ' class="lt-tb-ic" title="' + _esc(item.title || '') + '"';
+    if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
+    var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
+    return '<button type="button"' + attrs + '>' +
+             '<span class="material-symbols-outlined">' + _esc(item.icon) + '</span>' + badge +
+           '</button>';
+  }
+
+  function _renderUserChip(u) {
+    return '<button type="button" class="lt-tb-user" id="lt-tb-user" aria-haspopup="true" aria-expanded="false">' +
+             '<span class="material-symbols-outlined lt-tb-avatar-ic">account_circle</span>' +
+             '<div class="lt-tb-user-text">' +
+               '<span class="lt-tb-user-name">' + _esc(u.name) + '</span>' +
+               '<span class="lt-tb-user-role" id="lt-tb-user-role">' + _esc(u.role) + '</span>' +
+             '</div>' +
+             '<span class="material-symbols-outlined lt-tb-chev">keyboard_arrow_down</span>' +
+           '</button>';
+  }
+
+  function _renderQuotaItem(key, q, opts) {
+    opts = opts || {};
+    var meta = QUOTA_META[key];
+    // Premium：unlimited（無 used/total，cyan + sparkle，不可點）
+    if (opts.unlimited) {
+      return '<div class="lt-q-item is-unlimited">' +
+               '<span class="lt-q-dot"></span>' +
+               '<span class="lt-q-label">' + _esc(meta.label) + '</span>' +
+               '<span class="lt-q-val">Unlimited<span class="material-symbols-outlined">auto_awesome</span></span>' +
+             '</div>';
+    }
+    var used = q.used || 0, total = q.total || 0;
+    var remaining = Math.max(0, total - used);
+    var st = _status(used, total);
+    // Warning / Depleted 才有 hover tooltip 說明（取代原本點開的 Limit Reached 對話框；
+    // PM 確認無法提供 per-user 業務 email，故改輕量懸停說明，無 Contact Sales 動作）
+    // 文案含變數 {total} {unit} {label}；{label}=Cost Dashboard / Usage Optimization
+    var tip = '';
+    if (st === 'depleted' || st === 'warning') {
+      var verb = st === 'depleted' ? 'has been reached' : 'is approaching';
+      var tipText = 'Your monthly limit (' + total.toLocaleString() + ' ' + meta.unit + ') ' + verb +
+        ' for ' + meta.dialogLabel + '. Please contact your LumiTure.ai representative to purchase ' +
+        'Add-ons to increase your quota for this billing cycle.';
+      tip = '<span class="lt-q-tip">' + _esc(tipText) + '</span>';
+    }
+    var hasTip = tip !== '';
+    return '<div class="lt-q-item is-' + st + (hasTip ? ' has-tip' : '') + '"' + (hasTip ? ' tabindex="0"' : '') + '>' +
+             '<span class="lt-q-dot"></span>' +
+             '<span class="lt-q-label">' + _esc(meta.label) + '</span>' +
+             '<span class="lt-q-val">' + remaining.toLocaleString() + ' / ' + total.toLocaleString() + ' left</span>' +
+             tip +
+           '</div>';
+  }
+
+  function _renderQuotaBox(u) {
+    var isPremium = u.plan === 'Premium';
+    var items = _planItems(u.plan);
+    if (!items.length && !isPremium) return '';   // 無有效 plan：不顯示（理論上不會發生）
+    // Premium（unlimited）不重置 → header 只顯示 Org-wide，不接 refresh 日
+    var sub = isPremium ? 'Org-wide' : 'Org-wide, refresh on ' + _esc(u.quota.refreshDate);
+    var head = '<div class="lt-q-head">' +
+                 '<span class="lt-q-title">AI Quota</span>' +
+                 '<span class="lt-q-sub">' + sub + '</span>' +
+               '</div>';
+    // loading（refresh 日也尚未載入 → sub 一併 skeleton）
+    if (u.quota.state === 'loading') {
+      return '<div class="lt-q">' +
+               '<div class="lt-q-head"><span class="lt-q-title">AI Quota</span>' +
+                 '<span class="lt-q-skel lt-q-skel-sub"></span></div>' +
+               '<div class="lt-q-skel" style="width:78%"></div><div class="lt-q-skel" style="width:62%"></div>' +
+             '</div>';
+    }
+    // error（partial degrade：只有這塊壞，menu 其他項照常）；refresh 日未載入 → sub 只顯示 Org-wide；Retry 右對齊
+    if (u.quota.state === 'error') {
+      var headErr = '<div class="lt-q-head"><span class="lt-q-title">AI Quota</span><span class="lt-q-sub">Org-wide</span></div>';
+      return '<div class="lt-q">' + headErr +
+               '<div class="lt-q-err"><span class="material-symbols-outlined">help</span>' +
+               '<span class="lt-q-err-msg">Couldn\'t load quota</span>' +
+               '<a onclick="window.LumitureTopbar.rerender()">Retry</a></div>' +
+             '</div>';
+    }
+    var rows = isPremium
+      ? ['analyses', 'rightsizing'].map(function (k) { return _renderQuotaItem(k, {}, { unlimited: true }); }).join('')
+      : items.map(function (k) { return _renderQuotaItem(k, u.quota[k] || {}); }).join('');
+    // add-on 行（packs>0，Premium 不適用）；naming 對齊 PRD：單數 "AI Quota Add-on × N"
+    var addon = (!isPremium && (u.addonPacks || 0) > 0)
+      ? '<div class="lt-q-addon"><span class="material-symbols-outlined">auto_awesome</span>' +
+          u.addonPacks + ' × AI Quota Add-ons Activated</div>'
+      : '';
+    return '<div class="lt-q">' + head + rows + addon + '</div>';
+  }
+
+  function _renderMenu(u) {
+    var planName = _esc(u.plan) + ' Plan';
+    var bannerStyle = PLAN_BANNER[u.plan] || PLAN_BANNER.Standard;
+    var viewAs = u.canSwitchRole
+      ? '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'View as Another Role\')">' +
+          '<span class="material-symbols-outlined">sync_alt</span>View as Another Role</button>' +
+        '<div class="lt-am-div"></div>'
+      : '';
+    var box = _renderQuotaBox(u);
+    var quotaSection = box
+      ? '<div class="lt-am-div"></div>' + box + '<div class="lt-am-div"></div>'
+      : '<div class="lt-am-div"></div>';
+    return '<div class="lt-am-backdrop" id="lt-am-backdrop" onclick="window.LumitureTopbar.closeMenu()"></div>' +
+           '<div class="lt-am" id="lt-am" role="menu">' +
+             '<div class="lt-am-plan" style="' + bannerStyle + '">' +
+               '<span class="lt-am-plan-name">' + planName + '</span>' +
+               '<span class="lt-am-plan-date">' + _esc(u.planDateRange) + '</span>' +
+             '</div>' +
+             '<div class="lt-am-id">' +
+               '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
+               '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
+               '<span class="lt-am-chip"><span class="material-symbols-outlined">account_circle</span>' + _esc(u.role) + '</span>' +
+             '</div>' +
+             quotaSection +
+             viewAs +
+             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Profile\')">' +
+               '<span class="material-symbols-outlined">person</span>Profile</button>' +
+             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Settings\')">' +
+               '<span class="material-symbols-outlined">settings</span>Settings</button>' +
+             '<div class="lt-am-div"></div>' +
+             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Log out\')">' +
+               '<span class="material-symbols-outlined">logout</span>Log out</button>' +
+           '</div>';
+  }
+
+  // ===== Mount / state =====
+  var _menuOpen = false;
+
+  function _render() {
+    var mount = document.getElementById('lt-topbar');
+    if (!mount) { console.warn('[lumiture-topbar] Mount point #lt-topbar not found'); return; }
+    var u = _user();
+    var icons = window.LUMITURE_TOPBAR_ICONS || DEFAULT_ICONS;
+    mount.classList.add('lt-topbar');
+    mount.innerHTML = icons.map(_renderIcon).join('') + _renderUserChip(u);
+    var chip = document.getElementById('lt-tb-user');
+    if (chip) chip.addEventListener('click', function (e) { e.stopPropagation(); _toggleMenu(); });
+    _menuOpen = false;
+  }
+
+  function _menuHost() {
+    var host = document.getElementById('lt-am-host');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'lt-am-host';
+      document.body.appendChild(host);
+    }
+    return host;
+  }
+
+  function _openMenu() {
+    var u = _user();
+    _menuHost().innerHTML = _renderMenu(u);
+    _menuOpen = true;
+    var chip = document.getElementById('lt-tb-user');
+    if (chip) { chip.classList.add('is-open'); chip.setAttribute('aria-expanded', 'true'); }
+  }
+  function _closeMenu() {
+    _menuHost().innerHTML = '';
+    _menuOpen = false;
+    var chip = document.getElementById('lt-tb-user');
+    if (chip) { chip.classList.remove('is-open'); chip.setAttribute('aria-expanded', 'false'); }
+  }
+  function _toggleMenu() { _menuOpen ? _closeMenu() : _openMenu(); }
+
+  // Esc 關閉 menu
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && _menuOpen) _closeMenu();
+  });
+
+  // ===== Public API =====
+  window.LumitureTopbar = {
+    setUser: function (user) {
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, user || {});
+      _render(); if (_menuOpen) _openMenu();
+    },
+    setRole: function (role) {
+      var el = document.getElementById('lt-tb-user-role');
+      if (el) el.textContent = role;
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, { role: role });
+      if (_menuOpen) _openMenu();
+    },
+    setPlan: function (plan) {
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, { plan: plan });
+      if (_menuOpen) _openMenu();
+    },
+    setQuota: function (q) {
+      var cur = (window.LUMITURE_USER || {});
+      window.LUMITURE_USER = Object.assign({}, cur, {
+        quota: Object.assign({}, DEFAULT_USER.quota, cur.quota || {}, q || {}),
+      });
+      if (q && typeof q.addonPacks !== 'undefined') window.LUMITURE_USER.addonPacks = q.addonPacks;
+      if (_menuOpen) _openMenu();
+    },
+    openMenu: _openMenu,
+    closeMenu: _closeMenu,
+    toggleMenu: _toggleMenu,
+    rerender: function () { _render(); if (_menuOpen) _openMenu(); },
+    _noop: function (label) { /* 展示用：Profile/Settings/Log out/View as Another Role 點擊佔位 */
+      if (typeof window.LUMITURE_MENU_ACTION === 'function') window.LUMITURE_MENU_ACTION(label);
+    },
+  };
+
+  // ===== INIT =====
+  function _init() { _injectCSS(); _render(); }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else { _init(); }
+})();
+
+</script>
+<script>
+/* === Inlined: shared/demo-fab.js === */
+/*!
+ * demo-fab.js — Lumiture Designer Demo Scenarios (Shared Module v2)
+ *
+ * Auto-injects:
+ *   - .demo-fab (FAB button, bottom-left)
+ *   - .demo-popover (480px tall × 390px wide popover)
+ *   - #gl-tip (body-level fixed tooltip — required for demo button hover tips)
+ *
+ * Required globals:
+ *   window.DEMO_SCENARIOS = [...]   — scenario list
+ *   window.DEMO_APPLY     = fn      — called with (id, btn) when scenario clicked
+ *
+ * Optional globals:
+ *   window.DEMO_PAGES = [{id, label, icon}]      — page tabs (top row, pill style)
+ *   window.DEMO_CATEGORIES = [{id, label, icon, hint}]  — category tabs (underline style)
+ *   window.DEMO_DEFAULT = 'scenario-id'           — initial active scenario
+ *
+ * Rendering modes (auto-detected):
+ *   1. No pages, no categories → flat list of buttons
+ *   2. Pages only (LumiTag pattern) → underline tabs at top, scenarios filtered by page
+ *   3. Categories only (single-page Cost Dashboard pattern) → underline tabs, scenarios filtered by category
+ *   4. Pages + Categories → two-layer: pill page tabs (top) + underline category tabs (bottom)
+ *
+ * Scenario schema:
+ *   {
+ *     id:        string,           // unique
+ *     label:     string,
+ *     icon:      string,           // Material Symbols name
+ *     tip:       string?,          // hover tooltip (rendered via #gl-tip, NOT ::after)
+ *     page:      string?,          // matches DEMO_PAGES[].id (alias: 'tab' for backwards compat)
+ *     category:  string?,          // matches DEMO_CATEGORIES[].id
+ *     isNoData:  boolean?,         // groups under "no data" sub-divider
+ *     disabled:  boolean?,         // shows "Soon" badge, not clickable
+ *   }
+ *
+ * Programmatic API:
+ *   window.demoFabSwitchTab(pageId)    // switch to a specific page tab (called on navigation)
+ *   window._demoFabToggle()            // open/close popover
+ *   window._demoFabApply(id, btn)      // apply a scenario (internal)
+ */
+(function () {
+  'use strict';
+
+  // ===== MODULE STATE =====
+  var _activePage = null;         // null until first scenario filtered
+  var _activeCategory = null;
+  var _activeScenario = null;
+
+  // ===== CSS INJECTION =====
+  var CSS = [
+    /* FAB button */
+    '.demo-fab{position:fixed;bottom:18px;left:18px;width:48px;height:48px;border-radius:50%;',
+    'background:radial-gradient(circle at 78% 68%,#D9CC4A 0%,rgba(217,204,74,0) 42%),',
+    'radial-gradient(circle at 30% 28%,#4D8DDB 0%,rgba(77,141,219,0) 52%),',
+    'radial-gradient(circle at 25% 78%,#001A52 0%,rgba(0,26,82,0) 58%),',
+    'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);',
+    'color:#fff;box-shadow:0 4px 14px rgba(13,27,62,.36);z-index:999;cursor:pointer;',
+    'display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;border:0}',
+    '.demo-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(13,27,62,.45)}',
+    '.demo-fab:active{transform:scale(.96)}',
+    '.demo-fab .material-symbols-outlined{font-size:24px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}',
+    '.demo-fab.popped{box-shadow:0 4px 14px rgba(13,27,62,.36),inset 0 2px 6px rgba(0,0,0,.28)}',
+    '.demo-fab .demo-pulse{position:absolute;top:5px;right:5px;width:9px;height:9px;background:#FF403D;',
+    'border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 0 rgba(255,64,61,.6);animation:demoPulse 1.6s ease-in-out infinite}',
+    '@keyframes demoPulse{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,64,61,.6)}',
+    '70%{transform:scale(1.1);box-shadow:0 0 0 8px rgba(255,64,61,0)}',
+    '100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,64,61,0)}}',
+
+    /* Popover shell — 全站固定 390 × 480 */
+    '.demo-popover{position:fixed;bottom:78px;left:18px;width:390px;height:480px;background:#fff;',
+    'border:1px solid rgba(14,58,130,.18);border-radius:12px;box-shadow:0 8px 24px rgba(13,27,62,.16);',
+    'z-index:998;padding:0;opacity:0;transform:translateY(8px);pointer-events:none;',
+    'transition:opacity .18s,transform .18s;display:flex;flex-direction:column;overflow:hidden}',
+    '.demo-popover.show{opacity:1;transform:translateY(0);pointer-events:auto}',
+    '.demo-popover::before{content:\'\';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;',
+    'background:radial-gradient(circle at 78% 50%,#D9CC4A 0%,rgba(217,204,74,0) 32%),',
+    'radial-gradient(circle at 30% 50%,#4D8DDB 0%,rgba(77,141,219,0) 42%),',
+    'linear-gradient(90deg,#0D1B3E 0%,#0E3A82 100%)}',
+
+    /* Popover header */
+    '.demo-popover-hdr{display:flex;align-items:center;justify-content:space-between;',
+    'padding:14px 16px 10px;flex-shrink:0}',
+    '.demo-popover-title{font-size:12px;font-weight:700;color:#0E3A82;text-transform:uppercase;',
+    'letter-spacing:.5px;display:flex;align-items:center;gap:6px}',
+    '.demo-popover-close{color:#B0B7C0;cursor:pointer;padding:2px;border-radius:4px;',
+    'display:flex;align-items:center;background:none;border:none}',
+    '.demo-popover-close:hover{color:#0E3A82;background:rgba(14,58,130,.08)}',
+
+    /* Reset link */
+    '.demo-reset-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#676767;',
+    'font-weight:500;background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:4px;',
+    'font-family:inherit;margin:0 16px 6px}',
+    '.demo-reset-link:hover{color:#004FB0;background:#F2FAFF}',
+    '.demo-reset-link .material-symbols-outlined{font-size:14px}',
+
+    /* Page tabs (Layer 1 — pill / segmented style，only when both layers exist) */
+    '.demo-page-tabs{display:flex;gap:4px;padding:0 16px 8px;flex-shrink:0;overflow-x:auto;scrollbar-width:none}',
+    '.demo-page-tabs::-webkit-scrollbar{display:none}',
+    '.demo-page-tab{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;height:26px;',
+    'background:#F2F2F2;color:#676767;border:none;border-radius:13px;font-size:11px;font-weight:600;',
+    'font-family:inherit;cursor:pointer;transition:all .15s;white-space:nowrap}',
+    '.demo-page-tab:hover{color:#262626;background:#E6E6E6}',
+    '.demo-page-tab.active{background:#fff;color:#004FB0;box-shadow:inset 0 0 0 1px #004FB0}',
+    '.demo-page-tab .material-symbols-outlined{font-size:13px}',
+
+    /* Category tabs (Layer 2，or single-layer underline mode) */
+    '.demo-cat-tabs{display:flex;border-bottom:2px solid #E6E6E6;padding:0 12px;flex-shrink:0;',
+    'overflow-x:auto;scrollbar-width:none}',
+    '.demo-cat-tabs::-webkit-scrollbar{display:none}',
+    '.demo-cat-tab{display:inline-flex;align-items:center;gap:4px;padding:7px 10px;font-size:11px;',
+    'font-weight:600;color:#676767;border:none;background:none;border-bottom:2px solid transparent;',
+    'margin-bottom:-2px;cursor:pointer;letter-spacing:.3px;transition:all .15s;font-family:inherit;white-space:nowrap}',
+    '.demo-cat-tab .material-symbols-outlined{font-size:14px}',
+    '.demo-cat-tab:hover{color:#262626}',
+    '.demo-cat-tab.active{color:#004FB0;border-bottom-color:#004FB0}',
+
+    /* Hint block (淡藍底 + 左藍邊條) */
+    '.demo-pane-hint{font-size:11px;color:#676767;line-height:1.5;margin:0 0 8px;',
+    'padding:8px 10px;background:#F2FAFF;border-left:2px solid #004FB0;border-radius:4px}',
+
+    /* Scroll area (flex 1, hidden scrollbar) */
+    '.demo-popover-scroll{overflow-y:auto;overscroll-behavior:contain;flex:1;min-height:0;',
+    'padding:8px 16px 14px;transition:opacity .12s ease;scrollbar-width:none}',
+    '.demo-popover-scroll::-webkit-scrollbar{display:none}',
+
+    /* Sub-separator (no data divider) */
+    '.demo-sub-sep{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;',
+    'color:#9CAEC4;letter-spacing:.4px;text-transform:uppercase;margin:10px 0 6px}',
+    '.demo-sub-sep::before,.demo-sub-sep::after{content:\'\';flex:1;height:1px;background:rgba(14,58,130,.1)}',
+
+    /* Button group */
+    '.demo-buttons{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}',
+
+    /* Scenario button */
+    '.demo-btn{background:#fff;border:1px solid rgba(14,58,130,.25);color:#0E3A82;',
+    'padding:8px 12px;border-radius:8px;font-size:12px;font-weight:500;',
+    'display:flex;align-items:center;gap:6px;text-align:left;width:100%;',
+    'transition:all .15s;position:relative;cursor:pointer;font-family:inherit}',
+    '.demo-btn:hover{background:rgba(14,58,130,.05);border-color:rgba(14,58,130,.5)}',
+    '.demo-btn.active{background:radial-gradient(circle at 88% 70%,#D9CC4A 0%,rgba(217,204,74,0) 42%),',
+    'radial-gradient(circle at 22% 35%,#4D8DDB 0%,rgba(77,141,219,0) 50%),',
+    'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);color:#fff;border-color:transparent;',
+    'box-shadow:0 2px 6px rgba(13,27,62,.25)}',
+    '.demo-btn .material-symbols-outlined{font-size:16px;flex-shrink:0}',
+
+    /* Disabled button */
+    '.demo-btn.demo-dis{opacity:.42;cursor:not-allowed}',
+    '.demo-btn.demo-dis:hover{background:#fff!important;border-color:rgba(14,58,130,.25)!important}',
+    '.demo-cs{margin-left:auto;font-size:9px;font-weight:700;color:#9CAEC4;',
+    'background:rgba(14,58,130,.06);border-radius:3px;padding:1px 5px;letter-spacing:.3px;flex-shrink:0}',
+
+    /* Empty state when no scenarios match current filters */
+    '.demo-empty{padding:24px 8px;text-align:center;color:#9CAEC4;font-size:12px;line-height:1.5}',
+
+    /* ⚠️ Suppress any global CSS [data-tip]::after on demo elements.
+       Tooltips MUST be handled by #gl-tip (auto-injected below) — pseudo-tooltips
+       get clipped by .demo-popover { overflow: hidden }. */
+    '.demo-btn[data-tip]::after,.demo-btn[data-tip]::before,',
+    '.demo-page-tab[data-tip]::after,.demo-cat-tab[data-tip]::after{display:none!important}',
+
+    /* #gl-tip — body-level fixed tooltip (auto-injected) */
+    '#gl-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:12px;line-height:1.4;',
+    'padding:6px 10px;border-radius:4px;max-width:320px;white-space:normal;',
+    'pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25);',
+    'font-family:\'Noto Sans\',sans-serif}'
+  ].join('');
+
+  var style = document.createElement('style');
+  style.textContent = CSS;
+  document.head.appendChild(style);
+
+  // ===== HELPERS =====
+  function _esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  // Normalise scenario: tab → page (backwards compat)
+  function _normalizedScenarios() {
+    return (window.DEMO_SCENARIOS || []).map(function (s) {
+      return Object.assign({}, s, { page: s.page || s.tab || null });
+    });
+  }
+
+  // Detect rendering mode based on what's configured
+  function _detectMode() {
+    var scenarios = _normalizedScenarios();
+    var hasPages = (window.DEMO_PAGES && window.DEMO_PAGES.length) ||
+                   scenarios.some(function (s) { return !!s.page; });
+    var hasCats  = (window.DEMO_CATEGORIES && window.DEMO_CATEGORIES.length) ||
+                   scenarios.some(function (s) { return !!s.category; });
+    if (hasPages && hasCats) return 'two-layer';
+    if (hasPages) return 'pages-only';
+    if (hasCats)  return 'categories-only';
+    return 'flat';
+  }
+
+  // Auto-derive page list if DEMO_PAGES not provided
+  function _getPages() {
+    if (window.DEMO_PAGES && window.DEMO_PAGES.length) return window.DEMO_PAGES;
+    var seen = {};
+    var pages = [];
+    _normalizedScenarios().forEach(function (s) {
+      if (s.page && !seen[s.page]) {
+        seen[s.page] = true;
+        pages.push({ id: s.page, label: s.page.charAt(0).toUpperCase() + s.page.slice(1), icon: 'tab' });
+      }
+    });
+    return pages;
+  }
+
+  function _getCategories() {
+    return window.DEMO_CATEGORIES || [];
+  }
+
+  // Filter scenarios for current page + category
+  function _filterScenarios() {
+    var scenarios = _normalizedScenarios();
+    return scenarios.filter(function (s) {
+      if (_activePage && s.page && s.page !== _activePage) return false;
+      if (_activePage && !s.page) return false; // page-tab mode requires scenario to have page
+      if (_activeCategory && s.category && s.category !== _activeCategory) return false;
+      if (_activeCategory && !s.category) return false; // cat-tab mode requires scenario to have category
+      return true;
+    });
+  }
+
+  // ===== HTML BUILDERS =====
+  function _renderButtons(scenarios) {
+    if (!scenarios.length) {
+      return '<div class="demo-empty">No scenarios in this view.</div>';
+    }
+    var normal = scenarios.filter(function (s) { return !s.isNoData; });
+    var noData = scenarios.filter(function (s) { return s.isNoData; });
+    var html = _renderGroup(normal);
+    if (noData.length) {
+      html += '<div class="demo-sub-sep">no data</div>' + _renderGroup(noData);
+    }
+    return html;
+  }
+
+  function _renderGroup(scenarios) {
+    if (!scenarios.length) return '';
+    var btns = scenarios.map(function (s) {
+      var dis = s.disabled ? ' demo-dis' : '';
+      var act = s.id === _activeScenario ? ' active' : '';
+      var tip = s.tip ? ' data-tip="' + _esc(s.tip) + '"' : '';
+      var cs = s.disabled ? '<span class="demo-cs">Soon</span>' : '';
+      return '<button class="demo-btn' + dis + act + '"' + tip +
+             ' data-scenario="' + _esc(s.id) + '">' +
+             '<span class="material-symbols-outlined">' + _esc(s.icon || 'play_arrow') + '</span>' +
+             '<span>' + _esc(s.label) + '</span>' + cs + '</button>';
+    }).join('');
+    return '<div class="demo-buttons">' + btns + '</div>';
+  }
+
+  function _renderPageTabs(mode) {
+    var pages = _getPages();
+    if (!pages.length) return '';
+    // 雙層模式：page tabs 用 pill style 放最上面
+    // 單層 pages-only 模式：page tabs 用 underline style（跟 cat-tabs 一致），無第二層
+    var isTwoLayer = mode === 'two-layer';
+    var wrapClass = isTwoLayer ? 'demo-page-tabs' : 'demo-cat-tabs';
+    var tabClass  = isTwoLayer ? 'demo-page-tab' : 'demo-cat-tab';
+    return '<div class="' + wrapClass + '">' + pages.map(function (p) {
+      var act = p.id === _activePage ? ' active' : '';
+      return '<button class="' + tabClass + act + '" data-page="' + _esc(p.id) + '">' +
+             (p.icon ? '<span class="material-symbols-outlined">' + _esc(p.icon) + '</span>' : '') +
+             _esc(p.label) +
+             '</button>';
+    }).join('') + '</div>';
+  }
+
+  function _renderCategoryTabs() {
+    var cats = _getCategories();
+    if (!cats.length) return '';
+    return '<div class="demo-cat-tabs">' + cats.map(function (c) {
+      var act = c.id === _activeCategory ? ' active' : '';
+      return '<button class="demo-cat-tab' + act + '" data-category="' + _esc(c.id) + '">' +
+             (c.icon ? '<span class="material-symbols-outlined">' + _esc(c.icon) + '</span>' : '') +
+             _esc(c.label) +
+             '</button>';
+    }).join('') + '</div>';
+  }
+
+  function _renderHint() {
+    if (!_activeCategory) return '';
+    var cat = _getCategories().find(function (c) { return c.id === _activeCategory; });
+    if (!cat || !cat.hint) return '';
+    return '<div class="demo-pane-hint">' + _esc(cat.hint) + '</div>';
+  }
+
+  function _renderScrollArea() {
+    return _renderHint() + _renderButtons(_filterScenarios());
+  }
+
+  // ===== DOM MOUNTING =====
+  function _render() {
+    if (document.getElementById('demo-fab')) return;
+
+    // Auto-detect first page & category
+    var mode = _detectMode();
+    var pages = _getPages();
+    var cats = _getCategories();
+    if (!_activePage && pages.length) _activePage = pages[0].id;
+    if (!_activeCategory && cats.length) _activeCategory = cats[0].id;
+    if (mode === 'flat') { _activePage = null; _activeCategory = null; }
+    if (mode === 'pages-only') _activeCategory = null;
+    if (mode === 'categories-only') _activePage = null;
+
+    // FAB
+    var fabEl = document.createElement('button');
+    fabEl.className = 'demo-fab';
+    fabEl.id = 'demo-fab';
+    fabEl.title = 'Designer Demo Scenarios';
+    fabEl.innerHTML =
+      '<span class="material-symbols-outlined">science</span>' +
+      '<span class="demo-pulse" id="demo-fab-pulse"></span>';
+    fabEl.addEventListener('click', function () { window._demoFabToggle(); });
+
+    // Popover
+    var popEl = document.createElement('div');
+    popEl.className = 'demo-popover';
+    popEl.id = 'demo-popover';
+    popEl.innerHTML =
+      '<div class="demo-popover-hdr">' +
+        '<div class="demo-popover-title">' +
+          '<span class="material-symbols-outlined" style="font-size:16px">science</span>' +
+          'Demo Scenarios' +
+        '</div>' +
+        '<button class="demo-popover-close" id="demo-pop-close">' +
+          '<span class="material-symbols-outlined" style="font-size:18px">close</span>' +
+        '</button>' +
+      '</div>' +
+      (window.DEMO_DEFAULT
+        ? '<button class="demo-reset-link" id="demo-reset-link">' +
+            '<span class="material-symbols-outlined">refresh</span>Reset to Default</button>'
+        : '') +
+      _renderPageTabs(mode) +
+      _renderCategoryTabs() +
+      '<div class="demo-popover-scroll" id="demo-popover-scroll">' +
+        _renderScrollArea() +
+      '</div>';
+
+    document.body.appendChild(fabEl);
+    document.body.appendChild(popEl);
+
+    // === Event wiring ===
+    document.getElementById('demo-pop-close').addEventListener('click', function () {
+      window._demoFabToggle();
+    });
+
+    // Reset link
+    var resetLink = document.getElementById('demo-reset-link');
+    if (resetLink && window.DEMO_DEFAULT) {
+      resetLink.addEventListener('click', function () {
+        window._demoFabApply(window.DEMO_DEFAULT, null);
+      });
+    }
+
+    // Page tabs
+    popEl.querySelectorAll('.demo-page-tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        window._demoFabSetPage(t.dataset.page);
+      });
+    });
+
+    // Category tabs (also handles page tabs in pages-only mode, where they use demo-cat-tab class)
+    popEl.querySelectorAll('.demo-cat-tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        if (t.dataset.page) {
+          window._demoFabSetPage(t.dataset.page);
+        } else {
+          window._demoFabSetCategory(t.dataset.category);
+        }
+      });
+    });
+
+    // Scenario button clicks (event delegation on scroll area)
+    document.getElementById('demo-popover-scroll').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-scenario]');
+      if (!btn || btn.classList.contains('demo-dis')) return;
+      window._demoFabApply(btn.dataset.scenario, btn);
+    });
+
+    // Outside click to close
+    document.addEventListener('click', function (e) {
+      var pop = document.getElementById('demo-popover');
+      var fab = document.getElementById('demo-fab');
+      if (!pop || !fab) return;
+      if (!pop.contains(e.target) && !fab.contains(e.target) && pop.classList.contains('show')) {
+        pop.classList.remove('show');
+        fab.classList.remove('popped');
+      }
+    });
+
+    _injectGlobalTooltip();
+  }
+
+  // ===== #gl-tip auto-injection =====
+  function _injectGlobalTooltip() {
+    if (document.getElementById('gl-tip')) return; // host page already provides one
+    var tip = document.createElement('div');
+    tip.id = 'gl-tip';
+    document.body.appendChild(tip);
+    var cur = null;
+    document.addEventListener('mouseover', function (e) {
+      var el = e.target.closest('[data-tip]');
+      if (!el || el === cur) return;
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block';
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!cur) return;
+      var tw = tip.offsetWidth, th = tip.offsetHeight;
+      var x = e.clientX - tw / 2, y = e.clientY - th - 10;
+      if (x < 8) x = 8;
+      if (x + tw > window.innerWidth - 8) x = window.innerWidth - tw - 8;
+      if (y < 8) y = e.clientY + 16;
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    });
+    document.addEventListener('mouseout', function (e) {
+      var el = e.target.closest('[data-tip]');
+      if (el && el === cur) { cur = null; tip.style.display = 'none'; }
+    });
+  }
+
+  // ===== PUBLIC API =====
+  function _refreshScrollArea() {
+    var scroll = document.getElementById('demo-popover-scroll');
+    if (!scroll) return;
+    scroll.style.opacity = '0';
+    setTimeout(function () {
+      scroll.innerHTML = _renderScrollArea();
+      scroll.style.opacity = '1';
+    }, 120);
+  }
+
+  function _refreshTabs() {
+    var pop = document.getElementById('demo-popover');
+    if (!pop) return;
+    pop.querySelectorAll('.demo-page-tab').forEach(function (t) {
+      t.classList.toggle('active', t.dataset.page === _activePage);
+    });
+    pop.querySelectorAll('.demo-cat-tab').forEach(function (t) {
+      // In pages-only mode, cat-tab elements carry data-page (not data-category)
+      if (t.dataset.page) {
+        t.classList.toggle('active', t.dataset.page === _activePage);
+      } else {
+        t.classList.toggle('active', t.dataset.category === _activeCategory);
+      }
+    });
+  }
+
+  /** Toggle popover open/close */
+  window._demoFabToggle = function () {
+    var pop = document.getElementById('demo-popover');
+    var fab = document.getElementById('demo-fab');
+    var pulse = document.getElementById('demo-fab-pulse');
+    var opening = !pop.classList.contains('show');
+    pop.classList.toggle('show');
+    fab.classList.toggle('popped');
+    if (opening && pulse) pulse.style.display = 'none';
+  };
+
+  /** Set active page tab (internal + external) */
+  window._demoFabSetPage = function (pageId) {
+    if (_activePage === pageId) return;
+    _activePage = pageId;
+    _refreshTabs();
+    _refreshScrollArea();
+  };
+
+  /** Set active category tab */
+  window._demoFabSetCategory = function (catId) {
+    if (_activeCategory === catId) return;
+    _activeCategory = catId;
+    _refreshTabs();
+    _refreshScrollArea();
+  };
+
+  /**
+   * Called from prototype's navigation function to auto-switch the page tab.
+   * Only switches if the popover doesn't need to stay on current tab.
+   */
+  window.demoFabSwitchTab = function (pageId) {
+    window._demoFabSetPage(pageId);
+  };
+
+  /** Apply a scenario — called via event delegation or by host */
+  window._demoFabApply = function (id, btn) {
+    _activeScenario = id;
+    document.querySelectorAll('.demo-btn').forEach(function (b) {
+      b.classList.remove('active');
+    });
+    if (btn) {
+      btn.classList.add('active');
+    } else {
+      // No btn provided (e.g. Reset link) — find scenario in DOM
+      var found = document.querySelector('[data-scenario="' + id + '"]');
+      if (found) found.classList.add('active');
+    }
+    if (typeof window.DEMO_APPLY === 'function') {
+      window.DEMO_APPLY(id, btn);
+    }
+  };
+
+  // ===== INIT =====
+  function _init() {
+    if (_activeScenario === null && window.DEMO_DEFAULT) {
+      _activeScenario = window.DEMO_DEFAULT;
+    }
+    _render();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else {
+    _init();
+  }
+})();
+
+</script>
+
+</body>
+</html>
