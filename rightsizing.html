@@ -76,6 +76,21 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-banner-desc b{color:var(--g700);font-weight:700;letter-spacing:.4px}
 .rs-learn{color:var(--pri);text-decoration:underline;cursor:help;font-weight:500}
 .rs-banner-r{display:flex;align-items:center;gap:12px;flex-shrink:0}
+/* ==== AI Quota: Rightsizing scans（LT-3140 — UO header + 達上限 banner）==== */
+/* Figma #01 — dot(8px) + "Rightsizing Scans: {remaining}/{total} left"；定義同 User Menu（淺色背景版） */
+.rs-quota-chip{display:inline-flex;align-items:center;gap:6px;height:24px;border-radius:4px;padding:2px 8px 2px 6px}
+.rs-q-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.rs-q-green{color:#00B5A6} .rs-q-green.rs-q-dot{background:#00B5A6}
+.rs-q-amber{color:#FC9A0F} .rs-q-amber.rs-q-dot{background:#FC9A0F}
+.rs-q-red{color:#FF403D} .rs-q-red.rs-q-dot{background:#FF403D}
+/* Figma #01-6 Alert/Large: 白卡 + 頂部 4px 紅 strip + 32px warning icon */
+.rs-quota-banner{background:#fff;border:1px solid #fff;border-radius:6px;box-shadow:0 0 6px rgba(0,0,0,.2);margin-bottom:20px;overflow:hidden}
+.rs-quota-banner-strip{height:4px;background:#FF403D}
+.rs-quota-banner-body{display:flex;align-items:flex-start;gap:16px;padding:20px}
+.rs-quota-banner .material-symbols-outlined{font-size:32px;color:#FC9A0F;flex-shrink:0;font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 32}
+.rs-quota-banner-title{font-size:16px;font-weight:700;color:#262626;line-height:1.5;margin-bottom:4px}
+.rs-quota-banner-text{font-size:12px;color:#676767;line-height:1.6}
+.rs-quota-banner-text b{font-weight:700;color:#262626}
 
 /* ==== Paper ==== */
 .paper{background:#fff;border-radius:var(--r-md);padding:24px 28px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06)}
@@ -332,6 +347,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
       <div class="pg-hdr">
         <div class="pg-title">Rightsizing</div>
         <div class="pg-hdr-r" id="updwrap">
+          <div class="upd"><span class="rs-quota-chip"><span class="rs-q-dot rs-q-green" id="rs-quota-dot"></span><span id="rs-quota-hdr" class="rs-q-green">Rightsizing Scans: 590 / 1,000 left</span></span></div>
           <div class="upd"><b>Last Updated</b><span>25/08/2026 09:00</span></div>
           <div class="upd"><b>Next Update</b><span>25/09/2026 15:00 (UTC+0)</span>
             <span class="material-symbols-outlined ico-info" data-tip="Due to data latency from cloud service provider, the cloud cost here may be slightly different from the final billing.">info</span>
@@ -340,10 +356,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
       </div>
 
       <div id="rs-normal">
-      <!-- Summary cards -->
-      <div class="rs-cards" id="rs-cards"></div>
-
-      <!-- Info banner -->
+      <!-- Info banner（description + USD + Scope Settings）— Figma: 在 cards 上方 -->
       <div class="rs-banner" id="rs-banner">
         <div class="rs-banner-desc">
           Optimize cloud resources and track savings. Please note that LumiTure.ai values may slightly differ from your console
@@ -359,6 +372,19 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
           <button class="btn btn-o" id="scope-btn" onclick="showPage('scope')"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">settings</span>Scope Settings</button>
         </div>
       </div>
+      <!-- AI Quota: Rightsizing scans 達上限 banner（LT-3140 — Figma #01-6 Alert/Large；無 Contact Sales，PM 確認）-->
+      <div class="rs-quota-banner" id="rs-quota-banner" style="display:none;">
+        <div class="rs-quota-banner-strip"></div>
+        <div class="rs-quota-banner-body">
+          <span class="material-symbols-outlined" style="color:#FC9A0F">warning</span>
+          <div class="rs-quota-banner-text">
+            <div class="rs-quota-banner-title">Rightsizing Scan limit reached for this cycle.</div>
+            <div><b>New scans are paused until the next cycle.</b> Existing recommendations below are provided for reference only. To resume scanning within this billing cycle, please contact your LumiTure.ai representative to purchase Add-ons.</div>
+          </div>
+        </div>
+      </div>
+      <!-- Summary cards -->
+      <div class="rs-cards" id="rs-cards"></div>
 
       <!-- Recommendation list paper -->
       <div class="paper" id="rs-paper">
@@ -1096,6 +1122,9 @@ window.DEMO_SCENARIOS = [
   { id:'empty',      page:'state', label:'No data created',      icon:'inbox',         isNoData:true, tip:'已設定但無推薦資料：cards 顯示 No Data、表格 No Data Available。' },
   { id:'no-auth',    page:'state', label:'No authorization',     icon:'lock',          isNoData:true, tip:'雲端帳號尚未授權。Admin 看到 CTA；T1/T2 看到「請聯絡管理員」。切 Role 看差異。' },
   { id:'nodata',     page:'state', label:'Error (API failure)',  icon:'cloud_off',     isNoData:true, tip:'載入失敗，與 No Data 共用呈現。' },
+  { id:'rs-quota-normal',   page:'state', label:'AI Quota: 正常',           icon:'bolt',    tip:'AI Quota（LT-3140 / Figma #01）：header 顯示「● Rightsizing Scans: 590 / 1,000 left」（綠點）。' },
+  { id:'rs-quota-warning',  page:'state', label:'AI Quota: 警告（≥80%）',    icon:'warning', tip:'AI Quota（LT-3140 / Figma #2190:33938）：用量達 80%+，header 顯示「● Rightsizing Scans: 100 / 1,000 left」（琥珀點）。無額外 banner，chip 顏色警示即為全部。' },
+  { id:'rs-quota-depleted', page:'state', label:'AI Quota: 用盡（scans paused）', icon:'block', tip:'Rightsizing quota 用盡（used 1,000/1,000）：header 轉紅「● Rightsizing Scans: 0 / 1,000 left」+ Alert/Large banner（頂部 4px 紅 strip + warning icon + 文字）；Figma #01-6。無 Contact Sales（PM 決議）。' },
   // Modal
   { id:'modal-detail',  page:'modal', label:'Recommendation Details', icon:'analytics',  tip:'Figma #12 — 推薦細節彈窗：Usage Analysis + Detailed Analysis + Cost Calculator。' },
   { id:'modal-dismiss', page:'modal', label:'Dismiss Recommendations',icon:'block',      tip:'Figma #05 — Dismiss 原因單選彈窗（選 Other 才開放輸入）。' },
@@ -1106,11 +1135,35 @@ window.DEMO_APPLY = function(id){
   if(id==='view-list'){ showPage('list'); return; }
   if(id==='view-scope'){ showPage('scope'); return; }
   if(['admin','t1m','t1mb','t2m','t2mb'].indexOf(id)>=0){ setRole(id); return; }
-  if(['set','loading','first-time','empty','nodata','no-auth'].indexOf(id)>=0){ showPage('list'); setPageState(id); return; }
+  if(id==='rs-quota-depleted'){ if(state.page!=='list') showPage('list'); if(state.pageState!=='set') setPageState('set'); setRightsizingQuota(1000,1000); return; }
+  if(id==='rs-quota-warning'){  if(state.page!=='list') showPage('list'); if(state.pageState!=='set') setPageState('set'); setRightsizingQuota(900,1000);  return; }
+  if(id==='rs-quota-normal'){   if(state.page!=='list') showPage('list'); if(state.pageState!=='set') setPageState('set'); setRightsizingQuota(410,1000);  return; }
+  if(['set','loading','first-time','empty','nodata','no-auth'].indexOf(id)>=0){ showPage('list'); setPageState(id); if(id==='set') setRightsizingQuota(410,1000); return; }
   if(id==='modal-detail'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); openDetail(DATA.rec[1].recId); return; }
   if(id==='modal-dismiss'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); state.selection={}; state.selection[DATA.rec[0].recId]=true; openDismiss(); return; }
   if(id==='modal-remove'){ showPage('list'); state.tab='dismiss'; renderTabs(); state.selection={}; state.selection[DATA.dismiss[0].recId]=true; renderTable(); openRemove(); return; }
 };
+
+/* ============================================================
+   AI Quota — Rightsizing scans（LT-3140）：UO header 用量 + 達上限 banner
+============================================================ */
+window.RS_QUOTA = window.RS_QUOTA || { used: 410, total: 1000 };
+function setRightsizingQuota(used, total){
+  window.RS_QUOTA = { used: used, total: total };
+  var depleted = used >= total;
+  var pct = total > 0 ? used / total * 100 : 0;
+  var remaining = Math.max(0, total - used);
+  var stClass = depleted ? 'rs-q-red' : (pct >= 80 ? 'rs-q-amber' : 'rs-q-green');
+  var hdr = document.getElementById('rs-quota-hdr');
+  if(hdr){
+    hdr.textContent = 'Rightsizing Scans: ' + remaining.toLocaleString() + ' / ' + total.toLocaleString() + ' left';
+    hdr.className = stClass;
+  }
+  var dot = document.getElementById('rs-quota-dot');
+  if(dot) dot.className = 'rs-q-dot ' + stClass;
+  var banner = document.getElementById('rs-quota-banner');
+  if(banner) banner.style.display = depleted ? 'block' : 'none';
+}
 
 /* ============================================================
    SIDEBAR
@@ -1121,6 +1174,7 @@ window.LUMITURE_ACTIVE = 'usage-optimization';
    INIT
 ============================================================ */
 renderListPage();
+setRightsizingQuota(410, 1000); // AI Quota（LT-3140）：UO header 的 Rightsizing scans 用量
 bindTips();
 // inject inline CSP SVGs into static Scope Settings badges
 (function(){
@@ -1350,6 +1404,12 @@ bindTips();
 
     { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
       { id: 'general-budget',    label: 'General Budget',    icon: 'savings',              href: './general-budget.html' },
+      { id: 'customized-budget', label: 'Customized Budget', icon: 'tune',                 disabled: true },
+      { id: 'anomaly-detection', label: 'Anomaly Detection', icon: 'notifications_active', disabled: true },
+    ]},
+
+    { type: 'group', id: 'org', label: 'Organization Settings', items: [
+      { id: 'lumitag',            label: 'LumiTag',            icon: 'sell',            href: './lumitag.html' },
       { id: 'group-list',         label: 'Group List',         icon: 'groups',          disabled: true },
       { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
       { id: 'authorization-list', label: 'Authorization List', icon: 'link',            disabled: true },
@@ -1635,460 +1695,7 @@ bindTips();
 })();
 
 </script>
-<script>
-/* === Inlined: shared/lumiture-topbar.js === */
-/*!
- * lumiture-topbar.js — Lumiture Shared Topbar + Account Menu
- *
- * 用途：navy topbar（右側 icons + user chip）+ 點 user chip 展開的 Account Menu popover。
- * Account Menu 對齊 Figma General Behavior #01-3 / #01-4，並加上 LT-3138/LT-3140
- * (User Menu + AI Quota) v1.19.0 範圍的兩個新項目：Software version 列 + AI Quota box。
- *
- * 共用即一致：所有 prototype 只要載入這支檔，user chip 點開就是同一版 menu。
- *
- * Usage in prototype HTML:
- *   1. (Optional) Define window.LUMITURE_USER       — 見下方 Schema，沒設就吃預設
- *   2. (Optional) Define window.LUMITURE_TOPBAR_ICONS — array of {icon, title, onclick, badge?}
- *   3. Add mount point: <header id="lt-topbar"></header>
- *   4. <script src="../shared/lumiture-topbar.js?v=YYYY-MM-DD"><\/script>
- *
- * Schema (所有欄位皆 optional，未填吃 DEFAULT_USER)：
- *   window.LUMITURE_USER = {
- *     name:        'Kabin Yang',
- *     email:       'kabin.yang@mile.cloud',
- *     role:        'Admin',                 // role chip 文字（Admin 無群組後綴；其餘 'Manager - Cost Center'）
- *     initials:    'KY',                    // avatar 圓圈內字
- *     gradient:    'linear-gradient(...)',  // optional avatar bg override
- *     canSwitchRole: true,                  // false → 隱藏「View as Another Role」(只有可切換角色者顯示)
- *     plan:        'Standard',              // Essential | Starter | Standard | Premium | none  (決定 AI Quota box 顯示哪些項目)
- *     planDateRange: '2 Aug 2025 ~ 2 Aug 2035',
- *     product:     'LumiTure.ai',
- *     version:     'v1.19.0',               // Software version 列
- *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
- *     quota: {                              // AI Quota box 數據；total 已含 add-on
- *       refreshDate: 'Jul 1, 2026',         // 下次重置日（= 自然月下月 1 號）
- *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
- *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
- *     },
- *   };
- *
- * Public API:
- *   window.LumitureTopbar.setUser({...})          — 更新並 rerender
- *   window.LumitureTopbar.setRole('Manager - ...')— 只更新 role chip（Demo FAB role 切換用）
- *   window.LumitureTopbar.setPlan('Essential')    — 切 plan（連動 AI Quota box 顯示項目）
- *   window.LumitureTopbar.setQuota({analyses:{...}, rightsizing:{...}, refreshDate, addonPacks})
- *   window.LumitureTopbar.openMenu() / closeMenu() / toggleMenu()
- *   window.LumitureTopbar.openLimitReached('analyses'|'rightsizing')
- *   window.LumitureTopbar.rerender()
- */
-(function () {
-  'use strict';
-
-  // ===== Defaults ===== (預設給 Standard plan + Normal 狀態，所有既有 prototype 直接吃，不破版)
-  var DEFAULT_USER = {
-    name: 'Kabin Yang',
-    email: 'kabin.yang@mile.cloud',
-    role: 'Admin',
-    initials: 'KY',
-    canSwitchRole: true,
-    plan: 'Standard',
-    planDateRange: '2 Aug 2025 ~ 2 Aug 2035',
-    product: 'LumiTure.ai',
-    version: 'v1.19.0',
-    addonPacks: 0,
-    quota: {
-      refreshDate: 'Jul 1, 2026',
-      analyses:    { used: 32,  total: 80 },
-      rightsizing: { used: 410, total: 1000 },
-    },
-  };
-
-  var DEFAULT_ICONS = [
-    { icon: 'notifications', title: 'Notifications', badge: true },
-    { icon: 'help',          title: 'Help' },
-  ];
-
-  // plan → 顯示哪些 quota 項目（per specs/user-menu ai-quota README 邊界情況）
-  //   Essential = 只 rightsizing；Starter = 只 analyses；Standard = 兩項；Premium/none = 不顯示 box
-  var PLAN_QUOTA_ITEMS = {
-    Essential: ['rightsizing'],
-    Starter:   ['analyses'],
-    Standard:  ['analyses', 'rightsizing'],
-    Premium:   [],
-    none:      [],
-  };
-
-  // quota key → 顯示用標籤 / Limit Reached 對話框文案變數
-  var QUOTA_META = {
-    analyses:    { label: 'AI-Powered Analyses',  dialogLabel: 'Cost Dashboard',     unit: 'AI-powered analyses' },
-    rightsizing: { label: 'Rightsizing',          dialogLabel: 'Usage Optimization', unit: 'resources (Rightsizing)' },
-  };
-
-  // plan banner 配色（對齊 Figma #01-4：Essential 灰 / Starter 藍 / Standard 深藍 / Premium 金）
-  var PLAN_BANNER = {
-    Essential: 'background:#5B6B7F',
-    Starter:   'background:#2E6DB4',
-    Standard:  'background:#16407C',
-    Premium:   'background:linear-gradient(90deg,#B8901F 0%,#E3BC55 100%)',
-    none:      'background:#5B6B7F',
-  };
-
-  // ===== CSS =====
-  var CSS = [
-    /* ---------- Topbar 容器 ---------- */
-    '.lt-topbar{background:#002663;padding:14px 32px;display:flex;align-items:center;justify-content:flex-end;gap:16px;',
-    'position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px;box-sizing:border-box}',
-
-    /* Icon button */
-    '.lt-tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;',
-    'cursor:pointer;color:rgba(255,255,255,.7);background:none;border:none;padding:0;position:relative;font-family:inherit;transition:background .15s,color .15s}',
-    '.lt-tb-ic:hover{background:rgba(255,255,255,.08);color:#fff}',
-    '.lt-tb-ic .material-symbols-outlined{font-size:22px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 22}',
-    '.lt-tb-ic .lt-tb-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:#FF403D;',
-    'border:2px solid #002663;border-radius:50%}',
-
-    /* User chip — avatar + name + role + chevron */
-    '.lt-tb-user{display:flex;align-items:center;gap:10px;padding-left:16px;margin-left:0;',
-    'border-left:1px solid rgba(255,255,255,.1);color:#fff;cursor:pointer;transition:opacity .15s;background:none;border-top:none;border-right:none;border-bottom:none}',
-    '.lt-tb-user:hover{opacity:.92}',
-    '.lt-tb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#34B5D9,#004FB0);',
-    'display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;',
-    'letter-spacing:.3px;font-family:\'Noto Sans\',sans-serif}',
-    '.lt-tb-user-text{display:flex;flex-direction:column;font-size:12px;line-height:1.3;min-width:0;font-family:\'Noto Sans\',sans-serif;text-align:left}',
-    '.lt-tb-user-name{font-weight:600;color:#fff;white-space:nowrap}',
-    '.lt-tb-user-role{color:rgba(255,255,255,.6);font-size:11px;white-space:nowrap}',
-    '.lt-tb-chev{color:rgba(255,255,255,.6);font-size:20px;transition:transform .18s}',
-    '.lt-tb-user.is-open .lt-tb-chev{transform:rotate(180deg)}',
-
-    /* ---------- Account Menu popover ---------- */
-    '.lt-am-backdrop{position:fixed;inset:0;z-index:1000;background:transparent}',
-    '.lt-am{position:fixed;top:62px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
-    'box-shadow:0 4px 16px rgba(0,0,0,.28);overflow:hidden;font-family:\'Noto Sans\',sans-serif;color:#fff;',
-    'animation:lt-am-in .14s ease;transform-origin:top right}',
-    '@keyframes lt-am-in{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}',
-    '.lt-am-hidden{display:none!important}',
-
-    /* Plan banner */
-    '.lt-am-plan{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;color:#fff}',
-    '.lt-am-plan-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.lt-am-plan-date{font-size:11px;font-weight:500;opacity:.85;white-space:nowrap;letter-spacing:.2px}',
-
-    /* User identity */
-    '.lt-am-id{padding:14px 16px 12px}',
-    '.lt-am-id-name{font-size:15px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.lt-am-id-email{font-size:12px;color:rgba(255,255,255,.62);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.lt-am-chip{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:3px 10px 3px 8px;',
-    'background:#1E5FA8;border-radius:9999px;font-size:11px;font-weight:600;color:#fff}',
-    '.lt-am-chip .material-symbols-outlined{font-size:14px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 14}',
-
-    /* Software version 列 */
-    '.lt-am-ver{padding:0 16px 12px;font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.2px}',
-
-    /* ---------- AI Quota box (淺色卡片內嵌深底，確保彩色狀態對比) ---------- */
-    '.lt-q{margin:0 12px 12px;background:#fff;border-radius:8px;padding:12px 12px 10px;box-shadow:0 1px 3px rgba(0,0,0,.18)}',
-    '.lt-q-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}',
-    '.lt-q-title{font-size:13px;font-weight:700;color:#262626}',
-    '.lt-q-orgwide{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;background:#EAF1F8;color:#004FB0;',
-    'border-radius:9999px;font-size:10px;font-weight:600;cursor:default}',
-    '.lt-q-orgwide .material-symbols-outlined{font-size:12px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 12}',
-    /* quota item — 大小固定，不論可點與否（per spec：切狀態版面不跳動） */
-    '.lt-q-item{padding:8px;border-radius:6px;border:1px solid transparent;transition:background .12s,border-color .12s}',
-    '.lt-q-item + .lt-q-item{margin-top:2px}',
-    '.lt-q-item.is-depleted{cursor:pointer}',
-    '.lt-q-item.is-depleted:hover{background:#FFF2F2;border-color:#FFD0CF}',
-    '.lt-q-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px}',
-    '.lt-q-label{font-size:12.5px;font-weight:500;color:#262626;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.lt-q-val{font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0}',
-    '.lt-q-bar{height:5px;border-radius:9999px;background:#EDEFF2;margin-top:6px;overflow:hidden}',
-    '.lt-q-fill{height:100%;border-radius:9999px;transition:width .2s}',
-    /* 狀態色 */
-    '.lt-q-item.is-active   .lt-q-val{color:#00B5A6}', '.lt-q-item.is-active   .lt-q-fill{background:#00B5A6}',
-    '.lt-q-item.is-warning  .lt-q-val{color:#C77700}', '.lt-q-item.is-warning  .lt-q-fill{background:#FC9A0F}',
-    '.lt-q-item.is-depleted .lt-q-val{color:#FF403D}', '.lt-q-item.is-depleted .lt-q-fill{background:#FF403D}',
-    '.lt-q-foot{display:flex;align-items:center;gap:5px;margin-top:9px;padding-top:8px;border-top:1px solid #EDEFF2;',
-    'font-size:11px;color:#676767}',
-    '.lt-q-foot .material-symbols-outlined{font-size:13px;color:#9AA3B0;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 13}',
-
-    /* ---------- Menu action items ---------- */
-    '.lt-am-div{height:1px;background:rgba(255,255,255,.1)}',
-    '.lt-am-item{display:flex;align-items:center;gap:12px;padding:12px 16px;color:#fff;cursor:pointer;',
-    'background:none;border:none;width:100%;font-family:inherit;font-size:13.5px;text-align:left;transition:background .12s}',
-    '.lt-am-item:hover{background:rgba(255,255,255,.07)}',
-    '.lt-am-item .material-symbols-outlined{font-size:20px;color:rgba(255,255,255,.85);',
-    'font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20}',
-
-    /* ---------- Limit Reached confirm dialog (440px confirm-style) ---------- */
-    '.lt-lr-backdrop{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);display:flex;',
-    'align-items:center;justify-content:center;padding:24px;animation:lt-lr-fade .14s ease}',
-    '@keyframes lt-lr-fade{from{opacity:0}to{opacity:1}}',
-    '.lt-lr{width:440px;max-width:100%;background:#fff;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.22);',
-    'overflow:hidden;font-family:\'Noto Sans\',sans-serif;color:#262626}',
-    '.lt-lr-body{padding:24px 24px 20px}',
-    '.lt-lr-icon{width:44px;height:44px;border-radius:9999px;background:#FFEBEF;display:flex;align-items:center;',
-    'justify-content:center;margin-bottom:14px}',
-    '.lt-lr-icon .material-symbols-outlined{font-size:26px;color:#FF403D;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 26}',
-    '.lt-lr-title{font-size:18px;font-weight:700;margin-bottom:8px}',
-    '.lt-lr-text{font-size:13.5px;line-height:1.6;color:#3C3C3C}',
-    '.lt-lr-aux{margin-top:14px;padding:10px 12px;background:#F6F8FA;border-radius:8px;font-size:12px;color:#676767;',
-    'display:flex;flex-direction:column;gap:4px}',
-    '.lt-lr-aux b{color:#262626;font-weight:600}',
-    '.lt-lr-foot{display:flex;justify-content:flex-end;gap:10px;padding:0 24px 22px}',
-    '.lt-lr-btn{padding:9px 18px;border-radius:4px;font-size:13.5px;font-weight:600;cursor:pointer;border:none;font-family:inherit}',
-    '.lt-lr-btn-text{background:none;color:#676767}', '.lt-lr-btn-text:hover{background:#F2F2F2}',
-    '.lt-lr-btn-primary{background:#004FB0;color:#fff;display:inline-flex;align-items:center;gap:6px;text-decoration:none}',
-    '.lt-lr-btn-primary:hover{background:#0B6DD7}',
-    '.lt-lr-btn-primary .material-symbols-outlined{font-size:18px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 18}',
-  ].join('');
-
-  function _injectCSS() {
-    if (document.getElementById('lt-topbar-css')) return;
-    var s = document.createElement('style');
-    s.id = 'lt-topbar-css';
-    s.textContent = CSS;
-    document.head.appendChild(s);
-  }
-
-  // ===== Helpers =====
-  function _esc(s) {
-    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-  }
-  function _user() {
-    var u = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
-    u.quota = Object.assign({}, DEFAULT_USER.quota, (window.LUMITURE_USER || {}).quota || {});
-    return u;
-  }
-  function _status(used, total) {
-    if (!total || total <= 0) return 'active';
-    var pct = used / total * 100;
-    if (pct >= 100) return 'depleted';
-    if (pct >= 80)  return 'warning';
-    return 'active';
-  }
-  function _planItems(plan) {
-    return PLAN_QUOTA_ITEMS[plan] != null ? PLAN_QUOTA_ITEMS[plan] : PLAN_QUOTA_ITEMS.Standard;
-  }
-  function _showQuotaBox(u) {
-    return _planItems(u.plan).length > 0;
-  }
-
-  // ===== Renderers =====
-  function _renderIcon(item) {
-    var attrs = ' class="lt-tb-ic" title="' + _esc(item.title || '') + '"';
-    if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
-    var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
-    return '<button type="button"' + attrs + '>' +
-             '<span class="material-symbols-outlined">' + _esc(item.icon) + '</span>' + badge +
-           '</button>';
-  }
-
-  function _renderUserChip(u) {
-    var avatarStyle = u.gradient ? ' style="background:' + _esc(u.gradient) + '"' : '';
-    return '<button type="button" class="lt-tb-user" id="lt-tb-user" aria-haspopup="true" aria-expanded="false">' +
-             '<div class="lt-tb-avatar"' + avatarStyle + '>' + _esc(u.initials) + '</div>' +
-             '<div class="lt-tb-user-text">' +
-               '<span class="lt-tb-user-name">' + _esc(u.name) + '</span>' +
-               '<span class="lt-tb-user-role" id="lt-tb-user-role">' + _esc(u.role) + '</span>' +
-             '</div>' +
-             '<span class="material-symbols-outlined lt-tb-chev">keyboard_arrow_down</span>' +
-           '</button>';
-  }
-
-  function _renderQuotaItem(key, q) {
-    var meta = QUOTA_META[key];
-    var used = q.used || 0, total = q.total || 0;
-    var remaining = Math.max(0, total - used);
-    var st = _status(used, total);
-    var pct = total > 0 ? Math.min(100, used / total * 100) : 0;
-    var clickable = st === 'depleted';
-    var attrs = ' class="lt-q-item is-' + st + '"';
-    if (clickable) attrs += ' onclick="window.LumitureTopbar.openLimitReached(\'' + key + '\')" role="button" tabindex="0"';
-    return '<div' + attrs + '>' +
-             '<div class="lt-q-row">' +
-               '<span class="lt-q-label">' + _esc(meta.label) + '</span>' +
-               '<span class="lt-q-val">' + remaining.toLocaleString() + ' / ' + total.toLocaleString() + ' left</span>' +
-             '</div>' +
-             '<div class="lt-q-bar"><div class="lt-q-fill" style="width:' + pct + '%"></div></div>' +
-           '</div>';
-  }
-
-  function _renderQuotaBox(u) {
-    var items = _planItems(u.plan);
-    if (!items.length) return '';
-    var rows = items.map(function (k) { return _renderQuotaItem(k, u.quota[k] || {}); }).join('');
-    return '<div class="lt-q">' +
-             '<div class="lt-q-head">' +
-               '<span class="lt-q-title">AI Quota</span>' +
-               '<span class="lt-q-orgwide" title="Shared across your whole organization, not per user">' +
-                 '<span class="material-symbols-outlined">groups</span>Org-wide</span>' +
-             '</div>' +
-             rows +
-             '<div class="lt-q-foot"><span class="material-symbols-outlined">autorenew</span>' +
-               'Refresh on ' + _esc(u.quota.refreshDate) + '</div>' +
-           '</div>';
-  }
-
-  function _renderMenu(u) {
-    var planName = _esc(u.plan) + ' Plan';
-    var bannerStyle = PLAN_BANNER[u.plan] || PLAN_BANNER.Standard;
-    var ver = '<div class="lt-am-ver">' + _esc(u.product) + ' · ' + _esc(u.version) + '</div>';
-    var viewAs = u.canSwitchRole
-      ? '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'View as Another Role\')">' +
-          '<span class="material-symbols-outlined">sync_alt</span>View as Another Role</button>' +
-        '<div class="lt-am-div"></div>'
-      : '';
-    return '<div class="lt-am-backdrop" id="lt-am-backdrop" onclick="window.LumitureTopbar.closeMenu()"></div>' +
-           '<div class="lt-am" id="lt-am" role="menu">' +
-             '<div class="lt-am-plan" style="' + bannerStyle + '">' +
-               '<span class="lt-am-plan-name">' + planName + '</span>' +
-               '<span class="lt-am-plan-date">' + _esc(u.planDateRange) + '</span>' +
-             '</div>' +
-             '<div class="lt-am-id">' +
-               '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
-               '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
-               '<span class="lt-am-chip"><span class="material-symbols-outlined">badge</span>' + _esc(u.role) + '</span>' +
-             '</div>' +
-             ver +
-             _renderQuotaBox(u) +
-             '<div class="lt-am-div"></div>' +
-             viewAs +
-             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Profile\')">' +
-               '<span class="material-symbols-outlined">person</span>Profile</button>' +
-             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Settings\')">' +
-               '<span class="material-symbols-outlined">settings</span>Settings</button>' +
-             '<div class="lt-am-div"></div>' +
-             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Log out\')">' +
-               '<span class="material-symbols-outlined">logout</span>Log out</button>' +
-           '</div>';
-  }
-
-  function _renderLimitReached(key, u) {
-    var meta = QUOTA_META[key];
-    var q = u.quota[key] || {};
-    var total = (q.total || 0).toLocaleString();
-    var used = (q.used || 0).toLocaleString();
-    var mailto = 'mailto:sales@mile.cloud?subject=' + encodeURIComponent('AI Quota Add-on request — ' + meta.dialogLabel);
-    return '<div class="lt-lr-backdrop" id="lt-lr-backdrop" onclick="if(event.target===this)window.LumitureTopbar.closeLimitReached()">' +
-             '<div class="lt-lr" role="alertdialog" aria-labelledby="lt-lr-title">' +
-               '<div class="lt-lr-body">' +
-                 '<div class="lt-lr-icon"><span class="material-symbols-outlined">error</span></div>' +
-                 '<div class="lt-lr-title" id="lt-lr-title">Limit Reached</div>' +
-                 '<div class="lt-lr-text">Your monthly limit (<b>' + total + ' ' + _esc(meta.unit) + '</b>) ' +
-                   'has been reached for <b>' + _esc(meta.dialogLabel) + '</b>. Please contact your LumiTure ' +
-                   'representative to increase your quota for this billing cycle.</div>' +
-                 '<div class="lt-lr-aux">' +
-                   '<span>Used: <b>' + used + ' / ' + total + '</b></span>' +
-                   '<span>Refresh on: <b>' + _esc(u.quota.refreshDate) + '</b></span>' +
-                 '</div>' +
-               '</div>' +
-               '<div class="lt-lr-foot">' +
-                 '<button type="button" class="lt-lr-btn lt-lr-btn-text" onclick="window.LumitureTopbar.closeLimitReached()">Dismiss</button>' +
-                 '<a class="lt-lr-btn lt-lr-btn-primary" href="' + mailto + '">' +
-                   '<span class="material-symbols-outlined">mail</span>Contact Sales</a>' +
-               '</div>' +
-             '</div>' +
-           '</div>';
-  }
-
-  // ===== Mount / state =====
-  var _menuOpen = false;
-
-  function _render() {
-    var mount = document.getElementById('lt-topbar');
-    if (!mount) { console.warn('[lumiture-topbar] Mount point #lt-topbar not found'); return; }
-    var u = _user();
-    var icons = window.LUMITURE_TOPBAR_ICONS || DEFAULT_ICONS;
-    mount.classList.add('lt-topbar');
-    mount.innerHTML = icons.map(_renderIcon).join('') + _renderUserChip(u);
-    var chip = document.getElementById('lt-tb-user');
-    if (chip) chip.addEventListener('click', function (e) { e.stopPropagation(); _toggleMenu(); });
-    _menuOpen = false;
-  }
-
-  function _menuHost() {
-    var host = document.getElementById('lt-am-host');
-    if (!host) {
-      host = document.createElement('div');
-      host.id = 'lt-am-host';
-      document.body.appendChild(host);
-    }
-    return host;
-  }
-
-  function _openMenu() {
-    var u = _user();
-    _menuHost().innerHTML = _renderMenu(u);
-    _menuOpen = true;
-    var chip = document.getElementById('lt-tb-user');
-    if (chip) { chip.classList.add('is-open'); chip.setAttribute('aria-expanded', 'true'); }
-  }
-  function _closeMenu() {
-    _menuHost().innerHTML = '';
-    _menuOpen = false;
-    var chip = document.getElementById('lt-tb-user');
-    if (chip) { chip.classList.remove('is-open'); chip.setAttribute('aria-expanded', 'false'); }
-  }
-  function _toggleMenu() { _menuOpen ? _closeMenu() : _openMenu(); }
-
-  function _lrHost() {
-    var host = document.getElementById('lt-lr-host');
-    if (!host) { host = document.createElement('div'); host.id = 'lt-lr-host'; document.body.appendChild(host); }
-    return host;
-  }
-  function _openLimitReached(key) {
-    _lrHost().innerHTML = _renderLimitReached(key, _user());
-  }
-  function _closeLimitReached() { _lrHost().innerHTML = ''; }
-
-  // Esc 關閉（dialog 優先於 menu）
-  document.addEventListener('keydown', function (e) {
-    if (e.key !== 'Escape') return;
-    if (document.getElementById('lt-lr-backdrop')) { _closeLimitReached(); return; }
-    if (_menuOpen) _closeMenu();
-  });
-
-  // ===== Public API =====
-  window.LumitureTopbar = {
-    setUser: function (user) {
-      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, user || {});
-      _render(); if (_menuOpen) _openMenu();
-    },
-    setRole: function (role) {
-      var el = document.getElementById('lt-tb-user-role');
-      if (el) el.textContent = role;
-      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, { role: role });
-      if (_menuOpen) _openMenu();
-    },
-    setPlan: function (plan) {
-      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, { plan: plan });
-      if (_menuOpen) _openMenu();
-    },
-    setQuota: function (q) {
-      var cur = (window.LUMITURE_USER || {});
-      window.LUMITURE_USER = Object.assign({}, cur, {
-        quota: Object.assign({}, DEFAULT_USER.quota, cur.quota || {}, q || {}),
-      });
-      if (q && typeof q.addonPacks !== 'undefined') window.LUMITURE_USER.addonPacks = q.addonPacks;
-      if (_menuOpen) _openMenu();
-    },
-    openMenu: _openMenu,
-    closeMenu: _closeMenu,
-    toggleMenu: _toggleMenu,
-    openLimitReached: function (key) { _openLimitReached(key); },
-    closeLimitReached: _closeLimitReached,
-    rerender: function () { _render(); if (_menuOpen) _openMenu(); },
-    _noop: function (label) { /* 展示用：Profile/Settings/Log out/View as Another Role 點擊佔位 */
-      if (typeof window.LUMITURE_MENU_ACTION === 'function') window.LUMITURE_MENU_ACTION(label);
-    },
-  };
-
-  // ===== INIT =====
-  function _init() { _injectCSS(); _render(); }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', _init);
-  } else { _init(); }
-})();
-
-</script>
+<script src="../shared/lumiture-topbar.js?v=2026-06-23f"></script>
 <script>
 /* === Inlined: shared/demo-fab.js === */
 /*!
