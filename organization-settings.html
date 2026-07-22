@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lumiture.ai — Organization Settings v4 (Cross-cloud Authorization)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+/* === Inlined: shared/tokens.css === */
+/* ============================================================
+ * Lumiture Design Tokens
+ * ============================================================
+ * 來源：Figma CMDS + prototype scan + 8 項設計決策 (2026-05-12)
+ * 命名規範：W3C Design Tokens spec（長名結構化 BEM）
+ * 三層架構：Primitive → Semantic → Component
+ * 完整決策紀錄：~/.claude/.../project_design_tokens_decisions.md
+ * ============================================================ */
+
+:root {
+
+  /* ============================================================
+   * LAYER 1 — PRIMITIVE
+   * 原子層：純色號 / 純數值；不直接給 component 用
+   * ============================================================ */
+
+  /* --- Color: Brand Sky Blue (對齊 Figma Theme: LumiTure.ai/Primary) --- */
+  --lt-blue-10: #F2FAFF;   /* Figma: Primary/Light 10 */
+  --lt-blue-20: #D1EEFF;   /* Figma: Primary/Light 20 */
+  --lt-blue-30: #9ED7FF;   /* Figma: Primary/Light 30 */
+  --lt-blue-60: #0B6DD7;   /* Figma: Primary/Light */
+  --lt-blue-70: #004FB0;   /* Figma: Primary/Main */
+  --lt-blue-90: #002663;   /* Figma: Primary/Dark */
+
+  /* --- Color: Brand Turquoise (對齊 Figma Theme: LumiTure.ai/Secondary) --- */
+  --lt-turquoise-10: #F0FFFF;   /* Figma: Turquoise 10 */
+  --lt-turquoise-20: #DBFDFF;   /* Figma: Turquoise 20 */
+  --lt-turquoise-30: #B0F8FF;   /* Figma: Turquoise 30 */
+  --lt-turquoise-60: #4ADFFF;   /* Figma: Turquoise 60 (Chart) */
+  --lt-turquoise-70: #34B5D9;   /* Figma: Secondary/Main */
+  --lt-turquoise-80: #228EB3;   /* Figma: Secondary/Dark */
+
+  /* --- Color: Grey (9 階；同值不同 token = 為未來情境換色保留彈性) --- */
+  --lt-grey-50:  #F6F6F6;
+  --lt-grey-100: #F2F2F2;
+  --lt-grey-200: #E6E6E6;
+  --lt-grey-300: #CCCCCC;
+  --lt-grey-400: #B3B3B3;
+  --lt-grey-500: #676767;
+  --lt-grey-600: #676767;   /* 暫同 500；保留為 icon-default 等情境獨立換色用 */
+  --lt-grey-700: #262626;
+  --lt-grey-800: #262626;   /* 暫同 700；保留為 heading 等情境獨立換色用 */
+  --lt-grey-900: #262626;   /* 暫同 700；保留為 highest contrast 情境用 */
+
+  /* --- Color: Black / White --- */
+  --lt-black: #000000;
+  --lt-white: #FFFFFF;
+
+  /* --- Color: Chart Palette (對齊 Figma General Behavior 規範)
+   * 來源：Figma file 🧞‍♂️-General-Behavior, node 1642-36013
+   * 使用規則：圖表配色一律按 1→10 順序套用；超過 10 個則循環使用
+   * 命名按官方 "#N Main" 編號 + 視覺色名註解
+   */
+  --lt-chart-1:  #7A8BA9;   /* CMDS Color Kit Main #1 — Navy Blue 50 */
+  --lt-chart-2:  #9ED7FF;   /* CMDS Color Kit Main #2 — Sky Blue 30 (corrected from #86CBFC 2026-05-21; #86CBFC is GCP brand color, not CMDS palette) */
+  --lt-chart-3:  #9CF3FF;   /* CMDS Color Kit Main #3 — Turquoise Blue 40 */
+  --lt-chart-4:  #00DCC2;   /* CMDS Color Kit Main #4 — Green 60 */
+  --lt-chart-5:  #94F29D;   /* CMDS Color Kit Main #5 — Emerald Green 40 */
+  --lt-chart-6:  #F3BE68;   /* CMDS Color Kit Main #6 — Tangerine Orange 40 */
+  --lt-chart-7:  #F4B581;   /* CMDS Color Kit Main #7 — Lantern Orange 50 */
+  --lt-chart-8:  #FFA4A9;   /* CMDS Color Kit Main #8 — Red 30 */
+  --lt-chart-9:  #FE89C1;   /* CMDS Color Kit Main #9 — Fuchsia 30 */
+  --lt-chart-10: #C096FF;   /* CMDS Color Kit Main #10 — Purple 40 */
+  --lt-chart-11: #B3B3B3;   /* CMDS Color Kit Main #11 — Gray 30 (for n+1 fallback) */
+
+  /* --- Color: Functional (TBC — Figma 未做 Variable，待下輪 audit) --- */
+  --lt-color-success-base:  #00B5A6;   /* TBC: Figma audit needed */
+  --lt-color-success-dark:  #008F88;   /* TBC: Figma audit needed */
+  --lt-color-success-light: #E6FFF8;   /* TBC: Figma audit needed */
+  --lt-color-error-base:    #FF403D;   /* TBC: Figma audit needed */
+  --lt-color-error-light:   #FFEBEF;   /* TBC: Figma audit needed */
+  --lt-color-warning-base:  #FC9A0F;   /* TBC: Figma audit needed */
+  --lt-color-warning-light: #FEF3E1;   /* TBC: Figma audit needed */
+  --lt-color-info-base:     #0B6DD7;   /* = blue-60，符合 Figma info usage */
+  --lt-color-info-light:    #E6F6FF;   /* TBC: Figma audit needed */
+
+  /* --- Spacing: 嚴格 8px grid，4px 為微間距例外 --- */
+  --lt-space-0:    0;
+  --lt-space-4:    4px;     /* 例外：僅限 icon-text gap、border-thin 等微間距 */
+  --lt-space-8:    8px;
+  --lt-space-16:   16px;
+  --lt-space-24:   24px;
+  --lt-space-32:   32px;
+  --lt-space-48:   48px;
+  --lt-space-64:   64px;
+  --lt-space-96:   96px;
+  --lt-space-128:  128px;
+
+  /* --- Radius --- */
+  --lt-radius-none:   0;
+  --lt-radius-xs:     3px;      /* chips / badges / 薄狀指示器 (源自 lumi-tag v7 5 處用法) */
+  --lt-radius-sm:     4px;
+  --lt-radius-md:     8px;
+  --lt-radius-lg:     12px;
+  --lt-radius-xl:     16px;
+  --lt-radius-pill:   9999px;   /* pill button / chip — 矩形元素的最大圓角 */
+  --lt-radius-circle: 50%;      /* 圓形 icon / avatar / toggle dot — 形狀無關 */
+
+  /* --- Typography: Font Family --- */
+  --lt-font-sans: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'PingFang TC', sans-serif;
+  --lt-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* --- Typography: Font Size (對齊 Figma 8 階；13px 為例外備用) --- */
+  --lt-fs-12: 12px;   /* Figma: Caption */
+  --lt-fs-13: 13px;   /* 例外：半 body 半 caption 過渡用；不在 Figma 主規範 */
+  --lt-fs-14: 14px;   /* Figma: Body / Button Regular 1 / Link */
+  --lt-fs-16: 16px;   /* Figma: H6 / Button 2 */
+  --lt-fs-18: 18px;   /* Figma: H5 / Subtitle */
+  --lt-fs-20: 20px;   /* Figma: H4 */
+  --lt-fs-24: 24px;   /* Figma: H3 */
+  --lt-fs-36: 36px;   /* Figma: H2 */
+  --lt-fs-48: 48px;   /* Figma: H1 */
+
+  /* --- Typography: Font Weight --- */
+  --lt-fw-regular:  400;
+  --lt-fw-medium:   500;
+  --lt-fw-semibold: 600;   /* Figma: Button Medium 2 */
+  --lt-fw-bold:     700;
+
+  /* --- Typography: Line Height (對齊 Figma; Body 系列 1.75) --- */
+  --lt-leading-heading: 1.25;   /* Figma: H1 */
+  --lt-leading-tight:   1.5;    /* Figma: H2-H6 / Caption / Button / Link */
+  --lt-leading-body:    1.75;   /* Figma: Body Regular/Medium/Bold */
+
+  /* --- Typography: Letter Spacing (對齊 Figma: 全部 0) --- */
+  --lt-tracking-normal: 0;
+
+  /* --- Shadow: 對齊 CMDS Figma 規範 (2026-05-12 audit)
+   * 來源：Figma node 20599-107518 — CMDS 4 個官方 shadow variables
+   * 命名按「用途」而非「強度」(Cell / Button / Chip / Dialog)，跟 Material/Tailwind 不同
+   * Overlay 系列為 Lumiture 補充規範（CMDS 未涵蓋的較強 floating overlay 場景）
+   */
+  --lt-shadow-cell:   0 2px 0 0 rgba(0, 0, 0, 0.2);              /* 銳邊，blur=0；table row 分隔線替代 */
+  --lt-shadow-button: 0 2px 14px 0 rgba(137, 174, 255, 0.2);     /* 藍色 tinted，#89AEFF；clickable elevation */
+  --lt-shadow-chip:   0 2px 4px 0 rgba(0, 0, 0, 0.3);            /* chip / tag 用，較深 opacity */
+  --lt-shadow-dialog: 0 0 6px 0 rgba(0, 0, 0, 0.2);              /* Card / Dialog / Dropdown 共用；無 offset */
+  --lt-shadow-overlay:        0 4px 12px rgba(0, 0, 0, 0.14);    /* CMDS 未涵蓋；popover / floating menu */
+  --lt-shadow-overlay-strong: 0 4px 16px rgba(0, 0, 0, 0.18);    /* CMDS 未涵蓋；drawer / 較重 overlay */
+
+  /* --- Transition --- */
+  --lt-transition-fast: .15s ease;
+  --lt-transition-base: .2s ease;
+  --lt-transition-slow: .3s ease;
+
+  /* --- Z-index --- */
+  --lt-z-base:     0;
+  --lt-z-elevated: 10;
+  --lt-z-sticky:   100;
+  --lt-z-dropdown: 1000;
+  --lt-z-modal:    2000;
+  --lt-z-tooltip:  3000;
+  --lt-z-toast:    4000;
+
+
+  /* ============================================================
+   * LAYER 2 — SEMANTIC
+   * 語意層：引用 primitive，描述用途；component 預設用此層
+   * ============================================================ */
+
+  /* --- Color: Brand --- */
+  --lt-color-primary:         var(--lt-blue-70);
+  --lt-color-primary-hover:   var(--lt-blue-60);
+  --lt-color-primary-active:  var(--lt-blue-90);
+  --lt-color-primary-bg:      var(--lt-blue-10);
+  --lt-color-primary-bg-emphasized: var(--lt-blue-20);
+
+  --lt-color-secondary:       var(--lt-turquoise-70);
+  --lt-color-secondary-hover: var(--lt-turquoise-60);
+  --lt-color-secondary-bg:    var(--lt-turquoise-10);
+
+  /* --- Color: Functional (alias) --- */
+  --lt-color-success: var(--lt-color-success-base);
+  --lt-color-error:   var(--lt-color-error-base);
+  --lt-color-warning: var(--lt-color-warning-base);
+  --lt-color-info:    var(--lt-color-info-base);
+
+  /* --- Color: Text --- */
+  --lt-color-text-primary:   var(--lt-grey-700);   /* 內文預設 */
+  --lt-color-text-secondary: var(--lt-grey-500);   /* 次要文字 */
+  --lt-color-text-tertiary:  var(--lt-grey-400);   /* hint / placeholder */
+  --lt-color-text-disabled:  var(--lt-grey-400);
+  --lt-color-text-inverse:   var(--lt-white);
+  --lt-color-text-link:      var(--lt-blue-60);
+  --lt-color-text-heading:   var(--lt-grey-800);   /* 為未來 heading 獨立換色預留 */
+  --lt-color-text-icon:      var(--lt-grey-600);   /* 為未來 icon 獨立換色預留 */
+
+  /* --- Color: Background --- */
+  --lt-color-bg-default:    var(--lt-white);
+  --lt-color-bg-subtle:     var(--lt-grey-50);
+  --lt-color-bg-emphasized: var(--lt-grey-100);
+  --lt-color-bg-disabled:   var(--lt-grey-100);
+  --lt-color-bg-inverse:    var(--lt-blue-90);
+  --lt-color-bg-overlay:    rgba(0, 0, 0, 0.5);
+
+  /* --- Color: Border --- */
+  --lt-color-border-default: var(--lt-grey-200);
+  --lt-color-border-strong:  var(--lt-grey-300);
+  --lt-color-border-focus:   var(--lt-color-primary);
+  --lt-color-border-input:   #DCE3EC;   /* prototype --tf-border；略不同於 grey-200 */
+  --lt-color-border-error:   var(--lt-color-error-base);
+
+
+  /* ============================================================
+   * LAYER 3 — COMPONENT
+   * 元件層：給特定元件使用；引用 semantic
+   * ============================================================ */
+
+  /* --- Sidebar (深海軍藍) --- */
+  --lt-sidebar-width:      264px;
+  --lt-sidebar-bg:         var(--lt-blue-90);
+  --lt-sidebar-text:       rgba(255, 255, 255, 0.85);
+  --lt-sidebar-text-muted: rgba(255, 255, 255, 0.50);
+  --lt-sidebar-hover-bg:   rgba(255, 255, 255, 0.06);
+  --lt-sidebar-active-bg:  var(--lt-color-primary);
+
+  /* --- Topbar --- */
+  --lt-topbar-bg:     var(--lt-white);
+  --lt-topbar-shadow: var(--lt-shadow-dialog);   /* CMDS Dialog shadow（Card 級別 elevation）*/
+
+  /* --- Card --- */
+  --lt-card-bg:      var(--lt-color-bg-default);
+  --lt-card-radius:  var(--lt-radius-md);
+  --lt-card-shadow:  var(--lt-shadow-dialog);    /* CMDS 明確規範 Card 用 Dialog shadow */
+  --lt-card-padding: var(--lt-space-24);
+
+  /* --- Button --- */
+  --lt-button-radius:     var(--lt-radius-sm);
+  --lt-button-padding-x:  var(--lt-space-16);
+  --lt-button-padding-y:  var(--lt-space-8);
+  --lt-button-focus-ring: 0 0 0 3px rgba(0, 79, 176, 0.10);
+
+  /* --- Input / Text Field --- */
+  --lt-input-bg:        var(--lt-color-bg-default);
+  --lt-input-border:    var(--lt-color-border-input);
+  --lt-input-radius:    var(--lt-radius-sm);
+  --lt-input-padding-x: var(--lt-space-16);
+  --lt-input-padding-y: var(--lt-space-8);
+
+  /* --- Modal --- */
+  --lt-modal-radius:   var(--lt-radius-lg);
+  --lt-modal-shadow:   var(--lt-shadow-dialog);  /* CMDS Dialog shadow（Modal = Dialog 同類）*/
+  --lt-modal-padding:  var(--lt-space-24);
+  --lt-modal-backdrop: rgba(0, 0, 0, 0.5);
+
+  /* --- Tooltip --- */
+  --lt-tooltip-bg:      #3C3C3C;            /* 對齊 Lumiture-Guideline.md 規範；非品牌色，刻意不引用 brand token */
+  --lt-tooltip-text:    var(--lt-white);
+  --lt-tooltip-radius:  var(--lt-radius-sm);
+  --lt-tooltip-padding: var(--lt-space-8);
+}
+
+
+/* ============================================================
+ * NOT YET DEFINED (Pass 3+)
+ * ============================================================
+ * - ~~Chart palette~~ ✅ 已加入（2026-05-12 從 Figma General Behavior file audit）
+ * - Gradient tokens (Figma 有 Lumiture.ai Blue / Orange / Lemon C 等)
+ * - Opacity tokens (Figma 有 CM Opacity Color 系列)
+ * - Composite typography tokens (--lt-type-h1, --lt-type-body 等 style sets)
+ * - Focus / Inset shadow 特殊變體
+ * - Dark mode 對應 token
+ *
+ * Shadow 結構待 Figma audit：v7/v8 用單層、tokens.css 主階用雙層；Overlay 已用單層作折衷
+ * ============================================================ */
+
+</style>
+  <style>
+    *{box-sizing:border-box} body{margin:0;background:var(--lt-color-primary-bg);color:var(--lt-color-text-primary);font-family:var(--lt-font-sans);font-size:var(--lt-fs-14);letter-spacing:var(--lt-tracking-normal)}
+    button{font:inherit} .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+    .shell{display:flex;min-height:100vh}.workspace{min-width:0;flex:1;display:flex;flex-direction:column}.main{width:min(100%,1440px);margin:0 auto;padding:32px 32px 96px}
+    .page-title{display:block;margin-bottom:24px}
+    h1{font-size:var(--lt-fs-20);line-height:var(--lt-leading-tight);margin:1px 0 4px;color:var(--lt-color-text-heading)}.subtitle{margin:0;color:var(--lt-color-text-secondary);line-height:var(--lt-leading-body)}
+    .instruction{display:inline-flex;align-items:center;gap:8px;border:0;background:transparent;color:var(--lt-color-text-link);font-weight:600;padding:4px 0;margin:0 0 28px;cursor:pointer}.instruction .material-symbols-outlined{font-size:20px}.instruction:hover .instruction-text{text-decoration:underline}
+    .provider-list{display:flex;flex-direction:column;gap:32px}.provider{display:flex;flex-direction:column;gap:16px}.provider-head{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:40px}.provider-name{display:flex;align-items:center;gap:12px;min-width:0}.provider-name h2{font-size:var(--lt-fs-20);line-height:var(--lt-leading-tight);margin:0;color:var(--lt-color-text-heading)}
+    .csp{width:28px;height:28px;border-radius:var(--lt-radius-sm);display:grid;place-items:center;font-size:12px;font-weight:700;letter-spacing:-.3px;flex:0 0 auto}.csp.gcp{color:#4285F4;background:conic-gradient(from 35deg,#4285f4 0 25%,#34a853 0 50%,#fbbc05 0 75%,#ea4335 0)}.csp.gcp span{display:grid;place-items:center;width:17px;height:17px;border-radius:50%;background:#fff;color:#4285F4;font-size:9px}.csp.aws{background:#232f3e;color:#ff9900;font-size:11px}.csp.azure{background:#0078d4;color:#fff;font-size:11px}
+    .provider-actions{display:flex;align-items:center;gap:12px}.sync{position:relative;display:inline-flex;align-items:center;color:var(--lt-color-text-secondary);cursor:help}.sync .material-symbols-outlined{font-size:20px}.sync-tip{position:absolute;right:0;top:calc(100% + 8px);width:290px;opacity:0;visibility:hidden;transform:translateY(-3px);transition:var(--lt-transition-fast);z-index:5;background:#3C3C3C;color:#fff;border-radius:var(--lt-radius-sm);font-size:12px;font-weight:400;line-height:1.5;padding:8px 10px;box-shadow:var(--lt-shadow-overlay);pointer-events:none}.sync:hover .sync-tip{opacity:1;visibility:visible;transform:none}
+    .add-wrap{position:relative}.add-button{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:var(--lt-radius-sm);padding:9px 12px;background:var(--lt-color-primary);color:#fff;font-size:14px;font-weight:600;line-height:20px;cursor:pointer;box-shadow:var(--lt-shadow-button);transition:background var(--lt-transition-fast)}.add-button:hover{background:var(--lt-color-primary-hover)}.add-button .material-symbols-outlined{font-size:19px}.add-button[aria-expanded="true"] .material-symbols-outlined{transform:rotate(180deg)}
+    .menu{position:absolute;right:0;top:calc(100% + 8px);z-index:10;width:175px;background:#fff;border-radius:var(--lt-radius-sm);padding:4px 0;box-shadow:var(--lt-shadow-overlay);display:none;overscroll-behavior:contain}.menu.open{display:block}.menu button{width:100%;border:0;background:#fff;color:var(--lt-color-text-primary);font-size:14px;padding:10px 16px;text-align:left;cursor:pointer}.menu button:hover:not(:disabled){background:var(--lt-color-bg-subtle)}.menu button:disabled{cursor:not-allowed;color:var(--lt-color-text-disabled)}.menu-item{position:relative}.menu-item[data-tooltip]::after{content:attr(data-tooltip);position:absolute;top:3px;right:calc(100% + 8px);width:280px;background:#3C3C3C;color:#fff;padding:8px 10px;border-radius:var(--lt-radius-sm);font-size:12px;line-height:1.5;opacity:0;visibility:hidden;transform:translateY(-3px);transition:var(--lt-transition-fast);pointer-events:none;box-shadow:var(--lt-shadow-overlay)}.menu-item:hover[data-tooltip]::after{opacity:1;visibility:visible;transform:none}
+    .card{background:var(--lt-color-bg-default);border-radius:var(--lt-radius-md);box-shadow:var(--lt-shadow-dialog);padding:24px}.auth-group+.auth-group{margin-top:32px}.auth-title{font-size:var(--lt-fs-16);font-weight:700;line-height:var(--lt-leading-tight);color:var(--lt-color-text-heading);margin:0 0 16px}.table-wrap{overflow:auto;overscroll-behavior:contain;border-radius:var(--lt-radius-sm);border:1px solid var(--lt-color-border-default)}table{border-collapse:collapse;width:100%;min-width:620px;text-align:left}th{height:50px;padding:0 16px;background:var(--lt-color-bg-subtle);border-bottom:1px solid var(--lt-color-border-default);color:var(--lt-color-text-secondary);font-size:12px;font-weight:700;white-space:nowrap}td{height:58px;padding:10px 16px;border-bottom:1px solid var(--lt-color-border-default);vertical-align:middle;font-size:14px}tr:last-child td{border-bottom:0}.account-name{font-weight:600;color:var(--lt-color-text-primary);line-height:1.35}.account-id{font-size:12px;color:var(--lt-color-text-secondary);line-height:1.35;margin-top:2px;overflow-wrap:anywhere}.status{position:relative;display:inline-flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap}.status-dot{width:8px;height:8px;border-radius:50%;background:var(--lt-color-success)}.status.in-progress .status-dot{background:var(--lt-color-warning)}.status.error,.status.actionable{color:var(--lt-color-error)}.status.error .status-dot,.status.actionable .status-dot{background:var(--lt-color-error)}.status.actionable{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}.status[data-tooltip]::after{content:attr(data-tooltip);position:absolute;z-index:4;left:0;top:calc(100% + 8px);width:400px;max-width:calc(100vw - 80px);padding:9px 10px;border-radius:var(--lt-radius-sm);background:#3C3C3C;color:#fff;font-size:12px;font-weight:400;line-height:1.5;opacity:0;visibility:hidden;transform:translateY(-3px);transition:var(--lt-transition-fast);box-shadow:var(--lt-shadow-overlay);pointer-events:none}.status:hover[data-tooltip]::after{opacity:1;visibility:visible;transform:none}.updated{font-variant-numeric:tabular-nums;color:var(--lt-color-text-primary);white-space:nowrap}
+    .empty-card{min-height:246px;display:grid;place-items:center;padding:28px;background:#fff;border-radius:var(--lt-radius-md);box-shadow:var(--lt-shadow-dialog);text-align:center}.empty-card .material-symbols-outlined{font-size:44px;color:var(--lt-color-primary);margin-bottom:8px}.empty-title{font-size:16px;font-weight:700;margin:0 0 4px}.empty-copy{margin:0;max-width:480px;color:var(--lt-color-text-secondary);line-height:1.65}.empty-copy a{color:var(--lt-color-text-link);font-weight:600;text-decoration:none}.empty-copy a:hover{text-decoration:underline}
+    .skeleton-card{padding:24px;background:#fff;border-radius:var(--lt-radius-md);box-shadow:var(--lt-shadow-dialog);animation:fade .16s ease}.skel{background:linear-gradient(90deg,#edf2f5 0%,#f7f9fa 50%,#edf2f5 100%);background-size:200% 100%;animation:shimmer 1.25s linear infinite;border-radius:var(--lt-radius-sm)}.skel-title{height:24px;width:205px;margin-bottom:24px}.skel-table{height:150px;width:100%}@keyframes shimmer{to{background-position:-200% 0}}@keyframes fade{from{opacity:.55}to{opacity:1}}
+    .demo{position:fixed;right:24px;bottom:24px;z-index:30}.demo-main{display:flex;align-items:center;gap:8px;border:0;border-radius:var(--lt-radius-pill);padding:11px 16px;background:#002663;color:#fff;box-shadow:var(--lt-shadow-overlay-strong);font-size:13px;font-weight:700;cursor:pointer}.demo-main .material-symbols-outlined{font-size:20px}.demo-panel{position:absolute;right:0;bottom:calc(100% + 10px);width:252px;padding:12px;background:#fff;border-radius:var(--lt-radius-md);box-shadow:var(--lt-shadow-overlay-strong);display:none}.demo.open .demo-panel{display:block}.demo-label{display:block;color:var(--lt-color-text-secondary);font-size:12px;font-weight:700;margin:2px 4px 7px}.demo-choice{display:block;width:100%;text-align:left;border:0;background:transparent;border-radius:var(--lt-radius-sm);padding:9px 8px;color:var(--lt-color-text-primary);font-size:13px;cursor:pointer}.demo-choice:hover,.demo-choice.active{background:var(--lt-color-primary-bg);color:var(--lt-color-primary);font-weight:600}
+    .toast{position:fixed;left:24px;bottom:24px;z-index:50;display:flex;align-items:center;gap:10px;max-width:440px;border-radius:var(--lt-radius-sm);padding:12px 16px;background:var(--lt-color-success);color:#fff;box-shadow:var(--lt-shadow-overlay-strong);font-size:14px;transform:translateY(100px);opacity:0;transition:var(--lt-transition-base)}.toast.error{background:var(--lt-color-error)}.toast.show{opacity:1;transform:none}.toast .material-symbols-outlined{font-size:20px}
+    .footer{display:flex;justify-content:space-between;gap:16px;padding:20px 32px;margin-top:auto;font-size:12px;background:#fff;border-top:1px solid var(--lt-color-border-default)}.footer-version{color:var(--lt-color-text-primary);font-weight:600}.ver-tag{display:inline-block;margin-left:6px;background:#34B5D9;color:#fff;border-radius:var(--lt-radius-pill);padding:2px 8px;font-size:11px}.footer-credit{color:#676767}
+    @media(max-width:800px){.main{padding:24px 16px 96px}.provider-head{align-items:flex-start}.provider-actions{gap:8px}.add-button{padding:9px}.add-button .label{display:none}.card{padding:16px}.footer{padding:16px;flex-direction:column}.sync{display:none}}
+  </style>
+  <style>
+    /* Figma refinement: keep the authorization surface compact and table-led. */
+    .main{max-width:1366px;padding:32px 32px 72px}
+    .page-title{margin-bottom:8px}.instruction{margin:0 0 32px}
+    .provider-list{gap:40px}.provider{gap:12px}.provider-head{min-height:40px}
+    .card{padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+    .auth-group+.auth-group{margin-top:24px}.auth-title{margin-bottom:12px}
+    th,td{height:50px}td{padding:8px 16px}
+    .empty-card{min-height:246px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+    .skeleton-card{min-height:246px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+    .add-button:disabled{background:#c5c5c5;box-shadow:none;cursor:not-allowed}
+    .loading-actions{display:flex;align-items:center;gap:12px}.loading-actions .sync{opacity:.45}
+    /* Exact Authorization List table rules from Figma: 1004px = 644 / 240 / 120. */
+    .provider-list{gap:32px}.provider{gap:8px}.provider-name{gap:8px}.provider-name h2{font-size:18px;line-height:27px}
+    .csp{width:30px;height:30px;padding:0;background:transparent!important;border-radius:0;font-size:0}.csp img{display:block;max-width:none}.csp.gcp img{width:22px;height:18px}.csp.aws{position:relative}.csp.aws .aws-wordmark{position:absolute;top:8px;left:4px;width:22px;height:7px}.csp.aws .aws-arrow{position:absolute;top:17px;left:4px;width:22px;height:5px}.csp.azure img{width:20px;height:20px}
+    .card{gap:32px;padding:24px;border-radius:16px;box-shadow:0 0 10px rgba(0,0,0,.1)}.auth-group+.auth-group{margin-top:32px}.auth-title{font-size:16px;line-height:24px;margin-bottom:24px}
+    .table-wrap{border:0;border-radius:0;overflow-x:auto;overflow-y:hidden}.table-wrap table{width:100%;min-width:1004px;table-layout:fixed}.table-wrap th{height:50px;padding:7px 16px 8px;background:#F2FAFF;color:#262626;font-size:14px;font-weight:700;line-height:24.5px}.table-wrap td{height:50px;padding:7px 16px 8px;color:#262626;background:#fff;font-size:14px;line-height:21px}.table-wrap th:nth-child(1){width:64.1434%}.table-wrap th:nth-child(2){width:23.9044%}.table-wrap th:nth-child(3){width:11.9522%}
+    .account-name{font-weight:400;line-height:21px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.account-id{display:inline;margin:0;color:#B3B3B3;font-size:14px;line-height:21px}.updated{font-size:14px;line-height:21px}
+    .provider-actions .sync{justify-content:center;width:36px;height:36px;border:1px solid #308CE3;border-radius:5px;background:#fff;color:#308CE3;cursor:pointer}.provider-actions .sync:hover{background:#F2FAFF}.provider-actions .sync .material-symbols-outlined{font-size:24px}.loading-actions .sync{border-color:#E6E6E6;color:#B3B3B3;background:#fff;cursor:default}
+    .empty-card .material-symbols-outlined{color:#B3B3B3}
+    .status[data-tooltip]::after{display:none}.status-tooltip{position:fixed;z-index:400;max-width:min(400px,calc(100vw - 32px));padding:9px 10px;border-radius:var(--lt-radius-sm);background:#3C3C3C;color:#fff;font-size:12px;font-weight:400;line-height:1.5;box-shadow:var(--lt-shadow-overlay);pointer-events:none;opacity:0;visibility:hidden;transform:translateY(-3px);transition:var(--lt-transition-fast)}.status-tooltip.show{opacity:1;visibility:visible;transform:none}
+    .azure-flow{max-width:1052px}.flow-return{display:inline-flex;align-items:center;gap:4px;min-height:36px;margin:0 0 24px;padding:7px 0;border:0;background:transparent;color:#004FB0;font:inherit;font-weight:700;cursor:pointer}.flow-return .material-symbols-outlined{font-size:20px}.flow-return:hover .flow-return-label{text-decoration:underline}.flow-return:focus-visible{outline:2px solid #34B5D9;outline-offset:3px;border-radius:4px}.flow-top{display:flex;align-items:center;gap:12px;margin-bottom:24px}.flow-top>div{display:flex;flex-direction:column;align-items:flex-start}.flow-title{font-size:var(--lt-fs-20);line-height:30px;font-weight:var(--lt-fw-bold);margin:0;color:#262626}.stepper{display:flex;gap:0;margin:0 0 32px}.step{display:flex;align-items:center;gap:8px;flex:1;color:#676767;font-size:13px;font-weight:600}.step:not(:last-child)::after{content:'';height:2px;background:#E6E6E6;flex:1;margin-left:8px}.step.active{color:#004FB0}.step.done{color:#00B5A6}.step-dot{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#E6E6E6;color:#676767;font-size:12px}.active .step-dot{background:#004FB0;color:#fff}.done .step-dot{background:#00B5A6;color:#fff}.azure-panel{background:#fff;border-radius:16px;box-shadow:0 0 10px rgba(0,0,0,.1);padding:32px}.azure-panel h2{font-size:var(--lt-fs-18);line-height:27px;margin:0 0 8px}.azure-panel h3{font-size:var(--lt-fs-16);line-height:var(--lt-leading-tight);margin:28px 0 10px}.azure-panel p,.azure-panel li{line-height:var(--lt-leading-body)}.notice{border-left:4px solid #34B5D9;background:#F2FAFF;padding:16px 18px;border-radius:0 8px 8px 0;color:#262626}.notice.warning{border-color:#FC9A0F;background:#FFF8E8}.flow-actions{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:32px}.primary-action{min-height:36px;border:0;border-radius:5px;padding:7px 12px;background:#004FB0;color:#fff;font-weight:700;cursor:pointer}.secondary-action{display:inline-flex;align-items:center;gap:4px;min-height:36px;border:0;background:transparent;color:#004FB0;font-weight:700;cursor:pointer}.secondary-action::before{content:'arrow_circle_left';font-family:'Material Symbols Outlined';font-size:20px;font-weight:400}.field{display:grid;grid-template-columns:220px minmax(0,1fr);align-items:center;gap:8px;margin-top:16px;max-width:820px}.field label{font-weight:700}.field input{height:36px;border:1px solid #CCC;border-radius:5px;padding:0 8px;font:inherit}.field input.error{border-color:#FF403D}.field-error{color:#FF403D;font-size:12px}.help-card{margin-top:28px;padding-top:24px;border-top:1px solid #E6E6E6}.help-card a{color:#004FB0;font-weight:700}.success-mark{width:48px;height:48px;display:grid;place-items:center;border-radius:50%;background:#DDF7F4;color:#00B5A6;margin-bottom:14px}.success-mark .material-symbols-outlined{font-size:30px}
+    .demo{left:24px;right:auto}.demo-panel{left:0;right:auto}.toast{bottom:82px}
+    .flow-top{justify-content:space-between}.flow-heading{display:flex;align-items:center;gap:12px}.flow-type{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#E8F4FF;color:#004FB0;font-size:var(--lt-fs-12);font-weight:var(--lt-fw-bold)}.flow-type.usage{background:#E5F9F7;color:#007F76}.flow-lead{font-size:var(--lt-fs-14);line-height:var(--lt-leading-body);color:#676767;margin:4px 0 0}.task-list{display:grid;gap:12px;margin-top:24px}.task-card{display:grid;grid-template-columns:36px 1fr auto;gap:14px;align-items:start;padding:18px;border:1px solid #E6E6E6;border-radius:10px;background:#fff}.task-card.current{border-color:#34B5D9;box-shadow:0 0 0 3px rgba(52,181,217,.1)}.task-card.complete{border-color:#A8E5DF}.task-number{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#E8F4FF;color:#004FB0;font-weight:700}.complete .task-number{background:#DDF7F4;color:#007F76}.task-card h3{margin:2px 0 4px}.task-card p{margin:0;color:#676767}.task-status{font-size:12px;font-weight:700;color:#676767;padding-top:7px}.complete .task-status{color:#007F76}.portal-guide{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.portal-step{padding:16px;border-radius:8px;background:#F7FBFE;border:1px solid #D9EDF8}.portal-step strong{display:block;margin-bottom:4px;color:#004FB0}.copy-box{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-top:18px;padding:14px 16px;border:1px solid #B3B3B3;border-radius:8px;background:#FAFAFA}.copy-box code{font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;max-height:190px;overflow:auto}.copy-button{border:1px solid #004FB0;background:#fff;color:#004FB0;border-radius:5px;padding:7px 12px;font-weight:700;cursor:pointer}.select-field{display:grid;gap:7px;max-width:520px;margin-top:20px}.select-field label{font-weight:700}.select-field select{height:36px;border:1px solid #CCC;border-radius:5px;padding:0 8px;background:#fff;font:inherit}.outcome-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.outcome{padding:16px;border:1px solid #E6E6E6;border-radius:8px}.outcome .material-symbols-outlined{color:#004FB0}.flow-actions.stickyish{position:fixed;z-index:90;left:var(--lt-sb-w);right:0;bottom:0;margin:0;padding:16px 32px;background:#F2FAFF;border:0;box-shadow:0 0 3px rgba(0,0,0,.2)}body.is-flow-page .main{padding-bottom:128px}body.is-flow-page .footer{display:none}.ghost-action{border:1px solid #004FB0;border-radius:6px;padding:9px 15px;background:#fff;color:#004FB0;font-weight:700;cursor:pointer}.step-tutorial{margin-top:24px;border:1px solid #D9EDF8;border-radius:10px;background:#FCFEFF}.step-tutorial summary{display:flex;align-items:center;gap:8px;padding:16px 18px;color:#004FB0;font-weight:700;cursor:pointer;list-style:none}.step-tutorial summary::-webkit-details-marker{display:none}.step-tutorial summary::before{content:'expand_more';font-family:'Material Symbols Outlined';font-size:22px;transition:transform var(--lt-transition-fast)}.step-tutorial[open] summary{border-bottom:1px solid #D9EDF8}.step-tutorial[open] summary::before{transform:rotate(180deg)}.tutorial-content{padding:20px 24px 24px;color:#262626;line-height:var(--lt-leading-body)}.tutorial-content h3{margin:0 0 8px;font-size:var(--lt-fs-16);line-height:var(--lt-leading-tight)}.tutorial-content h4{margin:24px 0 8px;font-size:var(--lt-fs-14);line-height:var(--lt-leading-tight);color:#004FB0}.tutorial-content ol,.tutorial-content ul{margin:8px 0;padding-left:24px}.tutorial-content li+li{margin-top:7px}.tutorial-content .tutorial-note{margin-top:16px;padding:12px 14px;border-left:4px solid #34B5D9;background:#F2FAFF;border-radius:0 6px 6px 0}.tutorial-content .tutorial-warn{border-color:#FC9A0F;background:#FFF8E8}@media(max-width:900px){.portal-guide,.outcome-grid{grid-template-columns:1fr}.task-card{grid-template-columns:36px 1fr}.task-status{grid-column:2}.tutorial-content{padding:16px}}@media(max-width:800px){.flow-actions.stickyish{left:0;right:0;padding:16px}.flow-actions.stickyish .secondary-action,.flow-actions.stickyish .primary-action{min-height:40px}}
+  </style>
+  <style>
+    #demo{display:none!important}
+    .task-card .step-tutorial{grid-column:1/-1;margin:0}
+    .table-wrap{overflow-x:auto;overflow-y:hidden}
+    .table-wrap table{min-width:1004px}
+    .step-dot{flex:0 0 24px;aspect-ratio:1/1}
+    .demo{left:calc(var(--lt-sb-w) + 24px);right:auto;z-index:101}
+    .demo-panel{left:0;right:auto}
+    /* Long cloud setup labels stay readable on a horizontal, keyboard-focusable rail. */
+    .stepper{gap:20px;overflow-x:auto;overscroll-behavior:contain;scroll-behavior:smooth;padding:2px 2px 10px;margin-left:-2px;margin-right:-2px;scrollbar-width:thin}
+    .step{flex:0 0 auto;min-width:max-content;white-space:nowrap}
+    .step:not(:last-child)::after{display:none}
+    .step:focus-visible{outline:3px solid rgba(52,181,217,.45);outline-offset:4px;border-radius:4px}
+    .toast{left:24px;bottom:24px;z-index:300}
+    .journey-overview{margin:24px 0 28px;padding:20px;border:1px solid #D9EDF8;border-radius:12px;background:#F8FCFF}.journey-overview h3{margin:0 0 4px;font-size:16px}.journey-overview>p{margin:0 0 16px;color:#676767}.journey-list{display:grid;gap:8px}.journey-item{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:#fff;border:1px solid #E6E6E6}.journey-item.current{border-color:#34B5D9;background:#F2FAFF}.journey-item.done{border-color:#A8E5DF}.journey-index{width:24px;height:24px;display:grid;place-items:center;border-radius:50%;background:#E6E6E6;color:#676767;font-size:12px;font-weight:700}.journey-item.current .journey-index{background:#004FB0;color:#fff}.journey-item.done .journey-index{background:#00B5A6;color:#fff}.journey-title{font-size:13px;font-weight:700;color:#262626;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.journey-state{font-size:11px;font-weight:700;color:#676767}.journey-item.current .journey-state{color:#004FB0}.journey-item.done .journey-state{color:#007F76}
+    .copy-section{margin-top:24px}.copy-section>h3{margin-bottom:4px}.copy-caption{margin:0 0 10px!important;color:#676767;font-size:13px}.code-snippet{overflow:hidden;border-radius:6px;background:#0D0D0D}.code-snippet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;background:#2F2F2F;color:#F2F2F2;font-size:12px}.code-copy{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:#F2F2F2;padding:2px 0;cursor:pointer}.code-copy .material-symbols-outlined{font-size:16px}.code-snippet pre{max-height:360px;margin:0;padding:16px;overflow:auto;overscroll-behavior:contain}.code-snippet code{color:#B3B3B3;font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre}.generated-badge{display:inline-flex;align-items:center;gap:5px;margin-left:8px;padding:3px 8px;border-radius:999px;background:#E5F9F7;color:#007F76;font-size:11px;font-weight:700;vertical-align:middle}
+    .prototype-dialog-backdrop{position:fixed;inset:0;z-index:240;display:grid;place-items:center;padding:24px;background:rgba(0,38,99,.45)}.prototype-dialog{width:min(655px,100%);padding:24px 32px;border-radius:8px;background:#fff;box-shadow:var(--lt-shadow-overlay-strong)}.prototype-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}.prototype-dialog-title{display:flex;align-items:center;gap:10px}.prototype-dialog-title h2{margin:0;font-size:20px}.prototype-dialog-title .material-symbols-outlined{color:#FF403D}.dialog-close{border:0;background:transparent;color:#676767;cursor:pointer}.prototype-dialog-content{line-height:1.65}.prototype-dialog-content p{margin:0 0 12px}.prototype-dialog-content ul{margin:0;padding-left:24px}.prototype-dialog-actions{display:flex;justify-content:flex-end;margin-top:28px}
+    .usage-subscription-layout{display:grid;gap:20px;margin-top:20px}
+    .usage-subscription-layout .select-field,.usage-subscription-layout .outcome-grid{margin:0}
+    @media(max-width:800px){.demo{left:16px}.toast{left:16px;bottom:16px}.journey-item{grid-template-columns:28px minmax(0,1fr)}.journey-state{grid-column:2}.field{grid-template-columns:1fr}.field input{width:100%}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside id="lt-sidebar"></aside>
+    <div class="workspace">
+      <header id="lt-topbar"></header>
+      <main class="main">
+        <div class="page-title"><h1>Authorization List</h1><p class="subtitle">Please integrate authorizations to this organization. Once connected, you can head to the All Resources List to quickly assign resources to groups.</p></div>
+        <button class="instruction" type="button" onclick="showToast('Authorization and resource assignment guidance opened (prototype).')"><span class="material-symbols-outlined">info</span><span class="instruction-text">Learn More About Authorization and Resource Assignment</span></button>
+        <section id="app" class="provider-list" aria-live="polite"></section>
+      </main>
+      <div class="footer"><span class="footer-version">Organization Settings Prototype<span class="ver-tag">v4 · Cross-cloud Authorization</span></span><span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span></div>
+    </div>
+  </div>
+  <div class="demo" id="demo"><div class="demo-panel"><span class="demo-label">Demo States</span><button class="demo-choice active" data-state="normal">Normal — mixed statuses</button><button class="demo-choice" data-state="loading">Loading</button><button class="demo-choice" data-state="empty">No Authorization</button><button class="demo-choice" data-state="gcp-empty">GCP — no authorization</button></div><button class="demo-main" type="button" onclick="document.getElementById('demo').classList.toggle('open')"><span class="material-symbols-outlined">science</span>Demo States</button></div>
+  <div class="toast" id="toast"><span class="material-symbols-outlined" id="toast-icon">check_circle</span><span id="toast-text"></span></div>
+  <div class="status-tooltip" id="status-tooltip" role="tooltip"></div>
+  <div id="prototype-dialog-root"></div>
+  <script>window.LUMITURE_ACTIVE='authorization-list'; window.LUMITURE_USER={role:'Admin',plan:'Standard',quota:{analyses:{used:32,total:80},rightsizing:{used:410,total:1000},refreshDate:'2 Jul. 2026'}};</script>
+  <script>
+/* === Inlined: shared/lumiture-nav.js === */
+/*!
+ * lumiture-nav.js — Canonical Sidebar Navigation (Single Source of Truth)
+ *
+ * Defines window.LUMITURE_NAV used by shared/lumiture-sidebar.js.
+ * All Lumiture prototypes share the same nav structure — this file is the
+ * single source. Each prototype only needs to set window.LUMITURE_ACTIVE.
+ *
+ * Usage in prototype HTML:
+ *   <aside id="lt-sidebar"></aside>
+ *   <script>window.LUMITURE_ACTIVE = 'general-budget';<\/script>
+ *   <script src="../shared/lumiture-nav.js"><\/script>    ← MUST load BEFORE sidebar
+ *   <script src="../shared/lumiture-sidebar.js"><\/script>
+ *
+ * Rules:
+ *   - Items with `href` → rendered as <a> links (clickable, cross-prototype navigation)
+ *   - Items with `disabled:true` → rendered as <div> with .lt-dis class (greyed, not clickable)
+ *   - The item matching LUMITURE_ACTIVE → href automatically stripped by lumiture-sidebar.js
+ *     so the "current page" item won't self-link
+ *
+ * To add a new prototype:
+ *   1. Update the relevant entry below — change `disabled:true` to `href:'../{name}/{name}-prototype-v{N}.html'`
+ *   2. All 3 (or more) prototypes will automatically reflect the new link via this shared script
+ *   3. The new prototype only needs to set LUMITURE_ACTIVE = its own id
+ */
+(function () {
+  'use strict';
+
+  window.LUMITURE_NAV = [
+    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', disabled: true },
+
+    { type: 'group', id: 'dashboard', label: 'Dashboard', items: [
+      { id: 'cost-dashboard',     label: 'Cost Dashboard',     icon: 'dashboard',    href: './cost-dashboard.html' },
+      { id: 'executive-insights', label: 'Executive Insights', icon: 'auto_awesome', href: './executive-insights.html' },
+    ]},
+
+    { type: 'group', id: 'optimization', label: 'Optimization', items: [
+      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', href: './rightsizing.html' },
+      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'percent', href: './rate-optimization.html' },
+    ]},
+
+    { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
+      { id: 'general-budget',    label: 'General Budget',    icon: 'savings',              href: './general-budget.html' },
+      { id: 'customized-budget', label: 'Customized Budget', icon: 'tune',                 disabled: true },
+      { id: 'anomaly-detection', label: 'Anomaly Detection', icon: 'notifications_active', disabled: true },
+    ]},
+
+    { type: 'group', id: 'org', label: 'Organization Settings', items: [
+      { id: 'lumitag',            label: 'LumiTag',            icon: 'sell',            href: './lumitag.html' },
+      { id: 'group-list',         label: 'Group List',         icon: 'groups',          disabled: true },
+      { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
+      { id: 'authorization-list', label: 'Authorization List', icon: 'link',            href: './organization-settings.html' },
+      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
+    ]},
+  ];
+})();
+
+</script><script>
+/* === Inlined: shared/lumiture-sidebar.js === */
+/*!
+ * lumiture-sidebar.js — Lumiture Shared Sidebar (with canonical logo)
+ *
+ * Auto-injects:
+ *   - Sidebar CSS (logo, nav items, group collapse, active state)
+ *   - Canonical Lumiture logo (concentric circles + PROTOTYPE tag + LumiTure.ai wordmark)
+ *
+ * Usage in prototype HTML:
+ *   1. Define window.LUMITURE_NAV = [...]   (see schema below)
+ *   2. Define window.LUMITURE_ACTIVE = 'item-id'  (which item is highlighted)
+ *   3. Add mount point: <aside id="lt-sidebar"></aside>
+ *   4. <script src="../shared/lumiture-sidebar.js"><\/script>
+ *
+ * NAV schema:
+ *   window.LUMITURE_NAV = [
+ *     // Top-level item (no group)
+ *     { type: 'item', id: 'overview', label: 'Overview', icon: 'home', href: '#' },
+ *     // Group with children (expanded by default unless `collapsed: true`)
+ *     { type: 'group', id: 'dashboard', label: 'Dashboard', expanded: true, items: [
+ *       { id: 'cost-dashboard', label: 'Cost Dashboard', icon: 'dashboard', href: '#' },
+ *       { id: 'exec-insights',  label: 'Executive Insights', icon: 'monitoring', disabled: true },
+ *     ]},
+ *   ];
+ *   window.LUMITURE_ACTIVE = 'cost-dashboard';  // which item is active
+ *
+ * API:
+ *   window.LumitureSidebar.toggleGroup(groupId)
+ *   window.LumitureSidebar.toggleCollapse()    — collapse the whole sidebar (icon-only)
+ *   window.LumitureSidebar.setActive(itemId)
+ */
+(function () {
+  'use strict';
+
+  // ===== CSS =====
+  var CSS = [
+    /* CSS variables — sidebar 用 Primary Dark #002663（per Lumiture-Guideline.md，2026-05-08 設計師確認） */
+    ':root{--lt-sb-w:264px;--lt-sb-bg:#002663;--lt-sb-hov:rgba(255,255,255,.06);',
+    '--lt-sb-active:#004FB0;--lt-sb-text:rgba(255,255,255,.85);--lt-sb-text-muted:rgba(255,255,255,.5);',
+    '--lt-sb-border:rgba(255,255,255,.1)}',
+
+    /* Sidebar container — 採 sticky positioning：父層 .app 用 flex 或 grid 都能適應
+       min-width:0 是必要的：flex 子元素預設 min-width:auto 會被內容 min-content size 撐住，導致 collapse 失效 */
+    '.lt-sidebar{width:var(--lt-sb-w);min-width:0;background:var(--lt-sb-bg);color:#fff;',
+    'position:sticky;top:0;height:100vh;z-index:100;overflow:hidden;',
+    'flex-shrink:0;',
+    'display:flex;flex-direction:column;transition:width .2s ease;scrollbar-width:none}',
+    '.lt-sidebar::-webkit-scrollbar{display:none}',
+    '.lt-sidebar.lt-collapsed{width:64px}',
+
+    /* Logo block */
+    '.lt-sb-logo{padding:16px 20px;display:flex;align-items:center;gap:10px;',
+    'font-size:18px;font-weight:700;color:#fff;border-bottom:1px solid var(--lt-sb-border);',
+    'min-height:68px;box-sizing:border-box;white-space:nowrap;overflow:hidden;flex-shrink:0}',
+    '.lt-sb-logo-wrap{position:relative;width:32px;height:32px;flex-shrink:0}',
+    '.lt-sb-logo-wrap svg{width:32px;height:32px;display:block}',
+    /* PROTOTYPE tag — cyan caps below the icon */
+    '.lt-sb-proto{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);',
+    'background:var(--lt-sb-bg);color:#34B5D9;font-size:6px;font-weight:700;',
+    'padding:1px 3px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px;',
+    'line-height:1.2;white-space:nowrap}',
+    '.lt-sb-logo-text{transition:opacity .2s}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo-text{opacity:0;width:0;overflow:hidden}',
+    '.lt-sidebar.lt-collapsed .lt-sb-proto{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo{padding:16px;justify-content:center;gap:0}',
+
+    /* Nav scroll area — 內部捲動，sidebar 外層不捲（寬敞 padding 對齊原始設計） */
+    '.lt-sb-nav{flex:1;padding:8px 12px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}',
+    '.lt-sb-nav::-webkit-scrollbar{width:6px}',
+    '.lt-sb-nav::-webkit-scrollbar-track{background:transparent}',
+    '.lt-sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}',
+    '.lt-sb-nav::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.25)}',
+
+    /* Top-level item (no group) — 寬敞 padding，font-size 14px */
+    '.lt-sb-item{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;',
+    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden;margin-bottom:2px}',
+    '.lt-sb-item:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sb-item.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-item.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
+    '.lt-sb-item .material-symbols-outlined{font-size:20px;opacity:.9;flex-shrink:0}',
+
+    /* Group section */
+    '.lt-sb-group{margin-bottom:4px}',
+    '.lt-sb-group-hdr{display:flex;align-items:center;justify-content:space-between;',
+    'padding:18px 14px 10px;font-size:14px;font-weight:700;color:#fff;',
+    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:.2px}',
+    '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
+    '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
+    '.lt-sb-group-arrow{font-size:18px;transition:transform .18s;opacity:.85;flex-shrink:0}',
+    '.lt-sb-group.lt-collapsed .lt-sb-group-arrow{transform:rotate(180deg)}',
+    '.lt-sb-group.lt-collapsed .lt-sb-group-children{display:none}',
+
+    /* Sub-item (inside group) — 一致 14px font，11px 垂直 padding */
+    '.lt-sb-subitem{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;',
+    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden}',
+    '.lt-sb-subitem:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sb-subitem.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-subitem.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
+    '.lt-sb-subitem .material-symbols-outlined{font-size:18px;opacity:.9;flex-shrink:0}',
+
+    /* Collapsed state — hide labels, center icons */
+    '.lt-sidebar.lt-collapsed .lt-sb-item span:not(.material-symbols-outlined),',
+    '.lt-sidebar.lt-collapsed .lt-sb-subitem span:not(.material-symbols-outlined){display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-item,',
+    '.lt-sidebar.lt-collapsed .lt-sb-subitem{padding:10px 0;justify-content:center;border-radius:0}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-hdr > span:first-child{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-arrow{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-group-hdr{padding:8px 0;justify-content:center}',
+    /* In collapsed mode, always show children */
+    '.lt-sidebar.lt-collapsed .lt-sb-group.lt-collapsed .lt-sb-group-children{display:block}',
+    '.lt-sidebar.lt-collapsed .lt-sb-nav{padding:8px 4px}',
+
+    /* Collapse toggle button at bottom */
+    '.lt-sb-collapse-btn{padding:12px;display:flex;justify-content:flex-end;',
+    'border-top:1px solid var(--lt-sb-border);flex-shrink:0}',
+    '.lt-sb-collapse-btn button{color:var(--lt-sb-text-muted);background:none;border:0;cursor:pointer;',
+    'display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:4px;',
+    'transition:all .15s}',
+    '.lt-sb-collapse-btn button:hover{background:var(--lt-sb-hov);color:#fff}',
+    '.lt-sidebar.lt-collapsed .lt-sb-collapse-btn{justify-content:center}',
+    '.lt-sidebar.lt-collapsed .lt-sb-collapse-btn .material-symbols-outlined{transform:rotate(180deg)}'
+  ].join('');
+
+  function _injectCSS() {
+    if (document.getElementById('lt-sidebar-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-sidebar-css';
+    s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  // ===== Canonical Logo (concentric circles + PROTOTYPE tag + LumiTure.ai) =====
+  var LOGO_HTML =
+    '<div class="lt-sb-logo">' +
+      '<div class="lt-sb-logo-wrap">' +
+        '<svg viewBox="0 0 32 32" fill="none" aria-hidden="true">' +
+          '<circle cx="16" cy="16" r="13" stroke="#FFF" stroke-width="2" fill="none"/>' +
+          '<circle cx="16" cy="16" r="7" stroke="#FFF" stroke-width="2" fill="none"/>' +
+          '<circle cx="16" cy="16" r="3" fill="#FFF"/>' +
+        '</svg>' +
+        '<span class="lt-sb-proto">PROTOTYPE</span>' +
+      '</div>' +
+      '<span class="lt-sb-logo-text">LumiTure.ai</span>' +
+    '</div>';
+
+  // ===== Helpers =====
+  function _esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  function _renderItem(item, isSub) {
+    var cls = isSub ? 'lt-sb-subitem' : 'lt-sb-item';
+    var isActive = (item.id === window.LUMITURE_ACTIVE);
+    var active = isActive ? ' lt-active' : '';
+    var dis = item.disabled ? ' lt-dis' : '';
+    // Active item: render as <div> (no self-link). Disabled item: also no href.
+    var useHref = item.href && !isActive && !item.disabled;
+    var tag = useHref ? 'a' : 'div';
+    var hrefAttr = useHref ? ' href="' + _esc(item.href) + '"' : '';
+    var dataId = ' data-nav-id="' + _esc(item.id) + '"';
+    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + '>' +
+             '<span class="material-symbols-outlined">' + _esc(item.icon || 'circle') + '</span>' +
+             '<span>' + _esc(item.label) + '</span>' +
+           '</' + tag + '>';
+  }
+
+  function _renderGroup(grp) {
+    var collapsed = grp.collapsed ? ' lt-collapsed' : '';
+    var children = (grp.items || []).map(function (item) {
+      return _renderItem(item, true);
+    }).join('');
+    return '<div class="lt-sb-group' + collapsed + '" data-group-id="' + _esc(grp.id) + '">' +
+             '<div class="lt-sb-group-hdr">' +
+               '<span>' + _esc(grp.label) + '</span>' +
+               '<span class="material-symbols-outlined lt-sb-group-arrow">keyboard_arrow_up</span>' +
+             '</div>' +
+             '<div class="lt-sb-group-children">' + children + '</div>' +
+           '</div>';
+  }
+
+  function _renderNav() {
+    var nav = window.LUMITURE_NAV || [];
+    var html = '<div class="lt-sb-nav">';
+    nav.forEach(function (entry) {
+      if (entry.type === 'group') {
+        html += _renderGroup(entry);
+      } else {
+        html += _renderItem(entry, false);
+      }
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function _renderCollapseBtn() {
+    return '<div class="lt-sb-collapse-btn">' +
+             '<button type="button" data-action="toggle-collapse" title="Collapse sidebar">' +
+               '<span class="material-symbols-outlined">chevron_left</span>' +
+             '</button>' +
+           '</div>';
+  }
+
+  // ===== Mount =====
+  function _render() {
+    var mount = document.getElementById('lt-sidebar');
+    if (!mount) {
+      console.warn('[lumiture-sidebar] Mount point #lt-sidebar not found');
+      return;
+    }
+    // If mount is not already a sidebar, wrap it
+    mount.classList.add('lt-sidebar');
+    mount.innerHTML = LOGO_HTML + _renderNav() + _renderCollapseBtn();
+
+    // Group toggle
+    mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
+      hdr.addEventListener('click', function () {
+        var grp = hdr.parentElement;
+        if (grp) grp.classList.toggle('lt-collapsed');
+      });
+    });
+    // Collapse the whole sidebar
+    var btn = mount.querySelector('[data-action="toggle-collapse"]');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        window.LumitureSidebar.toggleCollapse();
+      });
+    }
+  }
+
+  // ===== Public API =====
+  window.LumitureSidebar = {
+    toggleGroup: function (groupId) {
+      var grp = document.querySelector('[data-group-id="' + groupId + '"]');
+      if (grp) grp.classList.toggle('lt-collapsed');
+    },
+    toggleCollapse: function () {
+      var sb = document.getElementById('lt-sidebar');
+      var main = document.querySelector('.lt-main, .main, main');
+      if (sb) sb.classList.toggle('lt-collapsed');
+      if (main) main.classList.toggle('lt-sidebar-collapsed');
+      // Sync legacy CSS vars (--sw) for prototypes that reference them in topbar / footer
+      var w = sb && sb.classList.contains('lt-collapsed') ? '64px' : '264px';
+      document.documentElement.style.setProperty('--sw', w);
+      document.documentElement.style.setProperty('--lt-sb-w', w);
+    },
+    setActive: function (itemId) {
+      window.LUMITURE_ACTIVE = itemId;
+      document.querySelectorAll('.lt-sb-item, .lt-sb-subitem').forEach(function (el) {
+        el.classList.toggle('lt-active', el.dataset.navId === itemId);
+      });
+    },
+    rerender: _render,
+  };
+
+  // ===== INIT =====
+  function _init() {
+    _injectCSS();
+    _render();
+    // Dispatch resize so chart libraries (ECharts 等) 重新測量容器
+    // —— 避免 inline script 已先 init chart 後，shared CSS 才 inject 導致 layout shift
+    requestAnimationFrame(function () {
+      window.dispatchEvent(new Event('resize'));
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else {
+    _init();
+  }
+})();
+
+</script><script>
+/* === Inlined: shared/lumiture-topbar.js === */
+/*!
+ * lumiture-topbar.js — Lumiture Shared Topbar + Account Menu
+ *
+ * 用途：navy topbar（右側 icons + user chip）+ 點 user chip 展開的 Account Menu popover。
+ * Account Menu 對齊 Figma General Behavior #01-3 / #01-4，核心是 LT-3138/LT-3140
+ * (User Menu + AI Quota) v1.19.0 的 AI Quota box。
+ * Warning/Depleted 項目用 hover tooltip 說明（無 Contact Sales 動作 — PM 確認無 per-user 業務 email）。
+ *
+ * 共用即一致：所有 prototype 只要載入這支檔，user chip 點開就是同一版 menu。
+ *
+ * Usage in prototype HTML:
+ *   1. (Optional) Define window.LUMITURE_USER       — 見下方 Schema，沒設就吃預設
+ *   2. (Optional) Define window.LUMITURE_TOPBAR_ICONS — array of {icon, title, onclick, badge?}
+ *   3. Add mount point: <header id="lt-topbar"></header>
+ *   4. <script src="../shared/lumiture-topbar.js?v=YYYY-MM-DD"><\/script>
+ *
+ * Schema (所有欄位皆 optional，未填吃 DEFAULT_USER)：
+ *   window.LUMITURE_USER = {
+ *     name:        'Kabin Yang',
+ *     email:       'kabin.yang@mile.cloud',
+ *     role:        'Admin',                 // role chip 文字（Admin 無群組後綴；其餘 'Manager - Cost Center'）
+ *     initials:    'KY',                    // avatar 圓圈內字
+ *     gradient:    'linear-gradient(...)',  // optional avatar bg override
+ *     canSwitchRole: true,                  // false → 隱藏「View as Another Role」(只有可切換角色者顯示)
+ *     plan:        'Standard',              // Essential | Starter | Standard | Premium | none  (決定 AI Quota box 顯示哪些項目)
+ *     planDateRange: '2 Aug 2025 ~ 2 Aug 2035',
+ *     product:     'LumiTure.ai',
+ *     version:     'v1.19.0',               // Software version 列
+ *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
+ *     quota: {                              // AI Quota box 數據；total 已含 add-on
+ *       refreshDate: 'Jul 1, 2026',         // 下次重置日（= 自然月下月 1 號）
+ *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
+ *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
+ *     },
+ *   };
+ *
+ * Public API:
+ *   window.LumitureTopbar.setUser({...})          — 更新並 rerender
+ *   window.LumitureTopbar.setRole('Manager - ...')— 只更新 role chip（Demo FAB role 切換用）
+ *   window.LumitureTopbar.setPlan('Essential')    — 切 plan（連動 AI Quota box 顯示項目）
+ *   window.LumitureTopbar.setQuota({analyses:{...}, rightsizing:{...}, refreshDate, addonPacks})
+ *   window.LumitureTopbar.openMenu() / closeMenu() / toggleMenu()
+ *   window.LumitureTopbar.rerender()
+ */
+(function () {
+  'use strict';
+
+  // ===== Defaults ===== (預設給 Standard plan + Normal 狀態，所有既有 prototype 直接吃，不破版)
+  var DEFAULT_USER = {
+    name: 'Kabin Yang',
+    email: 'kabin.yang@mile.cloud',
+    role: 'Admin',
+    initials: 'KY',
+    canSwitchRole: true,
+    plan: 'Standard',
+    planDateRange: '2 Aug. 2025 ~ 2 Aug. 2035',
+    product: 'LumiTure.ai',
+    version: 'v1.19.0',
+    addonPacks: 0,
+    quota: {
+      refreshDate: '2 Jul. 2026',
+      analyses:    { used: 32,  total: 80 },
+      rightsizing: { used: 410, total: 1000 },
+    },
+  };
+
+  var DEFAULT_ICONS = [
+    { icon: 'notifications', title: 'Notifications', badge: true },
+  ];
+
+  // plan → 顯示哪些 quota 項目
+  //   Essential = 兩項（照 Notion PRD，2026-06-22 Kabin 拍板）；Starter = 只 analyses；
+  //   Standard = 兩項；Premium/none = 不顯示 box
+  //   ⚠ specs ai-quota README 說 Essential 只 rightsizing，與 PRD 衝突、待 PM 對齊；此處照 PRD
+  var PLAN_QUOTA_ITEMS = {
+    Essential: ['analyses', 'rightsizing'],
+    Starter:   ['analyses'],
+    Standard:  ['analyses', 'rightsizing'],
+    Premium:   [],
+    none:      [],
+  };
+
+  // quota key → 顯示用標籤 / Limit Reached 對話框文案變數（對齊最新 PRD：unit = Rightsizing scans）
+  var QUOTA_META = {
+    analyses:    { label: 'AI Analyses', dialogLabel: 'Cost Dashboard',     unit: 'AI analyses' },
+    rightsizing: { label: 'Rightsizing Scans',   dialogLabel: 'Usage Optimization', unit: 'Rightsizing scans' },
+  };
+
+  // plan banner 配色（對齊 Figma #01-4：Essential 灰 / Starter 藍 / Standard 深藍 / Premium 金）
+  var PLAN_BANNER = {
+    Essential: 'background:#5B6B7F',
+    Starter:   'background:#2E6DB4',
+    Standard:  'background:#16407C',
+    Premium:   'background:linear-gradient(90deg,#B8901F 0%,#E3BC55 100%)',
+    none:      'background:#5B6B7F',
+  };
+
+  // ===== CSS =====
+  var CSS = [
+    /* ---------- Topbar 容器 ---------- */
+    '.lt-topbar{background:#002663;padding:14px 32px;display:flex;align-items:center;justify-content:flex-end;gap:16px;',
+    'position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px;box-sizing:border-box}',
+
+    /* Icon button */
+    '.lt-tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;',
+    'cursor:pointer;color:rgba(255,255,255,.7);background:none;border:none;padding:0;position:relative;font-family:inherit;transition:background .15s,color .15s}',
+    '.lt-tb-ic:hover{background:rgba(255,255,255,.08);color:#fff}',
+    '.lt-tb-ic .material-symbols-outlined{font-size:22px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 22}',
+    '.lt-tb-ic .lt-tb-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:#FF403D;',
+    'border:2px solid #002663;border-radius:50%}',
+
+    /* User chip — avatar + name + role + chevron */
+    '.lt-tb-user{display:flex;align-items:center;gap:10px;padding-left:16px;margin-left:0;',
+    'border-left:1px solid rgba(255,255,255,.1);color:#fff;cursor:pointer;transition:opacity .15s;background:none;border-top:none;border-right:none;border-bottom:none}',
+    '.lt-tb-user:hover{opacity:.92}',
+    '.lt-tb-avatar-ic{font-size:34px;color:#fff;flex-shrink:0;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 34}',
+    '.lt-tb-user-text{display:flex;flex-direction:column;font-size:12px;line-height:1.3;min-width:0;font-family:\'Noto Sans\',sans-serif;text-align:left}',
+    '.lt-tb-user-name{font-weight:600;color:#fff;white-space:nowrap}',
+    '.lt-tb-user-role{color:rgba(255,255,255,.6);font-size:11px;white-space:nowrap}',
+    '.lt-tb-chev{color:rgba(255,255,255,.6);font-size:20px;transition:transform .18s}',
+    '.lt-tb-user.is-open .lt-tb-chev{transform:rotate(180deg)}',
+
+    /* ---------- Account Menu popover ---------- */
+    '.lt-am-backdrop{position:fixed;inset:0;z-index:1000;background:transparent}',
+    '.lt-am{position:fixed;top:62px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
+    'box-shadow:0 4px 16px rgba(0,0,0,.28);overflow:hidden;font-family:\'Noto Sans\',sans-serif;color:#fff;',
+    'animation:lt-am-in .14s ease;transform-origin:top right}',
+    '@keyframes lt-am-in{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}',
+    '.lt-am-hidden{display:none!important}',
+
+    /* Plan banner */
+    '.lt-am-plan{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;color:#fff}',
+    '.lt-am-plan-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-plan-date{font-size:11px;font-weight:500;opacity:.85;white-space:nowrap;letter-spacing:.2px;text-transform:uppercase}',
+
+    /* User identity */
+    '.lt-am-id{padding:14px 16px 12px}',
+    '.lt-am-id-name{font-size:15px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-id-email{font-size:12px;color:rgba(255,255,255,.62);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-chip{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:3px 10px 3px 8px;',
+    'background:#1E5FA8;border-radius:9999px;font-size:11px;font-weight:600;color:#fff}',
+    '.lt-am-chip .material-symbols-outlined{font-size:14px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 14}',
+
+    /* ---------- AI Quota box (navy 內嵌，彩色圓點 + 提亮狀態色，對齊設計稿) ---------- */
+    '.lt-q{padding:12px 16px}',
+    '.lt-q-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}',
+    '.lt-q-title{font-size:13px;font-weight:700;color:#fff}',
+    '.lt-q-sub{font-size:11px;color:rgba(255,255,255,.5);white-space:nowrap;letter-spacing:.1px}',
+    /* quota item — 高度固定（per spec：切狀態版面不跳動）；warning/depleted 有 hover tooltip */
+    '.lt-q-item{display:flex;align-items:center;gap:9px;padding:5px 8px;margin:0 -8px;border-radius:6px;position:relative;transition:background .12s}',
+    '.lt-q-item.has-tip{cursor:help}',
+    '.lt-q-item.has-tip:hover{background:rgba(255,255,255,.07)}',
+    '.lt-q-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}',
+    '.lt-q-label{font-size:12.5px;color:rgba(255,255,255,.9);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-q-val{font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:3px}',
+    '.lt-q-val .material-symbols-outlined{font-size:13px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 13}',
+    /* hover tooltip（Lumiture 非圖表 tooltip 規範：#3C3C3C 深底白字） */
+    '.lt-q-tip{position:absolute;top:calc(100% + 2px);left:8px;right:8px;z-index:5;background:#3C3C3C;color:#fff;',
+    'font-size:11.5px;font-weight:400;line-height:1.45;padding:8px 10px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.3);',
+    'opacity:0;visibility:hidden;transform:translateY(-2px);transition:opacity .12s,transform .12s;pointer-events:none}',
+    '.lt-q-item.has-tip:hover .lt-q-tip,.lt-q-item.has-tip:focus-within .lt-q-tip{opacity:1;visibility:visible;transform:none}',
+    /* 狀態色（提亮一階給 navy 深底，dot + value 同色） */
+    '.lt-q-item.is-active    .lt-q-dot{background:#2DD4BF}', '.lt-q-item.is-active    .lt-q-val{color:#2DD4BF}',
+    '.lt-q-item.is-warning   .lt-q-dot{background:#FBBF24}', '.lt-q-item.is-warning   .lt-q-val{color:#FBBF24}',
+    '.lt-q-item.is-depleted  .lt-q-dot{background:#FF6B68}', '.lt-q-item.is-depleted  .lt-q-val{color:#FF6B68}',
+    '.lt-q-item.is-unlimited .lt-q-dot{background:#4ADFFF}', '.lt-q-item.is-unlimited .lt-q-val{color:#4ADFFF}',
+    /* add-on 行 */
+    '.lt-q-addon{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;color:#4ADFFF;font-weight:500}',
+    '.lt-q-addon .material-symbols-outlined{font-size:14px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 14}',
+    /* loading / error */
+    '.lt-q-skel{height:13px;border-radius:4px;margin:9px 0;background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.16),rgba(255,255,255,.08));background-size:200% 100%;animation:lt-q-shimmer 1.3s infinite}',
+    '.lt-q-skel-sub{width:120px;height:11px;margin:0;display:inline-block}',
+    '@keyframes lt-q-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}',
+    '.lt-q-err{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.75);padding:4px 0}',
+    '.lt-q-err-msg{flex:1;min-width:0}',
+    '.lt-q-err .material-symbols-outlined{font-size:16px;color:rgba(255,255,255,.55);font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 16}',
+    '.lt-q-err a{color:#4ADFFF;font-weight:600;cursor:pointer;flex-shrink:0}',
+
+    /* ---------- Menu action items ---------- */
+    '.lt-am-div{height:1px;background:rgba(255,255,255,.1)}',
+    '.lt-am-item{display:flex;align-items:center;gap:12px;padding:12px 16px;color:#fff;cursor:pointer;',
+    'background:none;border:none;width:100%;font-family:inherit;font-size:13.5px;text-align:left;transition:background .12s}',
+    '.lt-am-item:hover{background:rgba(255,255,255,.07)}',
+    '.lt-am-item .material-symbols-outlined{font-size:20px;color:rgba(255,255,255,.85);',
+    'font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20}',
+  ].join('');
+
+  function _injectCSS() {
+    if (document.getElementById('lt-topbar-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-topbar-css';
+    s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  // ===== Helpers =====
+  function _esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+  function _user() {
+    var u = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
+    u.quota = Object.assign({}, DEFAULT_USER.quota, (window.LUMITURE_USER || {}).quota || {});
+    return u;
+  }
+  function _status(used, total) {
+    if (!total || total <= 0) return 'active';
+    var pct = used / total * 100;
+    if (pct >= 100) return 'depleted';
+    if (pct >= 80)  return 'warning';
+    return 'active';
+  }
+  function _planItems(plan) {
+    return PLAN_QUOTA_ITEMS[plan] != null ? PLAN_QUOTA_ITEMS[plan] : PLAN_QUOTA_ITEMS.Standard;
+  }
+  function _showQuotaBox(u) {
+    return _planItems(u.plan).length > 0;
+  }
+
+  // ===== Renderers =====
+  function _renderIcon(item) {
+    var attrs = ' class="lt-tb-ic" title="' + _esc(item.title || '') + '"';
+    if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
+    var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
+    return '<button type="button"' + attrs + '>' +
+             '<span class="material-symbols-outlined">' + _esc(item.icon) + '</span>' + badge +
+           '</button>';
+  }
+
+  function _renderUserChip(u) {
+    return '<button type="button" class="lt-tb-user" id="lt-tb-user" aria-haspopup="true" aria-expanded="false">' +
+             '<span class="material-symbols-outlined lt-tb-avatar-ic">account_circle</span>' +
+             '<div class="lt-tb-user-text">' +
+               '<span class="lt-tb-user-name">' + _esc(u.name) + '</span>' +
+               '<span class="lt-tb-user-role" id="lt-tb-user-role">' + _esc(u.role) + '</span>' +
+             '</div>' +
+             '<span class="material-symbols-outlined lt-tb-chev">keyboard_arrow_down</span>' +
+           '</button>';
+  }
+
+  function _renderQuotaItem(key, q, opts) {
+    opts = opts || {};
+    var meta = QUOTA_META[key];
+    // Premium：unlimited（無 used/total，cyan + sparkle，不可點）
+    if (opts.unlimited) {
+      return '<div class="lt-q-item is-unlimited">' +
+               '<span class="lt-q-dot"></span>' +
+               '<span class="lt-q-label">' + _esc(meta.label) + '</span>' +
+               '<span class="lt-q-val">Unlimited<span class="material-symbols-outlined">auto_awesome</span></span>' +
+             '</div>';
+    }
+    var used = q.used || 0, total = q.total || 0;
+    var remaining = Math.max(0, total - used);
+    var st = _status(used, total);
+    // Warning / Depleted 才有 hover tooltip 說明（取代原本點開的 Limit Reached 對話框；
+    // PM 確認無法提供 per-user 業務 email，故改輕量懸停說明，無 Contact Sales 動作）
+    // 文案含變數 {total} {unit} {label}；{label}=Cost Dashboard / Usage Optimization
+    var tip = '';
+    if (st === 'depleted' || st === 'warning') {
+      var verb = st === 'depleted' ? 'has been reached' : 'is approaching';
+      var tipText = 'Your monthly limit (' + total.toLocaleString() + ' ' + meta.unit + ') ' + verb +
+        ' for ' + meta.dialogLabel + '. Please contact your LumiTure.ai representative to purchase ' +
+        'Add-ons to increase your quota for this billing cycle.';
+      tip = '<span class="lt-q-tip">' + _esc(tipText) + '</span>';
+    }
+    var hasTip = tip !== '';
+    return '<div class="lt-q-item is-' + st + (hasTip ? ' has-tip' : '') + '"' + (hasTip ? ' tabindex="0"' : '') + '>' +
+             '<span class="lt-q-dot"></span>' +
+             '<span class="lt-q-label">' + _esc(meta.label) + '</span>' +
+             '<span class="lt-q-val">' + remaining.toLocaleString() + ' / ' + total.toLocaleString() + ' left</span>' +
+             tip +
+           '</div>';
+  }
+
+  function _renderQuotaBox(u) {
+    var isPremium = u.plan === 'Premium';
+    var items = _planItems(u.plan);
+    if (!items.length && !isPremium) return '';   // 無有效 plan：不顯示（理論上不會發生）
+    // Premium（unlimited）不重置 → header 只顯示 Org-wide，不接 refresh 日
+    var sub = isPremium ? 'Org-wide' : 'Org-wide, refresh on ' + _esc(u.quota.refreshDate);
+    var head = '<div class="lt-q-head">' +
+                 '<span class="lt-q-title">AI Quota</span>' +
+                 '<span class="lt-q-sub">' + sub + '</span>' +
+               '</div>';
+    // loading（refresh 日也尚未載入 → sub 一併 skeleton）
+    if (u.quota.state === 'loading') {
+      return '<div class="lt-q">' +
+               '<div class="lt-q-head"><span class="lt-q-title">AI Quota</span>' +
+                 '<span class="lt-q-skel lt-q-skel-sub"></span></div>' +
+               '<div class="lt-q-skel" style="width:78%"></div><div class="lt-q-skel" style="width:62%"></div>' +
+             '</div>';
+    }
+    // error（partial degrade：只有這塊壞，menu 其他項照常）；refresh 日未載入 → sub 只顯示 Org-wide；Retry 右對齊
+    if (u.quota.state === 'error') {
+      var headErr = '<div class="lt-q-head"><span class="lt-q-title">AI Quota</span><span class="lt-q-sub">Org-wide</span></div>';
+      return '<div class="lt-q">' + headErr +
+               '<div class="lt-q-err"><span class="material-symbols-outlined">help</span>' +
+               '<span class="lt-q-err-msg">Couldn\'t load quota</span>' +
+               '<a onclick="window.LumitureTopbar.rerender()">Retry</a></div>' +
+             '</div>';
+    }
+    var rows = isPremium
+      ? ['analyses', 'rightsizing'].map(function (k) { return _renderQuotaItem(k, {}, { unlimited: true }); }).join('')
+      : items.map(function (k) { return _renderQuotaItem(k, u.quota[k] || {}); }).join('');
+    // add-on 行（packs>0，Premium 不適用）；naming 對齊 PRD：單數 "AI Quota Add-on × N"
+    var addon = (!isPremium && (u.addonPacks || 0) > 0)
+      ? '<div class="lt-q-addon"><span class="material-symbols-outlined">auto_awesome</span>' +
+          u.addonPacks + ' × AI Quota Add-ons Activated</div>'
+      : '';
+    return '<div class="lt-q">' + head + rows + addon + '</div>';
+  }
+
+  function _renderMenu(u) {
+    var planName = _esc(u.plan) + ' Plan';
+    var bannerStyle = PLAN_BANNER[u.plan] || PLAN_BANNER.Standard;
+    var viewAs = u.canSwitchRole
+      ? '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'View as Another Role\')">' +
+          '<span class="material-symbols-outlined">sync_alt</span>View as Another Role</button>' +
+        '<div class="lt-am-div"></div>'
+      : '';
+    var box = _renderQuotaBox(u);
+    var quotaSection = box
+      ? '<div class="lt-am-div"></div>' + box + '<div class="lt-am-div"></div>'
+      : '<div class="lt-am-div"></div>';
+    return '<div class="lt-am-backdrop" id="lt-am-backdrop" onclick="window.LumitureTopbar.closeMenu()"></div>' +
+           '<div class="lt-am" id="lt-am" role="menu">' +
+             '<div class="lt-am-plan" style="' + bannerStyle + '">' +
+               '<span class="lt-am-plan-name">' + planName + '</span>' +
+               '<span class="lt-am-plan-date">' + _esc(u.planDateRange) + '</span>' +
+             '</div>' +
+             '<div class="lt-am-id">' +
+               '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
+               '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
+               '<span class="lt-am-chip"><span class="material-symbols-outlined">account_circle</span>' + _esc(u.role) + '</span>' +
+             '</div>' +
+             quotaSection +
+             viewAs +
+             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Profile\')">' +
+               '<span class="material-symbols-outlined">person</span>Profile</button>' +
+             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Settings\')">' +
+               '<span class="material-symbols-outlined">settings</span>Settings</button>' +
+             '<div class="lt-am-div"></div>' +
+             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Log out\')">' +
+               '<span class="material-symbols-outlined">logout</span>Log out</button>' +
+           '</div>';
+  }
+
+  // ===== Mount / state =====
+  var _menuOpen = false;
+
+  function _render() {
+    var mount = document.getElementById('lt-topbar');
+    if (!mount) { console.warn('[lumiture-topbar] Mount point #lt-topbar not found'); return; }
+    var u = _user();
+    var icons = window.LUMITURE_TOPBAR_ICONS || DEFAULT_ICONS;
+    mount.classList.add('lt-topbar');
+    mount.innerHTML = icons.map(_renderIcon).join('') + _renderUserChip(u);
+    var chip = document.getElementById('lt-tb-user');
+    if (chip) chip.addEventListener('click', function (e) { e.stopPropagation(); _toggleMenu(); });
+    _menuOpen = false;
+  }
+
+  function _menuHost() {
+    var host = document.getElementById('lt-am-host');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'lt-am-host';
+      document.body.appendChild(host);
+    }
+    return host;
+  }
+
+  function _openMenu() {
+    var u = _user();
+    _menuHost().innerHTML = _renderMenu(u);
+    _menuOpen = true;
+    var chip = document.getElementById('lt-tb-user');
+    if (chip) { chip.classList.add('is-open'); chip.setAttribute('aria-expanded', 'true'); }
+  }
+  function _closeMenu() {
+    _menuHost().innerHTML = '';
+    _menuOpen = false;
+    var chip = document.getElementById('lt-tb-user');
+    if (chip) { chip.classList.remove('is-open'); chip.setAttribute('aria-expanded', 'false'); }
+  }
+  function _toggleMenu() { _menuOpen ? _closeMenu() : _openMenu(); }
+
+  // Esc 關閉 menu
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && _menuOpen) _closeMenu();
+  });
+
+  // ===== Public API =====
+  window.LumitureTopbar = {
+    setUser: function (user) {
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, user || {});
+      _render(); if (_menuOpen) _openMenu();
+    },
+    setRole: function (role) {
+      var el = document.getElementById('lt-tb-user-role');
+      if (el) el.textContent = role;
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, { role: role });
+      if (_menuOpen) _openMenu();
+    },
+    setPlan: function (plan) {
+      window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, { plan: plan });
+      if (_menuOpen) _openMenu();
+    },
+    setQuota: function (q) {
+      var cur = (window.LUMITURE_USER || {});
+      window.LUMITURE_USER = Object.assign({}, cur, {
+        quota: Object.assign({}, DEFAULT_USER.quota, cur.quota || {}, q || {}),
+      });
+      if (q && typeof q.addonPacks !== 'undefined') window.LUMITURE_USER.addonPacks = q.addonPacks;
+      if (_menuOpen) _openMenu();
+    },
+    openMenu: _openMenu,
+    closeMenu: _closeMenu,
+    toggleMenu: _toggleMenu,
+    rerender: function () { _render(); if (_menuOpen) _openMenu(); },
+    _noop: function (label) { /* 展示用：Profile/Settings/Log out/View as Another Role 點擊佔位 */
+      if (typeof window.LUMITURE_MENU_ACTION === 'function') window.LUMITURE_MENU_ACTION(label);
+    },
+  };
+
+  // ===== INIT =====
+  function _init() { _injectCSS(); _render(); }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else { _init(); }
+})();
+
+</script>
+  <script>
+    const PROVIDERS={
+      gcp:{name:'Google Cloud',key:'gcp',billingTitle:'Billing Data - Billing Account',billingHead:'Billing Account Name / ID',usageTitle:'Usage Data - Scoping Project',usageHead:'Scoping Project Name / ID',billing:[['Cleveland-client-01','00AH83-KJD294-KO37LS','Connected','18/12/2026'],['Cleveland-client-02','JG93P8-37LDNV-LWU321','In Progress','31/12/2026'],['Cleveland-client-03','M2910J-M29K1-KK8329','In Progress','31/12/2026']],usage:[['FinOps-Billing-Scope','finops-billing-scope-987','Connected','28/12/2026'],['Security-Audit-Viewer','security-audit-viewer-101','Error','31/12/2026']]},
+      aws:{name:'AWS',key:'aws',billingTitle:'Billing Data - Management Account',billingHead:'Management Account Name / ID',usageTitle:'Usage Data - Management Account',usageHead:'Management Account Name / ID',billing:[['AIoT','876543210987','Connected','18/03/2026'],['devops','321098765432','Error','27/04/2026']],usage:[['AIoT','876543210987','In Progress','18/03/2026'],['devops','321098765432','Error','27/04/2026']]},
+      azure:{name:'Azure',key:'azure',billingTitle:'Billing Data - Subscription',billingHead:'Subscription Name / ID',usageTitle:'Usage Data - Subscription',usageHead:'Subscription Name / ID',billing:[['Retrieving Resource Name','/subscriptions/3a4c.../resourceGroups/...','Connected','31/12/2026'],['Corporate-BI-Data','/subscriptions/c5d7.../resourceGroups/rg-corp-bi','Blob Reader & Events Pending','03/12/2026','Data cannot be retrieved correctly because the storage authorization steps are incomplete. Open Azure Billing Data Authorization to finish the remaining steps.']],usage:[['Prod-Web-Services','/subscriptions/3a4c.../resourceGroups/rg-prod-web','In Progress','31/12/2026']]}
+    };
+    let state='normal', openMenu=null;
+    function csp(key){return key==='gcp'?'<span class="csp gcp" aria-label="Google Cloud"><span>G</span></span>':key==='aws'?'<span class="csp aws" aria-label="AWS">aws</span>':'<span class="csp azure" aria-label="Azure">Az</span>'}
+    function statusCell(label,tip){const error=/Failed|Required|Error|Permission Denied|Quota Exceeded|Pending/.test(label), progress=label==='In Progress', actionable=/Required|Permission Denied|Quota Exceeded|Pending/.test(label);const classes=['status',error?'error':'',progress?'in-progress':'',actionable?'actionable':''].filter(Boolean).join(' ');return '<span class="'+classes+'" '+(tip?'data-tooltip="'+escapeHtml(tip)+'"':'')+' onclick="'+(actionable?"showToast('Opening the related authorization guidance…')":'')+'">'+escapeHtml(label)+'</span>'}
+    function table(title,head,rows){if(!rows.length)return '';return '<div class="auth-group"><h3 class="auth-title">'+title+'</h3><div class="table-wrap"><table><thead><tr><th>'+head+'</th><th>Status</th><th>Last Updated</th></tr></thead><tbody>'+rows.map(r=>'<tr><td><div class="account-name">'+escapeHtml(r[0])+'</div><div class="account-id">'+escapeHtml(r[1])+'</div></td><td>'+statusCell(r[2],r[4])+'</td><td class="updated">'+r[3]+'</td></tr>').join('')+'</tbody></table></div></div>'}
+    function provider(p,empty){const usageDisabled=p.key==='gcp'&&!p.billing.length;return '<section class="provider"><div class="provider-head"><div class="provider-name">'+csp(p.key)+'<h2>'+p.name+'</h2></div><div class="provider-actions"><span class="sync"><span class="material-symbols-outlined">sync</span><span class="sync-tip">Authorization status is refreshed periodically. Some cloud providers can take up to one day to show the latest result.</span></span><div class="add-wrap"><button class="add-button" type="button" aria-expanded="'+(openMenu===p.key)+'" onclick="toggleMenu(\''+p.key+'\')"><span class="label">Add Authorization</span><span class="material-symbols-outlined">arrow_drop_down</span></button><div class="menu '+(openMenu===p.key?'open':'')+'"><div class="menu-item"><button onclick="addAuthorization(\''+p.name+'\',\'Billing Data\')">Billing Data</button></div><div class="menu-item" '+(usageDisabled?'data-tooltip="To authorize the Scoping Project, you must first complete the authorization for its parent Billing Account."':'')+'><button '+(usageDisabled?'disabled':'')+' onclick="addAuthorization(\''+p.name+'\',\'Usage Data\')">Usage Data</button></div></div></div></div></div>'+(empty?'<div class="empty-card"><div><span class="material-symbols-outlined">cloud_off</span><p class="empty-title">No authorization yet</p><p class="empty-copy">Add a Billing Data source to connect your '+p.name+' account and start managing cloud cost data in LumiTure.ai.</p></div></div>':'<div class="card">'+table(p.billingTitle,p.billingHead,p.billing)+table(p.usageTitle,p.usageHead,p.usage)+'</div>')+'</section>'}
+    function skeleton(){return Object.values(PROVIDERS).map(p=>'<section class="provider"><div class="provider-head"><div class="provider-name">'+csp(p.key)+'<h2>'+p.name+'</h2></div><div class="provider-actions"><span class="skel" style="width:20px;height:20px"></span><span class="skel" style="width:154px;height:38px"></span></div></div><div class="skeleton-card"><div class="skel skel-title"></div><div class="skel skel-table"></div></div></section>').join('')}
+    function allEmpty(){return '<div class="empty-card" style="min-height:330px"><div><span class="material-symbols-outlined">cloud_off</span><p class="empty-title">No cloud account authorized yet</p><p class="empty-copy">Use <a href="#" onclick="event.preventDefault();showToast(\'Select a cloud provider and add authorization.\')">Add Authorization</a> below to connect a Billing Data or Usage Data source and start your FinOps journey on LumiTure.ai.</p></div></div>'}
+    function render(){const app=document.getElementById('app');if(state==='loading'){app.innerHTML=skeleton();return}if(state==='empty'){app.innerHTML=allEmpty();return}app.innerHTML=Object.values(PROVIDERS).map(p=>provider(p,state==='gcp-empty'&&p.key==='gcp')).join('')}
+    function toggleMenu(key){openMenu=openMenu===key?null:key;render()} function addAuthorization(provider,type){openMenu=null;render()} function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+    let toastTimer;function showToast(text,type='success'){document.getElementById('toast-text').textContent=text;document.getElementById('toast-icon').textContent=type==='error'?'error':'check_circle';const t=document.getElementById('toast');t.classList.toggle('error',type==='error');t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3600)}
+    document.addEventListener('click',e=>{if(!e.target.closest('.add-wrap')){if(openMenu!==null){openMenu=null;render()}}});document.querySelectorAll('.demo-choice').forEach(b=>b.addEventListener('click',()=>{state=b.dataset.state;openMenu=null;document.querySelectorAll('.demo-choice').forEach(x=>x.classList.toggle('active',x===b));render();document.getElementById('demo').classList.remove('open')}));
+    const statusTooltip = document.getElementById('status-tooltip');
+    function hideStatusTooltip(){statusTooltip.classList.remove('show');}
+    function showStatusTooltip(target){const copy=target.dataset.tooltip;if(!copy)return;statusTooltip.textContent=copy;statusTooltip.classList.add('show');const rect=target.getBoundingClientRect();const tipRect=statusTooltip.getBoundingClientRect();let left=Math.min(rect.left,window.innerWidth-tipRect.width-16);left=Math.max(16,left);let top=rect.bottom+8;if(top+tipRect.height>window.innerHeight-16)top=rect.top-tipRect.height-8;statusTooltip.style.left=left+'px';statusTooltip.style.top=Math.max(16,top)+'px';}
+    document.addEventListener('mouseover',e=>{const target=e.target.closest('.status[data-tooltip]');if(target)showStatusTooltip(target);});
+    document.addEventListener('mouseout',e=>{const target=e.target.closest('.status[data-tooltip]');if(target&&!target.contains(e.relatedTarget))hideStatusTooltip();});
+    document.addEventListener('scroll',hideStatusTooltip,true);window.addEventListener('resize',hideStatusTooltip);render();
+  </script>
+  <script>
+    /* The Figma no-authorization state preserves a CSP section for every provider. */
+    provider = function (p, empty) {
+      const billing = empty ? [] : p.billing;
+      const usage = empty ? [] : p.usage;
+      const usageDisabled = p.key === 'gcp' && !billing.length;
+      return '<section class="provider"><div class="provider-head"><div class="provider-name">' + csp(p.key) + '<h2>' + p.name + '</h2></div><div class="provider-actions"><span class="sync"><span class="material-symbols-outlined">sync</span><span class="sync-tip">Authorization status is refreshed periodically. Some cloud providers can take up to one day to show the latest result.</span></span><div class="add-wrap"><button class="add-button" type="button" aria-expanded="' + (openMenu === p.key) + '" onclick="toggleMenu(\'' + p.key + '\')"><span class="label">Add Authorization</span><span class="material-symbols-outlined">arrow_drop_down</span></button><div class="menu ' + (openMenu === p.key ? 'open' : '') + '"><div class="menu-item"><button onclick="addAuthorization(\'' + p.name + '\',\'Billing Data\')">Billing Data</button></div><div class="menu-item" ' + (usageDisabled ? 'data-tooltip="To authorize the Scoping Project, you must first complete the authorization for its parent Billing Account."' : '') + '><button ' + (usageDisabled ? 'disabled' : '') + ' onclick="addAuthorization(\'' + p.name + '\',\'Usage Data\')">Usage Data</button></div></div></div></div></div>' + (empty ? '<div class="empty-card"><div><span class="material-symbols-outlined">cloud_off</span><p class="empty-title">No authorization yet</p><p class="empty-copy">Add a Billing Data source to connect your ' + p.name + ' account and start managing cloud cost data in LumiTure.ai.</p></div></div>' : '<div class="card">' + table(p.billingTitle, p.billingHead, billing) + table(p.usageTitle, p.usageHead, usage) + '</div>') + '</section>';
+    };
+    skeleton = function () {
+      return Object.values(PROVIDERS).map(p => '<section class="provider"><div class="provider-head"><div class="provider-name">' + csp(p.key) + '<h2>' + p.name + '</h2></div><div class="loading-actions"><span class="sync"><span class="material-symbols-outlined">sync</span></span><button class="add-button" type="button" disabled><span class="label">Add Authorization</span><span class="material-symbols-outlined">arrow_drop_down</span></button></div></div><div class="skeleton-card"><div class="skel skel-title"></div><div class="skel skel-table"></div></div></section>').join('');
+    };
+    allEmpty = function () { return Object.values(PROVIDERS).map(p => provider(p, true)).join(''); };
+    render = function () {
+      const app = document.getElementById('app');
+      if (state === 'loading') { app.innerHTML = skeleton(); return; }
+      if (state === 'empty') { app.innerHTML = allEmpty(); return; }
+      if (state === 'error') { app.innerHTML = '<div class="empty-card"><div><span class="material-symbols-outlined">error</span><p class="empty-title">Unable to load authorizations</p><p class="empty-copy">Please try again. Your existing cloud connections have not been changed.</p><button class="primary-action" style="margin-top:16px" onclick="state=\'normal\';render()">Retry</button></div></div>'; return; }
+      if (state === 'no-access') { app.innerHTML = '<div class="empty-card"><div><span class="material-symbols-outlined">lock</span><p class="empty-title">You do not have access to Authorization List</p><p class="empty-copy">Contact an organization Owner or Admin if you need to manage cloud authorizations.</p></div></div>'; return; }
+      app.innerHTML = Object.values(PROVIDERS).map(p => provider(p, state === 'gcp-empty' && p.key === 'gcp')).join('');
+    };
+    csp = function (key) {
+      const gcp = '../../assets/csp-google-cloud.svg';
+      const aws = '../../assets/csp-aws-wordmark.svg';
+      const awsArrow = '../../assets/csp-aws-arrow.svg';
+      const azure = '../../assets/csp-azure.svg';
+      if (key === 'gcp') return '<span class="csp gcp" aria-label="Google Cloud"><img src="' + gcp + '" alt=""></span>';
+      if (key === 'aws') return '<span class="csp aws" aria-label="AWS"><img class="aws-wordmark" src="' + aws + '" alt=""><img class="aws-arrow" src="' + awsArrow + '" alt=""></span>';
+      return '<span class="csp azure" aria-label="Azure"><img src="' + azure + '" alt=""></span>';
+    };
+    table = function (title, head, rows) {
+      if (!rows.length) return '';
+      return '<div class="auth-group"><h3 class="auth-title">' + escapeHtml(title) + '</h3><div class="table-wrap"><table><colgroup><col style="width:64.14%"><col style="width:23.91%"><col style="width:11.95%"></colgroup><thead><tr><th>' + escapeHtml(head || 'Account Name / ID') + '</th><th>Status</th><th>Last Updated</th></tr></thead><tbody>' + rows.map(r => '<tr><td><div class="account-name">' + escapeHtml(r[0] || '—') + '<span class="account-id">' + (r[1] ? ' (' + escapeHtml(r[1]) + ')' : '') + '</span></div></td><td>' + statusCell(r[2], r[4]) + '</td><td class="updated">' + (r[3] || '—') + '</td></tr>').join('') + '</tbody></table></div></div>';
+    };
+    let azureListMarkup = null;
+    function setFlowPage(active) { document.body.classList.toggle('is-flow-page', active); }
+    function closeAzureFlow() { setFlowPage(false); document.querySelector('.main').innerHTML = azureListMarkup; azureListMarkup = null; render(); }
+    const AZURE_FLOW = {
+      billing: { title:'Cloud Billing Data Integration', labels:['Prepare billing export','Connect Azure','Create FinOps Reader','Grant storage access','Create export event'] },
+      usage: { title:'Cloud Usage Data Integration', labels:['Select subscription','Update custom role','Verify authorization'] }
+    };
+    const AZURE_SUBSCRIPTIONS = {
+      prod:{name:'Production Web',id:'3a4c5b6d-7e8f-4a0b-9c1d-2e3f4a5b6c7d'},
+      data:{name:'Data Platform',id:'9b7a311e-4fc4-4b41-9376-0c0f3ef8a1f2'}
+    };
+    let azureSelectedSubscription = 'prod';
+    let azureBillingTenantId = '';
+    let azureBillingSubscriptionId = '';
+    function journeyOverview(labels, currentStep) {
+      const items = labels.map((label,index) => { const state=index<currentStep?'done':(index===currentStep?'current':''); const stateLabel=index<currentStep?'Completed':(index===currentStep?'Current':'Upcoming'); return '<div class="journey-item '+state+'"><span class="journey-index">'+(index<currentStep?'✓':index+1)+'</span><span class="journey-title">'+label+'</span><span class="journey-state">'+stateLabel+'</span></div>'; }).join('');
+      return '<section class="journey-overview"><h3>Your setup journey</h3><p>Complete these tasks in order. You can leave and return if cloud permissions need time to propagate.</p><div class="journey-list">'+items+'</div></section>';
+    }
+    function previousControl(step, onclick, label) {
+      return step === 0 ? '<span aria-hidden="true"></span>' : '<button class="secondary-action" onclick="'+onclick+'">'+(label || 'Back')+'</button>';
+    }
+    function flowReturnControl() {
+      return '<button type="button" class="flow-return" onclick="closeAzureFlow()"><span class="material-symbols-outlined" aria-hidden="true">arrow_back</span><span class="flow-return-label">Back to Authorization List</span></button>';
+    }
+    function copyPayload(title, caption, id, value, badge) {
+      return '<section class="copy-section"><h3>'+title+(badge?'<span class="generated-badge">'+badge+'</span>':'')+'</h3>'+(caption?'<p class="copy-caption">'+caption+'</p>':'')+'<div class="code-snippet"><div class="code-snippet-head"><span>Code</span><button class="code-copy" onclick="copyAzureValue(\''+id+'\')"><span class="material-symbols-outlined">content_copy</span>Copy code</button></div><pre><code id="'+id+'">'+escapeHtml(value)+'</code></pre></div></section>';
+    }
+    function azureRoleJson() {
+      const subscription = AZURE_SUBSCRIPTIONS[azureSelectedSubscription];
+      return JSON.stringify({properties:{roleName:'LumiTure FinOps Reader-{後綴數字}',description:'',assignableScopes:['/subscriptions/'+subscription.id],permissions:[{actions:['Microsoft.Compute/virtualMachines/read','Microsoft.Compute/virtualMachines/instanceView/read','Microsoft.Compute/skus/read','Microsoft.Insights/Metrics/Read','Microsoft.Resources/subscriptions/read','Microsoft.Resources/subscriptions/resourceGroups/read'],notActions:[],dataActions:[],notDataActions:[]}]}},null,2);
+    }
+    function azureBillingRoleJson() {
+      const scope = azureBillingSubscriptionId || '{Corporate-BI-Data}';
+      return JSON.stringify({properties:{roleName:'LumiTure FinOps Reader-{後綴數字}',description:'',assignableScopes:['/subscriptions/'+scope],permissions:[{actions:['Microsoft.Resources/subscriptions/read','Microsoft.Resources/subscriptions/resourceGroups/read'],notActions:[],dataActions:[],notDataActions:[]}]}},null,2);
+    }
+    function azureSubscriptionOptions() { return Object.entries(AZURE_SUBSCRIPTIONS).map(([value,item])=>'<option value="'+value+'" '+(value===azureSelectedSubscription?'selected':'')+'>'+item.name+' · '+item.id.slice(0,8)+'…'+item.id.slice(-3)+'</option>').join(''); }
+    function setAzureSubscription(value) { azureSelectedSubscription=value; renderAzureFlow(0); }
+    function showPrototypeDialog(title, body) {
+      const root=document.getElementById('prototype-dialog-root');
+      root.innerHTML='<div class="prototype-dialog-backdrop" role="presentation" onclick="if(event.target===this)closePrototypeDialog()"><section class="prototype-dialog" role="dialog" aria-modal="true" aria-labelledby="prototype-dialog-title"><div class="prototype-dialog-head"><div class="prototype-dialog-title"><span class="material-symbols-outlined">warning</span><h2 id="prototype-dialog-title">'+title+'</h2></div><button class="dialog-close" aria-label="Close" onclick="closePrototypeDialog()"><span class="material-symbols-outlined">close</span></button></div><div class="prototype-dialog-content">'+body+'</div><div class="prototype-dialog-actions"><button class="primary-action" onclick="closePrototypeDialog()">Got it</button></div></section></div>';
+      requestAnimationFrame(()=>root.querySelector('.dialog-close').focus());
+    }
+    function closePrototypeDialog(){document.getElementById('prototype-dialog-root').innerHTML='';}
+    let azureFlowKind = 'billing';
+    let azureFlowStep = 0;
+    function flowTask(index, title, copy, step) { const cls = index < step ? 'complete' : (index === step ? 'current' : ''); return '<div class="task-card ' + cls + '"><span class="task-number">' + (index < step ? '✓' : index + 1) + '</span><div><h3>' + title + '</h3><p>' + copy + '</p></div><span class="task-status">' + (index < step ? 'Completed' : (index === step ? 'Current task' : 'Upcoming')) + '</span></div>'; }
+    function detailedSteps(kind, step) {
+      let body = '';
+      if (kind === 'billing' && step === 0) body = '<h3>Create the daily Billing Export</h3><ol><li>Sign in to Azure Portal. Search for <strong>Cost Management</strong> and open it.</li><li>Under <strong>Reporting + analytics</strong>, select <strong>Export</strong>.</li><li>Select <strong>Scope</strong>, then choose the billing scope you want LumiTure.ai to read.</li><li>Select <strong>+ Create</strong> and choose <strong>All data</strong>.</li><li>Enter <strong>daily</strong> as the Export prefix and select Next.</li><li>Set Storage type to <strong>Azure Blob Storage</strong>; choose Create new for the destination and storage.</li><li>For the new destination, select the target subscription, create resource group <strong>rg-lumiture</strong>, keep a copy of the Storage Account name, select <strong>(US) East US</strong>, container <strong>billing-export</strong>, directory <strong>cost</strong>, format <strong>CSV</strong>, and compression <strong>Gzip</strong>.</li><li>Enable <strong>File partitioning</strong> and <strong>Overwrite data</strong>, then select Next and Create.</li></ol><div class="tutorial-note"><strong>Why keep the storage account name?</strong><br>You will need it later when assigning Storage Blob Data Reader and creating the Event Grid subscription.</div>';
+      if (kind === 'billing' && step === 1) body = '<h3>Find and submit the Azure IDs</h3><ol><li>In Azure Portal, search for <strong>Microsoft Entra ID</strong> and open Overview.</li><li>Copy the <strong>Tenant ID</strong> from Basic information.</li><li>Search for <strong>Subscriptions</strong>, then open the subscription where you created the billing export.</li><li>Copy its <strong>Subscription ID</strong>.</li><li>Return here, paste both IDs, and select <strong>Permission Check and Integrate</strong>.</li><li>When Azure opens the permission request, select <strong>Accept</strong> to grant LumiTure-App the requested access.</li></ol><div class="tutorial-note tutorial-warn"><strong>Use matching IDs.</strong><br>The subscription must be the same one that owns the billing export; otherwise the export cannot be discovered.</div>';
+      if (kind === 'billing' && step === 2) body = '<h3>Create the LumiTure FinOps Reader custom role</h3><ol><li>In Azure Portal, open <strong>Subscriptions</strong> and select the connected subscription.</li><li>Open <strong>Access control (IAM)</strong> → <strong>+ Add</strong> → <strong>Add custom role</strong>.</li><li>In Basics, enter <strong>LumiTure FinOps Reader</strong> as the custom role name and add an optional description.</li><li>Open the <strong>JSON</strong> tab and select <strong>Edit</strong>.</li><li>Copy the complete JSON shown above and replace the editor contents.</li><li>Select <strong>Save</strong> → Next → <strong>Review + create</strong>, then select <strong>Create</strong>.</li></ol><h4>Assign the role to LumiTure-App</h4><ol><li>Return to Access control (IAM) and select <strong>+ Add</strong> → <strong>Add role assignment</strong>.</li><li>Search for <strong>LumiTure FinOps Reader</strong>, select it, and choose Next.</li><li>Select <strong>+ Select members</strong>, search for <strong>LumiTure-App</strong>, and select it.</li><li>Select <strong>Review + assign</strong> to finish the assignment.</li></ol><div class="tutorial-note"><strong>Read-only access.</strong><br>This custom role contains only subscription and resource-group read actions required by the Billing Data integration.</div>';
+      if (kind === 'billing' && step === 3) body = '<h3>Grant Storage Blob Data Reader</h3><ol><li>Search for <strong>Storage accounts</strong> and open the account created for the billing export.</li><li>Open <strong>Access control (IAM)</strong> → <strong>+ Add</strong> → <strong>Add role assignment</strong>.</li><li>Search for <strong>Storage Blob Data Reader</strong>, choose Next, then select <strong>LumiTure-App</strong> as the member.</li><li>Select <strong>Review + assign</strong> to finish the role assignment.</li></ol><div class="tutorial-note"><strong>Next up</strong><br>After this role is assigned, create the Event Grid subscription in the next task so LumiTure.ai knows when a new billing export arrives.</div>';
+      if (kind === 'billing' && step === 4) body = '<h3>Create the Blob Created Event Subscription</h3><ol><li>In the same storage account, open <strong>Events</strong> and select <strong>+ Event Subscription</strong>.</li><li>Name the event subscription and system topic as appropriate for your organization; keep Event Schema, Topic Type, Source Resource, and Cross-tenant delivery at their defaults.</li><li>Under Event Types, select <strong>Blob Created</strong>.</li><li>Set Endpoint Type to <strong>Web Hook</strong>, select Configure an endpoint, and paste the Subscriber endpoint shown above.</li><li>Confirm selection, then select <strong>Create</strong>.</li><li>After Azure confirms creation, return here and select <strong>Check Authorization Status</strong>.</li></ol><div class="tutorial-note tutorial-warn"><strong>If the status is In Progress</strong><br>Azure data synchronization can take up to one day. If it becomes Error, reopen this setup and check every prerequisite and role assignment.</div>';
+      if (kind === 'usage' && step === 0) body = '<h3>Confirm the correct subscription</h3><ol><li>Confirm that Billing Data Authorization is already Connected for the subscription you intend to use.</li><li>Make sure you have the <strong>Owner</strong> or <strong>User Access Administrator</strong> role on that subscription.</li><li>Select the subscription here. This choice generates the exact scope inside the custom-role JSON.</li></ol><div class="tutorial-note tutorial-warn"><strong>Double-check before continuing.</strong><br>The custom role is subscription-scoped. Choose the subscription that should provide Rightsizing and Recommendation data.</div>';
+      if (kind === 'usage' && step === 1) body = '<h3>Update the LumiTure FinOps Reader role</h3><ol><li>In Azure Portal, open <strong>Subscriptions</strong> and select the subscription chosen above.</li><li>Open <strong>Access control (IAM)</strong> → <strong>Roles</strong>, then open the existing <strong>LumiTure FinOps Reader</strong> custom role.</li><li>Open the <strong>JSON</strong> tab and select <strong>Edit</strong>.</li><li>Copy the generated JSON above and replace the JSON editor contents.</li><li>Select <strong>Save</strong>, then continue to <strong>Review + Update</strong>.</li><li>Review the configuration and select <strong>Update</strong>.</li></ol><div class="tutorial-note"><strong>No new write permission is added.</strong><br>The updated role adds only the six read actions in the approved Figma configuration for virtual machines, SKUs, metrics, subscriptions, and resource groups.</div>';
+      if (kind === 'usage' && step === 2) body = '<h3>Check the result in LumiTure.ai</h3><ol><li>Select <strong>Check Usage Data Authorization</strong> below.</li><li>Return to Authorization List and look under <strong>Usage Data - Subscription</strong>.</li><li>If the record is not visible, refresh the list. Azure synchronization may take up to <strong>one day</strong>.</li><li>Once the status is Connected, Usage Data is ready for Rightsizing and Recommendation features.</li></ol><div class="tutorial-note tutorial-warn"><strong>Need help with an error?</strong><br>Recheck the Billing connection, the selected subscription, the generated custom-role JSON, and the LumiTure-App role assignment.</div>';
+      return '<details class="step-tutorial" open><summary>Detailed setup instructions</summary><div class="tutorial-content">' + body + '</div></details>';
+    }
+    function azureFlowShell(kind, step, content) {
+      const config = AZURE_FLOW[kind];
+      const steps = config.labels.map((label, index) => '<div class="step ' + (index === step ? 'active' : (index < step ? 'done' : '')) + '"><span class="step-dot">' + (index < step ? '✓' : index + 1) + '</span><span>' + label + '</span></div>').join('');
+      return '<section class="azure-flow">' + flowReturnControl() + '<div class="flow-top"><div><div class="flow-heading"><h1 class="flow-title">' + config.title + '</h1><span class="flow-type ' + (kind === 'usage' ? 'usage' : '') + '">' + (kind === 'billing' ? 'Billing Data' : 'Usage Data') + '</span></div><p class="flow-lead">' + (kind === 'billing' ? 'Connect Azure cost exports and grant the minimum permissions LumiTure.ai needs.' : 'Update the subscription-scoped reader role for Rightsizing and Recommendation features.') + '</p></div></div><div class="stepper">' + steps + '</div>' + content + '</section>';
+    }
+    openAzureFlow = function (kind) { if (!azureListMarkup) azureListMarkup = document.querySelector('.main').innerHTML; setFlowPage(true); azureFlowKind = kind || 'billing'; azureFlowStep = 0; renderAzureFlow(0); };
+    renderAzureFlow = function (step) {
+      azureFlowStep = step;
+      const kind = azureFlowKind;
+      let content = '';
+      if (kind === 'billing' && step === 0) content = '<div class="azure-panel"><h2>Prepare your Azure billing export</h2><p>Start with the export, then connect the same subscription and grant the two read-only data paths.</p><div class="notice"><strong>Permissions you will need</strong><br>Application Administrator in Microsoft Entra ID, plus Owner or User Access Administrator and Contributor or Cost Management Contributor on the target subscription. Azure may take up to one day to synchronize.</div>' + journeyOverview(AZURE_FLOW.billing.labels,0) + detailedSteps('billing',0) + '<div class="flow-actions stickyish"><span aria-hidden="true"></span><button class="primary-action" onclick="renderAzureFlow(1)">I created the billing export</button></div></div>';
+      if (kind === 'billing' && step === 1) content = '<div class="azure-panel"><h2>Set Azure Authorization</h2><p>Copy both IDs from the same Azure tenant and subscription that owns the billing export.</p><div class="field"><label for="tenant-id">Tenant ID</label><input id="tenant-id" value="' + escapeHtml(azureBillingTenantId) + '" placeholder="e.g. 72f988bf-86f1-41af-91ab-2d7cd011db47"></div><div class="field"><label for="subscription-id">Subscription ID</label><input id="subscription-id" value="' + escapeHtml(azureBillingSubscriptionId) + '" placeholder="e.g. 3a4c5b6d-7e8f-4a0b-9c1d-2e3f4a5b6c7d"></div><div class="notice" style="margin-top:20px"><strong>Where to find them</strong><br>Tenant ID: Microsoft Entra ID → Overview. Subscription ID: Subscriptions → select the billing-export subscription.</div>' + detailedSteps('billing',1) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAzureFlow(0)">Back to Authorization Guide</button><button class="primary-action" onclick="submitAzureAuthorization()">Permission Check and Integrate</button></div></div>';
+      if (kind === 'billing' && step === 2) content = '<div class="azure-panel"><h2>Create and assign LumiTure FinOps Reader</h2><p>Create the approved custom read-only role in the connected subscription, then assign it to <strong>LumiTure-App</strong>.</p><div class="notice"><strong>Azure path</strong><br>Subscriptions → connected subscription → Access control (IAM) → + Add → Add custom role → JSON → Edit</div>' + copyPayload('Azure Portal custom-role JSON','Copy the complete JSON and replace all content in the Azure custom-role editor.','azure-billing-role-json',azureBillingRoleJson(),'Copy entire JSON') + detailedSteps('billing',2) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAzureFlow(1)">Back</button><button class="primary-action" onclick="renderAzureFlow(3)">Custom role created and assigned</button></div></div>';
+      if (kind === 'billing' && step === 3) content = '<div class="azure-panel"><h2>Grant storage access</h2><p>Give LumiTure-App read-only access to the storage account that contains your billing export.</p><div class="notice"><strong>Azure path</strong><br>Storage accounts → billing-export storage account → Access control (IAM) → + Add → Add role assignment → Storage Blob Data Reader</div>' + detailedSteps('billing',3) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAzureFlow(2)">Back</button><button class="primary-action" onclick="renderAzureFlow(4)">Storage access assigned</button></div></div>';
+      if (kind === 'billing' && step === 4) content = '<div class="azure-panel"><h2>Create the export event</h2><p>Create one Azure Event Grid subscription so LumiTure.ai is notified whenever a new billing export arrives.</p><div class="notice"><strong>Azure path</strong><br>Storage accounts → billing-export storage account → Events → + Event Subscription → Blob Created → Web Hook</div><h3>Subscriber endpoint <span class="generated-badge">Example</span></h3><div class="copy-box"><code id="azure-endpoint">https://your-lumiture-event-endpoint.example/api/billing_event_trigger</code><button class="copy-button" onclick="copyAzureValue(\'azure-endpoint\')">Copy</button></div>' + detailedSteps('billing',4) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAzureFlow(3)">Back</button><button class="primary-action" onclick="completeAzureFlow()">Check Authorization Status</button></div></div>';
+      if (kind === 'usage' && step === 0) content = '<div class="azure-panel"><h2>Select a connected subscription</h2><p>Usage Data authorization is available only after Billing Data is connected. Your selection generates the exact subscription scope inside the custom-role JSON.</p><div class="notice"><strong>Before you begin</strong><br>You need Owner or User Access Administrator on the selected subscription.</div>' + journeyOverview(AZURE_FLOW.usage.labels,0) + '<div class="usage-subscription-layout"><div class="select-field"><label for="azure-subscription">Azure Subscription</label><select id="azure-subscription" onchange="setAzureSubscription(this.value)">' + azureSubscriptionOptions() + '</select></div><div class="outcome-grid"><div class="outcome"><span class="material-symbols-outlined">query_stats</span><strong>Rightsizing</strong><p>Unlock utilization-based recommendations.</p></div><div class="outcome"><span class="material-symbols-outlined">recommend</span><strong>Recommendations</strong><p>Improve Azure cost optimization coverage.</p></div><div class="outcome"><span class="material-symbols-outlined">lock</span><strong>Read only</strong><p>No resource changes are performed.</p></div></div></div>' + detailedSteps('usage',0) + '<div class="flow-actions stickyish"><span aria-hidden="true"></span><button class="primary-action" onclick="renderAzureFlow(1)">Generate role update</button></div></div>';
+      if (kind === 'usage' && step === 1) content = '<div class="azure-panel"><h2>Update LumiTure FinOps Reader</h2><p>Update the existing Billing Data custom role with the approved Usage Data read permissions on <strong>' + AZURE_SUBSCRIPTIONS[azureSelectedSubscription].name + '</strong>.</p><div class="notice"><strong>Azure path</strong><br>Subscriptions → selected subscription → Access control (IAM) → Roles → LumiTure FinOps Reader → JSON → Edit</div>' + copyPayload('Azure Portal custom-role JSON','Copy the complete JSON and replace all content in the Azure custom-role JSON editor.','azure-role-json',azureRoleJson(),'Copy entire JSON') + detailedSteps('usage',1) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAzureFlow(0)">Back</button><button class="primary-action" onclick="renderAzureFlow(2)">Role updated</button></div></div>';
+      if (kind === 'usage' && step === 2) content = '<div class="azure-panel"><h2>Verify Usage Data authorization</h2><p>LumiTure.ai will check whether the generated role is assigned to <strong>' + AZURE_SUBSCRIPTIONS[azureSelectedSubscription].name + '</strong>.</p>' + detailedSteps('usage',2) + '<div class="notice" style="margin-top:20px"><strong>Synchronization timing</strong><br>The record may remain In Progress for up to one day. You can safely leave this page and refresh the list later.</div><div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAzureFlow(1)">Back</button><button class="primary-action" onclick="completeAzureFlow()">Check Usage Data Authorization</button></div></div>';
+      document.querySelector('.main').innerHTML = azureFlowShell(kind, step, content); focusActiveStep();
+    };
+    submitAzureAuthorization = function () { const tenant = document.getElementById('tenant-id'), subscription = document.getElementById('subscription-id'); const missing = !tenant.value.trim() || !subscription.value.trim(); tenant.classList.toggle('error', !tenant.value.trim()); subscription.classList.toggle('error', !subscription.value.trim()); if (missing) { showToast('Enter both Tenant ID and Subscription ID to continue.','error'); return; } if (tenant.value.trim().toLowerCase()==='invalid') { tenant.classList.add('error'); showToast('Invalid Tenant ID. Check Azure Overview and try again.','error'); tenant.focus(); return; } if (subscription.value.trim().toLowerCase()==='registered') { subscription.classList.add('error'); showToast('This Subscription ID is already registered.','error'); subscription.focus(); return; } azureBillingTenantId=tenant.value.trim(); azureBillingSubscriptionId=subscription.value.trim(); renderAzureFlow(2); showToast('Azure connected. Complete the remaining data-access tasks.'); };
+    function copyAzureValue(id) {
+      const text = document.getElementById(id).textContent;
+      const fallbackCopy = () => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        textarea.remove();
+      };
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).catch(fallbackCopy);
+      else fallbackCopy();
+      showToast('Copied successfully.');
+    }
+    function completeAzureFlow() { const kind = azureFlowKind; closeAzureFlow(); showToast(kind === 'billing' ? 'Azure Billing Data authorization check started.' : 'Azure Usage Data authorization integrated successfully.'); }
+    const GCP_SERVICE_ACCOUNT = 'lumiture-client@your-project.iam.gserviceaccount.com';
+    const GCP_FLOW = {
+      billing: { title:'Cloud Billing Data Integration', type:'Billing Data', labels:['Prepare export project','Enable required APIs','Create billing dataset','Grant read-only access','Enable exports','Connect in LumiTure.ai'] },
+      usage: { title:'Cloud Usage Data Integration', type:'Usage Data', labels:['Prepare a scoping project','Grant Monitoring Viewer','Connect in LumiTure.ai'] }
+    };
+    let gcpFlowKind = 'billing';
+    let gcpFlowStep = 0;
+    function gcpHelp(kind, step) {
+      const billing = [
+        '<h3>Choose the export project</h3><ol><li>In Google Cloud Console, select or create a project linked to the Billing Account you want to authorize.</li><li>Use a project your team can administer. Keep its <strong>Project ID</strong>; you will enter it in LumiTure.ai later.</li></ol><div class="tutorial-note">The Detailed usage cost and Pricing exports can use the same project and dataset.</div>',
+        '<h3>Enable the APIs</h3><ol><li>Open <strong>APIs &amp; Services</strong> → <strong>Library</strong>.</li><li>Enable <strong>BigQuery API</strong>.</li><li>Enable <strong>BigQuery Data Transfer Service API</strong>.</li></ol><div class="tutorial-note">You need Editor access, or someone with permission to enable services, on the export project.</div>',
+        '<h3>Create the dataset</h3><ol><li>Open <strong>BigQuery</strong> and select the export project.</li><li>Select <strong>⋮</strong> next to the project → <strong>Create dataset</strong>.</li><li>Name it <strong>lumiture_billing_data</strong> and set Data location to <strong>US (multi-region)</strong>.</li><li>Select <strong>Create dataset</strong>.</li></ol>',
+        '<h3>Grant the two read-only roles</h3><ol><li>In BigQuery, open the dataset → <strong>Sharing</strong> → <strong>Permissions</strong>.</li><li>Add the LumiTure.ai service account below as <strong>BigQuery Data Viewer</strong>.</li><li>Open <strong>Billing</strong> → select the Billing Account → <strong>Account management</strong> → <strong>Manage users</strong>.</li><li>Add the same service account as <strong>Billing Account Viewer</strong>.</li></ol><div class="tutorial-note">These roles only let LumiTure.ai read cost data. They cannot change your billing setup or cloud resources.</div>',
+        '<h3>Enable the two billing exports</h3><ol><li>Open <strong>Billing</strong> → select the Billing Account → <strong>Billing export</strong>.</li><li>For <strong>Detailed usage cost data</strong>, select <strong>Edit settings</strong>, then select the export project and dataset.</li><li>Repeat for <strong>Pricing</strong>.</li><li>Confirm both exports show <strong>Enabled</strong>.</li></ol><div class="tutorial-note tutorial-warn">Billing export data may take up to one day to appear for the first time.</div>',
+        '<h3>Copy the identifiers</h3><ol><li>In <strong>Billing</strong>, copy the Billing Account ID.</li><li>In BigQuery Explorer, copy the Project ID and Dataset Name used for Detailed usage cost.</li><li>Copy the Project ID and Dataset Name used for Pricing, then paste all five values below.</li></ol>'
+      ];
+      const usage = [
+        '<h3>Prepare one scoping project</h3><ol><li>First confirm the parent Billing Account is already connected in Billing Data Authorization.</li><li>Select an empty, resource-free Google Cloud project linked to that Billing Account.</li><li>Open <strong>Monitoring</strong> → <strong>Settings</strong> → <strong>Metrics Scope</strong>.</li><li>Select <strong>Add projects</strong> and add the projects whose usage data you want LumiTure.ai to read.</li></ol><div class="tutorial-note">Use this project only as the Monitoring scope. It keeps the setup easier to audit later.</div>',
+        '<h3>Grant Monitoring Viewer</h3><ol><li>Open the scoping project’s <strong>IAM &amp; Admin</strong> → <strong>IAM</strong>.</li><li>Select <strong>Grant access</strong> and add the LumiTure.ai service account below.</li><li>Assign <strong>Monitoring Viewer</strong>, then save.</li></ol><div class="tutorial-note">Monitoring Viewer is read-only. It does not change resources, alerts, or budgets.</div>',
+        '<h3>Find the Scoping Project ID</h3><ol><li>Open the project selector at the top of Google Cloud Console.</li><li>Find the scoping project you just configured.</li><li>Copy the value in the <strong>ID</strong> column and paste it below.</li></ol>'
+      ];
+      return '<details class="step-tutorial" open><summary>Detailed setup instructions</summary><div class="tutorial-content">' + (kind === 'billing' ? billing[step] : usage[step]) + '</div></details>';
+    }
+    function gcpFlowShell(kind, step, content) {
+      const config = GCP_FLOW[kind];
+      const steps = config.labels.map((label, index) => '<div class="step ' + (index === step ? 'active' : (index < step ? 'done' : '')) + '"><span class="step-dot">' + (index < step ? '✓' : index + 1) + '</span><span>' + label + '</span></div>').join('');
+      return '<section class="azure-flow">' + flowReturnControl() + '<div class="flow-top"><div><div class="flow-heading"><h1 class="flow-title">' + config.title + '</h1><span class="flow-type ' + (kind === 'usage' ? 'usage' : '') + '">' + config.type + '</span></div><p class="flow-lead">' + (kind === 'billing' ? 'Export Google Cloud billing data securely with the smallest read-only permissions.' : 'Connect Google Cloud usage data for Rightsizing and Recommendations without changing resources.') + '</p></div></div><div class="stepper">' + steps + '</div>' + content + '</section>';
+    }
+    function openGcpFlow(kind) { if (!azureListMarkup) azureListMarkup = document.querySelector('.main').innerHTML; setFlowPage(true); gcpFlowKind = kind || 'billing'; renderGcpFlow(0); }
+    function renderGcpFlow(step) {
+      gcpFlowStep = step;
+      const kind = gcpFlowKind;
+      const final = kind === 'billing' ? 5 : 2;
+      const labels = GCP_FLOW[kind].labels;
+      let content = '';
+      if (step < final) {
+        const billingCopy = ['Choose a project connected to the Billing Account you are authorizing.','Enable the Google Cloud services required to create and read billing exports.','Create the US multi-region BigQuery dataset for LumiTure.ai billing data.','Give LumiTure.ai exactly two read-only roles, once on the dataset and once on the Billing Account.','Turn on both Detailed usage cost and Pricing exports.'];
+        const usageCopy = ['Set up a Monitoring metrics scope after Billing Data is connected.','Give the LumiTure.ai service account read-only Monitoring access.'];
+        const copy = kind === 'billing' ? billingCopy[step] : usageCopy[step];
+        const path = kind === 'billing' ? ['Google Cloud Console → project selector','APIs & Services → Library','BigQuery → export project → Create dataset','BigQuery dataset → Sharing; Billing Account → Manage users','Billing → Billing export'][step] : ['Monitoring → Settings → Metrics Scope','IAM & Admin → IAM → Grant access'][step];
+        const overview = step === 0 ? journeyOverview(GCP_FLOW[kind].labels,0) : '';
+        const preflight = kind === 'billing'
+          ? '<div class="notice"><strong>Before you begin</strong><br>You need Billing Account Administrator on the target Billing Account, BigQuery Data Owner on the export project, and Editor access on the project that contains the dataset.</div>'
+          : '<div class="notice"><strong>Before you begin</strong><br>Billing Data must already be connected for the parent Billing Account. You also need Monitoring Admin to configure the metrics scope and enough IAM access to grant Monitoring Viewer.</div>';
+        const location = '<div class="notice"><strong>Google Cloud Console path</strong><br>' + path + '</div>';
+        content = '<div class="azure-panel"><h2>' + labels[step] + '</h2><p>' + copy + '</p>' + (step===0?preflight:location) + overview + (step === 3 || (kind === 'usage' && step === 1) ? '<h3>LumiTure.ai service account <span class="generated-badge">Example</span></h3><div class="copy-box"><code id="gcp-service-account">' + GCP_SERVICE_ACCOUNT + '</code><button class="copy-button" onclick="copyAzureValue(\'gcp-service-account\')">Copy</button></div>' : '') + gcpHelp(kind, step) + '<div class="flow-actions stickyish">' + previousControl(step,'renderGcpFlow(' + (step - 1) + ')') + '<button class="primary-action" onclick="renderGcpFlow(' + (step + 1) + ')">' + (step === 3 ? 'Roles granted' : (kind === 'billing' && step === 4 ? 'Both exports are enabled' : 'Continue')) + '</button></div></div>';
+      } else if (kind === 'billing') {
+        content = '<div class="azure-panel"><h2>Connect billing data in LumiTure.ai</h2><p>Paste the identifiers from the Billing Account and BigQuery exports. You can use the same project and dataset for both exports when that is how you configured Google Cloud.</p><div class="field"><label for="gcp-billing-account">Billing Account ID</label><input id="gcp-billing-account" placeholder="e.g. LLLLLL-UUUUUU-MMMMMM"></div><h3>Detailed usage cost</h3><div class="field"><label for="gcp-detailed-project">Project ID</label><input id="gcp-detailed-project" placeholder="e.g. lumiture-project-id"></div><div class="field"><label for="gcp-detailed-dataset">Dataset Name</label><input id="gcp-detailed-dataset" placeholder="e.g. lumiture_billing_data"></div><h3>Pricing</h3><div class="field"><label for="gcp-pricing-project">Project ID</label><input id="gcp-pricing-project" placeholder="e.g. lumiture-project-id"></div><div class="field"><label for="gcp-pricing-dataset">Dataset Name</label><input id="gcp-pricing-dataset" placeholder="e.g. lumiture_billing_data"></div>' + gcpHelp('billing', 5) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderGcpFlow(4)">Back</button><button class="primary-action" onclick="submitGcpBilling()">Integrate</button></div></div>';
+      } else {
+        content = '<div class="azure-panel"><h2>Connect usage data in LumiTure.ai</h2><p>Enter the project ID of the Monitoring scoping project. LumiTure.ai will verify the associated Billing Account and service account access.</p><div class="field"><label for="gcp-scoping-project">Scoping Project ID</label><input id="gcp-scoping-project" placeholder="e.g. finops-monitor-scope-example"></div>' + gcpHelp('usage', 2) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderGcpFlow(1)">Back</button><button class="primary-action" onclick="submitGcpUsage()">Integrate</button></div></div>';
+      }
+      document.querySelector('.main').innerHTML = gcpFlowShell(kind, step, content); focusActiveStep();
+    }
+    function focusActiveStep() { requestAnimationFrame(() => { const step = document.querySelector('.step.active'); if (!step) return; step.tabIndex = -1; step.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'}); step.focus({preventScroll:true}); }); }
+    function validateGcpFields(ids) { let bad = false; ids.forEach(id => { const input = document.getElementById(id); const empty = !input.value.trim(); input.classList.toggle('error', empty); bad = bad || empty; }); return !bad; }
+    function submitGcpBilling() { if (!validateGcpFields(['gcp-billing-account','gcp-detailed-project','gcp-detailed-dataset','gcp-pricing-project','gcp-pricing-dataset'])) { showToast('Enter all Billing Account and export values to continue.','error'); return; } if (document.getElementById('gcp-billing-account').value.trim()==='000000-000000-000000') { showPrototypeDialog('Permission Denied','<p>Check the Google Cloud authorization setup and confirm:</p><ul><li>The Project ID and Dataset Name are correct for both Detailed usage cost and Pricing exports.</li><li>The LumiTure.ai service account has <strong>BigQuery Data Viewer</strong> on the dataset.</li><li>The same service account has <strong>Billing Account Viewer</strong> on the Billing Account.</li></ul>'); return; } closeAzureFlow(); showToast('Google Cloud Billing Data authorization submitted. The first export can take up to one day.'); }
+    function submitGcpUsage() { if (!validateGcpFields(['gcp-scoping-project'])) { showToast('Enter the Scoping Project ID to continue.','error'); return; } const id=document.getElementById('gcp-scoping-project').value.trim(); if (id==='permission-denied') { showPrototypeDialog('Service Account Access Denied','<p>LumiTure.ai was not granted <strong>Monitoring Viewer</strong> on this scoping project.</p><ul><li>Grant Monitoring Viewer to the LumiTure.ai service account.</li><li>Confirm this is the same Project ID where the permission was granted.</li></ul>'); return; } if (id==='already-exists') { showPrototypeDialog('Scoping Project Already Exists','<p>This Scoping Project ID has already been integrated. Use a different project or return to Authorization List to manage the existing connection.</p>'); return; } closeAzureFlow(); showToast('Google Cloud Usage Data authorization integrated successfully.'); }
+    const AWS_LUMITURE_ACCOUNT = '123456789012';
+    const AWS_EXTERNAL_ID = 'lumiture-external-id-example';
+    const AWS_STACKSET_URL = 'https://example-bucket.s3.us-east-1.amazonaws.com/lumiture-member-role-template.yaml';
+    const AWS_BILLING_POLICY = JSON.stringify({Version:'2012-10-17',Statement:[
+      {Effect:'Allow',Action:['s3:PutObject','s3:GetBucketLocation','s3:ListBucket','s3:GetObject','s3:CreateBucket','s3:PutBucketPolicy','s3:PutBucketNotification','s3:GetBucketNotification'],Resource:['arn:aws:s3:::lumiture-{ACCOUNT ID}-cur','arn:aws:s3:::lumiture-{ACCOUNT ID}-focus']},
+      {Effect:'Allow',Action:['bcm-data-exports:CreateExport','bcm-data-exports:ListExports','bcm-data-exports:GetExport','bcm-data-exports:DeleteExport','bcm-data-exports:UpdateExport','cur:PutReportDefinition','cur:DeleteReportDefinition','cur:ModifyReportDefinition','cur:DescribeReportDefinitions'],Resource:'*'},
+      {Effect:'Allow',Action:['organizations:ListAccounts','iam:ListAttachedRolePolicies','iam:GetPolicy','iam:GetPolicyVersion','iam:ListAccountAliases','account:GetAccountInformation'],Resource:'*'},
+      {Effect:'Allow',Action:['cloudformation:DescribeStackInstance','cloudformation:DescribeStackSet','cloudformation:DescribeStacks','cloudformation:ListStackInstances','cloudformation:ListStackSets','cloudformation:ListStacks','cloudformation:UpdateStackSet','cloudwatch:Describe*','cloudwatch:Get*','cloudwatch:List*','ec2:DescribeInstances','ec2:DescribeInstanceStatus'],Resource:'*'}
+    ]},null,2);
+    const AWS_USAGE_MANAGEMENT_COMMAND = [
+      'aws cloudformation create-stack \\',
+      '  --stack-name LumiTureManagementStack \\',
+      '  --template-body <path-to-management-template> \\',
+      '  --parameters ParameterKey=ExternalId,ParameterValue="'+AWS_EXTERNAL_ID+'" \\',
+      '  --capabilities CAPABILITY_NAMED_IAM'
+    ].join('\n');
+    const AWS_USAGE_STACKSET_COMMAND = [
+      'aws cloudformation create-stack-set \\',
+      '  --stack-set-name LumiTureAccountMemberMonitoringSet \\',
+      '  --template-url '+AWS_STACKSET_URL+' \\',
+      '  --permission-model SERVICE_MANAGED \\',
+      '  --auto-deployment Enabled=true,RetainStacksOnAccountRemoval=true \\',
+      '  --capabilities CAPABILITY_NAMED_IAM \\',
+      '  --region us-east-1 \\',
+      '  --parameters ParameterKey=ExternalId,ParameterValue="'+AWS_EXTERNAL_ID+'"'
+    ].join('\n');
+    const AWS_USAGE_DEPLOY_COMMAND = [
+      'aws cloudformation create-stack-instances \\',
+      '  --stack-set-name LumiTureAccountMemberMonitoringSet \\',
+      '  --deployment-targets OrganizationalUnitIds=<OU-id> \\',
+      '  --regions <home-region>'
+    ].join('\n');
+    const AWS_USAGE_CLOUDSHELL_SCRIPT = [
+      '# 1. Create the Management Account stack',
+      AWS_USAGE_MANAGEMENT_COMMAND,
+      '',
+      '# 2. Create the Organization monitoring StackSet',
+      AWS_USAGE_STACKSET_COMMAND,
+      '',
+      '# 3. Deploy the StackSet to the intended Organizational Units',
+      AWS_USAGE_DEPLOY_COMMAND
+    ].join('\n');
+    const AWS_FLOW = {
+      billing:{title:'Cloud Billing Data Integration',type:'Billing Data',labels:['Check prerequisites','Create IAM policy','Create IAM role','Connect in LumiTure.ai']},
+      usage:{title:'Cloud Usage Data Integration',type:'Usage Data',labels:['Prepare AWS Console','Run setup script','Connect in LumiTure.ai']}
+    };
+    let awsFlowKind = 'billing';
+    function awsHelp(kind, step) {
+      const billing = [
+        '<h3>Confirm before starting</h3><ol><li>Sign in to the <strong>AWS Organization Management Account</strong>.</li><li>Confirm this account has capacity for the required exports: at most <strong>5 CUR 2.0</strong> and <strong>2 FOCUS</strong> exports per AWS account.</li><li>Keep the 12-digit Management Account ID available for the final step.</li></ol><div class="tutorial-note tutorial-warn">AWS can take up to 24 hours to begin delivering export data, and LumiTure.ai will initially show data from the previous day.</div>',
+        '<h3>Create the IAM policy</h3><ol><li>Open <strong>IAM</strong> → <strong>Policies</strong> → <strong>Create policy</strong>.</li><li>Choose the <strong>JSON</strong> tab and paste the complete LumiTure.ai billing policy shown above.</li><li>Replace every <strong>{ACCOUNT ID}</strong> placeholder with your 12-digit Management Account ID.</li><li>Name it <strong>LumiTureIntegrationPolicy</strong> and create it.</li><li>Open the policy Summary and copy its full ARN for the final form.</li></ol><div class="tutorial-note">The policy covers the billing exports, their S3 delivery, organization inventory, and the read actions required for this integration.</div>',
+        '<h3>Create a cross-account IAM role</h3><ol><li>In <strong>IAM</strong> → <strong>Roles</strong>, choose <strong>Create role</strong>.</li><li>Choose <strong>AWS account</strong> → <strong>Another AWS account</strong>.</li><li>Enter the LumiTure.ai AWS Account ID and enable <strong>Require external ID</strong>.</li><li>Paste the External ID below. Leave <strong>Require MFA</strong> unchecked.</li><li>Attach <strong>LumiTureIntegrationPolicy</strong>, name the role, and create it.</li></ol><div class="tutorial-note">The external ID protects this cross-account relationship from a confused-deputy attack.</div>',
+        '<h3>Copy the four values</h3><ol><li>Copy your Management Account ID from AWS Organizations.</li><li>Copy the full IAM Role ARN and IAM Policy ARN from their Summary pages.</li><li>Keep the generated External ID unchanged and submit all four values below.</li></ol>'
+      ];
+      const usage = [
+        '<h3>Prepare AWS Management Console</h3><ol><li>Confirm the Management Account already has <strong>Billing Data Authorization</strong>.</li><li>Sign in to that account in <strong>AWS Management Console</strong>.</li><li>Open the built-in <strong>CloudShell</strong> from the top navigation.</li><li>Keep CloudShell open; the next step provides one complete setup script to paste there.</li></ol><div class="tutorial-note">CloudShell is part of AWS Management Console. You do not need to install or open a separate CLI application.</div>',
+        '<h3>Paste the setup script in AWS CloudShell</h3><ol><li>Copy the complete setup script shown above.</li><li>Before pasting, replace the Management template path, Organizational Unit ID, and home region placeholders.</li><li>Paste the complete script into CloudShell and press Enter.</li><li>Wait until the intended StackSet instances show <strong>Current</strong> before continuing.</li></ol><div class="tutorial-note tutorial-warn">Paste and run this script only from the authorized AWS Organization Management Account.</div>',
+        '<h3>Copy the required values</h3><ol><li>Open CloudFormation → StackSets and copy the StackSet name.</li><li>Open its Parameters section and copy the Member Management Role Name.</li><li>Copy the 12-digit Management Account ID from AWS Organizations.</li><li>Paste the External ID supplied by LumiTure.ai unchanged.</li></ol>'
+      ];
+      return '<details class="step-tutorial" open><summary>Detailed setup instructions</summary><div class="tutorial-content">' + (kind === 'billing' ? billing[step] : usage[step]) + '</div></details>';
+    }
+    function awsFlowShell(kind, step, content) { const config = AWS_FLOW[kind]; const steps = config.labels.map((label,index) => '<div class="step '+(index===step?'active':(index<step?'done':''))+'"><span class="step-dot">'+(index<step?'✓':index+1)+'</span><span>'+label+'</span></div>').join(''); return '<section class="azure-flow">'+flowReturnControl()+'<div class="flow-top"><div><div class="flow-heading"><h1 class="flow-title">'+config.title+'</h1><span class="flow-type '+(kind==='usage'?'usage':'')+'">'+config.type+'</span></div><p class="flow-lead">'+(kind==='billing'?'Allow LumiTure.ai to securely create and read AWS billing exports.':'Deploy read-only member monitoring access for Rightsizing and Recommendations.')+'</p></div></div><div class="stepper">'+steps+'</div>'+content+'</section>'; }
+    function openAwsFlow(kind) { if (!azureListMarkup) azureListMarkup = document.querySelector('.main').innerHTML; setFlowPage(true); awsFlowKind = kind || 'billing'; renderAwsFlow(0); }
+    function awsCopy(label, id, value) { return '<h3>'+label+'</h3><div class="copy-box"><code id="'+id+'">'+value+'</code><button class="copy-button" onclick="copyAzureValue(\''+id+'\')">Copy</button></div>'; }
+    function renderAwsFlow(step) {
+      const kind = awsFlowKind, final = kind==='billing'?3:2, labels = AWS_FLOW[kind].labels; let content = '';
+      if (step < final) {
+        const paths = kind==='billing' ? ['AWS Organizations → Management Account','IAM → Policies → Create policy','IAM → Roles → Create role'] : ['AWS Organization Management Account','CloudFormation → StackSets → Create stack set'];
+        let extra = '';
+        if (kind==='billing' && step===1) extra = copyPayload('Complete IAM policy JSON','Replace both {ACCOUNT ID} placeholders before pasting this entire policy into IAM.','aws-billing-policy-json',AWS_BILLING_POLICY,'Copy entire policy');
+        if (kind==='billing' && step===2) extra = awsCopy("LumiTure.ai AWS Account ID (example)",'aws-lumiture-account',AWS_LUMITURE_ACCOUNT) + awsCopy('External ID (example)','aws-external-id',AWS_EXTERNAL_ID);
+        if (kind==='usage' && step===1) extra = copyPayload('AWS CloudShell setup script','Replace the three placeholders, then paste this entire script into CloudShell inside AWS Management Console.','aws-usage-cloudshell-script',AWS_USAGE_CLOUDSHELL_SCRIPT,'Copy entire script');
+        const overview = step===0 ? journeyOverview(AWS_FLOW[kind].labels,0) : '';
+        const preflight = kind==='billing' ? '<div class="notice"><strong>Before you begin</strong><br>Sign in to the AWS Organization Management Account with administrative access. Confirm the account has room for up to 5 CUR 2.0 and 2 FOCUS exports.</div>' : '<div class="notice"><strong>Before you begin</strong><br>Billing Data Authorization must already be connected for this Management Account, and you need administrative access to deploy Organization-wide CloudFormation StackSets.</div>';
+        const location = '<div class="notice"><strong>AWS Console path</strong><br>'+(kind==='usage'?'AWS Management Console → CloudShell':paths[step])+'</div>';
+        content = '<div class="azure-panel"><h2>'+labels[step]+'</h2><p>'+ (kind==='billing' ? ['Check account access and export quota before creating resources.','Create the least-privilege policy that lets AWS deliver the required billing exports.','Trust LumiTure.ai through an external-ID protected role.'][step] : ['Prepare the authorized AWS Management Account and open its built-in CloudShell.','Paste the LumiTure.ai setup script in AWS CloudShell to deploy the monitoring StackSet.'][step]) +'</p>'+(step===0?preflight:location)+overview+extra+awsHelp(kind,step)+'<div class="flow-actions stickyish">'+previousControl(step,'renderAwsFlow('+(step-1)+')')+'<button class="primary-action" onclick="renderAwsFlow('+(step+1)+')">'+(kind==='billing'&&step===2?'Role created':(kind==='usage'&&step===1?'StackSet deployed':'Continue'))+'</button></div></div>';
+      } else if (kind==='billing') {
+        content = '<div class="azure-panel"><h2>Connect billing data in LumiTure.ai</h2><p>Enter the AWS IAM details created in the Management Account. LumiTure.ai will run a permission check before creating the billing exports.</p><div class="field"><label for="aws-billing-account">Your AWS Management Account ID</label><input id="aws-billing-account" placeholder="e.g. 123456789012"></div><div class="field"><label for="aws-billing-role">IAM Role ARN</label><input id="aws-billing-role" placeholder="e.g. arn:aws:iam::123456789012:role/LumiTureIntegrationRole"></div><div class="field"><label for="aws-billing-policy">IAM Policy ARN</label><input id="aws-billing-policy" placeholder="e.g. arn:aws:iam::123456789012:policy/LumiTureIntegrationPolicy"></div><div class="field"><label for="aws-billing-external-input">External ID from LumiTure.ai</label><input id="aws-billing-external-input" value="'+AWS_EXTERNAL_ID+'"></div>'+awsHelp('billing',3)+'<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAwsFlow(2)">Back</button><button class="primary-action" onclick="submitAwsBilling()">Permission Check and Integrate</button></div></div>';
+      } else {
+        content = '<div class="azure-panel"><h2>Connect usage data in LumiTure.ai</h2><p>Provide the StackSet, member role, Management Account, and External ID that were created in AWS.</p><div class="field"><label for="aws-usage-stackset">StackSet Name</label><input id="aws-usage-stackset" placeholder="e.g. LumiTureAccountMemberMonitoringSet"></div><div class="field"><label for="aws-usage-role">Member Management Role Name</label><input id="aws-usage-role" placeholder="e.g. LumiTureAccountMemberMonitoringRole"></div><div class="field"><label for="aws-usage-account">AWS Management Account ID</label><input id="aws-usage-account" placeholder="e.g. 123456789012"></div><div class="field"><label for="aws-usage-external-input">External ID from LumiTure.ai</label><input id="aws-usage-external-input" value="'+AWS_EXTERNAL_ID+'"></div>'+awsHelp('usage',2)+'<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAwsFlow(1)">Back</button><button class="primary-action" onclick="submitAwsUsage()">Integrate</button></div></div>';
+      }
+      document.querySelector('.main').innerHTML = awsFlowShell(kind,step,content); focusActiveStep();
+    }
+    function submitAwsBilling() { if (!validateGcpFields(['aws-billing-account','aws-billing-role','aws-billing-policy','aws-billing-external-input'])) { showToast('Enter the Management Account and IAM details to continue.','error'); return; } const account=document.getElementById('aws-billing-account').value.trim(); if (account==='000000000000') { showPrototypeDialog('Quota Exceeded','<p>Each AWS account is limited to <strong>5 CUR 2.0</strong> and <strong>2 FOCUS</strong> data exports.</p><p>Remove an unused export or use another Management Account before running the integration again.</p>'); return; } if (account==='111111111111') { showPrototypeDialog('Permission Denied','<p>The permission check could not use the supplied IAM role and policy.</p><ul><li>Confirm the full Role ARN and Policy ARN are correct.</li><li>Confirm the complete billing policy is attached to the role.</li><li>Confirm the trust relationship uses LumiTure.ai account <strong>'+AWS_LUMITURE_ACCOUNT+'</strong> and the same External ID.</li></ul>'); return; } closeAzureFlow(); showToast('AWS Billing Data permission check started.'); }
+    function submitAwsUsage() { if (!validateGcpFields(['aws-usage-stackset','aws-usage-role','aws-usage-account','aws-usage-external-input'])) { showToast('Enter the StackSet, role, Management Account, and External ID details to continue.','error'); return; } const stackset=document.getElementById('aws-usage-stackset').value.trim().toLowerCase(); if (stackset==='stackset-failed') { showPrototypeDialog('StackSet Deployment Failed','<p>The StackSet failed to deploy to one or more target AWS accounts.</p><p>Open <strong>AWS CloudFormation → StackSets → Stack instances</strong> and review the detailed error for each failed target account.</p>'); return; } if (stackset==='policy-mismatch') { showPrototypeDialog('IAM Policy Mismatch','<p>The StackSet deployed, but its inline IAM policy does not match the required LumiTure.ai permissions.</p><p>Compare the deployed policy with the supplied template and redeploy the affected instances.</p>'); return; } if (stackset==='invalid-parameters') { showPrototypeDialog('Invalid Configuration Parameters','<p>The supplied StackSet Name or Member Management Role Name does not map to an active deployment in this AWS Organization.</p><p>Copy both values from the StackSet details and Parameters section, then try again.</p>'); return; } closeAzureFlow(); showToast('AWS Usage Data authorization integrated successfully.'); }
+    addAuthorization = function (providerName, type) { openMenu = null; if (providerName === 'Azure') { openAzureFlow(type === 'Usage Data' ? 'usage' : 'billing'); return; } if (providerName === 'Google Cloud') { openGcpFlow(type === 'Usage Data' ? 'usage' : 'billing'); return; } if (providerName === 'AWS') { openAwsFlow(type === 'Usage Data' ? 'usage' : 'billing'); return; } render(); };
+    const demoPanel = document.querySelector('.demo-panel'); if (demoPanel) demoPanel.insertAdjacentHTML('beforeend','<span class="demo-label" style="margin-top:10px">Azure Flows</span><button class="demo-choice" onclick="openAzureFlow(\'billing\');document.getElementById(\'demo\').classList.remove(\'open\')">Billing Data redesign</button><button class="demo-choice" onclick="openAzureFlow(\'usage\');document.getElementById(\'demo\').classList.remove(\'open\')">Usage Data redesign</button>');
+    render();
+  </script>
+  <script>
+    /* Claude Demo Scenarios contract: shared FAB owns presentation; this page owns state. */
+    window.DEMO_SCENARIOS = [
+      {id:'default', label:'Default (matches Figma #22 mock data)'},
+      {id:'empty', label:'Empty — nothing authorized yet'},
+      {id:'loading', label:'Loading'},
+      {id:'load-error', label:'Load Error'},
+      {id:'gcp-perm-denied', label:'GCP — Permission Denied (on submit, use Billing Account ID 000000-000000-000000)'},
+      {id:'aws-quota', label:'AWS — Quota Exceeded (on submit, use Account ID 000000000000)'},
+      {id:'no-access', label:'No Access (non Owner/Admin)'}
+    ];
+    window.DEMO_DEFAULT = 'default';
+    window.DEMO_APPLY = function(id) {
+      const gcpRow = PROVIDERS.gcp.billing[0];
+      const awsRow = PROVIDERS.aws.billing[0];
+      gcpRow[2] = 'Connected'; gcpRow[4] = '';
+      awsRow[2] = 'Connected'; awsRow[4] = '';
+      state = 'normal'; openMenu = null;
+      if (id === 'empty') state = 'empty';
+      if (id === 'loading') state = 'loading';
+      if (id === 'load-error') state = 'error';
+      if (id === 'no-access') state = 'no-access';
+      if (id === 'gcp-perm-denied') { gcpRow[2] = 'Permission Denied'; gcpRow[4] = 'Check the Billing Account ID and the permission granted to LumiTure-App, then try again.'; }
+      if (id === 'aws-quota') { awsRow[2] = 'Quota Exceeded'; awsRow[4] = 'The AWS account quota has been exceeded. Use another account or contact your administrator.'; }
+      render();
+    };
+  </script>
+  <script>
+/* === Inlined: shared/demo-fab.js === */
+/*!
+ * demo-fab.js — Lumiture Designer Demo Scenarios (Shared Module v2)
+ *
+ * Auto-injects:
+ *   - .demo-fab (FAB button, bottom-left)
+ *   - .demo-popover (480px tall × 390px wide popover)
+ *   - #gl-tip (body-level fixed tooltip — required for demo button hover tips)
+ *
+ * Required globals:
+ *   window.DEMO_SCENARIOS = [...]   — scenario list
+ *   window.DEMO_APPLY     = fn      — called with (id, btn) when scenario clicked
+ *
+ * Optional globals:
+ *   window.DEMO_PAGES = [{id, label, icon}]      — page tabs (top row, pill style)
+ *   window.DEMO_CATEGORIES = [{id, label, icon, hint}]  — category tabs (underline style)
+ *   window.DEMO_DEFAULT = 'scenario-id'           — initial active scenario
+ *
+ * Rendering modes (auto-detected):
+ *   1. No pages, no categories → flat list of buttons
+ *   2. Pages only (LumiTag pattern) → underline tabs at top, scenarios filtered by page
+ *   3. Categories only (single-page Cost Dashboard pattern) → underline tabs, scenarios filtered by category
+ *   4. Pages + Categories → two-layer: pill page tabs (top) + underline category tabs (bottom)
+ *
+ * Scenario schema:
+ *   {
+ *     id:        string,           // unique
+ *     label:     string,
+ *     icon:      string,           // Material Symbols name
+ *     tip:       string?,          // hover tooltip (rendered via #gl-tip, NOT ::after)
+ *     page:      string?,          // matches DEMO_PAGES[].id (alias: 'tab' for backwards compat)
+ *     category:  string?,          // matches DEMO_CATEGORIES[].id
+ *     isNoData:  boolean?,         // groups under "no data" sub-divider
+ *     disabled:  boolean?,         // shows "Soon" badge, not clickable
+ *   }
+ *
+ * Programmatic API:
+ *   window.demoFabSwitchTab(pageId)    // switch to a specific page tab (called on navigation)
+ *   window._demoFabToggle()            // open/close popover
+ *   window._demoFabApply(id, btn)      // apply a scenario (internal)
+ */
+(function () {
+  'use strict';
+
+  // ===== MODULE STATE =====
+  var _activePage = null;         // null until first scenario filtered
+  var _activeCategory = null;
+  var _activeScenario = null;
+
+  // ===== CSS INJECTION =====
+  var CSS = [
+    /* FAB button */
+    '.demo-fab{position:fixed;bottom:18px;left:18px;width:48px;height:48px;border-radius:50%;',
+    'background:radial-gradient(circle at 78% 68%,#D9CC4A 0%,rgba(217,204,74,0) 42%),',
+    'radial-gradient(circle at 30% 28%,#4D8DDB 0%,rgba(77,141,219,0) 52%),',
+    'radial-gradient(circle at 25% 78%,#001A52 0%,rgba(0,26,82,0) 58%),',
+    'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);',
+    'color:#fff;box-shadow:0 4px 14px rgba(13,27,62,.36);z-index:999;cursor:pointer;',
+    'display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;border:0}',
+    '.demo-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(13,27,62,.45)}',
+    '.demo-fab:active{transform:scale(.96)}',
+    '.demo-fab .material-symbols-outlined{font-size:24px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}',
+    '.demo-fab.popped{box-shadow:0 4px 14px rgba(13,27,62,.36),inset 0 2px 6px rgba(0,0,0,.28)}',
+    '.demo-fab .demo-pulse{position:absolute;top:5px;right:5px;width:9px;height:9px;background:#FF403D;',
+    'border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 0 rgba(255,64,61,.6);animation:demoPulse 1.6s ease-in-out infinite}',
+    '@keyframes demoPulse{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,64,61,.6)}',
+    '70%{transform:scale(1.1);box-shadow:0 0 0 8px rgba(255,64,61,0)}',
+    '100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,64,61,0)}}',
+
+    /* Popover shell — 全站固定 390 × 480 */
+    '.demo-popover{position:fixed;bottom:78px;left:18px;width:390px;height:480px;background:#fff;',
+    'border:1px solid rgba(14,58,130,.18);border-radius:12px;box-shadow:0 8px 24px rgba(13,27,62,.16);',
+    'z-index:998;padding:0;opacity:0;transform:translateY(8px);pointer-events:none;',
+    'transition:opacity .18s,transform .18s;display:flex;flex-direction:column;overflow:hidden}',
+    '.demo-popover.show{opacity:1;transform:translateY(0);pointer-events:auto}',
+    '.demo-popover::before{content:\'\';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;',
+    'background:radial-gradient(circle at 78% 50%,#D9CC4A 0%,rgba(217,204,74,0) 32%),',
+    'radial-gradient(circle at 30% 50%,#4D8DDB 0%,rgba(77,141,219,0) 42%),',
+    'linear-gradient(90deg,#0D1B3E 0%,#0E3A82 100%)}',
+
+    /* Popover header */
+    '.demo-popover-hdr{display:flex;align-items:center;justify-content:space-between;',
+    'padding:14px 16px 10px;flex-shrink:0}',
+    '.demo-popover-title{font-size:12px;font-weight:700;color:#0E3A82;text-transform:uppercase;',
+    'letter-spacing:.5px;display:flex;align-items:center;gap:6px}',
+    '.demo-popover-close{color:#B0B7C0;cursor:pointer;padding:2px;border-radius:4px;',
+    'display:flex;align-items:center;background:none;border:none}',
+    '.demo-popover-close:hover{color:#0E3A82;background:rgba(14,58,130,.08)}',
+
+    /* Reset link */
+    '.demo-reset-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#676767;',
+    'font-weight:500;background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:4px;',
+    'font-family:inherit;margin:0 16px 6px}',
+    '.demo-reset-link:hover{color:#004FB0;background:#F2FAFF}',
+    '.demo-reset-link .material-symbols-outlined{font-size:14px}',
+
+    /* Page tabs (Layer 1 — pill / segmented style，only when both layers exist) */
+    '.demo-page-tabs{display:flex;gap:4px;padding:0 16px 8px;flex-shrink:0;overflow-x:auto;scrollbar-width:none}',
+    '.demo-page-tabs::-webkit-scrollbar{display:none}',
+    '.demo-page-tab{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;height:26px;',
+    'background:#F2F2F2;color:#676767;border:none;border-radius:13px;font-size:11px;font-weight:600;',
+    'font-family:inherit;cursor:pointer;transition:all .15s;white-space:nowrap}',
+    '.demo-page-tab:hover{color:#262626;background:#E6E6E6}',
+    '.demo-page-tab.active{background:#fff;color:#004FB0;box-shadow:inset 0 0 0 1px #004FB0}',
+    '.demo-page-tab .material-symbols-outlined{font-size:13px}',
+
+    /* Category tabs (Layer 2，or single-layer underline mode) */
+    '.demo-cat-tabs{display:flex;border-bottom:2px solid #E6E6E6;padding:0 12px;flex-shrink:0;',
+    'overflow-x:auto;scrollbar-width:none}',
+    '.demo-cat-tabs::-webkit-scrollbar{display:none}',
+    '.demo-cat-tab{display:inline-flex;align-items:center;gap:4px;padding:7px 10px;font-size:11px;',
+    'font-weight:600;color:#676767;border:none;background:none;border-bottom:2px solid transparent;',
+    'margin-bottom:-2px;cursor:pointer;letter-spacing:.3px;transition:all .15s;font-family:inherit;white-space:nowrap}',
+    '.demo-cat-tab .material-symbols-outlined{font-size:14px}',
+    '.demo-cat-tab:hover{color:#262626}',
+    '.demo-cat-tab.active{color:#004FB0;border-bottom-color:#004FB0}',
+
+    /* Hint block (淡藍底 + 左藍邊條) */
+    '.demo-pane-hint{font-size:11px;color:#676767;line-height:1.5;margin:0 0 8px;',
+    'padding:8px 10px;background:#F2FAFF;border-left:2px solid #004FB0;border-radius:4px}',
+
+    /* Scroll area (flex 1, hidden scrollbar) */
+    '.demo-popover-scroll{overflow-y:auto;overscroll-behavior:contain;flex:1;min-height:0;',
+    'padding:8px 16px 14px;transition:opacity .12s ease;scrollbar-width:none}',
+    '.demo-popover-scroll::-webkit-scrollbar{display:none}',
+
+    /* Sub-separator (no data divider) */
+    '.demo-sub-sep{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;',
+    'color:#9CAEC4;letter-spacing:.4px;text-transform:uppercase;margin:10px 0 6px}',
+    '.demo-sub-sep::before,.demo-sub-sep::after{content:\'\';flex:1;height:1px;background:rgba(14,58,130,.1)}',
+
+    /* Button group */
+    '.demo-buttons{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}',
+
+    /* Scenario button */
+    '.demo-btn{background:#fff;border:1px solid rgba(14,58,130,.25);color:#0E3A82;',
+    'padding:8px 12px;border-radius:8px;font-size:12px;font-weight:500;',
+    'display:flex;align-items:center;gap:6px;text-align:left;width:100%;',
+    'transition:all .15s;position:relative;cursor:pointer;font-family:inherit}',
+    '.demo-btn:hover{background:rgba(14,58,130,.05);border-color:rgba(14,58,130,.5)}',
+    '.demo-btn.active{background:radial-gradient(circle at 88% 70%,#D9CC4A 0%,rgba(217,204,74,0) 42%),',
+    'radial-gradient(circle at 22% 35%,#4D8DDB 0%,rgba(77,141,219,0) 50%),',
+    'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);color:#fff;border-color:transparent;',
+    'box-shadow:0 2px 6px rgba(13,27,62,.25)}',
+    '.demo-btn .material-symbols-outlined{font-size:16px;flex-shrink:0}',
+
+    /* Disabled button */
+    '.demo-btn.demo-dis{opacity:.42;cursor:not-allowed}',
+    '.demo-btn.demo-dis:hover{background:#fff!important;border-color:rgba(14,58,130,.25)!important}',
+    '.demo-cs{margin-left:auto;font-size:9px;font-weight:700;color:#9CAEC4;',
+    'background:rgba(14,58,130,.06);border-radius:3px;padding:1px 5px;letter-spacing:.3px;flex-shrink:0}',
+
+    /* Empty state when no scenarios match current filters */
+    '.demo-empty{padding:24px 8px;text-align:center;color:#9CAEC4;font-size:12px;line-height:1.5}',
+
+    /* ⚠️ Suppress any global CSS [data-tip]::after on demo elements.
+       Tooltips MUST be handled by #gl-tip (auto-injected below) — pseudo-tooltips
+       get clipped by .demo-popover { overflow: hidden }. */
+    '.demo-btn[data-tip]::after,.demo-btn[data-tip]::before,',
+    '.demo-page-tab[data-tip]::after,.demo-cat-tab[data-tip]::after{display:none!important}',
+
+    /* #gl-tip — body-level fixed tooltip (auto-injected) */
+    '#gl-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:12px;line-height:1.4;',
+    'padding:6px 10px;border-radius:4px;max-width:320px;white-space:normal;',
+    'pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25);',
+    'font-family:\'Noto Sans\',sans-serif}'
+  ].join('');
+
+  var style = document.createElement('style');
+  style.textContent = CSS;
+  document.head.appendChild(style);
+
+  // ===== HELPERS =====
+  function _esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  // Normalise scenario: tab → page (backwards compat)
+  function _normalizedScenarios() {
+    return (window.DEMO_SCENARIOS || []).map(function (s) {
+      return Object.assign({}, s, { page: s.page || s.tab || null });
+    });
+  }
+
+  // Detect rendering mode based on what's configured
+  function _detectMode() {
+    var scenarios = _normalizedScenarios();
+    var hasPages = (window.DEMO_PAGES && window.DEMO_PAGES.length) ||
+                   scenarios.some(function (s) { return !!s.page; });
+    var hasCats  = (window.DEMO_CATEGORIES && window.DEMO_CATEGORIES.length) ||
+                   scenarios.some(function (s) { return !!s.category; });
+    if (hasPages && hasCats) return 'two-layer';
+    if (hasPages) return 'pages-only';
+    if (hasCats)  return 'categories-only';
+    return 'flat';
+  }
+
+  // Auto-derive page list if DEMO_PAGES not provided
+  function _getPages() {
+    if (window.DEMO_PAGES && window.DEMO_PAGES.length) return window.DEMO_PAGES;
+    var seen = {};
+    var pages = [];
+    _normalizedScenarios().forEach(function (s) {
+      if (s.page && !seen[s.page]) {
+        seen[s.page] = true;
+        pages.push({ id: s.page, label: s.page.charAt(0).toUpperCase() + s.page.slice(1), icon: 'tab' });
+      }
+    });
+    return pages;
+  }
+
+  function _getCategories() {
+    return window.DEMO_CATEGORIES || [];
+  }
+
+  // Filter scenarios for current page + category
+  function _filterScenarios() {
+    var scenarios = _normalizedScenarios();
+    return scenarios.filter(function (s) {
+      if (_activePage && s.page && s.page !== _activePage) return false;
+      if (_activePage && !s.page) return false; // page-tab mode requires scenario to have page
+      if (_activeCategory && s.category && s.category !== _activeCategory) return false;
+      if (_activeCategory && !s.category) return false; // cat-tab mode requires scenario to have category
+      return true;
+    });
+  }
+
+  // ===== HTML BUILDERS =====
+  function _renderButtons(scenarios) {
+    if (!scenarios.length) {
+      return '<div class="demo-empty">No scenarios in this view.</div>';
+    }
+    var normal = scenarios.filter(function (s) { return !s.isNoData; });
+    var noData = scenarios.filter(function (s) { return s.isNoData; });
+    var html = _renderGroup(normal);
+    if (noData.length) {
+      html += '<div class="demo-sub-sep">no data</div>' + _renderGroup(noData);
+    }
+    return html;
+  }
+
+  function _renderGroup(scenarios) {
+    if (!scenarios.length) return '';
+    var btns = scenarios.map(function (s) {
+      var dis = s.disabled ? ' demo-dis' : '';
+      var act = s.id === _activeScenario ? ' active' : '';
+      var tip = s.tip ? ' data-tip="' + _esc(s.tip) + '"' : '';
+      var cs = s.disabled ? '<span class="demo-cs">Soon</span>' : '';
+      return '<button class="demo-btn' + dis + act + '"' + tip +
+             ' data-scenario="' + _esc(s.id) + '">' +
+             '<span class="material-symbols-outlined">' + _esc(s.icon || 'play_arrow') + '</span>' +
+             '<span>' + _esc(s.label) + '</span>' + cs + '</button>';
+    }).join('');
+    return '<div class="demo-buttons">' + btns + '</div>';
+  }
+
+  function _renderPageTabs(mode) {
+    var pages = _getPages();
+    if (!pages.length) return '';
+    // 雙層模式：page tabs 用 pill style 放最上面
+    // 單層 pages-only 模式：page tabs 用 underline style（跟 cat-tabs 一致），無第二層
+    var isTwoLayer = mode === 'two-layer';
+    var wrapClass = isTwoLayer ? 'demo-page-tabs' : 'demo-cat-tabs';
+    var tabClass  = isTwoLayer ? 'demo-page-tab' : 'demo-cat-tab';
+    return '<div class="' + wrapClass + '">' + pages.map(function (p) {
+      var act = p.id === _activePage ? ' active' : '';
+      return '<button class="' + tabClass + act + '" data-page="' + _esc(p.id) + '">' +
+             (p.icon ? '<span class="material-symbols-outlined">' + _esc(p.icon) + '</span>' : '') +
+             _esc(p.label) +
+             '</button>';
+    }).join('') + '</div>';
+  }
+
+  function _renderCategoryTabs() {
+    var cats = _getCategories();
+    if (!cats.length) return '';
+    return '<div class="demo-cat-tabs">' + cats.map(function (c) {
+      var act = c.id === _activeCategory ? ' active' : '';
+      return '<button class="demo-cat-tab' + act + '" data-category="' + _esc(c.id) + '">' +
+             (c.icon ? '<span class="material-symbols-outlined">' + _esc(c.icon) + '</span>' : '') +
+             _esc(c.label) +
+             '</button>';
+    }).join('') + '</div>';
+  }
+
+  function _renderHint() {
+    if (!_activeCategory) return '';
+    var cat = _getCategories().find(function (c) { return c.id === _activeCategory; });
+    if (!cat || !cat.hint) return '';
+    return '<div class="demo-pane-hint">' + _esc(cat.hint) + '</div>';
+  }
+
+  function _renderScrollArea() {
+    return _renderHint() + _renderButtons(_filterScenarios());
+  }
+
+  // ===== DOM MOUNTING =====
+  function _render() {
+    if (document.getElementById('demo-fab')) return;
+
+    // Auto-detect first page & category
+    var mode = _detectMode();
+    var pages = _getPages();
+    var cats = _getCategories();
+    if (!_activePage && pages.length) _activePage = pages[0].id;
+    if (!_activeCategory && cats.length) _activeCategory = cats[0].id;
+    if (mode === 'flat') { _activePage = null; _activeCategory = null; }
+    if (mode === 'pages-only') _activeCategory = null;
+    if (mode === 'categories-only') _activePage = null;
+
+    // FAB
+    var fabEl = document.createElement('button');
+    fabEl.className = 'demo-fab';
+    fabEl.id = 'demo-fab';
+    fabEl.title = 'Designer Demo Scenarios';
+    fabEl.innerHTML =
+      '<span class="material-symbols-outlined">science</span>' +
+      '<span class="demo-pulse" id="demo-fab-pulse"></span>';
+    fabEl.addEventListener('click', function () { window._demoFabToggle(); });
+
+    // Popover
+    var popEl = document.createElement('div');
+    popEl.className = 'demo-popover';
+    popEl.id = 'demo-popover';
+    popEl.innerHTML =
+      '<div class="demo-popover-hdr">' +
+        '<div class="demo-popover-title">' +
+          '<span class="material-symbols-outlined" style="font-size:16px">science</span>' +
+          'Demo Scenarios' +
+        '</div>' +
+        '<button class="demo-popover-close" id="demo-pop-close">' +
+          '<span class="material-symbols-outlined" style="font-size:18px">close</span>' +
+        '</button>' +
+      '</div>' +
+      (window.DEMO_DEFAULT
+        ? '<button class="demo-reset-link" id="demo-reset-link">' +
+            '<span class="material-symbols-outlined">refresh</span>Reset to Default</button>'
+        : '') +
+      _renderPageTabs(mode) +
+      _renderCategoryTabs() +
+      '<div class="demo-popover-scroll" id="demo-popover-scroll">' +
+        _renderScrollArea() +
+      '</div>';
+
+    document.body.appendChild(fabEl);
+    document.body.appendChild(popEl);
+
+    // === Event wiring ===
+    document.getElementById('demo-pop-close').addEventListener('click', function () {
+      window._demoFabToggle();
+    });
+
+    // Reset link
+    var resetLink = document.getElementById('demo-reset-link');
+    if (resetLink && window.DEMO_DEFAULT) {
+      resetLink.addEventListener('click', function () {
+        window._demoFabApply(window.DEMO_DEFAULT, null);
+      });
+    }
+
+    // Page tabs
+    popEl.querySelectorAll('.demo-page-tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        window._demoFabSetPage(t.dataset.page);
+      });
+    });
+
+    // Category tabs (also handles page tabs in pages-only mode, where they use demo-cat-tab class)
+    popEl.querySelectorAll('.demo-cat-tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        if (t.dataset.page) {
+          window._demoFabSetPage(t.dataset.page);
+        } else {
+          window._demoFabSetCategory(t.dataset.category);
+        }
+      });
+    });
+
+    // Scenario button clicks (event delegation on scroll area)
+    document.getElementById('demo-popover-scroll').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-scenario]');
+      if (!btn || btn.classList.contains('demo-dis')) return;
+      window._demoFabApply(btn.dataset.scenario, btn);
+    });
+
+    // Outside click to close
+    document.addEventListener('click', function (e) {
+      var pop = document.getElementById('demo-popover');
+      var fab = document.getElementById('demo-fab');
+      if (!pop || !fab) return;
+      if (!pop.contains(e.target) && !fab.contains(e.target) && pop.classList.contains('show')) {
+        pop.classList.remove('show');
+        fab.classList.remove('popped');
+      }
+    });
+
+    _injectGlobalTooltip();
+  }
+
+  // ===== #gl-tip auto-injection =====
+  function _injectGlobalTooltip() {
+    if (document.getElementById('gl-tip')) return; // host page already provides one
+    var tip = document.createElement('div');
+    tip.id = 'gl-tip';
+    document.body.appendChild(tip);
+    var cur = null;
+    document.addEventListener('mouseover', function (e) {
+      var el = e.target.closest('[data-tip]');
+      if (!el || el === cur) return;
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block';
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!cur) return;
+      var tw = tip.offsetWidth, th = tip.offsetHeight;
+      var x = e.clientX - tw / 2, y = e.clientY - th - 10;
+      if (x < 8) x = 8;
+      if (x + tw > window.innerWidth - 8) x = window.innerWidth - tw - 8;
+      if (y < 8) y = e.clientY + 16;
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    });
+    document.addEventListener('mouseout', function (e) {
+      var el = e.target.closest('[data-tip]');
+      if (el && el === cur) { cur = null; tip.style.display = 'none'; }
+    });
+  }
+
+  // ===== PUBLIC API =====
+  function _refreshScrollArea() {
+    var scroll = document.getElementById('demo-popover-scroll');
+    if (!scroll) return;
+    scroll.style.opacity = '0';
+    setTimeout(function () {
+      scroll.innerHTML = _renderScrollArea();
+      scroll.style.opacity = '1';
+    }, 120);
+  }
+
+  function _refreshTabs() {
+    var pop = document.getElementById('demo-popover');
+    if (!pop) return;
+    pop.querySelectorAll('.demo-page-tab').forEach(function (t) {
+      t.classList.toggle('active', t.dataset.page === _activePage);
+    });
+    pop.querySelectorAll('.demo-cat-tab').forEach(function (t) {
+      // In pages-only mode, cat-tab elements carry data-page (not data-category)
+      if (t.dataset.page) {
+        t.classList.toggle('active', t.dataset.page === _activePage);
+      } else {
+        t.classList.toggle('active', t.dataset.category === _activeCategory);
+      }
+    });
+  }
+
+  /** Toggle popover open/close */
+  window._demoFabToggle = function () {
+    var pop = document.getElementById('demo-popover');
+    var fab = document.getElementById('demo-fab');
+    var pulse = document.getElementById('demo-fab-pulse');
+    var opening = !pop.classList.contains('show');
+    pop.classList.toggle('show');
+    fab.classList.toggle('popped');
+    if (opening && pulse) pulse.style.display = 'none';
+  };
+
+  /** Set active page tab (internal + external) */
+  window._demoFabSetPage = function (pageId) {
+    if (_activePage === pageId) return;
+    _activePage = pageId;
+    _refreshTabs();
+    _refreshScrollArea();
+  };
+
+  /** Set active category tab */
+  window._demoFabSetCategory = function (catId) {
+    if (_activeCategory === catId) return;
+    _activeCategory = catId;
+    _refreshTabs();
+    _refreshScrollArea();
+  };
+
+  /**
+   * Called from prototype's navigation function to auto-switch the page tab.
+   * Only switches if the popover doesn't need to stay on current tab.
+   */
+  window.demoFabSwitchTab = function (pageId) {
+    window._demoFabSetPage(pageId);
+  };
+
+  /** Apply a scenario — called via event delegation or by host */
+  window._demoFabApply = function (id, btn) {
+    _activeScenario = id;
+    document.querySelectorAll('.demo-btn').forEach(function (b) {
+      b.classList.remove('active');
+    });
+    if (btn) {
+      btn.classList.add('active');
+    } else {
+      // No btn provided (e.g. Reset link) — find scenario in DOM
+      var found = document.querySelector('[data-scenario="' + id + '"]');
+      if (found) found.classList.add('active');
+    }
+    if (typeof window.DEMO_APPLY === 'function') {
+      window.DEMO_APPLY(id, btn);
+    }
+  };
+
+  // ===== INIT =====
+  function _init() {
+    if (_activeScenario === null && window.DEMO_DEFAULT) {
+      _activeScenario = window.DEMO_DEFAULT;
+    }
+    _render();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _init);
+  } else {
+    _init();
+  }
+})();
+
+</script>
+</body>
+</html>
