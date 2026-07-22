@@ -609,11 +609,10 @@ var state = {
   // Per-provider data-source enablement. Data-driven so it scales 1→N providers
   // (PRD heading: "服務啟用開關…適用於三朵雲，僅 AWS 標注費用"). Only providers
   // with `gated:true` in PROVIDERS incur a cost + confirm step; others toggle freely.
-  // PRD: "服務啟用開關（預設不開，適用於三朵雲。僅 AWS 標注費用）" — the OFF-by-default
-  // behavior applies to ALL THREE providers; only AWS additionally carries a cost/fee
-  // annotation + confirm step. (Corrected 2026-07-21 — previously wrongly assumed only
-  // the cost-gated AWS defaulted off and the free providers defaulted on.)
-  provEnabled: { aws:false, gcp:false, azure:false },
+  // Prototype default: AWS is already connected; Google Cloud and Microsoft Azure
+  // remain off until their billing data source is enabled. AWS still carries the
+  // cost/fee annotation + confirm step when users toggle it back on.
+  provEnabled: { aws:true, gcp:false, azure:false },
   hintDismissedSession: false,  // "X" dismiss — in-memory only, reappears on next visit/reload
   selection: {},
 };
@@ -787,8 +786,7 @@ function renderDataSources(){
   var onCount = PROVIDERS.filter(function(p){return state.provEnabled[p.key];}).length;
   var total = PROVIDERS.length;
   // Header button reflects state so a disabled provider is never silently hidden.
-  // Only show the count badge when something is OFF — in the healthy "all enabled"
-  // state a static "3/3" is just noise (it's the expected default, not new information).
+  // Only show the count badge when something is OFF — a static "3/3" is just noise.
   var btn = $('#ds-btn'), badge = $('#ds-badge');
   var incomplete = onCount < total;
   if(badge){ badge.textContent = onCount+'/'+total; badge.classList.toggle('hide', !incomplete); }
@@ -902,9 +900,8 @@ function renderCards(){
     }).join('');
   } else if(allSourcesOff()){
     // Distinct from the "nd" (page-level empty/error) state: the numbers aren't
-    // missing because of a data problem — nothing has been turned on yet. This is
-    // the state every real user hits first, since AWS (the only source with data
-    // in this phase) defaults OFF. Point straight at the fix (open Data sources).
+    // missing because of a data problem — all data sources have been turned off.
+    // Point straight at the fix (open Data sources).
     var labels2 = ['Coverage','Utilization','Potential Monthly Savings'];
     cards = labels2.map(function(l){
       return '<div class="rs-card nd"><span class="lbl">'+l+'</span><span class="val">No Data</span><span class="sub">No cloud data sources enabled</span></div>';
@@ -1931,7 +1928,7 @@ bindTips();
 
   // quota key → 顯示用標籤 / Limit Reached 對話框文案變數（對齊最新 PRD：unit = Rightsizing scans）
   var QUOTA_META = {
-    analyses:    { label: 'AI-Powered Analyses', dialogLabel: 'Cost Dashboard',     unit: 'AI-powered analyses' },
+    analyses:    { label: 'AI Analyses', dialogLabel: 'Cost Dashboard',     unit: 'AI analyses' },
     rightsizing: { label: 'Rightsizing Scans',   dialogLabel: 'Usage Optimization', unit: 'Rightsizing scans' },
   };
 
