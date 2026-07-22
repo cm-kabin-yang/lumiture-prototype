@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — Rate Optimization v1 (Recommendation List + Active Commitments + Scope Settings)</title>
+<title>Lumiture.ai — Rate Optimization v2 (PRD Revision Alignment)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
@@ -58,7 +58,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .btn-b:hover .btn-text{text-decoration:underline}
 
 /* ==== Summary cards ==== */
-.rs-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.rs-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
 .rs-card{background:#fff;border-radius:var(--r-md);box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);padding:20px 24px;min-height:126px;display:flex;flex-direction:column;gap:6px}
 .rs-card .lbl{font-size:12px;font-weight:700;color:var(--g500);display:flex;align-items:center;gap:6px;line-height:1.4}
 .rs-card .lbl .ico-info{font-size:16px}
@@ -73,7 +73,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 
 /* ==== Info banner ==== */
 .rs-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:20px}
-.rs-banner-desc{font-size:12px;color:var(--g500);line-height:1.7;max-width:820px}
+.rs-banner-desc{font-size:12px;color:var(--g500);line-height:1.7;flex:1}
 .rs-banner-desc b{color:var(--g700);font-weight:700;letter-spacing:.4px}
 .rs-learn{color:var(--pri);text-decoration:underline;cursor:help;font-weight:500}
 .rs-banner-r{display:flex;align-items:center;gap:12px;flex-shrink:0}
@@ -85,6 +85,66 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .paper-section-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:4px}
 .paper-section-title{font-size:18px;font-weight:700;color:var(--g900);line-height:1.5;display:flex;align-items:center;gap:8px}
 .paper-desc{font-size:12px;color:var(--g500);margin-bottom:16px;line-height:1.5}
+/* Rightsizing-first tip — advisory tone (blue/lightbulb), NOT a warning:
+   we cannot verify whether the user actually ran rightsizing, so this is
+   always a generic best-practice nudge, never a real pass/fail state.
+   Reserve --warn (orange) for genuine alerts (AWS disabled, expiring soon). */
+.rs-hint{position:relative;display:flex;align-items:flex-start;gap:12px;background:var(--info-lt);border:1px solid var(--pri-lt30);border-radius:var(--r-md);padding:14px 40px 14px 18px;margin-bottom:20px;line-height:1.6}
+.rs-hint > .material-symbols-outlined{font-size:20px;color:var(--pri);flex-shrink:0;font-variation-settings:'FILL' 1;margin-top:1px}
+.rs-hint .h-t{font-weight:700;color:var(--g900);font-size:13px;margin-bottom:2px}
+.rs-hint .h-d{font-size:12px;color:var(--g500)}
+.rs-hint a{font-weight:500;cursor:pointer;color:var(--pri)}
+.rs-hint a:hover{text-decoration:underline}
+.rs-hint .h-dismiss-row{display:flex;justify-content:flex-end;margin-top:6px}
+.rs-hint .h-dismiss{color:var(--g500);font-weight:400;font-size:12px;text-decoration:underline;text-underline-offset:2px}
+.rs-hint .h-dismiss:hover{color:var(--g700)}
+.rs-hint-x{position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--g500);cursor:pointer;background:none;border:none;padding:0}
+.rs-hint-x:hover{background:rgba(0,0,0,.06);color:var(--g700)}
+.rs-hint-x .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 0}
+
+/* Cloud data sources — data-driven per-provider enablement, shown inside a modal
+   opened from the compact header button (keeps the main scroll uncluttered) */
+.ds-badge{font-size:11px;font-weight:700;background:var(--g100);color:var(--g500);border-radius:10px;padding:1px 7px;line-height:1.6;margin-left:2px}
+#ds-btn.has-off{border-color:var(--warn);color:#B26A00}
+#ds-btn.has-off .ds-badge{background:var(--warn-lt);color:#B26A00}
+#ds-btn.has-off > .material-symbols-outlined{color:var(--warn)}
+#mo-prov-confirm{z-index:210}
+.rs-sources-sum{font-size:12px;color:var(--g500);padding:2px 0 8px}
+.rs-src-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--g100)}
+.rs-src-row:last-child{border-bottom:none}
+.rs-src-ico{width:30px;height:30px;border-radius:6px;background:var(--g50);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rs-src-ico .rs-prov{width:20px;height:20px}
+.rs-src-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.rs-src-name{font-weight:700;color:var(--g900);font-size:13px;display:flex;align-items:center;gap:5px}
+.rs-src-note{font-size:12px;color:var(--g500);line-height:1.5}
+.rs-src-note a{color:var(--pri);font-weight:500;cursor:pointer}
+.rs-src-note a:hover{text-decoration:underline}
+.rs-src-status{font-size:11px;font-weight:700;padding:1px 9px;border-radius:10px;line-height:1.7;flex-shrink:0}
+.rs-src-status.on{background:var(--ok-lt);color:var(--ok-dk)}
+.rs-src-status.off{background:var(--g100);color:var(--g500)}
+
+/* Toggle switch */
+.rs-toggle{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0}
+.rs-toggle input{opacity:0;width:0;height:0}
+.rs-toggle .track{position:absolute;inset:0;background:var(--g300);border-radius:22px;cursor:pointer;transition:background-color .15s}
+.rs-toggle .track::before{content:'';position:absolute;left:2px;top:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.rs-toggle input:checked + .track{background:var(--pri)}
+.rs-toggle input:checked + .track::before{transform:translateX(18px)}
+.rs-toggle input:focus-visible + .track{box-shadow:0 0 0 3px rgba(0,79,176,.25)}
+.pm-flag{display:inline-flex;align-items:center;margin-left:5px;font-size:11px;cursor:help;vertical-align:middle}
+.rs-band{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:10px;align-self:center;line-height:1.6}
+.rs-band.warn{background:var(--warn-lt);color:#B26A00}
+.rs-band.ok{background:var(--ok-lt);color:var(--ok-dk)}
+.rs-band.err{background:var(--err-lt);color:#E5403D}
+.rs-cap{font-size:11px;color:var(--g400);margin-bottom:8px;display:flex;align-items:center}
+.rs-toolbar{display:flex;justify-content:flex-end;margin-bottom:14px}
+.rs-selwrap{position:relative}
+.rs-sel.on{border-color:var(--pri);color:var(--pri)}
+.rs-menu{display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:220px;background:#fff;border:1px solid var(--g200);border-radius:var(--r-sm);box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:90;padding:4px;max-height:280px;overflow:auto;overscroll-behavior:contain}
+.rs-menu.open{display:block}
+.rs-menu-item{padding:8px 12px;font-size:14px;color:var(--g700);border-radius:4px;cursor:pointer;white-space:nowrap}
+.rs-menu-item:hover{background:var(--g50)}
+.rs-menu-item.sel{color:var(--pri);font-weight:500;background:var(--pri-lt10)}
 
 /* ==== View switch (Recommendations | Active Commitments) ==== */
 .rs-viewseg{display:inline-flex;background:var(--g100);border-radius:var(--r-sm);padding:3px;margin-bottom:18px}
@@ -120,11 +180,11 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-tblscroll::-webkit-scrollbar{width:9px;height:9px}
 .rs-tblscroll::-webkit-scrollbar-thumb{background:var(--g300);border-radius:5px}
 .rs-tblscroll::-webkit-scrollbar-track{background:transparent}
-table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;min-width:1480px}
+table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;min-width:1180px}
 table.rstbl.acttbl{min-width:1080px}
 .rstbl thead th{background:var(--pri-lt10);height:50px;padding:0 12px;text-align:left;font-weight:700;font-size:13px;color:var(--g700);position:sticky;top:0;z-index:3;box-shadow:inset 0 -1px 0 var(--g300);white-space:nowrap;vertical-align:middle}
 .rstbl td{height:50px;padding:0 12px;border-bottom:1px solid var(--g100);background:#fff;color:var(--g700);vertical-align:middle;white-space:nowrap}
-.rstbl tbody tr{cursor:pointer}
+.rstbl tbody tr{cursor:default}
 .rstbl tbody tr:hover td{background:var(--g50)}
 .rstbl tbody tr.sel td{background:var(--pri-lt10)}
 .rstbl tbody tr.sel:hover td{background:var(--pri-lt20)}
@@ -135,7 +195,7 @@ table.rstbl.acttbl{min-width:1080px}
 .rstbl tbody tr.sel:hover td.fix{background:var(--pri-lt20)}
 .rs-c-sel{width:48px;min-width:48px;left:0;text-align:center;padding:0 8px!important}
 .rs-c-sel input{accent-color:var(--pri);width:16px;height:16px;cursor:pointer;margin:0;vertical-align:middle}
-.rs-c-target{width:256px;min-width:256px;left:48px;box-shadow:inset -1px 0 0 var(--g200)}
+.rs-c-target{width:256px;min-width:256px;left:0;box-shadow:inset -1px 0 0 var(--g200)}
 .rstbl thead th.rs-c-target{box-shadow:inset 0 -1px 0 var(--g300),inset -1px 0 0 var(--g200)}
 /* Active table sticky first col (no checkbox) */
 .acttbl .rs-c-cid{width:230px;min-width:230px;left:0;box-shadow:inset -1px 0 0 var(--g200)}
@@ -164,6 +224,7 @@ table.rstbl.acttbl{min-width:1080px}
 .rs-save .rate{font-size:12px}
 .rs-save .rate.pos{color:var(--ok-dk)}.rs-save .rate.zero{color:var(--g400)}
 .rs-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;font-size:14px;line-height:1.4;max-width:100%}
+.rs-trunc{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:320px}
 .rs-muted{color:var(--g400)}
 .rs-c-rec,.rs-c-crit{white-space:normal!important}
 .rs-c-rec{width:300px;min-width:300px}.rs-c-crit{width:260px;min-width:260px}
@@ -176,8 +237,8 @@ table.rstbl.acttbl{min-width:1080px}
 .rs-util .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--ok)}
 .rs-util.low .bar i{background:var(--warn)}
 .rs-util.low .pct{color:#B26A00;font-weight:500}
-.rs-exp{display:inline-flex;align-items:center;gap:4px;margin-left:8px;padding:1px 8px;border-radius:10px;border:1px solid var(--warn);background:var(--warn-lt);color:#B26A00;font-size:11px;font-weight:700;line-height:1.6}
-.rs-exp .material-symbols-outlined{font-size:13px}
+.rs-exp{display:inline-flex;align-items:center;justify-content:center;margin-left:8px;width:20px;height:20px;border-radius:50%;border:1px solid var(--warn);background:var(--warn-lt);color:#B26A00;cursor:help;vertical-align:middle}
+.rs-exp .material-symbols-outlined{font-size:14px;font-variation-settings:'FILL' 0}
 
 /* ==== Empty / states ==== */
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:64px 24px;gap:12px;background:#fff;border-radius:var(--r-md)}
@@ -279,7 +340,9 @@ table.rstbl.acttbl{min-width:1080px}
 .rm-list li{list-style:none;font-size:14px;color:var(--pri);line-height:1.9;display:flex;gap:8px}
 .rm-list li::before{content:'•';color:var(--g400)}
 
-/* ==== Scope Settings page ==== */
+/* ==== Scope Settings page ====
+   ⚠️ 202607 版本先無：PRD 明訂本期不開放使用者設定（偵測範圍/觸發條件/Impact 門檻皆用平台預設，不開 Settings UI）。
+   markup 保留但入口已隱藏（沿用 rightsizing 現有頁面重用，非本期真實產品範圍），僅供日後 fast-follow 參考，不代表已定案設計。 */
 .sc-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
 .sc-back{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--pri);font-weight:500;background:none;border:none;cursor:pointer;margin-bottom:8px}
 .sc-back:hover .bt{text-decoration:underline}
@@ -328,8 +391,8 @@ table.rstbl.acttbl{min-width:1080px}
 @keyframes sIn{from{transform:translateX(-110%);opacity:0}to{transform:translateX(0);opacity:1}}
 
 /* ==== Tooltip ==== */
-.rs-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:12px;line-height:1.6;padding:8px 11px;border-radius:6px;max-width:340px;z-index:400;pointer-events:none;opacity:0;transition:opacity .12s;box-shadow:0 4px 12px rgba(0,0,0,.25)}
-.rs-tip.show{opacity:1}
+.rs-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:12px;line-height:1.6;padding:8px 11px;border-radius:6px;max-width:340px;z-index:400;pointer-events:none;display:none;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.rs-tip.show{display:block}
 .rs-tip b{font-weight:700}
 
 /* ==== Footer ==== */
@@ -355,70 +418,53 @@ table.rstbl.acttbl{min-width:1080px}
         <div class="pg-hdr-r" id="updwrap">
           <div class="upd"><b>Last Updated</b><span>09/06/2026 11:30</span></div>
           <div class="upd"><b>Next Update</b><span>10/06/2026 11:30 (UTC+0)</span>
-            <span class="material-symbols-outlined ico-info" data-tip="Billing & usage data is refreshed daily (T+1). Figures here may differ slightly from the cloud provider console due to time zones, currency, and credit exclusion.">info</span>
+            <span class="material-symbols-outlined ico-info" data-rs-tip="Billing & usage data is refreshed daily (T+1). Figures here may differ slightly from the cloud provider console due to time zones, currency, and credit exclusion.">info</span>
           </div>
         </div>
       </div>
 
       <div id="rs-normal">
-      <!-- Summary cards -->
-      <div class="rs-cards" id="rs-cards"></div>
-
-      <!-- Info banner -->
+      <!-- Info banner (description first, above cards) -->
       <div class="rs-banner" id="rs-banner">
         <div class="rs-banner-desc">
-          Lower your cloud unit rates through commitment discounts — Savings Plans, CUDs, and Reservations.
-          <b>LumiTure is advisory</b>: it detects opportunities and tracks your portfolio, but does not purchase commitments — you execute in the provider console.
-          Values may differ slightly from your console due to time zone, currency, and <b>CREDIT EXCLUSION</b>.
-          (<span class="rs-learn" data-tip="Commitments only reduce unit price; they do not remove waste. Run Usage Optimization (rightsizing) first, then commit on the clean baseline.">Learn More</span>)
+          Lower your cloud unit rates through commitment discounts — Savings Plans, CUDs, and Reservations. <b>LumiTure is advisory</b>: it detects opportunities but does not purchase commitments — you execute in the provider console.
+          (<span class="rs-learn" data-rs-tip="Commitments only reduce unit price; they do not remove waste — run Usage Optimization (rightsizing) first, then commit on the clean baseline. Recommendations are surfaced from each provider's own engine (AWS Cost Explorer, GCP CUD Recommender, Azure) and aggregated across clouds. Values may differ slightly from your console due to time zone, currency, and credit exclusion.">Learn More</span>)
         </div>
         <div class="rs-banner-r">
+          <button class="curr-btn" id="ds-btn" onclick="openModal('mo-sources')" data-rs-tip="Choose which clouds LumiTure fetches Rate Optimization data from">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0;font-size:18px">cloud_sync</span>
+            <span>Data sources</span>
+            <span class="ds-badge hide" id="ds-badge"></span>
+          </button>
           <button class="curr-btn" id="curr-btn" onclick="openCurrPicker(this)">
             <span class="curr-flag" id="curr-flag">🇺🇸</span>
             <span class="curr-code" id="curr-code">USD</span>
             <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16">expand_more</span>
           </button>
-          <button class="btn btn-o" id="scope-btn" onclick="showPage('scope')"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">settings</span>Scope Settings</button>
         </div>
       </div>
+      <!-- Guidance: run rightsizing first (dismissible coach-mark — cannot be a verified state, see renderHint()) -->
+      <div id="rs-hintbox"></div>
+      <!-- Summary cards -->
+      <div class="rs-cards" id="rs-cards"></div>
 
       <!-- Main paper -->
       <div class="paper" id="rs-paper">
-        <div class="paper-section-row">
-          <div class="paper-section-title" id="rs-paper-title">Rate Optimization
-            <span class="material-symbols-outlined ico-info" data-tip="<b>Recommendations</b> are surfaced from each provider's own engine (AWS Cost Explorer, GCP CUD Recommender, Azure). LumiTure aggregates, tracks lifecycle, and reports coverage / utilization / realized savings across providers.">info</span>
-          </div>
-        </div>
-        <div class="paper-desc">Commitments lock in pricing for a term. Review the criteria and your current coverage before purchasing in the provider console.</div>
-
         <!-- View switch: Recommendations | Active Commitments -->
         <div class="rs-viewseg" id="rs-viewseg"></div>
 
         <!-- ===== Recommendations view ===== -->
         <div id="rs-recview">
-          <div class="tabs-row">
-            <div class="tabs" id="rs-tabs"></div>
-            <div class="rs-actions-row" id="rs-actions-row">
-              <div id="rs-actions" style="display:flex;gap:10px"></div>
-              <button class="btn btn-o" onclick="toast('(Demo) Exporting current view to CSV…')"><span class="material-symbols-outlined">download</span>Export CSV</button>
-            </div>
-          </div>
-          <div class="rs-filter" id="rs-filter">
-            <div class="rs-sel" onclick="toast('(Demo) Cloud Service Provider filter')"><span class="material-symbols-outlined lead">cloud</span>All Cloud Service Providers<span class="material-symbols-outlined tail">expand_more</span></div>
-            <div class="rs-sel" onclick="toast('(Demo) Commitment type filter')"><span class="material-symbols-outlined lead">sell</span>All Commitment Types<span class="material-symbols-outlined tail">expand_more</span></div>
-            <div class="rs-sel" onclick="toast('(Demo) Group filter')"><span class="material-symbols-outlined lead">groups</span>All Groups<span class="material-symbols-outlined tail">expand_more</span></div>
-            <div class="rs-search"><span class="material-symbols-outlined">search</span><input id="rs-search-input" placeholder="Search target, type, or recommendation" oninput="renderTable()"></div>
-          </div>
+          <div class="rs-toolbar"><button class="btn btn-o" onclick="toast('(Demo) Exporting current view to CSV…')"><span class="material-symbols-outlined">download</span>Export CSV</button></div>
+          <div class="rs-filter" id="rs-filter"></div>
+          <div class="rs-cap">Column order &amp; sortable columns are a design suggestion, approved by PM</div>
           <div id="rs-tablearea"></div>
         </div>
 
         <!-- ===== Active Commitments view ===== -->
         <div id="rs-actview" class="hide">
-          <div class="rs-filter">
-            <div class="rs-sel" onclick="toast('(Demo) Cloud Service Provider filter')"><span class="material-symbols-outlined lead">cloud</span>All Cloud Service Providers<span class="material-symbols-outlined tail">expand_more</span></div>
-            <div class="rs-sel" onclick="toast('(Demo) Commitment type filter')"><span class="material-symbols-outlined lead">sell</span>All Commitment Types<span class="material-symbols-outlined tail">expand_more</span></div>
-            <div class="rs-search"><span class="material-symbols-outlined">search</span><input id="rs-act-search" placeholder="Search commitment ID or service" oninput="renderActiveTable()"></div>
-          </div>
+          <div class="rs-filter" id="rs-actfilter"></div>
+          <div class="rs-cap">Column order &amp; sortable columns are a design suggestion, approved by PM</div>
           <div id="rs-acttablearea"></div>
         </div>
 
@@ -427,6 +473,7 @@ table.rstbl.acttbl{min-width:1080px}
     </div>
 
     <!-- ============ PAGE: Scope Settings ============ -->
+    <!-- ⚠️ 202607 版本先無 — 本期 PRD 不開放此設定 UI，頁面保留純供日後參考，非本期交付範圍 -->
     <div class="content has-savebar hide" id="page-scope">
       <button class="sc-back" onclick="showPage('list')"><span class="material-symbols-outlined">arrow_back</span><span class="bt">Back to Rate Optimization</span></button>
       <div class="sc-head">
@@ -509,52 +556,35 @@ table.rstbl.acttbl{min-width:1080px}
     </div>
 
     <div class="footer">
-      <span class="footer-version">Rate Optimization Prototype<span class="ver-tag">v1</span></span>
+      <span class="footer-version">Rate Optimization Prototype<span class="ver-tag">v2 · PRD Revision Alignment</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
     </div>
   </div>
 </div>
 
-<!-- ============ Modals ============ -->
-<!-- Recommendation Details (read-only) -->
-<div class="mo" id="mo-detail">
+<!-- ============ Modals (action-only; recommendation / commitment content is inline, no detail popups) ============ -->
+<!-- (Dismiss / Remove action modals removed — lifecycle not in this phase) -->
+
+<!-- Cloud data sources — per-provider enablement (opened from the compact header button;
+     kept out of the main scroll so it doesn't bury the KPIs / recommendations). -->
+<div class="mo" id="mo-sources">
   <div class="modal">
-    <div class="mh"><div class="mt">Recommendation Details</div><button class="mx" onclick="closeModals()"><span class="material-symbols-outlined">close</span></button></div>
-    <div class="mb" id="dt-body"></div>
+    <div class="mh"><div class="mt">Cloud data sources</div><button class="mx" onclick="closeModal('mo-sources')"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="mdesc">Choose which clouds LumiTure fetches Rate Optimization data from. Disabled providers are excluded from the KPIs and both lists.</div>
+    <div class="mb" id="ds-modal-body"></div>
   </div>
 </div>
 
-<!-- Commitment Details (read-only) -->
-<div class="mo" id="mo-commit">
-  <div class="modal">
-    <div class="mh"><div class="mt">Commitment Details</div><button class="mx" onclick="closeModals()"><span class="material-symbols-outlined">close</span></button></div>
-    <div class="mb" id="cm-body"></div>
-  </div>
-</div>
-
-<!-- Dismiss Recommendations -->
-<div class="mo" id="mo-dismiss">
-  <div class="modal">
-    <div class="mh"><div class="mt">Dismiss Recommendations</div><button class="mx" onclick="closeModals()"><span class="material-symbols-outlined">close</span></button></div>
-    <div class="mdesc">Dismiss duration is determined by your <b>Scope Settings</b>. Please choose a reason before dismissing these recommendations:</div>
-    <div class="mb" id="dm-body"></div>
-    <div class="mf">
-      <button class="btn btn-b mf-left" onclick="confirmDismiss(true)"><span class="btn-text">Skip and Dismiss</span></button>
-      <button class="btn btn-o" onclick="closeModals()">Cancel</button>
-      <button class="btn btn-p" onclick="confirmDismiss(false)">Dismiss Recommendations</button>
-    </div>
-  </div>
-</div>
-
-<!-- Remove Recommendation -->
-<div class="mo" id="mo-remove">
+<!-- Enable a cost-gated data source — confirm before a real, ongoing cost is incurred.
+     Generic: driven by the provider config (only providers with `gated:true` reach here).
+     Placed AFTER mo-sources so it stacks on top when triggered from within it. -->
+<div class="mo" id="mo-prov-confirm">
   <div class="modal modal-sm">
-    <div class="mh"><div class="mt"><span class="material-symbols-outlined warn-ic">error</span><span id="rm-title">Remove 1 Recommendation(s)</span></div><button class="mx" onclick="closeModals()"><span class="material-symbols-outlined">close</span></button></div>
-    <div class="mdesc">Are you sure you want to remove the selected recommendation(s)? This action is irreversible.</div>
-    <div class="mb"><ul class="rm-list" id="rm-list"></ul></div>
+    <div class="mh"><div class="mt" id="pc-title">Enable data source?</div><button class="mx" onclick="closeModal('mo-prov-confirm')"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="mdesc" id="pc-desc"></div>
     <div class="mf">
-      <button class="btn btn-o" onclick="closeModals()">Cancel</button>
-      <button class="btn btn-p" onclick="confirmRemove()">Remove Recommendation</button>
+      <button class="btn btn-o" onclick="closeModal('mo-prov-confirm')">Cancel</button>
+      <button class="btn btn-p" id="pc-ok" onclick="confirmEnableProv()">Enable</button>
     </div>
   </div>
 </div>
@@ -575,7 +605,17 @@ var state = {
   currency: 'USD',
   sort: { key:null, dir:1 },
   actSort: { key:null, dir:1 },
-  selection: {},          // recId -> true
+  fProv: '', fType: '',
+  // Per-provider data-source enablement. Data-driven so it scales 1→N providers
+  // (PRD heading: "服務啟用開關…適用於三朵雲，僅 AWS 標注費用"). Only providers
+  // with `gated:true` in PROVIDERS incur a cost + confirm step; others toggle freely.
+  // PRD: "服務啟用開關（預設不開，適用於三朵雲。僅 AWS 標注費用）" — the OFF-by-default
+  // behavior applies to ALL THREE providers; only AWS additionally carries a cost/fee
+  // annotation + confirm step. (Corrected 2026-07-21 — previously wrongly assumed only
+  // the cost-gated AWS defaulted off and the free providers defaulted on.)
+  provEnabled: { aws:false, gcp:false, azure:false },
+  hintDismissedSession: false,  // "X" dismiss — in-memory only, reappears on next visit/reload
+  selection: {},
 };
 var $ = function(s,r){ return (r||document).querySelector(s); };
 
@@ -589,13 +629,16 @@ var CSP_LOGOS = {
   aws: '<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path fill="#252F3E" d="M61.51 86.28c-.05 1.77.17 3.52.67 5.22a27.22 27.22 0 0 0 1.9 4.19c.26.4.4.86.43 1.33a2.25 2.25 0 0 1-1.13 1.73l-3.52 2.46a3 3 0 0 1-1.55.53 2.44 2.44 0 0 1-1.73-.8 13.82 13.82 0 0 1-2.1-2.72 34.67 34.67 0 0 1-1.8-3.52 21.62 21.62 0 0 1-17.22 8.1 15.99 15.99 0 0 1-11.7-4.2 15.03 15.03 0 0 1-4.29-11.26 15.07 15.07 0 0 1 5.14-11.97 21.34 21.34 0 0 1 14.37-4.54c2.07 0 4.14.16 6.2.46 2.16.3 4.4.72 6.72 1.26v-4.3c.34-3.36-.66-6.72-2.78-9.36a13.41 13.41 0 0 0-9.54-2.7c-2.13 0-4.24.26-6.3.77a44.99 44.99 0 0 0-6.3 2 16 16 0 0 1-2.05.78h-.91c-.83 0-1.24-.61-1.24-1.83v-2.79c-.05-.7.1-1.4.43-2.04a4.23 4.23 0 0 1 1.65-1.23 38.3 38.3 0 0 1 16.48-3.77 21.13 21.13 0 0 1 15.31 4.76 19.33 19.33 0 0 1 4.86 14.4v19.04ZM37.75 95.2c2.06-.03 4.1-.4 6.05-1.09a12.78 12.78 0 0 0 5.53-3.77 9.23 9.23 0 0 0 1.97-3.52c.4-1.66.6-3.36.57-5.07v-2.46a50.52 50.52 0 0 0-5.4-.99 43.57 43.57 0 0 0-5.48-.35 13.5 13.5 0 0 0-8.7 2.36 8.24 8.24 0 0 0-2.78 6.51 8.28 8.28 0 0 0 2.15 6.2 8.45 8.45 0 0 0 6.09 2.18Zm47 6.34c-.8.07-1.59-.13-2.25-.56a4.57 4.57 0 0 1-1.24-2.3L67.56 53.4c-.26-.76-.43-1.56-.52-2.36a1.27 1.27 0 0 1 1.44-1.44h5.74c.8-.08 1.62.11 2.3.56.57.65.98 1.44 1.15 2.29l9.83 38.73 9.12-38.73c.14-.86.54-1.64 1.16-2.25.7-.44 1.53-.64 2.36-.57h4.72c.82-.07 1.65.13 2.35.57.61.62 1 1.42 1.13 2.28l9.19 39.23 10.14-39.23a4.9 4.9 0 0 1 1.2-2.28 3.52 3.52 0 0 1 2.29-.57h5.42a1.27 1.27 0 0 1 1.44 1.45c.03.3.03.6 0 .91-.11.49-.25.97-.42 1.44l-14.08 45.28a4.68 4.68 0 0 1-1.24 2.3 3.5 3.5 0 0 1-2.25.55h-5.14a3.52 3.52 0 0 1-2.36-.6c-.6-.65-1-1.47-1.13-2.35l-9.12-37.71-9 37.67c-.14.88-.53 1.7-1.14 2.36a3.5 3.5 0 0 1-2.35.6h-5.04Zm75.2 1.55c-3.03 0-6.05-.34-9-1.02a26.2 26.2 0 0 1-6.77-2.36 3.52 3.52 0 0 1-2.14-3.28v-2.95c0-1.22.44-1.83 1.33-1.83.38 0 .75.07 1.1.2l1.47.6c2.07.92 4.23 1.6 6.45 2.05 2.31.47 4.67.71 7.04.7 2.98.18 5.94-.5 8.56-1.93a6.2 6.2 0 0 0 3.02-5.53 5.67 5.67 0 0 0-1.58-4.09 15.1 15.1 0 0 0-6.13-3.1l-8.48-2.67c-3.58-1-6.76-3.06-9.12-5.92a13.87 13.87 0 0 1-2.92-8.48c-.05-2.27.5-4.52 1.58-6.51a15.73 15.73 0 0 1 4.19-4.83 18.76 18.76 0 0 1 5.98-3.03 26.2 26.2 0 0 1 7.36-1.02 35.48 35.48 0 0 1 7.75.92c1.2.28 2.31.58 3.34.91.85.27 1.68.61 2.47 1.02a5.6 5.6 0 0 1 1.72 1.45c.38.57.56 1.25.53 1.93v2.79c0 1.22-.44 1.83-1.34 1.83a6.2 6.2 0 0 1-2.25-.7 27.25 27.25 0 0 0-11.27-2.26c-2.69-.14-5.37.43-7.78 1.65a5.63 5.63 0 0 0-2.78 5.22 5.57 5.57 0 0 0 1.73 4.15 17.4 17.4 0 0 0 6.44 3.24l8.3 2.5c3.53.91 6.68 2.88 9.06 5.63a13.24 13.24 0 0 1 2.74 8.45 14.83 14.83 0 0 1-5.8 11.97 19.12 19.12 0 0 1-6.52 3.28c-2.7.73-5.48 1.08-8.27 1.02Z"/><path fill="#F90" fill-rule="evenodd" clip-rule="evenodd" d="M171.12 131.49c-19.26 14.22-47.22 21.8-71.1 21.8a129 129 0 0 1-87.24-33.2c-1.8-1.63-.21-3.84 1.97-2.61a175.27 175.27 0 0 0 87.14 23.13 173.13 173.13 0 0 0 66.44-13.63c3.24-1.37 5.99 2.15 2.78 4.51Z"/><path fill="#F90" fill-rule="evenodd" clip-rule="evenodd" d="M179.14 122.34c-2.46-3.17-16.3-1.48-22.5-.74-1.86.2-2.18-1.41-.49-2.6 11.02-7.75 29.12-5.54 31.2-2.93 2.08 2.6-.57 20.74-10.88 29.4-1.59 1.34-3.1.63-2.4-1.13 2.33-5.84 7.54-18.84 5.07-22Z"/></svg>',
   azure: '<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rspaint0" x1="88.1713" y1="13.9645" x2="26.7396" y2="195.438" gradientUnits="userSpaceOnUse"><stop stop-color="#114A8B"/><stop offset="1" stop-color="#0669BC"/></linearGradient><linearGradient id="rspaint2" x1="99.4863" y1="8.66537" x2="166.911" y2="188.291" gradientUnits="userSpaceOnUse"><stop stop-color="#3CCBF4"/><stop offset="1" stop-color="#2892DF"/></linearGradient></defs><path fill="url(#rspaint0)" d="M66.598.005h59.112L64.345 181.928a9.447 9.447 0 0 1-3.433 4.645 9.4 9.4 0 0 1-2.61 1.316 9.471 9.471 0 0 1-2.887.454H9.411a9.371 9.371 0 0 1-4.295-1.039c-1.33.318-2.478-.672-3.349-1.886-.871-1.215-1.441-1.62-1.663-2.098-.222-.479-.087-1.587.39-2.405l57.171-174.5A9.432 9.432 0 0 1 66.595 0v.002l.003.003Z"/><path fill="#0078D4" d="M175.569 188.345h-53.078a9.477 9.477 0 0 1-5.057-1.461 9.52 9.52 0 0 1-1.406-1.084l-60.233-56.252a4.339 4.339 0 0 1 2.962-7.517h93.735l23.072 66.317.005-.003Z"/><path fill="url(#rspaint2)" d="M199.273 175.91a9.447 9.447 0 0 1 .392 4.405 9.41 9.41 0 0 1-5.009 6.984c-1.329.682-1.801 1.039-3.296 1.039h-66.881a9.425 9.425 0 0 0 7.646-3.925 9.425 9.425 0 0 0 1.274-8.503L76.225 6.405A9.418 9.418 0 0 0 70.19.452 9.418 9.418 0 0 0 67.31 0h65.879a9.431 9.431 0 0 1 5.491 1.766 9.47 9.47 0 0 1 2.078 2.05 9.456 9.456 0 0 1 1.351 2.59l57.174 169.504h-.01Z"/></svg>',
 };
-function provBadge(prov){ return '<span class="rs-prov" data-tip="'+PROV_LABEL[prov]+'">'+CSP_LOGOS[prov]+'</span>'; }
+function provBadge(prov){ return '<span class="rs-prov" data-rs-tip="'+PROV_LABEL[prov]+'">'+CSP_LOGOS[prov]+'</span>'; }
 function nFmt(n){
   var a = Math.abs(n);
   if(a >= 1e6) return (n/1e6).toFixed(2)+'M';
   if(a >= 1e3) return (n/1e3).toFixed(2)+'K';
   return n.toFixed(2);
 }
+function comma(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,','); }
+function termOf(r){ return r.term || '1 Year'; }
+function paymentOf(r){ return r.payment || 'Monthly'; }
 function impactCell(v){
   var map = {0:['low','Low'],1:['medium','Medium'],2:['high','High']};
   var m = map[v];
@@ -617,6 +660,60 @@ function utilCell(pct, target){
 }
 function escTip(s){ return (s||'').replace(/"/g,'&quot;'); }
 
+/* ===== Provider data-source config (single source of truth for the enablement gate) =====
+   Add/remove a provider or flip `gated` here — the "Cloud data sources" card, the
+   confirm-on-enable flow, KPI exclusion and filter gating all derive from this. */
+var PROVIDERS = [
+  { key:'aws',   label:'AWS',          full:'Amazon Web Services', gated:true,
+    noteOn:'Cost Explorer API enabled · AWS bills your account at $0.01/request',
+    noteOff:'Off — AWS recommendations &amp; commitments are not fetched',
+    costTip:'Enabling calls the AWS Cost Explorer API, which AWS bills directly to your own AWS account at $0.01 per request (usage-based, refreshes daily, ongoing while enabled). LumiTure adds no fee.' },
+  { key:'gcp',   label:'Google Cloud', full:'Google Cloud', gated:false, noteOn:'Included · no per-request cost', noteOff:'Off — GCP data is not fetched' },
+  { key:'azure', label:'Azure',        full:'Microsoft Azure', gated:false, noteOn:'Included · no per-request cost', noteOff:'Off — Azure data is not fetched' },
+];
+function provOf(key){ return PROVIDERS.filter(function(p){return p.key===key;})[0]; }
+
+/* ===== Filters (functional dropdowns) ===== */
+var PROV_OPTS=[['','All Cloud Service Providers'],['aws','Amazon Web Services'],['gcp','Google Cloud'],['azure','Microsoft Azure']];
+function fpTypes(view){
+  var d=view==='rec'?DATA.rec:ACTIVE, t=[];
+  d.forEach(function(x){ if(!state.provEnabled[x.prov]) return; if(t.indexOf(x.type)<0) t.push(x.type); });
+  return t;
+}
+function renderFilters(view){
+  var box = view==='rec'?$('#rs-filter'):$('#rs-actfilter'); if(!box) return;
+  var provLbl = state.fProv ? (PROV_OPTS.filter(function(p){return p[0]===state.fProv;})[0]||['',''])[1] : 'All Cloud Service Providers';
+  var typeLbl = state.fType || 'All Commitment Types';
+  var sid = view==='rec'?'rs-search-input':'rs-act-search';
+  var ph = view==='rec'?'Search target, type, or recommendation':'Search commitment ID or service';
+  var onin = view==='rec'?'renderTable()':'renderActiveTable()';
+  box.innerHTML =
+    '<div class="rs-selwrap"><div class="rs-sel'+(state.fProv?' on':'')+'" onclick="toggleFMenu(this,\'prov\')"><span class="material-symbols-outlined lead">cloud</span>'+provLbl+'<span class="material-symbols-outlined tail">expand_more</span></div><div class="rs-menu"></div></div>'
+   +'<div class="rs-selwrap"><div class="rs-sel'+(state.fType?' on':'')+'" onclick="toggleFMenu(this,\'type\')"><span class="material-symbols-outlined lead">sell</span>'+typeLbl+'<span class="material-symbols-outlined tail">expand_more</span></div><div class="rs-menu"></div></div>'
+   +'<div class="rs-search"><span class="material-symbols-outlined">search</span><input id="'+sid+'" placeholder="'+ph+'" oninput="'+onin+'"></div>';
+}
+function toggleFMenu(el, kind){
+  var menu = el.parentNode.querySelector('.rs-menu');
+  var isOpen = menu.classList.contains('open');
+  closeFMenus();
+  if(isOpen) return;
+  var opts = kind==='prov'?PROV_OPTS:[['','All Commitment Types']].concat(fpTypes(state.view).map(function(t){return [t,t];}));
+  var cur = kind==='prov'?state.fProv:state.fType;
+  menu.innerHTML = opts.map(function(o){
+    return '<div class="rs-menu-item'+(o[0]===cur?' sel':'')+'" data-v="'+o[0]+'" onclick="selectFilter(\''+kind+'\',this.getAttribute(\'data-v\'))">'+o[1]+'</div>';
+  }).join('');
+  menu.classList.add('open');
+}
+function closeFMenus(){ document.querySelectorAll('.rs-menu.open').forEach(function(m){m.classList.remove('open');}); }
+function selectFilter(kind, val){
+  var si=$('#rs-search-input')||$('#rs-act-search'); var sv=si?si.value:'';
+  if(kind==='prov') state.fProv=val; else state.fType=val;
+  closeFMenus(); renderFilters(state.view);
+  var si2=$('#rs-search-input')||$('#rs-act-search'); if(si2) si2.value=sv;
+  if(state.view==='rec') renderTable(); else renderActiveTable();
+}
+document.addEventListener('click', function(e){ if(!e.target.closest('.rs-selwrap')) closeFMenus(); });
+
 /* ============================================================
    DATA — recommendations
 ============================================================ */
@@ -625,34 +722,20 @@ function rec(o){
 }
 var DATA = {
   rec: [
-    rec({recId:'r1', prov:'aws', target:'Compute (EC2 / Fargate / Lambda)', tid:'compute-sp-global', type:'Compute SP', impact:2, status:0, estAmt:1230, estRate:0.320, recDate:'05/06/2026', eot:'End of Month', group:'Platform Team',
-      recommendation:'Purchase Compute Savings Plan — 3yr · All Upfront · $4.20/hr commitment',
-      criteria:['60-day on-demand spend stable (±6%)','Coverage gap 38%','≥30 days of steady baseline'],
-      net:{count:2, avgUtil:93, items:['sp-0a1b2c3d · 96% util · expires 01/07/2026','sp-9f8e7d6c · 89% util · expires 15/02/2028']} }),
-    rec({recId:'r2', prov:'aws', target:'Compute (EC2 m6i family)', tid:'compute-sp-m6i', type:'Compute SP', impact:1, status:0, estAmt:540, estRate:0.210, recDate:'04/06/2026', eot:'End of Month', group:'Platform Team',
-      recommendation:'Purchase Compute Savings Plan — 1yr · No Upfront · $1.80/hr commitment',
-      criteria:['30-day on-demand spend stable','Coverage gap 22%'],
-      net:{count:2, avgUtil:93, items:['sp-0a1b2c3d · 96% util','sp-9f8e7d6c · 89% util']} }),
-    rec({recId:'r3', prov:'aws', target:'Compute (Fargate)', tid:'compute-sp-fargate', type:'Compute SP', impact:0, status:1, estAmt:180, estRate:0.110, recDate:'05/06/2026', eot:'End of Month', group:'—',
-      recommendation:'Purchase Compute Savings Plan — 1yr · Partial Upfront · $0.60/hr commitment',
-      criteria:['30-day spend stable','Coverage gap 9%'],
-      net:{count:2, avgUtil:93, items:['sp-0a1b2c3d · 96% util · expires 01/07/2026','sp-9f8e7d6c · 89% util · expires 15/02/2028']} }),
-    rec({recId:'r4', prov:'gcp', target:'Compute Engine · us-central1', tid:'cud-central1', type:'Resource CUD', impact:2, status:0, estAmt:1480, estRate:0.370, recDate:'04/06/2026', eot:'End of Quarter', group:'Data Platform',
-      recommendation:'Commit 120 vCPU + 480 GB memory · us-central1 · 1yr',
-      criteria:['Sustained vCPU usage ≥ 110 for 60 days','Coverage gap 44%','Resource-based CUD eligible'],
-      net:{count:1, avgUtil:88, items:['cud-central1-vcpu · 88% util · expires 25/06/2026']} }),
-    rec({recId:'r5', prov:'gcp', target:'Compute Engine · asia-east1', tid:'cud-asia1', type:'Resource CUD', impact:1, status:0, estAmt:620, estRate:0.240, recDate:'03/06/2026', eot:'End of Quarter', group:'Analytics',
-      recommendation:'Commit 48 vCPU + 192 GB memory · asia-east1 · 1yr',
-      criteria:['Sustained vCPU usage ≥ 44 for 30 days','Coverage gap 26%'],
-      net:{count:1, avgUtil:74, items:['cud-asia1-mem · 74% util · expires 01/09/2028']} }),
-    rec({recId:'r6', prov:'azure', target:'Virtual Machines · West US 2', tid:'res-westus2', type:'Reservation', impact:2, status:0, estAmt:880, estRate:0.280, recDate:'04/06/2026', eot:'End of Year', group:'Infra',
-      recommendation:'Purchase Reservation — Standard_D4s_v5 × 8 · West US 2 · 3yr · Shared scope',
-      criteria:['7-day VM usage stable','Shared-scope coverage gap 32%','Instance flexibility group matched'],
-      net:{count:1, avgUtil:82, items:['azure-res-d4sv5 · 82% util · expires 01/10/2027']} }),
-    rec({recId:'r7', prov:'azure', target:'Compute · West US 2', tid:'sp-westus2', type:'Savings Plan', impact:1, status:0, estAmt:470, estRate:0.190, recDate:'03/06/2026', eot:'End of Month', group:'Infra',
-      recommendation:'Purchase Compute Savings Plan — 1yr · $2.10/hr hourly commitment',
-      criteria:['30-day compute spend stable','Coverage gap 24%'],
-      net:{count:1, avgUtil:79, items:['azure-sp-compute · 79% util · expires 20/06/2026']} }),
+    rec({recId:'r1', prov:'aws', target:'Compute (EC2 / Fargate / Lambda)', type:'Compute SP', estAmt:1230, estRate:0.320, recDate:'05/06/2026', term:'3 Years', payment:'All Upfront',
+      recommendation:'Purchase Compute Savings Plan · $4.20/hr commitment' }),
+    rec({recId:'r2', prov:'aws', target:'Compute (EC2 m6i family)', type:'Compute SP', estAmt:540, estRate:0.210, recDate:'04/06/2026', term:'1 Year', payment:'No Upfront',
+      recommendation:'Purchase Compute Savings Plan · $1.80/hr commitment' }),
+    rec({recId:'r3', prov:'aws', target:'Compute (Fargate)', type:'Compute SP', estAmt:180, estRate:0.110, recDate:'05/06/2026', term:'1 Year', payment:'Partial Upfront',
+      recommendation:'Purchase Compute Savings Plan · $0.60/hr commitment' }),
+    rec({recId:'r4', prov:'gcp', target:'Compute Engine · us-central1', type:'Resource CUD', estAmt:1480, estRate:0.370, recDate:'04/06/2026', term:'1 Year', payment:'Monthly',
+      recommendation:'Commit 120 vCPU + 480 GB memory · us-central1' }),
+    rec({recId:'r5', prov:'gcp', target:'Compute Engine · asia-east1', type:'Resource CUD', estAmt:620, estRate:0.240, recDate:'03/06/2026', term:'1 Year', payment:'Monthly',
+      recommendation:'Commit 48 vCPU + 192 GB memory · asia-east1' }),
+    rec({recId:'r6', prov:'azure', target:'Virtual Machines · West US 2', type:'Reservation', estAmt:880, estRate:0.280, recDate:'04/06/2026', term:'3 Years', payment:'All Upfront',
+      recommendation:'Purchase Reservation — Standard_D4s_v5 × 8 · West US 2 · Shared scope' }),
+    rec({recId:'r7', prov:'azure', target:'Compute · West US 2', type:'Savings Plan', estAmt:470, estRate:0.190, recDate:'03/06/2026', term:'1 Year', payment:'Monthly',
+      recommendation:'Purchase Compute Savings Plan · $2.10/hr commitment' }),
   ],
   done: [
     rec({recId:'d1', prov:'aws', target:'Compute (EC2 c-family)', tid:'done-aws-1', type:'Compute SP', impact:1, status:1, estAmt:430, estRate:0.260, recDate:'02/03/2026', eot:'End of Month', group:'Platform Team',
@@ -690,55 +773,155 @@ var VIEWS = [
   { id:'rec',    label:'Recommendations', icon:'lightbulb' },
   { id:'active', label:'Active Commitments', icon:'inventory_2' },
 ];
-var TABS = [
-  { id:'rec',      label:'Recommendations', badge:'7' },
-  { id:'done',     label:'Done',            badge:'2' },
-  { id:'dismiss',  label:'Dismiss',         badge:'1' },
-  { id:'archived', label:'Archived',        badge:'' },
-];
-var TAB_ACTIONS = {
-  rec:      [ {label:'Done', icon:'check', act:'done', tip:"Mark as purchased in the provider console — items move to 'Done'."},
-              {label:'Dismiss', icon:'block', act:'dismiss', tip:"Choose a reason, then move the items to 'Dismiss'."},
-              {label:'Archive', icon:'archive', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
-  done:     [ {label:'Undo Completion', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
-              {label:'Archive', icon:'archive', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
-  dismiss:  [ {label:'Undo', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
-              {label:'Remove', icon:'delete', act:'remove', tip:'Permanently remove the selected items.'} ],
-  archived: [ {label:'Remove', icon:'delete', act:'remove', tip:'Permanently remove the selected items.'} ],
-};
-var READONLY_ROLES = ['t1m','t1mb','t2m','t2mb'];
 function canEdit(){ return state.role==='admin'; }
+
+/* ============================================================
+   Cloud data sources — per-provider enablement gate (data-driven)
+   Scales 1→N providers in ONE card. Only providers with gated:true
+   incur a per-request cost and require a confirm step before enabling.
+   Currently only AWS is gated (Cost Explorer API billed to the
+   customer's own AWS account); GCP/Azure are free but still toggleable
+   so the same control extends cleanly if they become gated later.
+============================================================ */
+function renderDataSources(){
+  var onCount = PROVIDERS.filter(function(p){return state.provEnabled[p.key];}).length;
+  var total = PROVIDERS.length;
+  // Header button reflects state so a disabled provider is never silently hidden.
+  // Only show the count badge when something is OFF — in the healthy "all enabled"
+  // state a static "3/3" is just noise (it's the expected default, not new information).
+  var btn = $('#ds-btn'), badge = $('#ds-badge');
+  var incomplete = onCount < total;
+  if(badge){ badge.textContent = onCount+'/'+total; badge.classList.toggle('hide', !incomplete); }
+  if(btn) btn.classList.toggle('has-off', incomplete);
+  var body = $('#ds-modal-body'); if(!body) return;
+  var rows = PROVIDERS.map(function(p){
+    var on = !!state.provEnabled[p.key];
+    var note = on ? p.noteOn
+      : (p.noteOff + (p.gated ? ' <a onclick="toast(\'(Demo) Would open '+p.label+' pricing.\')">See pricing ↗</a>' : ''));
+    var costIcon = p.gated ? ' <span class="material-symbols-outlined ico-info" data-rs-tip="'+escTip(p.costTip)+'">info</span>' : '';
+    return '<div class="rs-src-row">'
+      +'<div class="rs-src-ico">'+provBadge(p.key)+'</div>'
+      +'<div class="rs-src-body"><div class="rs-src-name">'+p.label+costIcon+'</div><div class="rs-src-note">'+note+'</div></div>'
+      +'<span class="rs-src-status '+(on?'on':'off')+'">'+(on?'On':'Off')+'</span>'
+      +'<label class="rs-toggle"><input type="checkbox"'+(on?' checked':'')+' onchange="onProvToggle(\''+p.key+'\',this)"><span class="track"></span></label>'
+      +'</div>';
+  }).join('');
+  body.innerHTML = '<div class="rs-sources-sum">'+onCount+' of '+total+' enabled</div>'+rows;
+  bindTips();
+}
+var _pendingProv = null;
+function onProvToggle(key, input){
+  if(input.checked){ input.checked=false; requestEnableProv(key); }
+  else setProvEnabled(key, false);
+}
+function requestEnableProv(key){
+  var p = provOf(key); if(!p) return;
+  if(p.gated){ _pendingProv = key; renderProvConfirm(p); openModal('mo-prov-confirm'); }
+  else setProvEnabled(key, true);
+}
+function renderProvConfirm(p){
+  $('#pc-title').textContent = 'Enable '+p.full+'?';
+  $('#pc-desc').innerHTML = 'This calls the '+p.label+' recommendation API, which <b>'+p.label+' bills directly to your own '+p.label+' account</b> — not LumiTure — at <b>$0.01 per request</b> (usage-based, refreshes daily, so cost is ongoing while enabled). You can turn this off anytime. <a onclick="toast(\'(Demo) Would open '+p.label+' pricing.\')">See '+p.label+' pricing ↗</a>';
+  $('#pc-ok').textContent = 'Enable '+p.label;
+}
+function confirmEnableProv(){ var k=_pendingProv; _pendingProv=null; closeModal('mo-prov-confirm'); if(k) setProvEnabled(k, true); }
+function setProvEnabled(key, on){
+  state.provEnabled[key] = on;
+  state.fProv=''; state.fType='';
+  refreshProviderViews();
+  var lbl = (provOf(key)||{label:key}).label;
+  toast(lbl + (on ? ' enabled.' : ' turned off — data is no longer fetched.'));
+}
+function refreshProviderViews(){
+  renderDataSources(); renderCards(); renderFilters(state.view);
+  if(state.view==='rec') renderTable(); else renderActiveTable();
+}
+/* ============================================================
+   Rightsizing-first tip — dismissible coach-mark
+   We cannot verify whether the user actually ran rightsizing, so this
+   is always a generic reminder, never a checked/unchecked real state.
+   "X" = dismiss for this visit only (in-memory; reappears on next
+   reload/session — simple new users or infrequent visitors still see it).
+   "Don't show again" = permanent opt-out, persisted in localStorage
+   (survives reload, distinct mechanism from the session-only dismiss).
+============================================================ */
+var HINT_KEY = 'ro_hint_hidden_v1';
+function hintPermanentlyHidden(){ try{ return localStorage.getItem(HINT_KEY)==='1'; }catch(e){ return false; } }
+function renderHint(){
+  var box = $('#rs-hintbox'); if(!box) return;
+  if(state.hintDismissedSession || hintPermanentlyHidden()){ box.innerHTML=''; return; }
+  box.innerHTML = '<div class="rs-hint"><span class="material-symbols-outlined">lightbulb</span><div style="flex:1"><div class="h-t">Tip: run Usage Optimization (rightsizing) first</div>'
+    +'<div class="h-d">Commitments lock in your baseline — remove oversized or idle resources first, then optimize rates on the clean baseline. <a onclick="toast(\'(Demo) Would open Usage Optimization.\')">Go to Usage Optimization →</a></div>'
+    +'<div class="h-dismiss-row"><a class="h-dismiss" onclick="hideHintForever()">Don\'t show again</a></div></div>'
+    +'<button class="rs-hint-x" onclick="dismissHint()" data-rs-tip="Dismiss for now — shown again next visit"><span class="material-symbols-outlined">close</span></button></div>';
+  bindTips();
+}
+function dismissHint(){ state.hintDismissedSession = true; renderHint(); }
+function hideHintForever(){ try{ localStorage.setItem(HINT_KEY,'1'); }catch(e){} renderHint(); toast('Got it — this tip won\'t show again.'); }
+function openModal(id){ $('#'+id).classList.add('active'); }   /* stack-friendly: does not close others */
+function closeModal(id){ var m=$('#'+id); if(m) m.classList.remove('active'); }
+function closeModals(){ document.querySelectorAll('.mo.active').forEach(function(m){m.classList.remove('active');}); }
+document.querySelectorAll('.mo').forEach(function(m){ m.addEventListener('click', function(e){ if(e.target===m) closeModal(m.id); }); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModals(); });
 
 /* ============================================================
    RENDER — summary cards
 ============================================================ */
+function provSegs(vals){
+  var order=[['aws','AWS'],['gcp','GCP'],['azure','Azure']];
+  return order.filter(function(o){return state.provEnabled[o[0]];})
+    .map(function(o){return o[1]+' '+vals[o[0]]+'%';}).join('<span class="seg">·</span>');
+}
+// Mirrors LumiTag Coverage's exact 3-tier threshold rule (lumi-tag-prototype-v8.html covC()):
+// >=70 healthy, 40-69 medium, <40 low. PM-confirmed to apply to both Coverage and Utilization here.
+function covBand(p){
+  if(p>=70) return {cls:'ok', label:'Healthy (≥70%)'};
+  if(p>=40) return {cls:'warn', label:'Medium (40–69%)'};
+  return {cls:'err', label:'Low (<40%)'};
+}
+function excludedProvLabels(){
+  return PROVIDERS.filter(function(p){return !state.provEnabled[p.key];}).map(function(p){return p.label;});
+}
+function allSourcesOff(){ return PROVIDERS.every(function(p){return !state.provEnabled[p.key];}); }
 function renderCards(){
   var nd = (state.pageState==='empty' || state.pageState==='nodata');
   var loading = state.pageState==='loading';
   var c = state.currency;
   var cards;
   if(loading){
-    cards = [0,1,2,3].map(function(){
+    cards = [0,1,2].map(function(){
       return '<div class="rs-card"><span class="skeleton sk-line" style="width:120px;height:12px"></span>'
         +'<span class="skeleton sk-line" style="width:90px;height:30px;margin-top:8px"></span>'
         +'<span class="skeleton sk-line" style="width:140px;height:12px;margin-top:auto;align-self:flex-end"></span></div>';
     }).join('');
   } else if(nd){
-    var labels = ['Coverage','Utilization','Savings to Date','Potential Monthly Savings'];
-    var subs = ['Not yet calculated','Not yet calculated','Start date not set','No recommendations yet'];
+    var labels = ['Coverage','Utilization','Potential Monthly Savings'];
+    var subs = ['Not yet calculated','Not yet calculated','No open recommendations'];
     cards = labels.map(function(l,i){
       return '<div class="rs-card nd"><span class="lbl">'+l+'</span><span class="val">No Data</span><span class="sub">'+subs[i]+'</span></div>';
     }).join('');
+  } else if(allSourcesOff()){
+    // Distinct from the "nd" (page-level empty/error) state: the numbers aren't
+    // missing because of a data problem — nothing has been turned on yet. This is
+    // the state every real user hits first, since AWS (the only source with data
+    // in this phase) defaults OFF. Point straight at the fix (open Data sources).
+    var labels2 = ['Coverage','Utilization','Potential Monthly Savings'];
+    cards = labels2.map(function(l){
+      return '<div class="rs-card nd"><span class="lbl">'+l+'</span><span class="val">No Data</span><span class="sub">No cloud data sources enabled</span></div>';
+    }).join('');
   } else {
+    var pot = DATA.rec.filter(function(r){return state.provEnabled[r.prov];}).reduce(function(s,r){return s+r.estAmt;},0);
+    var excl = excludedProvLabels();
+    var covSegs = provSegs({aws:58,gcp:72,azure:45});
+    var utilSegs = provSegs({aws:93,gcp:88,azure:84});
+    var covB = covBand(60), utilB = covBand(89);
     cards =
-      '<div class="rs-card"><span class="lbl">Coverage <span class="material-symbols-outlined ico-info" data-tip="<b>Coverage</b> = eligible spend covered by commitments (weighted average across providers).">info</span></span>'
-        +'<span class="val">60<span class="unit">%</span></span><span class="sub">AWS 58%<span class="seg">·</span>GCP 72%<span class="seg">·</span>Azure 45%</span></div>'
-      +'<div class="rs-card"><span class="lbl">Utilization <span class="material-symbols-outlined ico-info" data-tip="<b>Utilization</b> = purchased commitment capacity actually used (weighted average).">info</span></span>'
-        +'<span class="val">89<span class="unit">%</span></span><span class="sub">AWS 93%<span class="seg">·</span>GCP 88%<span class="seg">·</span>Azure 84%</span></div>'
-      +'<div class="rs-card"><span class="lbl">Savings to Date</span>'
-        +'<span class="val rs-num">55.50K <span class="unit">'+c+'</span></span><span class="sub">Year to date</span></div>'
-      +'<div class="rs-card"><span class="lbl">Potential Monthly Savings <span class="material-symbols-outlined ico-info" data-tip="Estimated monthly savings if all open recommendations are adopted.">info</span></span>'
-        +'<span class="val rs-num">8.04K <span class="unit">'+c+'</span></span><span class="sub pos">If all recommendations adopted</span></div>';
+      '<div class="rs-card"><span class="lbl">Coverage <span class="material-symbols-outlined ico-info" data-rs-tip="<b>Coverage</b> = eligible spend covered by commitments (weighted average across providers).">info</span></span>'
+        +'<span class="val">60<span class="unit">%</span> <span class="rs-band '+covB.cls+'">'+covB.label+'</span></span><span class="sub">'+covSegs+'</span></div>'
+      +'<div class="rs-card"><span class="lbl">Utilization <span class="material-symbols-outlined ico-info" data-rs-tip="<b>Utilization</b> = purchased commitment capacity actually used (weighted average).">info</span></span>'
+        +'<span class="val">89<span class="unit">%</span> <span class="rs-band '+utilB.cls+'">'+utilB.label+'</span></span><span class="sub">'+utilSegs+'</span></div>'
+      +'<div class="rs-card"><span class="lbl">Potential Monthly Savings <span class="material-symbols-outlined ico-info" data-rs-tip="Sum of Estimated Savings (Monthly) across all open recommendations (To-Do / Changed). It just totals the per-recommendation values already provided by each provider engine — no separate cross-cloud calculation needed.">info</span></span>'
+        +'<span class="val rs-num">'+nFmt(pot)+' <span class="unit">'+state.currency+'</span></span><span class="sub pos">If all open recommendations adopted'+(excl.length?' (excl. '+excl.join(', ')+')':'')+'</span></div>';
   }
   $('#rs-cards').innerHTML = cards;
 }
@@ -756,41 +939,21 @@ function renderViewSeg(){
 }
 function setView(v){
   state.view = v;
-  state.selection = {};
+  state.fProv=''; state.fType='';
   $('#rs-recview').classList.toggle('hide', v!=='rec');
   $('#rs-actview').classList.toggle('hide', v!=='active');
-  renderViewSeg();
-  if(v==='rec'){ renderTabs(); renderActions(); renderTable(); }
+  renderViewSeg(); renderFilters(v);
+  if(v==='rec'){ renderTable(); }
   else { renderActiveTable(); }
-}
-
-/* ============================================================
-   RENDER — tabs + actions
-============================================================ */
-function renderTabs(){
-  $('#rs-tabs').innerHTML = TABS.map(function(t){
-    var active = t.id===state.tab?' active':'';
-    var badge = t.badge!==''?'<span class="tab-badge">'+t.badge+'</span>':'';
-    return '<button class="tab'+active+'" onclick="setTab(\''+t.id+'\')">'+t.label+badge+'</button>';
-  }).join('');
-}
-function renderActions(){
-  var selCount = Object.keys(state.selection).length;
-  var box = $('#rs-actions');
-  if(selCount===0 || state.pageState!=='set' || !canEdit()){ box.innerHTML=''; return; }
-  var acts = TAB_ACTIONS[state.tab] || [];
-  box.innerHTML = acts.map(function(a){
-    return '<button class="btn btn-o" data-tip="'+escTip(a.tip)+'" onclick="doAction(\''+a.act+'\')"><span class="material-symbols-outlined" style="font-variation-settings:\'FILL\' 0">'+a.icon+'</span>'+a.label+'</button>';
-  }).join('');
-  bindTips();
 }
 
 /* ============================================================
    RENDER — recommendation table
 ============================================================ */
 var COLS = [
-  {h:'Type'}, {h:'Impact', sort:'impact'}, {h:'Status', sort:'status'}, {h:'Est. Savings', sort:'estAmt'},
-  {h:'Assigned to Group'}, {h:'Recommendation'}, {h:'Criteria'}
+  {h:'Type'}, {h:'Estimated Savings (Monthly)', sort:'estAmt'}, {h:'Term', sort:'term'},
+  {h:'Payment <span class="pm-flag" data-rs-tip="待確認：Payment 欄為設計端新增（PRD Rec 欄位清單未列，原併在 Recommendation 文字內）。獨立成欄方便掃讀承諾付款方式。">❓</span>'},
+  {h:'Recommendation'}, {h:'Recommendation Date', sort:'recDate'}
 ];
 function renderTable(){
   var area = $('#rs-tablearea');
@@ -800,20 +963,32 @@ function renderTable(){
       +'<div class="empty-state-title">No Data Available</div><div class="empty-state-sub">Recommendations will appear once enough billing history has accumulated.</div></div></div>';
     return;
   }
-  var rows = DATA[state.tab].slice();
+  var rows = DATA.rec.slice();
+  rows = rows.filter(function(r){return state.provEnabled[r.prov];});
+  if(state.fProv) rows = rows.filter(function(r){return r.prov===state.fProv;});
+  if(state.fType) rows = rows.filter(function(r){return r.type===state.fType;});
   var q = ($('#rs-search-input') && $('#rs-search-input').value || '').toLowerCase().trim();
   if(q){
     rows = rows.filter(function(r){
-      return (r.target+' '+r.type+' '+r.recommendation+' '+r.group+' '+r.criteria.join(' ')).toLowerCase().indexOf(q)>=0;
+      return (r.target+' '+r.type+' '+r.recommendation).toLowerCase().indexOf(q)>=0;
     });
   }
   if(state.sort.key){
     var k = state.sort.key, d = state.sort.dir;
-    rows.sort(function(a,b){ var va=a[k], vb=b[k]; if(va<vb) return -1*d; if(va>vb) return 1*d; return 0; });
+    rows.sort(function(a,b){
+      var va=a[k], vb=b[k];
+      if(k==='recDate'){ va=dateNum(a.recDate); vb=dateNum(b.recDate); }
+      if(k==='term'){ va=termOf(a); vb=termOf(b); }
+      if(va<vb) return -1*d; if(va>vb) return 1*d; return 0;
+    });
+  } else {
+    rows.sort(function(a,b){
+      if(b.estAmt!==a.estAmt) return b.estAmt-a.estAmt;
+      if(b.estRate!==a.estRate) return b.estRate-a.estRate;
+      return dateNum(b.recDate)-dateNum(a.recDate);
+    });
   }
-  var showSel = canEdit();
-  var ths = (showSel?'<th class="fix rs-c-sel"><input type="checkbox" id="rs-selall" onchange="toggleAll(this.checked)"></th>':'')
-    +'<th class="fix rs-c-target">Target Item</th>'
+  var ths = '<th class="fix rs-c-target">Target Item</th>'
     + COLS.map(function(c){
         if(c.sort){
           var on = state.sort.key===c.sort?' on':'';
@@ -822,30 +997,41 @@ function renderTable(){
         }
         return '<th>'+c.h+'</th>';
       }).join('');
-  if(showSel) $('.rs-c-target') && null;
   var trs = rows.map(function(r){
-    var sel = state.selection[r.recId]?'sel':'';
-    var checked = state.selection[r.recId]?' checked':'';
-    var groupTxt = (r.group==='—') ? '<span class="rs-muted">—</span>' : r.group;
-    return '<tr class="'+sel+'" onclick="openDetail(\''+r.recId+'\')">'
-      +(showSel?'<td class="fix rs-c-sel" onclick="event.stopPropagation()"><input type="checkbox"'+checked+' onchange="toggleRow(\''+r.recId+'\',this.checked)"></td>':'')
-      +'<td class="fix rs-c-target"><span class="rs-two">'+provBadge(r.prov)+'<span class="rs-two-txt"><span class="nm" data-tip="'+escTip(r.target)+'">'+r.target+'</span></span></span></td>'
+    return '<tr>'
+      +'<td class="fix rs-c-target"><span class="rs-two">'+provBadge(r.prov)+'<span class="rs-two-txt"><span class="nm" data-rs-tip="'+escTip(r.target)+'">'+r.target+'</span></span></span></td>'
       +'<td>'+typeChip(r.type)+'</td>'
-      +'<td>'+impactCell(r.impact)+'</td>'
-      +'<td>'+statusCell(r.status)+'</td>'
       +'<td>'+saveCell(r.estAmt, r.estRate)+'</td>'
-      +'<td class="rs-c-group"><span class="rs-tag-cell">'+groupTxt+'</span></td>'
-      +'<td class="rs-c-rec"><div class="rs-clamp">'+r.recommendation+'</div></td>'
-      +'<td class="rs-c-crit"><div class="rs-clamp">'+r.criteria.join(' · ')+'</div></td>'
+      +'<td>'+termOf(r)+'</td>'
+      +'<td>'+paymentOf(r)+'</td>'
+      +'<td class="rs-c-rec"><span class="rs-trunc" data-rs-tip="'+escTip(r.recommendation)+'">'+r.recommendation+'</span></td>'
+      +'<td class="rs-num">'+r.recDate+'</td>'
       +'</tr>';
   }).join('');
   if(rows.length===0){
+    if(allSourcesOff()){ area.innerHTML = allSourcesOffHtml(); return; }
+    if(state.fProv && !state.provEnabled[state.fProv]){ area.innerHTML = provGateHtml(state.fProv); return; }
     area.innerHTML = '<div class="rs-tblwrap"><div class="empty-state rs-tbl-empty"><span class="material-symbols-outlined">'+(q?'search_off':'inbox')+'</span>'
-      +'<div class="empty-state-title">'+(q?'No matching recommendations':'No items in this category')+'</div>'+(q?'<div class="empty-state-sub">Try adjusting your search or filters.</div>':'')+'</div></div>';
+      +'<div class="empty-state-title">No matching recommendations</div><div class="empty-state-sub">Try adjusting your search or filters.</div></div></div>';
     return;
   }
   area.innerHTML = '<div class="rs-tblwrap"><div class="rs-tblscroll"><table class="rstbl"><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div></div>';
   bindTips();
+}
+function allSourcesOffHtml(){
+  return '<div class="rs-tblwrap"><div class="empty-state rs-tbl-empty"><span class="material-symbols-outlined">cloud_off</span>'
+    +'<div class="empty-state-title">No cloud data sources enabled</div>'
+    +'<div class="empty-state-sub">Turn on at least one provider in Cloud data sources to see recommendations and active commitments.</div>'
+    +'<button class="btn btn-p" onclick="openModal(\'mo-sources\')">Open Data Sources</button>'
+    +'</div></div>';
+}
+function provGateHtml(key){
+  var p = provOf(key) || {label:key};
+  return '<div class="rs-tblwrap"><div class="empty-state rs-tbl-empty"><span class="material-symbols-outlined">cloud_off</span>'
+    +'<div class="empty-state-title">'+p.label+' is not enabled</div>'
+    +'<div class="empty-state-sub">Enable it in <b>Cloud data sources</b> above to see '+p.label+' recommendations and active commitments.</div>'
+    +'<button class="btn btn-p" onclick="requestEnableProv(\''+key+'\')">Enable '+p.label+'</button>'
+    +'</div></div>';
 }
 function skeletonTable(){
   var cells = '';
@@ -859,7 +1045,7 @@ function skeletonTable(){
    RENDER — active commitments table
 ============================================================ */
 var ACT_COLS = [
-  {h:'Type'}, {h:'Service'}, {h:'Term'}, {h:'Payment'}, {h:'Hourly Cost', sort:'hourly'}, {h:'Utilization', sort:'util'}, {h:'Expiry', sort:'expSort'}
+  {h:'Type'}, {h:'Utilization', sort:'util'}, {h:'Expiry', sort:'expSort'}, {h:'Term'}, {h:'Monthly Cost', sort:'monthly'}, {h:'Payment'}
 ];
 function dateNum(s){ var p=s.split('/'); return new Date(p[2],p[1]-1,p[0]).getTime(); }
 function renderActiveTable(){
@@ -871,14 +1057,17 @@ function renderActiveTable(){
     return;
   }
   var rows = ACTIVE.slice();
+  rows = rows.filter(function(a){return state.provEnabled[a.prov];});
+  if(state.fProv) rows = rows.filter(function(a){return a.prov===state.fProv;});
+  if(state.fType) rows = rows.filter(function(a){return a.type===state.fType;});
   var q = ($('#rs-act-search') && $('#rs-act-search').value || '').toLowerCase().trim();
   if(q){ rows = rows.filter(function(a){ return (a.cid+' '+a.service+' '+a.type).toLowerCase().indexOf(q)>=0; }); }
   // default sort: expiry ascending (soonest first)
   var sk = state.actSort.key || 'expSort';
   var sd = state.actSort.key ? state.actSort.dir : 1;
   rows.sort(function(a,b){
-    var va = sk==='expSort'?dateNum(a.expiry):a[sk];
-    var vb = sk==='expSort'?dateNum(b.expiry):b[sk];
+    var va = sk==='expSort'?dateNum(a.expiry):(sk==='monthly'?a.hourly:a[sk]);
+    var vb = sk==='expSort'?dateNum(b.expiry):(sk==='monthly'?b.hourly:b[sk]);
     if(va<vb) return -1*sd; if(va>vb) return 1*sd; return 0;
   });
   var ths = '<th class="fix rs-c-cid">Commitment ID</th>'
@@ -891,19 +1080,21 @@ function renderActiveTable(){
         return '<th>'+c.h+'</th>';
       }).join('');
   var trs = rows.map(function(a){
-    var expBadge = a.exp ? '<span class="rs-exp"><span class="material-symbols-outlined">schedule</span>Expiring Soon</span>' : '';
-    return '<tr onclick="openCommitment(\''+a.cid+'\')">'
+    var expBadge = a.exp ? '<span class="rs-exp" data-rs-tip="Expiring within 30 days"><span class="material-symbols-outlined">schedule</span></span>' : '';
+    var monthly = Math.round(a.hourly*730);
+    return '<tr>'
       +'<td class="fix rs-c-cid"><span class="rs-two">'+provBadge(a.prov)+'<span class="rs-two-txt"><span class="nm">'+a.cid+'</span></span></span></td>'
       +'<td>'+typeChip(a.type)+'</td>'
-      +'<td><span class="rs-tag-cell" data-tip="'+escTip(a.service)+'">'+a.service+'</span></td>'
-      +'<td>'+a.term+'</td>'
-      +'<td>'+a.payment+'</td>'
-      +'<td class="rs-num">'+state.currency+' '+a.hourly.toFixed(2)+'</td>'
       +'<td>'+utilCell(a.util, UTIL_TARGET)+'</td>'
       +'<td><span class="rs-num">'+a.expiry+'</span>'+expBadge+'</td>'
+      +'<td>'+a.term+'</td>'
+      +'<td class="rs-num">'+state.currency+' '+comma(monthly)+'</td>'
+      +'<td>'+a.payment+'</td>'
       +'</tr>';
   }).join('');
   if(rows.length===0){
+    if(allSourcesOff()){ area.innerHTML = allSourcesOffHtml(); return; }
+    if(state.fProv && !state.provEnabled[state.fProv]){ area.innerHTML = provGateHtml(state.fProv); return; }
     area.innerHTML = '<div class="rs-tblwrap"><div class="empty-state rs-tbl-empty"><span class="material-symbols-outlined">search_off</span><div class="empty-state-title">No matching commitments</div></div></div>';
     return;
   }
@@ -916,194 +1107,12 @@ function setActSort(k){
 }
 
 /* ============================================================
-   SELECTION + ACTIONS
+   SELECTION + SORT
 ============================================================ */
-function toggleRow(id, on){ if(on) state.selection[id]=true; else delete state.selection[id]; renderTable(); renderActions(); }
-function toggleAll(on){
-  state.selection = {};
-  if(on) DATA[state.tab].forEach(function(r){ state.selection[r.recId]=true; });
-  renderTable(); renderActions();
-}
-function setTab(t){ state.tab=t; state.selection={}; state.sort={key:null,dir:1}; renderTabs(); renderActions(); renderTable(); }
 function setSort(k){
   if(state.sort.key===k) state.sort.dir*=-1; else { state.sort.key=k; state.sort.dir=1; }
   renderTable();
 }
-function doAction(act){
-  var ids = Object.keys(state.selection);
-  if(ids.length===0) return;
-  if(act==='dismiss'){ openDismiss(); return; }
-  if(act==='remove'){ openRemove(); return; }
-  var map = {done:"moved to 'Done'", undo:"restored to 'Recommendations'", archive:"transferred to 'Archived'"};
-  toast(ids.length+' recommendation(s) '+map[act]+'.');
-  state.selection={}; renderTable(); renderActions();
-}
-
-/* ============================================================
-   MODALS — recommendation detail (read-only)
-============================================================ */
-function findRec(id){
-  var all = DATA.rec.concat(DATA.done, DATA.dismiss, DATA.archived);
-  return all.filter(function(r){return r.recId===id;})[0];
-}
-function openDetail(id){
-  if(state.pageState!=='set') return;
-  var r = findRec(id); if(!r) return;
-  renderDetail(r);
-  openModal('mo-detail');
-}
-function renderDetail(r){
-  var c = state.currency;
-  var net = r.net || {count:0, items:[]};
-  var netHtml = '';
-  if(net.count>0){
-    netHtml = '<div class="dt-sec"><div class="dt-sec-t">Current coverage — '+CONSOLE_LABEL[r.prov]+'</div>'
-      +'<div class="dt-net"><div class="dt-net-hint">What you already hold in this scope. Existing commitments are netted out of this recommendation, so it only covers the remaining gap.</div>'
-      +'<div class="dt-net-sum">'+net.count+' active commitment'+(net.count>1?'s':'')+' · avg '+net.avgUtil+'% utilization</div>'
-      + net.items.map(function(it){return '<div class="dt-net-row">'+it+'</div>';}).join('')
-      +'</div></div>';
-  }
-  $('#dt-body').innerHTML =
-    '<div class="dt-head">'
-      +'<div class="dt-target">'+provBadge(r.prov)+r.target+'</div>'
-      +'<div class="dt-saving">Estimated Savings: '+c+' '+nFmt(r.estAmt)+' / month <span style="font-size:14px;color:var(--ok-dk);font-weight:700">(Save '+(r.estRate*100).toFixed(1)+'%)</span></div>'
-      +'<div class="dt-change">'+typeChip(r.type)+' &nbsp;·&nbsp; Impact '+['Low','Medium','High'][r.impact]+'</div>'
-    +'</div>'
-    +'<div class="dt-sec"><div class="dt-kv">'
-      +'<div class="dt-kv-item"><span class="k">Type</span><span class="v">'+r.type+'</span></div>'
-      +'<div class="dt-kv-item"><span class="k">Rec. Date</span><span class="v">'+r.recDate+'</span></div>'
-      +'<div class="dt-kv-item"><span class="k">End of Tracking</span><span class="v">'+r.eot+'</span></div>'
-      +'<div class="dt-kv-item"><span class="k">Assigned to Group</span><span class="v'+(r.group==='—'?' muted':'')+'">'+r.group+'</span></div>'
-      +'<div class="dt-kv-item"><span class="k">Status</span><span class="v">'+['To-Do','Changed','Error'][r.status]+'</span></div>'
-    +'</div></div>'
-    +'<div class="dt-sec"><div class="dt-sec-t">Recommendation</div><div class="dt-rec-text">'+r.recommendation+'</div></div>'
-    +'<div class="dt-sec"><div class="dt-sec-t">Criteria <span class="material-symbols-outlined ico-info" data-tip="The conditions that triggered this recommendation, based on observed historical usage.">info</span></div>'
-      +'<ul class="dt-crit">'+r.criteria.map(function(c){return '<li>'+c+'</li>';}).join('')+'</ul></div>'
-    + netHtml
-    +'<div class="dt-advisory"><span class="material-symbols-outlined">info</span><div>LumiTure is advisory — it does not purchase commitments. Review the criteria above, then complete the purchase in your provider console.'
-      +'<br><a class="dt-console" onclick="toast(\'(Demo) Would open the '+CONSOLE_LABEL[r.prov]+' purchase console in a new tab.\')">View in '+CONSOLE_LABEL[r.prov]+' console<span class="material-symbols-outlined">open_in_new</span></a></div></div>';
-  bindTips();
-}
-
-/* ============================================================
-   MODALS — commitment detail (read-only) + utilization trend
-============================================================ */
-function trendSvg(end){
-  // generate a gently declining 12-month utilization series ending near `end`
-  var pts = [], n=12, base = Math.min(98, end+8);
-  for(var i=0;i<n;i++){ var v = base - (base-end)*(i/(n-1)) + (i%2?1.2:-1.0); pts.push(Math.max(40, Math.min(100, v))); }
-  pts[n-1]=end;
-  var W=620,H=160,padL=34,padB=20,padT=8, plotW=W-padL-8, plotH=H-padB-padT;
-  function x(i){ return padL + plotW*(i/(n-1)); }
-  function y(v){ return padT + plotH*(1-(v/100)); }
-  var line='', area='M'+x(0)+' '+y(pts[0]);
-  pts.forEach(function(v,i){ var cmd=(i===0?'M':'L')+x(i)+' '+y(v); line+=cmd+' '; if(i>0) area+=' L'+x(i)+' '+y(v); });
-  area += ' L'+x(n-1)+' '+(padT+plotH)+' L'+x(0)+' '+(padT+plotH)+' Z';
-  var months=['Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'];
-  var grid=''; [0,25,50,75,100].forEach(function(g){ var yy=y(g); grid+='<line x1="'+padL+'" y1="'+yy+'" x2="'+W+'" y2="'+yy+'" stroke="#E6E6E6" stroke-dasharray="3 3"/><text class="axis" x="'+(padL-6)+'" y="'+(yy+3)+'" text-anchor="end">'+g+'%</text>'; });
-  var tgtY=y(UTIL_TARGET);
-  var xlabels = months.map(function(m,i){ return '<text class="axis" x="'+x(i)+'" y="'+(H-4)+'" text-anchor="middle">'+m+'</text>'; }).join('');
-  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">'
-    + grid
-    + '<path d="'+area+'" fill="rgba(0,79,176,.08)"/>'
-    + '<path d="'+line.trim()+'" fill="none" stroke="#004FB0" stroke-width="2"/>'
-    + '<line x1="'+padL+'" y1="'+tgtY+'" x2="'+W+'" y2="'+tgtY+'" stroke="#FC9A0F" stroke-width="1.5" stroke-dasharray="5 4"/>'
-    + '<text class="axis" x="'+(W-4)+'" y="'+(tgtY-4)+'" text-anchor="end" fill="#FC9A0F">Target '+UTIL_TARGET+'%</text>'
-    + xlabels
-    + '</svg>';
-}
-function openCommitment(cid){
-  if(state.pageState!=='set') return;
-  var a = ACTIVE.filter(function(x){return x.cid===cid;})[0]; if(!a) return;
-  var c = state.currency;
-  var low = a.util < UTIL_TARGET;
-  var banner = a.exp
-    ? '<div class="dt-expbanner"><span class="material-symbols-outlined">schedule</span><div><div class="t">Expiring soon</div><div class="d">Renew in the '+CONSOLE_LABEL[a.prov]+' console before it expires to avoid reverting to on-demand rates. (LumiTure is advisory — it does not purchase commitments.)</div></div></div>'
-    : '';
-  var lowNote = (low && !a.exp)
-    ? '<div class="dt-expbanner" style="border-color:var(--warn)"><span class="material-symbols-outlined">trending_down</span><div><div class="t">Under-utilized</div><div class="d">Running below the '+UTIL_TARGET+'% target — part of this commitment may be wasted. Consider this when planning renewals.</div></div></div>'
-    : '';
-  $('#cm-body').innerHTML =
-    '<div class="dt-head" style="text-align:left">'
-      +'<div class="dt-target" style="justify-content:flex-start">'+provBadge(a.prov)+'<b style="color:var(--g900);font-weight:700">'+a.cid+'</b></div>'
-      +'<div style="font-size:13px;color:var(--g500)">'+CONSOLE_LABEL[a.prov]+' · '+a.type+'</div>'
-    +'</div>'
-    + banner + lowNote
-    +'<div class="dt-sec"><div class="dt-kv">'
-      +'<div class="dt-kv-item"><span class="k">Service</span><span class="v">'+a.service+'</span></div>'
-      +'<div class="dt-kv-item"><span class="k">Term</span><span class="v">'+a.term+'</span></div>'
-      +'<div class="dt-kv-item"><span class="k">Payment</span><span class="v">'+a.payment+'</span></div>'
-      +'<div class="dt-kv-item"><span class="k">Hourly Cost</span><span class="v rs-num">'+c+' '+a.hourly.toFixed(2)+'</span></div>'
-      +'<div class="dt-kv-item"><span class="k">Start</span><span class="v">'+a.start+'</span></div>'
-      +'<div class="dt-kv-item"><span class="k">Expiry</span><span class="v">'+a.expiry+'</span></div>'
-      +'<div class="dt-kv-item"><span class="k">Current Utilization</span><span class="v" style="color:'+(low?'#B26A00':'var(--ok-dk)')+'">'+a.util+'%</span></div>'
-      +'<div class="dt-kv-item"><span class="k">Realized Savings to Date</span><span class="v rs-num">'+c+' '+nFmt(a.realized)+'</span></div>'
-    +'</div></div>'
-    +'<div class="dt-sec"><div class="dt-sec-t">Utilization Trend</div>'
-      +'<div class="dt-trend">'+trendSvg(a.util)+'</div>'
-      +'<div class="dt-trend-legend"><span><i></i>Target '+UTIL_TARGET+'%</span></div></div>';
-  openModal('mo-commit');
-  bindTips();
-}
-
-/* ============================================================
-   MODALS — dismiss
-============================================================ */
-var DISMISS_REASONS = [
-  ['Workload not stable enough','On-demand spend fluctuates too much to commit'],
-  ['Planned migration / decommission','Resource will change or be removed soon'],
-  ['Pending budget approval','Commitment purchase not yet approved'],
-  ['Covered by another agreement','Already covered by an EDP or negotiated discount'],
-  ['Unreasonable recommendation','Not aligned with actual usage patterns'],
-  ['Other','Please specify your reason'],
-];
-function openDismiss(){
-  $('#dm-body').innerHTML = DISMISS_REASONS.map(function(r,i){
-    var isOther = (r[0]==='Other');
-    return '<label class="dm-opt"><input type="radio" name="dm-reason" value="'+i+'" onchange="onDismissReason('+isOther+')">'
-      +'<span><span class="o-t">'+r[0]+'</span><span class="o-d">: '+r[1]+'</span></span></label>';
-  }).join('')
-  + '<textarea class="dm-textarea" id="dm-text" placeholder="Please provide a brief explanation" disabled></textarea>'
-  + '<div class="dm-err" id="dm-err">Reason cannot be empty.</div>';
-  openModal('mo-dismiss');
-}
-function onDismissReason(isOther){
-  var ta = $('#dm-text');
-  ta.disabled = !isOther;
-  if(isOther) ta.focus(); else { ta.value=''; $('#dm-err').classList.remove('show'); }
-}
-function confirmDismiss(skip){
-  if(!skip){
-    var picked = document.querySelector('input[name="dm-reason"]:checked');
-    if(!picked){ toast('Please choose a reason before dismissing.', 'err'); return; }
-    if(DISMISS_REASONS[+picked.value][0]==='Other' && !$('#dm-text').value.trim()){
-      $('#dm-err').classList.add('show'); return;
-    }
-  }
-  var n = Object.keys(state.selection).length || 1;
-  closeModals(); toast(n+" recommendation(s) moved to 'Dismiss'.");
-  state.selection={}; renderTable(); renderActions();
-}
-
-/* MODALS — remove */
-function openRemove(){
-  var ids = Object.keys(state.selection);
-  var recs = ids.map(findRec).filter(Boolean);
-  if(recs.length===0) recs = [DATA[state.tab][0]];
-  $('#rm-title').textContent = 'Remove '+recs.length+' Recommendation(s)';
-  $('#rm-list').innerHTML = recs.map(function(r){return '<li>'+r.target+' — '+r.type+'</li>';}).join('');
-  openModal('mo-remove');
-}
-function confirmRemove(){
-  var n = Object.keys(state.selection).length || 1;
-  closeModals(); toast(n+' recommendation(s) removed.');
-  state.selection={}; renderTable(); renderActions();
-}
-
-function openModal(id){ closeModals(); $('#'+id).classList.add('active'); }
-function closeModals(){ document.querySelectorAll('.mo.active').forEach(function(m){m.classList.remove('active');}); }
-document.querySelectorAll('.mo').forEach(function(m){ m.addEventListener('click', function(e){ if(e.target===m) closeModals(); }); });
-document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModals(); });
 
 /* ============================================================
    PAGE STATE
@@ -1120,6 +1129,14 @@ function renderListPage(){
   var scopeBtn = $('#scope-btn');
   if(scopeBtn) scopeBtn.classList.toggle('hide', !canEdit());
 
+  if(!canEdit()){
+    normalBox.classList.add('hide');
+    $('#updwrap').classList.add('hide');
+    content.insertAdjacentHTML('beforeend', noAccessState());
+    bindTips();
+    return;
+  }
+
   if(state.pageState==='no-auth'){
     normalBox.classList.add('hide');
     $('#updwrap').classList.add('hide');
@@ -1127,14 +1144,23 @@ function renderListPage(){
     bindTips();
     return;
   }
-  renderCards(); renderViewSeg();
-  if(state.view==='rec'){ renderTabs(); renderActions(); renderTable(); }
+  renderDataSources(); renderHint(); renderCards(); renderViewSeg(); renderFilters(state.view);
+  if(state.view==='rec'){ renderTable(); }
   else { renderActiveTable(); }
   $('#rs-recview').classList.toggle('hide', state.view!=='rec');
   $('#rs-actview').classList.toggle('hide', state.view!=='active');
 
   if(state.pageState==='first-time'){
     normalBox.classList.add('rs-ft-blur');
+    // Kept distinct from the no-auth state on purpose: no-auth = billing accounts not
+    // connected at all (platform-level gate); first-time = already connected, but scope
+    // hasn't been set up yet (feature-level gate) — same distinction rightsizing uses.
+    // CTA intentionally still points at Scope Settings (showPage('scope')) even though
+    // that page has no real config UI in 202607 (see page-scope annotation) — this
+    // preserves the intended eventual flow rather than collapsing into a duplicate of
+    // no-auth's "Add Your Authorization" CTA. Reverted 2026-07-21 after briefly pointing
+    // this at Authorization, which made the two states redundant; see Demo FAB tip for
+    // the "this isn't real yet" annotation instead of changing user-facing copy.
     content.insertAdjacentHTML('beforeend',
       '<div class="rs-ft-overlay" id="rs-ft-overlay"><div class="rs-ft-card"><div class="ico"><span class="material-symbols-outlined">savings</span></div>'
       +'<h3>Start Lowering Your Cloud Rates</h3>'
@@ -1142,16 +1168,28 @@ function renderListPage(){
       +'<button class="btn btn-p" onclick="showPage(\'scope\')">Set Up Scope Settings</button></div></div>');
   }
 }
-function authState(){
-  var admin = canEdit();
-  var sub = admin
-    ? "Commitment recommendations require billing-account-level access (AWS payer/management account, GCP Billing Account, Azure billing scope). Authorize your billing data to start detecting Savings Plan, Reserved Instance, and CUD opportunities across providers."
-    : "To start optimizing your cloud rates, please ask your organization's administrator to authorize billing-account access.";
-  var cta = admin ? '<button class="btn btn-p" onclick="toast(\'(Demo) Would navigate to Authorization Settings.\')"><span class="material-symbols-outlined">add</span>Add Your Authorization</button>' : '';
+function noAccessState(){
   return '<div id="rs-statefull" class="rs-fullcard"><div class="empty-state" style="padding:0">'
-    +'<span class="material-symbols-outlined">'+(admin?'lock_open':'lock')+'</span>'
+    +'<span class="material-symbols-outlined">lock</span>'
+    +'<div class="empty-state-title">Rate Optimization is available to Owners and Admins</div>'
+    +'<div class="empty-state-sub">Commitment purchases are a central, billing-account-level decision, so this feature is restricted to Owner / Admin roles. You will be redirected to Overview.</div>'
+    +'<button class="btn btn-p" onclick="toast(\'(Demo) Would redirect to Overview.\')">Back to Overview</button></div></div>';
+}
+function authState(){
+  // Only ever reached when canEdit() is true — renderListPage()'s earlier
+  // `if(!canEdit())` branch already intercepts every non-admin role with
+  // noAccessState() (a different, feature-level "Owner/Admin only" block).
+  // So there is no reachable "non-admin sees a different no-auth message"
+  // variant here; this function has exactly one real audience: an admin
+  // whose billing account isn't authorized yet. (Simplified 2026-07-21 —
+  // previously had a dead `!admin` branch left over from before Rate
+  // Optimization became Owner/Admin-only; the Demo FAB tip claiming
+  // "switch role to see the difference" was equally stale, now fixed.)
+  return '<div id="rs-statefull" class="rs-fullcard"><div class="empty-state" style="padding:0">'
+    +'<span class="material-symbols-outlined">lock_open</span>'
     +'<div class="empty-state-title">Connect Your Billing Data to Unlock Rate Optimization</div>'
-    +'<div class="empty-state-sub">'+sub+'</div>'+cta+'</div></div>';
+    +'<div class="empty-state-sub">Commitment recommendations require billing-account-level access (AWS payer/management account, GCP Billing Account, Azure billing scope). Authorize your billing data to start detecting Savings Plan, Reserved Instance, and CUD opportunities across providers.</div>'
+    +'<button class="btn btn-p" onclick="toast(\'(Demo) Would navigate to Authorization Settings.\')"><span class="material-symbols-outlined">add</span>Add Your Authorization</button></div></div>';
 }
 
 /* ============================================================
@@ -1162,7 +1200,6 @@ function showPage(p){
   $('#page-list').classList.toggle('hide', p!=='list');
   $('#page-scope').classList.toggle('hide', p!=='scope');
   $('#app').classList.toggle('savebar-on', p==='scope');
-  closeModals();
 }
 function setRole(r){ state.role = r; state.selection={}; renderListPage(); }
 
@@ -1182,25 +1219,35 @@ function toast(msg, type){
    TOOLTIP
 ============================================================ */
 function bindTips(){
-  document.querySelectorAll('[data-tip]').forEach(function(el){
+  document.querySelectorAll('[data-rs-tip]').forEach(function(el){
     if(el._tipBound) return; el._tipBound=true;
     el.addEventListener('mouseenter', function(){ showTip(el); });
     el.addEventListener('mouseleave', hideTip);
-    el.addEventListener('mousemove', moveTip);
   });
 }
 var _tipEl;
-function showTip(el){ _tipEl = $('#rs-tip'); _tipEl.innerHTML = el.getAttribute('data-tip'); _tipEl.classList.add('show'); moveTipFor(el); }
-function moveTip(e){ if(_tipEl && _tipEl.classList.contains('show')) positionTip(e.clientX, e.clientY); }
-function moveTipFor(el){ var r=el.getBoundingClientRect(); positionTip(r.left+r.width/2, r.top); }
-function positionTip(x,y){
+/* Anchor tooltip to the trigger element ONCE on mouseenter — do not re-track
+   the cursor on mousemove. Show/hide is a hard display:none/block toggle
+   (no opacity transition) so there is no fade window during which an old
+   and a new tooltip could ever be visible/overlapping at once. */
+function showTip(el){
+  _tipEl = $('#rs-tip');
+  _tipEl.classList.remove('show');   // force-reset any previous show state first
+  _tipEl.innerHTML = el.getAttribute('data-rs-tip');
+  _tipEl.classList.add('show');
+  positionTipFor(el);
+}
+function positionTipFor(el){
   if(!_tipEl) return;
-  var w=_tipEl.offsetWidth, h=_tipEl.offsetHeight;
-  var left = Math.min(Math.max(8, x-w/2), window.innerWidth-w-8);
-  var top = y-h-10; if(top<8) top = y+18;
-  _tipEl.style.left=left+'px'; _tipEl.style.top=top+'px';
+  var r = el.getBoundingClientRect();
+  var w = _tipEl.offsetWidth, h = _tipEl.offsetHeight;
+  var cx = r.left + r.width/2;
+  var left = Math.min(Math.max(8, cx-w/2), window.innerWidth-w-8);
+  var top = r.top - h - 10; if(top<8) top = r.bottom + 10;
+  _tipEl.style.left = left+'px'; _tipEl.style.top = top+'px';
 }
 function hideTip(){ if(_tipEl) _tipEl.classList.remove('show'); }
+window.addEventListener('scroll', hideTip, true);
 
 /* ============================================================
    CURRENCY
@@ -1223,43 +1270,51 @@ window.DEMO_PAGES = [
   { id:'view',  label:'View',  icon:'tab' },
   { id:'role',  label:'Role',  icon:'person' },
   { id:'state', label:'State', icon:'layers' },
-  { id:'modal', label:'Modal', icon:'open_in_new' },
+  { id:'src',   label:'Data sources', icon:'cloud_sync' },
 ];
 window.DEMO_SCENARIOS = [
   // View
-  { id:'view-rec',    page:'view', label:'Recommendations',    icon:'lightbulb',   tip:'主畫面：4 張 KPI 卡 + 推薦列表（Recommendations/Done/Dismiss/Archived 4 tab）。' },
-  { id:'view-active', page:'view', label:'Active Commitments', icon:'inventory_2', tip:'現有承諾組合：利用率 + 到期追蹤，依到期日排序，30 天內到期標 Expiring Soon。' },
-  { id:'view-scope',  page:'view', label:'Scope Settings',     icon:'settings',    tip:'範圍設定頁：Detection Scope + Trigger Criteria + Tracking & Impact + Utilization Target。' },
+  { id:'view-rec',    page:'view', label:'Recommendations',    icon:'lightbulb',   tip:'主畫面：3 張 KPI 卡 + 推薦清單（無生命週期分頁，純 advisory 檢視）。' },
+  { id:'view-active', page:'view', label:'Active Commitments', icon:'inventory_2', tip:'現有承諾組合：Monthly Cost + 利用率 + 到期追蹤，依到期排序，低利用率變色。' },
+  { id:'reset-tip',   page:'view', label:'Reset "Rightsizing tip"', icon:'restart_alt', tip:'重置 rightsizing 提示（清掉 session 關閉狀態 + localStorage 永久關閉狀態），用於重覆展示 dismiss 行為。' },
   // Role
-  { id:'admin', page:'role', label:'Admin',      icon:'admin_panel_settings', tip:'Owner/Admin：可採納/忽略/封存 + 指派 group（bulk-select + toolbar 動作）。可進 Scope Settings。' },
-  { id:'t1m',   page:'role', label:'T1 Manager', icon:'supervisor_account',   tip:'T1 Manager：唯讀（無 checkbox、無動作列、無 Scope 按鈕）。' },
-  { id:'t1mb',  page:'role', label:'T1 Member',  icon:'badge',                tip:'T1 Member：唯讀。' },
-  { id:'t2m',   page:'role', label:'T2 Manager', icon:'person',               tip:'T2 Manager：唯讀，授權範圍內。' },
-  { id:'t2mb',  page:'role', label:'T2 Member',  icon:'person_outline',       tip:'T2 Member：唯讀。' },
+  { id:'admin',  page:'role', label:'Owner / Admin',       icon:'admin_panel_settings', tip:'唯一有存取權：可篩選/搜尋，並可切換各 provider 的資料來源啟用開關。' },
+  { id:'viewer', page:'role', label:'T1 / T2 (No access)', icon:'lock',                 tip:'Manager / Member 對 Rate Optimization 無存取，功能不顯示、導回 Overview。' },
   // State
   { id:'set',        page:'state', label:'With data (預設)',    icon:'check_circle',  tip:'正常狀態：KPI 有值、推薦與承諾可操作。' },
   { id:'loading',    page:'state', label:'Loading (Skeleton)',  icon:'hourglass_top', isNoData:true, tip:'資料載入中：cards 與表格以 shimmer 取代。' },
-  { id:'first-time', page:'state', label:'First-Time use',      icon:'savings',       isNoData:true, tip:'第一次使用：模糊預覽 + 引導至 Scope Settings 連線帳單。' },
+  { id:'first-time', page:'state', label:'First-Time use',      icon:'savings',       isNoData:true, tip:'第一次使用：模糊預覽 + CTA「Set Up Scope Settings」。與 No Authorization 狀態刻意區分（no-auth=完全未連線的平台層級關卡；first-time=已連線但未設範圍的功能層級關卡）。⚠️ 202607 版本不做：Scope Settings 頁面本身無真實設定 UI（見 page-scope 註記），此 CTA 保留是為了維持與 no-auth 的區隔、預留未來真實流程，非本期功能。' },
   { id:'empty',      page:'state', label:'No data created',     icon:'inbox',         isNoData:true, tip:'已連線但資料累積中：KPI 顯示 No Data、表格說明累積中。' },
-  { id:'no-auth',    page:'state', label:'No authorization',    icon:'lock',          isNoData:true, tip:'帳單帳戶尚未授權。Admin 看到 CTA；T1/T2 看到「請聯絡管理員」。切 Role 看差異。' },
+  { id:'no-auth',    page:'state', label:'No authorization',    icon:'lock',          isNoData:true, tip:'帳單帳戶尚未授權（僅 admin 會看到，含 Add Your Authorization CTA）。⚠️ 2026-07-21 修正：此狀態只有一種畫面，不會因角色而異——切到 viewer 看到的是完全不同的「Owner/Admin only」全域擋牆（noAccessState，功能層級），不是這個狀態本身的非 admin 變體；authState() 內原本的非 admin 分支已確認不可達並移除。' },
   { id:'nodata',     page:'state', label:'Error (API failure)', icon:'cloud_off',     isNoData:true, tip:'載入失敗，與 No Data 共用呈現。' },
-  // Modal
-  { id:'modal-detail',  page:'modal', label:'Recommendation Details', icon:'analytics',   tip:'唯讀推薦細節：Type/Impact/Savings + Criteria + Current coverage(netting) + advisory & console 連結。無動作按鈕。' },
-  { id:'modal-commit',  page:'modal', label:'Commitment Details',     icon:'inventory_2', tip:'唯讀承諾細節：到期提醒 + Realized Savings + Utilization Trend 圖（含 Target 線）。' },
-  { id:'modal-dismiss', page:'modal', label:'Dismiss Recommendations',icon:'block',       tip:'Dismiss 原因單選彈窗（選 Other 才開放輸入）— 由 toolbar 動作觸發。' },
-  { id:'modal-remove',  page:'modal', label:'Remove Recommendation',  icon:'delete',      tip:'刪除確認彈窗（列出即將刪除的項目）。' },
+  // Data sources (per-provider enablement — data-driven, scales 1→N)
+  { id:'src-all',      page:'src', label:'All enabled',           icon:'cloud_done', tip:'三朵雲皆啟用：KPI/清單含全部資料。此卡資料驅動，加減 provider 只改 config。' },
+  { id:'src-all-off',  page:'src', label:'All off — 真實預設 (2026-07-21 修正)', icon:'cloud_off', tip:'三朵雲全關，這就是 provEnabled 的實際初始值，也是頁面載入當下的狀態——PRD「服務啟用開關預設不開，適用於三朵雲」對三雲皆成立，僅 AWS 額外標注費用，不是「只有 AWS 預設關」。這也是本期（AWS 為先階段）大多數使用者第一次進來會撞到的真實狀態。KPI 卡顯示 No Data（非 error/empty pageState，而是「沒開任何來源」的專屬訊息），表格顯示 Open Data Sources CTA。' },
+  { id:'src-aws-off', page:'src', label:'AWS off only (cost-gated)', icon:'toggle_off', tip:'只關 AWS（其餘開）：AWS 從 KPI/清單/type filter 全數排除，KPI 標「(excl. AWS)」，filter 選 AWS 出現 not-enabled 空狀態。開啟會跳費用確認彈窗（唯一 gated provider）。此情境用於單獨測試 AWS 費用確認機制，非代表真實預設。' },
+  { id:'src-gcp-off', page:'src', label:'GCP off only (free provider)', icon:'toggle_off', tip:'只關 GCP（其餘開）：示範同一套機制也適用非收費 provider——GCP 關閉直接生效（無費用確認），資料一樣被排除。證明未來三朵雲各有開關可零改版擴充。此情境用於單獨測試機制，非代表真實預設。' },
 ];
 window.DEMO_DEFAULT = 'set';
 window.DEMO_APPLY = function(id){
-  if(id==='view-rec'){ showPage('list'); setView('rec'); return; }
-  if(id==='view-active'){ showPage('list'); setView('active'); return; }
-  if(id==='view-scope'){ showPage('scope'); return; }
-  if(['admin','t1m','t1mb','t2m','t2mb'].indexOf(id)>=0){ setRole(id); return; }
-  if(['set','loading','first-time','empty','nodata','no-auth'].indexOf(id)>=0){ showPage('list'); setPageState(id); return; }
-  if(id==='modal-detail'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); setView('rec'); openDetail('r1'); return; }
-  if(id==='modal-commit'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); setView('active'); openCommitment('cud-central1-vcpu'); return; }
-  if(id==='modal-dismiss'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); if(!canEdit()) setRole('admin'); setView('rec'); state.selection={}; state.selection['r1']=true; openDismiss(); return; }
-  if(id==='modal-remove'){ showPage('list'); if(!canEdit()) setRole('admin'); setView('rec'); state.tab='dismiss'; renderTabs(); state.selection={}; state.selection['x1']=true; renderTable(); openRemove(); return; }
+  if(id==='view-rec'){ if(!canEdit()) setRole('admin'); showPage('list'); setView('rec'); return; }
+  if(id==='view-active'){ if(!canEdit()) setRole('admin'); showPage('list'); setView('active'); return; }
+  if(id==='reset-tip'){ state.hintDismissedSession=false; try{ localStorage.removeItem(HINT_KEY); }catch(e){} renderHint(); toast('Rightsizing tip reset.'); return; }
+  if(id==='admin'){ setRole('admin'); return; }
+  if(id==='viewer'){ setRole('viewer'); return; }
+  if(id==='set'){
+    // "With data" is a reviewer baseline (full populated design), distinct from the
+    // real production default — force all providers on so the label stays accurate
+    // regardless of whatever a prior 'src-*' scenario left provEnabled at.
+    if(!canEdit()) setRole('admin'); showPage('list'); state.provEnabled = { aws:true, gcp:true, azure:true }; setPageState('set'); return;
+  }
+  if(['loading','first-time','empty','nodata','no-auth'].indexOf(id)>=0){ if(!canEdit()) setRole('admin'); showPage('list'); setPageState(id); return; }
+  if(['src-all','src-all-off','src-aws-off','src-gcp-off'].indexOf(id)>=0){
+    if(!canEdit()) setRole('admin'); showPage('list'); if(state.pageState!=='set') setPageState('set');
+    if(id==='src-all') state.provEnabled = { aws:true, gcp:true, azure:true };
+    else if(id==='src-all-off') state.provEnabled = { aws:false, gcp:false, azure:false };
+    else if(id==='src-aws-off') state.provEnabled = { aws:false, gcp:true, azure:true };
+    else if(id==='src-gcp-off') state.provEnabled = { aws:true, gcp:false, azure:true };
+    state.fProv=''; state.fType=''; refreshProviderViews(); return;
+  }
 };
 
 /* ============================================================
@@ -1494,7 +1549,7 @@ bindTips();
 
     { type: 'group', id: 'optimization', label: 'Optimization', items: [
       { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', href: './rightsizing.html' },
-      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'sell', href: './rate-optimization.html' },
+      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'percent', href: './rate-optimization.html' },
     ]},
 
     { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
@@ -1507,7 +1562,7 @@ bindTips();
       { id: 'lumitag',            label: 'LumiTag',            icon: 'sell',            href: './lumitag.html' },
       { id: 'group-list',         label: 'Group List',         icon: 'groups',          disabled: true },
       { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
-      { id: 'authorization-list', label: 'Authorization List', icon: 'link',            disabled: true },
+      { id: 'authorization-list', label: 'Authorization List', icon: 'link',            href: '../organization-settings/organization-settings-prototype-v4.html' },
       { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
     ]},
   ];
