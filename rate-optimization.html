@@ -29,7 +29,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .app{display:flex;min-height:100vh}
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
 .topbar{background:var(--pri-dk);padding:14px 32px;display:flex;align-items:center;justify-content:flex-end;gap:16px;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px}
-.content{padding:24px 32px;flex:1;position:relative}
+.content{padding:24px 32px;flex:1;position:relative;display:flex;flex-direction:column}
 .content.has-savebar{padding-bottom:96px}
 
 /* ==== Page header ==== */
@@ -38,7 +38,12 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .pg-hdr-r{display:flex;align-items:center;gap:20px}
 .upd{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--g500)}
 .upd b{font-weight:500;color:var(--g500)}
-.ico-info{font-size:16px;color:var(--g500);cursor:help;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16}
+/* Filled circle-i, per Figma #01 (node 10736:5927) — was outlined (FILL 0), which
+   is also the wrong default per the Lumiture guideline (info isn't one of the
+   chevron/arrow/close/tune exceptions that stay outlined). ⚠️ Colour is a visual
+   estimate: Figma Dev Mode MCP timed out on this node repeatedly, so the exact hex
+   couldn't be pulled — worth a quick eyeball check against the live file. */
+.ico-info{font-size:16px;color:var(--g400);cursor:help;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 16}
 
 /* ==== Buttons (CMDS) ==== */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:80px;padding:0 16px;height:36px;border-radius:var(--r-sm);font-weight:500;font-size:14px;transition:background-color .15s,border-color .15s,color .15s,box-shadow .2s;line-height:1.5;white-space:nowrap;border:1px solid transparent;font-family:inherit}
@@ -63,6 +68,11 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-card .lbl{font-size:12px;font-weight:700;color:var(--g500);display:flex;align-items:center;gap:6px;line-height:1.4}
 .rs-card .lbl .ico-info{font-size:16px}
 .rs-card .val{font-size:36px;font-weight:700;color:var(--g900);line-height:1.1;display:flex;align-items:baseline;gap:6px;letter-spacing:-.5px}
+/* Figma puts the health colour on the number itself (no threshold pill).
+   Only Coverage / Utilization get these — Potential Monthly Savings stays --g900. */
+.rs-card .val.ok{color:var(--ok)}
+.rs-card .val.warn{color:var(--warn)}
+.rs-card .val.err{color:var(--err)}
 .rs-card .val .unit{font-size:13px;font-weight:700;color:var(--g500);letter-spacing:0}
 .rs-card .val .slash{font-size:18px;font-weight:500;color:var(--g400);letter-spacing:0}
 .rs-card.nd .val{color:var(--g400);font-size:28px}
@@ -75,7 +85,6 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:20px}
 .rs-banner-desc{font-size:12px;color:var(--g500);line-height:1.7;flex:1}
 .rs-banner-desc b{color:var(--g700);font-weight:700;letter-spacing:.4px}
-.rs-learn{color:var(--pri);text-decoration:underline;cursor:help;font-weight:500}
 .rs-banner-r{display:flex;align-items:center;gap:12px;flex-shrink:0}
 .curr-btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff;color:var(--g700);cursor:pointer}
 .curr-btn:hover{border-color:var(--g400)}
@@ -88,40 +97,65 @@ input,select,textarea{font-family:inherit;font-size:14px}
 /* Rightsizing-first tip — advisory tone (blue/lightbulb), NOT a warning:
    we cannot verify whether the user actually ran rightsizing, so this is
    always a generic best-practice nudge, never a real pass/fail state.
-   Reserve --warn (orange) for genuine alerts (AWS disabled, expiring soon). */
-.rs-hint{position:relative;display:flex;align-items:flex-start;gap:12px;background:var(--info-lt);border:1px solid var(--pri-lt30);border-radius:var(--r-md);padding:14px 40px 14px 18px;margin-bottom:20px;line-height:1.6}
-.rs-hint > .material-symbols-outlined{font-size:20px;color:var(--pri);flex-shrink:0;font-variation-settings:'FILL' 1;margin-top:1px}
-.rs-hint .h-t{font-weight:700;color:var(--g900);font-size:13px;margin-bottom:2px}
-.rs-hint .h-d{font-size:12px;color:var(--g500)}
+   Reserve --warn (orange) for genuine alerts (AWS disabled, expiring soon).
+
+   2026-07-30 — demoted from a filled banner to a left-ruled inline note,
+   because this message is permanent (see renderHint): a tinted, bordered,
+   rounded card is the visual language of "act on me and I'll go away", and
+   this one never goes away. Convention being followed: fill = transient /
+   act-now, left rule = persistent context.
+
+   Lowering weight is NOT the same as lowering noticeability. Six things still
+   carry attention, none of which is a fill: unchanged position in the primary
+   reading path (directly above the KPI cards), the filled primary-blue icon,
+   a 3px --pri left rule (1px grey would be a whisper), a bold inline lead-in
+   at full text contrast as the scanning anchor, the primary-coloured link, and
+   copy tightened to one sentence — a sentence worth reading beats a loud box.
+
+   Contrast is deliberately split rather than raised uniformly: the lead-in
+   takes --g900 so it gets noticed, the explanatory tail stays --g500 so a
+   permanent advisory does not compete with the KPI numbers and table data it
+   sits above, which is the content that should own primary text weight. The
+   compensation for losing the tint is the 12px → 13px size bump plus that
+   anchor, not flattening the whole line to primary. (This palette has only
+   two text values — #676767 and #262626 — so there is no middle step to take.)
+   The stacked bold-title/grey-body hierarchy of the old card is preserved,
+   just inline. Net: ~87px → ~29px, one row instead of two. */
+/* Figma #01 renders this as one plain inline line — lightbulb, text, blue link.
+   No tinted card, no left rule, no dismiss control. (An earlier iteration used a
+   left rule; the design's own treatment is lighter still, so it wins.) */
+.rs-hint{display:flex;align-items:flex-start;gap:8px;margin-bottom:18px;line-height:1.6}
+.rs-hint > .material-symbols-outlined{font-size:18px;color:var(--pri);flex-shrink:0;font-variation-settings:'FILL' 1;margin-top:1px}
+.rs-hint .h-d{font-size:13px;color:var(--g700)}
+.rs-hint .h-d b{color:var(--g900);font-weight:700}
 .rs-hint a{font-weight:500;cursor:pointer;color:var(--pri)}
 .rs-hint a:hover{text-decoration:underline}
-.rs-hint .h-dismiss-row{display:flex;justify-content:flex-end;margin-top:6px}
-.rs-hint .h-dismiss{color:var(--g500);font-weight:400;font-size:12px;text-decoration:underline;text-underline-offset:2px}
-.rs-hint .h-dismiss:hover{color:var(--g700)}
-.rs-hint-x{position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--g500);cursor:pointer;background:none;border:none;padding:0}
-.rs-hint-x:hover{background:rgba(0,0,0,.06);color:var(--g700)}
-.rs-hint-x .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 0}
 
 /* Cloud data sources — data-driven per-provider enablement, shown inside a modal
    opened from the compact header button (keeps the main scroll uncluttered) */
-.ds-badge{font-size:11px;font-weight:700;background:var(--g100);color:var(--g500);border-radius:10px;padding:1px 7px;line-height:1.6;margin-left:2px}
-#ds-btn.has-off{border-color:var(--warn);color:#B26A00}
-#ds-btn.has-off .ds-badge{background:var(--warn-lt);color:#B26A00}
-#ds-btn.has-off > .material-symbols-outlined{color:var(--warn)}
-#mo-prov-confirm{z-index:210}
-.rs-sources-sum{font-size:12px;color:var(--g500);padding:2px 0 8px}
+/* ds-btn is now a filled primary button (Figma #01), so the "some sources off"
+   signal has to read on a dark blue ground — the old treatment tinted the border
+   and label, which is invisible on a filled button. Amber pill on white instead. */
 .rs-src-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--g100)}
+/* Providers not supported this release: whole row dimmed, note in disabled grey,
+   toggle inert (Figma #12 「其他項目顯示但不開放操作，因此呈現 Disabled 狀態」). */
+.rs-src-row.locked{opacity:.5}
+.rs-src-row.locked .rs-src-note{color:var(--g300)}
+.rs-toggle input:disabled + .track{cursor:not-allowed}
+/* Cost-gated provider notes: bold grey when off, bold amber when on — no icon.
+   2026-08 team call: this is a heads-up, not a blocking error, so it takes the
+   same warning-amber as the expiring-commitment styling below, not --err red.
+   The pricing link deliberately inherits that colour on the ON state. */
+.rs-src-note.gated-off{font-weight:700;color:var(--g500)}
+.rs-src-note.gated-on{font-weight:700;color:var(--warn)}
+.rs-src-note.gated-on a{color:inherit}
 .rs-src-row:last-child{border-bottom:none}
 .rs-src-ico{width:30px;height:30px;border-radius:6px;background:var(--g50);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .rs-src-ico .rs-prov{width:20px;height:20px}
 .rs-src-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .rs-src-name{font-weight:700;color:var(--g900);font-size:13px;display:flex;align-items:center;gap:5px}
 .rs-src-note{font-size:12px;color:var(--g500);line-height:1.5}
-.rs-src-note a{color:var(--pri);font-weight:500;cursor:pointer}
-.rs-src-note a:hover{text-decoration:underline}
-.rs-src-status{font-size:11px;font-weight:700;padding:1px 9px;border-radius:10px;line-height:1.7;flex-shrink:0}
-.rs-src-status.on{background:var(--ok-lt);color:var(--ok-dk)}
-.rs-src-status.off{background:var(--g100);color:var(--g500)}
+.rs-src-note a{color:var(--pri);font-weight:500;cursor:pointer;text-decoration:underline}
 
 /* Toggle switch */
 .rs-toggle{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0}
@@ -131,13 +165,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-toggle input:checked + .track{background:var(--pri)}
 .rs-toggle input:checked + .track::before{transform:translateX(18px)}
 .rs-toggle input:focus-visible + .track{box-shadow:0 0 0 3px rgba(0,79,176,.25)}
-.pm-flag{display:inline-flex;align-items:center;margin-left:5px;font-size:11px;cursor:help;vertical-align:middle}
-.rs-band{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:10px;align-self:center;line-height:1.6}
-.rs-band.warn{background:var(--warn-lt);color:#B26A00}
-.rs-band.ok{background:var(--ok-lt);color:var(--ok-dk)}
-.rs-band.err{background:var(--err-lt);color:#E5403D}
 .rs-cap{font-size:11px;color:var(--g400);margin-bottom:8px;display:flex;align-items:center}
-.rs-toolbar{display:flex;justify-content:flex-end;margin-bottom:14px}
 .rs-selwrap{position:relative}
 .rs-sel.on{border-color:var(--pri);color:var(--pri)}
 .rs-menu{display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:220px;background:#fff;border:1px solid var(--g200);border-radius:var(--r-sm);box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:90;padding:4px;max-height:280px;overflow:auto;overscroll-behavior:contain}
@@ -147,11 +175,20 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-menu-item.sel{color:var(--pri);font-weight:500;background:var(--pri-lt10)}
 
 /* ==== View switch (Recommendations | Active Commitments) ==== */
-.rs-viewseg{display:inline-flex;background:var(--g100);border-radius:var(--r-sm);padding:3px;margin-bottom:18px}
-.rs-viewseg button{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;font-size:14px;font-weight:500;color:var(--g500);border-radius:calc(var(--r-sm) - 1px);background:none;border:none;cursor:pointer;line-height:1.5}
-.rs-viewseg button.active{background:#fff;color:var(--pri);box-shadow:0 1px 2px rgba(0,0,0,.12)}
-.rs-viewseg .seg-badge{font-size:11px;font-weight:700;background:var(--warn-lt);color:#B26A00;border-radius:10px;padding:1px 7px;line-height:1.5}
-.rs-viewseg button.active .seg-badge{background:var(--warn);color:#fff}
+/* Underline tabs, per Figma #01 / #07 — replaces the pill segmented control.
+   CSS lifted verbatim from prototypes/rightsizing/rightsizing-prototype-v1.html
+   (lines 102–108) rather than reinvented, which also brings Rate Optimization's
+   tab treatment in line with its sister feature instead of one pill + one underline. */
+.rs-viewseg{display:flex;align-items:flex-end;gap:0;border-bottom:2px solid var(--g200);margin-bottom:16px}
+.rs-viewseg button{padding:8px 14px;font-size:14px;font-weight:500;color:var(--g500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;display:flex;align-items:center;gap:8px;background:none;border-left:none;border-right:none;border-top:none;font-family:inherit;line-height:1.5}
+.rs-viewseg button:hover{color:var(--g700)}
+.rs-viewseg button.active{color:var(--pri);border-bottom-color:var(--pri)}
+/* 2026-08 Kickoff final: PM decided already-expired commitments never display in
+   this tab at all (TL's point — an expired commitment should already have become
+   a Recommendation, not linger here). So this badge only ever counts items that
+   are still active but expiring within 30 days — no red-escalation case exists
+   any more; amber is the only state. */
+.rs-viewseg .seg-badge{font-size:11px;font-weight:700;background:var(--warn-lt);color:#B26A00;border-radius:10px;padding:1px 7px;line-height:1.5;min-width:20px;text-align:center}
 
 /* ==== Tabs + action area ==== */
 .tabs-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:2px solid var(--g200);margin-bottom:16px}
@@ -164,12 +201,15 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-actions-row{display:flex;align-items:center;gap:10px;padding-bottom:6px}
 
 /* ==== Filter row ==== */
-.rs-filter{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+/* One row: filters on the left, search + CSV on the right (Figma #01 / #07). */
+.rs-filter{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.rs-filter .rs-fl{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.rs-filter .rs-fr{display:flex;align-items:center;gap:12px}
 .rs-sel{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff;color:var(--g700);font-size:14px;cursor:pointer;white-space:nowrap}
 .rs-sel .lead{color:var(--g500);font-size:16px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16}
 .rs-sel .material-symbols-outlined.tail{color:var(--g500);font-size:18px;font-variation-settings:'FILL' 0}
 .rs-sel:hover{border-color:var(--g400)}
-.rs-search{margin-left:auto;display:flex;align-items:center;gap:6px;height:36px;width:280px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff}
+.rs-search{display:flex;align-items:center;gap:6px;height:36px;width:280px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff}
 .rs-search:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 .rs-search .material-symbols-outlined{font-size:18px;color:var(--g400);font-variation-settings:'FILL' 0}
 .rs-search input{border:none;outline:none;background:none;width:100%;font-size:14px;color:var(--g700)}
@@ -203,6 +243,10 @@ table.rstbl.acttbl{min-width:1080px}
 .th-sort{display:inline-flex;align-items:center;gap:3px;cursor:pointer}
 .th-sort .material-symbols-outlined{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 0,'wght' 500}
 .th-sort.on .material-symbols-outlined{color:var(--pri)}
+/* Search hit highlight — site-wide, per the rightsizing spec (node 8117:40065):
+   「以 Primary: Light 的顏色 + 粗體 標示出符合的關鍵字」. Confirmed against the actual
+   rendered rows in that frame: no background, just colour + weight on the text. */
+.rs-hl{background:none;color:var(--pri-lt);font-weight:700}
 /* cells */
 .rs-prov{width:22px;height:22px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;background:transparent}
 .rs-prov svg{width:100%;height:100%}
@@ -218,7 +262,6 @@ table.rstbl.acttbl{min-width:1080px}
 .rs-chip.changed{border-color:var(--ok);background:var(--ok-lt);color:var(--ok-dk)}
 .rs-chip.error{border-color:#FFB0AE;background:var(--err-lt);color:#E5403D}
 /* commitment-type chip */
-.rs-type{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:4px;border:1px solid var(--pri-lt30);background:var(--info-lt);color:var(--pri);font-size:12px;font-weight:500;line-height:1.6;white-space:nowrap}
 .rs-save{display:flex;flex-direction:column;line-height:1.3}
 .rs-save .amt{font-size:14px;color:var(--g700);font-variant-numeric:tabular-nums}
 .rs-save .rate{font-size:12px}
@@ -232,13 +275,23 @@ table.rstbl.acttbl{min-width:1080px}
 .rs-tag-cell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px;display:block}
 .rs-num{font-variant-numeric:tabular-nums}
 /* utilization cell (active table) — over-committed coloring */
-.rs-util{display:inline-flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums}
-.rs-util .bar{width:54px;height:6px;border-radius:3px;background:var(--g200);overflow:hidden;position:relative}
-.rs-util .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--ok)}
-.rs-util.low .bar i{background:var(--warn)}
-.rs-util.low .pct{color:#B26A00;font-weight:500}
-.rs-exp{display:inline-flex;align-items:center;justify-content:center;margin-left:8px;width:20px;height:20px;border-radius:50%;border:1px solid var(--warn);background:var(--warn-lt);color:#B26A00;cursor:help;vertical-align:middle}
-.rs-exp .material-symbols-outlined{font-size:14px;font-variation-settings:'FILL' 0}
+/* Five discrete segments (Figma #07), coloured by the same covBand three-band rule
+   used on the KPI cards. Empty segments stay neutral grey. */
+.rs-util{display:inline-flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.rs-util .segs{display:inline-flex;gap:2px}
+.rs-util .segs i{width:10px;height:12px;border-radius:2px;background:var(--g200);display:inline-block}
+.rs-util.ok  .segs i.on{background:var(--ok)}
+.rs-util.warn .segs i.on{background:var(--warn)}
+.rs-util.err .segs i.on{background:var(--err)}
+.rs-util .pct{font-size:13px;color:var(--g700)}
+/* Figma #07: an expiring commitment shows its date in red with an hourglass,
+   not a circular badge — the date itself is the warning. */
+/* Amber, not red — same 2026-08 call as the AWS cost note above: this is a
+   heads-up (renew soon), not an error. Already-expired rows never reach this
+   cell at all now (see isExpired hard-filter in renderActiveTable). */
+.rs-exp-cell .rs-num{color:var(--warn);font-weight:700}
+.rs-exp{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;color:var(--warn);cursor:help;vertical-align:middle}
+.rs-exp .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 1}
 
 /* ==== Empty / states ==== */
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:64px 24px;gap:12px;background:#fff;border-radius:var(--r-md)}
@@ -246,19 +299,17 @@ table.rstbl.acttbl{min-width:1080px}
 .empty-state-title{font-weight:700;color:var(--g900);margin:0;line-height:1.4;font-size:18px}
 .empty-state-sub{color:var(--g500);margin:0;line-height:1.6;max-width:520px;font-size:14px}
 .empty-state .btn{margin-top:4px}
+/* Kabin-supplied illustration for the #10 data-source gate card, replacing the generic material icon. Native 534x300; capped so it stays proportionate inside the card. */
+.rs-gate-img{max-width:380px;width:100%;height:auto;margin-bottom:20px}
+/* .empty-state's own gap is 12px; the extra 20px here makes the image-to-title
+   gap 32px specifically, without changing the other gaps in this stack. */
+#rs-srcgate{flex:1}
 .rs-tbl-empty{padding:72px 24px}
 .rs-tbl-empty > .material-symbols-outlined{font-size:56px}
 
 /* No-auth / first-time full card */
 .rs-fullcard{background:#fff;border-radius:var(--r-md);box-shadow:0 1px 3px rgba(0,0,0,.08);min-height:420px;display:flex;align-items:center;justify-content:center;padding:48px}
 .rs-ft{position:relative}
-.rs-ft-blur{filter:blur(4px);opacity:.55;pointer-events:none;user-select:none}
-.rs-ft-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.35);border-radius:var(--r-md)}
-.rs-ft-card{background:#fff;border-radius:var(--r-lg);box-shadow:0 12px 40px rgba(0,38,99,.18);padding:40px 48px;text-align:center;max-width:560px}
-.rs-ft-card .ico{width:64px;height:64px;border-radius:50%;background:var(--pri-lt10);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
-.rs-ft-card .ico .material-symbols-outlined{font-size:34px;color:var(--pri)}
-.rs-ft-card h3{font-size:22px;font-weight:700;color:var(--g900);margin-bottom:10px}
-.rs-ft-card p{font-size:14px;color:var(--g500);line-height:1.6;margin-bottom:24px}
 
 /* Skeleton */
 @keyframes sk-shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
@@ -427,19 +478,22 @@ table.rstbl.acttbl{min-width:1080px}
       <!-- Info banner (description first, above cards) -->
       <div class="rs-banner" id="rs-banner">
         <div class="rs-banner-desc">
-          Lower your cloud unit rates through commitment discounts — Savings Plans, CUDs, and Reservations. <b>LumiTure is advisory</b>: it detects opportunities but does not purchase commitments — you execute in the provider console.
-          (<span class="rs-learn" data-rs-tip="Commitments only reduce unit price; they do not remove waste — run Usage Optimization (rightsizing) first, then commit on the clean baseline. Recommendations are surfaced from each provider's own engine (AWS Cost Explorer, GCP CUD Recommender, Azure) and aggregated across clouds. Values may differ slightly from your console due to time zone, currency, and credit exclusion.">Learn More</span>)
+          Cut your cloud unit costs using commitment discounts (Savings Plans, CUDs, and Reservations). LumiTure.ai provides recommendations only and never purchases commitments automatically. You always execute changes directly in your cloud console.
         </div>
         <div class="rs-banner-r">
-          <button class="curr-btn" id="ds-btn" onclick="openModal('mo-sources')" data-rs-tip="Choose which clouds LumiTure fetches Rate Optimization data from">
-            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0;font-size:18px">cloud_sync</span>
-            <span>Data sources</span>
-            <span class="ds-badge hide" id="ds-badge"></span>
-          </button>
           <button class="curr-btn" id="curr-btn" onclick="openCurrPicker(this)">
             <span class="curr-flag" id="curr-flag">🇺🇸</span>
             <span class="curr-code" id="curr-code">USD</span>
             <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16">expand_more</span>
+          </button>
+          <!-- Filled primary + gear, per Figma #01. Stays the one filled button in this
+               header — 2026-07-31 Kabin's call downgraded CSV export to outline instead
+               (see renderFilters), resolving the two-primaries competition raised in §7
+               item 6. The N/3 count chip was a design-side addition; Kabin removed it
+               2026-07-30 to match the design exactly. -->
+          <button class="btn btn-p" id="ds-btn" onclick="openSourcesModal()" data-rs-tip="Select which cloud providers LumiTure.ai syncs Rate Optimization data from.">
+            <span class="material-symbols-outlined" style="font-size:18px">settings</span>
+            <span>Data Sources</span>
           </button>
         </div>
       </div>
@@ -450,21 +504,23 @@ table.rstbl.acttbl{min-width:1080px}
 
       <!-- Main paper -->
       <div class="paper" id="rs-paper">
+        <div class="paper-section-row">
+          <div class="paper-section-title">Commitment Discounts
+            <span class="material-symbols-outlined ico-info" data-rs-tip="Rate-based savings earned by committing to cloud usage (RIs, Savings Plans, CUDs). Toggle between <b>Recommendations</b> to review opportunities and <b>Active Commitments</b> to track performance.">info</span>
+          </div>
+        </div>
         <!-- View switch: Recommendations | Active Commitments -->
         <div class="rs-viewseg" id="rs-viewseg"></div>
 
         <!-- ===== Recommendations view ===== -->
         <div id="rs-recview">
-          <div class="rs-toolbar"><button class="btn btn-o" onclick="toast('(Demo) Exporting current view to CSV…')"><span class="material-symbols-outlined">download</span>Export CSV</button></div>
           <div class="rs-filter" id="rs-filter"></div>
-          <div class="rs-cap">Column order &amp; sortable columns are a design suggestion, approved by PM</div>
           <div id="rs-tablearea"></div>
         </div>
 
         <!-- ===== Active Commitments view ===== -->
         <div id="rs-actview" class="hide">
           <div class="rs-filter" id="rs-actfilter"></div>
-          <div class="rs-cap">Column order &amp; sortable columns are a design suggestion, approved by PM</div>
           <div id="rs-acttablearea"></div>
         </div>
 
@@ -567,27 +623,26 @@ table.rstbl.acttbl{min-width:1080px}
 
 <!-- Cloud data sources — per-provider enablement (opened from the compact header button;
      kept out of the main scroll so it doesn't bury the KPIs / recommendations). -->
+<!-- Staged: toggles here write to a local draft, not live state — see _srcDraft.
+     Nothing outside this modal (KPIs, tables, badge) changes until Save commits it. -->
 <div class="mo" id="mo-sources">
   <div class="modal">
-    <div class="mh"><div class="mt">Cloud data sources</div><button class="mx" onclick="closeModal('mo-sources')"><span class="material-symbols-outlined">close</span></button></div>
-    <div class="mdesc">Choose which clouds LumiTure fetches Rate Optimization data from. Disabled providers are excluded from the KPIs and both lists.</div>
+    <div class="mh"><div class="mt">Cloud Data Sources</div><button class="mx" onclick="cancelSourcesModal()"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="mdesc">Select which cloud providers LumiTure.ai syncs Rate Optimization data from.<br><b>Currently, only AWS is supported.</b></div>
     <div class="mb" id="ds-modal-body"></div>
-  </div>
-</div>
-
-<!-- Enable a cost-gated data source — confirm before a real, ongoing cost is incurred.
-     Generic: driven by the provider config (only providers with `gated:true` reach here).
-     Placed AFTER mo-sources so it stacks on top when triggered from within it. -->
-<div class="mo" id="mo-prov-confirm">
-  <div class="modal modal-sm">
-    <div class="mh"><div class="mt" id="pc-title">Enable data source?</div><button class="mx" onclick="closeModal('mo-prov-confirm')"><span class="material-symbols-outlined">close</span></button></div>
-    <div class="mdesc" id="pc-desc"></div>
     <div class="mf">
-      <button class="btn btn-o" onclick="closeModal('mo-prov-confirm')">Cancel</button>
-      <button class="btn btn-p" id="pc-ok" onclick="confirmEnableProv()">Enable</button>
+      <button class="btn btn-o" onclick="cancelSourcesModal()">Cancel</button>
+      <!-- data-rs-tip is set/cleared in renderSourceRows() based on the draft: the
+           design only shows this warning when AWS is toggled on. -->
+      <button class="btn btn-p" id="ds-save" onclick="saveSourcesModal()">Save</button>
     </div>
   </div>
 </div>
+
+<!-- The cost-gated "Enable Amazon Web Services?" confirm modal was removed 2026-07-30
+     per Figma #12-1: enabling AWS applies immediately and the disclosure is the inline
+     red warning on the row plus the Save-hover tooltip. Cost consent still happens
+     before anything is charged, because nothing commits until Save. -->
 
 <div class="tc" id="toast-container"></div>
 <div class="rs-tip" id="rs-tip"></div>
@@ -603,17 +658,24 @@ var state = {
   view: 'rec',            // rec | active
   tab: 'rec',             // rec | done | dismiss | archived
   currency: 'USD',
-  sort: { key:null, dir:1 },
-  actSort: { key:null, dir:1 },
+  /* Explicit defaults so the active column's sort arrow is lit on load, matching
+     the design (Est. Savings already dark blue in #01). dir: 1 = asc, -1 = desc. */
+  sort:    { key:'estAmt',  dir:-1 },   // Recommendations: biggest saving first
+  actSort: { key:'expSort', dir:1  },   // Active Commitments: soonest expiry first
   fProv: '', fType: '',
+  searchQ: '',        // current search term, kept in state so hl() can mark matches
   // Per-provider data-source enablement. Data-driven so it scales 1→N providers
   // (PRD heading: "服務啟用開關…適用於三朵雲，僅 AWS 標注費用"). Only providers
   // with `gated:true` in PROVIDERS incur a cost + confirm step; others toggle freely.
-  // Prototype default: AWS is already connected; Google Cloud and Microsoft Azure
-  // remain off until their billing data source is enabled. AWS still carries the
-  // cost/fee annotation + confirm step when users toggle it back on.
-  provEnabled: { aws:true, gcp:false, azure:false },
-  hintDismissedSession: false,  // "X" dismiss — in-memory only, reappears on next visit/reload
+  //
+  // Default is all-off, matching the PRD: enabling a source can cost the customer
+  // money (AWS Cost Explorer bills $0.01/request to their own account), so nothing
+  // may be switched on without an explicit opt-in. 2026-07-22 briefly shipped
+  // `aws:true` as demo scaffolding so reviewers landed on a populated page; that
+  // silently bypassed the cost-consent step the `gated` flag exists to enforce, and
+  // was reverted 2026-07-30. Reviewers who want the populated baseline use the Demo
+  // FAB ("With data"), or just click through the first-run gate below.
+  provEnabled: { aws:false, gcp:false, azure:false },
   selection: {},
 };
 var $ = function(s,r){ return (r||document).querySelector(s); };
@@ -629,13 +691,32 @@ var CSP_LOGOS = {
   azure: '<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="rspaint0" x1="88.1713" y1="13.9645" x2="26.7396" y2="195.438" gradientUnits="userSpaceOnUse"><stop stop-color="#114A8B"/><stop offset="1" stop-color="#0669BC"/></linearGradient><linearGradient id="rspaint2" x1="99.4863" y1="8.66537" x2="166.911" y2="188.291" gradientUnits="userSpaceOnUse"><stop stop-color="#3CCBF4"/><stop offset="1" stop-color="#2892DF"/></linearGradient></defs><path fill="url(#rspaint0)" d="M66.598.005h59.112L64.345 181.928a9.447 9.447 0 0 1-3.433 4.645 9.4 9.4 0 0 1-2.61 1.316 9.471 9.471 0 0 1-2.887.454H9.411a9.371 9.371 0 0 1-4.295-1.039c-1.33.318-2.478-.672-3.349-1.886-.871-1.215-1.441-1.62-1.663-2.098-.222-.479-.087-1.587.39-2.405l57.171-174.5A9.432 9.432 0 0 1 66.595 0v.002l.003.003Z"/><path fill="#0078D4" d="M175.569 188.345h-53.078a9.477 9.477 0 0 1-5.057-1.461 9.52 9.52 0 0 1-1.406-1.084l-60.233-56.252a4.339 4.339 0 0 1 2.962-7.517h93.735l23.072 66.317.005-.003Z"/><path fill="url(#rspaint2)" d="M199.273 175.91a9.447 9.447 0 0 1 .392 4.405 9.41 9.41 0 0 1-5.009 6.984c-1.329.682-1.801 1.039-3.296 1.039h-66.881a9.425 9.425 0 0 0 7.646-3.925 9.425 9.425 0 0 0 1.274-8.503L76.225 6.405A9.418 9.418 0 0 0 70.19.452 9.418 9.418 0 0 0 67.31 0h65.879a9.431 9.431 0 0 1 5.491 1.766 9.47 9.47 0 0 1 2.078 2.05 9.456 9.456 0 0 1 1.351 2.59l57.174 169.504h-.01Z"/></svg>',
 };
 function provBadge(prov){ return '<span class="rs-prov" data-rs-tip="'+PROV_LABEL[prov]+'">'+CSP_LOGOS[prov]+'</span>'; }
+/* Number format — Figma page-level spec (annotation node 10627:34745):
+   「數值套用國際單位制的縮寫，超過十萬後以 K/M/B 簡寫，並顯示小數點後 2 位」
+   Note the threshold is 100,000 (十萬), NOT 1,000 — this was previously wrong
+   (1,230 rendered as "1.23K" when the spec wants "1,230.00"), and the
+   non-abbreviated branch was missing thousands separators (the design's own KPI
+   card reads "10,750.82"). Both fixed here; comma() already existed unused. */
 function nFmt(n){
   var a = Math.abs(n);
+  if(a >= 1e9) return (n/1e9).toFixed(2)+'B';
   if(a >= 1e6) return (n/1e6).toFixed(2)+'M';
-  if(a >= 1e3) return (n/1e3).toFixed(2)+'K';
-  return n.toFixed(2);
+  if(a >= 1e5) return (n/1e3).toFixed(2)+'K';
+  return comma(n.toFixed(2));
 }
-function comma(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,','); }
+// Inserts thousands separators without touching the decimal part.
+function comma(n){
+  var s = String(n).split('.');
+  s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  return s.join('.');
+}
+/* 「若因為各種緣故無法取得實際數值，請以『--』顯示各欄位」— same annotation.
+   Wrap any value that could legitimately be absent, so RD has an explicit
+   reference for the missing-data rule rather than inferring it. */
+function dash(v, fmt){
+  if(v === null || v === undefined || (typeof v === 'number' && isNaN(v))) return '--';
+  return fmt ? fmt(v) : v;
+}
 function termOf(r){ return r.term || '1 Year'; }
 function paymentOf(r){ return r.payment || 'Monthly'; }
 function impactCell(v){
@@ -648,56 +729,144 @@ function statusCell(v){
   var m = map[v];
   return '<span class="rs-chip '+m[0]+'">'+m[1]+'</span>';
 }
-function typeChip(t){ return '<span class="rs-type">'+t+'</span>'; }
+/* Design shows 2 decimals on the percentage ("Save 8.92%"), not 1.
+   Terminology: always "Save". The design has one row reading "Avoid -87.35%",
+   but per the PRD review (PORTFOLIO_LOG Entry 1) commitment discounts are
+   Savings — Avoidance belongs to rightsizing — and a negative "Avoid" percent
+   looks like a mockup data bug. Flagged for the designer; not implemented. */
 function saveCell(amt, rate){
   var cls = rate>0?'pos':'zero';
-  return '<span class="rs-save"><span class="amt">'+state.currency+' '+nFmt(amt)+'</span><span class="rate '+cls+'">Save '+(rate*100).toFixed(1)+'%</span></span>';
+  return '<span class="rs-save"><span class="amt">'+dash(amt, function(v){return state.currency+' '+nFmt(v);})+'</span>'
+    +'<span class="rate '+cls+'">'+dash(rate, function(v){return 'Save '+(v*100).toFixed(2)+'%';})+'</span></span>';
 }
-function utilCell(pct, target){
-  var low = pct < (target||80);
-  return '<span class="rs-util'+(low?' low':'')+'"><span class="bar"><i style="width:'+Math.min(pct,100)+'%"></i></span><span class="pct">'+pct+'%</span></span>';
+/* Figma #07 renders utilization as five discrete segments + the percentage, with
+   the fill colour following the same three-band rule as the KPI cards (covBand),
+   so both places where a percentage appears speak one colour language.
+   Segments light up proportionally: each represents 20 percentage points. */
+function utilCell(pct){
+  if(pct === null || pct === undefined || isNaN(pct)) return '<span class="rs-util">'+dash(pct)+'</span>';
+  var band = covBand(pct).cls;
+  var filled = Math.round(Math.min(Math.max(pct,0),100) / 20);
+  var segs = '';
+  for(var i=0;i<5;i++){ segs += '<i class="'+(i<filled?'on':'')+'"></i>'; }
+  return '<span class="rs-util '+band+'"><span class="segs">'+segs+'</span><span class="pct">'+pct+'%</span></span>';
 }
 function escTip(s){ return (s||'').replace(/"/g,'&quot;'); }
+/* Search-term highlighting — site-wide pattern (defined in the rightsizing design).
+   Wraps every case-insensitive match in the current query so a hit is visible in a
+   dense table without the user re-scanning each row for what matched.
+   Escapes the text first, then injects the mark, so cell content can never inject
+   markup; the query is regex-escaped for the same reason.
+   ⚠️ Exact visual spec unverified — Figma Dev Mode MCP was disconnected when this
+   was built, so the swatch below is a reasonable stand-in for the design's
+   highlight, not a confirmed match. Re-check node 8117:40065 when Figma is back. */
+function escHtml(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function hl(text){
+  var safe = escHtml(text);
+  var q = (state.searchQ||'').trim();
+  if(!q) return safe;
+  var pat = escHtml(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return safe.replace(new RegExp('('+pat+')','ig'), '<mark class="rs-hl">$1</mark>');
+}
+/* 「Search bar 停止輸入約一秒後，以模糊搜尋提出相對應的結果」(node 8117:40065) — re-render
+   only after typing has paused for ~1s, rather than on every keystroke. */
+var _searchTimer = null;
+function debounceSearch(fn){
+  if(_searchTimer) clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(fn, 1000);
+}
 
 /* ===== Provider data-source config (single source of truth for the enablement gate) =====
-   Add/remove a provider or flip `gated` here — the "Cloud data sources" card, the
-   confirm-on-enable flow, KPI exclusion and filter gating all derive from this. */
+   Two orthogonal flags:
+     supported — can this provider be toggled at all this release? 202607 is AWS-only;
+                 GCP/Azure render permanently locked ("shown but not operable", per the
+                 Figma annotation 「其他項目顯示但不開放操作，因此呈現 Disabled 狀態」).
+     gated     — does enabling it cost the customer money? Affects note copy/styling
+                 ONLY. Since the 2026-07-30 Figma alignment there is no confirm modal:
+                 the toggle applies immediately and the inline red warning plus the
+                 Save-hover tooltip are the disclosure surface.
+   Row order below is the row order in the modal (Figma: Google Cloud, AWS, Azure).
+   Locked rows get their note generated from `label` in renderSourceRows(), so the
+   per-provider wording can't drift out of sync with the provider it sits under. */
+var AWS_PRICING_URL = 'https://aws.amazon.com/tw/aws-cost-management/aws-cost-explorer/pricing/';
 var PROVIDERS = [
-  { key:'aws',   label:'AWS',          full:'Amazon Web Services', gated:true,
-    noteOn:'Cost Explorer API enabled · AWS bills your account at $0.01/request',
-    noteOff:'Off — AWS recommendations &amp; commitments are not fetched',
-    costTip:'Enabling calls the AWS Cost Explorer API, which AWS bills directly to your own AWS account at $0.01 per request (usage-based, refreshes daily, ongoing while enabled). LumiTure adds no fee.' },
-  { key:'gcp',   label:'Google Cloud', full:'Google Cloud', gated:false, noteOn:'Included · no per-request cost', noteOff:'Off — GCP data is not fetched' },
-  { key:'azure', label:'Azure',        full:'Microsoft Azure', gated:false, noteOn:'Included · no per-request cost', noteOff:'Off — Azure data is not fetched' },
+  { key:'gcp',   label:'Google Cloud', full:'Google Cloud',        supported:false, gated:false },
+  { key:'aws',   label:'AWS',          full:'Amazon Web Services', supported:true,  gated:true,
+    noteOff:'AWS charges for Cost Explorer API requests. Please check <a href="'+AWS_PRICING_URL+'" target="_blank" rel="noopener">pricing</a> before enabling.',
+    noteOn:'AWS charges for Cost Explorer API requests. Please check <a href="'+AWS_PRICING_URL+'" target="_blank" rel="noopener">pricing</a> before saving.' },
+  { key:'azure', label:'Azure',        full:'Microsoft Azure',     supported:false, gated:false },
 ];
 function provOf(key){ return PROVIDERS.filter(function(p){return p.key===key;})[0]; }
 
-/* ===== Filters (functional dropdowns) ===== */
+/* ===== Filters (functional dropdowns) =====
+   ⚠️ The CSP filter below is a DELIBERATE deviation from the design. The Figma page
+   annotation (node 10627:34745) says of the non-AWS providers:
+     「202607 Scope 尚不開放 [Scope Settings] 與 AWS 外的其他 CSP，設計稿示意其他平台
+       為預留彈性，開發請忽略。等到未來開放可能會考慮再加入 CSP Filter。」
+   — i.e. the design intentionally ships no CSP filter this release. Kabin's call is
+   to KEEP it in the prototype as a forward-looking placeholder, which lines up with
+   that annotation's own closing sentence about adding a CSP Filter once the other
+   providers open up. Kept on purpose; not an alignment miss. */
 var PROV_OPTS=[['','All Cloud Service Providers'],['aws','Amazon Web Services'],['gcp','Google Cloud'],['azure','Microsoft Azure']];
 function fpTypes(view){
   var d=view==='rec'?DATA.rec:ACTIVE, t=[];
   d.forEach(function(x){ if(!state.provEnabled[x.prov]) return; if(t.indexOf(x.type)<0) t.push(x.type); });
   return t;
 }
+/* Single-row toolbar per Figma #01 / #07: filters left, search + CSV button right
+   (previously the CSV button sat on its own row above the filters). */
 function renderFilters(view){
   var box = view==='rec'?$('#rs-filter'):$('#rs-actfilter'); if(!box) return;
   var provLbl = state.fProv ? (PROV_OPTS.filter(function(p){return p[0]===state.fProv;})[0]||['',''])[1] : 'All Cloud Service Providers';
-  var typeLbl = state.fType || 'All Commitment Types';
+  // Design labels this "All Types" (not "All Commitment Types").
+  var typeLbl = state.fType || 'All Types';
   var sid = view==='rec'?'rs-search-input':'rs-act-search';
-  var ph = view==='rec'?'Search target, type, or recommendation':'Search commitment ID or service';
-  var onin = view==='rec'?'renderTable()':'renderActiveTable()';
+  var ph = view==='rec'?'Search items, types':'Search commitments, types';
+  var onin = view==='rec'?'debounceSearch(renderTable)':'debounceSearch(renderActiveTable)';
+  // 2026-07-31 Kabin's call: unify on "Export CSV" for both tabs — the Figma
+  // inconsistency (Recommendations said "Download CSV", Active Commitments and the
+  // page annotation both said "Export CSV") is resolved in the prototype's favour.
+  // Figma itself still needs the Recommendations frame updated to match.
+  var csvLabel = 'Export CSV';
+  // 2026-08 Kickoff final: Active Commitments' toolbar in Figma dropped to just
+  // search + Export CSV — no Type filter, and the Including/Excluding Expired
+  // toggle is gone entirely now that expired items never appear in this tab
+  // (see isExpired hard-filter in renderActiveTable). Type filter stays Recommendations-only.
+  var typeSel = view==='rec'
+    ? '<div class="rs-selwrap"><div class="rs-sel'+(state.fType?' on':'')+'" onclick="toggleFMenu(this,\'type\')"><span class="material-symbols-outlined lead">sell</span>'+typeLbl+'<span class="material-symbols-outlined tail">expand_more</span></div><div class="rs-menu"></div></div>'
+    : '';
   box.innerHTML =
-    '<div class="rs-selwrap"><div class="rs-sel'+(state.fProv?' on':'')+'" onclick="toggleFMenu(this,\'prov\')"><span class="material-symbols-outlined lead">cloud</span>'+provLbl+'<span class="material-symbols-outlined tail">expand_more</span></div><div class="rs-menu"></div></div>'
-   +'<div class="rs-selwrap"><div class="rs-sel'+(state.fType?' on':'')+'" onclick="toggleFMenu(this,\'type\')"><span class="material-symbols-outlined lead">sell</span>'+typeLbl+'<span class="material-symbols-outlined tail">expand_more</span></div><div class="rs-menu"></div></div>'
-   +'<div class="rs-search"><span class="material-symbols-outlined">search</span><input id="'+sid+'" placeholder="'+ph+'" oninput="'+onin+'"></div>';
+    '<div class="rs-fl">'
+     // CSP filter kept on both tabs per Kabin's page-wide "keep the CSP switcher as
+     // a forward-looking placeholder" call — that decision predates and is separate
+     // from this Kickoff's Type/Expired filter removal, so it's left in here even
+     // though Figma's final Active Commitments toolbar shows no filter row at all.
+     // 2026-08: the "multi-cloud, planned" context lives in a hover tooltip on the
+     // selector itself, not a separate visible tag — a persistent label next to
+     // every functional filter widened the toolbar row and broke wrapping.
+     +'<div class="rs-selwrap"><div class="rs-sel'+(state.fProv?' on':'')+'" onclick="toggleFMenu(this,\'prov\')" data-rs-tip="This filter previews multi-cloud support. 202607 scope is AWS-only — filtering by GCP or Azure has no effect until those providers launch."><span class="material-symbols-outlined lead">cloud</span>'+provLbl+'<span class="material-symbols-outlined tail">expand_more</span></div><div class="rs-menu"></div></div>'
+     +typeSel
+    +'</div>'
+   +'<div class="rs-fr">'
+     +'<div class="rs-search"><span class="material-symbols-outlined">search</span><input id="'+sid+'" placeholder="'+ph+'" oninput="'+onin+'"></div>'
+     // Outline, not filled — every other Lumiture prototype treats CSV export this
+     // way (Cost Dashboard btn-secondary, General Budget btn-o, Rightsizing btn-o).
+     // Figma had this filled blue alongside Data Sources, which read as two
+     // primaries competing for the same page; Data Sources keeps the filled
+     // treatment since it's the gate the whole page's data depends on.
+     +'<button class="btn btn-o" onclick="toast(\'(Demo) Exporting current view to CSV…\')"><span class="material-symbols-outlined">download</span>'+csvLabel+'</button>'
+    +'</div>';
 }
 function toggleFMenu(el, kind){
   var menu = el.parentNode.querySelector('.rs-menu');
   var isOpen = menu.classList.contains('open');
   closeFMenus();
   if(isOpen) return;
-  var opts = kind==='prov'?PROV_OPTS:[['','All Commitment Types']].concat(fpTypes(state.view).map(function(t){return [t,t];}));
-  var cur = kind==='prov'?state.fProv:state.fType;
+  var opts, cur;
+  if(kind==='prov'){ opts = PROV_OPTS; cur = state.fProv; }
+  else { opts = [['','All Types']].concat(fpTypes(state.view).map(function(t){return [t,t];})); cur = state.fType; }
   menu.innerHTML = opts.map(function(o){
     return '<div class="rs-menu-item'+(o[0]===cur?' sel':'')+'" data-v="'+o[0]+'" onclick="selectFilter(\''+kind+'\',this.getAttribute(\'data-v\'))">'+o[1]+'</div>';
   }).join('');
@@ -706,7 +875,8 @@ function toggleFMenu(el, kind){
 function closeFMenus(){ document.querySelectorAll('.rs-menu.open').forEach(function(m){m.classList.remove('open');}); }
 function selectFilter(kind, val){
   var si=$('#rs-search-input')||$('#rs-act-search'); var sv=si?si.value:'';
-  if(kind==='prov') state.fProv=val; else state.fType=val;
+  if(kind==='prov') state.fProv=val;
+  else state.fType=val;
   closeFMenus(); renderFilters(state.view);
   var si2=$('#rs-search-input')||$('#rs-act-search'); if(si2) si2.value=sv;
   if(state.view==='rec') renderTable(); else renderActiveTable();
@@ -719,51 +889,86 @@ document.addEventListener('click', function(e){ if(!e.target.closest('.rs-selwra
 function rec(o){
   return Object.assign({ impact:0, status:0, criteria:[], group:'—' }, o);
 }
+/* Mock data synced to Kabin's actual Figma table (node 10627:34743 / 10674:61941),
+   2026-08 — she resolved the KPI/table magnitude mismatch by going with "Direction A"
+   (scale the KPI up to match the table's real sum) rather than the smaller realistic
+   figures this file used before. These 11 rows are her approved numbers verbatim, so
+   the KPI card's sum below now lands on the same ≈4.55M she has in Figma.
+   Row 6 (ops-jenkins-controller-main) is the one exception: Figma shows this as
+   "Avoid -87.35%", a still-open design bug (negative avoidance %, wrong FinOps term —
+   see plan §7 item 4). The dollar amount is kept as-is so the KPI sum still matches,
+   but estRate is a plausible positive placeholder rather than replicating the bug. */
 var DATA = {
   rec: [
-    rec({recId:'r1', prov:'aws', target:'Compute (EC2 / Fargate / Lambda)', type:'Compute SP', estAmt:1230, estRate:0.320, recDate:'05/06/2026', term:'3 Years', payment:'All Upfront',
+    rec({recId:'r1', prov:'gcp', target:'prod-webapp-server-01', rid:'prodwebapp-s-01', type:'Resource CUD', estAmt:225300, estRate:0.0892, recDate:'25/08/2026', term:'1 Year', payment:'All Upfront',
+      recommendation:'Commit 1-year Resource CUD — backend API compute' }),
+    rec({recId:'r2', prov:'gcp', target:'dev-backend-api-03', rid:'dev-be-api-03', type:'Resource CUD', estAmt:312450, estRate:0.1007, recDate:'23/08/2026', term:'1 Year', payment:'Monthly',
+      recommendation:'Commit 36 vCPU + 72 GB memory · asia-east1' }),
+    rec({recId:'r3', prov:'aws', target:'stg-mariadb-primary-001', rid:'i-0a1b2c3d4e5f6789a', type:'Compute SP', estAmt:382990, estRate:0.1113, recDate:'22/08/2026', term:'1 Year', payment:'All Upfront',
       recommendation:'Purchase Compute Savings Plan · $4.20/hr commitment' }),
-    rec({recId:'r2', prov:'aws', target:'Compute (EC2 m6i family)', type:'Compute SP', estAmt:540, estRate:0.210, recDate:'04/06/2026', term:'1 Year', payment:'No Upfront',
+    rec({recId:'r4', prov:'aws', target:'prod-redis-cache-ap-northeast', rid:'i-0d4e5f6789abcd23', type:'Compute SP', estAmt:255900, estRate:0.1315, recDate:'21/08/2026', term:'1 Year', payment:'All Upfront',
       recommendation:'Purchase Compute Savings Plan · $1.80/hr commitment' }),
-    rec({recId:'r3', prov:'aws', target:'Compute (Fargate)', type:'Compute SP', estAmt:180, estRate:0.110, recDate:'05/06/2026', term:'1 Year', payment:'Partial Upfront',
-      recommendation:'Purchase Compute Savings Plan · $0.60/hr commitment' }),
-    rec({recId:'r4', prov:'gcp', target:'Compute Engine · us-central1', type:'Resource CUD', estAmt:1480, estRate:0.370, recDate:'04/06/2026', term:'1 Year', payment:'Monthly',
-      recommendation:'Commit 120 vCPU + 480 GB memory · us-central1' }),
-    rec({recId:'r5', prov:'gcp', target:'Compute Engine · asia-east1', type:'Resource CUD', estAmt:620, estRate:0.240, recDate:'03/06/2026', term:'1 Year', payment:'Monthly',
+    rec({recId:'r5', prov:'aws', target:'quantum-project-prod-autoscale', rid:'i-0b2c3d4e5f6789ab0', type:'Compute SP', estAmt:175000, estRate:0.0329, recDate:'20/08/2026', term:'3 Years', payment:'All Upfront',
+      recommendation:'Purchase 3-year Compute Savings Plan — quantum project compute' }),
+    rec({recId:'r6', prov:'gcp', target:'ops-jenkins-controller-main', rid:'iot-device-mgmt-3284', type:'Resource CUD', estAmt:530150, estRate:0.1873, recDate:'19/08/2026', term:'3 Years', payment:'Partial Upfront',
       recommendation:'Commit 48 vCPU + 192 GB memory · asia-east1' }),
-    rec({recId:'r6', prov:'azure', target:'Virtual Machines · West US 2', type:'Reservation', estAmt:880, estRate:0.280, recDate:'04/06/2026', term:'3 Years', payment:'All Upfront',
-      recommendation:'Purchase Reservation — Standard_D4s_v5 × 8 · West US 2 · Shared scope' }),
-    rec({recId:'r7', prov:'azure', target:'Compute · West US 2', type:'Savings Plan', estAmt:470, estRate:0.190, recDate:'03/06/2026', term:'1 Year', payment:'Monthly',
-      recommendation:'Purchase Compute Savings Plan · $2.10/hr commitment' }),
+    rec({recId:'r7', prov:'gcp', target:'prod-batch-processor-work', rid:'product-alpha-kfeu20', type:'Resource CUD', estAmt:510800, estRate:0.8307, recDate:'19/08/2026', term:'3 Years', payment:'Monthly',
+      recommendation:'Commit 120 vCPU + 240 GB memory · us-central1' }),
+    rec({recId:'r8', prov:'aws', target:'data-etl-spark-node-asia-east', rid:'i-0a1b2c3d4e5f6789a', type:'Compute SP', estAmt:487200, estRate:0.1022, recDate:'19/08/2026', term:'1 Year', payment:'Monthly',
+      recommendation:'Purchase Compute Savings Plan · $3.12/hr commitment' }),
+    rec({recId:'r9', prov:'gcp', target:'shared-bastion-host-prd-01', rid:'internal-tools-ujeu83', type:'Resource CUD', estAmt:423750, estRate:0.0680, recDate:'16/08/2026', term:'3 Years', payment:'Monthly',
+      recommendation:'Commit 72 vCPU + 256 GB memory · asia-east1' }),
+    rec({recId:'r10', prov:'azure', target:'ml-training-gpu-instance-01', rid:'i-089abcdef6789012', type:'Savings Plan', estAmt:392380, estRate:0.5279, recDate:'15/08/2026', term:'1 Year', payment:'Partial Upfront',
+      recommendation:'Purchase 1-year Savings Plan — ML training GPU workload' }),
+    rec({recId:'r11', prov:'aws', target:'ml-training-gpu-instance-02', rid:'i-8237duecdef8e3sk', type:'Compute SP', estAmt:850000, estRate:0.1455, recDate:'08/08/2026', term:'1 Year', payment:'Monthly',
+      recommendation:'Purchase Compute Savings Plan · $6.11/hr commitment' }),
   ],
   done: [
-    rec({recId:'d1', prov:'aws', target:'Compute (EC2 c-family)', tid:'done-aws-1', type:'Compute SP', impact:1, status:1, estAmt:430, estRate:0.260, recDate:'02/03/2026', eot:'End of Month', group:'Platform Team',
-      recommendation:'Purchased Compute Savings Plan — 1yr · Partial Upfront', criteria:['Coverage gap closed'], net:{count:0, avgUtil:0, items:[]} }),
-    rec({recId:'d2', prov:'gcp', target:'Compute Engine · europe-west1', tid:'done-gcp-1', type:'Resource CUD', impact:0, status:1, estAmt:210, estRate:0.140, recDate:'18/02/2026', eot:'End of Quarter', group:'Backend Squad',
-      recommendation:'Committed 24 vCPU + 96 GB · europe-west1 · 1yr', criteria:['Coverage gap closed'], net:{count:0, avgUtil:0, items:[]} }),
+    rec({recId:'d1', prov:'aws', target:'prod-api-gateway-c-family', rid:'i-07f8e9d0c1b2a3456', tid:'done-aws-1', type:'Compute SP', impact:1, status:1, estAmt:9640, estRate:0.2604, recDate:'02/03/2026', eot:'End of Month', group:'Platform Team',
+      recommendation:'Purchased Compute Savings Plan — 1yr · Partial Upfront', criteria:['Coverage gap closed'] }),
+    rec({recId:'d2', prov:'gcp', target:'prod-search-index-eu-w1', rid:'search-idx-eu-3391', tid:'done-gcp-1', type:'Resource CUD', impact:0, status:1, estAmt:5280, estRate:0.1437, recDate:'18/02/2026', eot:'End of Quarter', group:'Backend Squad',
+      recommendation:'Committed 24 vCPU + 96 GB · europe-west1 · 1yr', criteria:['Coverage gap closed'] }),
   ],
   dismiss: [
-    rec({recId:'x1', prov:'azure', target:'Virtual Machines · East US', tid:'dis-az-1', type:'Reservation', impact:0, status:0, estAmt:150, estRate:0.090, recDate:'12/05/2026', eot:'30 days', group:'Research',
-      recommendation:'Purchase Reservation — Standard_D2s_v5 × 4 · East US · 1yr', criteria:['Coverage gap 14%'], net:{count:0, avgUtil:0, items:[]} }),
+    rec({recId:'x1', prov:'azure', target:'research-sandbox-vm-east', rid:'vm-4c5d6e7f8091a2b3', tid:'dis-az-1', type:'Reservation', impact:0, status:0, estAmt:3410, estRate:0.0918, recDate:'12/05/2026', eot:'30 days', group:'Research',
+      recommendation:'Purchase Reservation — Standard_D2s_v5 × 4 · East US · 1yr', criteria:['Coverage gap 14%'] }),
   ],
   archived: [
-    rec({recId:'a1', prov:'gcp', target:'Compute Engine · us-west1 (removed)', tid:'arc-gcp-1', type:'Resource CUD', impact:0, status:1, estAmt:90, estRate:0.060, recDate:'08/01/2026', eot:'End of Year', group:'SRE',
-      recommendation:'Commit 16 vCPU · us-west1 · 1yr', criteria:['Workload decommissioned — no longer applicable'], net:{count:0, avgUtil:0, items:[]} }),
+    rec({recId:'a1', prov:'gcp', target:'legacy-worker-us-west1', rid:'legacy-wkr-8842', tid:'arc-gcp-1', type:'Resource CUD', impact:0, status:1, estAmt:2160, estRate:0.0642, recDate:'08/01/2026', eot:'End of Year', group:'SRE',
+      recommendation:'Commit 16 vCPU · us-west1 · 1yr', criteria:['Workload decommissioned — no longer applicable'] }),
   ],
 };
 
 /* ============================================================
    DATA — active commitments
 ============================================================ */
+/* `service` renders as the row's bold name and `cid` as the grey ID beneath it,
+   matching the design's "Commitment Name / ID" column — so both are resource-style.
+   Utilization values deliberately span all three colour bands (see covBand):
+   24/27 red (<41), 49/70/73 amber (41–79), 99/100 green (≥80) — the previous set
+   bottomed out at 74 so the red band was never rendered anywhere on the page.
+   Exactly 3 rows carry exp:true to match the design's "3 expiring" tab badge.
+   One hourly rate is large enough that Monthly Cost crosses 100,000 and exercises
+   the K abbreviation in this column too. */
+/* Mock "today", matching the Last Updated stamp in the page header. Expired vs
+   expiring is DERIVED from this rather than hand-flagged, so the dates and the red
+   treatment can never drift apart. `exp` (red date + hourglass) = already expired
+   OR within 30 days; exactly 3 rows qualify, matching the "3 expiring" tab badge. */
+var TODAY = '09/06/2026';
 var ACTIVE = [
-  {cid:'sp-0a1b2c3d',   prov:'aws',   type:'Compute Savings Plan', service:'Compute (EC2/Fargate/Lambda)', term:'1 Year',  payment:'All Upfront',     hourly:3.50, util:96, start:'01/07/2025', expiry:'01/07/2026', exp:true,  realized:18420 },
-  {cid:'sp-9f8e7d6c',   prov:'aws',   type:'Compute Savings Plan', service:'Compute (EC2)',                 term:'3 Years', payment:'Partial Upfront', hourly:5.20, util:89, start:'15/02/2025', expiry:'15/02/2028', exp:false, realized:31200 },
-  {cid:'cud-central1-vcpu', prov:'gcp', type:'Resource CUD',       service:'Compute Engine · us-central1', term:'1 Year',  payment:'Monthly',         hourly:2.80, util:88, start:'25/06/2025', expiry:'25/06/2026', exp:true,  realized:9600 },
-  {cid:'cud-asia1-mem', prov:'gcp',   type:'Resource CUD',         service:'Compute Engine · asia-east1',  term:'3 Years', payment:'Monthly',         hourly:1.90, util:74, start:'01/09/2025', expiry:'01/09/2028', exp:false, realized:7300 },
-  {cid:'azure-res-d4sv5', prov:'azure', type:'Reservation',        service:'Virtual Machines · West US 2', term:'3 Years', payment:'All Upfront',     hourly:4.10, util:82, start:'01/10/2024', expiry:'01/10/2027', exp:false, realized:26800 },
-  {cid:'azure-sp-compute', prov:'azure', type:'Savings Plan',      service:'Compute · West US 2',          term:'1 Year',  payment:'Monthly',         hourly:2.10, util:79, start:'20/06/2025', expiry:'20/06/2026', exp:true,  realized:6100 },
+  {cid:'i-0a1b2c3d4e5f67890', prov:'aws',   type:'Compute Savings Plan', service:'prod-webapp-server-01',        term:'1 Year',  payment:'All Upfront',     hourly:185.00, util:49,  start:'01/07/2025', expiry:'25/04/2026', realized:142800 },
+  {cid:'product-alpha-kfeu20', prov:'gcp',  type:'Resource CUD',         service:'prod-batch-processor-worker',  term:'1 Year',  payment:'Monthly',         hourly:42.80,  util:73,  start:'25/06/2025', expiry:'20/06/2026', realized:33600 },
+  {cid:'i-0d4e5f6789abcd23',  prov:'aws',   type:'Compute Savings Plan', service:'data-etl-spark-node-asia-e01', term:'1 Year',  payment:'All Upfront',     hourly:28.50,  util:100, start:'15/02/2025', expiry:'05/07/2026', realized:24900 },
+  {cid:'internal-tools-ujeu83', prov:'gcp', type:'Resource CUD',         service:'shared-bastion-host-prd-01',   term:'3 Years', payment:'Monthly',         hourly:19.40,  util:99,  start:'01/09/2025', expiry:'16/11/2027', realized:16700 },
+  {cid:'vm-089abcdef6789012', prov:'azure', type:'Reservation',          service:'ml-training-gpu-instance-01',  term:'3 Years', payment:'All Upfront',     hourly:15.20,  util:27,  start:'01/10/2024', expiry:'21/08/2026', realized:11400 },
+  {cid:'vm-8237duecdef8e3sk', prov:'azure', type:'Savings Plan',         service:'ops-jenkins-controller-main',  term:'1 Year',  payment:'Monthly',         hourly:8.60,   util:24,  start:'20/06/2025', expiry:'15/12/2027', realized:5900 },
+  {cid:'dev-be-api-03',       prov:'gcp',   type:'Resource CUD',         service:'dev-backend-api-03',           term:'1 Year',  payment:'Monthly',         hourly:5.30,   util:70,  start:'08/01/2026', expiry:'08/12/2028', realized:4100 },
 ];
 var UTIL_TARGET = 80;
+var DAY_MS = 86400000;
+function isExpired(a){ return dateNum(a.expiry) < dateNum(TODAY); }
+// Red date + hourglass covers both "already lapsed" and "about to lapse".
+function isExpiringOrExpired(a){ return dateNum(a.expiry) < dateNum(TODAY) + 30*DAY_MS; }
 
 /* ============================================================
    VIEW SWITCH + TABS
@@ -782,80 +987,119 @@ function canEdit(){ return state.role==='admin'; }
    customer's own AWS account); GCP/Azure are free but still toggleable
    so the same control extends cleanly if they become gated later.
 ============================================================ */
-function renderDataSources(){
-  var onCount = PROVIDERS.filter(function(p){return state.provEnabled[p.key];}).length;
-  var total = PROVIDERS.length;
-  // Header button reflects state so a disabled provider is never silently hidden.
-  // Only show the count badge when something is OFF — a static "3/3" is just noise.
-  var btn = $('#ds-btn'), badge = $('#ds-badge');
-  var incomplete = onCount < total;
-  if(badge){ badge.textContent = onCount+'/'+total; badge.classList.toggle('hide', !incomplete); }
-  if(btn) btn.classList.toggle('has-off', incomplete);
+/* The header button carries no state indicator any more — the N/3 count chip was a
+   design-side addition and Kabin removed it 2026-07-30 to match Figma exactly. The
+   "nothing is enabled" signal now lives where it's actionable: the full-page gate. */
+function renderDataSources(){ /* no-op: button is static; kept as a hook if the design adds an indicator back */ }
+// 2026-07-30: modal switched from apply-on-toggle to a staged draft committed by
+// Save (Cancel/✕ discard it). _srcDraft is a plain clone of state.provEnabled,
+// live only while the modal is open — nothing outside it (KPIs, tables, badge,
+// first-run gate) reacts until saveSourcesModal() commits it.
+var _srcDraft = null;
+function openSourcesModal(){
+  _srcDraft = Object.assign({}, state.provEnabled);
+  renderSourceRows();
+  openModal('mo-sources');
+}
+var SAVE_AWS_TIP = 'Please Note: Saving with AWS enabled will incur Cost Explorer API charges on your AWS bill.';
+function renderSourceRows(){
   var body = $('#ds-modal-body'); if(!body) return;
   var rows = PROVIDERS.map(function(p){
-    var on = !!state.provEnabled[p.key];
-    var note = on ? p.noteOn
-      : (p.noteOff + (p.gated ? ' <a onclick="toast(\'(Demo) Would open '+p.label+' pricing.\')">See pricing ↗</a>' : ''));
-    var costIcon = p.gated ? ' <span class="material-symbols-outlined ico-info" data-rs-tip="'+escTip(p.costTip)+'">info</span>' : '';
-    return '<div class="rs-src-row">'
+    var on = !!_srcDraft[p.key];
+    var note, noteCls = 'rs-src-note';
+    if(!p.supported){
+      // Generated from p.label so each locked row always names its own provider.
+      note = 'Support for '+p.label+' will be available in upcoming releases.';
+    } else if(p.gated){
+      // ON: red + warning icon (Figma #12-1). OFF: bold grey with the pricing link
+      // (Figma #12). The link inherits the red on the ON state — checked against the
+      // Figma source, which only sets a blue link colour on the OFF variant.
+      note = on ? p.noteOn : p.noteOff;
+      noteCls += on ? ' gated-on' : ' gated-off';
+    } else {
+      note = on ? 'Enabled' : 'Off';   // future non-gated supported provider; unreachable in 202607
+    }
+    return '<div class="rs-src-row'+(p.supported?'':' locked')+'">'
       +'<div class="rs-src-ico">'+provBadge(p.key)+'</div>'
-      +'<div class="rs-src-body"><div class="rs-src-name">'+p.label+costIcon+'</div><div class="rs-src-note">'+note+'</div></div>'
-      +'<span class="rs-src-status '+(on?'on':'off')+'">'+(on?'On':'Off')+'</span>'
-      +'<label class="rs-toggle"><input type="checkbox"'+(on?' checked':'')+' onchange="onProvToggle(\''+p.key+'\',this)"><span class="track"></span></label>'
+      +'<div class="rs-src-body"><div class="rs-src-name">'+p.label+'</div><div class="'+noteCls+'">'+note+'</div></div>'
+      +'<label class="rs-toggle"><input type="checkbox"'+(on?' checked':'')+(p.supported?'':' disabled')
+        +' onchange="onProvToggle(\''+p.key+'\',this)"><span class="track"></span></label>'
       +'</div>';
   }).join('');
-  body.innerHTML = '<div class="rs-sources-sum">'+onCount+' of '+total+' enabled</div>'+rows;
+  // No "N of 3 enabled" summary — not present in the Figma modal.
+  body.innerHTML = rows;
+  // Save-hover/focus warning, only while AWS is on in the draft (Figma annotation
+  // spells out this exact condition). showTip() reads the attribute at hover time,
+  // so mutating it here needs no re-binding.
+  var save = $('#ds-save');
+  if(save){
+    if(_srcDraft.aws) save.setAttribute('data-rs-tip', SAVE_AWS_TIP);
+    else save.removeAttribute('data-rs-tip');
+  }
   bindTips();
 }
-var _pendingProv = null;
+/* One path for every provider — no branching on `gated` for the toggle action
+   itself. Unsupported providers bail out (their input is `disabled` anyway; this is
+   just belt-and-braces against a programmatic call). */
 function onProvToggle(key, input){
-  if(input.checked){ input.checked=false; requestEnableProv(key); }
-  else setProvEnabled(key, false);
+  var p = provOf(key);
+  if(!p || !p.supported){ input.checked = false; return; }
+  _srcDraft[key] = input.checked;
+  renderSourceRows();
 }
-function requestEnableProv(key){
-  var p = provOf(key); if(!p) return;
-  if(p.gated){ _pendingProv = key; renderProvConfirm(p); openModal('mo-prov-confirm'); }
-  else setProvEnabled(key, true);
-}
-function renderProvConfirm(p){
-  $('#pc-title').textContent = 'Enable '+p.full+'?';
-  $('#pc-desc').innerHTML = 'This calls the '+p.label+' recommendation API, which <b>'+p.label+' bills directly to your own '+p.label+' account</b> — not LumiTure — at <b>$0.01 per request</b> (usage-based, refreshes daily, so cost is ongoing while enabled). You can turn this off anytime. <a onclick="toast(\'(Demo) Would open '+p.label+' pricing.\')">See '+p.label+' pricing ↗</a>';
-  $('#pc-ok').textContent = 'Enable '+p.label;
-}
-function confirmEnableProv(){ var k=_pendingProv; _pendingProv=null; closeModal('mo-prov-confirm'); if(k) setProvEnabled(k, true); }
-function setProvEnabled(key, on){
-  state.provEnabled[key] = on;
+function cancelSourcesModal(){ closeModal('mo-sources'); } // _srcDraft just gets discarded; re-seeded from live state next open
+function saveSourcesModal(){
+  var changed = PROVIDERS.filter(function(p){ return !!_srcDraft[p.key] !== !!state.provEnabled[p.key]; });
+  state.provEnabled = Object.assign({}, _srcDraft);
   state.fProv=''; state.fType='';
-  refreshProviderViews();
-  var lbl = (provOf(key)||{label:key}).label;
-  toast(lbl + (on ? ' enabled.' : ' turned off — data is no longer fetched.'));
-}
-function refreshProviderViews(){
-  renderDataSources(); renderCards(); renderFilters(state.view);
-  if(state.view==='rec') renderTable(); else renderActiveTable();
+  // First successful enable graduates the org out of the first-run gate for good,
+  // so later "everything off again" reads as a config choice, not a fresh install.
+  // ⚠️ Real bug fixed 2026-08: this comment described the intent but the code to
+  // do it was never written — pageState stayed wherever a Demo FAB scenario left it
+  // (e.g. 'first-time'), so Save could enable AWS and the gate would still never
+  // clear, because the gate's condition is `pageState==='first-time' || allSourcesOff()`
+  // and only the second half was ever getting updated.
+  if(state.pageState!=='set') state.pageState='set';
+  closeModal('mo-sources');
+  // Goes through renderListPage (not just the inner renders) so the first-run gate is
+  // re-evaluated: committing an enable has to tear the overlay down, not leave it floating.
+  renderListPage();
+  if(!changed.length) return;
+  toast(changed.length===1
+    ? changed[0].label+(state.provEnabled[changed[0].key] ? ' enabled.' : ' turned off — data is no longer fetched.')
+    : changed.length+' data sources updated.');
 }
 /* ============================================================
-   Rightsizing-first tip — dismissible coach-mark
+   Rightsizing-first tip — permanent advisory (no dismiss)
    We cannot verify whether the user actually ran rightsizing, so this
    is always a generic reminder, never a checked/unchecked real state.
-   "X" = dismiss for this visit only (in-memory; reappears on next
-   reload/session — simple new users or infrequent visitors still see it).
-   "Don't show again" = permanent opt-out, persisted in localStorage
-   (survives reload, distinct mechanism from the session-only dismiss).
+
+   2026-07-30: both dismiss affordances were removed — first the session-only
+   "X" (MUI banners use text actions, not a close icon, and two flavours of
+   "go away" for one tip was a decision tax), then "Don't show again" itself
+   (Kabin's call: don't build dismissal machinery until someone actually asks
+   for it — YAGNI; cheap to add back, ~4 lines + a localStorage key).
+
+   ⚠️ Known trade-off, deliberately accepted for now: because this tip can
+   neither be dismissed nor self-resolve, it is permanent furniture above the
+   fold. Its current styling (tinted banner + icon + title) promises the
+   transience it no longer has. If it stays undismissable, the honest
+   follow-up is to demote it to a quieter inline element rather than a
+   notification-shaped one. Revisit when someone reports tip fatigue.
 ============================================================ */
-var HINT_KEY = 'ro_hint_hidden_v1';
-function hintPermanentlyHidden(){ try{ return localStorage.getItem(HINT_KEY)==='1'; }catch(e){ return false; } }
 function renderHint(){
   var box = $('#rs-hintbox'); if(!box) return;
-  if(state.hintDismissedSession || hintPermanentlyHidden()){ box.innerHTML=''; return; }
-  box.innerHTML = '<div class="rs-hint"><span class="material-symbols-outlined">lightbulb</span><div style="flex:1"><div class="h-t">Tip: run Usage Optimization (rightsizing) first</div>'
-    +'<div class="h-d">Commitments lock in your baseline — remove oversized or idle resources first, then optimize rates on the clean baseline. <a onclick="toast(\'(Demo) Would open Usage Optimization.\')">Go to Usage Optimization →</a></div>'
-    +'<div class="h-dismiss-row"><a class="h-dismiss" onclick="hideHintForever()">Don\'t show again</a></div></div>'
-    +'<button class="rs-hint-x" onclick="dismissHint()" data-rs-tip="Dismiss for now — shown again next visit"><span class="material-symbols-outlined">close</span></button></div>';
+  // The "Tip:" title row is gone on purpose — labelling it a tip framed it as
+  // dismissible advice, which it no longer is. The bold lead-in does the same
+  // scanning job inline, in one row instead of two.
+  box.innerHTML = '<div class="rs-hint"><span class="material-symbols-outlined">lightbulb</span>'
+    // Copy per Figma #01. Real navigation, not a demo toast — the page annotation
+    // says 「[Tip] 點擊文字中連結前往 Usage Optimization」, and the href matches the
+    // one the shared sidebar uses for that entry so both stay on the same target.
+    +'<div class="h-d" style="flex:1"><b>Tip:</b> Remove oversized or idle resources in <a href="../rightsizing/rightsizing-prototype-v1.html">Usage Optimization</a> before locking in your commitments.</div>'
+    +'</div>';
   bindTips();
 }
-function dismissHint(){ state.hintDismissedSession = true; renderHint(); }
-function hideHintForever(){ try{ localStorage.setItem(HINT_KEY,'1'); }catch(e){} renderHint(); toast('Got it — this tip won\'t show again.'); }
 function openModal(id){ $('#'+id).classList.add('active'); }   /* stack-friendly: does not close others */
 function closeModal(id){ var m=$('#'+id); if(m) m.classList.remove('active'); }
 function closeModals(){ document.querySelectorAll('.mo.active').forEach(function(m){m.classList.remove('active');}); }
@@ -865,22 +1109,35 @@ document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModa
 /* ============================================================
    RENDER — summary cards
 ============================================================ */
-function provSegs(vals){
-  var order=[['aws','AWS'],['gcp','GCP'],['azure','Azure']];
-  return order.filter(function(o){return state.provEnabled[o[0]];})
-    .map(function(o){return o[1]+' '+vals[o[0]]+'%';}).join('<span class="seg">·</span>');
-}
-// Mirrors LumiTag Coverage's exact 3-tier threshold rule (lumi-tag-prototype-v8.html covC()):
-// >=70 healthy, 40-69 medium, <40 low. PM-confirmed to apply to both Coverage and Utilization here.
+/* Colour thresholds per the Figma page annotation (node 10627:34745):
+   「[Coverage] & [Utilization] 文字顏色分三階段：40% 以下為紅色、41-79% 為黃色、
+     80-100% 為綠色」
+   This REPLACES the LumiTag covC() rule (>=70 green) that was adopted 2026-07-21
+   as a stopgap when PM couldn't supply thresholds. The two disagree at 70–79%:
+   LumiTag said green, the design says amber. Design wins.
+   Edge note: the annotation leaves a literal gap between "40 以下" and "41-79",
+   so fractional 40.5 is unassigned; implemented as <41 red so nothing falls through.
+   ⚠️ LumiTag Coverage still uses its own >=70 rule — two coverage scales now
+   coexist product-wide unless LumiTag follows. Raised with PM (plan §7 item 9).
+   No `label` is returned any more: the design has no threshold pills, the colour
+   sits on the number itself (see renderCards). */
 function covBand(p){
-  if(p>=70) return {cls:'ok', label:'Healthy (≥70%)'};
-  if(p>=40) return {cls:'warn', label:'Medium (40–69%)'};
-  return {cls:'err', label:'Low (<40%)'};
-}
-function excludedProvLabels(){
-  return PROVIDERS.filter(function(p){return !state.provEnabled[p.key];}).map(function(p){return p.label;});
+  if(p >= 80) return {cls:'ok'};
+  if(p >= 41) return {cls:'warn'};
+  return {cls:'err'};
 }
 function allSourcesOff(){ return PROVIDERS.every(function(p){return !state.provEnabled[p.key];}); }
+/* Card label + tooltip defined once and reused by every state. Previously each
+   branch hand-wrote its own markup, which is why the No Data cards silently lost
+   their info icons — a whole class of bug this makes structurally impossible. */
+var CARD_META = [
+  { label:'Coverage',                  tip:'Percentage of eligible spend covered by active commitments (weighted average across providers).' },
+  { label:'Utilization',               tip:'Percentage of purchased commitment capacity actually used (weighted average across providers).' },
+  { label:'Potential Monthly Savings', tip:'Total estimated monthly savings across all open recommendations (To-Do and Changed), aggregated from native provider engines.' }
+];
+function cardLabel(m){
+  return '<span class="lbl">'+m.label+' <span class="material-symbols-outlined ico-info" data-rs-tip="'+escTip(m.tip)+'">info</span></span>';
+}
 function renderCards(){
   var nd = (state.pageState==='empty' || state.pageState==='nodata');
   var loading = state.pageState==='loading';
@@ -893,45 +1150,54 @@ function renderCards(){
         +'<span class="skeleton sk-line" style="width:140px;height:12px;margin-top:auto;align-self:flex-end"></span></div>';
     }).join('');
   } else if(nd){
-    var labels = ['Coverage','Utilization','Potential Monthly Savings'];
     var subs = ['Not yet calculated','Not yet calculated','No open recommendations'];
-    cards = labels.map(function(l,i){
-      return '<div class="rs-card nd"><span class="lbl">'+l+'</span><span class="val">No Data</span><span class="sub">'+subs[i]+'</span></div>';
-    }).join('');
-  } else if(allSourcesOff()){
-    // Distinct from the "nd" (page-level empty/error) state: the numbers aren't
-    // missing because of a data problem — all data sources have been turned off.
-    // Point straight at the fix (open Data sources).
-    var labels2 = ['Coverage','Utilization','Potential Monthly Savings'];
-    cards = labels2.map(function(l){
-      return '<div class="rs-card nd"><span class="lbl">'+l+'</span><span class="val">No Data</span><span class="sub">No cloud data sources enabled</span></div>';
+    cards = CARD_META.map(function(m,i){
+      return '<div class="rs-card nd">'+cardLabel(m)+'<span class="val">No Data</span><span class="sub">'+subs[i]+'</span></div>';
     }).join('');
   } else {
+    /* THREE cards, per Figma #01 and #07 (both tabs show the same set):
+         1. Coverage                 — % , colour-coded by covBand
+         2. Utilization              — % , colour-coded by covBand
+         3. Potential Monthly Savings— currency, deliberately NOT colour-coded
+       Card 3 stays dark in the design and the threshold annotation names only
+       [Coverage] & [Utilization] — it isn't a percentage and carries no health
+       semantics, so colouring it would invent a rule the design doesn't define.
+       The threshold pills ("Medium (40–69%)" etc.) are gone: the design puts the
+       colour on the number itself.
+       ⚠️ That makes status colour-only, which conflicts with the Lumiture
+       guideline on not relying on colour alone (a11y). Kabin chose to follow the
+       design; raised with the designer (plan §7 item 2).
+       Note there is no all-sources-off branch here: that state no longer renders
+       cards at all, it renders the #10 gate over the whole content area. */
     var pot = DATA.rec.filter(function(r){return state.provEnabled[r.prov];}).reduce(function(s,r){return s+r.estAmt;},0);
-    var excl = excludedProvLabels();
-    var covSegs = provSegs({aws:58,gcp:72,azure:45});
-    var utilSegs = provSegs({aws:93,gcp:88,azure:84});
-    var covB = covBand(60), utilB = covBand(89);
+    var cov = 60, util = 89;
     cards =
-      '<div class="rs-card"><span class="lbl">Coverage <span class="material-symbols-outlined ico-info" data-rs-tip="<b>Coverage</b> = eligible spend covered by commitments (weighted average across providers).">info</span></span>'
-        +'<span class="val">60<span class="unit">%</span> <span class="rs-band '+covB.cls+'">'+covB.label+'</span></span><span class="sub">'+covSegs+'</span></div>'
-      +'<div class="rs-card"><span class="lbl">Utilization <span class="material-symbols-outlined ico-info" data-rs-tip="<b>Utilization</b> = purchased commitment capacity actually used (weighted average).">info</span></span>'
-        +'<span class="val">89<span class="unit">%</span> <span class="rs-band '+utilB.cls+'">'+utilB.label+'</span></span><span class="sub">'+utilSegs+'</span></div>'
-      +'<div class="rs-card"><span class="lbl">Potential Monthly Savings <span class="material-symbols-outlined ico-info" data-rs-tip="Sum of Estimated Savings (Monthly) across all open recommendations (To-Do / Changed). It just totals the per-recommendation values already provided by each provider engine — no separate cross-cloud calculation needed.">info</span></span>'
-        +'<span class="val rs-num">'+nFmt(pot)+' <span class="unit">'+state.currency+'</span></span><span class="sub pos">If all open recommendations adopted'+(excl.length?' (excl. '+excl.join(', ')+')':'')+'</span></div>';
+      '<div class="rs-card">'+cardLabel(CARD_META[0])
+        +'<span class="val '+covBand(cov).cls+'">'+dash(cov)+'<span class="unit">%</span></span><span class="sub">Commitment-covered spend</span></div>'
+      +'<div class="rs-card">'+cardLabel(CARD_META[1])
+        +'<span class="val '+covBand(util).cls+'">'+dash(util)+'<span class="unit">%</span></span><span class="sub">Commitment capacity used</span></div>'
+      +'<div class="rs-card">'+cardLabel(CARD_META[2])
+        // Plain secondary text: this line is a caveat on how the figure is derived,
+        // not a positive result, so it doesn't take the success green.
+        +'<span class="val rs-num">'+dash(pot, nFmt)+' <span class="unit">'+state.currency+'</span></span><span class="sub">If all recommendations below are applied</span></div>';
   }
   $('#rs-cards').innerHTML = cards;
+  bindTips();
 }
 
 /* ============================================================
    RENDER — view switch
 ============================================================ */
 function renderViewSeg(){
-  var expCount = ACTIVE.filter(function(a){return a.exp;}).length;
+  // Count against the same already-expired-excluded set the table actually shows
+  // (see renderActiveTable) — an expired row can't inflate this count since it's
+  // never in view here at all.
+  var expCount = ACTIVE.filter(function(a){return !isExpired(a);}).filter(isExpiringOrExpired).length;
   $('#rs-viewseg').innerHTML = VIEWS.map(function(v){
     var active = v.id===state.view?' active':'';
     var badge = (v.id==='active' && expCount>0) ? '<span class="seg-badge">'+expCount+' expiring</span>' : '';
-    return '<button class="'+active.trim()+'" onclick="setView(\''+v.id+'\')"><span class="material-symbols-outlined" style="font-size:18px;font-variation-settings:\'FILL\' 0">'+v.icon+'</span>'+v.label+badge+'</button>';
+    // No leading icon: the design's tabs are text + badge only.
+    return '<button class="'+active.trim()+'" onclick="setView(\''+v.id+'\')">'+v.label+badge+'</button>';
   }).join('');
 }
 function setView(v){
@@ -947,10 +1213,16 @@ function setView(v){
 /* ============================================================
    RENDER — recommendation table
 ============================================================ */
+/* Column order and labels per Figma #01 / #01-1:
+   Target Item Name / ID | Type | Rec. Date | Est. Savings | Term | Payment | Recommendation
+   (Rec. Date moved up from last to 3rd; sort affordances only on Target / Rec. Date /
+   Est. Savings / Term, matching the design — Type, Payment, Recommendation have none.)
+   ⚠️ "Est. Savings" drops the "(Monthly)" qualifier the previous label carried. For a
+   finance audience that loses the period, raising ambiguity over one-off vs recurring.
+   Following the design as instructed; flagged for the designer (plan §7 item 3). */
 var COLS = [
-  {h:'Type'}, {h:'Estimated Savings (Monthly)', sort:'estAmt'}, {h:'Term', sort:'term'},
-  {h:'Payment <span class="pm-flag" data-rs-tip="待確認：Payment 欄為設計端新增（PRD Rec 欄位清單未列，原併在 Recommendation 文字內）。獨立成欄方便掃讀承諾付款方式。">❓</span>'},
-  {h:'Recommendation'}, {h:'Recommendation Date', sort:'recDate'}
+  {h:'Type'}, {h:'Rec. Date', sort:'recDate'}, {h:'Est. Savings', sort:'estAmt'},
+  {h:'Term', sort:'term'}, {h:'Payment'}, {h:'Recommendation'}
 ];
 function renderTable(){
   var area = $('#rs-tablearea');
@@ -965,27 +1237,32 @@ function renderTable(){
   if(state.fProv) rows = rows.filter(function(r){return r.prov===state.fProv;});
   if(state.fType) rows = rows.filter(function(r){return r.type===state.fType;});
   var q = ($('#rs-search-input') && $('#rs-search-input').value || '').toLowerCase().trim();
+  state.searchQ = q;   // hl() reads this to mark matches in the cells below
   if(q){
     rows = rows.filter(function(r){
-      return (r.target+' '+r.type+' '+r.recommendation).toLowerCase().indexOf(q)>=0;
+      // rid included so the resource ID shown in the Target cell is searchable too.
+      return (r.target+' '+(r.rid||'')+' '+r.type+' '+r.recommendation).toLowerCase().indexOf(q)>=0;
     });
   }
-  if(state.sort.key){
-    var k = state.sort.key, d = state.sort.dir;
-    rows.sort(function(a,b){
-      var va=a[k], vb=b[k];
-      if(k==='recDate'){ va=dateNum(a.recDate); vb=dateNum(b.recDate); }
-      if(k==='term'){ va=termOf(a); vb=termOf(b); }
-      if(va<vb) return -1*d; if(va>vb) return 1*d; return 0;
-    });
-  } else {
-    rows.sort(function(a,b){
-      if(b.estAmt!==a.estAmt) return b.estAmt-a.estAmt;
-      if(b.estRate!==a.estRate) return b.estRate-a.estRate;
-      return dateNum(b.recDate)-dateNum(a.recDate);
-    });
-  }
-  var ths = '<th class="fix rs-c-target">Target Item</th>'
+  /* state.sort now carries a real default (estAmt desc) instead of null, so the
+     Est. Savings header renders its arrow lit — the design shows that column
+     already active on load, and a null key left every arrow grey while the rows
+     were in fact sorted by it. Tie-breakers kept for the default column. */
+  var k = state.sort.key, d = state.sort.dir;
+  rows.sort(function(a,b){
+    var va=a[k], vb=b[k];
+    if(k==='recDate'){ va=dateNum(a.recDate); vb=dateNum(b.recDate); }
+    if(k==='term'){ va=termOf(a); vb=termOf(b); }
+    if(va<vb) return -1*d; if(va>vb) return 1*d;
+    if(k==='estAmt'){
+      if(b.estRate!==a.estRate) return (b.estRate-a.estRate)*(d===-1?1:-1);
+      return (dateNum(b.recDate)-dateNum(a.recDate))*(d===-1?1:-1);
+    }
+    return 0;
+  });
+  var tgtOn = state.sort.key==='target'?' on':'';
+  var tgtArrow = state.sort.key!=='target'?'swap_vert':(state.sort.dir===1?'arrow_upward':'arrow_downward');
+  var ths = '<th class="fix rs-c-target"><span class="th-sort'+tgtOn+'" onclick="setSort(\'target\')">Target Item Name / ID<span class="material-symbols-outlined">'+tgtArrow+'</span></span></th>'
     + COLS.map(function(c){
         if(c.sort){
           var on = state.sort.key===c.sort?' on':'';
@@ -995,18 +1272,24 @@ function renderTable(){
         return '<th>'+c.h+'</th>';
       }).join('');
   var trs = rows.map(function(r){
+    // Two-line Target cell (name + resource ID), same rs-two pattern the Active
+    // Commitments table already uses. Type is plain text per the design, not a chip.
     return '<tr>'
-      +'<td class="fix rs-c-target"><span class="rs-two">'+provBadge(r.prov)+'<span class="rs-two-txt"><span class="nm" data-rs-tip="'+escTip(r.target)+'">'+r.target+'</span></span></span></td>'
-      +'<td>'+typeChip(r.type)+'</td>'
+      +'<td class="fix rs-c-target"><span class="rs-two">'+provBadge(r.prov)+'<span class="rs-two-txt">'
+        +'<span class="nm" data-rs-tip="'+escTip(r.target)+'">'+hl(r.target)+'</span>'
+        +'<span class="id" data-rs-tip="'+escTip(r.rid||'')+'">'+(r.rid?hl(r.rid):'--')+'</span>'
+        +'</span></span></td>'
+      +'<td>'+hl(r.type)+'</td>'
+      +'<td class="rs-num">'+dash(r.recDate)+'</td>'
       +'<td>'+saveCell(r.estAmt, r.estRate)+'</td>'
       +'<td>'+termOf(r)+'</td>'
       +'<td>'+paymentOf(r)+'</td>'
-      +'<td class="rs-c-rec"><span class="rs-trunc" data-rs-tip="'+escTip(r.recommendation)+'">'+r.recommendation+'</span></td>'
-      +'<td class="rs-num">'+r.recDate+'</td>'
+      +'<td class="rs-c-rec"><span class="rs-trunc" data-rs-tip="'+escTip(r.recommendation)+'">'+hl(r.recommendation)+'</span></td>'
       +'</tr>';
   }).join('');
   if(rows.length===0){
-    if(allSourcesOff()){ area.innerHTML = allSourcesOffHtml(); return; }
+    // No all-sources-off branch: that case never reaches the table now, it's caught
+    // earlier by the page-level gate in renderListPage().
     if(state.fProv && !state.provEnabled[state.fProv]){ area.innerHTML = provGateHtml(state.fProv); return; }
     area.innerHTML = '<div class="rs-tblwrap"><div class="empty-state rs-tbl-empty"><span class="material-symbols-outlined">'+(q?'search_off':'inbox')+'</span>'
       +'<div class="empty-state-title">No matching recommendations</div><div class="empty-state-sub">Try adjusting your search or filters.</div></div></div>';
@@ -1015,19 +1298,20 @@ function renderTable(){
   area.innerHTML = '<div class="rs-tblwrap"><div class="rs-tblscroll"><table class="rstbl"><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div></div>';
   bindTips();
 }
-function allSourcesOffHtml(){
-  return '<div class="rs-tblwrap"><div class="empty-state rs-tbl-empty"><span class="material-symbols-outlined">cloud_off</span>'
-    +'<div class="empty-state-title">No cloud data sources enabled</div>'
-    +'<div class="empty-state-sub">Turn on at least one provider in Cloud data sources to see recommendations and active commitments.</div>'
-    +'<button class="btn btn-p" onclick="openModal(\'mo-sources\')">Open Data Sources</button>'
-    +'</div></div>';
-}
+/* Shown when the CSP filter selects a provider that isn't enabled. Its CTA used to
+   call requestEnableProv(), which (a) no longer exists and (b) was already broken
+   here: reached from outside the modal, _srcDraft is null. Now it just opens the
+   modal. For providers this release doesn't support there's nothing to enable, so
+   the button is dropped rather than offering a dead action. */
 function provGateHtml(key){
-  var p = provOf(key) || {label:key};
+  var p = provOf(key) || {label:key, supported:true};
+  var body = p.supported
+    ? '<div class="empty-state-sub">Enable it in <b>Cloud Data Sources</b> above to see '+p.label+' recommendations and active commitments.</div>'
+      +'<button class="btn btn-p" onclick="openSourcesModal()">Open Data Sources</button>'
+    : '<div class="empty-state-sub">Support for '+p.label+' is coming in upcoming releases.</div>';
   return '<div class="rs-tblwrap"><div class="empty-state rs-tbl-empty"><span class="material-symbols-outlined">cloud_off</span>'
     +'<div class="empty-state-title">'+p.label+' is not enabled</div>'
-    +'<div class="empty-state-sub">Enable it in <b>Cloud data sources</b> above to see '+p.label+' recommendations and active commitments.</div>'
-    +'<button class="btn btn-p" onclick="requestEnableProv(\''+key+'\')">Enable '+p.label+'</button>'
+    +body
     +'</div></div>';
 }
 function skeletonTable(){
@@ -1042,7 +1326,11 @@ function skeletonTable(){
    RENDER — active commitments table
 ============================================================ */
 var ACT_COLS = [
-  {h:'Type'}, {h:'Utilization', sort:'util'}, {h:'Expiry', sort:'expSort'}, {h:'Term'}, {h:'Monthly Cost', sort:'monthly'}, {h:'Payment'}
+  /* Order per Figma #07: Monthly Cost sits BEFORE Term (was the other way round).
+     ⚠️ The design prints this header as "Montly Cost" — a typo (missing h).
+     Implemented with the correct spelling; flagged for the designer (plan §7 item 10). */
+  {h:'Type'}, {h:'Utilization', sort:'util'}, {h:'Expiry', sort:'expSort'},
+  {h:'Monthly Cost', sort:'monthly'}, {h:'Term'}, {h:'Payment'}
 ];
 function dateNum(s){ var p=s.split('/'); return new Date(p[2],p[1]-1,p[0]).getTime(); }
 function renderActiveTable(){
@@ -1056,18 +1344,23 @@ function renderActiveTable(){
   var rows = ACTIVE.slice();
   rows = rows.filter(function(a){return state.provEnabled[a.prov];});
   if(state.fProv) rows = rows.filter(function(a){return a.prov===state.fProv;});
-  if(state.fType) rows = rows.filter(function(a){return a.type===state.fType;});
+  // No Type filter here — 2026-08 Kickoff final drops it from this tab's toolbar
+  // (it stays Recommendations-only, see renderFilters). Already-expired commitments
+  // never show at all now (PM call: they belong in Recommendations, not here) —
+  // that's an unconditional exclude, not a toggle, so there's nothing to switch off.
+  rows = rows.filter(function(a){return !isExpired(a);});
   var q = ($('#rs-act-search') && $('#rs-act-search').value || '').toLowerCase().trim();
+  state.searchQ = q;   // hl() reads this to mark matches in the cells below
   if(q){ rows = rows.filter(function(a){ return (a.cid+' '+a.service+' '+a.type).toLowerCase().indexOf(q)>=0; }); }
-  // default sort: expiry ascending (soonest first)
-  var sk = state.actSort.key || 'expSort';
-  var sd = state.actSort.key ? state.actSort.dir : 1;
+  // Default (expiry ascending, soonest first) now lives in state.actSort itself, so
+  // the Expiry header shows a lit arrow on load instead of a grey neutral one.
+  var sk = state.actSort.key, sd = state.actSort.dir;
   rows.sort(function(a,b){
     var va = sk==='expSort'?dateNum(a.expiry):(sk==='monthly'?a.hourly:a[sk]);
     var vb = sk==='expSort'?dateNum(b.expiry):(sk==='monthly'?b.hourly:b[sk]);
     if(va<vb) return -1*sd; if(va>vb) return 1*sd; return 0;
   });
-  var ths = '<th class="fix rs-c-cid">Commitment ID</th>'
+  var ths = '<th class="fix rs-c-cid">Commitment Name / ID</th>'
     + ACT_COLS.map(function(c){
         if(c.sort){
           var on = state.actSort.key===c.sort?' on':'';
@@ -1077,20 +1370,24 @@ function renderActiveTable(){
         return '<th>'+c.h+'</th>';
       }).join('');
   var trs = rows.map(function(a){
-    var expBadge = a.exp ? '<span class="rs-exp" data-rs-tip="Expiring within 30 days"><span class="material-symbols-outlined">schedule</span></span>' : '';
+    // Already-expired rows are filtered out above, so every row reaching here is
+    // still active — the only flag left to show is "about to lapse soon".
+    var flagged = isExpiringOrExpired(a);
+    var expTip = 'Expires within 30 days. Renew soon to maintain your discount coverage.';
+    var expBadge = flagged ? '<span class="rs-exp" data-rs-tip="'+escTip(expTip)+'"><span class="material-symbols-outlined">hourglass_bottom</span></span>' : '';
     var monthly = Math.round(a.hourly*730);
     return '<tr>'
-      +'<td class="fix rs-c-cid"><span class="rs-two">'+provBadge(a.prov)+'<span class="rs-two-txt"><span class="nm">'+a.cid+'</span></span></span></td>'
-      +'<td>'+typeChip(a.type)+'</td>'
-      +'<td>'+utilCell(a.util, UTIL_TARGET)+'</td>'
-      +'<td><span class="rs-num">'+a.expiry+'</span>'+expBadge+'</td>'
+      +'<td class="fix rs-c-cid"><span class="rs-two">'+provBadge(a.prov)+'<span class="rs-two-txt"><span class="nm" data-rs-tip="'+escTip(a.service)+'">'+hl(a.service)+'</span><span class="id">'+hl(a.cid)+'</span></span></span></td>'
+      +'<td>'+hl(a.type)+'</td>'
+      +'<td>'+utilCell(a.util)+'</td>'
+      +'<td class="'+(flagged?'rs-exp-cell':'')+'"><span class="rs-num">'+dash(a.expiry)+'</span>'+expBadge+'</td>'
+      +'<td class="rs-num">'+dash(monthly, function(v){return state.currency+' '+nFmt(v);})+'</td>'
       +'<td>'+a.term+'</td>'
-      +'<td class="rs-num">'+state.currency+' '+comma(monthly)+'</td>'
       +'<td>'+a.payment+'</td>'
       +'</tr>';
   }).join('');
   if(rows.length===0){
-    if(allSourcesOff()){ area.innerHTML = allSourcesOffHtml(); return; }
+    // all-sources-off is caught by the page-level gate before reaching here.
     if(state.fProv && !state.provEnabled[state.fProv]){ area.innerHTML = provGateHtml(state.fProv); return; }
     area.innerHTML = '<div class="rs-tblwrap"><div class="empty-state rs-tbl-empty"><span class="material-symbols-outlined">search_off</span><div class="empty-state-title">No matching commitments</div></div></div>';
     return;
@@ -1115,62 +1412,111 @@ function setSort(k){
    PAGE STATE
 ============================================================ */
 function setPageState(s){ state.pageState=s; renderListPage(); }
+// Tracks whether the normal populated view is already on screen, so the
+// deliberate skeleton beat (see renderListPage) only plays on the transition INTO
+// it, not on every incidental re-render while already there.
+var _normalShown = false;
 function renderListPage(){
   var content = $('#page-list');
   var normalBox = $('#rs-normal');
   var auth = $('#rs-statefull'); if(auth) auth.remove();
-  var ov = $('#rs-ft-overlay'); if(ov) ov.remove();
-  normalBox.classList.remove('rs-ft-blur', 'hide');
+  var gate = $('#rs-srcgate'); if(gate) gate.remove();
+  normalBox.classList.remove('hide');
   $('#updwrap').classList.remove('hide');
 
   var scopeBtn = $('#scope-btn');
   if(scopeBtn) scopeBtn.classList.toggle('hide', !canEdit());
 
   if(!canEdit()){
+    _normalShown = false;
     normalBox.classList.add('hide');
     $('#updwrap').classList.add('hide');
     content.insertAdjacentHTML('beforeend', noAccessState());
     bindTips();
+    // 2026-08: Kabin's call — a T1/T2 viewer shouldn't have to click a button to
+    // leave a page they were never meant to land on. In production this would be
+    // `window.location.href` to Overview, fired the moment the role check fails;
+    // here it's simulated with a toast since this demo suite has no real Overview
+    // page to navigate to (nav item is `disabled:true` in lumiture-nav.js).
+    toast('(Demo) Redirecting to Overview — Rate Optimization requires Owner/Admin access.');
     return;
   }
 
   if(state.pageState==='no-auth'){
+    _normalShown = false;
     normalBox.classList.add('hide');
     $('#updwrap').classList.add('hide');
     content.insertAdjacentHTML('beforeend', authState());
     bindTips();
     return;
   }
+  /* Data-source gate (feature level), per Figma #10 (node 10627:34832).
+     Fires whenever the org is authorized but no source is enabled — ONE treatment,
+     with no first-run vs turned-it-off-later split. The design's own annotation
+     says「若使用者已完成授權且所有 Data Source 皆設定為關閉，顯示狀態如上圖」, i.e.
+     the history of how you got here doesn't change the screen. The localStorage
+     flag that used to distinguish the two (ro_sources_configured_v1) is gone.
+
+     Why this replaces the whole content area rather than showing "No Data" cards:
+     "No Data" is the vocabulary of "there genuinely isn't any / something failed",
+     and reusing it for "you haven't told us where to look" mislabels a one-click
+     config state as a dead end. Three cards each repeating a non-actionable "No
+     Data" also outranked the one thing the user actually needs to do. */
+  if(state.pageState==='first-time' || allSourcesOff()){
+    // No skeleton beat here — unlike the populated view below, this card's content
+    // is entirely static (no real data to wait on), so a loading flash before it
+    // would be theatre, not signal. Kabin's call, 2026-08.
+    normalBox.classList.add('hide');
+    _normalShown = false;
+    content.insertAdjacentHTML('beforeend', sourceGateState());
+    bindTips();
+    return;
+  }
+
+  // Deliberate skeleton beat for the transition INTO
+  // the populated view (e.g. right after enabling a data source and saving).
+  // renderCards()/renderTable()/renderActiveTable() all already branch on
+  // pageState==='loading' for the Demo FAB's own Loading scenario, so this reuses
+  // that existing skeleton rendering rather than building a second one.
+  if(!_normalShown){
+    _normalShown = true;
+    var _realPageState = state.pageState;
+    state.pageState = 'loading';
+    renderNormalContent();
+    setTimeout(function(){
+      state.pageState = _realPageState;
+      renderNormalContent();
+    }, 600);
+    return;
+  }
+  renderNormalContent();
+}
+function renderNormalContent(){
   renderDataSources(); renderHint(); renderCards(); renderViewSeg(); renderFilters(state.view);
   if(state.view==='rec'){ renderTable(); }
   else { renderActiveTable(); }
   $('#rs-recview').classList.toggle('hide', state.view!=='rec');
   $('#rs-actview').classList.toggle('hide', state.view!=='active');
-
-  if(state.pageState==='first-time'){
-    normalBox.classList.add('rs-ft-blur');
-    // Kept distinct from the no-auth state on purpose: no-auth = billing accounts not
-    // connected at all (platform-level gate); first-time = already connected, but scope
-    // hasn't been set up yet (feature-level gate) — same distinction rightsizing uses.
-    // CTA intentionally still points at Scope Settings (showPage('scope')) even though
-    // that page has no real config UI in 202607 (see page-scope annotation) — this
-    // preserves the intended eventual flow rather than collapsing into a duplicate of
-    // no-auth's "Add Your Authorization" CTA. Reverted 2026-07-21 after briefly pointing
-    // this at Authorization, which made the two states redundant; see Demo FAB tip for
-    // the "this isn't real yet" annotation instead of changing user-facing copy.
-    content.insertAdjacentHTML('beforeend',
-      '<div class="rs-ft-overlay" id="rs-ft-overlay"><div class="rs-ft-card"><div class="ico"><span class="material-symbols-outlined">savings</span></div>'
-      +'<h3>Start Lowering Your Cloud Rates</h3>'
-      +'<p>Connect your billing accounts and set a detection scope to unlock commitment recommendations — and see how much you could save on the rates you already pay.</p>'
-      +'<button class="btn btn-p" onclick="showPage(\'scope\')">Set Up Scope Settings</button></div></div>');
-  }
 }
+/* ⚠️ Copy is Figma #10's, verbatim. The "off by default … until you are ready"
+   sentence is load-bearing: without it an empty page reads as a broken product
+   rather than a deliberate guard on the customer's cloud bill. */
+function sourceGateState(){
+  return '<div id="rs-srcgate" class="rs-fullcard"><div class="empty-state" style="padding:0">'
+    +'<img class="rs-gate-img" alt="" src="data:image/png;base64,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">'
+    +'<div class="empty-state-title">Enable Cloud Data Sources to View Rate Optimization</div>'
+    +'<div class="empty-state-sub">Enable your cloud data sources to view personalized commitment recommendations and rate savings insights. <b>Data sources remain off by default</b> to prevent unexpected provider API charges until you are ready.</div>'
+    +'<button class="btn btn-p" onclick="openSourcesModal()"><span class="material-symbols-outlined">auto_awesome</span>Unlock My Recommendations</button>'
+    +'</div></div>';
+}
+// No CTA here on purpose: the redirect fires automatically the moment renderListPage()
+// finds !canEdit() (see the toast() call there) — there's nothing left to click.
 function noAccessState(){
   return '<div id="rs-statefull" class="rs-fullcard"><div class="empty-state" style="padding:0">'
     +'<span class="material-symbols-outlined">lock</span>'
     +'<div class="empty-state-title">Rate Optimization is available to Owners and Admins</div>'
-    +'<div class="empty-state-sub">Commitment purchases are a central, billing-account-level decision, so this feature is restricted to Owner / Admin roles. You will be redirected to Overview.</div>'
-    +'<button class="btn btn-p" onclick="toast(\'(Demo) Would redirect to Overview.\')">Back to Overview</button></div></div>';
+    +'<div class="empty-state-sub">Commitment purchases are a central, billing-account-level decision, so this feature is restricted to Owner / Admin roles. Redirecting you to Overview…</div>'
+    +'</div></div>';
 }
 function authState(){
   // Only ever reached when canEdit() is true — renderListPage()'s earlier
@@ -1220,6 +1566,10 @@ function bindTips(){
     if(el._tipBound) return; el._tipBound=true;
     el.addEventListener('mouseenter', function(){ showTip(el); });
     el.addEventListener('mouseleave', hideTip);
+    // Focus/blur as well: the Figma annotation specifies "Hover / Focus" for the
+    // Save warning, and it makes every tooltip reachable by keyboard.
+    el.addEventListener('focus', function(){ showTip(el); });
+    el.addEventListener('blur', hideTip);
   });
 }
 var _tipEl;
@@ -1228,9 +1578,13 @@ var _tipEl;
    (no opacity transition) so there is no fade window during which an old
    and a new tooltip could ever be visible/overlapping at once. */
 function showTip(el){
+  // Listeners persist after data-rs-tip is removed (see renderSourceRows toggling the
+  // Save warning), and innerHTML = null would literally render "null" — so bail out
+  // when there's nothing to show rather than displaying a phantom tooltip.
+  var t = el.getAttribute('data-rs-tip'); if(!t) return;
   _tipEl = $('#rs-tip');
   _tipEl.classList.remove('show');   // force-reset any previous show state first
-  _tipEl.innerHTML = el.getAttribute('data-rs-tip');
+  _tipEl.innerHTML = t;
   _tipEl.classList.add('show');
   positionTipFor(el);
 }
@@ -1273,44 +1627,56 @@ window.DEMO_SCENARIOS = [
   // View
   { id:'view-rec',    page:'view', label:'Recommendations',    icon:'lightbulb',   tip:'主畫面：3 張 KPI 卡 + 推薦清單（無生命週期分頁，純 advisory 檢視）。' },
   { id:'view-active', page:'view', label:'Active Commitments', icon:'inventory_2', tip:'現有承諾組合：Monthly Cost + 利用率 + 到期追蹤，依到期排序，低利用率變色。' },
-  { id:'reset-tip',   page:'view', label:'Reset "Rightsizing tip"', icon:'restart_alt', tip:'重置 rightsizing 提示（清掉 session 關閉狀態 + localStorage 永久關閉狀態），用於重覆展示 dismiss 行為。' },
-  // Role
+  // Role — T1/T2 (no access) removed from the demo list (2026-08); canEdit()/
+  // noAccessState() themselves are untouched, this only affects what's browsable here.
   { id:'admin',  page:'role', label:'Owner / Admin',       icon:'admin_panel_settings', tip:'唯一有存取權：可篩選/搜尋，並可切換各 provider 的資料來源啟用開關。' },
-  { id:'viewer', page:'role', label:'T1 / T2 (No access)', icon:'lock',                 tip:'Manager / Member 對 Rate Optimization 無存取，功能不顯示、導回 Overview。' },
   // State
   { id:'set',        page:'state', label:'With data (預設)',    icon:'check_circle',  tip:'正常狀態：KPI 有值、推薦與承諾可操作。' },
   { id:'loading',    page:'state', label:'Loading (Skeleton)',  icon:'hourglass_top', isNoData:true, tip:'資料載入中：cards 與表格以 shimmer 取代。' },
-  { id:'first-time', page:'state', label:'First-Time use',      icon:'savings',       isNoData:true, tip:'第一次使用：模糊預覽 + CTA「Set Up Scope Settings」。與 No Authorization 狀態刻意區分（no-auth=完全未連線的平台層級關卡；first-time=已連線但未設範圍的功能層級關卡）。⚠️ 202607 版本不做：Scope Settings 頁面本身無真實設定 UI（見 page-scope 註記），此 CTA 保留是為了維持與 no-auth 的區隔、預留未來真實流程，非本期功能。' },
+  { id:'first-time', page:'state', label:'Data sources 全關（引導卡）', icon:'cloud_sync', isNoData:true, tip:'依 Figma #10（node 10627:34832）：已授權但沒開任何資料來源時，整個內容區換成單張引導卡「Enable Cloud Data Sources to View Rate Optimization」+ CTA「Unlock My Recommendations」。**只有這一種畫面**——設計稿註記寫「若使用者已完成授權且所有 Data Source 皆設定為關閉，顯示狀態如上圖」，不分第一次使用或自己關掉，所以原本用 localStorage 區分兩態的機制（ro_sources_configured_v1 與 Reset first-run gate 情境）已全數移除。此狀態也會在 provEnabled 全關時自動觸發，不必特地點這張卡。取代先前「三張 KPI 卡各喊一次 No Data」的呈現：No Data 是「真的沒資料／出錯」的語彙，用來講「你還沒選來源」會把一個一鍵可解的設定狀態誤標成死路。' },
   { id:'empty',      page:'state', label:'No data created',     icon:'inbox',         isNoData:true, tip:'已連線但資料累積中：KPI 顯示 No Data、表格說明累積中。' },
   { id:'no-auth',    page:'state', label:'No authorization',    icon:'lock',          isNoData:true, tip:'帳單帳戶尚未授權（僅 admin 會看到，含 Add Your Authorization CTA）。⚠️ 2026-07-21 修正：此狀態只有一種畫面，不會因角色而異——切到 viewer 看到的是完全不同的「Owner/Admin only」全域擋牆（noAccessState，功能層級），不是這個狀態本身的非 admin 變體；authState() 內原本的非 admin 分支已確認不可達並移除。' },
   { id:'nodata',     page:'state', label:'Error (API failure)', icon:'cloud_off',     isNoData:true, tip:'載入失敗，與 No Data 共用呈現。' },
   // Data sources (per-provider enablement — data-driven, scales 1→N)
-  { id:'src-all',      page:'src', label:'All enabled',           icon:'cloud_done', tip:'三朵雲皆啟用：KPI/清單含全部資料。此卡資料驅動，加減 provider 只改 config。' },
-  { id:'src-all-off',  page:'src', label:'All off — 真實預設 (2026-07-21 修正)', icon:'cloud_off', tip:'三朵雲全關，這就是 provEnabled 的實際初始值，也是頁面載入當下的狀態——PRD「服務啟用開關預設不開，適用於三朵雲」對三雲皆成立，僅 AWS 額外標注費用，不是「只有 AWS 預設關」。這也是本期（AWS 為先階段）大多數使用者第一次進來會撞到的真實狀態。KPI 卡顯示 No Data（非 error/empty pageState，而是「沒開任何來源」的專屬訊息），表格顯示 Open Data Sources CTA。' },
-  { id:'src-aws-off', page:'src', label:'AWS off only (cost-gated)', icon:'toggle_off', tip:'只關 AWS（其餘開）：AWS 從 KPI/清單/type filter 全數排除，KPI 標「(excl. AWS)」，filter 選 AWS 出現 not-enabled 空狀態。開啟會跳費用確認彈窗（唯一 gated provider）。此情境用於單獨測試 AWS 費用確認機制，非代表真實預設。' },
-  { id:'src-gcp-off', page:'src', label:'GCP off only (free provider)', icon:'toggle_off', tip:'只關 GCP（其餘開）：示範同一套機制也適用非收費 provider——GCP 關閉直接生效（無費用確認），資料一樣被排除。證明未來三朵雲各有開關可零改版擴充。此情境用於單獨測試機制，非代表真實預設。' },
+  { id:'src-aws-only', page:'src', label:'AWS only — 202607 真實正常態', icon:'cloud_done', tip:'只開 AWS，這是本期 scope 下真正的正常使用狀態，也是對照 Figma #01／#07 主畫面時該用的情境。依設計稿頁面註記「202607 Scope 尚不開放 Scope Settings 與 AWS 外的其他 CSP」，GCP/Azure 在 Data Sources 彈窗中呈現 Disabled、無法開啟，所以真實使用者只可能停在這個組合。' },
+  { id:'src-all',      page:'src', label:'All enabled（未來態預覽）', icon:'cloud_done', tip:'三朵雲皆啟用：KPI/清單含全部（含 GCP/Azure）mock 資料。⚠️ 未來態預覽：202607 版彈窗已將 GCP/Azure 鎖定為 Disabled（僅 AWS 可操作），此狀態無法再經由真實 UI 到達，只能由 Demo FAB 直接寫入 state——保留作為多雲開放後的願景展示，mock 資料因此不刪。' },
+  { id:'src-all-off',  page:'src', label:'All off（＝產品預設）', icon:'cloud_off', tip:'三朵雲全關 = PRD 定義的產品預設（啟用來源可能對客戶產生費用，故一律不預開），顯示 Figma #10 的引導卡。與 State 分頁的「Data sources 全關（引導卡）」是同一個畫面——不論第一次使用或自己關掉都一樣，設計稿只定義這一種呈現。' },
+  { id:'src-aws-off', page:'src', label:'AWS off only（未來態預覽）', icon:'toggle_off', tip:'只關 AWS（其餘開）：⚠️ 未來態預覽——真實 UI 中 GCP/Azure 無法開啟，「AWS 關、其他開」只能由 Demo FAB 到達。用於檢視 KPI 排除與 filter 選到未啟用 provider 時的空狀態。註：AWS 費用確認彈窗已依 Figma #12-1 移除，開啟 AWS 改為 toggle 直接生效 + 列內紅字警告 + Save hover/focus tooltip，且因為是暫存草稿，按 Save 前不會真的產生費用。' },
+  { id:'src-gcp-off', page:'src', label:'GCP off only（未來態預覽）', icon:'toggle_off', tip:'只關 GCP（其餘開）：⚠️ 未來態預覽，202607 鎖定後此組合真實 UI 不可達。保留以展示同一套 config 驅動機制：資料排除、filter 空狀態、加減 provider 零改版擴充。' },
 ];
 window.DEMO_DEFAULT = 'set';
 window.DEMO_APPLY = function(id){
   if(id==='view-rec'){ if(!canEdit()) setRole('admin'); showPage('list'); setView('rec'); return; }
   if(id==='view-active'){ if(!canEdit()) setRole('admin'); showPage('list'); setView('active'); return; }
-  if(id==='reset-tip'){ state.hintDismissedSession=false; try{ localStorage.removeItem(HINT_KEY); }catch(e){} renderHint(); toast('Rightsizing tip reset.'); return; }
   if(id==='admin'){ setRole('admin'); return; }
-  if(id==='viewer'){ setRole('viewer'); return; }
   if(id==='set'){
     // "With data" is a reviewer baseline (full populated design), distinct from the
     // real production default — force all providers on so the label stays accurate
     // regardless of whatever a prior 'src-*' scenario left provEnabled at.
     if(!canEdit()) setRole('admin'); showPage('list'); state.provEnabled = { aws:true, gcp:true, azure:true }; setPageState('set'); return;
   }
-  if(['loading','first-time','empty','nodata','no-auth'].indexOf(id)>=0){ if(!canEdit()) setRole('admin'); showPage('list'); setPageState(id); return; }
-  if(['src-all','src-all-off','src-aws-off','src-gcp-off'].indexOf(id)>=0){
+  if(['loading','first-time','empty','nodata','no-auth'].indexOf(id)>=0){
+    if(!canEdit()) setRole('admin'); showPage('list');
+    // 'first-time' means "all sources off" by definition (that's the label) — force
+    // provEnabled to match so it can't inherit an all-on state left by a prior 'set'/
+    // 'src-*' scenario. Fixed a real bug: leaving provEnabled untouched meant opening
+    // the real Data Sources modal from here showed every toggle as ON by default.
+    if(id==='first-time') state.provEnabled = { aws:false, gcp:false, azure:false };
+    setPageState(id);
+    return;
+  }
+  if(['src-aws-only','src-all','src-all-off','src-aws-off','src-gcp-off'].indexOf(id)>=0){
     if(!canEdit()) setRole('admin'); showPage('list'); if(state.pageState!=='set') setPageState('set');
-    if(id==='src-all') state.provEnabled = { aws:true, gcp:true, azure:true };
+    // The real 202607 normal state: AWS is the only provider this release supports.
+    if(id==='src-aws-only') state.provEnabled = { aws:true, gcp:false, azure:false };
+    else if(id==='src-all') state.provEnabled = { aws:true, gcp:true, azure:true };
     else if(id==='src-all-off') state.provEnabled = { aws:false, gcp:false, azure:false };
     else if(id==='src-aws-off') state.provEnabled = { aws:false, gcp:true, azure:true };
     else if(id==='src-gcp-off') state.provEnabled = { aws:true, gcp:false, azure:true };
-    state.fProv=''; state.fType=''; refreshProviderViews(); return;
+    // renderListPage(), not the old refreshProviderViews() — that helper was removed
+    // in an earlier refactor but this call site kept referencing it, so every src-*
+    // scenario threw a ReferenceError.
+    state.fProv=''; state.fType=''; renderListPage(); return;
   }
 };
 
@@ -1332,7 +1698,6 @@ bindTips();
 })();
 </script>
 
-<!-- Shared components — nav data MUST load before sidebar renderer -->
 <script>
 /* === Inlined: shared/currency-picker.js === */
 /*!
