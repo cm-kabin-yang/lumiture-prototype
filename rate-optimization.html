@@ -137,6 +137,8 @@ input,select,textarea{font-family:inherit;font-size:14px}
    signal has to read on a dark blue ground — the old treatment tinted the border
    and label, which is invisible on a filled button. Amber pill on white instead. */
 .rs-src-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--g100)}
+.rs-sync-status{font-size:13px;color:var(--g500);flex-shrink:0}
+.rs-sync-status.failed{color:var(--err)}
 /* Providers not supported this release: whole row dimmed, note in disabled grey,
    toggle inert (Figma #12 「其他項目顯示但不開放操作，因此呈現 Disabled 狀態」). */
 .rs-src-row.locked{opacity:.5}
@@ -145,10 +147,10 @@ input,select,textarea{font-family:inherit;font-size:14px}
 /* Cost-gated provider notes: bold grey when off, bold amber when on — no icon.
    2026-08 team call: this is a heads-up, not a blocking error, so it takes the
    same warning-amber as the expiring-commitment styling below, not --err red.
-   The pricing link deliberately inherits that colour on the ON state. */
+   2026-08 correction: the pricing link stays hyperlink-blue in both states —
+   it's a real link, not part of the warning colour, so it doesn't inherit. */
 .rs-src-note.gated-off{font-weight:700;color:var(--g500)}
 .rs-src-note.gated-on{font-weight:700;color:var(--warn)}
-.rs-src-note.gated-on a{color:inherit}
 .rs-src-row:last-child{border-bottom:none}
 .rs-src-ico{width:30px;height:30px;border-radius:6px;background:var(--g50);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .rs-src-ico .rs-prov{width:20px;height:20px}
@@ -316,6 +318,8 @@ table.rstbl.acttbl{min-width:1080px}
 .skeleton{background:linear-gradient(90deg,var(--g100) 25%,var(--g200) 37%,var(--g100) 63%);background-size:1200px 100%;animation:sk-shimmer 1.4s ease infinite;border-radius:4px;display:inline-block}
 .sk-row td{height:50px;border-bottom:1px solid var(--g100)}
 .sk-line{height:14px;border-radius:4px}
+@keyframes rs-spin{to{transform:rotate(360deg)}}
+.rs-spin{animation:rs-spin 1s linear infinite;margin-left:2px}
 
 /* ==== Modal ==== */
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:24px}
@@ -676,6 +680,11 @@ var state = {
   // was reverted 2026-07-30. Reviewers who want the populated baseline use the Demo
   // FAB ("With data"), or just click through the first-run gate below.
   provEnabled: { aws:false, gcp:false, azure:false },
+  // Per-provider async sync status, per Figma #05-2 (node 10923:49787). Only AWS
+  // ever gets a real value — it's the only provider that actually fetches data;
+  // GCP/Azure are locked placeholders with nothing to sync.
+  // null | 'syncing' | 'synced' | 'failed'
+  syncStatus: { aws: null },
   selection: {},
 };
 var $ = function(s,r){ return (r||document).querySelector(s); };
@@ -990,7 +999,19 @@ function canEdit(){ return state.role==='admin'; }
 /* The header button carries no state indicator any more — the N/3 count chip was a
    design-side addition and Kabin removed it 2026-07-30 to match Figma exactly. The
    "nothing is enabled" signal now lives where it's actionable: the full-page gate. */
-function renderDataSources(){ /* no-op: button is static; kept as a hook if the design adds an indicator back */ }
+var DS_BTN_TIP_DEFAULT = 'Select which cloud providers LumiTure.ai syncs Rate Optimization data from.';
+// Figma #11 (node 10912:231433): while AWS is mid-sync, the button grows a spinner
+// and the tooltip switches to explaining that the wait is normal and the page is
+// safe to leave — the button stays clickable so a reviewer can reopen the modal
+// and see the same Syncing/Synced/Failed status from renderSourceRows().
+var DS_BTN_TIP_SYNCING = 'Syncing typically takes a few minutes. You can track the progress by clicking this button, or safely leave this page and check back later.';
+function renderDataSources(){
+  var btn = $('#ds-btn'); if(!btn) return;
+  var syncing = state.syncStatus.aws==='syncing';
+  btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">settings</span><span>Data Sources</span>'
+    + (syncing ? '<span class="material-symbols-outlined rs-spin" style="font-size:16px">progress_activity</span>' : '');
+  btn.setAttribute('data-rs-tip', syncing ? DS_BTN_TIP_SYNCING : DS_BTN_TIP_DEFAULT);
+}
 // 2026-07-30: modal switched from apply-on-toggle to a staged draft committed by
 // Save (Cancel/✕ discard it). _srcDraft is a plain clone of state.provEnabled,
 // live only while the modal is open — nothing outside it (KPIs, tables, badge,
@@ -1019,9 +1040,15 @@ function renderSourceRows(){
     } else {
       note = on ? 'Enabled' : 'Off';   // future non-gated supported provider; unreachable in 202607
     }
+    // Sync status text sits immediately left of the toggle (Figma #05-2, node
+    // 10923:49787) — only ever set for AWS, the one provider that actually fetches
+    // data; GCP/Azure have nothing to sync so they never get a status label.
+    var sync = state.syncStatus[p.key];
+    var syncLbl = sync ? '<span class="rs-sync-status'+(sync==='failed'?' failed':'')+'">'+(sync==='syncing'?'Syncing':sync==='synced'?'Synced':'Failed')+'</span>' : '';
     return '<div class="rs-src-row'+(p.supported?'':' locked')+'">'
       +'<div class="rs-src-ico">'+provBadge(p.key)+'</div>'
       +'<div class="rs-src-body"><div class="rs-src-name">'+p.label+'</div><div class="'+noteCls+'">'+note+'</div></div>'
+      +syncLbl
       +'<label class="rs-toggle"><input type="checkbox"'+(on?' checked':'')+(p.supported?'':' disabled')
         +' onchange="onProvToggle(\''+p.key+'\',this)"><span class="track"></span></label>'
       +'</div>';
@@ -1048,8 +1075,16 @@ function onProvToggle(key, input){
   renderSourceRows();
 }
 function cancelSourcesModal(){ closeModal('mo-sources'); } // _srcDraft just gets discarded; re-seeded from live state next open
+// How long the demo pretends AWS takes to sync. Real backend is "a few minutes"
+// (Figma #11 tooltip copy) — shortened here so a reviewer doesn't have to wait.
+var AWS_SYNC_MS = 4000;
 function saveSourcesModal(){
   var changed = PROVIDERS.filter(function(p){ return !!_srcDraft[p.key] !== !!state.provEnabled[p.key]; });
+  // AWS is the only provider that actually fetches data, so it's the only one
+  // with an async sync beat (Figma #05-2 / #11, node 10923:49787 / 10912:231433).
+  // Turning it off, or touching the still-locked GCP/Azure, applies immediately —
+  // there's nothing to wait on.
+  var awsJustEnabled = _srcDraft.aws && !state.provEnabled.aws;
   state.provEnabled = Object.assign({}, _srcDraft);
   state.fProv=''; state.fType='';
   // First successful enable graduates the org out of the first-run gate for good,
@@ -1061,6 +1096,19 @@ function saveSourcesModal(){
   // and only the second half was ever getting updated.
   if(state.pageState!=='set') state.pageState='set';
   closeModal('mo-sources');
+
+  if(awsJustEnabled){
+    state.syncStatus.aws = 'syncing';
+    // Pre-mark the transition-skeleton flag so renderListPage()'s own "just
+    // arrived at the populated view" skeleton (600ms, see renderNormalContent)
+    // doesn't also fire and race with this longer sync-driven one — pageState
+    // stays 'loading' for the whole sync, not just the usual quick flash.
+    _normalShown = true;
+    state.pageState = 'loading';
+    renderListPage();
+    startAwsSync();
+    return;
+  }
   // Goes through renderListPage (not just the inner renders) so the first-run gate is
   // re-evaluated: committing an enable has to tear the overlay down, not leave it floating.
   renderListPage();
@@ -1068,6 +1116,24 @@ function saveSourcesModal(){
   toast(changed.length===1
     ? changed[0].label+(state.provEnabled[changed[0].key] ? ' enabled.' : ' turned off — data is no longer fetched.')
     : changed.length+' data sources updated.');
+}
+/* Figma sticky note under #05-2 (node 10923:50063): failed syncs auto-retry on the
+   backend and the chance of a persistent failure is treated as negligible, so
+   there's deliberately no manual retry UI here — just the two end states. `outcome`
+   lets the Demo FAB force a specific result instead of leaving it to Math.random(),
+   which this file's other demo scenarios avoid for the same determinism reason. */
+function startAwsSync(outcome){
+  setTimeout(function(){
+    var ok = outcome ? outcome==='success' : true; // negligible failure rate per Figma
+    state.syncStatus.aws = ok ? 'synced' : 'failed';
+    state.pageState = ok ? 'set' : 'nodata';
+    renderListPage();
+    toast(
+      ok ? 'Rate Optimization data synced successfully.'
+         : 'Unable to complete data source sync for rate optimization. The system will automatically retry. Please check back later.',
+      ok ? undefined : 'err'
+    );
+  }, AWS_SYNC_MS);
 }
 /* ============================================================
    Rightsizing-first tip — permanent advisory (no dismiss)
@@ -1096,7 +1162,7 @@ function renderHint(){
     // Copy per Figma #01. Real navigation, not a demo toast — the page annotation
     // says 「[Tip] 點擊文字中連結前往 Usage Optimization」, and the href matches the
     // one the shared sidebar uses for that entry so both stay on the same target.
-    +'<div class="h-d" style="flex:1"><b>Tip:</b> Remove oversized or idle resources in <a href="../rightsizing/rightsizing-prototype-v1.html">Usage Optimization</a> before locking in your commitments.</div>'
+    +'<div class="h-d" style="flex:1"><b>Tip:</b> Remove oversized or idle resources in <a href="./rightsizing.html">Usage Optimization</a> before locking in your commitments.</div>'
     +'</div>';
   bindTips();
 }
@@ -1643,6 +1709,12 @@ window.DEMO_SCENARIOS = [
   { id:'src-all-off',  page:'src', label:'All off（＝產品預設）', icon:'cloud_off', tip:'三朵雲全關 = PRD 定義的產品預設（啟用來源可能對客戶產生費用，故一律不預開），顯示 Figma #10 的引導卡。與 State 分頁的「Data sources 全關（引導卡）」是同一個畫面——不論第一次使用或自己關掉都一樣，設計稿只定義這一種呈現。' },
   { id:'src-aws-off', page:'src', label:'AWS off only（未來態預覽）', icon:'toggle_off', tip:'只關 AWS（其餘開）：⚠️ 未來態預覽——真實 UI 中 GCP/Azure 無法開啟，「AWS 關、其他開」只能由 Demo FAB 到達。用於檢視 KPI 排除與 filter 選到未啟用 provider 時的空狀態。註：AWS 費用確認彈窗已依 Figma #12-1 移除，開啟 AWS 改為 toggle 直接生效 + 列內紅字警告 + Save hover/focus tooltip，且因為是暫存草稿，按 Save 前不會真的產生費用。' },
   { id:'src-gcp-off', page:'src', label:'GCP off only（未來態預覽）', icon:'toggle_off', tip:'只關 GCP（其餘開）：⚠️ 未來態預覽，202607 鎖定後此組合真實 UI 不可達。保留以展示同一套 config 驅動機制：資料排除、filter 空狀態、加減 provider 零改版擴充。' },
+  // Async AWS sync — Figma #05-2 / #11 / #12 (2026-08-07 team discussion). Real
+  // trigger is toggling AWS on in the modal and hitting Save; these three let a
+  // reviewer jump straight to each end state instead of waiting AWS_SYNC_MS out.
+  { id:'sync-progress', page:'src', label:'Data source: Syncing…', icon:'progress_activity', tip:'停在同步中，不會自動 resolve：Data Sources 按鈕帶 spinner + 換過的 tooltip，卡片/表格維持 skeleton，開彈窗會看到 AWS 那列狀態是 Syncing。真實觸發路徑是在彈窗把 AWS 從關切到開再按 Save。' },
+  { id:'sync-success',  page:'src', label:'Data source: Synced', icon:'cloud_done', tip:'同步剛成功落地：資料正常顯示、彈窗 AWS 列狀態是 Synced，並補跳一次成功 toast 方便截圖。' },
+  { id:'sync-failed',   page:'src', label:'Data source: Failed', icon:'cloud_off', tip:'同步失敗：頁面走現有的 No Data / Error 呈現（跟其他失敗情境共用），彈窗 AWS 列狀態是 Failed（紅字）。設計稿明講失敗會由後端自動重試、且視為機率極低，所以這裡沒有手動 retry 按鈕。' },
 ];
 window.DEMO_DEFAULT = 'set';
 window.DEMO_APPLY = function(id){
@@ -1677,6 +1749,28 @@ window.DEMO_APPLY = function(id){
     // in an earlier refactor but this call site kept referencing it, so every src-*
     // scenario threw a ReferenceError.
     state.fProv=''; state.fType=''; renderListPage(); return;
+  }
+  if(['sync-progress','sync-success','sync-failed'].indexOf(id)>=0){
+    if(!canEdit()) setRole('admin'); showPage('list');
+    state.provEnabled = { aws:true, gcp:false, azure:false };
+    state.fProv=''; state.fType='';
+    if(id==='sync-progress'){
+      state.syncStatus.aws = 'syncing';
+      _normalShown = true;
+      state.pageState = 'loading';
+    } else if(id==='sync-success'){
+      state.syncStatus.aws = 'synced';
+      _normalShown = true;
+      state.pageState = 'set';
+    } else {
+      state.syncStatus.aws = 'failed';
+      _normalShown = true;
+      state.pageState = 'nodata';
+    }
+    renderListPage();
+    if(id==='sync-success') toast('Rate Optimization data synced successfully.');
+    if(id==='sync-failed') toast('Unable to complete data source sync for rate optimization. The system will automatically retry. Please check back later.', 'err');
+    return;
   }
 };
 
