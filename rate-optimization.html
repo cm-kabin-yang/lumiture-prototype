@@ -802,9 +802,12 @@ function debounceSearch(fn){
 var AWS_PRICING_URL = 'https://aws.amazon.com/tw/aws-cost-management/aws-cost-explorer/pricing/';
 var PROVIDERS = [
   { key:'gcp',   label:'Google Cloud', full:'Google Cloud',        supported:false, gated:false },
+  // 2026-08: FE asked for one copy instead of an enabling/saving pair — maintaining
+  // two near-identical strings that only differ by one word was adding complexity
+  // on their end for no real benefit to the user. Same text regardless of on/off;
+  // the on/off colour distinction (gated-on/gated-off, see renderSourceRows) stays.
   { key:'aws',   label:'AWS',          full:'Amazon Web Services', supported:true,  gated:true,
-    noteOff:'AWS charges for Cost Explorer API requests. Please check <a href="'+AWS_PRICING_URL+'" target="_blank" rel="noopener">pricing</a> before enabling.',
-    noteOn:'AWS charges for Cost Explorer API requests. Please check <a href="'+AWS_PRICING_URL+'" target="_blank" rel="noopener">pricing</a> before saving.' },
+    note:'AWS charges for Cost Explorer API requests. Please check <a href="'+AWS_PRICING_URL+'" target="_blank" rel="noopener">pricing</a> before saving.' },
   { key:'azure', label:'Azure',        full:'Microsoft Azure',     supported:false, gated:false },
 ];
 function provOf(key){ return PROVIDERS.filter(function(p){return p.key===key;})[0]; }
@@ -1032,10 +1035,11 @@ function renderSourceRows(){
       // Generated from p.label so each locked row always names its own provider.
       note = 'Support for '+p.label+' will be available in upcoming releases.';
     } else if(p.gated){
-      // ON: red + warning icon (Figma #12-1). OFF: bold grey with the pricing link
-      // (Figma #12). The link inherits the red on the ON state — checked against the
-      // Figma source, which only sets a blue link colour on the OFF variant.
-      note = on ? p.noteOn : p.noteOff;
+      // Same copy on and off (see PROVIDERS — FE's call, one string to maintain
+      // instead of two). Only the colour still switches: bold grey when off, bold
+      // amber when on (see .rs-src-note.gated-on); the pricing link stays hyperlink
+      // blue in both states.
+      note = p.note;
       noteCls += on ? ' gated-on' : ' gated-off';
     } else {
       note = on ? 'Enabled' : 'Off';   // future non-gated supported provider; unreachable in 202607
@@ -1199,7 +1203,7 @@ function allSourcesOff(){ return PROVIDERS.every(function(p){return !state.provE
 var CARD_META = [
   { label:'Coverage',                  tip:'Percentage of eligible spend covered by active commitments (weighted average across providers).' },
   { label:'Utilization',               tip:'Percentage of purchased commitment capacity actually used (weighted average across providers).' },
-  { label:'Potential Monthly Savings', tip:'Total estimated monthly savings across all open recommendations (To-Do and Changed), aggregated from native provider engines.' }
+  { label:'Potential Monthly Savings', tip:'Estimated monthly savings based on a conservative 1-year, No Upfront baseline across non-overlapping Savings Plans to avoid double-counting.' }
 ];
 function cardLabel(m){
   return '<span class="lbl">'+m.label+' <span class="material-symbols-outlined ico-info" data-rs-tip="'+escTip(m.tip)+'">info</span></span>';
@@ -1245,7 +1249,7 @@ function renderCards(){
       +'<div class="rs-card">'+cardLabel(CARD_META[2])
         // Plain secondary text: this line is a caveat on how the figure is derived,
         // not a positive result, so it doesn't take the success green.
-        +'<span class="val rs-num">'+dash(pot, nFmt)+' <span class="unit">'+state.currency+'</span></span><span class="sub">If all recommendations below are applied</span></div>';
+        +'<span class="val rs-num">'+dash(pot, nFmt)+' <span class="unit">'+state.currency+'</span></span><span class="sub">Based on 1-year No Upfront options</span></div>';
   }
   $('#rs-cards').innerHTML = cards;
   bindTips();
