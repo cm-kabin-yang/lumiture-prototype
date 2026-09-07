@@ -416,7 +416,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:var(--lt-color-primar
 .rmodal-close{border:0;background:transparent;color:var(--lt-color-text-secondary);cursor:pointer;display:flex;padding:2px}
 .rmodal-tools{display:flex;align-items:center;gap:8px;padding:16px 24px 12px}
 .rmodal-tools .search-box{flex:1;width:auto}
-.rmodal-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;border-top:1px solid var(--lt-color-border-default);border-bottom:1px solid var(--lt-color-border-default);padding:8px 0}
+.rmodal-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;border-top:1px solid var(--lt-color-border-default);border-bottom:1px solid var(--lt-color-border-default)}
 .rmodal-body::-webkit-scrollbar{width:6px}
 .rmodal-body::-webkit-scrollbar-thumb{background:var(--lt-grey-300);border-radius:3px}
 .rmodal-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px}
@@ -428,6 +428,11 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:var(--lt-color-primar
 /* 每一層畫一條垂直引導線，否則子資料夾跟同層專案縮排相同、讀不出誰屬於誰 */
 .trail{position:absolute;top:0;bottom:0;width:1px;background:var(--lt-color-border-default)}
 .tnode:hover{background:var(--lt-color-primary-bg)}
+/* 資料夾列在自己的子樹範圍內黏在頂端。因為 .tbranch 把子項包起來，
+ * 黏著會在子樹捲完時自然結束，不會一路疊到底。收合的資料夾 .tbranch
+ * 高度等於自己那一列，等於沒有黏著空間，行為自動退回一般列。 */
+.tnode.is-folder{position:sticky;background:var(--lt-color-bg-default)}
+.tnode.is-folder:hover{background:var(--lt-color-primary-bg)}
 .tnode.is-project{min-height:44px}
 .tchev{width:20px;height:20px;flex:0 0 20px;display:grid;place-items:center;border:0;background:transparent;color:var(--lt-color-text-secondary);cursor:pointer;border-radius:3px}
 .tchev:hover{background:var(--lt-grey-200)}
@@ -1856,6 +1861,7 @@ function checkboxHtml(stateKey, onclick, indeterminate){
  * 視覺編碼，換成文字等於要使用者自己讀了再比對，反而更難懂），不如把步進縮小
  * 讓縮排一路撐到底：16px × 10 層 = 160px，660px 的彈窗放得下，階層也全程看得見。 */
 const INDENT_STEP = 16;
+const FOLDER_ROW_H = 40;   // sticky 疊放的 offset 要跟資料夾列高一致
 function indentPx(depth){ return 24 + depth * INDENT_STEP; }
 function railsHtml(depth){
   let out = '';
@@ -1888,12 +1894,14 @@ function folderRow(node, depth){
       node.children.filter(nodeHasVisible).map(child=>folderRow(child, depth+1)).join('') +
       node.projects.filter(project => folderMatches(node) ? (assign.baFilter==='all'||project.ba.id===assign.baFilter) : projectVisible(project)).map(project=>projectRow(project, depth+1)).join('')
     ) : '';
-  return `<div class="tnode is-folder" style="padding-left:${indentPx(depth)}px"${node.folderId?` title="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth)}
-      <button class="tchev" onclick="event.stopPropagation();toggleExpand('${node.id}')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
-      ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome)}
-      <span class="material-symbols-outlined ticon">folder</span>
-      <div class="tlabel"><span class="tname">${hl(node.name)} <span class="tcount ${assign.baFilter!=='all'?'partial':''}">${countText}</span></span></div>
-    </div>${kids}`;
+  return `<div class="tbranch">
+      <div class="tnode is-folder" style="padding-left:${indentPx(depth)}px;top:${depth*FOLDER_ROW_H}px;z-index:${30-depth}"${node.folderId?` title="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth)}
+        <button class="tchev" onclick="event.stopPropagation();toggleExpand('${node.id}')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
+        ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome)}
+        <span class="material-symbols-outlined ticon">folder</span>
+        <div class="tlabel"><span class="tname">${hl(node.name)} <span class="tcount ${assign.baFilter!=='all'?'partial':''}">${countText}</span></span></div>
+      </div>${kids}
+    </div>`;
 }
 function unassignedRow(){
   const inFilter = UNASSIGNED_PROJECTS.filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter);
@@ -1904,13 +1912,15 @@ function unassignedRow(){
   const isSome = picked>0 && !isAll;
   const expanded = !!assign.expanded['unassigned'] || !!assign.search;
   const kids = expanded ? visible.map(project=>projectRow(project,1)).join('') : '';
-  return `<div class="tnode is-folder is-unassigned" style="padding-left:24px" onclick="toggleExpand('unassigned')">
-      <button class="tchev" onclick="event.stopPropagation();toggleExpand('unassigned')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
-      ${checkboxHtml(isAll, `toggleUnassigned()`, isSome)}
-      <span class="material-symbols-outlined ticon">folder_off</span>
-      <div class="tlabel"><span class="tname">No folder <span class="tcount">(${inFilter.length})</span></span>
-      <span class="tsub">Projects sitting directly under ${ORG_DOMAIN}</span></div>
-    </div>${kids}`;
+  return `<div class="tbranch">
+      <div class="tnode is-folder is-unassigned" style="padding-left:24px;top:0;z-index:30" onclick="toggleExpand('unassigned')">
+        <button class="tchev" onclick="event.stopPropagation();toggleExpand('unassigned')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
+        ${checkboxHtml(isAll, `toggleUnassigned()`, isSome)}
+        <span class="material-symbols-outlined ticon">folder_off</span>
+        <div class="tlabel"><span class="tname">No folder <span class="tcount">(${inFilter.length})</span></span>
+        <span class="tsub">Projects sitting directly under ${ORG_DOMAIN}</span></div>
+      </div>${kids}
+    </div>`;
 }
 function toggleUnassigned(){
   const inFilter = UNASSIGNED_PROJECTS.filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter);
@@ -1929,12 +1939,14 @@ function flatBaTree(){
     const picked = selectedIn(projects);
     const isAll = projects.length>0 && picked===projects.length;
     const isSome = picked>0 && !isAll;
-    return `<div class="tnode is-folder" style="padding-left:24px" onclick="toggleExpand('${ba.id}')">
-        <button class="tchev" onclick="event.stopPropagation();toggleExpand('${ba.id}')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
-        ${checkboxHtml(isAll, `toggleBa('${ba.id}')`, isSome)}
-        <span class="material-symbols-outlined ticon">account_balance_wallet</span>
-        <div class="tlabel"><span class="tname">${hl(ba.name)} <span class="tcount">(${projects.length})</span></span></div>
-      </div>${expanded ? projects.map(project=>projectRow(project,1)).join('') : ''}`;
+    return `<div class="tbranch">
+        <div class="tnode is-folder" style="padding-left:24px;top:0;z-index:30" onclick="toggleExpand('${ba.id}')">
+          <button class="tchev" onclick="event.stopPropagation();toggleExpand('${ba.id}')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
+          ${checkboxHtml(isAll, `toggleBa('${ba.id}')`, isSome)}
+          <span class="material-symbols-outlined ticon">account_balance_wallet</span>
+          <div class="tlabel"><span class="tname">${hl(ba.name)} <span class="tcount">(${projects.length})</span></span></div>
+        </div>${expanded ? projects.map(project=>projectRow(project,1)).join('') : ''}
+      </div>`;
   }).join('');
 }
 function toggleBa(baId){
