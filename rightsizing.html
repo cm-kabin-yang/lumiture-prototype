@@ -33,7 +33,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .content.has-savebar{padding-bottom:96px}
 
 /* ==== Page header ==== */
-.pg-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap}
+.pg-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:16px;flex-wrap:wrap}
 .pg-title{font-size:20px;font-weight:700;color:var(--g900);line-height:1.5;display:flex;align-items:center;gap:8px}
 .pg-hdr-r{display:flex;align-items:center;gap:20px}
 .upd{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--g500)}
@@ -58,8 +58,8 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .btn-b:hover .btn-text{text-decoration:underline}
 
 /* ==== Summary cards ==== */
-.rs-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
-.rs-card{background:#fff;border-radius:var(--r-md);box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);padding:20px 24px;min-height:126px;display:flex;flex-direction:column;gap:6px}
+.rs-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+.rs-card{background:#fff;border-radius:var(--r-md);box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);padding:20px 24px;min-height:146px;display:flex;flex-direction:column;gap:6px}
 .rs-card .lbl{font-size:12px;font-weight:700;color:var(--g500);display:flex;align-items:center;gap:6px;line-height:1.4}
 .rs-card .lbl .ico-info{font-size:16px}
 .rs-card .val{font-size:36px;font-weight:700;color:var(--g900);line-height:1.1;display:flex;align-items:baseline;gap:6px;letter-spacing:-.5px}
@@ -71,11 +71,11 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-card .sub.neg{color:var(--err)}
 
 /* ==== Info banner ==== */
-.rs-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:20px}
+.rs-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:16px}
 .rs-banner-desc{font-size:12px;color:var(--g500);line-height:1.7;max-width:780px}
 .rs-banner-desc b{color:var(--g700);font-weight:700;letter-spacing:.4px}
 .rs-learn{color:var(--pri);text-decoration:underline;cursor:help;font-weight:500}
-.rs-banner-r{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.rs-banner-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
 /* ==== AI Quota: Rightsizing scans（LT-3140 — UO header + 達上限 banner）==== */
 /* Figma #01 — dot(8px) + "Rightsizing Scans: {remaining}/{total} left"；定義同 User Menu（淺色背景版） */
 .rs-quota-chip{display:inline-flex;align-items:center;gap:6px;height:24px;border-radius:4px;padding:2px 8px 2px 6px}
@@ -94,7 +94,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 
 /* ==== Paper ==== */
 .paper{background:#fff;border-radius:var(--r-md);padding:24px 28px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06)}
-.paper-section-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:4px}
+.paper-section-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:8px}
 .paper-section-title{font-size:18px;font-weight:700;color:var(--g900);line-height:1.5;display:flex;align-items:center;gap:8px}
 .paper-desc{font-size:12px;color:var(--g500);margin-bottom:16px;line-height:1.5}
 
@@ -109,7 +109,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-actions-row{display:flex;align-items:center;gap:10px;padding-bottom:6px}
 
 /* ==== Filter row ==== */
-.rs-filter{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.rs-filter{display:flex;align-items:center;gap:12px;margin-bottom:23px}
 .rs-sel{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff;color:var(--g700);font-size:14px;cursor:pointer;white-space:nowrap}
 .rs-sel .lead{color:var(--g500);font-size:16px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16}
 .rs-sel .material-symbols-outlined.tail{color:var(--g500);font-size:18px;font-variation-settings:'FILL' 0}
@@ -386,23 +386,25 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
       <!-- Summary cards -->
       <div class="rs-cards" id="rs-cards"></div>
 
+      <!-- Section header: sits above the card, per Figma (title/desc/tabs outside
+           the white bordered card; only filter+table live inside it) -->
+      <div class="paper-section-row">
+        <div class="paper-section-title">Rightsizing Recommendation List
+          <span class="material-symbols-outlined ico-info" data-tip="<b>Rightsizing</b> recommendations help you match cloud resources to actual usage. Review each recommendation and apply, dismiss, or archive as appropriate.">info</span>
+        </div>
+      </div>
+      <div class="paper-desc">Certain resources might be used for backup or load balancing. Please verify the usage before applying changes.</div>
+
+      <div class="tabs-row">
+        <div class="tabs" id="rs-tabs"></div>
+        <div class="rs-actions-row" id="rs-actions-row">
+          <div id="rs-actions" style="display:flex;gap:10px"></div>
+          <button class="btn btn-o" onclick="toast('(Demo) Exporting current view to CSV…')"><span class="material-symbols-outlined">download</span>Export CSV</button>
+        </div>
+      </div>
+
       <!-- Recommendation list paper -->
       <div class="paper" id="rs-paper">
-        <div class="paper-section-row">
-          <div class="paper-section-title">Rightsizing Recommendation List
-            <span class="material-symbols-outlined ico-info" data-tip="<b>Rightsizing</b> recommendations help you match cloud resources to actual usage. Review each recommendation and apply, dismiss, or archive as appropriate.">info</span>
-          </div>
-        </div>
-        <div class="paper-desc">Certain resources might be used for backup or load balancing. Please verify the usage before applying changes.</div>
-
-        <div class="tabs-row">
-          <div class="tabs" id="rs-tabs"></div>
-          <div class="rs-actions-row" id="rs-actions-row">
-            <div id="rs-actions" style="display:flex;gap:10px"></div>
-            <button class="btn btn-o" onclick="toast('(Demo) Exporting current view to CSV…')"><span class="material-symbols-outlined">download</span>Export CSV</button>
-          </div>
-        </div>
-
         <div class="rs-filter" id="rs-filter">
           <div class="rs-sel" onclick="toast('(Demo) Cloud Service Provider filter')"><span class="material-symbols-outlined lead">cloud</span>All Cloud Service Providers<span class="material-symbols-outlined tail">expand_more</span></div>
           <div class="rs-sel" onclick="toast('(Demo) Group filter')"><span class="material-symbols-outlined lead">groups</span>All Groups<span class="material-symbols-outlined tail">expand_more</span></div>
@@ -1245,7 +1247,7 @@ bindTips();
   /* ===== CSS ===== */
   var CSS = [
     /* Trigger button — Normal: transparent, no border; H=30px per CMDS spec */
-    '.curr-btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 8px;',
+    '.curr-btn{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 7px;',
     'font-size:13px;color:#262626;',
     'cursor:pointer;background:transparent;border:none;border-radius:6px;',
     'font-family:inherit;line-height:1;white-space:nowrap;',
@@ -1258,7 +1260,7 @@ bindTips();
     '.curr-btn:focus-visible{outline:2px solid #004FB0;outline-offset:1px}',
     /* Flag + code */
     '.curr-flag{font-size:15px;line-height:1;flex-shrink:0}',
-    '.curr-code{font-size:13px;color:#262626}',
+    '.curr-code{font-size:14px;color:#262626}',
     /* Arrow icon */
     '.curr-btn .material-symbols-outlined{font-size:16px;',
     'color:#676767;flex-shrink:0;transition:transform .15s}',
@@ -1399,7 +1401,7 @@ bindTips();
 
     { type: 'group', id: 'optimization', label: 'Optimization', items: [
       { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', href: './rightsizing.html' },
-      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'sell', href: './rate-optimization.html' },
+      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'percent', href: './rate-optimization.html' },
     ]},
 
     { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
@@ -1410,9 +1412,9 @@ bindTips();
 
     { type: 'group', id: 'org', label: 'Organization Settings', items: [
       { id: 'lumitag',            label: 'LumiTag',            icon: 'sell',            href: './lumitag.html' },
-      { id: 'group-list',         label: 'Group List',         icon: 'groups',          disabled: true },
+      { id: 'group-list',         label: 'Group List',         icon: 'groups',          href: './group-list.html' },
       { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
-      { id: 'authorization-list', label: 'Authorization List', icon: 'link',            disabled: true },
+      { id: 'authorization-list', label: 'Authorization List', icon: 'link',            href: './organization-settings.html' },
       { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
     ]},
   ];
@@ -1457,7 +1459,7 @@ bindTips();
   // ===== CSS =====
   var CSS = [
     /* CSS variables — sidebar 用 Primary Dark #002663（per Lumiture-Guideline.md，2026-05-08 設計師確認） */
-    ':root{--lt-sb-w:264px;--lt-sb-bg:#002663;--lt-sb-hov:rgba(255,255,255,.06);',
+    ':root{--lt-sb-w:250px;--lt-sb-bg:#002663;--lt-sb-hov:rgba(255,255,255,.06);',
     '--lt-sb-active:#004FB0;--lt-sb-text:rgba(255,255,255,.85);--lt-sb-text-muted:rgba(255,255,255,.5);',
     '--lt-sb-border:rgba(255,255,255,.1)}',
 
@@ -1663,7 +1665,7 @@ bindTips();
       if (sb) sb.classList.toggle('lt-collapsed');
       if (main) main.classList.toggle('lt-sidebar-collapsed');
       // Sync legacy CSS vars (--sw) for prototypes that reference them in topbar / footer
-      var w = sb && sb.classList.contains('lt-collapsed') ? '64px' : '264px';
+      var w = sb && sb.classList.contains('lt-collapsed') ? '64px' : '250px';
       document.documentElement.style.setProperty('--sw', w);
       document.documentElement.style.setProperty('--lt-sb-w', w);
     },
@@ -1781,7 +1783,7 @@ bindTips();
 
   // quota key → 顯示用標籤 / Limit Reached 對話框文案變數（對齊最新 PRD：unit = Rightsizing scans）
   var QUOTA_META = {
-    analyses:    { label: 'AI-Powered Analyses', dialogLabel: 'Cost Dashboard',     unit: 'AI-powered analyses' },
+    analyses:    { label: 'AI Analyses', dialogLabel: 'Cost Dashboard',     unit: 'AI analyses' },
     rightsizing: { label: 'Rightsizing Scans',   dialogLabel: 'Usage Optimization', unit: 'Rightsizing scans' },
   };
 

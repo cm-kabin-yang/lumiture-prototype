@@ -96,7 +96,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .paper-sep{height:1px;background:var(--g200);margin:32px 0 24px}
 
 /* ==== Org Annual Budget grid ==== */
-.orgrow{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:16px}
+.orgrow{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:24px}
 /* Figma 對齊：第一張卡 (Total Annual Budget) 與後面 per-CSP 卡之間有垂直分隔線，
    視覺分組「合計 vs 各雲」。用 ::after 偽元素畫在 gap 中央，不影響 grid layout。*/
 .orgcell{position:relative}
@@ -142,7 +142,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .fy-warning-list{margin:0;padding-left:28px;font-size:14px;line-height:1.75;color:var(--warn-dark);list-style:disc}
 .fy-warning-list li{margin-bottom:0}
 .fy-field-label{display:block;font-size:13px;font-weight:500;color:var(--g700);margin-bottom:6px}
-.orgcell .ov{font-size:36px;font-weight:700;color:var(--g900);line-height:1.1;letter-spacing:-.5px}
+.orgcell .ov{font-size:36px;font-weight:700;color:var(--g900);line-height:1.5;letter-spacing:-.5px}
 .orgcell .ou{font-size:12px;font-weight:500;color:var(--g500);margin-left:6px}
 .orgcell .conv{font-size:12px;color:var(--g500);margin-top:4px;display:none;font-weight:500}
 .show-conv .orgcell .conv{display:block}
@@ -151,7 +151,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .orgcell .empty-val{color:var(--g400);font-weight:500}
 
 /* ==== Currency / converter row ==== */
-.curr-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.curr-row{display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap}
 .toggle{position:relative;width:36px;height:20px;background:var(--g300);border-radius:10px;cursor:pointer;transition:background .15s;flex-shrink:0;display:inline-block;border:none;padding:0}
 .toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
 .toggle.on{background:var(--pri)}
@@ -243,7 +243,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 
 /* ==== Budget table (inside the paper) ==== */
 .tblwrap{border:1px solid var(--g200);border-radius:var(--r-md);overflow:hidden;background:#fff}
-.tblscroll{max-height:575px;overflow:auto;position:relative}
+.tblscroll{max-height:627px;overflow:auto;position:relative}
 .tblscroll::-webkit-scrollbar{width:8px;height:8px}
 .tblscroll::-webkit-scrollbar-thumb{background:var(--g300);border-radius:4px}
 .tblscroll::-webkit-scrollbar-track{background:transparent}
@@ -283,43 +283,47 @@ table.budget tbody tr.selected:hover td.fix{background:var(--pri-lt20)}
    字級維持 CMDS body 14px，padding 縮減控制密度
    Edit mode 4 欄全保留（PRD §7.5）；月份格寬度 88px view/edit 一致（無 layout jump）；月份區於窄螢幕橫滾
    When show-4col class is on .paper, 4 columns replace single .col-total */
-.col-cb{width:40px;min-width:40px;padding:0 8px!important;text-align:center;left:0}
+.col-cb{width:48px;min-width:48px;padding:0 8px!important;text-align:center;left:0}
 .col-cb input{accent-color:var(--pri);width:16px;height:16px;cursor:pointer;margin:0;vertical-align:middle}
-.col-name{width:160px;min-width:160px;max-width:160px;left:40px;overflow:hidden;text-overflow:ellipsis}
-.col-gear{width:44px;min-width:44px;padding:0!important;text-align:center;left:200px}
-/* Single Total column (current prod baseline) */
-.col-total{width:120px;min-width:120px;left:244px}
+.col-name{width:160px;min-width:160px;max-width:160px;left:48px;overflow:hidden;text-overflow:ellipsis}
+.col-gear{width:56px;min-width:56px;padding:0!important;text-align:center;left:208px}
+/* Single Total column (current prod baseline) — width unverified against Figma this round, left untouched;
+   only its show-2col reuse (below) is corrected, since that's the only instance checked against Figma. */
+.col-total{width:120px;min-width:120px;left:264px}
 /* 4-column annual summary (PRD §7.1 — when .paper has .show-4col)
    Order: Budget → Spend → Spent % → Remaining (aligned with PRD)
    Padding 縮減控制密度（保留 14px body 字級對齊 CMDS）*/
-.col-budget{width:78px;min-width:78px;left:244px;padding:0 8px!important}
-.col-spend{width:78px;min-width:78px;left:322px;padding:0 8px!important}
-.col-pct{width:96px;min-width:96px;left:400px;padding:0 8px!important}
-.col-remain{width:78px;min-width:78px;left:496px;padding:0 8px!important;border-right:2px solid var(--g200)}
-/* Edit mode: 4 欄全保留（PRD §7.5），透過縮窄月份格 88→72px 換取空間 */
-/* When no checkbox (view mode), shift all sticky positions left by 40 */
+.col-budget{width:88px;min-width:88px;left:264px;padding:0 8px!important}
+.col-spend{width:88px;min-width:88px;left:352px;padding:0 8px!important}
+.col-pct{width:112px;min-width:112px;left:440px;padding:0 8px!important}
+.col-remain{width:108px;min-width:108px;left:552px;padding:0 8px!important;border-right:2px solid var(--g200)}
+/* Edit mode (show-2col): Total column here is narrower than the standalone .col-total baseline —
+   Figma 實測 88px（跟 Budget 同寬），非 120px；見 .paper.show-2col 覆寫（下方，鄰近 .col-spend 的 show-2col 覆寫處）。 */
+/* When no checkbox (view mode), shift all sticky positions left by col-cb's width (48px) */
 .no-cb .col-name{left:0}
 .no-cb .col-gear{left:160px}
-.no-cb .col-total{left:204px}
-.no-cb .col-budget{left:204px}
-.no-cb .col-spend{left:282px}
-.no-cb .col-pct{left:360px}
-.no-cb .col-remain{left:456px}
-/* When no gear (view mode + no edit), shift sticky positions back by 44 */
-.no-gear .col-total{left:200px}
+.no-cb .col-total{left:216px}
+.no-cb .col-budget{left:216px}
+.no-cb .col-spend{left:304px}
+.no-cb .col-pct{left:392px}
+.no-cb .col-remain{left:504px}
+/* When no gear (view mode + no edit), shift sticky positions back by col-gear's width (56px) */
+.no-gear .col-total{left:208px}
 .no-cb.no-gear .col-total{left:160px}
-.no-gear .col-budget{left:200px}
-.no-gear .col-spend{left:278px}
-.no-gear .col-pct{left:356px}
-.no-gear .col-remain{left:452px}
+.no-gear .col-budget{left:208px}
+.no-gear .col-spend{left:296px}
+.no-gear .col-pct{left:384px}
+.no-gear .col-remain{left:496px}
 .no-cb.no-gear .col-budget{left:160px}
-.no-cb.no-gear .col-spend{left:238px}
-.no-cb.no-gear .col-pct{left:316px}
-.no-cb.no-gear .col-remain{left:412px}
+.no-cb.no-gear .col-spend{left:248px}
+.no-cb.no-gear .col-pct{left:336px}
+.no-cb.no-gear .col-remain{left:448px}
 
 .col-mon{width:88px;min-width:88px}
-/* Month col width unified across view + edit modes (88px) — no layout jump on mode switch.
-   Annual block sticky-left always visible; months scroll horizontally on narrow screens. */
+/* View Mode month cell = 88px（Figma 已核實）。Edit Mode 月份格因為要塞 $ 前綴+可編輯數字輸入框，
+   Figma 實測反而更寬（140px），不是更窄——舊註解「縮窄至72px」與「統一88px」皆與現況不符，已更正：
+   下方 .paper.editing 覆寫才是目前 Figma 對應的真值（2026-08-28 核實，見 pantograph HANDOVER 第十八輪）。 */
+.paper.editing .col-mon{width:140px;min-width:140px}
 /* Month header year suffix (e.g., '26) — subdued styling so month is primary, year secondary */
 .col-mon .mon-year{font-size:11px;color:var(--g500);margin-left:2px;font-weight:400;letter-spacing:0}
 /* Sparkline column (Demo 方向Y) — replaces 12 month cells in View Mode with a single mini chart cell */
@@ -353,9 +357,11 @@ table.budget tbody tr.selected:hover td.fix{background:var(--pri-lt20)}
 .paper.show-4col table.budget tbody tr.selected:hover td.col-pct,
 .paper.show-4col table.budget tbody tr.selected:hover td.col-remain{background:var(--pri-lt20)}
 /* 2-col edit-mode annual block: Total + Spend (Spend reuses .col-spend class but at different left position).
-   Total stays at left:244 (width 120, same as standalone .col-total).
-   Spend sits right after Total at left:364 (244+120), becomes the rightmost sticky col → gets border-right. */
-.paper.show-2col table.budget .col-spend{left:364px;border-right:2px solid var(--g200)}
+   Total stays at left:264 (cb 48 + name 160 + gear 56); its width here is 88px (Figma-verified, NOT the
+   120px standalone .col-total baseline — see override below). Spend sits right after Total at left:352
+   (264+88), becomes the rightmost sticky col → gets border-right. */
+.paper.show-2col table.budget .col-total{width:88px;min-width:88px}
+.paper.show-2col table.budget .col-spend{left:352px;border-right:2px solid var(--g200)}
 .paper.show-2col table.budget tbody tr.selected td.col-total,
 .paper.show-2col table.budget tbody tr.selected td.col-spend{background:var(--pri-lt10)}
 .paper.show-2col table.budget tbody tr.selected:hover td.col-total,
@@ -774,8 +780,10 @@ const ROLES = {
   admin:  { card1Title:'Organization Annual Budget', secTitle:'Tier 1 Group Budget', editable:true,  showExpected:false, currentLabel:'Total Annual Budget', warningOn:'group-row' },
   t1m:    { card1Title:'BU-Healthcare Annual Budget', secTitle:'Tier 2 Group Budget', editable:true,  showExpected:true,  currentLabel:'Total Annual Budget', warningOn:'allocated-row' },
   t1mb:   { card1Title:'BU-Healthcare Annual Budget', secTitle:'Tier 2 Group Budget', editable:false, showExpected:true,  currentLabel:'Total Annual Budget', warningOn:'allocated-row' },
-  t2m:    { card1Title:'Team-Genomics Annual Budget', secTitle:'',                     editable:false, showExpected:false, currentLabel:'Total Annual Budget', warningOn:null },
-  t2mb:   { card1Title:'Team-Genomics Annual Budget', secTitle:'',                     editable:false, showExpected:false, currentLabel:'Total Annual Budget', warningOn:null },
+  // T2 也有 secTitle：Figma #07 明確呈現「Tier 2 Group Budget」標題 + Download CSV（規格註記只說「隱藏所有編輯按鈕」，
+  // CSV 是匯出不是編輯，故保留）。原本 secTitle:'' 會讓 #sec2-row 整列隱藏，連 CSV 按鈕一併消失（2026-09-04 查證修正）。
+  t2m:    { card1Title:'Team-Genomics Annual Budget', secTitle:'Tier 2 Group Budget',   editable:false, showExpected:false, currentLabel:'Total Annual Budget', warningOn:null },
+  t2mb:   { card1Title:'Team-Genomics Annual Budget', secTitle:'Tier 2 Group Budget',   editable:false, showExpected:false, currentLabel:'Total Annual Budget', warningOn:null },
 };
 
 // CSP 品牌 SVG — 從 LumiTure-FE/src/lumiture-ui/SvgIcon/Platform.tsx 200x200 高解析官方版本（GCP / AWS / Azure 含官方 gradient）
@@ -2516,7 +2524,7 @@ window.DEMO_APPLY = function(id){
   else if(id === 'modal-discard')     { closeAllModals(); $('#mo-discard').classList.add('active'); }
   // Toast demos
   else if(id === 'toast-budget-ok')   toast('Budget updated successfully.');
-  else if(id === 'toast-budget-err')  toast('Unable to update budget. Please try later.', 'err');
+  else if(id === 'toast-budget-err')  toast('Unable to update budget. Please try again later.', 'err');
   else if(id === 'toast-amount-ok')   toast('Amount applied successfully.');
   else if(id === 'toast-alert-ok')    toast('Alert settings updated successfully.');
   else if(id === 'toast-fy-ok')       toast('Fiscal Start Month updated successfully.');
@@ -2593,7 +2601,7 @@ renderFYPicker();
   /* ===== CSS ===== */
   var CSS = [
     /* Trigger button — Normal: transparent, no border; H=30px per CMDS spec */
-    '.curr-btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 8px;',
+    '.curr-btn{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 7px;',
     'font-size:13px;color:#262626;',
     'cursor:pointer;background:transparent;border:none;border-radius:6px;',
     'font-family:inherit;line-height:1;white-space:nowrap;',
@@ -2606,7 +2614,7 @@ renderFYPicker();
     '.curr-btn:focus-visible{outline:2px solid #004FB0;outline-offset:1px}',
     /* Flag + code */
     '.curr-flag{font-size:15px;line-height:1;flex-shrink:0}',
-    '.curr-code{font-size:13px;color:#262626}',
+    '.curr-code{font-size:14px;color:#262626}',
     /* Arrow icon */
     '.curr-btn .material-symbols-outlined{font-size:16px;',
     'color:#676767;flex-shrink:0;transition:transform .15s}',
@@ -2747,7 +2755,7 @@ renderFYPicker();
 
     { type: 'group', id: 'optimization', label: 'Optimization', items: [
       { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', href: './rightsizing.html' },
-      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'sell', href: './rate-optimization.html' },
+      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'percent', href: './rate-optimization.html' },
     ]},
 
     { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
@@ -2758,9 +2766,9 @@ renderFYPicker();
 
     { type: 'group', id: 'org', label: 'Organization Settings', items: [
       { id: 'lumitag',            label: 'LumiTag',            icon: 'sell',            href: './lumitag.html' },
-      { id: 'group-list',         label: 'Group List',         icon: 'groups',          disabled: true },
+      { id: 'group-list',         label: 'Group List',         icon: 'groups',          href: './group-list.html' },
       { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
-      { id: 'authorization-list', label: 'Authorization List', icon: 'link',            disabled: true },
+      { id: 'authorization-list', label: 'Authorization List', icon: 'link',            href: './organization-settings.html' },
       { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
     ]},
   ];
@@ -2805,7 +2813,7 @@ renderFYPicker();
   // ===== CSS =====
   var CSS = [
     /* CSS variables — sidebar 用 Primary Dark #002663（per Lumiture-Guideline.md，2026-05-08 設計師確認） */
-    ':root{--lt-sb-w:264px;--lt-sb-bg:#002663;--lt-sb-hov:rgba(255,255,255,.06);',
+    ':root{--lt-sb-w:250px;--lt-sb-bg:#002663;--lt-sb-hov:rgba(255,255,255,.06);',
     '--lt-sb-active:#004FB0;--lt-sb-text:rgba(255,255,255,.85);--lt-sb-text-muted:rgba(255,255,255,.5);',
     '--lt-sb-border:rgba(255,255,255,.1)}',
 
@@ -3011,7 +3019,7 @@ renderFYPicker();
       if (sb) sb.classList.toggle('lt-collapsed');
       if (main) main.classList.toggle('lt-sidebar-collapsed');
       // Sync legacy CSS vars (--sw) for prototypes that reference them in topbar / footer
-      var w = sb && sb.classList.contains('lt-collapsed') ? '64px' : '264px';
+      var w = sb && sb.classList.contains('lt-collapsed') ? '64px' : '250px';
       document.documentElement.style.setProperty('--sw', w);
       document.documentElement.style.setProperty('--lt-sb-w', w);
     },
@@ -3129,7 +3137,7 @@ renderFYPicker();
 
   // quota key → 顯示用標籤 / Limit Reached 對話框文案變數（對齊最新 PRD：unit = Rightsizing scans）
   var QUOTA_META = {
-    analyses:    { label: 'AI-Powered Analyses', dialogLabel: 'Cost Dashboard',     unit: 'AI-powered analyses' },
+    analyses:    { label: 'AI Analyses', dialogLabel: 'Cost Dashboard',     unit: 'AI analyses' },
     rightsizing: { label: 'Rightsizing Scans',   dialogLabel: 'Usage Optimization', unit: 'Rightsizing scans' },
   };
 

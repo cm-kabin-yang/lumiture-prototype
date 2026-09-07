@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — User Menu v1 (Account Menu + AI Quota)</title>
+<title>Lumiture.ai — Group List v2 (Folder Tree Resource Picker)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* === Inlined: shared/tokens.css === */
 /* ============================================================
@@ -277,196 +276,216 @@
 
 </style>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; overscroll-behavior: none; }
-body {
-  font-family: var(--lt-font-sans);
-  font-size: var(--lt-fs-14); font-weight: 400; color: var(--lt-color-text-primary);
-  background: var(--lt-blue-10); letter-spacing: 0;
-  -webkit-font-smoothing: antialiased;
-}
-button { font-family: inherit; font-size: inherit; cursor: pointer; border: none; background: none; color: inherit; letter-spacing: 0; }
-a { color: inherit; text-decoration: none; }
-.material-symbols-outlined {
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  font-size: 20px; line-height: 1; vertical-align: middle; user-select: none;
-}
+*{box-sizing:border-box}
+body{margin:0;background:var(--lt-color-primary-bg);color:var(--lt-color-text-primary);font-family:var(--lt-font-sans);font-size:var(--lt-fs-14);letter-spacing:var(--lt-tracking-normal)}
+button,input{font:inherit}
+.material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+.shell{display:flex;min-height:100vh}
+.workspace{min-width:0;flex:1;display:flex;flex-direction:column}
+.main{width:min(100%,1366px);margin:0 auto;padding:32px 32px 96px;flex:1;width:100%}
 
-/* LAYOUT */
-.app { display: flex; min-height: 100vh; }
-#lt-sidebar { flex-shrink: 0; }
-.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.content { flex: 1; padding: 48px 32px; display: flex; align-items: flex-start; justify-content: center; }
+/* ---- go-back / breadcrumb ---- */
+.go-back{display:inline-flex;align-items:center;gap:4px;border:0;background:transparent;color:var(--lt-color-primary);font-weight:700;font-size:14px;padding:0 0 24px;cursor:pointer}
+.go-back .material-symbols-outlined{font-size:20px}
+.go-back:hover .go-back-label{text-decoration:underline}
+.crumb{font-size:12px;color:var(--lt-color-text-secondary);margin-bottom:4px}
 
-/* Hint card */
-.hint { max-width: 560px; background: #fff; border-radius: var(--lt-radius-md); box-shadow: var(--lt-shadow-dialog);
-  padding: 32px; text-align: center; }
-.hint-arrow { display: inline-flex; align-items: center; gap: 6px; color: var(--lt-color-primary);
-  font-weight: 600; font-size: 13px; margin-bottom: 16px; }
-.hint-arrow .material-symbols-outlined { font-size: 18px; }
-.hint h1 { font-size: var(--lt-fs-20); font-weight: 700; margin-bottom: 10px; color: var(--lt-color-text-heading); }
-.hint p { font-size: 13.5px; line-height: 1.7; color: var(--lt-color-text-secondary); margin-bottom: 14px; }
-.hint ul { text-align: left; font-size: 12.5px; line-height: 1.8; color: var(--lt-color-text-secondary);
-  list-style: none; display: inline-block; }
-.hint li { display: flex; gap: 8px; align-items: flex-start; }
-.hint li .material-symbols-outlined { font-size: 16px; color: var(--lt-color-secondary); margin-top: 2px; }
+/* ---- page card ---- */
+.card{background:var(--lt-color-bg-default);border-radius:var(--lt-radius-md);box-shadow:0 1px 3px rgba(0,0,0,.08);padding:24px}
 
-/* FOOTER */
-.footer { display: flex; align-items: center; justify-content: space-between; padding: 14px 32px;
-  border-top: 1px solid var(--lt-color-border-default); background: #fff; font-size: 12px; color: var(--lt-color-text-secondary); }
-.footer-version { font-weight: 600; color: var(--lt-color-text-primary); display: inline-flex; align-items: center; gap: 8px; }
-.ver-tag { background: #34B5D9; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; }
-.footer-credit { color: #676767; }
+/* ---- list page header (type scale read off Figma text-node heights:
+ * CloudMile 36px→H3 24, "Tier 1 Group List (13)" 24px→H6 16, description 18px→Caption 12) ---- */
+.org-title{font-size:var(--lt-fs-24);font-weight:var(--lt-fw-bold);color:var(--lt-color-text-heading);margin:0 0 20px}
+.section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.section-head h2{font-size:var(--lt-fs-16);font-weight:700;line-height:var(--lt-leading-tight);margin:0 0 8px;color:var(--lt-color-text-heading)}
+.section-head p{margin:0;color:var(--lt-color-text-secondary);font-size:var(--lt-fs-12);line-height:var(--lt-leading-tight)}
+.section-copy{margin:0;color:var(--lt-color-text-secondary);font-size:var(--lt-fs-12);line-height:var(--lt-leading-tight)}
+.btn{display:inline-flex;align-items:center;gap:4px;min-width:80px;height:36px;border-radius:5px;padding:0 16px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;justify-content:center}
+.btn .material-symbols-outlined{font-size:18px}
+.btn-pri{border:0;background:var(--lt-color-primary);color:#fff;box-shadow:var(--lt-shadow-button)}
+.btn-pri:hover{background:var(--lt-color-primary-hover)}
+.btn-pri:active{background:var(--lt-blue-90)}
+.btn-pri:disabled{background:var(--lt-grey-100);color:var(--lt-grey-300);cursor:not-allowed;box-shadow:none}
+.btn-out{border:1px solid var(--lt-color-primary);background:#fff;color:var(--lt-color-primary)}
+.btn-out:hover{background:var(--lt-color-primary-bg)}
+.btn-out:disabled{border-color:var(--lt-grey-200);color:var(--lt-grey-300);cursor:not-allowed}
+.btn-out.danger{border-color:var(--lt-color-error);color:var(--lt-color-error)}
+.btn-out.danger:hover{background:var(--lt-color-error-light)}
+.btn-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;background:transparent;border-radius:5px;color:var(--lt-color-text-secondary);cursor:pointer}
+.btn-icon:hover{background:var(--lt-color-bg-subtle);color:var(--lt-color-text-primary)}
+.btn-icon.danger:hover{background:var(--lt-color-error-light);color:var(--lt-color-error)}
+.btn-icon:disabled{color:var(--lt-grey-300);cursor:not-allowed;background:transparent}
+.btn-icon .material-symbols-outlined{font-size:20px}
+
+/* ---- table ---- */
+.table-wrap{border-radius:var(--lt-radius-sm);overflow:auto;overscroll-behavior:contain;max-height:575px;border:1px solid var(--lt-color-border-default)}
+.table-wrap::-webkit-scrollbar{width:6px;height:6px}
+.table-wrap::-webkit-scrollbar-thumb{background:var(--lt-grey-300);border-radius:3px}
+table{border-collapse:collapse;width:100%;min-width:760px;text-align:left;table-layout:fixed}
+thead th{position:sticky;top:0;z-index:2;height:50px;padding:7px 16px 8px;background:var(--lt-color-primary-bg);border-bottom:1px solid var(--lt-color-border-default);color:var(--lt-color-text-heading);font-size:var(--lt-fs-14);font-weight:700;white-space:nowrap}
+th.center,td.center{text-align:center}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{background:var(--lt-grey-200)}
+.th-sort{display:inline-flex;align-items:center;gap:4px}
+th.sortable.center .th-sort{justify-content:center;width:100%}
+.sort-ic{font-size:16px!important;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20!important}
+tbody td{height:50px;padding:8px 16px;border-bottom:1px solid var(--lt-color-border-default);vertical-align:middle;font-size:14px;overflow:hidden;text-overflow:ellipsis}
+tbody tr:last-child td{border-bottom:0}
+tbody tr.clickable{cursor:pointer}
+tbody tr.clickable:hover td{background:var(--lt-color-primary-bg)}
+tbody tr.selected td{background:var(--lt-blue-20)}
+tbody tr.selected:hover td{background:var(--lt-blue-30)}
+tbody tr.pending td{background:var(--lt-grey-100);color:var(--lt-grey-400)}
+.cell-ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell-double .l1{color:var(--lt-color-text-primary)}
+.cell-double .l2{color:var(--lt-color-text-secondary);font-size:12px;margin-top:2px;overflow-wrap:anywhere}
+.link-btn{border:0;background:transparent;color:var(--lt-color-text-link);font-weight:600;font-size:14px;padding:0;cursor:pointer}
+.link-btn:hover{text-decoration:underline}
+.actions-cell{display:flex;align-items:center;gap:4px}
+td.center .actions-cell{justify-content:center}
+.status-text{font-size:14px}
+.status-text.inactive{color:var(--lt-color-text-secondary)}
+input[type="checkbox"]{width:16px;height:16px;accent-color:var(--lt-color-primary);cursor:pointer}
+
+/* ---- tabs (primary, underline) ---- */
+.tabs-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:1px solid var(--lt-color-border-default);margin-bottom:20px}
+.tabs{display:flex;gap:4px}
+.tab{padding:8px 16px;height:36px;font-size:14px;font-weight:500;color:var(--lt-color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:var(--lt-transition-fast);background:none;border-left:none;border-right:none;border-top:none;font-family:inherit;white-space:nowrap}
+.tab:hover{color:var(--lt-color-text-heading);border-bottom-color:var(--lt-grey-200)}
+.tab.active{color:var(--lt-color-primary);font-weight:700;border-bottom-color:var(--lt-color-primary)}
+.tab:disabled{color:var(--lt-grey-300);cursor:not-allowed}
+
+/* ---- cloud sub-tabs (pill) ---- */
+.pill-tabs{display:inline-flex;gap:4px;background:var(--lt-grey-100);border-radius:5px;padding:4px;margin-bottom:16px}
+.pill-tab{height:28px;padding:0 12px;border:0;background:transparent;border-radius:5px;font-size:13px;font-weight:600;color:var(--lt-color-text-secondary);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.pill-tab.active{background:#fff;color:var(--lt-color-primary);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.pill-tab .csp-dot{width:8px;height:8px;border-radius:50%}
+.groupby-row{display:flex;align-items:center;gap:8px;padding:0 24px 12px}
+.groupby-row .lbl{font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary)}
+.groupby-row .pill-tabs{margin:0}
+.groupby-row .groupby-toggle{display:flex;align-items:center;gap:8px;margin-left:auto}
+
+/* ---- search ---- */
+.search-box{position:relative;width:280px}
+.search-box input{width:100%;height:36px;border:1px solid var(--lt-color-border-input);border-radius:5px;padding:0 12px 0 36px;font-size:14px}
+.search-box input:focus{outline:none;border-color:var(--lt-color-primary)}
+.search-box .material-symbols-outlined{position:absolute;left:9px;top:8px;font-size:20px;color:var(--lt-color-text-secondary)}
+.ba-select{height:36px;border:1px solid var(--lt-color-border-input);border-radius:5px;padding:0 8px;background:#fff;font-size:14px;color:var(--lt-color-text-primary);cursor:pointer;max-width:220px}
+.res-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.res-toolbar-actions{display:flex;align-items:center;gap:8px}
+
+/* ---- empty / error state ---- */
+.empty-state{min-height:280px;display:grid;place-items:center;padding:32px;text-align:center}
+.empty-state.small{min-height:180px}
+.empty-state .material-symbols-outlined{font-size:64px;color:var(--lt-blue-30);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48;margin-bottom:12px}
+.empty-title{font-size:16px;font-weight:700;margin:0 0 4px;color:var(--lt-color-text-heading)}
+.empty-copy{margin:0;max-width:420px;color:var(--lt-color-text-secondary);line-height:1.65;white-space:pre-line}
+.empty-state.error .material-symbols-outlined{color:var(--lt-color-error);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
+.empty-state .btn{margin-top:16px}
+
+/* ---- skeleton ---- */
+.skel{background:linear-gradient(90deg,#edf2f5 0%,#f7f9fa 50%,#edf2f5 100%);background-size:200% 100%;animation:shimmer 1.25s linear infinite;border-radius:var(--lt-radius-sm)}
+@keyframes shimmer{to{background-position:-200% 0}}
+.skel-title{height:24px;width:220px;margin-bottom:12px}
+.skel-btn{height:36px;width:120px}
+.skel-row{height:50px;border-bottom:1px solid var(--lt-color-border-default)}
+
+/* ---- role/demo chip on header ---- */
+.role-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--lt-color-primary-bg);color:var(--lt-color-primary);font-size:12px;font-weight:700;margin-bottom:12px}
+.role-chip .material-symbols-outlined{font-size:16px}
+
+/* ---- confirm dialog ---- */
+.dlg-backdrop{position:fixed;inset:0;z-index:2000;background:var(--lt-modal-backdrop);display:grid;place-items:center;padding:24px}
+.dlg{width:min(440px,100%);background:#fff;border-radius:var(--lt-radius-lg);box-shadow:var(--lt-modal-shadow);padding:24px}
+.dlg-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.dlg-head .material-symbols-outlined{color:var(--lt-color-warning);font-size:24px}
+.dlg-head h3{margin:0;font-size:18px}
+.dlg-body{color:var(--lt-color-text-primary);line-height:1.65;margin-bottom:20px}
+.dlg-body b{font-weight:700}
+.dlg-actions{display:flex;justify-content:flex-end;gap:8px}
+.dlg-actions .btn{min-width:100px}
+
+
+/* ---- assign-resource modal + folder tree ---- */
+.rmodal-backdrop{position:fixed;inset:0;z-index:2000;background:var(--lt-modal-backdrop);display:grid;place-items:center;padding:24px}
+.rmodal{width:min(660px,100%);max-height:min(720px,calc(100vh - 48px));display:flex;flex-direction:column;background:#fff;border-radius:var(--lt-radius-lg);box-shadow:var(--lt-modal-shadow)}
+.rmodal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:24px 24px 0}
+.rmodal-head h3{margin:0 0 4px;font-size:var(--lt-fs-18);line-height:var(--lt-leading-tight)}
+.rmodal-head p{margin:0;font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);line-height:var(--lt-leading-tight)}
+.rmodal-close{border:0;background:transparent;color:var(--lt-color-text-secondary);cursor:pointer;display:flex;padding:2px}
+.rmodal-tools{display:flex;align-items:center;gap:8px;padding:16px 24px 12px}
+.rmodal-tools .search-box{flex:1;width:auto}
+.rmodal-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;border-top:1px solid var(--lt-color-border-default);border-bottom:1px solid var(--lt-color-border-default);padding:8px 0}
+.rmodal-body::-webkit-scrollbar{width:6px}
+.rmodal-body::-webkit-scrollbar-thumb{background:var(--lt-grey-300);border-radius:3px}
+.rmodal-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px}
+.rmodal-foot .btn{min-width:100px}
+.rmodal-count{font-size:var(--lt-fs-14);color:var(--lt-color-text-secondary)}
+.rmodal-count b{color:var(--lt-color-text-primary)}
+
+.tnode{position:relative;display:flex;align-items:center;gap:8px;min-height:40px;padding:4px 24px 4px 0;cursor:default}
+/* 每一層畫一條垂直引導線，否則子資料夾跟同層專案縮排相同、讀不出誰屬於誰 */
+.trail{position:absolute;top:0;bottom:0;width:1px;background:var(--lt-color-border-default)}
+.tnode:hover{background:var(--lt-color-primary-bg)}
+.tnode.is-project{min-height:44px}
+.tchev{width:20px;height:20px;flex:0 0 20px;display:grid;place-items:center;border:0;background:transparent;color:var(--lt-color-text-secondary);cursor:pointer;border-radius:3px}
+.tchev:hover{background:var(--lt-grey-200)}
+.tchev .material-symbols-outlined{font-size:20px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20}
+.tchev.ghost{visibility:hidden}
+.tnode .ticon{font-size:18px;color:var(--lt-color-text-secondary);flex:0 0 auto}
+.tnode.is-folder .ticon{color:var(--lt-color-primary)}
+.tnode.is-unassigned .ticon{color:var(--lt-grey-400)}
+.tlabel{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.tname{font-size:var(--lt-fs-14);color:var(--lt-color-text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tnode.is-folder .tname{font-weight:600}
+.tnode.is-unassigned .tname{color:var(--lt-color-text-secondary)}
+.tsub{font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tcount{font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);font-weight:400;font-variant-numeric:tabular-nums}
+.tcount.partial{color:var(--lt-color-warning)}
+.ba-chip{flex:0 0 auto;font-size:11px;color:var(--lt-color-text-secondary);background:var(--lt-grey-100);border-radius:var(--lt-radius-xs);padding:2px 8px;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
+.hl{color:var(--lt-blue-60);font-weight:700}
+.tempty{padding:40px 24px;text-align:center;color:var(--lt-color-text-secondary);font-size:var(--lt-fs-14)}
+.tnote{display:flex;gap:8px;align-items:flex-start;margin:0 24px 12px;padding:10px 12px;background:var(--lt-color-primary-bg);border-radius:var(--lt-radius-sm);font-size:var(--lt-fs-12);line-height:1.6;color:var(--lt-color-text-primary)}
+.tnote .material-symbols-outlined{font-size:16px;color:var(--lt-color-primary);flex:0 0 auto;margin-top:1px}
+.tskel{padding:8px 24px}
+.tskel .skel{height:36px;margin-bottom:8px}
+
+/* ---- toast ---- */
+.toast{position:fixed;left:24px;bottom:24px;z-index:4000;display:flex;align-items:center;gap:10px;max-width:440px;border-radius:var(--lt-radius-sm);padding:12px 16px;background:var(--lt-color-success);color:#fff;box-shadow:var(--lt-shadow-overlay-strong);font-size:14px;transform:translateY(100px);opacity:0;transition:var(--lt-transition-base)}
+.toast.error{background:var(--lt-color-error)}
+.toast.show{opacity:1;transform:none}
+
+
+/* ---- footer ---- */
+.footer{display:flex;justify-content:space-between;gap:16px;padding:20px 32px;margin-top:auto;font-size:12px;background:#fff;border-top:1px solid var(--lt-color-border-default)}
+.footer-version{color:var(--lt-color-text-primary);font-weight:600}
+.ver-tag{display:inline-block;margin-left:6px;background:#34B5D9;color:#fff;border-radius:999px;padding:2px 8px;font-size:11px}
+.footer-credit{color:#676767}
+
+@media(max-width:800px){.main{padding:24px 16px 96px}.section-head{flex-direction:column}.res-toolbar{flex-direction:column;align-items:flex-start}.search-box{width:100%}}
 </style>
 </head>
 <body>
-<div class="app">
-  <!-- SIDEBAR — rendered by shared/lumiture-sidebar.js -->
+<div class="shell">
   <aside id="lt-sidebar"></aside>
-
-  <div class="main">
-    <!-- Shared topbar + Account Menu — see shared/lumiture-topbar.js -->
+  <div class="workspace">
     <header id="lt-topbar"></header>
-
-    <div class="content">
-      <div class="hint">
-        <div class="hint-arrow"><span class="material-symbols-outlined">north_east</span>點右上角頭像開啟 Account Menu</div>
-        <h1>User Menu + AI Quota</h1>
-        <p>這是 LT-3138 / LT-3140（v1.19.0）的共用 Account Menu。它掛在共用 topbar 上，所有 prototype 點開頭像都會看到同一版。用左下角的 <span class="material-symbols-outlined" style="font-size:16px; color:var(--lt-color-secondary); vertical-align:-3px;">science</span> Demo 切換情境：</p>
-        <ul>
-          <li><span class="material-symbols-outlined">layers</span>各方案（Essential / Starter / Standard / Premium）顯示哪些 quota 項目</li>
-          <li><span class="material-symbols-outlined">circle</span>Active（綠）/ Warning（琥珀）/ Depleted（紅）+ Loading / Error</li>
-          <li><span class="material-symbols-outlined">info</span>Warning / Depleted 項目 hover 顯示 tooltip 說明（無彈窗、無 Contact Sales）</li>
-        </ul>
-      </div>
-    </div>
-
+    <main class="main">
+      <section id="app" aria-live="polite"></section>
+    </main>
     <div class="footer">
-      <span class="footer-version">User Menu Prototype<span class="ver-tag">v1</span></span>
+      <span class="footer-version">Group List Prototype<span class="ver-tag">v2 · Folder Tree</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
     </div>
   </div>
 </div>
 
-<!-- Demo Scenarios — rendered by shared/demo-fab.js -->
+<div class="toast" id="toast"><span class="material-symbols-outlined" id="toast-icon">check_circle</span><span id="toast-text"></span></div>
+<div id="dialog-root"></div>
+<div id="assign-root"></div>
 
-<script>
-// =================================================================
-// DEMO SCENARIOS — 切換 Account Menu 各情境（數值對齊 specs §參考情境）
-// =================================================================
-window.DEMO_CATEGORIES = [
-  { id: 'plan',   label: 'Plan',    icon: 'layers',
-    hint: '不同方案決定 AI Quota box 顯示哪些項目。Standard=兩項（預設）；Essential=兩項（照 PRD）；Starter=只 analyses；Premium=兩項皆 Unlimited。' },
-  { id: 'state',  label: 'State',   icon: 'circle',
-    hint: '以 Standard（兩項）展示用量狀態與資料狀態：<80% 綠 / 80-99% 琥珀 / ≥100% 紅 / Loading / Error。數值取自 specs 參考情境表。' },
-  { id: 'special',label: 'Special', icon: 'tune',
-    hint: '混合狀態、加購後額度提升、角色 chip 變體、不可切換角色（隱藏 View as Another Role）。' },
-];
 
-window.DEMO_SCENARIOS = [
-  // === Plan ===
-  { id: 'plan-standard',  category: 'plan', label: 'Standard（預設・兩項）',  icon: 'workspace_premium',
-    tip: 'Standard plan：AI Quota box 顯示 AI Analyses + Rightsizing 兩項，皆綠色（32/80、410/1000）。三方資料皆一致，最適合設計稿參照。' },
-  { id: 'plan-essential', category: 'plan', label: 'Essential（兩項）', icon: 'eco',
-    tip: 'Essential plan：照 Notion PRD 顯示 AI Analyses + Rightsizing 兩項。⚠ specs ai-quota README 說只 rightsizing，與 PRD 衝突待 PM 對齊。' },
-  { id: 'plan-starter',   category: 'plan', label: 'Starter（只 analyses）',  icon: 'rocket_launch',
-    tip: 'Starter plan：只顯示 AI Analyses 項目（無 rightsizing）。' },
-  { id: 'plan-premium',   category: 'plan', label: 'Premium（Unlimited）',   icon: 'diamond',
-    tip: 'Premium plan：unlimited，兩項皆顯示 Unlimited ✨（cyan，不可點）。金色 plan banner。⚠ 偏離 PRD（PRD 說 Premium 不顯示 box），設計上更友善，待回推 PM。' },
-
-  // === State (Standard, 兩項) ===
-  { id: 'state-normal',   category: 'state', label: 'Normal（綠）',   icon: 'check_circle',
-    tip: 'Active：analyses 32/80、rightsizing 410/1000，皆 <80% 綠色、不可點。' },
-  { id: 'state-warning',  category: 'state', label: 'Warning（琥珀）', icon: 'warning',
-    tip: 'Warning：analyses 70/80 (87.5%)、rightsizing 850/1000 (85%)，皆 80-99% 琥珀色、純預警不可點。' },
-  { id: 'state-depleted', category: 'state', label: 'Depleted（紅）',  icon: 'error',
-    tip: 'Depleted：analyses 80/80、rightsizing 1000/1000，皆 ≥100% 紅色。hover 紅項顯示 tooltip 說明（取代原 Limit Reached 彈窗，無 Contact Sales）。' },
-  { id: 'state-loading',  category: 'state', label: 'Loading（載入中）', icon: 'hourglass_top',
-    tip: 'Quota 資料載入中：box 顯示 2 行 shimmer skeleton（避免 generic spinner）。menu 其他項照常。' },
-  { id: 'state-error',    category: 'state', label: 'Error（抓不到）',   icon: 'error',
-    tip: 'Quota 端點失敗：partial degrade — 只有 box 顯示「Couldn\'t load quota · Retry」，menu 其他項不受影響。' },
-
-  // === Special ===
-  { id: 'special-addon',  category: 'special', label: 'Add-on Active（加購 ×2）', icon: 'add_shopping_cart',
-    tip: '加購 2 包後 total 提升：analyses 92/160、rightsizing 1180/2000，皆回到綠色。（Billing 摘要為階段二，v1.19.0 僅反映在額度提升）' },
-  { id: 'special-mixed',  category: 'special', label: '混合狀態（琥珀+紅）',     icon: 'compare_arrows',
-    tip: 'analyses 琥珀 (72/80)、rightsizing 紅 (1000/1000)。驗證兩項獨立判斷、版面不跳動；hover 各自顯示對應 tooltip。' },
-  { id: 'special-manager',category: 'special', label: '角色 chip：Manager - Group', icon: 'badge',
-    tip: 'Manager 角色 chip 帶群組後綴「Manager - Cost Center」（Admin 以外才有後綴）。' },
-  { id: 'special-noswitch',category:'special', label: '不可切換角色',           icon: 'person_off',
-    tip: 'canSwitchRole=false → 隱藏「View as Another Role」（只有有其他角色可切換的帳號才顯示）。' },
-];
-
-window.DEMO_DEFAULT = 'plan-standard';
-window.DEMO_APPLY = applyScenario;
-
-// 共用 menu 動作佔位（Profile/Settings/Log out/View as Another Role）
-window.LUMITURE_MENU_ACTION = function (label) {
-  console.log('[user-menu demo] clicked:', label);
-};
-
-// 基礎 user
-function baseUser() {
-  return {
-    name: 'Isabella Izzy Rodriguez',
-    email: 'isabella.rc@tech-ventures.co',
-    role: 'Admin',
-    initials: 'IR',
-    canSwitchRole: true,
-    plan: 'Standard',
-    planDateRange: '2 Aug. 2025 ~ 2 Aug. 2035',
-    product: 'LumiTure.ai',
-    version: 'v1.19.0',
-    addonPacks: 0,
-    quota: {
-      refreshDate: '2 Apr. 2035',
-      analyses:    { used: 32,  total: 80 },
-      rightsizing: { used: 410, total: 1000 },
-    },
-  };
-}
-
-function applyScenario(id) {
-  var u = baseUser();
-
-  switch (id) {
-    // Plan
-    case 'plan-standard':  break;
-    case 'plan-essential': u.plan = 'Essential'; break;
-    case 'plan-starter':   u.plan = 'Starter';   break;
-    case 'plan-premium':   u.plan = 'Premium';   break;
-
-    // State
-    case 'state-normal':   break;
-    case 'state-warning':  u.quota.analyses = { used: 70, total: 80 };  u.quota.rightsizing = { used: 850, total: 1000 }; break;
-    case 'state-depleted': u.quota.analyses = { used: 80, total: 80 };  u.quota.rightsizing = { used: 1000, total: 1000 }; break;
-    case 'state-loading':  u.quota.state = 'loading'; break;
-    case 'state-error':    u.quota.state = 'error';   break;
-
-    // Special
-    case 'special-addon':  u.addonPacks = 2; u.quota.analyses = { used: 92, total: 160 }; u.quota.rightsizing = { used: 1180, total: 2000 }; break;
-    case 'special-mixed':  u.quota.analyses = { used: 72, total: 80 };  u.quota.rightsizing = { used: 1000, total: 1000 }; break;
-    case 'special-manager':u.role = 'Manager - Cost Center'; u.name = 'John Doue'; u.email = 'jdoe@email.com'; u.initials = 'JD'; break;
-    case 'special-noswitch': u.canSwitchRole = false; break;
-  }
-
-  window.LUMITURE_USER = u;
-  window.LumitureTopbar.rerender();
-  window.LumitureTopbar.openMenu();
-}
-
-// 初始載入即套預設情境並開啟 menu
-window.addEventListener('load', function () {
-  setTimeout(function () { applyScenario(window.DEMO_DEFAULT); }, 60);
-});
-
-// =================================================================
-// SIDEBAR NAV — definition in shared/lumiture-nav.js
-// =================================================================
-window.LUMITURE_ACTIVE = 'user-menu';
-</script>
-
-<!-- SHARED MODULES — nav 必須在 sidebar 前載入 -->
+<script>window.LUMITURE_ACTIVE='group-list'; window.LUMITURE_USER={role:'Admin',plan:'Standard',quota:{analyses:{used:32,total:80},rightsizing:{used:410,total:1000},refreshDate:'2 Jul. 2026'}};</script>
 <script>
 /* === Inlined: shared/lumiture-nav.js === */
 /*!
@@ -1237,6 +1256,822 @@ window.LUMITURE_ACTIVE = 'user-menu';
 
 </script>
 <script>
+/* ============================================================
+ * Group List prototype — rebuilt from LumiTure-FE production
+ * source (apps/lumiture-ai/src/app/(main)/(organization-settings)/group-list/)
+ * Scope: T1/T2 Group List + Group Details (Members/Resources/Tier2 tabs).
+ * CRUD modals (Create/Edit/Remove Group, Invite/Edit/Remove User,
+ * Assign Resource) are stubbed as toasts — deferred to next phase.
+ * ============================================================ */
+const ORG_NAME = 'CloudMile';
+
+/* ---------- role → availableActions (FE drives visibility purely by data flags, not role strings) ---------- */
+const ROLE_ACTIONS = {
+  admin:      { createGroup:true,  editGroup:true,  removeGroup:true,  inviteUser:true,  editUser:true,  removeUser:true,  assignResource:true,  removeResource:true  },
+  't1-manager': { createGroup:true,  editGroup:true,  removeGroup:false, inviteUser:true,  editUser:true,  removeUser:false, assignResource:true,  removeResource:true  },
+  't1-member':  { createGroup:false, editGroup:false, removeGroup:false, inviteUser:false, editUser:false, removeUser:false, assignResource:false, removeResource:false },
+  't2-manager': { createGroup:false, editGroup:true,  removeGroup:false, inviteUser:true,  editUser:true,  removeUser:false, assignResource:true,  removeResource:true  },
+  't2-member':  { createGroup:false, editGroup:false, removeGroup:false, inviteUser:false, editUser:false, removeUser:false, assignResource:false, removeResource:false },
+};
+const ROLE_LABEL = {admin:'Admin', 't1-manager':'T1 Manager', 't1-member':'T1 Member', 't2-manager':'T2 Manager', 't2-member':'T2 Member'};
+
+/* ---------- mock data ---------- */
+const NAME_POOL = ['Alfonso Vetrovs','Aspen Westervelt','Makenna Herwitz','Cristofer Vetrovs','Charlie Passaquindici Arcand','Leo Donin','Craig Passaquindici Arcand','Gretchen Lipshutz','Carla Herwitz','Corey Lubin','Randy Stanton','Tatiana Dorwart','Marley Levin','Dulce Botosh','Kaylynn Herwitz'];
+function personEmail(name){return name.toLowerCase().replace(/[^a-z ]/g,'').trim().replace(/ /g,'.')+'@cloudmile.com'}
+function pick(arr,i){return arr[i%arr.length]}
+
+const T1_GROUPS = [
+  {id:'biz-dev', name:'Business Development', resource:5, tier2:6, lastUpdated:'3 weeks ago', creator:'Alfonso Vetrovs', created:'03/05/2025'},
+  {id:'cust-exp', name:'Customer Experience', resource:1, tier2:1, lastUpdated:'11 months ago', creator:'Aspen Westervelt', created:'02/05/2025'},
+  {id:'data-analytics', name:'Data Analytics', resource:0, tier2:6, lastUpdated:'14 days ago', creator:'Makenna Herwitz', created:'01/05/2025'},
+  {id:'engineering', name:'Engineering', resource:142, tier2:2, lastUpdated:'2 weeks ago', creator:'Cristofer Vetrovs', created:'01/05/2025'},
+  {id:'finance', name:'Finance', resource:1, tier2:10, lastUpdated:'1 day ago', creator:'Charlie Passaquindici Arcand', created:'01/05/2025'},
+  {id:'hr', name:'Human Resources', resource:1, tier2:0, lastUpdated:'1 week ago', creator:'Leo Donin', created:'01/05/2025'},
+  {id:'it', name:'Information Technology', resource:8, tier2:3, lastUpdated:'4 months ago', creator:'Craig Passaquindici Arcand', created:'01/05/2025'},
+  {id:'innovation', name:'Innovation', resource:34, tier2:8, lastUpdated:'25 days ago', creator:'Gretchen Lipshutz', created:'01/05/2025'},
+  {id:'legal', name:'Legal', resource:12, tier2:0, lastUpdated:'1 month ago', creator:'Carla Herwitz', created:'01/05/2025'},
+  {id:'marketing', name:'Marketing', resource:7, tier2:1, lastUpdated:'Today', creator:'Corey Lubin', created:'01/05/2025'},
+  {id:'operations', name:'Operations', resource:5, tier2:6, lastUpdated:'11 months ago', creator:'Randy Stanton', created:'01/05/2025'},
+  {id:'partnerships', name:'Partnerships', resource:5, tier2:6, lastUpdated:'11 months ago', creator:'Tatiana Dorwart', created:'01/05/2025'},
+];
+
+/* Business Development's Tier 2 Groups — matches the exact reference screen (kept 1:1). */
+const T2_BY_T1 = {
+  'biz-dev': [
+    {id:'acq-team', name:'Acquisition Team', resource:5, lastUpdated:'3 weeks ago', creator:'Alfonso Vetrovs', created:'03/05/2025'},
+    {id:'budget-analyst', name:'Budget Analyst', resource:1, lastUpdated:'11 months ago', creator:'Aspen Westervelt', created:'02/05/2025'},
+    {id:'emp-safety', name:'Employee Safety Officer', resource:0, lastUpdated:'14 days ago', creator:'Makenna Herwitz', created:'01/05/2025'},
+    {id:'onboarding', name:'Onboarding Team', resource:142, lastUpdated:'2 weeks ago', creator:'Cristofer Vetrovs', created:'01/05/2025'},
+    {id:'org-analyst', name:'Organizational Analyst', resource:1, lastUpdated:'1 day ago', creator:'Charlie Passaquindici Arcand', created:'01/05/2025'},
+    {id:'workforce', name:'Workforce Specialist', resource:1, lastUpdated:'1 week ago', creator:'Leo Donin', created:'01/05/2025'},
+  ],
+};
+function tier2GroupsFor(t1){
+  if (T2_BY_T1[t1.id]) return T2_BY_T1[t1.id];
+  const out=[];
+  for(let index=0;index<t1.tier2;index++){
+    out.push({id:t1.id+'-t2-'+index, name:pick(['Regional Team','Vendor Ops','Contract Review','Field Support','Data Stewardship','Partner Success','Compliance Desk','Access Review'],index)+' '+(index+1), resource:(index*3)%9, lastUpdated:pick(['2 days ago','1 week ago','3 weeks ago','2 months ago'],index), creator:pick(NAME_POOL,index+2), created:'0'+((index%9)+1)+'/05/2025'});
+  }
+  return out;
+}
+function usersFor(groupId){
+  const seedBase = groupId.length;
+  const count = 3 + (seedBase % 4);
+  const roles = ['manager','member'];
+  const out=[];
+  for(let index=0;index<count;index++){
+    const name=pick(NAME_POOL, seedBase+index);
+    out.push({id:groupId+'-u'+index, name, email:personEmail(name), role:pick(roles,index+seedBase), active: index%4!==3, lastLogin:pick(['2 hours ago','Yesterday','3 days ago','2 weeks ago','1 month ago'],index+seedBase)});
+  }
+  return out;
+}
+const GCP_PROJECTS=[['finops-prod-core','proj-8837201'],['data-pipeline-svc','proj-1029384'],['ml-training-eu','proj-5563820'],['web-frontend-stg','proj-7729103']];
+const GCP_BAS=[['CloudMile Master Billing','012ABC-34DEF5-6789GH'],['CloudMile APAC','019JKL-22MNO3-4567PQ']];
+const AWS_ACCOUNTS=[['prod-payments','876543210987'],['staging-web','321098765432'],['analytics-lake','998877665544']];
+const AWS_MGMT=[['CloudMile-Org-Root','112233445566']];
+const AZ_RG=[['rg-prod-web','/resourceGroups/rg-prod-web'],['rg-corp-bi','/resourceGroups/rg-corp-bi']];
+const AZ_SUB=[['Corporate-BI-Data','/subscriptions/c5d7a1e2']];
+function resourcesFor(groupId, cloud){
+  const seedBase = groupId.length + (cloud==='aws'?1:cloud==='azure'?2:0);
+  const count = 1 + (seedBase % 4);
+  const out=[];
+  for(let index=0;index<count;index++){
+    if(cloud==='gcp'){const p=pick(GCP_PROJECTS,seedBase+index), b=pick(GCP_BAS,seedBase+index); out.push({id:groupId+'-gcp'+index, name:p[0], subId:p[1], parentName:b[0], parentId:b[1], canRemove:index!==0||true});}
+    else if(cloud==='aws'){const a=pick(AWS_ACCOUNTS,seedBase+index), m=pick(AWS_MGMT,0); out.push({id:groupId+'-aws'+index, name:a[0], subId:a[1], parentName:m[0], parentId:m[1], canRemove:true});}
+    else {const r=pick(AZ_RG,seedBase+index), s=pick(AZ_SUB,0); out.push({id:groupId+'-az'+index, name:r[0], subId:r[1], parentName:s[0], parentId:s[1], canRemove:true});}
+  }
+  return out;
+}
+
+
+/* ============================================================
+ * Folder tree mock
+ * 結構取自 2026-08-28 的 GCP Folder 工程調查（某客戶正式環境實查），
+ * 但名稱全部換成中性假名，因為這支會部署到公開的 GitHub Pages。
+ * 保留的結構特徵（這些才是設計要處理的東西）：
+ *   10 個資料夾、2 層巢狀、88 個專案、10 個沒有資料夾、
+ *   一個資料夾橫跨兩個帳單帳戶、以及兩個同名資料夾分屬不同 parent。
+ * ============================================================ */
+const ORG_DOMAIN = 'example-corp.com';
+const BILLING_ACCOUNTS = [
+  {id:'ba-main', name:'corp-main-billing'},
+  {id:'ba-secondary', name:'corp-apac-billing'},
+];
+const SEED_PROJECTS = {'ml-services':['ml-inference-prod'], 'data-warehouse':['ads-warehouse'], platform:['reporting-iac']};
+function makeProjects(folderKey, count, baSplit){
+  const seeds = SEED_PROJECTS[folderKey] || [];
+  const out = [];
+  for(let index=0;index<count;index++){
+    const name = seeds[index] || `${folderKey.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${String(index+1).padStart(2,'0')}`;
+    // platform 是唯一橫跨兩個帳單帳戶的資料夾（對應工程調查第四節第 2 點的發現）
+    const ba = baSplit && index >= baSplit ? BILLING_ACCOUNTS[1] : BILLING_ACCOUNTS[0];
+    out.push({id:`${folderKey}-p${index}`, name, projectId:`${name}-${470000+index*137}`, ba});
+  }
+  return out;
+}
+/* GCP 只要求同一個 parent 底下的資料夾不同名，不同 parent 可以同名，
+ * 所以底下刻意讓 platform 和 deprecated 各有一個叫 staging 的子資料夾。 */
+/* folderId 用 GCP 的數字形式。畫面上跟專案一樣走兩行 Name / ID，
+ * 對齊 Resources 表格既有的「Project Name / ID」「Billing Account Name / ID」慣例。 */
+const FOLDER_TREE = [
+  {id:'f-platform', name:'platform', folderId:'720879011932', projects:makeProjects('platform',17,11), children:[
+    {id:'f-platform-staging', name:'staging', folderId:'792354814932', projects:makeProjects('platform-staging',7), children:[]},
+  ]},
+  {id:'f-data', name:'data-warehouse', folderId:'104882735610', projects:makeProjects('data-warehouse',14), children:[]},
+  {id:'f-internal', name:'internal-tools', folderId:'238104765221', projects:makeProjects('internal-tools',11), children:[]},
+  {id:'f-ml', name:'ml-services', folderId:'551093428077', projects:makeProjects('ml-services',6), children:[]},
+  {id:'f-consumer', name:'consumer-apps', folderId:'689213470558', projects:makeProjects('consumer-apps',6), children:[]},
+  {id:'f-api', name:'api-gateway', folderId:'473820156904', projects:makeProjects('api-gateway',5), children:[]},
+  {id:'f-mobile', name:'mobile-backend', folderId:'318447290613', projects:makeProjects('mobile-backend',4), children:[]},
+  {id:'f-depr', name:'deprecated', folderId:'860275143398', projects:makeProjects('deprecated',3), children:[
+    {id:'f-depr-staging', name:'staging', folderId:'915630482771', projects:makeProjects('legacy-staging',5), children:[]},
+  ]},
+];
+/* 沒有資料夾、直接掛在 organization 底下的 10 個專案（報告第三節） */
+const UNASSIGNED_PROJECTS = makeProjects('ungrouped',10);
+
+/* 極端深度情境用的合成樹（GCP 上限 10 層）。真實客戶只有 2 層，
+ * 這棵樹純粹用來確認縮排在官方上限下不會壞版。 */
+function makeDeepTree(){
+  const names = ['corp','platform-ops','infra','prod','eu-west','payments','ledger','settlement','fraud-review','archive']; // 10 層 = GCP 官方上限
+  let node = null;
+  for(let index=names.length-1; index>=0; index--){
+    node = {id:`deep-${index}`, name:names[index], folderId:String(500000000000+index*10193), projects:makeProjects(`deep-${names[index]}`, index===names.length-1?4:1), children:node?[node]:[]};
+  }
+  return node;
+}
+
+function walkFolders(nodes, fn, depth=0, path=[]){
+  nodes.forEach(node=>{ fn(node, depth, path); walkFolders(node.children, fn, depth+1, path.concat(node.name)); });
+}
+function allProjectsOf(node){
+  let out = node.projects.slice();
+  node.children.forEach(child=>{ out = out.concat(allProjectsOf(child)); });
+  return out;
+}
+function everyProject(){
+  let out = [];
+  walkFolders(FOLDER_TREE, node=>{ out = out.concat(node.projects); });
+  return out.concat(UNASSIGNED_PROJECTS);
+}
+
+/* ---------- state ---------- */
+const state = {
+  role:'admin',
+  pageState:'set',      // set | loading | empty | nodata
+  cloudAuth:'all',      // all | gcp-only
+  view:'list',          // list | detail
+  tier:1,               // 1 | 2 (detail context)
+  t1Id:null,
+  t2Id:null,
+  tab:'group-members',  // group-members | resources | tier-2-groups
+  cloud:'gcp',
+  selectedResources:{},
+  pendingDialog:null,
+  sort:{t1:{key:null,dir:0}, tier2:{key:null,dir:0}, members:{key:null,dir:0}, resources:{key:null,dir:0}},
+};
+function actions(){return ROLE_ACTIONS[state.role]}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function findT1(id){return T1_GROUPS.find(g=>g.id===id)}
+function findT2(t1id,t2id){return tier2GroupsFor(findT1(t1id)).find(g=>g.id===t2id)}
+
+/* ---------- toast ---------- */
+let toastTimer;
+function showToast(text,type='success'){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-text').textContent=text;
+  document.getElementById('toast-icon').textContent = type==='error'?'error':'check_circle';
+  t.classList.toggle('error', type==='error');
+  t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3400);
+}
+function deferredAction(label){ showToast(label+' — 這個彈窗留待下一階段規劃（本輪只重建 List / Details 主畫面）'); }
+
+/* ---------- confirm dialog (Unlink Resource only — the one interaction worth showing live) ---------- */
+function openUnlinkDialog(groupId, cloud, ids){
+  const root=document.getElementById('dialog-root');
+  const names = resourcesFor(groupId,cloud).filter(r=>ids.includes(r.id)).map(r=>r.name);
+  root.innerHTML = `<div class="dlg-backdrop" onclick="if(event.target===this)closeDialog()">
+    <div class="dlg">
+      <div class="dlg-head"><span class="material-symbols-outlined">warning</span><h3>Unlink Resource</h3></div>
+      <div class="dlg-body">Do you confirm that you want to unlink this resource from the group?<br><br>${names.map(n=>'<b>'+esc(n)+'</b>').join('<br>')}</div>
+      <div class="dlg-actions">
+        <button class="btn btn-out" onclick="closeDialog()">Cancel</button>
+        <button class="btn btn-pri" style="background:var(--lt-color-error)" onclick="confirmUnlink('${groupId}','${cloud}')">Unlink</button>
+      </div>
+    </div>
+  </div>`;
+}
+function closeDialog(){document.getElementById('dialog-root').innerHTML='';}
+function confirmUnlink(groupId,cloud){
+  state.selectedResources[cloud]={};
+  closeDialog();
+  showToast('Resource unlinked from the group.');
+  render();
+}
+
+/* ---------- sorting (matches FE: TanStack Table sort baked into VirtualizedTable,
+ * fixed here to also show the Guideline's default grey arrow_upward per the
+ * gap the FE hasn't patched yet — see PORTFOLIO_LOG) ---------- */
+function relTimeToDays(s){
+  if(!s) return 999999;
+  if(/today/i.test(s)) return 0;
+  if(/yesterday/i.test(s)) return 1;
+  const m = s.match(/(\d+)\s*(hour|day|week|month|year)/i);
+  if(!m) return 999999;
+  const n = +m[1], unit = m[2].toLowerCase();
+  const mult = unit==='hour'?(1/24):unit==='day'?1:unit==='week'?7:unit==='month'?30:365;
+  return n*mult;
+}
+function dateToTs(s){
+  const m = String(s).match(/(\d+)\/(\d+)\/(\d+)/);
+  if(!m) return 0;
+  return new Date(+m[3], +m[2]-1, +m[1]).getTime();
+}
+function sortIconHtml(tableKey,colKey){
+  const s = state.sort[tableKey];
+  const active = s.key===colKey;
+  const color = active ? 'var(--lt-color-primary)' : 'var(--lt-grey-300)';
+  const name = (active && s.dir===-1) ? 'arrow_downward' : 'arrow_upward';
+  return `<span class="material-symbols-outlined sort-ic" style="color:${color}">${name}</span>`;
+}
+function sortHeader(label, tableKey, colKey, centered){
+  return `<th class="sortable${centered?' center':''}" onclick="toggleSort('${tableKey}','${colKey}')"><span class="th-sort">${label}${sortIconHtml(tableKey,colKey)}</span></th>`;
+}
+function toggleSort(tableKey,colKey){
+  const s = state.sort[tableKey];
+  if(s.key!==colKey){ s.key=colKey; s.dir=1; }
+  else if(s.dir===1){ s.dir=-1; }
+  else { s.key=null; s.dir=0; }
+  render();
+}
+function sortRows(rows, tableKey, accessors){
+  const s = state.sort[tableKey];
+  if(!s.key || !accessors[s.key]) return rows;
+  const acc = accessors[s.key];
+  return [...rows].sort((a,b)=>{
+    const va=acc(a), vb=acc(b);
+    if(va<vb) return -1*s.dir;
+    if(va>vb) return 1*s.dir;
+    return 0;
+  });
+}
+
+/* Column ratios measured off the Figma table (1004px content width) so the table
+ * fills the card exactly instead of auto-sizing past it. */
+function groupCols(showTier2, showAction){
+  const widths = showTier2
+    ? (showAction ? [18.5,14,14.5,13.5,16.5,14,9] : [20,15.5,16,15,18,15.5])
+    : (showAction ? [22,15,15,22,15,11]           : [24,17,17,25,17]);
+  return '<colgroup>'+widths.map(w=>'<col style="width:'+w+'%">').join('')+'</colgroup>';
+}
+
+/* ---------- renderers: list page ---------- */
+function skeletonRows(cols){
+  return Array.from({length:8}).map(()=>'<tr class="skel-row">'+Array.from({length:cols}).map(()=>'<td><div class="skel" style="height:16px;width:'+(60+Math.random()*40|0)+'%"></div></td>').join('')+'</tr>').join('');
+}
+function groupTable(groups, opts){
+  const showAction = opts.editable;
+  const tableKey = opts.sortTable;
+  const colDefs = opts.showTier2
+    ? [['Group Name','name'],['Resource','resource'],['Tier 2 Group','tier2'],['Last Updated','lastUpdated'],['Creator','creator'],['Time Created','created']]
+    : [['Group Name','name'],['Resource','resource'],['Last Updated','lastUpdated'],['Creator','creator'],['Time Created','created']];
+  const accessors = {name:g=>g.name.toLowerCase(), resource:g=>g.resource, tier2:g=>g.tier2, lastUpdated:g=>relTimeToDays(g.lastUpdated), creator:g=>g.creator.toLowerCase(), created:g=>dateToTs(g.created)};
+  if(state.pageState==='loading'){
+    const headCells = colDefs.map(([label])=>'<th>'+label+'</th>').join('') + (showAction?'<th>Action</th>':'');
+    return `<div class="table-wrap"><table>${groupCols(opts.showTier2, showAction)}<thead><tr>${headCells}</tr></thead><tbody>${skeletonRows(colDefs.length+(showAction?1:0))}</tbody></table></div>`;
+  }
+  if(!groups.length){
+    return `<div class="empty-state small error"><div><span class="material-symbols-outlined">group_off</span>
+      <p class="empty-title">No Groups Yet</p>
+      <p class="empty-copy">It seems like there are no groups created yet.
+Please create a new group or contact your administrator for assistance.</p>
+      ${actions().createGroup?'<button class="btn btn-pri" onclick="deferredAction(\'Create Group\')"><span class="material-symbols-outlined">add</span>Create Group</button>':''}
+      </div></div>`;
+  }
+  const rows = sortRows(groups, tableKey, accessors).map(g=>{
+    const tds = [
+      `<td class="cell-ellipsis">${esc(g.name)}</td>`,
+      `<td><button class="link-btn" onclick="event.stopPropagation();goToTab('${opts.tier===2?'t2':'t1'}','${opts.t1IdForRow||g.id}','${opts.tier===2?g.id:''}','resources')">${g.resource} Resource${g.resource===1?'':'s'}</button></td>`,
+    ];
+    if(opts.showTier2) tds.push(`<td><button class="link-btn" onclick="event.stopPropagation();openDetail(1,'${g.id}','tier-2-groups')">${g.tier2} Group${g.tier2===1?'':'s'}</button></td>`);
+    tds.push(`<td>${esc(g.lastUpdated)}</td>`, `<td class="cell-ellipsis">${esc(g.creator)}</td>`, `<td>${esc(g.created)}</td>`);
+    if(showAction){
+      tds.push(`<td><div class="actions-cell">
+        <button class="btn-icon" data-testid="edit-group-button" onclick="event.stopPropagation();deferredAction('Edit Group')" title="Edit Group"><span class="material-symbols-outlined">edit</span></button>
+        ${actions().removeGroup?'<button class="btn-icon danger" data-testid="remove-group-button" onclick="event.stopPropagation();deferredAction(\'Remove Group\')" title="Remove Group"><span class="material-symbols-outlined">delete</span></button>':''}
+        </div></td>`);
+    }
+    const clickTarget = opts.tier===2 ? `openDetail(2,'${opts.t1IdForRow}','${g.id}')` : `openDetail(1,'${g.id}')`;
+    return `<tr class="clickable" onclick="${clickTarget}">${tds.join('')}</tr>`;
+  }).join('');
+  const headCells = colDefs.map(([label,key])=>sortHeader(label, tableKey, key, false)).join('') + (showAction?'<th>Action</th>':'');
+  return `<div class="table-wrap"><table>${groupCols(opts.showTier2, showAction)}<thead><tr>${headCells}</tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderList(){
+  if(state.pageState==='nodata'){
+    return `<h1 class="org-title">${ORG_NAME}</h1><div class="card"><div class="empty-state error"><div>
+      <span class="material-symbols-outlined">cloud_off</span>
+      <p class="empty-title">Unable to load Group List</p>
+      <p class="empty-copy">Please try again. If the problem persists, contact your administrator.</p>
+      <button class="btn btn-pri" onclick="state.pageState='set';render()">Retry</button>
+      </div></div></div>`;
+  }
+  const total = state.pageState==='empty' ? 0 : T1_GROUPS.length;
+  const groups = state.pageState==='empty' ? [] : T1_GROUPS;
+  const titleCount = state.pageState==='loading' ? 0 : total;
+  return `<h1 class="org-title">${ORG_NAME}</h1>
+    <div class="card">
+      <div class="section-head">
+        <div>
+          <h2>Tier 1 Group List (${titleCount})</h2>
+          <p>You can quickly view the Tier 1 group information here, and click on each group to check details such as group members.</p>
+        </div>
+        ${actions().createGroup ? `<button class="btn btn-pri" ${state.pageState==='loading'?'disabled':''} onclick="deferredAction('Create Group')"><span class="material-symbols-outlined">add</span>Create Group</button>` : ''}
+      </div>
+      ${groupTable(groups, {showTier2:true, editable:actions().editGroup, tier:1, sortTable:'t1'})}
+    </div>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+      <button class="link-btn" style="color:var(--lt-color-text-secondary)" onclick="deferredAction('Learn More About Organization and Role')">ⓘ Learn More About Organization and Role</button>
+      <button class="link-btn" style="color:var(--lt-color-text-secondary)" onclick="deferredAction('Learn More About Authorization and Resource Assignment')">ⓘ Learn More About Authorization and Resource Assignment</button>
+    </div>`;
+}
+
+/* ---------- renderers: detail page ---------- */
+function goToTab(tier,t1id,t2id,tab){
+  openDetail(tier==='t2'?2:1, t1id, t2id||null);
+  state.tab = tab; render();
+}
+function openDetail(tier, t1id, t2id){
+  state.view='detail'; state.tier=tier; state.t1Id=t1id; state.t2Id=t2id||null;
+  state.tab = arguments[3] || 'group-members'; state.cloud='gcp'; state.selectedResources={};
+  render();
+}
+function backToList(){ state.view='list'; render(); }
+
+function tabsHeader(group, tier){
+  const memberCount = usersFor(group.id).length;
+  const resourceCount = group.resource;
+  const tabs = [ {id:'group-members', label:`Group Members (${memberCount})`} , {id:'resources', label:`Resources (${resourceCount})`} ];
+  if(tier===1) tabs.push({id:'tier-2-groups', label:`Tier 2 Groups (${group.tier2})`});
+  return `<div class="tabs-row"><div class="tabs">${tabs.map(t=>`<button class="tab ${state.tab===t.id?'active':''}" onclick="state.tab='${t.id}';render()">${t.label}</button>`).join('')}</div></div>`;
+}
+
+function membersTab(group){
+  if(state.pageState==='loading'){
+    return `<p class="section-copy">You can explore the details of this group here, including members, resources, and subgroups belonging to this group.</p>
+      <div class="table-wrap"><table><thead><tr><th>User Name</th><th>Email</th><th class="center">Role</th><th class="center">Active Status</th><th class="center">Last Login</th></tr></thead><tbody>${skeletonRows(5)}</tbody></table></div>`;
+  }
+  const users = usersFor(group.id);
+  const showAction = actions().editUser || actions().removeUser;
+  if(!users.length){
+    return `<div class="empty-state small error"><div><span class="material-symbols-outlined">person_off</span>
+      <p class="empty-title">No Users Yet</p>
+      <p class="empty-copy">There are currently no users assigned to this group.
+Invite users to the group or check with your administrator if assistance is needed.</p></div></div>`;
+  }
+  const colDefs = [['User Name','name',false],['Email','email',false],['Role','role',true],['Active Status','active',true],['Last Login','lastLogin',true]];
+  const accessors = {name:u=>u.name.trim().toLowerCase(), email:u=>u.email.toLowerCase(), role:u=>u.role, active:u=>u.active?1:0, lastLogin:u=>relTimeToDays(u.lastLogin)};
+  const rows = sortRows(users, 'members', accessors).map(u=>`<tr>
+      <td class="cell-ellipsis">${esc(u.name.trim()||'--')}</td>
+      <td class="cell-ellipsis">${esc(u.email)}</td>
+      <td class="center">${u.role.charAt(0).toUpperCase()+u.role.slice(1)}</td>
+      <td class="center"><span class="status-text ${u.active?'':'inactive'}">${u.active?'Active':'Inactive'}</span></td>
+      <td class="center">${esc(u.lastLogin)}</td>
+      ${showAction?`<td class="center"><div class="actions-cell">
+        ${actions().editUser?'<button class="btn-icon" data-testid="edit-user-button" onclick="deferredAction(\'Edit User\')" title="Edit"><span class="material-symbols-outlined">edit</span></button>':''}
+        ${actions().removeUser?'<button class="btn-icon danger" data-testid="delete-user-button" onclick="deferredAction(\'Remove User\')" title="Remove"><span class="material-symbols-outlined">delete</span></button>':''}
+        </div></td>`:''}
+    </tr>`).join('');
+  const headCells = colDefs.map(([label,key,centered])=>sortHeader(label,'members',key,centered)).join('') + (showAction?'<th class="center">Action</th>':'');
+  const memberCols = showAction
+    ? '<colgroup><col style="width:22%"><col style="width:26%"><col style="width:12%"><col style="width:14%"><col style="width:15%"><col style="width:11%"></colgroup>'
+    : '<colgroup><col style="width:25%"><col style="width:30%"><col style="width:13%"><col style="width:16%"><col style="width:16%"></colgroup>';
+  return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px">
+      <p class="section-copy">You can explore the details of this group here, including members, resources, and subgroups belonging to this group.</p>
+      ${actions().inviteUser?'<button class="btn btn-pri" onclick="deferredAction(\'Invite User\')"><span class="material-symbols-outlined">person_add</span>Invite User</button>':''}
+    </div>
+    <div class="table-wrap"><table>${memberCols}<thead><tr>${headCells}</tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+const CLOUD_META = {
+  gcp:{label:'Google Cloud', col1:'Project', col2:'Billing Account (Project belongs to)', dot:'conic-gradient(from 35deg,#4285f4 0 25%,#34a853 0 50%,#fbbc05 0 75%,#ea4335 0)'},
+  aws:{label:'AWS', col1:'Account', col2:'Management Account (Account belongs to)', dot:'#ff9900'},
+  azure:{label:'Azure', col1:'Resource Group', col2:'Subscription (Resource Group belongs to)', dot:'#0078d4'},
+};
+function resourcesTab(group){
+  const isT2 = state.tier===2;
+  const notAuthorized = state.cloudAuth==='gcp-only' && state.cloud!=='gcp';
+  const body = () => {
+    if(state.pageState==='loading'){
+      return `<div class="pill-tabs">${Object.keys(CLOUD_META).map(c=>`<span class="pill-tab ${c===state.cloud?'active':''}"><span class="csp-dot" style="background:${CLOUD_META[c].dot}"></span>${CLOUD_META[c].label}</span>`).join('')}</div>
+        <div class="res-toolbar"><div class="search-box"><span class="material-symbols-outlined">search</span><input disabled placeholder="Search resources"></div></div>
+        <div class="table-wrap"><table><colgroup><col style="width:48px"><col style="width:42%"><col><col style="width:80px"></colgroup><thead><tr><th></th><th>${CLOUD_META[state.cloud].col1}</th><th>${CLOUD_META[state.cloud].col2}</th><th>Action</th></tr></thead><tbody>${skeletonRows(4)}</tbody></table></div>`;
+    }
+    if(notAuthorized){
+      const isAdmin = state.role==='admin';
+      return `<div class="pill-tabs">${Object.keys(CLOUD_META).map(c=>`<button class="pill-tab ${c===state.cloud?'active':''}" onclick="state.cloud='${c}';render()"><span class="csp-dot" style="background:${CLOUD_META[c].dot}"></span>${CLOUD_META[c].label}</button>`).join('')}</div>
+        <div class="empty-state error"><div>
+          <span class="material-symbols-outlined">${isAdmin?'lock_open':'lock'}</span>
+          <p class="empty-title">${CLOUD_META[state.cloud].label} is not authorized</p>
+          <p class="empty-copy">${isAdmin?`Authorize ${CLOUD_META[state.cloud].label} in Authorization List before assigning resources from this provider.`:'Please reach out to your administrator to authorize this cloud provider.'}</p>
+          ${isAdmin?'<a class="btn btn-pri" href="./organization-settings.html" style="text-decoration:none"><span class="material-symbols-outlined">link</span>Go to Authorization List</a>':''}
+        </div></div>`;
+    }
+    const resources = resourcesFor(group.id, state.cloud);
+    const selected = state.selectedResources[state.cloud] || {};
+    const selectedIds = Object.keys(selected).filter(id=>selected[id]);
+    const canRemove = actions().removeResource;
+    const canAssign = actions().assignResource;
+    let tableBlock;
+    if(!resources.length){
+      tableBlock = `<div class="empty-state"><div><span class="material-symbols-outlined">inventory_2</span>
+        <p class="empty-title">No Resources Yet</p>
+        <p class="empty-copy">No resources have been assigned to this group yet.
+Please assign new resources or reach out to your administrator for help.</p></div></div>`;
+    } else {
+      const resAccessors = {col1:r=>r.name.toLowerCase(), col2:r=>r.parentName.toLowerCase()};
+      const rows = sortRows(resources, 'resources', resAccessors).map(r=>`<tr class="${selected[r.id]?'selected':''}">
+          <td>${canRemove?`<input type="checkbox" ${selected[r.id]?'checked':''} onchange="toggleResource('${r.id}',this.checked)">`:''}</td>
+          <td class="cell-double"><div class="l1">${esc(r.name)}</div><div class="l2">${esc(r.subId)}</div></td>
+          <td class="cell-double"><div class="l1">${esc(r.parentName)}</div><div class="l2">${esc(r.parentId)}</div></td>
+          <td><button class="btn-icon ${r.canRemove&&canRemove?'danger':''}" ${!(r.canRemove&&canRemove)?'disabled':''} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'])" title="Unlink Resource"><span class="material-symbols-outlined">link_off</span></button></td>
+        </tr>`).join('');
+      tableBlock = `<div class="table-wrap"><table><colgroup><col style="width:48px"><col style="width:42%"><col><col style="width:80px"></colgroup><thead><tr><th></th>${sortHeader(CLOUD_META[state.cloud].col1,'resources','col1')}${sortHeader(CLOUD_META[state.cloud].col2,'resources','col2')}<th>Action</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+    return `<div class="pill-tabs">${Object.keys(CLOUD_META).map(c=>`<button class="pill-tab ${c===state.cloud?'active':''}" onclick="state.cloud='${c}';render()"><span class="csp-dot" style="background:${CLOUD_META[c].dot}"></span>${CLOUD_META[c].label}</button>`).join('')}</div>
+      <div class="res-toolbar">
+        <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="Search resources" oninput="showToast('Filtering… (prototype does not filter mock data)')"></div>
+        <div class="res-toolbar-actions">
+          ${(canRemove && selectedIds.length)?`<button class="btn btn-out danger" onclick="openUnlinkDialog('${group.id}','${state.cloud}',[${selectedIds.map(id=>"'"+id+"'").join(',')}])"><span class="material-symbols-outlined">link_off</span>Unlink Resource</button>`:''}
+          ${canAssign?`<button class="btn btn-pri" data-testid="assign-resource-button" onclick="${state.cloud==='gcp'?'openAssign()':"deferredAction('Assign Resource')"}"><span class="material-symbols-outlined">add_link</span>Assign Resource</button>`:''}
+        </div>
+      </div>
+      ${tableBlock}`;
+  };
+  return `<p class="section-copy" style="margin-bottom:16px">You can assign cloud resources to this group here.</p>${body()}`;
+}
+
+function renderDetail(){
+  const isT2 = state.tier===2;
+  const t1 = findT1(state.t1Id);
+  const group = isT2 ? findT2(state.t1Id, state.t2Id) : t1;
+  if(!group){ state.view='list'; return renderList(); }
+  const backHref = isT2 && state.role==='t2-member' ? null : null; // both roles route back to list in this prototype scope
+  const crumb = isT2 ? `${ORG_NAME} / ${t1.name}` : `${ORG_NAME} /`;
+  let body;
+  if(state.tab==='group-members') body = membersTab(group);
+  else if(state.tab==='resources') body = resourcesTab(group);
+  else body = groupsSubTab();
+  function groupsSubTab(){
+    const list = tier2GroupsFor(t1);
+    return groupTable(list, {showTier2:false, editable:actions().editGroup, tier:2, resourceCenter:true, t1IdForRow:t1.id, sortTable:'tier2'});
+  }
+  return `<button class="go-back" onclick="backToList()"><span class="material-symbols-outlined">arrow_back</span><span class="go-back-label">Back to Group List</span></button>
+    <div class="card">
+      <div class="crumb">${esc(crumb)}</div>
+      <div class="section-head" style="align-items:center;margin-bottom:20px">
+        <h1 style="font-size:24px;font-weight:700;margin:0">${esc(group.name)}</h1>
+        <div style="display:flex;gap:8px">
+          ${actions().editGroup?`<button class="btn btn-out" onclick="deferredAction('Edit Group')"><span class="material-symbols-outlined">edit</span>Edit Group</button>`:''}
+          ${actions().removeGroup?`<button class="btn btn-out danger" onclick="deferredAction('Remove Group')"><span class="material-symbols-outlined">delete</span>Remove Group</button>`:''}
+        </div>
+      </div>
+      ${tabsHeader(group, isT2?2:1)}
+      ${state.tab==='tier-2-groups' ? `<div class="section-head">
+        <div>
+          <h2>Tier 2 Group List (${t1.tier2})</h2>
+          <p>You can quickly view the Tier 2 group information here, and click on each group to check details such as group members.</p>
+        </div>
+        ${actions().createGroup?`<button class="btn btn-pri" onclick="deferredAction('Create Group')"><span class="material-symbols-outlined">add</span>Create Group</button>`:''}
+      </div>` : ''}
+      ${body}
+    </div>`;
+}
+function toggleResource(id, checked){
+  if(!state.selectedResources[state.cloud]) state.selectedResources[state.cloud]={};
+  state.selectedResources[state.cloud][id]=checked;
+  render();
+}
+
+
+/* ============================================================
+ * Assign Resource — folder tree picker
+ * 骨架採「資料夾 → 專案」，帳單帳戶降級成篩選器（見
+ * specs/2026-09-03-group-list-folder-view-ux-response.md 第一節）。
+ * 走「帳單帳戶 → 資料夾 → 專案」的話，橫跨兩個 BA 的資料夾會因此
+ * 出現兩次，使用者勾一個會以為選完、實際只拿到一半。
+ * ============================================================ */
+const assign = {
+  open:false,
+  hasFolders:true,     // org 完全沒開資料夾時退回現行的 BA → Project 兩層
+  loading:false,
+  expanded:{},
+  selected:{},
+  search:'',
+  baFilter:'all',
+  groupBy:'ba',       // ba | folder —— 預設維持現行的帳單帳戶視角，Folder 是新增的選項。
+                      // 選取單位是專案、分組只是呈現，所以切換不會弄丟已勾的東西
+};
+let assignSearchTimer;
+
+function openAssign(){
+  assign.open = true;
+  assign.loading = true;
+  assign.expanded = {};
+  assign.selected = {};
+  assign.search = '';
+  assign.baFilter = 'all';
+  assign.groupBy = 'ba';
+  renderAssign();
+  setTimeout(()=>{ assign.loading = false; renderAssign(); }, 500);
+}
+function closeAssign(){ assign.open = false; renderAssign(); }
+
+/* 帳單帳戶篩選只縮小「看得到的專案」，不改變樹的骨架 */
+function projectVisible(project){
+  if(assign.baFilter !== 'all' && project.ba.id !== assign.baFilter) return false;
+  if(!assign.search) return true;
+  const term = assign.search.toLowerCase();
+  return project.name.toLowerCase().includes(term) || project.projectId.toLowerCase().includes(term);
+}
+function folderMatches(node){
+  return assign.search && node.name.toLowerCase().includes(assign.search.toLowerCase());
+}
+/* 資料夾自己命中搜尋時，底下的專案整批留著，不然搜到資料夾卻看不到內容 */
+function visibleProjectsOf(node, inheritedMatch){
+  const keepAll = inheritedMatch || folderMatches(node);
+  const own = node.projects.filter(project => keepAll ? (assign.baFilter==='all' || project.ba.id===assign.baFilter) : projectVisible(project));
+  let total = own.length;
+  node.children.forEach(child=>{ total += visibleProjectsOf(child, keepAll).length; });
+  return keepAll ? allProjectsOf(node).filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter) : (function(){
+    let acc = own.slice();
+    node.children.forEach(child=>{ acc = acc.concat(visibleProjectsOf(child, false)); });
+    return acc;
+  })();
+}
+function nodeHasVisible(node){ return visibleProjectsOf(node, false).length > 0 || folderMatches(node); }
+
+function selectedIn(projects){ return projects.filter(project=>assign.selected[project.id]).length; }
+function toggleFolder(nodeId){
+  const node = findFolder(nodeId);
+  if(!node) return;
+  const projects = allProjectsOf(node).filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter);
+  const allOn = projects.length>0 && projects.every(project=>assign.selected[project.id]);
+  projects.forEach(project=>{ if(allOn) delete assign.selected[project.id]; else assign.selected[project.id]=true; });
+  renderAssign();
+}
+function toggleProject(projectId){
+  if(assign.selected[projectId]) delete assign.selected[projectId]; else assign.selected[projectId]=true;
+  renderAssign();
+}
+function toggleExpand(nodeId){ assign.expanded[nodeId] = !assign.expanded[nodeId]; renderAssign(); }
+function findFolder(nodeId){
+  let found = null;
+  walkFolders(FOLDER_TREE, node=>{ if(node.id===nodeId) found = node; });
+  return found;
+}
+function onAssignSearch(value){
+  clearTimeout(assignSearchTimer);
+  /* 對齊 FE ResourcesSearch 的 500ms debounce */
+  assignSearchTimer = setTimeout(()=>{ assign.search = value.trim(); renderAssign(); }, 500);
+}
+function setBaFilter(value){ assign.baFilter = value; renderAssign(); }
+/* 切換分組不動 assign.selected，因為選取的是專案本身，跟怎麼分組無關 */
+function setGroupBy(mode){ assign.groupBy = mode; assign.expanded = {}; if(mode==='ba') assign.baFilter='all'; renderAssign(); }
+
+function hl(text){
+  if(!assign.search) return esc(text);
+  const term = assign.search;
+  const at = text.toLowerCase().indexOf(term.toLowerCase());
+  if(at < 0) return esc(text);
+  return esc(text.slice(0,at)) + '<span class="hl">' + esc(text.slice(at, at+term.length)) + '</span>' + esc(text.slice(at+term.length));
+}
+function checkboxHtml(stateKey, onclick, indeterminate){
+  return `<input type="checkbox" ${stateKey?'checked':''} onclick="event.stopPropagation();${onclick}" ${indeterminate?'data-indeterminate="1"':''}>`;
+}
+/* GCP 允許 10 層。與其在某一層之後改用文字路徑說明（試過，縮排是一眼可見的
+ * 視覺編碼，換成文字等於要使用者自己讀了再比對，反而更難懂），不如把步進縮小
+ * 讓縮排一路撐到底：16px × 10 層 = 160px，660px 的彈窗放得下，階層也全程看得見。 */
+const INDENT_STEP = 16;
+function indentPx(depth){ return 24 + depth * INDENT_STEP; }
+function railsHtml(depth){
+  let out = '';
+  for(let level=0; level<depth; level++){ out += `<span class="trail" style="left:${32 + level*INDENT_STEP}px"></span>`; }
+  return out;
+}
+function projectRow(project, depth){
+  return `<div class="tnode is-project" style="padding-left:${indentPx(depth)}px" onclick="toggleProject('${project.id}')">${railsHtml(depth)}
+    <span class="tchev ghost"></span>
+    ${checkboxHtml(!!assign.selected[project.id], `toggleProject('${project.id}')`)}
+    <div class="tlabel">
+      <span class="tname">${hl(project.name)}</span>
+      <span class="tsub">${hl(project.projectId)}</span>
+    </div>
+    ${(assign.hasFolders && assign.groupBy==='folder')?`<span class="ba-chip">${esc(project.ba.name)}</span>`:''}
+  </div>`;
+}
+function folderRow(node, depth){
+  const all = allProjectsOf(node);
+  const inFilter = all.filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter);
+  const picked = selectedIn(inFilter);
+  const isAll = inFilter.length>0 && picked===inFilter.length;
+  const isSome = picked>0 && !isAll;
+  /* 篩選讓資料夾只剩一部分時要講出來，不然使用者以為專案不見了 */
+  const countText = assign.baFilter==='all'
+    ? `(${all.length})`
+    : `(${inFilter.length} / ${all.length})`;
+  const expanded = !!assign.expanded[node.id] || !!assign.search;
+  const kids = expanded ? (
+      node.children.filter(nodeHasVisible).map(child=>folderRow(child, depth+1)).join('') +
+      node.projects.filter(project => folderMatches(node) ? (assign.baFilter==='all'||project.ba.id===assign.baFilter) : projectVisible(project)).map(project=>projectRow(project, depth+1)).join('')
+    ) : '';
+  return `<div class="tnode is-folder" style="padding-left:${indentPx(depth)}px"${node.folderId?` title="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth)}
+      <button class="tchev" onclick="event.stopPropagation();toggleExpand('${node.id}')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
+      ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome)}
+      <span class="material-symbols-outlined ticon">folder</span>
+      <div class="tlabel"><span class="tname">${hl(node.name)} <span class="tcount ${assign.baFilter!=='all'?'partial':''}">${countText}</span></span></div>
+    </div>${kids}`;
+}
+function unassignedRow(){
+  const inFilter = UNASSIGNED_PROJECTS.filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter);
+  const visible = inFilter.filter(projectVisible);
+  if(assign.search && !visible.length) return '';
+  const picked = selectedIn(inFilter);
+  const isAll = inFilter.length>0 && picked===inFilter.length;
+  const isSome = picked>0 && !isAll;
+  const expanded = !!assign.expanded['unassigned'] || !!assign.search;
+  const kids = expanded ? visible.map(project=>projectRow(project,1)).join('') : '';
+  return `<div class="tnode is-folder is-unassigned" style="padding-left:24px" onclick="toggleExpand('unassigned')">
+      <button class="tchev" onclick="event.stopPropagation();toggleExpand('unassigned')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
+      ${checkboxHtml(isAll, `toggleUnassigned()`, isSome)}
+      <span class="material-symbols-outlined ticon">folder_off</span>
+      <div class="tlabel"><span class="tname">No folder <span class="tcount">(${inFilter.length})</span></span>
+      <span class="tsub">Projects sitting directly under ${ORG_DOMAIN}</span></div>
+    </div>${kids}`;
+}
+function toggleUnassigned(){
+  const inFilter = UNASSIGNED_PROJECTS.filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter);
+  const allOn = inFilter.length>0 && inFilter.every(project=>assign.selected[project.id]);
+  inFilter.forEach(project=>{ if(allOn) delete assign.selected[project.id]; else assign.selected[project.id]=true; });
+  renderAssign();
+}
+
+/* org 一個資料夾都沒開時，樹會退化成一個裝了 92 個專案的「No folder」節點，
+ * 比現在的平鋪還難用。所以沒有資料夾就維持現行的 BA → Project 兩層。 */
+function flatBaTree(){
+  return BILLING_ACCOUNTS.map(ba=>{
+    const projects = everyProject().filter(project=>project.ba.id===ba.id).filter(projectVisible);
+    if(!projects.length) return '';
+    const expanded = !!assign.expanded[ba.id] || !!assign.search;
+    const picked = selectedIn(projects);
+    const isAll = projects.length>0 && picked===projects.length;
+    const isSome = picked>0 && !isAll;
+    return `<div class="tnode is-folder" style="padding-left:24px" onclick="toggleExpand('${ba.id}')">
+        <button class="tchev" onclick="event.stopPropagation();toggleExpand('${ba.id}')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
+        ${checkboxHtml(isAll, `toggleBa('${ba.id}')`, isSome)}
+        <span class="material-symbols-outlined ticon">account_balance_wallet</span>
+        <div class="tlabel"><span class="tname">${hl(ba.name)} <span class="tcount">(${projects.length})</span></span></div>
+      </div>${expanded ? projects.map(project=>projectRow(project,1)).join('') : ''}`;
+  }).join('');
+}
+function toggleBa(baId){
+  const projects = everyProject().filter(project=>project.ba.id===baId);
+  const allOn = projects.every(project=>assign.selected[project.id]);
+  projects.forEach(project=>{ if(allOn) delete assign.selected[project.id]; else assign.selected[project.id]=true; });
+  renderAssign();
+}
+
+function renderAssign(){
+  const root = document.getElementById('assign-root');
+  if(!assign.open){ root.innerHTML=''; return; }
+  const total = everyProject().length;
+  const picked = Object.keys(assign.selected).length;
+
+  let body;
+  if(assign.loading){
+    body = `<div class="tskel">${Array.from({length:7}).map(()=>'<div class="skel"></div>').join('')}</div>`;
+  } else if(!assign.hasFolders || assign.groupBy === 'ba'){
+    body = flatBaTree() || `<div class="tempty">No resources match your search.</div>`;
+  } else {
+    const tree = FOLDER_TREE.filter(nodeHasVisible).map(node=>folderRow(node,0)).join('') + unassignedRow();
+    body = tree || `<div class="tempty">No resources match your search.</div>`;
+  }
+
+  const note = !assign.hasFolders
+    ? `<div class="tnote"><span class="material-symbols-outlined">info</span><span>No folders were found in this organization, so projects are grouped by billing account.</span></div>`
+    : assign.groupBy === 'folder'
+      ? `<div class="tnote"><span class="material-symbols-outlined">info</span><span>Folders come from your Google Cloud resource hierarchy. Selecting a folder selects every project inside it, including sub-folders. Your selection is kept when you switch grouping.</span></div>`
+      : `<div class="tnote"><span class="material-symbols-outlined">info</span><span>Grouped by billing account. Switch to Folder to browse your Google Cloud resource hierarchy instead. A folder can span more than one billing account, so folders are not shown in this grouping, and your selection is kept when you switch.</span></div>`;
+
+  root.innerHTML = `<div class="rmodal-backdrop" onclick="if(event.target===this)closeAssign()">
+    <div class="rmodal" role="dialog" aria-label="Assign Resource">
+      <div class="rmodal-head">
+        <div>
+          <h3>Assign Resource</h3>
+          <p>Google Cloud · ${esc(ORG_DOMAIN)}</p>
+        </div>
+        <button class="rmodal-close" onclick="closeAssign()" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="rmodal-tools">
+        <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="Search folders or projects" value="${esc(assign.search)}" oninput="onAssignSearch(this.value)"></div>
+      </div>
+      <div class="groupby-row">
+        ${(assign.hasFolders && assign.groupBy==='folder') ? `<select class="ba-select" onchange="setBaFilter(this.value)">
+          <option value="all" ${assign.baFilter==='all'?'selected':''}>All billing accounts</option>
+          ${BILLING_ACCOUNTS.map(ba=>`<option value="${ba.id}" ${assign.baFilter===ba.id?'selected':''}>${esc(ba.name)}</option>`).join('')}
+        </select>` : ''}
+        ${assign.hasFolders ? `<div class="groupby-toggle">
+          <span class="lbl">Group by</span>
+          <div class="pill-tabs">
+            <button class="pill-tab ${assign.groupBy==='ba'?'active':''}" onclick="setGroupBy('ba')"><span class="material-symbols-outlined" style="font-size:16px">account_balance_wallet</span>Billing account</button>
+            <button class="pill-tab ${assign.groupBy==='folder'?'active':''}" onclick="setGroupBy('folder')"><span class="material-symbols-outlined" style="font-size:16px">folder</span>Folder</button>
+          </div>
+        </div>` : ''}
+      </div>
+      ${note}
+      <div class="rmodal-body">${body}</div>
+      <div class="rmodal-foot">
+        <span class="rmodal-count"><b>${picked}</b> of ${total} projects selected</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-out" onclick="closeAssign()">Cancel</button>
+          <button class="btn btn-pri" ${picked?'':'disabled'} onclick="confirmAssign()">Assign</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  /* indeterminate 只能用 JS 設，HTML 屬性沒有這個狀態 */
+  root.querySelectorAll('input[data-indeterminate]').forEach(box=>{ box.indeterminate = true; });
+}
+/* Demo 用：把樹換成 7 層深的合成結構並整條展開 */
+function showDeepTree(){
+  if(!FOLDER_TREE.some(node=>node.id==='deep-0')) FOLDER_TREE.unshift(makeDeepTree());
+  assign.hasFolders = true;
+  openAssign();
+  setGroupBy('folder');
+  setTimeout(()=>{
+    for(let index=0; index<10; index++){ assign.expanded[`deep-${index}`] = true; }
+    renderAssign();
+  }, 520);
+}
+function confirmAssign(){
+  const picked = Object.keys(assign.selected).length;
+  closeAssign();
+  showToast(`${picked} project${picked===1?'':'s'} assigned to this group.`);
+}
+
+/* ---------- top-level render ---------- */
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = state.view==='list' ? renderList() : renderDetail();
+}
+render();
+/* 讓 #assign 可以直接連到選單，方便貼進討論串請人看 */
+if(location.hash === '#assign'){ openDetail(1,'biz-dev'); state.tab='resources'; render(); openAssign(); }
+
+/* ---------- Demo scenarios（走 shared/demo-fab.js，不自寫 FAB） ---------- */
+window.DEMO_CATEGORIES = [
+  {id:'role',   label:'Role',      icon:'person',      hint:'按鈕顯示與否由後端回傳的 availableActions 決定，這裡是 5 組對應的布林值組合'},
+  {id:'state',  label:'Page',      icon:'layers',      hint:'Group List 主畫面的資料狀態'},
+  {id:'cloud',  label:'Resources', icon:'cloud',       hint:'Resources 分頁的雲端授權狀態'},
+  {id:'assign', label:'Assign',    icon:'account_tree',hint:'Assign Resource 的資料夾樹選單'},
+];
+window.DEMO_SCENARIOS = [
+  {id:'admin',      category:'role', label:'Admin',       icon:'admin_panel_settings', tip:'全部 availableActions 為 true'},
+  {id:'t1-manager', category:'role', label:'T1 Manager',  icon:'supervisor_account',   tip:'可建立與編輯，不可刪除'},
+  {id:'t1-member',  category:'role', label:'T1 Member',   icon:'badge',                tip:'唯讀，所有操作元件隱藏'},
+  {id:'t2-manager', category:'role', label:'T2 Manager',  icon:'person',               tip:'可編輯自己的群組，不可建立 T2'},
+  {id:'t2-member',  category:'role', label:'T2 Member',   icon:'person_outline',       tip:'唯讀'},
+
+  {id:'set',     category:'state', label:'With data',          icon:'check_circle',   tip:'12 個 T1 群組'},
+  {id:'loading', category:'state', label:'Loading (Skeleton)', icon:'hourglass_top',  isNoData:true},
+  {id:'empty',   category:'state', label:'No groups created',  icon:'group_off',      isNoData:true, tip:'FE 的 EmptyState type="error"'},
+  {id:'nodata',  category:'state', label:'Error / failed',     icon:'cloud_off',      isNoData:true},
+
+  {id:'cloud-all',      category:'cloud', label:'All clouds authorized', icon:'cloud_done'},
+  {id:'cloud-gcp-only', category:'cloud', label:'Only GCP authorized',   icon:'lock', tip:'AWS / Azure 顯示授權引導，Admin 才有 CTA'},
+
+  {id:'assign-ba',     category:'assign', label:'預設：Billing account 視角',   icon:'account_balance_wallet', tip:'既有客戶的現況，開啟選單的預設分組'},
+  {id:'assign-folder', category:'assign', label:'切換到 Folder 視角', icon:'account_tree', tip:'10 個資料夾、2 層巢狀、88 個專案、10 個未分類，結構取自工程調查的實查結果'},
+  {id:'assign-nofld',  category:'assign', label:'Org 沒有資料夾',               icon:'folder_off', tip:'報告沒涵蓋的 case：退回現行的 BA 兩層'},
+  {id:'assign-deep',   category:'assign', label:'極端深度（10 層，GCP 上限）', icon:'unfold_more', tip:'合成資料，真實客戶只有 2 層；用來確認縮排在官方上限下不會壞版'},
+];
+window.DEMO_DEFAULT = 'admin';
+window.DEMO_APPLY = function (id) {
+  if (['admin','t1-manager','t1-member','t2-manager','t2-member'].includes(id)) {
+    state.role = id; state.selectedResources = {}; render(); return;
+  }
+  if (['set','loading','empty','nodata'].includes(id)) { state.pageState = id; render(); return; }
+  if (id === 'cloud-all')      { state.cloudAuth = 'all';      render(); return; }
+  if (id === 'cloud-gcp-only') { state.cloudAuth = 'gcp-only'; render(); return; }
+  if (id === 'assign-ba')      { assign.hasFolders = true;  openAssign(); return; }
+  if (id === 'assign-folder')  { assign.hasFolders = true;  openAssign(); setGroupBy('folder'); return; }
+  if (id === 'assign-nofld')   { assign.hasFolders = false; openAssign(); return; }
+  if (id === 'assign-deep')    { showDeepTree(); return; }
+};
+</script>
+<script>
 /* === Inlined: shared/demo-fab.js === */
 /*!
  * demo-fab.js — Lumiture Designer Demo Scenarios (Shared Module v2)
@@ -1759,6 +2594,5 @@ window.LUMITURE_ACTIVE = 'user-menu';
 })();
 
 </script>
-
 </body>
 </html>
