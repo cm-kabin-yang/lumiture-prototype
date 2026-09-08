@@ -451,16 +451,8 @@ input[type="checkbox"]:disabled{cursor:default;opacity:.5}
 .tcount.partial{color:var(--lt-color-warning)}
 .ba-chip{flex:0 0 auto;font-size:11px;color:var(--lt-color-text-secondary);background:var(--lt-grey-100);border-radius:var(--lt-radius-xs);padding:2px 8px;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
 .hl{color:var(--lt-blue-60);font-weight:700}
-/* 「還有幾個沒指派」提示：把「你要記得回來維護」換成「系統告訴你有東西可以加」。
- * 資料來自 API 既有的 projects[].assigned，不需要任何新後端概念。 */
-.new-hint{flex:0 0 auto;border:0;background:var(--lt-blue-20);color:var(--lt-color-primary);font-size:11px;font-weight:700;border-radius:var(--lt-radius-pill);padding:3px 10px;cursor:pointer;font-family:inherit;white-space:nowrap}
-.new-hint:hover{background:var(--lt-color-primary);color:#fff}
-.assigned-tag{flex:0 0 auto;font-size:11px;color:var(--lt-color-text-secondary);white-space:nowrap}
-.add-tag{flex:0 0 auto;font-size:11px;font-weight:700;color:var(--lt-color-primary);white-space:nowrap}
-.drop-tag{flex:0 0 auto;font-size:11px;font-weight:700;color:var(--lt-color-error);white-space:nowrap}
-.tnode.is-drop .tname{text-decoration:line-through;color:var(--lt-color-text-secondary)}
-.tnote.is-warn{background:var(--lt-color-warning-bg,#FFF4E5)}
-.tnote.is-warn .material-symbols-outlined{color:var(--lt-color-warning)}
+.tempty-icon{display:block;font-size:32px;color:var(--lt-color-success);margin-bottom:8px}
+.tempty-title{font-size:var(--lt-fs-16);font-weight:600;color:var(--lt-color-text-primary);margin-bottom:4px}
 .tempty{padding:40px 24px;text-align:center;color:var(--lt-color-text-secondary);font-size:var(--lt-fs-14)}
 .tnote{display:flex;gap:8px;align-items:flex-start;margin:0 24px 12px;padding:10px 12px;background:var(--lt-color-primary-bg);border-radius:var(--lt-radius-sm);font-size:var(--lt-fs-12);line-height:1.6;color:var(--lt-color-text-primary)}
 .tnote .material-symbols-outlined{font-size:16px;color:var(--lt-color-primary);flex:0 0 auto;margin-top:1px}
@@ -1792,7 +1784,6 @@ const assign = {
   loading:false,
   expanded:{},
   selected:{},
-  baseline:{},        // 開啟時已指派的，用來算出「要加什麼、要移除什麼」
   search:'',
   baFilter:'all',
   groupBy:'ba',       // ba | folder —— 預設維持現行的帳單帳戶視角，Folder 是新增的選項。
@@ -1800,41 +1791,31 @@ const assign = {
 };
 let assignSearchTimer;
 
-/* PUT platforms/{platform}/resources/assign 是「覆寫」不是「追加」：
- * 規格（backend/api/user.md R5）寫 "Cleans existing resource perms, then assigns
- * new ones. For tier-one groups, also cleans removed resources from child
- * tier-two groups"。所以送出的 project_ids 就是這個群組之後的完整清單，
- * 沒被帶上的會被移除，T1 還會連帶清掉子 T2 群組的。
+/* ⚠️ 這個彈窗只列「尚未被指派的資源」，依設計稿註記
+ * （Figma 11735:168385「僅顯示『尚未被 assign 的資源』」）。
+ * 移除是另一條路：Resources 表格批次勾選 → [Unlink Resource] → 彈窗 #20
+ * （Figma 12801:76215），T1 還會先跑 group-check 列出受影響的 T2 群組。
+ * 所以這裡沒有取消指派，也不該有。
  *
- * 因此彈窗開啟時必須把已指派的先勾起來，畫面才等於群組現在的狀態，
- * 取消勾選也才等於移除。這也是 assigned 這個欄位存在的用途，
- * Rightsizing Scope（GCPScopeResource.tsx:46）就是這樣用的。
+ * 實作上有一個必須注意的點：PUT platforms/{platform}/resources/assign
+ * 是「覆寫整份清單」不是「追加」——
+ *   - backend/api/user.md R5：Cleans existing resource perms, then assigns new
+ *     ones. For tier-one groups, also cleans removed resources from child
+ *     tier-two groups
+ *   - domain/identity/organization.md（Resource Assignment Flow）：
+ *     PUT assign - replaces full assignment set
+ * 所以畫面只顯示未指派的、送出時必須帶上「已指派的 + 這次勾的」。
+ * 只送這次勾的會把群組原本的資源全部洗掉，T1 還連帶清掉子 T2。
  *
- * ⚠️ 現況 FE 沒有這樣做：GCPAssignResources.tsx 每次開啟都是 useState([])，
- * 而且完全沒讀 assigned。所以第一次設定完之後再開來加一個專案，
- * 會把沒重新勾的全部洗掉。這點待 BE / TL 確認規格那行是否精確。 */
-function seedSelectionFromAssigned(){
-  assign.selected = {};
-  assign.baseline = {};
-  everyProject().forEach(project=>{
-    if(project.assigned){ assign.selected[project.id] = true; assign.baseline[project.id] = true; }
-  });
-}
-function assignDiff(){
-  const toAdd = [], toRemove = [];
-  everyProject().forEach(project=>{
-    const on = !!assign.selected[project.id];
-    if(on && !assign.baseline[project.id]) toAdd.push(project);
-    if(!on && assign.baseline[project.id]) toRemove.push(project);
-  });
-  return { toAdd, toRemove };
-}
+ * ⚠️ 現況 FE 兩件事都沒做：GCPAssignResourcesContent 完全沒讀 assigned
+ * （所以沒過濾、也沒辦法在送出時補上既有的），GCPAssignResources 每次
+ * 開啟都是 useState([])。詳見 specs 的 §8.11。 */
 
 function openAssign(){
   assign.open = true;
   assign.loading = true;
   assign.expanded = {};
-  seedSelectionFromAssigned();
+  assign.selected = {};
   assign.search = '';
   assign.baFilter = 'all';
   assign.groupBy = 'ba';
@@ -1845,6 +1826,7 @@ function closeAssign(){ assign.open = false; renderAssign(); }
 
 /* 帳單帳戶篩選只縮小「看得到的專案」，不改變樹的骨架 */
 function projectVisible(project){
+  if(project.assigned) return false;   // 已指派的不進這個選單（設計稿註記）
   if(assign.baFilter !== 'all' && project.ba.id !== assign.baFilter) return false;
   if(!assign.search) return true;
   const term = assign.search.toLowerCase();
@@ -1856,10 +1838,10 @@ function folderMatches(node){
 /* 資料夾自己命中搜尋時，底下的專案整批留著，不然搜到資料夾卻看不到內容 */
 function visibleProjectsOf(node, inheritedMatch){
   const keepAll = inheritedMatch || folderMatches(node);
-  const own = node.projects.filter(project => keepAll ? (assign.baFilter==='all' || project.ba.id===assign.baFilter) : projectVisible(project));
+  const own = node.projects.filter(project => keepAll ? inFolderScope(project) : projectVisible(project));
   let total = own.length;
   node.children.forEach(child=>{ total += visibleProjectsOf(child, keepAll).length; });
-  return keepAll ? allProjectsOf(node).filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter) : (function(){
+  return keepAll ? allProjectsOf(node).filter(inFolderScope) : (function(){
     let acc = own.slice();
     node.children.forEach(child=>{ acc = acc.concat(visibleProjectsOf(child, false)); });
     return acc;
@@ -1867,6 +1849,11 @@ function visibleProjectsOf(node, inheritedMatch){
 }
 function nodeHasVisible(node){ return visibleProjectsOf(node, false).length > 0 || folderMatches(node); }
 
+/* 這個選單的可選範圍：未指派 + 通過帳單帳戶篩選 */
+function inFolderScope(project){
+  if(project.assigned) return false;
+  return assign.baFilter==='all' || project.ba.id===assign.baFilter;
+}
 function selectedIn(projects){ return projects.filter(project=>assign.selected[project.id]).length; }
 /* Demo 用：三種指派狀態。mixed = mock 原始值（當初指派過、之後 GCP 又長出新專案）， 
  * none = 第一次指派（全部可選），all = 全部都指派過（提示不出現） */
@@ -1877,17 +1864,13 @@ function setAssignedMode(mode){
   projects.forEach(project=>{
     project.assigned = mode==='none' ? false : mode==='all' ? true : ASSIGNED_SNAPSHOT.get(project.id);
   });
-  seedSelectionFromAssigned();
+  assign.selected = {};
 }
-function inBaFilter(projects){ return projects.filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter); }
 function selectableOf(node){
   const target = typeof node === 'string' ? findFolder(node) : node;
-  return target ? inBaFilter(allProjectsOf(target)) : [];
+  return target ? allProjectsOf(target).filter(inFolderScope) : [];
 }
-function notYetIn(projects){ return projects.filter(project => !assign.baseline[project.id]); }
-/* 藥丸要數的是「還沒在群組裡、而且這次也還沒勾起來」的。
- * 勾起來之後就不該再邀請點擊，不然按了沒反應又是一個死的 affordance。 */
-function stillMissing(projects){ return notYetIn(projects).filter(project => !assign.selected[project.id]); }
+function everyUnassigned(){ return everyProject().filter(project=>!project.assigned); }
 function toggleFolder(nodeId){
   const node = findFolder(nodeId);
   if(!node) return;
@@ -1901,11 +1884,6 @@ function toggleProject(projectId){
 function toggleScope(projects){
   const allOn = projects.length>0 && projects.every(project=>assign.selected[project.id]);
   projects.forEach(project=>{ if(allOn) delete assign.selected[project.id]; else assign.selected[project.id]=true; });
-  renderAssign();
-}
-/* 藥丸專用：只補選「還沒在群組裡」的，不動已經在裡面的 */
-function selectMissing(projects){
-  notYetIn(projects).forEach(project=>{ assign.selected[project.id]=true; });
   renderAssign();
 }
 function toggleExpand(nodeId){ assign.expanded[nodeId] = !assign.expanded[nodeId]; renderAssign(); }
@@ -1930,19 +1908,6 @@ function hl(text){
   if(at < 0) return esc(text);
   return esc(text.slice(0,at)) + '<span class="hl">' + esc(text.slice(at, at+term.length)) + '</span>' + esc(text.slice(at+term.length));
 }
-/* 父層列尾的「還有 N 個沒指派」。點一下只補選那些還不在群組裡的，
- * 不會動到已經在裡面的，使用者不用自己比對哪幾個是新的。 */
-function hintHtml(missingCount, inGroupCount, onclick){
-  /* 只有「這個父層已經指派過一部分、又還有沒指派的」才提示。
-   * 兩個理由：
-   * 1. 全新群組每一列都還沒指派，提示會變成滿螢幕的雜訊，而勾選框本身就是動作。
-   * 2. 完全沒指派過的資料夾，我們分不出「客戶剛開的新資料夾」跟「這個群組本來就不管它」。
-   *    T1 群組只擁有一部分資源是常態，對每個它不擁有的資料夾喊「還有 N 個沒指派」是錯的。
-   * 加上這個條件之後，藥丸只代表一件事：這裡曾經設定過，而現在跟當初不一樣了。 */
-  if(!inGroupCount) return '';
-  if(!missingCount) return `<span class="assigned-tag">All assigned</span>`;
-  return `<button class="new-hint" onclick="event.stopPropagation();${onclick}" title="Select the ${missingCount} project${missingCount===1?'':'s'} not assigned to this group yet">${missingCount} not assigned</button>`;
-}
 function checkboxHtml(stateKey, onclick, indeterminate){
   return `<input type="checkbox" ${stateKey?'checked':''} onclick="event.stopPropagation();${onclick}" ${indeterminate?'data-indeterminate="1"':''}>`;
 }
@@ -1958,36 +1923,28 @@ function railsHtml(depth){
   return out;
 }
 function projectRow(project, depth){
-  const inGroup = !!assign.baseline[project.id];
-  const on = !!assign.selected[project.id];
-  /* 三種狀態要分得出來：本來就在群組裡、這次要加進去、這次要移除。
-   * 取消勾選一個本來在裡面的專案就是移除，所以那一列要看得出來會被拿掉。 */
-  const flag = inGroup
-    ? (on ? '<span class="assigned-tag">In group</span>' : '<span class="drop-tag">Will be removed</span>')
-    : (on ? '<span class="add-tag">Will be added</span>' : '');
-  return `<div class="tnode is-project${inGroup&&!on?' is-drop':''}" style="padding-left:${indentPx(depth)}px" onclick="toggleProject('${project.id}')">${railsHtml(depth)}
+  return `<div class="tnode is-project" style="padding-left:${indentPx(depth)}px" onclick="toggleProject('${project.id}')">${railsHtml(depth)}
     <span class="tchev ghost"></span>
-    ${checkboxHtml(on, `toggleProject('${project.id}')`)}
+    ${checkboxHtml(!!assign.selected[project.id], `toggleProject('${project.id}')`)}
     <div class="tlabel">
       <span class="tname">${hl(project.name)}</span>
       <span class="tsub">${hl(project.projectId)}</span>
     </div>
-    ${flag}
     ${(assign.hasFolders && assign.groupBy==='folder')?`<span class="ba-chip">${esc(project.ba.name)}</span>`:''}
   </div>`;
 }
 function folderRow(node, depth){
-  const all = allProjectsOf(node);
-  const inFilter = inBaFilter(all);
+  /* 選單只列未指派的，所以計數也只能算未指派的，
+   * 不然「platform (24)」底下只掛 3 列，數字跟看到的東西對不起來 */
+  const unassigned = allProjectsOf(node).filter(project=>!project.assigned);
   const selectable = selectableOf(node);
-  const missing = stillMissing(selectable);
   const picked = selectedIn(selectable);
   const isAll = selectable.length>0 && picked===selectable.length;
   const isSome = picked>0 && !isAll;
   /* 篩選讓資料夾只剩一部分時要講出來，不然使用者以為專案不見了 */
   const countText = assign.baFilter==='all'
-    ? `(${all.length})`
-    : `(${inFilter.length} / ${all.length})`;
+    ? `(${unassigned.length})`
+    : `(${selectable.length} / ${unassigned.length})`;
   const expanded = !!assign.expanded[node.id] || !!assign.search;
   const kids = expanded ? (
       node.children.filter(nodeHasVisible).map(child=>folderRow(child, depth+1)).join('') +
@@ -1999,13 +1956,11 @@ function folderRow(node, depth){
         ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome)}
         <span class="material-symbols-outlined ticon">folder</span>
         <div class="tlabel"><span class="tname">${hl(node.name)} <span class="tcount ${assign.baFilter!=='all'?'partial':''}">${countText}</span></span></div>
-        ${hintHtml(missing.length, selectable.length-missing.length, `selectMissing(selectableOf('${node.id}'))`)}
       </div>${kids}
     </div>`;
 }
 function unassignedRow(){
-  const inFilter = inBaFilter(UNASSIGNED_PROJECTS);
-  const missing = stillMissing(inFilter);
+  const inFilter = UNASSIGNED_PROJECTS.filter(inFolderScope);
   const visible = inFilter.filter(projectVisible);
   if(assign.search && !visible.length) return '';
   const picked = selectedIn(inFilter);
@@ -2020,11 +1975,10 @@ function unassignedRow(){
         <span class="material-symbols-outlined ticon">folder_off</span>
         <div class="tlabel"><span class="tname">No folder <span class="tcount">(${inFilter.length})</span></span>
         <span class="tsub">Projects sitting directly under ${ORG_DOMAIN}</span></div>
-        ${hintHtml(missing.length, inFilter.length-missing.length, `selectMissing(unassignedInFilter())`)}
       </div>${kids}
     </div>`;
 }
-function unassignedInFilter(){ return inBaFilter(UNASSIGNED_PROJECTS); }
+function unassignedInFilter(){ return UNASSIGNED_PROJECTS.filter(inFolderScope); }
 function toggleUnassigned(){ toggleScope(unassignedInFilter()); }
 
 /* org 一個資料夾都沒開時，樹會退化成一個裝了 92 個專案的「No folder」節點，
@@ -2034,7 +1988,6 @@ function flatBaTree(){
     const projects = everyProject().filter(project=>project.ba.id===ba.id).filter(projectVisible);
     if(!projects.length) return '';
     const expanded = !!assign.expanded[ba.id] || !!assign.search;
-    const missing = stillMissing(projects);
     const picked = selectedIn(projects);
     const isAll = projects.length>0 && picked===projects.length;
     const isSome = picked>0 && !isAll;
@@ -2044,41 +1997,28 @@ function flatBaTree(){
           ${checkboxHtml(isAll, `toggleBa('${ba.id}')`, isSome)}
           <span class="material-symbols-outlined ticon">account_balance_wallet</span>
           <div class="tlabel"><span class="tname">${hl(ba.name)} <span class="tcount">(${projects.length})</span></span></div>
-          ${hintHtml(missing.length, projects.length-missing.length, `selectMissing(baProjects('${ba.id}'))`)}
         </div>${expanded ? projects.map(project=>projectRow(project,1)).join('') : ''}
       </div>`;
   }).join('');
 }
-function baProjects(baId){ return everyProject().filter(project=>project.ba.id===baId); }
+function baProjects(baId){ return everyUnassigned().filter(project=>project.ba.id===baId); }
 function toggleBa(baId){ toggleScope(baProjects(baId)); }
 
-/* 送出的是整份清單，所以底部要講「這次改了什麼」，不是「勾了幾個」 */
-function diffText(addCount, dropCount, inGroup, total){
-  const parts = [];
-  if(addCount) parts.push(`<b>${addCount}</b> to add`);
-  if(dropCount) parts.push(`<b>${dropCount}</b> to remove`);
-  if(parts.length) return parts.join(' · ');
-  if(!inGroup) return `No projects selected`;
-  if(inGroup===total) return `All ${total} projects are assigned to this group`;
-  return `${inGroup} of ${total} projects assigned · no changes yet`;
-}
-/* 規格說 T1 存檔時會連帶清掉子 T2 群組的同一批資源，那是使用者看不到的後果，
- * 所以有移除時一定要先講。表格的 Unlink 流程本來就會先跑 group-check 顯示
- * 受影響的 T2 群組，這個彈窗目前完全沒有對應的提示。 */
-function dropWarnHtml(dropCount){
-  if(!dropCount) return '';
-  return `<div class="tnote is-warn"><span class="material-symbols-outlined">warning</span><span><b>${dropCount} project${dropCount===1?'':'s'} will be removed from this group.</b> For a Tier 1 group, they are also removed from its Tier 2 groups. Cost history already recorded is not affected.</span></div>`;
-}
 function renderAssign(){
   const root = document.getElementById('assign-root');
   if(!assign.open){ root.innerHTML=''; return; }
-  const total = everyProject().length;
-  const { toAdd, toRemove } = assignDiff();
-  const inGroup = Object.keys(assign.baseline).length;
+  const assignable = everyUnassigned().length;
+  const picked = Object.keys(assign.selected).length;
 
   let body;
   if(assign.loading){
     body = `<div class="tskel">${Array.from({length:7}).map(()=>'<div class="skel"></div>').join('')}</div>`;
+  } else if(!everyUnassigned().length){
+    /* 全部都指派過就沒東西可加了。這裡刻意不用 No Data 那種語彙——
+     * 這不是出錯，是這個群組已經設定完了，而且要移除的話得去表格。 */
+    body = `<div class="tempty"><span class="material-symbols-outlined tempty-icon">check_circle</span>
+      <div class="tempty-title">Everything is already assigned</div>
+      <div>All authorized Google Cloud resources are assigned to this group. To remove one, select it in the Resources table and use Unlink Resource.</div></div>`;
   } else if(!assign.hasFolders || assign.groupBy === 'ba'){
     body = flatBaTree() || `<div class="tempty">No resources match your search.</div>`;
   } else {
@@ -2092,9 +2032,10 @@ function renderAssign(){
       ? `Folders come from your Google Cloud resource hierarchy. Selecting a folder selects every project inside it, including sub-folders. Your selection is kept when you switch grouping.`
       : `Grouped by billing account. Switch to Folder to browse your Google Cloud resource hierarchy instead. A folder can span more than one billing account, so folders are not shown in this grouping, and your selection is kept when you switch.`;
   /* 資料夾和帳單帳戶都只是「一次選很多」的分組，送出的其實是攤平後的專案清單。
-   * 之後在 console 新增的專案不會自動補進來，這件事以前介面完全沒講，
-   * 使用者會以為勾了整個資料夾就等於長期綁定。這裡明講，父層列尾再標出差異。 */
-  const noteHtml = `<div class="tnote"><span class="material-symbols-outlined">info</span><span>${note} Saving replaces this group's resource list with exactly what is checked here, so clearing a checkbox removes that project from the group. Projects are stored one by one, so projects you add in Google Cloud later are not assigned automatically. Reopen this dialog to see what is still unassigned.</span></div>`;
+   * 兩件事以前介面完全沒講，都在這裡補上：
+   * 1. 這裡只列還沒指派的，要移除得去 Resources 表格用 Unlink（設計稿的分工）
+   * 2. 之後在 console 新增的專案不會自動補進來，得回來這裡再勾一次 */
+  const noteHtml = `<div class="tnote"><span class="material-symbols-outlined">info</span><span>${note} Only resources that are not assigned to this group yet are listed here. To remove a resource, select it in the Resources table and use Unlink Resource. Projects you add in Google Cloud later are not assigned automatically, so reopen this dialog to pick them up.</span></div>`;
 
   root.innerHTML = `<div class="rmodal-backdrop" onclick="if(event.target===this)closeAssign()">
     <div class="rmodal" role="dialog" aria-label="Assign Resource">
@@ -2122,13 +2063,12 @@ function renderAssign(){
         </select>` : ''}
       </div>
       ${noteHtml}
-      ${dropWarnHtml(toRemove.length)}
       <div class="rmodal-body">${body}</div>
       <div class="rmodal-foot">
-        <span class="rmodal-count">${diffText(toAdd.length, toRemove.length, inGroup, total)}</span>
+        <span class="rmodal-count">${assignable?`<b>${picked}</b> of ${assignable} project${assignable===1?'':'s'} selected`:''}</span>
         <div style="display:flex;gap:8px">
           <button class="btn btn-out" onclick="closeAssign()">Cancel</button>
-          <button class="btn btn-pri" ${(toAdd.length||toRemove.length)?'':'disabled'} onclick="confirmAssign()">Save</button>
+          <button class="btn btn-pri" ${picked?'':'disabled'} onclick="confirmAssign()">Assign</button>
         </div>
       </div>
     </div>
@@ -2188,9 +2128,9 @@ window.DEMO_SCENARIOS = [
   {id:'assign-folder', category:'assign', label:'切換到 Folder 視角', icon:'account_tree', tip:'10 個資料夾、2 層巢狀、88 個專案、10 個未分類，結構取自工程調查的實查結果'},
   {id:'assign-nofld',  category:'assign', label:'Org 沒有資料夾',               icon:'folder_off', tip:'報告沒涵蓋的 case：退回現行的 BA 兩層'},
   {id:'assign-deep',   category:'assign', label:'極端深度（10 層，GCP 上限）', icon:'unfold_more', tip:'合成資料，真實客戶只有 2 層；用來確認縮排在官方上限下不會壞版'},
-  {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:'全新群組，樹裡每個專案都可勾選，不會出現 not assigned 提示'},
-  {id:'assign-drift',  category:'assign', label:'回訪：資料夾長出新專案',     icon:'new_releases', tip:'指派過之後客戶又在 console 新增專案。API 既有的 projects[].assigned 拿來標出差異，父層列尾顯示「N not assigned」，點一下就補選'},
-  {id:'assign-synced', category:'assign', label:'全部都已指派（無差異）',       icon:'done_all', tip:'提示不出現、勾選框呈已選取且不可動，代表這個資料夾沒有要補的東西'},
+  {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:'全新群組，88 個專案都在選單裡'},
+  {id:'assign-drift',  category:'assign', label:'回訪：只剩沒指派的 16 個',     icon:'new_releases', tip:'指派過之後客戶又在 console 新增專案。依設計稿註記，選單只列尚未指派的，所以整個選單本身就是差異報告：88 → 16 列、10 個資料夾只剩 5 個。用 API 既有的 projects[].assigned 過濾'},
+  {id:'assign-synced', category:'assign', label:'全部都已指派（選單空的）',       icon:'done_all', tip:'沒有東西可以加了，走空狀態並指向表格的 Unlink Resource。刻意不用 No Data 語彙，這不是出錯'},
 ];
 window.DEMO_DEFAULT = 'admin';
 window.DEMO_APPLY = function (id) {
