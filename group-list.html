@@ -459,6 +459,7 @@ input[type="checkbox"]:disabled{cursor:default;opacity:.5}
 .tnode.is-already .tname{color:var(--lt-color-text-secondary)}
 .tnode.is-already:hover{background:transparent}
 .assigned-tag{flex:0 0 auto;font-size:11px;color:var(--lt-color-text-secondary);white-space:nowrap}
+.amark{width:16px;flex:0 0 16px;font-size:16px;color:var(--lt-color-success);cursor:help;font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 20}
 .tempty{padding:40px 24px;text-align:center;color:var(--lt-color-text-secondary);font-size:var(--lt-fs-14)}
 .tnote{display:flex;gap:8px;align-items:flex-start;margin:0 24px 12px;padding:10px 12px;background:var(--lt-color-primary-bg);border-radius:var(--lt-radius-sm);font-size:var(--lt-fs-12);line-height:1.6;color:var(--lt-color-text-primary)}
 .tnote .material-symbols-outlined{font-size:16px;color:var(--lt-color-primary);flex:0 0 auto;margin-top:1px}
@@ -1368,6 +1369,10 @@ function resourcesFor(groupId, cloud){
  *   一個資料夾橫跨兩個帳單帳戶、以及兩個同名資料夾分屬不同 parent。
  * ============================================================ */
 const ORG_DOMAIN = 'example-corp.com';
+/* 這個彈窗是「加」資源用的，移除一直都走 Resources 表格的 Unlink：
+ * 後端是分開的兩支 API（PUT resources/assign 只加、DELETE resources/remove 才移除），
+ * 而且移除的權限是逐列的 can_remove_resource，跟 assign_resource 不是同一個。 */
+const ASSIGNED_HINT = 'Already assigned to this group. To remove it, use Unlink in the Resources table.';
 const BILLING_ACCOUNTS = [
   {id:'ba-main', name:'corp-main-billing'},
   {id:'ba-secondary', name:'corp-apac-billing'},
@@ -1894,13 +1899,21 @@ function hintHtml(assignableCount, assignedCount, onclick){
    * 2. 完全沒指派過的資料夾，我們分不出「客戶剛開的新資料夾」跟「這個群組本來就不管它」。
    *    T1 群組只擁有一部分資源是常態，對每個它不擁有的資料夾喊「還有 N 個沒指派」是錯的。
    * 加上這個條件之後，藥丸只代表一件事：這裡曾經設定過，而現在跟當初不一樣了。 */
-  if(!assignableCount || !assignedCount) return '';
+  if(!assignedCount) return '';
+  if(!assignableCount) return `<span class="assigned-tag">All assigned</span>`;
   return `<button class="new-hint" onclick="event.stopPropagation();${onclick}" title="Select the ${assignableCount} project${assignableCount===1?'':'s'} not assigned to this group yet">${assignableCount} not assigned</button>`;
+}
+/* 規則：這一列做不了事，就不要給它勾選框。
+ * 原本用 checked + disabled 的勾選框表示「已指派」，但那看起來就是可以點的東西，
+ * 點下去沒反應也沒解釋，是個死的 affordance。改成純狀態的打勾記號，
+ * 加上 hover 說明要去哪裡移除。移除本來就不在這個彈窗裡（見 assignedMark 註解）。 */
+function assignedMark(title){
+  return `<span class="amark material-symbols-outlined" title="${title}">check</span>`;
 }
 function parentCheckbox(assignableCount, isAll, isSome, onclick){
   return assignableCount
     ? checkboxHtml(isAll, onclick, isSome)
-    : `<input type="checkbox" checked disabled title="Every project here is already assigned to this group">`;
+    : assignedMark('Every project here is already assigned to this group.');
 }
 function checkboxHtml(stateKey, onclick, indeterminate){
   return `<input type="checkbox" ${stateKey?'checked':''} onclick="event.stopPropagation();${onclick}" ${indeterminate?'data-indeterminate="1"':''}>`;
@@ -1920,12 +1933,12 @@ function projectRow(project, depth){
   if(project.assigned){
     return `<div class="tnode is-project is-already" style="padding-left:${indentPx(depth)}px">${railsHtml(depth)}
       <span class="tchev ghost"></span>
-      <input type="checkbox" checked disabled>
+      ${assignedMark(ASSIGNED_HINT)}
       <div class="tlabel">
         <span class="tname">${hl(project.name)}</span>
         <span class="tsub">${hl(project.projectId)}</span>
       </div>
-      <span class="assigned-tag">Assigned</span>
+      <span class="assigned-tag" title="${ASSIGNED_HINT}">Assigned</span>
     </div>`;
   }
   return `<div class="tnode is-project" style="padding-left:${indentPx(depth)}px" onclick="toggleProject('${project.id}')">${railsHtml(depth)}
