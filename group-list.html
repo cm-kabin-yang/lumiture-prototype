@@ -346,6 +346,7 @@ td.center .actions-cell{justify-content:center}
 .status-text{font-size:14px}
 .status-text.inactive{color:var(--lt-color-text-secondary)}
 input[type="checkbox"]{width:16px;height:16px;accent-color:var(--lt-color-primary);cursor:pointer}
+input[type="checkbox"]:disabled{cursor:default;opacity:.5}
 
 /* ---- tabs (primary, underline) ---- */
 .tabs-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:1px solid var(--lt-color-border-default);margin-bottom:20px}
@@ -450,6 +451,14 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:var(--lt-color-primar
 .tcount.partial{color:var(--lt-color-warning)}
 .ba-chip{flex:0 0 auto;font-size:11px;color:var(--lt-color-text-secondary);background:var(--lt-grey-100);border-radius:var(--lt-radius-xs);padding:2px 8px;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
 .hl{color:var(--lt-blue-60);font-weight:700}
+/* 「還有幾個沒指派」提示：把「你要記得回來維護」換成「系統告訴你有東西可以加」。
+ * 資料來自 API 既有的 projects[].assigned，不需要任何新後端概念。 */
+.new-hint{flex:0 0 auto;border:0;background:var(--lt-blue-20);color:var(--lt-color-primary);font-size:11px;font-weight:700;border-radius:var(--lt-radius-pill);padding:3px 10px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.new-hint:hover{background:var(--lt-color-primary);color:#fff}
+.tnode.is-already{color:var(--lt-color-text-secondary)}
+.tnode.is-already .tname{color:var(--lt-color-text-secondary)}
+.tnode.is-already:hover{background:transparent}
+.assigned-tag{flex:0 0 auto;font-size:11px;color:var(--lt-color-text-secondary);white-space:nowrap}
 .tempty{padding:40px 24px;text-align:center;color:var(--lt-color-text-secondary);font-size:var(--lt-fs-14)}
 .tnote{display:flex;gap:8px;align-items:flex-start;margin:0 24px 12px;padding:10px 12px;background:var(--lt-color-primary-bg);border-radius:var(--lt-radius-sm);font-size:var(--lt-fs-12);line-height:1.6;color:var(--lt-color-text-primary)}
 .tnote .material-symbols-outlined{font-size:16px;color:var(--lt-color-primary);flex:0 0 auto;margin-top:1px}
@@ -1364,14 +1373,20 @@ const BILLING_ACCOUNTS = [
   {id:'ba-secondary', name:'corp-apac-billing'},
 ];
 const SEED_PROJECTS = {'ml-services':['ml-inference-prod'], 'data-warehouse':['ads-warehouse'], platform:['reporting-iac']};
-function makeProjects(folderKey, count, baSplit){
+/* unassignedTail = 尾端幾個標成「還沒指派」，模擬「當初整個資料夾都指派過，
+ * 之後客戶又在 GCP 新增了幾個 project」這個真實情境。
+ * 對應 API 既有但目前 Group List 沒用到的 GCPAvailableResourcesInfos.projects[].assigned */
+function makeProjects(folderKey, count, baSplit, unassignedTail = 0){
   const seeds = SEED_PROJECTS[folderKey] || [];
   const out = [];
   for(let index=0;index<count;index++){
     const name = seeds[index] || `${folderKey.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${String(index+1).padStart(2,'0')}`;
     // platform 是唯一橫跨兩個帳單帳戶的資料夾（對應工程調查第四節第 2 點的發現）
     const ba = baSplit && index >= baSplit ? BILLING_ACCOUNTS[1] : BILLING_ACCOUNTS[0];
-    out.push({id:`${folderKey}-p${index}`, name, projectId:`${name}-${470000+index*137}`, ba});
+    out.push({
+      id:`${folderKey}-p${index}`, name, projectId:`${name}-${470000+index*137}`, ba,
+      assigned: index < count - unassignedTail,
+    });
   }
   return out;
 }
@@ -1380,13 +1395,13 @@ function makeProjects(folderKey, count, baSplit){
 /* folderId 用 GCP 的數字形式。畫面上跟專案一樣走兩行 Name / ID，
  * 對齊 Resources 表格既有的「Project Name / ID」「Billing Account Name / ID」慣例。 */
 const FOLDER_TREE = [
-  {id:'f-platform', name:'platform', folderId:'720879011932', projects:makeProjects('platform',17,11), children:[
-    {id:'f-platform-staging', name:'staging', folderId:'792354814932', projects:makeProjects('platform-staging',7), children:[]},
+  {id:'f-platform', name:'platform', folderId:'720879011932', projects:makeProjects('platform',17,11,2), children:[
+    {id:'f-platform-staging', name:'staging', folderId:'792354814932', projects:makeProjects('platform-staging',7,0,1), children:[]},
   ]},
-  {id:'f-data', name:'data-warehouse', folderId:'104882735610', projects:makeProjects('data-warehouse',14), children:[]},
-  {id:'f-internal', name:'internal-tools', folderId:'238104765221', projects:makeProjects('internal-tools',11), children:[]},
+  {id:'f-data', name:'data-warehouse', folderId:'104882735610', projects:makeProjects('data-warehouse',14,0,4), children:[]},
+  {id:'f-internal', name:'internal-tools', folderId:'238104765221', projects:makeProjects('internal-tools',11,0,0), children:[]},
   {id:'f-ml', name:'ml-services', folderId:'551093428077', projects:makeProjects('ml-services',6), children:[]},
-  {id:'f-consumer', name:'consumer-apps', folderId:'689213470558', projects:makeProjects('consumer-apps',6), children:[]},
+  {id:'f-consumer', name:'consumer-apps', folderId:'689213470558', projects:makeProjects('consumer-apps',6,0,6), children:[]},
   {id:'f-api', name:'api-gateway', folderId:'473820156904', projects:makeProjects('api-gateway',5), children:[]},
   {id:'f-mobile', name:'mobile-backend', folderId:'318447290613', projects:makeProjects('mobile-backend',4), children:[]},
   {id:'f-depr', name:'deprecated', folderId:'860275143398', projects:makeProjects('deprecated',3), children:[
@@ -1394,7 +1409,7 @@ const FOLDER_TREE = [
   ]},
 ];
 /* 沒有資料夾、直接掛在 organization 底下的 10 個專案（報告第三節） */
-const UNASSIGNED_PROJECTS = makeProjects('ungrouped',10);
+const UNASSIGNED_PROJECTS = makeProjects('ungrouped',10,0,3);
 
 /* 極端深度情境用的合成樹（GCP 上限 10 層）。真實客戶只有 2 層，
  * 這棵樹純粹用來確認縮排在官方上限下不會壞版。 */
@@ -1820,15 +1835,31 @@ function visibleProjectsOf(node, inheritedMatch){
 function nodeHasVisible(node){ return visibleProjectsOf(node, false).length > 0 || folderMatches(node); }
 
 function selectedIn(projects){ return projects.filter(project=>assign.selected[project.id]).length; }
+/* 選單是用來「加」資源的，所以父層勾選只作用在還沒指派的專案上 */
+/* Demo 用：三種指派狀態。mixed = mock 原始值（當初指派過、之後 GCP 又長出新專案）， 
+ * none = 第一次指派（全部可選），all = 全部都指派過（提示不出現） */
+let ASSIGNED_SNAPSHOT = null;
+function setAssignedMode(mode){
+  const projects = everyProject();
+  if(!ASSIGNED_SNAPSHOT) ASSIGNED_SNAPSHOT = new Map(projects.map(project=>[project.id, project.assigned]));
+  projects.forEach(project=>{
+    project.assigned = mode==='none' ? false : mode==='all' ? true : ASSIGNED_SNAPSHOT.get(project.id);
+  });
+  assign.selected = {};
+}
+function inBaFilter(projects){ return projects.filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter); }
+function assignableOf(node){ return inBaFilter(allProjectsOf(node)).filter(project => !project.assigned); }
 function toggleFolder(nodeId){
   const node = findFolder(nodeId);
   if(!node) return;
-  const projects = allProjectsOf(node).filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter);
+  const projects = assignableOf(node);
   const allOn = projects.length>0 && projects.every(project=>assign.selected[project.id]);
   projects.forEach(project=>{ if(allOn) delete assign.selected[project.id]; else assign.selected[project.id]=true; });
   renderAssign();
 }
 function toggleProject(projectId){
+  const project = everyProject().find(item=>item.id===projectId);
+  if(project && project.assigned) return;   // 已指派的不能在這裡再勾（要移除走表格的 Unlink）
   if(assign.selected[projectId]) delete assign.selected[projectId]; else assign.selected[projectId]=true;
   renderAssign();
 }
@@ -1854,6 +1885,23 @@ function hl(text){
   if(at < 0) return esc(text);
   return esc(text.slice(0,at)) + '<span class="hl">' + esc(text.slice(at, at+term.length)) + '</span>' + esc(text.slice(at+term.length));
 }
+/* 父層列尾的「還有 N 個沒指派」。點一下就直接把那些勾起來，
+ * 使用者不用自己比對哪幾個是新的。全部都指派過就不顯示。 */
+function hintHtml(assignableCount, assignedCount, onclick){
+  /* 只有「這個父層已經指派過一部分、又還有沒指派的」才提示。
+   * 兩個理由：
+   * 1. 全新群組每一列都還沒指派，提示會變成滿螢幕的雜訊，而勾選框本身就是動作。
+   * 2. 完全沒指派過的資料夾，我們分不出「客戶剛開的新資料夾」跟「這個群組本來就不管它」。
+   *    T1 群組只擁有一部分資源是常態，對每個它不擁有的資料夾喊「還有 N 個沒指派」是錯的。
+   * 加上這個條件之後，藥丸只代表一件事：這裡曾經設定過，而現在跟當初不一樣了。 */
+  if(!assignableCount || !assignedCount) return '';
+  return `<button class="new-hint" onclick="event.stopPropagation();${onclick}" title="Select the ${assignableCount} project${assignableCount===1?'':'s'} not assigned to this group yet">${assignableCount} not assigned</button>`;
+}
+function parentCheckbox(assignableCount, isAll, isSome, onclick){
+  return assignableCount
+    ? checkboxHtml(isAll, onclick, isSome)
+    : `<input type="checkbox" checked disabled title="Every project here is already assigned to this group">`;
+}
 function checkboxHtml(stateKey, onclick, indeterminate){
   return `<input type="checkbox" ${stateKey?'checked':''} onclick="event.stopPropagation();${onclick}" ${indeterminate?'data-indeterminate="1"':''}>`;
 }
@@ -1869,6 +1917,17 @@ function railsHtml(depth){
   return out;
 }
 function projectRow(project, depth){
+  if(project.assigned){
+    return `<div class="tnode is-project is-already" style="padding-left:${indentPx(depth)}px">${railsHtml(depth)}
+      <span class="tchev ghost"></span>
+      <input type="checkbox" checked disabled>
+      <div class="tlabel">
+        <span class="tname">${hl(project.name)}</span>
+        <span class="tsub">${hl(project.projectId)}</span>
+      </div>
+      <span class="assigned-tag">Assigned</span>
+    </div>`;
+  }
   return `<div class="tnode is-project" style="padding-left:${indentPx(depth)}px" onclick="toggleProject('${project.id}')">${railsHtml(depth)}
     <span class="tchev ghost"></span>
     ${checkboxHtml(!!assign.selected[project.id], `toggleProject('${project.id}')`)}
@@ -1881,9 +1940,10 @@ function projectRow(project, depth){
 }
 function folderRow(node, depth){
   const all = allProjectsOf(node);
-  const inFilter = all.filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter);
-  const picked = selectedIn(inFilter);
-  const isAll = inFilter.length>0 && picked===inFilter.length;
+  const inFilter = inBaFilter(all);
+  const assignable = assignableOf(node);
+  const picked = selectedIn(assignable);
+  const isAll = assignable.length>0 && picked===assignable.length;
   const isSome = picked>0 && !isAll;
   /* 篩選讓資料夾只剩一部分時要講出來，不然使用者以為專案不見了 */
   const countText = assign.baFilter==='all'
@@ -1897,33 +1957,36 @@ function folderRow(node, depth){
   return `<div class="tbranch">
       <div class="tnode is-folder" style="padding-left:${indentPx(depth)}px;top:${depth*FOLDER_ROW_H}px;z-index:${30-depth}"${node.folderId?` title="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth)}
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('${node.id}')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
-        ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome)}
+        ${parentCheckbox(assignable.length, isAll, isSome, `toggleFolder('${node.id}')`)}
         <span class="material-symbols-outlined ticon">folder</span>
         <div class="tlabel"><span class="tname">${hl(node.name)} <span class="tcount ${assign.baFilter!=='all'?'partial':''}">${countText}</span></span></div>
+        ${hintHtml(assignable.length, inFilter.length-assignable.length, `toggleFolder('${node.id}')`)}
       </div>${kids}
     </div>`;
 }
 function unassignedRow(){
-  const inFilter = UNASSIGNED_PROJECTS.filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter);
+  const inFilter = inBaFilter(UNASSIGNED_PROJECTS);
+  const assignable = inFilter.filter(project=>!project.assigned);
   const visible = inFilter.filter(projectVisible);
   if(assign.search && !visible.length) return '';
-  const picked = selectedIn(inFilter);
-  const isAll = inFilter.length>0 && picked===inFilter.length;
+  const picked = selectedIn(assignable);
+  const isAll = assignable.length>0 && picked===assignable.length;
   const isSome = picked>0 && !isAll;
   const expanded = !!assign.expanded['unassigned'] || !!assign.search;
   const kids = expanded ? visible.map(project=>projectRow(project,1)).join('') : '';
   return `<div class="tbranch">
       <div class="tnode is-folder is-unassigned" style="padding-left:24px;top:0;z-index:30" onclick="toggleExpand('unassigned')">
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('unassigned')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
-        ${checkboxHtml(isAll, `toggleUnassigned()`, isSome)}
+        ${parentCheckbox(assignable.length, isAll, isSome, `toggleUnassigned()`)}
         <span class="material-symbols-outlined ticon">folder_off</span>
         <div class="tlabel"><span class="tname">No folder <span class="tcount">(${inFilter.length})</span></span>
         <span class="tsub">Projects sitting directly under ${ORG_DOMAIN}</span></div>
+        ${hintHtml(assignable.length, inFilter.length-assignable.length, `toggleUnassigned()`)}
       </div>${kids}
     </div>`;
 }
 function toggleUnassigned(){
-  const inFilter = UNASSIGNED_PROJECTS.filter(project => assign.baFilter==='all' || project.ba.id===assign.baFilter);
+  const inFilter = inBaFilter(UNASSIGNED_PROJECTS).filter(project=>!project.assigned);
   const allOn = inFilter.length>0 && inFilter.every(project=>assign.selected[project.id]);
   inFilter.forEach(project=>{ if(allOn) delete assign.selected[project.id]; else assign.selected[project.id]=true; });
   renderAssign();
@@ -1936,22 +1999,24 @@ function flatBaTree(){
     const projects = everyProject().filter(project=>project.ba.id===ba.id).filter(projectVisible);
     if(!projects.length) return '';
     const expanded = !!assign.expanded[ba.id] || !!assign.search;
-    const picked = selectedIn(projects);
-    const isAll = projects.length>0 && picked===projects.length;
+    const assignable = projects.filter(project=>!project.assigned);
+    const picked = selectedIn(assignable);
+    const isAll = assignable.length>0 && picked===assignable.length;
     const isSome = picked>0 && !isAll;
     return `<div class="tbranch">
         <div class="tnode is-folder" style="padding-left:24px;top:0;z-index:30" onclick="toggleExpand('${ba.id}')">
           <button class="tchev" onclick="event.stopPropagation();toggleExpand('${ba.id}')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
-          ${checkboxHtml(isAll, `toggleBa('${ba.id}')`, isSome)}
+          ${parentCheckbox(assignable.length, isAll, isSome, `toggleBa('${ba.id}')`)}
           <span class="material-symbols-outlined ticon">account_balance_wallet</span>
           <div class="tlabel"><span class="tname">${hl(ba.name)} <span class="tcount">(${projects.length})</span></span></div>
+          ${hintHtml(assignable.length, projects.length-assignable.length, `toggleBa('${ba.id}')`)}
         </div>${expanded ? projects.map(project=>projectRow(project,1)).join('') : ''}
       </div>`;
   }).join('');
 }
 function toggleBa(baId){
-  const projects = everyProject().filter(project=>project.ba.id===baId);
-  const allOn = projects.every(project=>assign.selected[project.id]);
+  const projects = everyProject().filter(project=>project.ba.id===baId && !project.assigned);
+  const allOn = projects.length>0 && projects.every(project=>assign.selected[project.id]);
   projects.forEach(project=>{ if(allOn) delete assign.selected[project.id]; else assign.selected[project.id]=true; });
   renderAssign();
 }
@@ -1961,6 +2026,7 @@ function renderAssign(){
   if(!assign.open){ root.innerHTML=''; return; }
   const total = everyProject().length;
   const picked = Object.keys(assign.selected).length;
+  const notAssignedTotal = everyProject().filter(project=>!project.assigned).length;
 
   let body;
   if(assign.loading){
@@ -1973,10 +2039,14 @@ function renderAssign(){
   }
 
   const note = !assign.hasFolders
-    ? `<div class="tnote"><span class="material-symbols-outlined">info</span><span>No folders were found in this organization, so projects are grouped by billing account.</span></div>`
+    ? `No folders were found in this organization, so projects are grouped by billing account.`
     : assign.groupBy === 'folder'
-      ? `<div class="tnote"><span class="material-symbols-outlined">info</span><span>Folders come from your Google Cloud resource hierarchy. Selecting a folder selects every project inside it, including sub-folders. Your selection is kept when you switch grouping.</span></div>`
-      : `<div class="tnote"><span class="material-symbols-outlined">info</span><span>Grouped by billing account. Switch to Folder to browse your Google Cloud resource hierarchy instead. A folder can span more than one billing account, so folders are not shown in this grouping, and your selection is kept when you switch.</span></div>`;
+      ? `Folders come from your Google Cloud resource hierarchy. Selecting a folder selects every project inside it, including sub-folders. Your selection is kept when you switch grouping.`
+      : `Grouped by billing account. Switch to Folder to browse your Google Cloud resource hierarchy instead. A folder can span more than one billing account, so folders are not shown in this grouping, and your selection is kept when you switch.`;
+  /* 資料夾和帳單帳戶都只是「一次選很多」的分組，送出的其實是攤平後的專案清單。
+   * 之後在 console 新增的專案不會自動補進來，這件事以前介面完全沒講，
+   * 使用者會以為勾了整個資料夾就等於長期綁定。這裡明講，父層列尾再標出差異。 */
+  const noteHtml = `<div class="tnote"><span class="material-symbols-outlined">info</span><span>${note} Projects are assigned one by one, so projects you add in Google Cloud later are not assigned to this group automatically. Reopen this dialog to see what is still unassigned.</span></div>`;
 
   root.innerHTML = `<div class="rmodal-backdrop" onclick="if(event.target===this)closeAssign()">
     <div class="rmodal" role="dialog" aria-label="Assign Resource">
@@ -2003,10 +2073,16 @@ function renderAssign(){
           ${BILLING_ACCOUNTS.map(ba=>`<option value="${ba.id}" ${assign.baFilter===ba.id?'selected':''}>${esc(ba.name)}</option>`).join('')}
         </select>` : ''}
       </div>
-      ${note}
+      ${noteHtml}
       <div class="rmodal-body">${body}</div>
       <div class="rmodal-foot">
-        <span class="rmodal-count"><b>${picked}</b> of ${total} projects selected</span>
+        <span class="rmodal-count">${picked
+          ? `<b>${picked}</b> project${picked===1?'':'s'} will be added`
+          : notAssignedTotal===0
+            ? `All ${total} projects are already assigned to this group`
+            : notAssignedTotal===total
+            ? `No projects selected`
+            : `${notAssignedTotal} of ${total} projects not assigned yet`}</span>
         <div style="display:flex;gap:8px">
           <button class="btn btn-out" onclick="closeAssign()">Cancel</button>
           <button class="btn btn-pri" ${picked?'':'disabled'} onclick="confirmAssign()">Assign</button>
@@ -2069,6 +2145,9 @@ window.DEMO_SCENARIOS = [
   {id:'assign-folder', category:'assign', label:'切換到 Folder 視角', icon:'account_tree', tip:'10 個資料夾、2 層巢狀、88 個專案、10 個未分類，結構取自工程調查的實查結果'},
   {id:'assign-nofld',  category:'assign', label:'Org 沒有資料夾',               icon:'folder_off', tip:'報告沒涵蓋的 case：退回現行的 BA 兩層'},
   {id:'assign-deep',   category:'assign', label:'極端深度（10 層，GCP 上限）', icon:'unfold_more', tip:'合成資料，真實客戶只有 2 層；用來確認縮排在官方上限下不會壞版'},
+  {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:'全新群組，樹裡每個專案都可勾選，不會出現 not assigned 提示'},
+  {id:'assign-drift',  category:'assign', label:'回訪：資料夾長出新專案',     icon:'new_releases', tip:'指派過之後客戶又在 console 新增專案。API 既有的 projects[].assigned 拿來標出差異，父層列尾顯示「N not assigned」，點一下就補選'},
+  {id:'assign-synced', category:'assign', label:'全部都已指派（無差異）',       icon:'done_all', tip:'提示不出現、勾選框呈已選取且不可動，代表這個資料夾沒有要補的東西'},
 ];
 window.DEMO_DEFAULT = 'admin';
 window.DEMO_APPLY = function (id) {
@@ -2082,6 +2161,9 @@ window.DEMO_APPLY = function (id) {
   if (id === 'assign-folder')  { assign.hasFolders = true;  openAssign(); setGroupBy('folder'); return; }
   if (id === 'assign-nofld')   { assign.hasFolders = false; openAssign(); return; }
   if (id === 'assign-deep')    { showDeepTree(); return; }
+  if (id === 'assign-first')   { setAssignedMode('none');  assign.hasFolders = true; openAssign(); setGroupBy('folder'); return; }
+  if (id === 'assign-drift')   { setAssignedMode('mixed'); assign.hasFolders = true; openAssign(); setGroupBy('folder'); return; }
+  if (id === 'assign-synced')  { setAssignedMode('all');   assign.hasFolders = true; openAssign(); setGroupBy('folder'); return; }
 };
 </script>
 <script>
