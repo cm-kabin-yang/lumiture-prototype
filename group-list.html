@@ -2026,16 +2026,17 @@ function renderAssign(){
     body = tree || `<div class="tempty">No resources match your search.</div>`;
   }
 
+  /* 原本這段banner 塞了 4-5 句話（分組規則 + 只列未指派 + 去哪移除 + 新資源要重開），
+   * Kabin 反饋太長。砍到每個模式只留「這個模式特有的一句」，
+   * 「只列未指派 / 去哪移除」兩句所有模式共用，只講一次。
+   * 「新增的資源要重開才看得到」這句拿掉——「只列未指派」已經隱含這件事，
+   * 不需要再展開講一次重開的機制。 */
   const note = !assign.hasFolders
     ? `No folders were found in this organization, so projects are grouped by billing account.`
     : assign.groupBy === 'folder'
-      ? `Folders come from your Google Cloud resource hierarchy. Selecting a folder selects every project inside it, including sub-folders. Your selection is kept when you switch grouping.`
-      : `Grouped by billing account. Switch to Folder to browse your Google Cloud resource hierarchy instead. A folder can span more than one billing account, so folders are not shown in this grouping, and your selection is kept when you switch.`;
-  /* 資料夾和帳單帳戶都只是「一次選很多」的分組，送出的其實是攤平後的專案清單。
-   * 兩件事以前介面完全沒講，都在這裡補上：
-   * 1. 這裡只列還沒指派的，要移除得去 Resources 表格用 Unlink（設計稿的分工）
-   * 2. 之後在 console 新增的專案不會自動補進來，得回來這裡再勾一次 */
-  const noteHtml = `<div class="tnote"><span class="material-symbols-outlined">info</span><span>${note} Only resources that are not assigned to this group yet are listed here. To remove a resource, select it in the Resources table and use Unlink Resource. Projects you add in Google Cloud later are not assigned automatically, so reopen this dialog to pick them up.</span></div>`;
+      ? `Selecting a folder selects everything inside it, including sub-folders.`
+      : `A folder can span multiple billing accounts, so switch to Folder to browse by folder.`;
+  const noteHtml = `<div class="tnote"><span class="material-symbols-outlined">info</span><span>Only resources not yet assigned to this group are listed here. ${note} To remove a resource, use Unlink in the Resources table.</span></div>`;
 
   root.innerHTML = `<div class="rmodal-backdrop" onclick="if(event.target===this)closeAssign()">
     <div class="rmodal" role="dialog" aria-label="Assign Resource">
