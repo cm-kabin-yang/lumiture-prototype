@@ -375,10 +375,9 @@ td.center .actions-cell{justify-content:center}
 .pill-tab{height:28px;padding:0 12px;border:0;background:transparent;border-radius:5px;font-size:13px;font-weight:600;color:var(--lt-color-text-secondary);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .pill-tab.active{background:#fff;color:var(--lt-color-primary);box-shadow:0 1px 2px rgba(0,0,0,.06)}
 .pill-tab .csp-dot{width:8px;height:8px;border-radius:50%}
-.groupby-row{display:flex;align-items:center;gap:8px;padding:0 24px 12px}
-.groupby-row .lbl{font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary)}
-.groupby-row .pill-tabs{margin:0}
-.groupby-row .groupby-toggle{display:flex;align-items:center;gap:8px}
+.groupby-toggle{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.groupby-toggle .lbl{font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);white-space:nowrap}
+.groupby-toggle .pill-tabs{margin:0}
 
 /* ---- search ---- */
 .search-box{position:relative;width:280px}
@@ -1500,6 +1499,7 @@ const PICKER = {
   gcp: {
     cloudLabel:'Google Cloud',
     parentLabel:'Billing account', parentIcon:'account_balance_wallet',
+    parentShort:'accounts',   // placeholder 併行後放不下 billing accounts 全稱
     noun:'project', nounPlural:'projects',
     supportsFolders:true,
     groups:()=>GCP_BILLING_ACCOUNTS,
@@ -2227,7 +2227,11 @@ function searchPlaceholder(){
   if(c.searchHint) return `Search ${c.searchHint}`;
   const parent = c.parentLabel.toLowerCase() + 's';
   if(!showFolderView()) return `Search ${parent} or ${c.nounPlural}`;
-  return `Search folders, ${parent}, or ${c.nounPlural}`;
+  /* 搜尋跟 Group by 併一行之後，搜尋框的文字區只有 234px。實測
+   * `Search folders, billing accounts, or projects` 要 300px、
+   * 拿掉 billing 之後 238px 還是差 8px，所以連 or 一起省掉（221px）。
+   * 三個可搜尋的東西都還在，placeholder 用頓列不接連接詞也是常見寫法。 */
+  return `Search folders, ${c.parentShort || parent}, ${c.nounPlural}`;
 }
 function baMatches(ba){
   return !!assign.search && ba.name.toLowerCase().includes(assign.search.toLowerCase());
@@ -2294,8 +2298,6 @@ function renderAssign(){
       </div>
       <div class="rmodal-tools">
         <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="${searchPlaceholder()}" value="${esc(assign.search)}" oninput="onAssignSearch(this.value)"></div>
-      </div>
-      <div class="groupby-row">
         ${showGroupByToggle() ? `<div class="groupby-toggle">
           <span class="lbl">Group by</span>
           <span class="material-symbols-outlined gb-info" title="${esc(GROUPBY_HELP)}">info</span>
