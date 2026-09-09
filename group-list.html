@@ -472,6 +472,10 @@ td.center .actions-cell{justify-content:center}
 .tcount.partial{color:var(--lt-color-warning)}
 .ba-chip{flex:0 0 auto;font-size:11px;color:var(--lt-color-text-secondary);background:var(--lt-grey-100);border-radius:var(--lt-radius-xs);padding:2px 8px;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
 .hl{color:var(--lt-blue-60);font-weight:700}
+/* Select All 是清單的總開關，不是樹的一部分，用一條底線跟樹分開 */
+.tnode.is-selectall{border-bottom:1px solid var(--lt-color-border-default);position:sticky;top:0;z-index:40;background:var(--lt-color-bg-default)}
+.tnode.is-selectall .tname{font-weight:600}
+.tname.is-nocost{color:var(--lt-color-text-secondary);font-style:italic}
 .tempty-icon{display:block;font-size:32px;color:var(--lt-color-success);margin-bottom:8px}
 .tempty-title{font-size:var(--lt-fs-16);font-weight:600;color:var(--lt-color-text-primary);margin-bottom:4px}
 .tempty{padding:40px 24px;text-align:center;color:var(--lt-color-text-secondary);font-size:var(--lt-fs-14)}
@@ -1388,6 +1392,15 @@ const BILLING_ACCOUNTS = [
   {id:'ba-secondary', name:'corp-apac-billing'},
 ];
 const SEED_PROJECTS = {'ml-services':['ml-inference-prod'], 'data-warehouse':['ads-warehouse'], platform:['reporting-iac']};
+/* 設計稿 #18-1 註記的兩個「GCP 特殊情況」，來自 202607 線上實際遭遇：
+ *   1. 因 No Cost 拿不到 Project name → Name 顯示「No Cost Project」，其餘照常
+ *   2. 沒有 Billing Account 的 Project → 統一顯示在清單最底部，
+ *      標頭顯示「Projects without Billing Account」
+ * 註記自己寫「理論上不會發生，但先保留以防某種 edge case」，所以這裡也照樣
+ * 只放少量樣本，不讓它影響主要情境的資料量。 */
+const NO_COST_LABEL = 'No Cost Project';
+function projectLabel(project){ return project.name || NO_COST_LABEL; }
+const NO_BILLING_ACCOUNT = {id:'ba-none', name:'', none:true};
 /* unassignedTail = 尾端幾個標成「還沒指派」，模擬「當初整個資料夾都指派過，
  * 之後客戶又在 GCP 新增了幾個 project」這個真實情境。
  * 對應 API 既有但目前 Group List 沒用到的 GCPAvailableResourcesInfos.projects[].assigned */
@@ -1425,6 +1438,12 @@ const FOLDER_TREE = [
 ];
 /* 沒有資料夾、直接掛在 organization 底下的 10 個專案（報告第三節） */
 const UNASSIGNED_PROJECTS = makeProjects('ungrouped',10,0,3);
+/* 沒有帳單帳戶的專案：刻意不塞進資料夾樹，因為設計稿要求「統一顯示在清單
+ * 最底部」，塞進樹裡就會同時出現在兩個地方。 */
+const NO_BA_PROJECTS = [
+  {id:'noba-p0', name:'sandbox-legacy',  projectId:'sandbox-legacy-471902',  ba:NO_BILLING_ACCOUNT, assigned:false},
+  {id:'noba-p1', name:'',               projectId:'proj-8830142',            ba:NO_BILLING_ACCOUNT, assigned:false, noCost:true},
+];
 
 /* 極端深度情境用的合成樹（GCP 上限 10 層）。真實客戶只有 2 層，
  * 這棵樹純粹用來確認縮排在官方上限下不會壞版。 */
@@ -1448,7 +1467,7 @@ function allProjectsOf(node){
 function everyProject(){
   let out = [];
   walkFolders(FOLDER_TREE, node=>{ out = out.concat(node.projects); });
-  return out.concat(UNASSIGNED_PROJECTS);
+  return out.concat(UNASSIGNED_PROJECTS).concat(NO_BA_PROJECTS);
 }
 
 /* ---------- state ---------- */
@@ -1855,7 +1874,7 @@ function projectVisible(project){
   /* 搜尋範圍 = 畫面上看得到的東西。專案列有 name、ID，資料夾視角還在右邊掛了
    * 帳單帳戶 chip，所以帳單帳戶名稱也要能搜到，不然使用者看著 chip 上的字
    * 打進去卻搜不到。 */
-  return project.name.toLowerCase().includes(term)
+  return projectLabel(project).toLowerCase().includes(term)
     || project.projectId.toLowerCase().includes(term)
     || project.ba.name.toLowerCase().includes(term);
 }
@@ -1966,10 +1985,10 @@ function projectRow(project, depth){
     ${checkboxHtml(!!assign.selected[project.id], `toggleProject('${project.id}')`)}
     <span class="material-symbols-outlined ticon ghost">folder</span>
     <div class="tlabel">
-      <span class="tname">${hl(project.name)}</span>
+      <span class="tname ${project.name?'':'is-nocost'}">${hl(projectLabel(project))}</span>
       <span class="tsub">${hl(project.projectId)}</span>
     </div>
-    ${(assign.hasFolders && assign.groupBy==='folder')?`<span class="ba-chip">${esc(project.ba.name)}</span>`:''}
+    ${(assign.hasFolders && assign.groupBy==='folder' && !project.ba.none)?`<span class="ba-chip">${esc(project.ba.name)}</span>`:''}
   </div>`;
 }
 function folderRow(node, depth){
@@ -2027,6 +2046,62 @@ function unassignedRow(){
 }
 function unassignedInFilter(){ return UNASSIGNED_PROJECTS.filter(inFolderScope).filter(projectVisible); }
 function toggleUnassigned(){ toggleScope(unassignedInFilter()); }
+
+/* 設計稿 #18-1：沒有帳單帳戶的專案統一排在清單最底部，標頭寫
+ * 「Projects without Billing Account」。兩個視角都出現在最後一列，
+ * 因為它既歸不到帳單帳戶、也不該混進資料夾的階層裡。 */
+function noBaInFilter(){ return NO_BA_PROJECTS.filter(inFolderScope).filter(projectVisible); }
+function toggleNoBa(){ toggleScope(noBaInFilter()); }
+function noBaRow(){
+  const inScope = NO_BA_PROJECTS.filter(inFolderScope);
+  const visible = noBaInFilter();
+  if(!inScope.length) return '';
+  if(assign.search && !visible.length) return '';
+  const picked = selectedIn(visible);
+  const isAll = visible.length>0 && picked===visible.length;
+  const isSome = picked>0 && !isAll;
+  const countText = visible.length===inScope.length ? `(${inScope.length})` : `(${visible.length} / ${inScope.length})`;
+  const expanded = !!assign.expanded['no-ba'] || !!assign.search;
+  const kids = expanded ? visible.map(project=>projectRow(project,1)).join('') : '';
+  return `<div class="tbranch">
+      <div class="tnode is-folder is-unassigned" style="padding-left:24px;top:0;z-index:30" onclick="toggleExpand('no-ba')">
+        <button class="tchev" onclick="event.stopPropagation();toggleExpand('no-ba')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
+        ${checkboxHtml(isAll, `toggleNoBa()`, isSome)}
+        <span class="material-symbols-outlined ticon">money_off</span>
+        <div class="tlabel"><span class="tname">Projects without Billing Account <span class="tcount ${visible.length!==inScope.length?'partial':''}">${countText}</span></span></div>
+      </div>${kids}
+    </div>`;
+}
+
+/* 設計稿 #18-1 要求的 Select All。範圍＝目前視角下真正列出來的所有可選專案，
+ * 跟父層全選同一條規則（有搜尋時只算搜到的）。 */
+function allVisibleSelectable(){
+  const seen = new Set();
+  const out = [];
+  const push = list => list.forEach(project=>{ if(!seen.has(project.id)){ seen.add(project.id); out.push(project); } });
+  if(!assign.hasFolders || assign.groupBy === 'ba'){
+    BILLING_ACCOUNTS.forEach(ba=>push(baProjects(ba.id)));
+  } else {
+    FOLDER_TREE.forEach(node=>push(visibleProjectsOf(node, false)));
+    push(unassignedInFilter());
+  }
+  push(noBaInFilter());
+  return out;
+}
+function toggleSelectAll(){ toggleScope(allVisibleSelectable()); }
+function selectAllRow(){
+  const scope = allVisibleSelectable();
+  if(!scope.length) return '';
+  const picked = selectedIn(scope);
+  const isAll = picked===scope.length;
+  const isSome = picked>0 && !isAll;
+  return `<div class="tnode is-selectall">
+      <span class="tchev ghost"></span>
+      ${checkboxHtml(isAll, `toggleSelectAll()`, isSome)}
+      <span class="material-symbols-outlined ticon ghost">folder</span>
+      <div class="tlabel"><span class="tname">Select all <span class="tcount">(${scope.length})</span></span></div>
+    </div>`;
+}
 
 /* org 一個資料夾都沒開時，樹會退化成一個裝了 92 個專案的「No folder」節點，
  * 比現在的平鋪還難用。所以沒有資料夾就維持現行的 BA → Project 兩層。 */
@@ -2092,10 +2167,11 @@ function renderAssign(){
       <div class="tempty-title">Everything is already assigned</div>
       <div>All authorized Google Cloud resources are assigned to this group. To remove one, select it in the Resources table and use Unlink Resource.</div></div>`;
   } else if(!assign.hasFolders || assign.groupBy === 'ba'){
-    body = flatBaTree() || `<div class="tempty">No resources match your search.</div>`;
+    const tree = flatBaTree() + noBaRow();
+    body = tree ? selectAllRow() + tree : `<div class="tempty">No resources match your search.</div>`;
   } else {
-    const tree = FOLDER_TREE.filter(nodeHasVisible).map(node=>folderRow(node,0)).join('') + unassignedRow();
-    body = tree || `<div class="tempty">No resources match your search.</div>`;
+    const tree = FOLDER_TREE.filter(nodeHasVisible).map(node=>folderRow(node,0)).join('') + unassignedRow() + noBaRow();
+    body = tree ? selectAllRow() + tree : `<div class="tempty">No resources match your search.</div>`;
   }
 
   /* 原本這段banner 塞了 4-5 句話（分組規則 + 只列未指派 + 去哪移除 + 新資源要重開），
@@ -2114,7 +2190,7 @@ function renderAssign(){
     <div class="rmodal" role="dialog" aria-label="Assign Resource">
       <div class="rmodal-head">
         <div>
-          <h3>Assign Resource</h3>
+          <h3>Assign Resource: Google Cloud</h3>
           <p>Google Cloud · ${esc(ORG_DOMAIN)}</p>
         </div>
         <button class="rmodal-close" onclick="closeAssign()" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
