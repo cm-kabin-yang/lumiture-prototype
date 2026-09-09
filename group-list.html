@@ -1385,7 +1385,7 @@ function resourcesFor(groupId, cloud){
  *   一個資料夾橫跨兩個帳單帳戶、以及兩個同名資料夾分屬不同 parent。
  * ============================================================ */
 const ORG_DOMAIN = 'example-corp.com';
-const BILLING_ACCOUNTS = [
+const GCP_BILLING_ACCOUNTS = [
   {id:'ba-main', name:'corp-main-billing'},
   {id:'ba-secondary', name:'corp-apac-billing'},
 ];
@@ -1413,9 +1413,9 @@ function makeProjects(folderKey, count, baSplit, unassignedTail = 0){
   for(let index=0;index<count;index++){
     const name = seeds[index] || `${folderKey.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-${String(index+1).padStart(2,'0')}`;
     // platform 是唯一橫跨兩個帳單帳戶的資料夾（對應工程調查第四節第 2 點的發現）
-    const ba = baSplit && index >= baSplit ? BILLING_ACCOUNTS[1] : BILLING_ACCOUNTS[0];
+    const parent = baSplit && index >= baSplit ? GCP_BILLING_ACCOUNTS[1] : GCP_BILLING_ACCOUNTS[0];
     out.push({
-      id:`${folderKey}-p${index}`, name, projectId:`${name}-${470000+index*137}`, ba,
+      id:`${folderKey}-p${index}`, name, resId:`${name}-${470000+index*137}`, parent,
       assigned: index < count - unassignedTail,
     });
   }
@@ -1444,9 +1444,103 @@ const UNASSIGNED_PROJECTS = makeProjects('ungrouped',10,0,3);
 /* 沒有帳單帳戶的專案：刻意不塞進資料夾樹，因為設計稿要求「統一顯示在清單
  * 最底部」，塞進樹裡就會同時出現在兩個地方。 */
 const NO_BA_PROJECTS = [
-  {id:'noba-p0', name:'sandbox-legacy',  projectId:'sandbox-legacy-471902',  ba:NO_BILLING_ACCOUNT, assigned:false},
-  {id:'noba-p1', name:'',               projectId:'proj-8830142',            ba:NO_BILLING_ACCOUNT, assigned:false, noCost:true},
+  {id:'noba-p0', name:'sandbox-legacy', resId:'sandbox-legacy-471902', parent:NO_BILLING_ACCOUNT, assigned:false},
+  {id:'noba-p1', name:'',               resId:'proj-8830142',           parent:NO_BILLING_ACCOUNT, assigned:false, noCost:true},
 ];
+
+/* ============================================================
+ * AWS / Azure 的 assign 選單
+ * 設計稿的 AWS 版（#19 / #19-1，Figma 11735:168403 / 11948:106601）用的是跟
+ * GCP 同一個元件（instance 名稱就是「Popup: Assign Resource to This Group
+ * (GCP) Ver2」），差別只在上層是什麼：
+ *   GCP   Billing account → Project
+ *   AWS   Management account → Account
+ *   Azure Subscription → Resource group
+ * Azure 在這份 canvas 上只有兩個空白的 Page Format frame、還沒設計，所以照
+ * Kabin 的指示「參考 AWS 現況」，用同一個骨架換成 Azure 的名詞。
+ * 資料夾是 GCP 才有的概念（AWS 的 Organizational Unit、Azure 的 Management
+ * Group 是對應物，但這輪只做 GCP folder），所以另外兩朵雲沒有視角切換。
+ * ============================================================ */
+const AWS_MGMT_ACCOUNTS = [
+  {id:'mgmt-prod', name:'corp-mgmt-prod'},
+  {id:'mgmt-sandbox', name:'corp-mgmt-sandbox'},
+];
+const AZURE_SUBSCRIPTIONS = [
+  {id:'sub-prod', name:'corp-prod-subscription'},
+  {id:'sub-apac', name:'corp-apac-subscription'},
+];
+/* 扁平兩層的資源清單（沒有資料夾階層）。unassignedTail 的用意跟 GCP 一樣：
+ * 模擬「當初指派過，之後客戶又在 console 開了新的」。 */
+function makeFlatResources(keyPrefix, names, parents, parentSplit, unassignedIdx, makeId){
+  const pending = new Set(unassignedIdx);
+  return names.map((name, index)=>({
+    id:`${keyPrefix}-r${index}`,
+    name,
+    resId:makeId(name, index),
+    parent: parentSplit && index >= parentSplit ? parents[1] : parents[0],
+    /* 未指派的刻意跨兩個上層（不是取尾端連續幾個），否則選單只會列出一個
+     * 上層，看不出「上層 → 資源」的分組長什麼樣 */
+    assigned: !pending.has(index),
+  }));
+}
+const AWS_PICK_ACCOUNTS = makeFlatResources('aws', [
+  'web-prod','api-prod','data-lake','ml-training','billing-ops','security-audit',
+  'logging-central','network-hub','cdn-edge','iam-hub','backup-vault','cost-reports',
+  'web-stg','api-stg','sandbox-dev','sandbox-qa','dr-standby','legacy-erp',
+], AWS_MGMT_ACCOUNTS, 12, [3,9,13,16,17], (name, index)=>`${418200000000 + index*137911}`);
+const AZURE_RESOURCE_GROUPS = makeFlatResources('azure', [
+  'rg-web-prod','rg-api-prod','rg-sql-prod','rg-aks-prod','rg-storage-cool',
+  'rg-keyvault','rg-network-hub','rg-monitor','rg-backup','rg-analytics',
+  'rg-web-stg','rg-aks-dev','rg-devops','rg-legacy-vm',
+], AZURE_SUBSCRIPTIONS, 10, [2,7,11,13], (name)=>`${name}-eastasia`);
+
+/* 每朵雲的名詞與資料。彈窗的標題、副標、placeholder、底部計數都從這裡長出來，
+ * 免得三份文案各自寫死之後慢慢走鐘。 */
+const PICKER = {
+  gcp: {
+    cloudLabel:'Google Cloud',
+    parentLabel:'Billing account', parentIcon:'account_balance_wallet',
+    noun:'project', nounPlural:'projects',
+    supportsFolders:true,
+    groups:()=>GCP_BILLING_ACCOUNTS,
+    folders:()=>FOLDER_TREE,
+    noFolder:()=>UNASSIGNED_PROJECTS,
+    orphans:()=>NO_BA_PROJECTS,
+  },
+  aws: {
+    cloudLabel:'AWS',
+    parentLabel:'Management account', parentIcon:'account_tree',
+    noun:'account', nounPlural:'accounts',
+    /* AWS 兩層都是 account（management account → account），照通用規則拼會
+     * 變成「Search management accounts or accounts」，所以這裡直接覆寫 */
+    searchHint:'accounts',
+    supportsFolders:false,
+    groups:()=>AWS_MGMT_ACCOUNTS,
+    folders:()=>[], noFolder:()=>[], orphans:()=>[],
+    flat:()=>AWS_PICK_ACCOUNTS,
+  },
+  azure: {
+    cloudLabel:'Azure',
+    parentLabel:'Subscription', parentIcon:'subscriptions',
+    noun:'resource group', nounPlural:'resource groups',
+    supportsFolders:false,
+    groups:()=>AZURE_SUBSCRIPTIONS,
+    folders:()=>[], noFolder:()=>[], orphans:()=>[],
+    flat:()=>AZURE_RESOURCE_GROUPS,
+  },
+};
+function cfg(){ return PICKER[assign.cloud] || PICKER.gcp; }
+/* GCP 的資源散在資料夾樹 + 沒資料夾 + 沒帳單帳戶三處；另外兩朵雲是一份扁平清單 */
+function pickerResources(){
+  const c = cfg();
+  if(c.flat) return c.flat();
+  let out = [];
+  walkFolders(c.folders(), node=>{ out = out.concat(node.projects); });
+  return out.concat(c.noFolder()).concat(c.orphans());
+}
+/* 只有 GCP 有資料夾視角，而且要 org 真的開了資料夾（Demo FAB 有那個情境） */
+function showFolderView(){ return cfg().supportsFolders && assign.hasFolders && assign.groupBy==='folder'; }
+function showGroupByToggle(){ return cfg().supportsFolders && assign.hasFolders; }
 
 /* 極端深度情境用的合成樹（GCP 上限 10 層）。真實客戶只有 2 層，
  * 這棵樹純粹用來確認縮排在官方上限下不會壞版。 */
@@ -1467,11 +1561,7 @@ function allProjectsOf(node){
   node.children.forEach(child=>{ out = out.concat(allProjectsOf(child)); });
   return out;
 }
-function everyProject(){
-  let out = [];
-  walkFolders(FOLDER_TREE, node=>{ out = out.concat(node.projects); });
-  return out.concat(UNASSIGNED_PROJECTS).concat(NO_BA_PROJECTS);
-}
+function everyProject(){ return pickerResources(); }
 
 /* ---------- state ---------- */
 const state = {
@@ -1763,7 +1853,7 @@ Please assign new resources or reach out to your administrator for help.</p></di
         <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="Search resources" oninput="showToast('Filtering… (prototype does not filter mock data)')"></div>
         <div class="res-toolbar-actions">
           ${(canRemove && selectedIds.length)?`<button class="btn btn-out danger" onclick="openUnlinkDialog('${group.id}','${state.cloud}',[${selectedIds.map(id=>"'"+id+"'").join(',')}])"><span class="material-symbols-outlined">link_off</span>Unlink Resource</button>`:''}
-          ${canAssign?`<button class="btn btn-pri" data-testid="assign-resource-button" onclick="${state.cloud==='gcp'?'openAssign()':"deferredAction('Assign Resource')"}"><span class="material-symbols-outlined">add_link</span>Assign Resource</button>`:''}
+          ${canAssign?`<button class="btn btn-pri" data-testid="assign-resource-button" onclick="openAssign('${state.cloud}')"><span class="material-symbols-outlined">add_link</span>Assign Resource</button>`:''}
         </div>
       </div>
       ${tableBlock}`;
@@ -1824,6 +1914,7 @@ function toggleResource(id){
  * ============================================================ */
 const assign = {
   open:false,
+  cloud:'gcp',         // gcp | aws | azure，決定名詞與資料來源
   hasFolders:true,     // org 完全沒開資料夾時退回現行的 BA → Project 兩層
   loading:false,
   expanded:{},
@@ -1854,7 +1945,8 @@ let assignSearchTimer;
  * （所以沒過濾、也沒辦法在送出時補上既有的），GCPAssignResources 每次
  * 開啟都是 useState([])。詳見 specs 的 §8.11。 */
 
-function openAssign(){
+function openAssign(cloud){
+  assign.cloud = cloud || state.cloud || 'gcp';
   assign.open = true;
   assign.loading = true;
   assign.expanded = {};
@@ -1876,8 +1968,8 @@ function projectVisible(project){
    * 帳單帳戶 chip，所以帳單帳戶名稱也要能搜到，不然使用者看著 chip 上的字
    * 打進去卻搜不到。 */
   return projectLabel(project).toLowerCase().includes(term)
-    || project.projectId.toLowerCase().includes(term)
-    || project.ba.name.toLowerCase().includes(term);
+    || project.resId.toLowerCase().includes(term)
+    || project.parent.name.toLowerCase().includes(term);
 }
 function folderMatches(node){
   return assign.search && node.name.toLowerCase().includes(assign.search.toLowerCase());
@@ -1983,9 +2075,9 @@ function projectRow(project, depth){
     <span class="material-symbols-outlined ticon ghost">folder</span>
     <div class="tlabel">
       <span class="tname ${project.name?'':'is-nocost'}">${hl(projectLabel(project))}</span>
-      <span class="tsub">${hl(project.projectId)}</span>
+      <span class="tsub">${hl(project.resId)}</span>
     </div>
-    ${(assign.hasFolders && assign.groupBy==='folder' && !project.ba.none)?`<span class="ba-chip">${esc(project.ba.name)}</span>`:''}
+    ${(showFolderView() && !project.parent.none)?`<span class="ba-chip">${esc(project.parent.name)}</span>`:''}
   </div>`;
 }
 function folderRow(node, depth){
@@ -2020,7 +2112,7 @@ function folderRow(node, depth){
     </div>`;
 }
 function unassignedRow(){
-  const inFilter = UNASSIGNED_PROJECTS.filter(inFolderScope);   // 帳單帳戶篩選後的分母，不受搜尋影響
+  const inFilter = cfg().noFolder().filter(inFolderScope);   // 分母，不受搜尋影響
   const visible = inFilter.filter(projectVisible);              // 目前搜尋下真的看得到、選得到的
   if(assign.search && !visible.length) return '';
   /* 全選範圍跟折疊資料夾同一顆問題：要用 visible（搜尋後的）不是 inFilter
@@ -2041,16 +2133,16 @@ function unassignedRow(){
       </div>${kids}
     </div>`;
 }
-function unassignedInFilter(){ return UNASSIGNED_PROJECTS.filter(inFolderScope).filter(projectVisible); }
+function unassignedInFilter(){ return cfg().noFolder().filter(inFolderScope).filter(projectVisible); }
 function toggleUnassigned(){ toggleScope(unassignedInFilter()); }
 
 /* 設計稿 #18-1：沒有帳單帳戶的專案統一排在清單最底部，標頭寫
  * 「Projects without Billing Account」。兩個視角都出現在最後一列，
  * 因為它既歸不到帳單帳戶、也不該混進資料夾的階層裡。 */
-function noBaInFilter(){ return NO_BA_PROJECTS.filter(inFolderScope).filter(projectVisible); }
+function noBaInFilter(){ return cfg().orphans().filter(inFolderScope).filter(projectVisible); }
 function toggleNoBa(){ toggleScope(noBaInFilter()); }
 function noBaRow(){
-  const inScope = NO_BA_PROJECTS.filter(inFolderScope);
+  const inScope = cfg().orphans().filter(inFolderScope);
   const visible = noBaInFilter();
   if(!inScope.length) return '';
   if(assign.search && !visible.length) return '';
@@ -2077,9 +2169,9 @@ function allVisibleSelectable(){
   const out = [];
   const push = list => list.forEach(project=>{ if(!seen.has(project.id)){ seen.add(project.id); out.push(project); } });
   if(!assign.hasFolders || assign.groupBy === 'ba'){
-    BILLING_ACCOUNTS.forEach(ba=>push(baProjects(ba.id)));
+    cfg().groups().forEach(group=>push(baProjects(group.id)));
   } else {
-    FOLDER_TREE.forEach(node=>push(visibleProjectsOf(node, false)));
+    cfg().folders().forEach(node=>push(visibleProjectsOf(node, false)));
     push(unassignedInFilter());
   }
   push(noBaInFilter());
@@ -2103,21 +2195,21 @@ function selectAllRow(){
 /* org 一個資料夾都沒開時，樹會退化成一個裝了 92 個專案的「No folder」節點，
  * 比現在的平鋪還難用。所以沒有資料夾就維持現行的 BA → Project 兩層。 */
 function flatBaTree(){
-  return BILLING_ACCOUNTS.map(ba=>{
-    const all = everyUnassigned().filter(project=>project.ba.id===ba.id);
-    const projects = baProjects(ba.id);
+  return cfg().groups().map(group=>{
+    const all = everyUnassigned().filter(project=>project.parent.id===group.id);
+    const projects = baProjects(group.id);
     if(!projects.length) return '';
-    const expanded = !!assign.expanded[ba.id] || !!assign.search;
+    const expanded = !!assign.expanded[group.id] || !!assign.search;
     const picked = selectedIn(projects);
     const isAll = projects.length>0 && picked===projects.length;
     const isSome = picked>0 && !isAll;
     const countText = projects.length===all.length ? `(${all.length})` : `(${projects.length} / ${all.length})`;
     return `<div class="tbranch">
-        <div class="tnode is-folder" style="padding-left:24px;top:0;z-index:30" onclick="toggleExpand('${ba.id}')">
-          <button class="tchev" onclick="event.stopPropagation();toggleExpand('${ba.id}')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
-          ${checkboxHtml(isAll, `toggleBa('${ba.id}')`, isSome)}
-          <span class="material-symbols-outlined ticon">account_balance_wallet</span>
-          <div class="tlabel"><span class="tname">${hl(ba.name)} <span class="tcount ${projects.length!==all.length?'partial':''}">${countText}</span></span></div>
+        <div class="tnode is-folder" style="padding-left:24px;top:0;z-index:30" onclick="toggleExpand('${group.id}')">
+          <button class="tchev" onclick="event.stopPropagation();toggleExpand('${group.id}')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
+          ${checkboxHtml(isAll, `toggleBa('${group.id}')`, isSome)}
+          <span class="material-symbols-outlined ticon">${cfg().parentIcon}</span>
+          <div class="tlabel"><span class="tname">${hl(group.name)} <span class="tcount ${projects.length!==all.length?'partial':''}">${countText}</span></span></div>
         </div>${expanded ? projects.map(project=>projectRow(project,1)).join('') : ''}
       </div>`;
   }).join('');
@@ -2129,10 +2221,13 @@ function flatBaTree(){
  * 但在帳單帳戶視角裡沒有資料夾這個東西，而帳單帳戶名稱其實搜得到卻沒被提到。 */
 function searchPlaceholder(){
   /* placeholder 要把這個視角實際搜得到的東西講完。資料夾視角三種都搜得到
-   * （資料夾名稱、帳單帳戶名稱、專案 name / ID）；帳單帳戶視角沒有資料夾列，
+   * （資料夾名稱、上層名稱、資源 name / ID）；上層分組的視角沒有資料夾列，
    * 搜資料夾名稱會出現「不知道為什麼命中」的結果，所以那個視角只講兩種。 */
-  if(!assign.hasFolders || assign.groupBy === 'ba') return 'Search billing accounts or projects';
-  return 'Search folders, billing accounts, or projects';
+  const c = cfg();
+  if(c.searchHint) return `Search ${c.searchHint}`;
+  const parent = c.parentLabel.toLowerCase() + 's';
+  if(!showFolderView()) return `Search ${parent} or ${c.nounPlural}`;
+  return `Search folders, ${parent}, or ${c.nounPlural}`;
 }
 function baMatches(ba){
   return !!assign.search && ba.name.toLowerCase().includes(assign.search.toLowerCase());
@@ -2140,10 +2235,10 @@ function baMatches(ba){
 /* 這同時是「畫面上排哪些列」跟「全選會選走哪些」的唯一來源，兩邊共用一個
  * 函式就不會再出現「看到 1 個卻選走 14 個」那種對不起來的情況。 */
 function baProjects(baId){
-  const ba = BILLING_ACCOUNTS.find(item=>item.id===baId);
+  const ba = cfg().groups().find(item=>item.id===baId);
   const keepAll = !!ba && baMatches(ba);
   return everyProject()
-    .filter(project=>project.ba.id===baId)
+    .filter(project=>project.parent.id===baId)
     .filter(project=>keepAll ? inFolderScope(project) : projectVisible(project));
 }
 function toggleBa(baId){ toggleScope(baProjects(baId)); }
@@ -2162,12 +2257,12 @@ function renderAssign(){
      * 這不是出錯，是這個群組已經設定完了，而且要移除的話得去表格。 */
     body = `<div class="tempty"><span class="material-symbols-outlined tempty-icon">check_circle</span>
       <div class="tempty-title">Everything is already assigned</div>
-      <div>All authorized Google Cloud resources are assigned to this group. To remove one, select it in the Resources table and use Unlink Resource.</div></div>`;
-  } else if(!assign.hasFolders || assign.groupBy === 'ba'){
+      <div>All authorized ${esc(cfg().cloudLabel)} resources are assigned to this group. To remove one, select it in the Resources table and use Unlink Resource.</div></div>`;
+  } else if(!showFolderView()){
     const tree = flatBaTree() + noBaRow();
     body = tree ? selectAllRow() + tree : `<div class="tempty">No resources match your search.</div>`;
   } else {
-    const tree = FOLDER_TREE.filter(nodeHasVisible).map(node=>folderRow(node,0)).join('') + unassignedRow() + noBaRow();
+    const tree = cfg().folders().filter(nodeHasVisible).map(node=>folderRow(node,0)).join('') + unassignedRow() + noBaRow();
     body = tree ? selectAllRow() + tree : `<div class="tempty">No resources match your search.</div>`;
   }
 
@@ -2192,8 +2287,8 @@ function renderAssign(){
     <div class="rmodal" role="dialog" aria-label="Assign Resource">
       <div class="rmodal-head">
         <div>
-          <h3>Assign Resource: Google Cloud</h3>
-          <p>Select the Google Cloud resources you want to assign to this group.</p>
+          <h3>Assign Resource: ${esc(cfg().cloudLabel)}</h3>
+          <p>Select the ${esc(cfg().cloudLabel)} resources you want to assign to this group.</p>
         </div>
         <button class="rmodal-close" onclick="closeAssign()" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
       </div>
@@ -2201,11 +2296,11 @@ function renderAssign(){
         <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="${searchPlaceholder()}" value="${esc(assign.search)}" oninput="onAssignSearch(this.value)"></div>
       </div>
       <div class="groupby-row">
-        ${assign.hasFolders ? `<div class="groupby-toggle">
+        ${showGroupByToggle() ? `<div class="groupby-toggle">
           <span class="lbl">Group by</span>
           <span class="material-symbols-outlined gb-info" title="${esc(GROUPBY_HELP)}">info</span>
           <div class="pill-tabs">
-            <button class="pill-tab ${assign.groupBy==='ba'?'active':''}" onclick="setGroupBy('ba')"><span class="material-symbols-outlined" style="font-size:16px">account_balance_wallet</span>Billing account</button>
+            <button class="pill-tab ${assign.groupBy==='ba'?'active':''}" onclick="setGroupBy('ba')"><span class="material-symbols-outlined" style="font-size:16px">${cfg().parentIcon}</span>${esc(cfg().parentLabel)}</button>
             <button class="pill-tab ${assign.groupBy==='folder'?'active':''}" onclick="setGroupBy('folder')"><span class="material-symbols-outlined" style="font-size:16px">folder</span>Folder</button>
           </div>
         </div>` : ''}
@@ -2213,7 +2308,7 @@ function renderAssign(){
       ${noFolderNote}
       <div class="rmodal-body">${body}</div>
       <div class="rmodal-foot">
-        <span class="rmodal-count">${assignable?`<b>${picked}</b> of ${assignable} unassigned project${assignable===1?'':'s'} selected`:''}</span>
+        <span class="rmodal-count">${assignable?`<b>${picked}</b> of ${assignable} unassigned ${assignable===1?cfg().noun:cfg().nounPlural} selected`:''}</span>
         <div style="display:flex;gap:8px">
           <button class="btn btn-out" onclick="closeAssign()">Cancel</button>
           <button class="btn btn-pri" ${picked?'':'disabled'} onclick="confirmAssign()">Assign</button>
@@ -2294,14 +2389,14 @@ window.DEMO_APPLY = function (id) {
   if (['set','loading','empty','nodata'].includes(id)) { state.pageState = id; render(); return; }
   if (id === 'cloud-all')      { state.cloudAuth = 'all';      render(); return; }
   if (id === 'cloud-gcp-only') { state.cloudAuth = 'gcp-only'; render(); return; }
-  if (id === 'assign-ba')      { assign.hasFolders = true;  openAssign(); return; }
-  if (id === 'assign-folder')  { assign.hasFolders = true;  openAssign(); setGroupBy('folder'); return; }
-  if (id === 'assign-nofld')   { assign.hasFolders = false; openAssign(); return; }
+  if (id === 'assign-ba')      { assign.hasFolders = true;  openAssign('gcp'); return; }
+  if (id === 'assign-folder')  { assign.hasFolders = true;  openAssign('gcp'); setGroupBy('folder'); return; }
+  if (id === 'assign-nofld')   { assign.hasFolders = false; openAssign('gcp'); return; }
   if (id === 'assign-deep')    { showDeepTree(); return; }
-  if (id === 'assign-first')   { setAssignedMode('none');  assign.hasFolders = true; openAssign(); setGroupBy('folder'); return; }
-  if (id === 'assign-drift')   { setAssignedMode('mixed'); assign.hasFolders = true; openAssign(); setGroupBy('folder'); return; }
-  if (id === 'assign-synced')  { setAssignedMode('all');   assign.hasFolders = true; openAssign(); setGroupBy('folder'); return; }
-  if (id === 'assign-fail')    { setAssignedMode('mixed'); assign.hasFolders = true; openAssign(); setGroupBy('folder'); assign.forceFail = true; return; }
+  if (id === 'assign-first')   { setAssignedMode('none');  assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
+  if (id === 'assign-drift')   { setAssignedMode('mixed'); assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
+  if (id === 'assign-synced')  { setAssignedMode('all');   assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
+  if (id === 'assign-fail')    { setAssignedMode('mixed'); assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); assign.forceFail = true; return; }
 };
 </script>
 <script>
