@@ -473,11 +473,11 @@ td.center .actions-cell{justify-content:center}
 .tnode.is-selectall{border-bottom:1px solid var(--lt-color-border-default);position:sticky;top:0;z-index:40;background:var(--lt-color-bg-default)}
 .tnode.is-selectall .tname{font-weight:600}
 .tname.is-nocost{color:var(--lt-color-text-secondary);font-style:italic}
-.tempty-icon{display:block;font-size:32px;color:var(--lt-color-success);margin-bottom:8px}
+.tempty-icon{display:block;font-size:32px;color:var(--lt-color-text-tertiary);margin-bottom:8px}
+.tempty-icon.is-success{color:var(--lt-color-success)}
 .tempty-title{font-size:var(--lt-fs-16);font-weight:600;color:var(--lt-color-text-primary);margin-bottom:4px}
 .tempty{padding:40px 24px;text-align:center;color:var(--lt-color-text-secondary);font-size:var(--lt-fs-14)}
 .gb-info{font-size:16px;color:var(--lt-color-text-secondary);cursor:help}
-.tcaption{margin:0 24px 12px;font-size:var(--lt-fs-12);line-height:1.6;color:var(--lt-color-text-secondary)}
 .tskel{padding:8px 24px}
 .tskel .skel{height:36px;margin-bottom:8px}
 
@@ -1540,7 +1540,7 @@ function pickerResources(){
 }
 /* 只有 GCP 有資料夾視角，而且要 org 真的開了資料夾（Demo FAB 有那個情境） */
 function showFolderView(){ return cfg().supportsFolders && assign.hasFolders && assign.groupBy==='folder'; }
-function showGroupByToggle(){ return cfg().supportsFolders && assign.hasFolders; }
+function showGroupByToggle(){ return cfg().supportsFolders; }
 
 /* 極端深度情境用的合成樹（GCP 上限 10 層）。真實客戶只有 2 層，
  * 這棵樹純粹用來確認縮排在官方上限下不會壞版。 */
@@ -2259,9 +2259,16 @@ function renderAssign(){
   } else if(!everyUnassigned().length){
     /* 全部都指派過就沒東西可加了。這裡刻意不用 No Data 那種語彙——
      * 這不是出錯，是這個群組已經設定完了，而且要移除的話得去表格。 */
-    body = `<div class="tempty"><span class="material-symbols-outlined tempty-icon">check_circle</span>
+    body = `<div class="tempty"><span class="material-symbols-outlined tempty-icon is-success">check_circle</span>
       <div class="tempty-title">Everything is already assigned</div>
       <div>All authorized ${esc(cfg().cloudLabel)} resources are assigned to this group. To remove one, select it in the Resources table and use Unlink Resource.</div></div>`;
+  } else if(cfg().supportsFolders && assign.groupBy==='folder' && !assign.hasFolders){
+    /* 使用者主動點了 Folder 分頁，這個 org 才真的沒有資料夾可看。跟
+     * cloud pill tabs 的 not-authorized 空狀態同一個視覺語言（icon +
+     * 標題 + 說明），不是常駐警語。 */
+    body = `<div class="tempty"><span class="material-symbols-outlined tempty-icon">folder_off</span>
+      <div class="tempty-title">No folders in this organization</div>
+      <div>Projects here aren't organized into folders. Switch to ${esc(cfg().parentLabel)} to browse and assign resources.</div></div>`;
   } else if(!showFolderView()){
     const tree = flatBaTree() + noBaRow();
     body = tree ? selectAllRow() + tree : `<div class="tempty">No resources match your search.</div>`;
@@ -2275,17 +2282,16 @@ function renderAssign(){
    * 「只列未指派 / 去哪移除」兩句所有模式共用，只講一次。
    * 「新增的資源要重開才看得到」這句拿掉——「只列未指派」已經隱含這件事，
    * 不需要再展開講一次重開的機制。 */
-  /* 原本這裡有一塊藍底常駐說明，收掉了（Kabin 2026-09-09 決定）。
-   * 收掉的理由不只是佔空間：這個位置以後要放真的警示（T1 存檔連帶清掉子 T2、
-   * 同步失敗），常駐的靜態說明長期佔著同一套視覺語彙，使用者會學會跳過它，
-   * 真警示出現時就沒有警示力了。三件事各自歸位：
-   *   「只列未指派」→ 併進底部計數的 unassigned 這個字
-   *   視角行為 → Group by 旁邊的 info tooltip（就掛在它解釋的那個控制項上）
-   *   「要移除去表格 Unlink」→ 全部指派完的空狀態已經有這句話
-   * 唯一留下來的是「這個 org 沒有資料夾」，因為那是唯一「畫面上少了東西
-   * 但沒有任何線索」的情況（Group by 切換器整個不會出現）。 */
-  const noFolderNote = assign.hasFolders ? '' :
-    `<p class="tcaption">No folders were found in this organization, so projects are grouped by billing account.</p>`;
+  /* 原本這裡有一塊藍底常駐說明，收掉了（Kabin 2026-09-09 決定）。三件事
+   * 各自歸位：「只列未指派」→ 底部計數的 unassigned 這個字、視角行為 →
+   * Group by 的 info tooltip、「要移除去表格 Unlink」→ 空狀態已經有。
+   *
+   * 「這個 org 沒有資料夾」原本也走常駐 caption，2026-09-10 改掉：Kabin
+   * 指出這件事該比照本檔 resourcesTab() 的雲端 pill tabs 做——tab 永遠
+   * 顯示，沒資料的那個點下去才出現空狀態，不要預先把選項藏起來再用文字
+   * 解釋為什麼看不到。所以 Group by 的 Folder 分頁永遠在，這個 org 真的
+   * 沒有資料夾時，點進 Folder 才在 rmodal-body 出現對應空狀態
+   * （見下方 assign.groupBy==='folder' && !assign.hasFolders 分支）。 */
 
   root.innerHTML = `<div class="rmodal-backdrop" onclick="if(event.target===this)closeAssign()">
     <div class="rmodal" role="dialog" aria-label="Assign Resource">
@@ -2307,7 +2313,6 @@ function renderAssign(){
           </div>
         </div>` : ''}
       </div>
-      ${noFolderNote}
       <div class="rmodal-body">${body}</div>
       <div class="rmodal-foot">
         <span class="rmodal-count">${assignable?`<b>${picked}</b> of ${assignable} unassigned ${assignable===1?cfg().noun:cfg().nounPlural} selected`:''}</span>
@@ -2376,7 +2381,7 @@ window.DEMO_SCENARIOS = [
 
   {id:'assign-ba',     category:'assign', label:'預設：Billing account 視角',   icon:'account_balance_wallet', tip:'既有客戶的現況，開啟選單的預設分組'},
   {id:'assign-folder', category:'assign', label:'切換到 Folder 視角', icon:'account_tree', tip:'10 個資料夾、2 層巢狀、88 個專案、10 個未分類，結構取自工程調查的實查結果'},
-  {id:'assign-nofld',  category:'assign', label:'Org 沒有資料夾',               icon:'folder_off', tip:'報告沒涵蓋的 case：退回現行的 BA 兩層'},
+  {id:'assign-nofld',  category:'assign', label:'Org 沒有資料夾',               icon:'folder_off', tip:'報告沒涵蓋的 case。Folder 分頁仍然存在，點進去才看到「No folders in this organization」空狀態——跟雲端 pill tabs 的 not-authorized 是同一套語言，不預先把選項藏起來'},
   {id:'assign-deep',   category:'assign', label:'極端深度（10 層，GCP 上限）', icon:'unfold_more', tip:'合成資料，真實客戶只有 2 層；用來確認縮排在官方上限下不會壞版'},
   {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:'全新群組，88 個專案都在選單裡'},
   {id:'assign-drift',  category:'assign', label:'回訪：只剩沒指派的 16 個',     icon:'new_releases', tip:'指派過之後客戶又在 console 新增專案。依設計稿註記，選單只列尚未指派的，所以整個選單本身就是差異報告：88 → 16 列、10 個資料夾只剩 5 個。用 API 既有的 projects[].assigned 過濾'},
