@@ -379,14 +379,12 @@ td.center .actions-cell{justify-content:center}
 .groupby-row .lbl{font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary)}
 .groupby-row .pill-tabs{margin:0}
 .groupby-row .groupby-toggle{display:flex;align-items:center;gap:8px}
-.groupby-row .ba-select{margin-left:auto}
 
 /* ---- search ---- */
 .search-box{position:relative;width:280px}
 .search-box input{width:100%;height:36px;border:1px solid var(--lt-color-border-input);border-radius:5px;padding:0 12px 0 36px;font-size:14px}
 .search-box input:focus{outline:none;border-color:var(--lt-color-primary)}
 .search-box .material-symbols-outlined{position:absolute;left:9px;top:8px;font-size:20px;color:var(--lt-color-text-secondary)}
-.ba-select{height:36px;border:1px solid var(--lt-color-border-input);border-radius:5px;padding:0 8px;background:#fff;font-size:14px;color:var(--lt-color-text-primary);cursor:pointer;max-width:220px}
 .res-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
 .res-toolbar-actions{display:flex;align-items:center;gap:8px}
 
@@ -479,8 +477,8 @@ td.center .actions-cell{justify-content:center}
 .tempty-icon{display:block;font-size:32px;color:var(--lt-color-success);margin-bottom:8px}
 .tempty-title{font-size:var(--lt-fs-16);font-weight:600;color:var(--lt-color-text-primary);margin-bottom:4px}
 .tempty{padding:40px 24px;text-align:center;color:var(--lt-color-text-secondary);font-size:var(--lt-fs-14)}
-.tnote{display:flex;gap:8px;align-items:flex-start;margin:0 24px 12px;padding:10px 12px;background:var(--lt-color-primary-bg);border-radius:var(--lt-radius-sm);font-size:var(--lt-fs-12);line-height:1.6;color:var(--lt-color-text-primary)}
-.tnote .material-symbols-outlined{font-size:16px;color:var(--lt-color-primary);flex:0 0 auto;margin-top:1px}
+.gb-info{font-size:16px;color:var(--lt-color-text-secondary);cursor:help}
+.tcaption{margin:0 24px 12px;font-size:var(--lt-fs-12);line-height:1.6;color:var(--lt-color-text-secondary)}
 .tskel{padding:8px 24px}
 .tskel .skel{height:36px;margin-bottom:8px}
 
@@ -1398,6 +1396,11 @@ const SEED_PROJECTS = {'ml-services':['ml-inference-prod'], 'data-warehouse':['a
  *      標頭顯示「Projects without Billing Account」
  * 註記自己寫「理論上不會發生，但先保留以防某種 edge case」，所以這裡也照樣
  * 只放少量樣本，不讓它影響主要情境的資料量。 */
+/* 原本寫在常駐 banner 裡的視角說明，改掛在 Group by 的 info icon 上。
+ * 這支檔案沒有自製 tooltip 元件，既有的 Unlink Resource / Folder ID 都是用
+ * 原生 title，所以這裡沿用同一個做法（Guideline 的深底 tooltip 規格等真的
+ * 要做成元件時再一起補）。 */
+const GROUPBY_HELP = 'Folder groups projects by your Google Cloud resource hierarchy, and selecting a folder selects everything inside it, including sub-folders. A folder can span more than one billing account, so folders are not shown in the Billing account grouping.';
 const NO_COST_LABEL = 'No Cost Project';
 function projectLabel(project){ return project.name || NO_COST_LABEL; }
 const NO_BILLING_ACCOUNT = {id:'ba-none', name:'', none:true};
@@ -1826,7 +1829,6 @@ const assign = {
   expanded:{},
   selected:{},
   search:'',
-  baFilter:'all',
   groupBy:'ba',       // ba | folder —— 預設維持現行的帳單帳戶視角，Folder 是新增的選項。
                       // 選取單位是專案、分組只是呈現，所以切換不會弄丟已勾的東西
 };
@@ -1857,8 +1859,8 @@ function openAssign(){
   assign.loading = true;
   assign.expanded = {};
   assign.selected = {};
+  assign.forceFail = false;
   assign.search = '';
-  assign.baFilter = 'all';
   assign.groupBy = 'ba';
   renderAssign();
   setTimeout(()=>{ assign.loading = false; renderAssign(); }, 500);
@@ -1868,7 +1870,6 @@ function closeAssign(){ assign.open = false; renderAssign(); }
 /* 帳單帳戶篩選只縮小「看得到的專案」，不改變樹的骨架 */
 function projectVisible(project){
   if(project.assigned) return false;   // 已指派的不進這個選單（設計稿註記）
-  if(assign.baFilter !== 'all' && project.ba.id !== assign.baFilter) return false;
   if(!assign.search) return true;
   const term = assign.search.toLowerCase();
   /* 搜尋範圍 = 畫面上看得到的東西。專案列有 name、ID，資料夾視角還在右邊掛了
@@ -1896,10 +1897,7 @@ function visibleProjectsOf(node, inheritedMatch){
 function nodeHasVisible(node){ return visibleProjectsOf(node, false).length > 0 || folderMatches(node); }
 
 /* 這個選單的可選範圍：未指派 + 通過帳單帳戶篩選 */
-function inFolderScope(project){
-  if(project.assigned) return false;
-  return assign.baFilter==='all' || project.ba.id===assign.baFilter;
-}
+function inFolderScope(project){ return !project.assigned; }
 function selectedIn(projects){ return projects.filter(project=>assign.selected[project.id]).length; }
 /* Demo 用：三種指派狀態。mixed = mock 原始值（當初指派過、之後 GCP 又長出新專案）， 
  * none = 第一次指派（全部可選），all = 全部都指派過（提示不出現） */
@@ -1947,9 +1945,8 @@ function onAssignSearch(value){
   /* 對齊 FE ResourcesSearch 的 500ms debounce */
   assignSearchTimer = setTimeout(()=>{ assign.search = value.trim(); renderAssign(); }, 500);
 }
-function setBaFilter(value){ assign.baFilter = value; renderAssign(); }
 /* 切換分組不動 assign.selected，因為選取的是專案本身，跟怎麼分組無關 */
-function setGroupBy(mode){ assign.groupBy = mode; assign.expanded = {}; if(mode==='ba') assign.baFilter='all'; renderAssign(); }
+function setGroupBy(mode){ assign.groupBy = mode; assign.expanded = {}; renderAssign(); }
 
 function hl(text){
   if(!assign.search) return esc(text);
@@ -2179,19 +2176,24 @@ function renderAssign(){
    * 「只列未指派 / 去哪移除」兩句所有模式共用，只講一次。
    * 「新增的資源要重開才看得到」這句拿掉——「只列未指派」已經隱含這件事，
    * 不需要再展開講一次重開的機制。 */
-  const note = !assign.hasFolders
-    ? `No folders were found in this organization, so projects are grouped by billing account.`
-    : assign.groupBy === 'folder'
-      ? `Selecting a folder selects everything inside it, including sub-folders.`
-      : `A folder can span multiple billing accounts, so switch to Folder to browse by folder.`;
-  const noteHtml = `<div class="tnote"><span class="material-symbols-outlined">info</span><span>Only resources not yet assigned to this group are listed here. ${note} To remove a resource, use Unlink in the Resources table.</span></div>`;
+  /* 原本這裡有一塊藍底常駐說明，收掉了（Kabin 2026-09-09 決定）。
+   * 收掉的理由不只是佔空間：這個位置以後要放真的警示（T1 存檔連帶清掉子 T2、
+   * 同步失敗），常駐的靜態說明長期佔著同一套視覺語彙，使用者會學會跳過它，
+   * 真警示出現時就沒有警示力了。三件事各自歸位：
+   *   「只列未指派」→ 併進底部計數的 unassigned 這個字
+   *   視角行為 → Group by 旁邊的 info tooltip（就掛在它解釋的那個控制項上）
+   *   「要移除去表格 Unlink」→ 全部指派完的空狀態已經有這句話
+   * 唯一留下來的是「這個 org 沒有資料夾」，因為那是唯一「畫面上少了東西
+   * 但沒有任何線索」的情況（Group by 切換器整個不會出現）。 */
+  const noFolderNote = assign.hasFolders ? '' :
+    `<p class="tcaption">No folders were found in this organization, so projects are grouped by billing account.</p>`;
 
   root.innerHTML = `<div class="rmodal-backdrop" onclick="if(event.target===this)closeAssign()">
     <div class="rmodal" role="dialog" aria-label="Assign Resource">
       <div class="rmodal-head">
         <div>
           <h3>Assign Resource: Google Cloud</h3>
-          <p>Google Cloud · ${esc(ORG_DOMAIN)}</p>
+          <p>Select the Google Cloud resources you want to assign to this group.</p>
         </div>
         <button class="rmodal-close" onclick="closeAssign()" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
       </div>
@@ -2201,20 +2203,17 @@ function renderAssign(){
       <div class="groupby-row">
         ${assign.hasFolders ? `<div class="groupby-toggle">
           <span class="lbl">Group by</span>
+          <span class="material-symbols-outlined gb-info" title="${esc(GROUPBY_HELP)}">info</span>
           <div class="pill-tabs">
             <button class="pill-tab ${assign.groupBy==='ba'?'active':''}" onclick="setGroupBy('ba')"><span class="material-symbols-outlined" style="font-size:16px">account_balance_wallet</span>Billing account</button>
             <button class="pill-tab ${assign.groupBy==='folder'?'active':''}" onclick="setGroupBy('folder')"><span class="material-symbols-outlined" style="font-size:16px">folder</span>Folder</button>
           </div>
         </div>` : ''}
-        ${(assign.hasFolders && assign.groupBy==='folder') ? `<select class="ba-select" onchange="setBaFilter(this.value)">
-          <option value="all" ${assign.baFilter==='all'?'selected':''}>All billing accounts</option>
-          ${BILLING_ACCOUNTS.map(ba=>`<option value="${ba.id}" ${assign.baFilter===ba.id?'selected':''}>${esc(ba.name)}</option>`).join('')}
-        </select>` : ''}
       </div>
-      ${noteHtml}
+      ${noFolderNote}
       <div class="rmodal-body">${body}</div>
       <div class="rmodal-foot">
-        <span class="rmodal-count">${assignable?`<b>${picked}</b> of ${assignable} project${assignable===1?'':'s'} selected`:''}</span>
+        <span class="rmodal-count">${assignable?`<b>${picked}</b> of ${assignable} unassigned project${assignable===1?'':'s'} selected`:''}</span>
         <div style="display:flex;gap:8px">
           <button class="btn btn-out" onclick="closeAssign()">Cancel</button>
           <button class="btn btn-pri" ${picked?'':'disabled'} onclick="confirmAssign()">Assign</button>
@@ -2234,10 +2233,17 @@ function showDeepTree(){
     renderAssign();
   }, 520);
 }
+/* 文案照設計稿 #18-3（11735:168501）。註記：成功與失敗都是關閉彈窗 + 左下角
+ * toast。設計稿自己標了「需請前端協助確認 Toast 文案，目前文案動詞使用
+ * update」，Kabin 2026-09-09 決定先照設計稿。 */
+const ASSIGN_TOAST = {
+  success: 'Resource updated successfully.',
+  error: 'Unable to update resource. Please try again later.',
+};
 function confirmAssign(){
-  const picked = Object.keys(assign.selected).length;
+  const failed = assign.forceFail;
   closeAssign();
-  showToast(`${picked} project${picked===1?'':'s'} assigned to this group.`);
+  showToast(failed ? ASSIGN_TOAST.error : ASSIGN_TOAST.success, failed ? 'error' : 'success');
 }
 
 /* ---------- top-level render ---------- */
@@ -2278,6 +2284,7 @@ window.DEMO_SCENARIOS = [
   {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:'全新群組，88 個專案都在選單裡'},
   {id:'assign-drift',  category:'assign', label:'回訪：只剩沒指派的 16 個',     icon:'new_releases', tip:'指派過之後客戶又在 console 新增專案。依設計稿註記，選單只列尚未指派的，所以整個選單本身就是差異報告：88 → 16 列、10 個資料夾只剩 5 個。用 API 既有的 projects[].assigned 過濾'},
   {id:'assign-synced', category:'assign', label:'全部都已指派（選單空的）',       icon:'done_all', tip:'沒有東西可以加了，走空狀態並指向表格的 Unlink Resource。刻意不用 No Data 語彙，這不是出錯'},
+  {id:'assign-fail',   category:'assign', label:'Assign 失敗（toast）',           icon:'error', tip:'設計稿 #18-3 定義了成功與失敗兩種 toast，失敗也是關閉彈窗 + 左下角 toast。勾幾個再按 Assign 就會走失敗分支'},
 ];
 window.DEMO_DEFAULT = 'admin';
 window.DEMO_APPLY = function (id) {
@@ -2294,6 +2301,7 @@ window.DEMO_APPLY = function (id) {
   if (id === 'assign-first')   { setAssignedMode('none');  assign.hasFolders = true; openAssign(); setGroupBy('folder'); return; }
   if (id === 'assign-drift')   { setAssignedMode('mixed'); assign.hasFolders = true; openAssign(); setGroupBy('folder'); return; }
   if (id === 'assign-synced')  { setAssignedMode('all');   assign.hasFolders = true; openAssign(); setGroupBy('folder'); return; }
+  if (id === 'assign-fail')    { setAssignedMode('mixed'); assign.hasFolders = true; openAssign(); setGroupBy('folder'); assign.forceFail = true; return; }
 };
 </script>
 <script>
