@@ -311,7 +311,7 @@ button,input{font:inherit}
 .btn-out:disabled{border-color:var(--lt-grey-200);color:var(--lt-grey-300);cursor:not-allowed}
 .btn-out.danger{border-color:var(--lt-color-error);color:var(--lt-color-error)}
 .btn-out.danger:hover{background:var(--lt-color-error-light)}
-.btn-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;background:transparent;border-radius:5px;color:var(--lt-color-text-secondary);cursor:pointer}
+.btn-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;border:0;background:transparent;border-radius:5px;color:var(--lt-color-text-secondary);cursor:pointer}
 .btn-icon:hover{background:var(--lt-color-bg-subtle);color:var(--lt-color-text-primary)}
 .btn-icon.danger:hover{background:var(--lt-color-error-light);color:var(--lt-color-error)}
 .btn-icon:disabled{color:var(--lt-grey-300);cursor:not-allowed;background:transparent}
@@ -449,7 +449,11 @@ td.center .actions-cell{justify-content:center}
 .tnode.is-folder{position:sticky;background:var(--lt-color-bg-default)}
 .tnode.is-folder:hover{background:var(--lt-color-primary-bg)}
 .tnode.is-project{min-height:44px}
-.tchev{width:20px;height:20px;flex:0 0 20px;display:grid;place-items:center;border:0;background:transparent;color:var(--lt-color-text-secondary);cursor:pointer;border-radius:3px}
+/* padding:0 是必要的，不是保險：<button> 的 UA 預設 padding 是 1px 6px，
+ * 配上 box-sizing:border-box 跟固定 20x20，content box 只剩 8px 寬，
+ * 20px 的 icon 放不進去就往右溢出 6px、往下 1px。結果是 hover 的灰色方塊
+ * （按鈕本體）跟箭頭本身錯開，看起來歪斜。 */
+.tchev{width:20px;height:20px;flex:0 0 20px;padding:0;display:grid;place-items:center;border:0;background:transparent;color:var(--lt-color-text-secondary);cursor:pointer;border-radius:var(--lt-radius-sm)}
 .tchev:hover{background:var(--lt-grey-200)}
 .tchev .material-symbols-outlined{font-size:20px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20}
 .tchev.ghost{visibility:hidden}
@@ -1848,7 +1852,12 @@ function projectVisible(project){
   if(assign.baFilter !== 'all' && project.ba.id !== assign.baFilter) return false;
   if(!assign.search) return true;
   const term = assign.search.toLowerCase();
-  return project.name.toLowerCase().includes(term) || project.projectId.toLowerCase().includes(term);
+  /* 搜尋範圍 = 畫面上看得到的東西。專案列有 name、ID，資料夾視角還在右邊掛了
+   * 帳單帳戶 chip，所以帳單帳戶名稱也要能搜到，不然使用者看著 chip 上的字
+   * 打進去卻搜不到。 */
+  return project.name.toLowerCase().includes(term)
+    || project.projectId.toLowerCase().includes(term)
+    || project.ba.name.toLowerCase().includes(term);
 }
 function folderMatches(node){
   return assign.search && node.name.toLowerCase().includes(assign.search.toLowerCase());
@@ -2047,8 +2056,11 @@ function flatBaTree(){
 /* placeholder 要講出這個視角實際搜得到什麼。原本固定寫「folders or projects」，
  * 但在帳單帳戶視角裡沒有資料夾這個東西，而帳單帳戶名稱其實搜得到卻沒被提到。 */
 function searchPlaceholder(){
+  /* placeholder 要把這個視角實際搜得到的東西講完。資料夾視角三種都搜得到
+   * （資料夾名稱、帳單帳戶名稱、專案 name / ID）；帳單帳戶視角沒有資料夾列，
+   * 搜資料夾名稱會出現「不知道為什麼命中」的結果，所以那個視角只講兩種。 */
   if(!assign.hasFolders || assign.groupBy === 'ba') return 'Search billing accounts or projects';
-  return 'Search folders or projects';
+  return 'Search folders, billing accounts, or projects';
 }
 function baMatches(ba){
   return !!assign.search && ba.name.toLowerCase().includes(assign.search.toLowerCase());
