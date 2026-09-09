@@ -454,6 +454,9 @@ td.center .actions-cell{justify-content:center}
 .tchev .material-symbols-outlined{font-size:20px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20}
 .tchev.ghost{visibility:hidden}
 .tnode .ticon{font-size:18px;color:var(--lt-color-text-secondary);flex:0 0 auto}
+/* 專案列沒有資料夾 icon，但如果不補一個等寬的空位，專案名稱會比父層資料夾的
+ * 名稱還靠左（父層多了 icon 18px + gap 8px），縮排看起來像倒退回去。 */
+.tnode .ticon.ghost{visibility:hidden}
 .tnode.is-folder .ticon{color:var(--lt-color-primary)}
 .tnode.is-unassigned .ticon{color:var(--lt-grey-400)}
 .tlabel{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
@@ -1881,15 +1884,19 @@ function setAssignedMode(mode){
   });
   assign.selected = {};
 }
-function selectableOf(node){
-  const target = typeof node === 'string' ? findFolder(node) : node;
-  return target ? allProjectsOf(target).filter(inFolderScope) : [];
-}
 function everyUnassigned(){ return everyProject().filter(project=>!project.assigned); }
+/* 父層勾選框「全選」跟畫面上實際看得到的列，之前是兩個不同的集合：
+ * 顯示用 visibleProjectsOf()（有搜尋時只算搜到的），但點擊全選卻是
+ * selectableOf()（不管有沒有搜尋，永遠是整個資料夾底下全部）。
+ * 後果：搜尋只篩出 1 個子項目時，勾這個資料夾的全選會連同畫面上看不到
+ * 的其他 N 個一起選走，「16 個裡勾了 14 個」這種結果就是這樣來的。
+ * 修法：全選的範圍一律用 visibleProjectsOf()，跟畫面上排出來的列一致。
+ * 沒有搜尋時 visibleProjectsOf(node,false) 就等於原本 selectableOf(node)，
+ * 行為不變。 */
 function toggleFolder(nodeId){
   const node = findFolder(nodeId);
   if(!node) return;
-  toggleScope(selectableOf(node));
+  toggleScope(visibleProjectsOf(node, false));
 }
 function toggleProject(projectId){
   if(assign.selected[projectId]) delete assign.selected[projectId]; else assign.selected[projectId]=true;
@@ -1948,6 +1955,7 @@ function projectRow(project, depth){
   return `<div class="tnode is-project" style="padding-left:${indentPx(depth)}px" onclick="toggleProject('${project.id}')">${railsHtml(depth)}
     <span class="tchev ghost"></span>
     ${checkboxHtml(!!assign.selected[project.id], `toggleProject('${project.id}')`)}
+    <span class="material-symbols-outlined ticon ghost">folder</span>
     <div class="tlabel">
       <span class="tname">${hl(project.name)}</span>
       <span class="tsub">${hl(project.projectId)}</span>
@@ -1959,35 +1967,43 @@ function folderRow(node, depth){
   /* 選單只列未指派的，所以計數也只能算未指派的，
    * 不然「platform (24)」底下只掛 3 列，數字跟看到的東西對不起來 */
   const unassigned = allProjectsOf(node).filter(project=>!project.assigned);
-  const selectable = selectableOf(node);
+  /* 這裡的「全選範圍」要跟畫面上實際排出來的列一致，包含帳單帳戶篩選
+   * 跟搜尋兩種情況——用 visibleProjectsOf() 而不是不看搜尋的 selectableOf() */
+  const selectable = visibleProjectsOf(node, false);
   const picked = selectedIn(selectable);
   const isAll = selectable.length>0 && picked===selectable.length;
   const isSome = picked>0 && !isAll;
-  /* 篩選讓資料夾只剩一部分時要講出來，不然使用者以為專案不見了 */
-  const countText = assign.baFilter==='all'
+  /* 篩選（帳單帳戶或搜尋）讓資料夾只剩一部分時要講出來，不然使用者以為專案不見了 */
+  const countText = selectable.length === unassigned.length
     ? `(${unassigned.length})`
     : `(${selectable.length} / ${unassigned.length})`;
   const expanded = !!assign.expanded[node.id] || !!assign.search;
   const kids = expanded ? (
       node.children.filter(nodeHasVisible).map(child=>folderRow(child, depth+1)).join('') +
-      node.projects.filter(project => folderMatches(node) ? (assign.baFilter==='all'||project.ba.id===assign.baFilter) : projectVisible(project)).map(project=>projectRow(project, depth+1)).join('')
+      /* 資料夾自己命中搜尋時整批留著底下的專案，但「已指派的不進這個選單」這條
+       * 規則不能跟著放掉——原本這裡只檢查帳單帳戶篩選，導致搜資料夾名稱時
+       * 已指派的專案會冒出來，跟旁邊的計數對不起來。用 inFolderScope 一起擋掉。 */
+      node.projects.filter(project => folderMatches(node) ? inFolderScope(project) : projectVisible(project)).map(project=>projectRow(project, depth+1)).join('')
     ) : '';
   return `<div class="tbranch">
       <div class="tnode is-folder" style="padding-left:${indentPx(depth)}px;top:${depth*FOLDER_ROW_H}px;z-index:${30-depth}"${node.folderId?` title="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth)}
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('${node.id}')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
         ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome)}
         <span class="material-symbols-outlined ticon">folder</span>
-        <div class="tlabel"><span class="tname">${hl(node.name)} <span class="tcount ${assign.baFilter!=='all'?'partial':''}">${countText}</span></span></div>
+        <div class="tlabel"><span class="tname">${hl(node.name)} <span class="tcount ${selectable.length!==unassigned.length?'partial':''}">${countText}</span></span></div>
       </div>${kids}
     </div>`;
 }
 function unassignedRow(){
-  const inFilter = UNASSIGNED_PROJECTS.filter(inFolderScope);
-  const visible = inFilter.filter(projectVisible);
+  const inFilter = UNASSIGNED_PROJECTS.filter(inFolderScope);   // 帳單帳戶篩選後的分母，不受搜尋影響
+  const visible = inFilter.filter(projectVisible);              // 目前搜尋下真的看得到、選得到的
   if(assign.search && !visible.length) return '';
-  const picked = selectedIn(inFilter);
-  const isAll = inFilter.length>0 && picked===inFilter.length;
+  /* 全選範圍跟折疊資料夾同一顆問題：要用 visible（搜尋後的）不是 inFilter
+   * （沒管搜尋的），不然全選會連畫面上沒列出來的也一起選走 */
+  const picked = selectedIn(visible);
+  const isAll = visible.length>0 && picked===visible.length;
   const isSome = picked>0 && !isAll;
+  const countText = visible.length===inFilter.length ? `(${inFilter.length})` : `(${visible.length} / ${inFilter.length})`;
   const expanded = !!assign.expanded['unassigned'] || !!assign.search;
   const kids = expanded ? visible.map(project=>projectRow(project,1)).join('') : '';
   return `<div class="tbranch">
@@ -1995,35 +2011,57 @@ function unassignedRow(){
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('unassigned')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
         ${checkboxHtml(isAll, `toggleUnassigned()`, isSome)}
         <span class="material-symbols-outlined ticon">folder_off</span>
-        <div class="tlabel"><span class="tname">No folder <span class="tcount">(${inFilter.length})</span></span>
+        <div class="tlabel"><span class="tname">No folder <span class="tcount ${visible.length!==inFilter.length?'partial':''}">${countText}</span></span>
         <span class="tsub">Projects sitting directly under ${ORG_DOMAIN}</span></div>
       </div>${kids}
     </div>`;
 }
-function unassignedInFilter(){ return UNASSIGNED_PROJECTS.filter(inFolderScope); }
+function unassignedInFilter(){ return UNASSIGNED_PROJECTS.filter(inFolderScope).filter(projectVisible); }
 function toggleUnassigned(){ toggleScope(unassignedInFilter()); }
 
 /* org 一個資料夾都沒開時，樹會退化成一個裝了 92 個專案的「No folder」節點，
  * 比現在的平鋪還難用。所以沒有資料夾就維持現行的 BA → Project 兩層。 */
 function flatBaTree(){
   return BILLING_ACCOUNTS.map(ba=>{
-    const projects = everyProject().filter(project=>project.ba.id===ba.id).filter(projectVisible);
+    const all = everyUnassigned().filter(project=>project.ba.id===ba.id);
+    const projects = baProjects(ba.id);
     if(!projects.length) return '';
     const expanded = !!assign.expanded[ba.id] || !!assign.search;
     const picked = selectedIn(projects);
     const isAll = projects.length>0 && picked===projects.length;
     const isSome = picked>0 && !isAll;
+    const countText = projects.length===all.length ? `(${all.length})` : `(${projects.length} / ${all.length})`;
     return `<div class="tbranch">
         <div class="tnode is-folder" style="padding-left:24px;top:0;z-index:30" onclick="toggleExpand('${ba.id}')">
           <button class="tchev" onclick="event.stopPropagation();toggleExpand('${ba.id}')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
           ${checkboxHtml(isAll, `toggleBa('${ba.id}')`, isSome)}
           <span class="material-symbols-outlined ticon">account_balance_wallet</span>
-          <div class="tlabel"><span class="tname">${hl(ba.name)} <span class="tcount">(${projects.length})</span></span></div>
+          <div class="tlabel"><span class="tname">${hl(ba.name)} <span class="tcount ${projects.length!==all.length?'partial':''}">${countText}</span></span></div>
         </div>${expanded ? projects.map(project=>projectRow(project,1)).join('') : ''}
       </div>`;
   }).join('');
 }
-function baProjects(baId){ return everyUnassigned().filter(project=>project.ba.id===baId); }
+/* 帳單帳戶自己的名字也算搜尋命中，命中就整批留著底下的專案——跟資料夾視角的
+ * folderMatches() 同一套規則，不然搜「corp-main」會搜不到任何東西（因為之前
+ * 只比對專案的 name / ID）。 */
+/* placeholder 要講出這個視角實際搜得到什麼。原本固定寫「folders or projects」，
+ * 但在帳單帳戶視角裡沒有資料夾這個東西，而帳單帳戶名稱其實搜得到卻沒被提到。 */
+function searchPlaceholder(){
+  if(!assign.hasFolders || assign.groupBy === 'ba') return 'Search billing accounts or projects';
+  return 'Search folders or projects';
+}
+function baMatches(ba){
+  return !!assign.search && ba.name.toLowerCase().includes(assign.search.toLowerCase());
+}
+/* 這同時是「畫面上排哪些列」跟「全選會選走哪些」的唯一來源，兩邊共用一個
+ * 函式就不會再出現「看到 1 個卻選走 14 個」那種對不起來的情況。 */
+function baProjects(baId){
+  const ba = BILLING_ACCOUNTS.find(item=>item.id===baId);
+  const keepAll = !!ba && baMatches(ba);
+  return everyProject()
+    .filter(project=>project.ba.id===baId)
+    .filter(project=>keepAll ? inFolderScope(project) : projectVisible(project));
+}
 function toggleBa(baId){ toggleScope(baProjects(baId)); }
 
 function renderAssign(){
@@ -2070,7 +2108,7 @@ function renderAssign(){
         <button class="rmodal-close" onclick="closeAssign()" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
       </div>
       <div class="rmodal-tools">
-        <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="Search folders or projects" value="${esc(assign.search)}" oninput="onAssignSearch(this.value)"></div>
+        <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="${searchPlaceholder()}" value="${esc(assign.search)}" oninput="onAssignSearch(this.value)"></div>
       </div>
       <div class="groupby-row">
         ${assign.hasFolders ? `<div class="groupby-toggle">
