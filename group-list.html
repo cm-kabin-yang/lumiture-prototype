@@ -345,8 +345,22 @@ tbody tr.pending td{background:var(--lt-grey-100);color:var(--lt-grey-400)}
 td.center .actions-cell{justify-content:center}
 .status-text{font-size:14px}
 .status-text.inactive{color:var(--lt-color-text-secondary)}
-input[type="checkbox"]{width:16px;height:16px;accent-color:var(--lt-color-primary);cursor:pointer}
-input[type="checkbox"]:disabled{cursor:default;opacity:.5}
+/* Checkbox（Guideline #Checkbox，S size／Primary／unchecked-checked-mixed）。
+ * 原生 input[type=checkbox] + accent-color 在部分瀏覽器的 unchecked 狀態會多畫出
+ * 一個小圓點（換成 appearance:none 徒手畫框線就會消失，實測跟 accent-color、
+ * 尺寸都無關，單純是瀏覽器畫原生 checkbox 本身的痕跡）。改成 Guideline 定義的
+ * span 版自訂 checkbox，順便對齊規範沒有走完的 mixed 狀態視覺。 */
+.checkbox{display:inline-flex;align-items:center;gap:8px;cursor:pointer;flex:0 0 auto}
+.checkbox.is-disabled{cursor:not-allowed}
+.checkbox__box{display:inline-flex;align-items:center;justify-content:center;flex:0 0 16px;width:16px;height:16px;border:1px solid var(--lt-grey-300);border-radius:var(--lt-radius-sm);background:#fff;transition:border-color 150ms ease,background 150ms ease,box-shadow 200ms ease}
+.checkbox__icon{color:#fff;display:none;font-size:12px;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 20}
+.checkbox:hover .checkbox__box{border-color:var(--lt-grey-400)}
+.checkbox.is-checked .checkbox__box,.checkbox.is-mixed .checkbox__box{background:var(--lt-color-primary);border-color:var(--lt-color-primary)}
+.checkbox.is-checked .checkbox__icon,.checkbox.is-mixed .checkbox__icon{display:inline-block}
+.checkbox:hover.is-checked .checkbox__box,.checkbox:hover.is-mixed .checkbox__box{background:var(--lt-color-primary-hover);border-color:var(--lt-color-primary-hover)}
+.checkbox:focus-visible .checkbox__box{border-color:var(--lt-color-primary);box-shadow:0 0 0 3px rgba(0,79,176,.1);outline:none}
+.checkbox.is-disabled .checkbox__box{border-color:var(--lt-grey-300);background:#fff}
+.checkbox.is-disabled.is-checked .checkbox__box,.checkbox.is-disabled.is-mixed .checkbox__box{background:var(--lt-grey-300);border-color:var(--lt-grey-300)}
 
 /* ---- tabs (primary, underline) ---- */
 .tabs-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:1px solid var(--lt-color-border-default);margin-bottom:20px}
@@ -1708,7 +1722,7 @@ Please assign new resources or reach out to your administrator for help.</p></di
     } else {
       const resAccessors = {col1:r=>r.name.toLowerCase(), col2:r=>r.parentName.toLowerCase()};
       const rows = sortRows(resources, 'resources', resAccessors).map(r=>`<tr class="${selected[r.id]?'selected':''}">
-          <td>${canRemove?`<input type="checkbox" ${selected[r.id]?'checked':''} onchange="toggleResource('${r.id}',this.checked)">`:''}</td>
+          <td>${canRemove?checkboxHtml(!!selected[r.id], `toggleResource('${r.id}')`):''}</td>
           <td class="cell-double"><div class="l1">${esc(r.name)}</div><div class="l2">${esc(r.subId)}</div></td>
           <td class="cell-double"><div class="l1">${esc(r.parentName)}</div><div class="l2">${esc(r.parentId)}</div></td>
           <td><button class="btn-icon ${r.canRemove&&canRemove?'danger':''}" ${!(r.canRemove&&canRemove)?'disabled':''} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'])" title="Unlink Resource"><span class="material-symbols-outlined">link_off</span></button></td>
@@ -1764,9 +1778,10 @@ function renderDetail(){
       ${body}
     </div>`;
 }
-function toggleResource(id, checked){
+function toggleResource(id){
   if(!state.selectedResources[state.cloud]) state.selectedResources[state.cloud]={};
-  state.selectedResources[state.cloud][id]=checked;
+  const bucket = state.selectedResources[state.cloud];
+  bucket[id] = !bucket[id];
   render();
 }
 
@@ -1908,8 +1923,15 @@ function hl(text){
   if(at < 0) return esc(text);
   return esc(text.slice(0,at)) + '<span class="hl">' + esc(text.slice(at, at+term.length)) + '</span>' + esc(text.slice(at+term.length));
 }
-function checkboxHtml(stateKey, onclick, indeterminate){
-  return `<input type="checkbox" ${stateKey?'checked':''} onclick="event.stopPropagation();${onclick}" ${indeterminate?'data-indeterminate="1"':''}>`;
+/* Guideline #Checkbox 的 span 版元件，不是 input——mixed 狀態原本要靠 JS 補設
+ * input.indeterminate（HTML 屬性沒有這個狀態），改成純 class 之後不用再補這一步。
+ * 用 role="checkbox" + tabindex + Enter/Space 補鍵盤操作，原生 input 這些是免費的。 */
+function checkboxHtml(checked, onclick, mixed, disabled){
+  const state = disabled ? 'is-disabled' : (mixed ? 'is-mixed' : (checked ? 'is-checked' : ''));
+  const act = disabled ? '' : `event.stopPropagation();${onclick}`;
+  return `<span class="checkbox ${state}" role="checkbox" aria-checked="${mixed?'mixed':!!checked}" aria-disabled="${!!disabled}" tabindex="${disabled?-1:0}" onclick="${act}" onkeydown="if((event.key===' '||event.key==='Enter')&&!${!!disabled}){event.preventDefault();${act}}">
+    <span class="checkbox__box"><span class="material-symbols-outlined checkbox__icon">${mixed?'remove':'check'}</span></span>
+  </span>`;
 }
 /* GCP 允許 10 層。與其在某一層之後改用文字路徑說明（試過，縮排是一眼可見的
  * 視覺編碼，換成文字等於要使用者自己讀了再比對，反而更難懂），不如把步進縮小
@@ -2074,8 +2096,6 @@ function renderAssign(){
       </div>
     </div>
   </div>`;
-  /* indeterminate 只能用 JS 設，HTML 屬性沒有這個狀態 */
-  root.querySelectorAll('input[data-indeterminate]').forEach(box=>{ box.indeterminate = true; });
 }
 /* Demo 用：把樹換成 7 層深的合成結構並整條展開 */
 function showDeepTree(){
