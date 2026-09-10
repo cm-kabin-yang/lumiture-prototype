@@ -2001,25 +2001,16 @@ let assignSearchTimer;
  * （所以沒過濾、也沒辦法在送出時補上既有的），GCPAssignResources 每次
  * 開啟都是 useState([])。詳見 specs 的 §8.11。 */
 
-/* 只有極端深度那棵合成樹（deep-0..deep-9，見檔尾 bootstrap）預先展開，其他
- * 資料夾照設計稿「預設收合」。這樣切到資料夾視角就直接看得到 GCP 上限 10 層
- * 的縮排，不用一層一層點九次。**這是展示用的偏離**，真實產品全部收合。
- * 資料裡沒有這棵樹時這些 key 只是無害的多餘旗標。 */
-function defaultExpanded(){
-  const map = {};
-  for(let index=0; index<10; index++){ map[`deep-${index}`] = true; }
-  return map;
-}
 function openAssign(cloud){
   assign.cloud = cloud || state.cloud || 'gcp';
   assign.open = true;
   assign.loading = true;
-  assign.expanded = defaultExpanded();
+  /* 照設計稿：預設收合，先看到第一層資料夾，展開才往下看。 */
+  assign.expanded = {};
   assign.selected = {};
   assign.forceFail = false;
   assign.search = '';
-  /* 預設維持現行的帳單帳戶視角（既有客戶操作不變），資料夾是切過去的第二個
-   * 視角。切過去就看得到十層那棵樹。 */
+  /* 預設維持現行的帳單帳戶視角（既有客戶操作不變），資料夾是切過去的第二個視角。 */
   assign.groupBy = 'ba';
   renderAssign();
   setTimeout(()=>{ assign.loading = false; renderAssign(); }, 500);
@@ -2105,7 +2096,7 @@ function onAssignSearch(value){
   assignSearchTimer = setTimeout(()=>{ assign.search = value.trim(); renderAssign(); }, 500);
 }
 /* 切換分組不動 assign.selected，因為選取的是專案本身，跟怎麼分組無關 */
-function setGroupBy(mode){ assign.groupBy = mode; assign.expanded = defaultExpanded(); renderAssign(); }
+function setGroupBy(mode){ assign.groupBy = mode; assign.expanded = {}; renderAssign(); }
 
 function hl(text){
   if(!assign.search) return esc(text);
@@ -2443,7 +2434,9 @@ function render(){
 }
 /* 預設 = Demo FAB 那個「極端深度」情境，兩件事一起做：
  * ①把 10 層那棵合成樹接到最前面（GCP 官方上限，也是現在跟 TL 在討論的
- *   「第一層 T1、第二層 T2」那件事的最壞情況），開檔就看得到縮排到底長怎樣。
+ *   「第一層 T1、第二層 T2」那件事的最壞情況）。照設計稿預設收合，所以它是
+ *   第一層的 corp，一層一層點下去才看得到十層縮排；Demo FAB 的「極端深度」
+ *   情境會一次全展開，要截圖用那個。
  * ②所有專案設回未指派。選單只列未指派的，mock 原本「大部分已指派」的狀態
  *   只露出 3 個資料夾，工程調查的巢狀跟兩個同名 staging 都看不到。
  * setAssignedMode() 會先把 mock 原值存進 ASSIGNED_SNAPSHOT，所以 Demo FAB 的
