@@ -2430,6 +2430,12 @@ function render(){
   const app = document.getElementById('app');
   app.innerHTML = state.view==='list' ? renderList() : renderDetail();
 }
+/* 預設讓整份工程調查結構都看得到：10 個資料夾、2 層巢狀（含刻意放的兩個
+ * 同名 staging 分屬不同 parent）、88 個專案。因為選單只列未指派的，mock 原本
+ * 「大部分已指派」的狀態只會露出 5 個資料夾，看不出巢狀跟同名這兩個關鍵特徵。
+ * setAssignedMode() 會先把 mock 原值存進 ASSIGNED_SNAPSHOT，所以 Demo FAB 的
+ * 「回訪：只剩沒指派的 16 個」還原得回去。 */
+setAssignedMode('none');
 render();
 /* 讓 #assign 可以直接連到選單，方便貼進討論串請人看 */
 if(location.hash === '#assign'){ openDetail(1,'biz-dev'); state.tab='resources'; render(); openAssign(); }
@@ -2461,8 +2467,8 @@ window.DEMO_SCENARIOS = [
   {id:'assign-folder', category:'assign', label:'切換到 Folder 視角', icon:'account_tree', tip:'10 個資料夾、2 層巢狀、88 個專案、10 個未分類，結構取自工程調查的實查結果'},
   {id:'assign-nofld',  category:'assign', label:'Org 沒有資料夾',               icon:'folder_off', tip:'報告沒涵蓋的 case。Folder 分頁仍然存在，點進去才看到「No folders in this organization」空狀態——跟雲端 pill tabs 的 not-authorized 是同一套語言，不預先把選項藏起來'},
   {id:'assign-deep',   category:'assign', label:'極端深度（10 層，GCP 上限）', icon:'unfold_more', tip:'合成資料，真實客戶只有 2 層；用來確認縮排在官方上限下不會壞版'},
-  {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:'全新群組，88 個專案都在選單裡'},
-  {id:'assign-drift',  category:'assign', label:'回訪：只剩沒指派的 16 個',     icon:'new_releases', tip:'指派過之後客戶又在 console 新增專案。依設計稿註記，選單只列尚未指派的，所以整個選單本身就是差異報告：88 → 16 列、10 個資料夾只剩 5 個。用 API 既有的 projects[].assigned 過濾'},
+  {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:'全新群組，90 個專案（含 2 個沒有帳單帳戶的）都在選單裡'},
+  {id:'assign-drift',  category:'assign', label:'回訪：只剩沒指派的 18 個',     icon:'new_releases', tip:'指派過之後客戶又在 console 新增專案。依設計稿註記，選單只列尚未指派的，所以整個選單本身就是差異報告：90 → 18 列、10 個資料夾只剩 3 個。用 API 既有的 projects[].assigned 過濾'},
   {id:'assign-synced', category:'assign', label:'全部都已指派（選單空的）',       icon:'done_all', tip:'沒有東西可以加了，走空狀態並指向表格的 Unlink Resource。刻意不用 No Data 語彙，這不是出錯'},
   {id:'assign-fail',   category:'assign', label:'Assign 失敗（toast）',           icon:'error', tip:'設計稿 #18-3 定義了成功與失敗兩種 toast，失敗也是關閉彈窗 + 左下角 toast。勾幾個再按 Assign 就會走失敗分支'},
 
