@@ -504,6 +504,15 @@ td.center .actions-cell{justify-content:center}
 .tdesc{font-size:var(--lt-fs-14);color:var(--lt-color-text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* 元件版 + 建議修正：箭頭移回左邊（跟縮排同一欄）、縮排步進改 16px。
  * 只有這兩個差異，其餘視覺完全等於元件版。 */
+/* 只釘「目前所在的最上層資料夾」那一列，不做巢狀釘選。
+ * 巢狀釘選（每一層祖先都釘住）在 10 層 = 400px 的釘住區、body 只有 465px，
+ * 會自己撐爆；而且 react-window 的列是 position:absolute、本來就不能 sticky。
+ * 只釘一列是設計上合理、技術上也做得到的那個版本。
+ * ⚠️ 這支 prototype 沒有虛擬清單，所以這裡的 sticky 是「示意要的行為」，
+ * 不等於證明它在 react-window 裡可行。真的要做的路徑是換成
+ * @tanstack/react-virtual（package.json 已有，VirtualizedTable 已在用且
+ * sticky header 有效）。 */
+.rmodal-body.is-component.is-component-fixed .tnode.is-folder[data-depth="0"]{position:sticky}
 .rmodal-body.is-component.is-component-fixed .tchev{order:0;margin-left:0}
 .rmodal-body.is-component.is-component-fixed .tchev.ghost{display:block;visibility:hidden}
 .tempty-icon{display:block;font-size:32px;color:var(--lt-color-text-tertiary);margin-bottom:8px}
@@ -2117,6 +2126,14 @@ function indentStep(){
   return (isComponentStyle() && !isComponentFixed()) ? INDENT_STEP_COMPONENT : INDENT_STEP_TREE;
 }
 const FOLDER_ROW_H = 40;   // sticky 疊放的 offset 要跟資料夾列高一致
+const SELECT_ALL_H = 40;   // 頂端 Select All 那列也是 sticky，資料夾要釘在它下面
+/* 資料夾列釘住的位置。之前只算 depth*40，忘記頂端還有一列 sticky 的
+ * Select All（z-index 40）壓在上面，所以第 0 層資料夾其實是釘在它底下、
+ * 看不到——這是我加 Select All 那輪造成的 regression，樹狀版也一樣中。
+ * component-fix 只釘第 0 層（不做巢狀），所以固定就是 Select All 的下緣。 */
+function folderStickyTop(depth){
+  return isComponentFixed() ? SELECT_ALL_H : SELECT_ALL_H + depth * FOLDER_ROW_H;
+}
 function indentPx(depth){ return 24 + depth * indentStep(); }
 function railsHtml(depth){
   if(isComponentStyle()) return '';   // 既有元件沒有縮排引導線
@@ -2163,7 +2180,7 @@ function folderRow(node, depth){
       node.projects.filter(project => folderMatches(node) ? inFolderScope(project) : projectVisible(project)).map(project=>projectRow(project, depth+1)).join('')
     ) : '';
   return `<div class="tbranch">
-      <div class="tnode is-folder" style="padding-left:${indentPx(depth)}px;top:${depth*FOLDER_ROW_H}px;z-index:${30-depth}"${node.folderId?` title="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth)}
+      <div class="tnode is-folder" data-depth="${depth}" style="padding-left:${indentPx(depth)}px;top:${folderStickyTop(depth)}px;z-index:${30-depth}"${node.folderId?` title="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth)}
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('${node.id}')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
         ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome)}
         <span class="material-symbols-outlined ticon">folder</span>
@@ -2184,7 +2201,7 @@ function unassignedRow(){
   const expanded = !!assign.expanded['unassigned'] || !!assign.search;
   const kids = expanded ? visible.map(project=>projectRow(project,1)).join('') : '';
   return `<div class="tbranch">
-      <div class="tnode is-folder is-unassigned" style="padding-left:24px;top:0;z-index:30" onclick="toggleExpand('unassigned')">
+      <div class="tnode is-folder is-unassigned" style="padding-left:24px;top:${folderStickyTop(0)}px;z-index:30" onclick="toggleExpand('unassigned')">
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('unassigned')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
         ${checkboxHtml(isAll, `toggleUnassigned()`, isSome)}
         <span class="material-symbols-outlined ticon">folder_off</span>
@@ -2213,7 +2230,7 @@ function noBaRow(){
   const expanded = !!assign.expanded['no-ba'] || !!assign.search;
   const kids = expanded ? visible.map(project=>projectRow(project,1)).join('') : '';
   return `<div class="tbranch">
-      <div class="tnode is-folder is-unassigned" style="padding-left:24px;top:0;z-index:30" onclick="toggleExpand('no-ba')">
+      <div class="tnode is-folder is-unassigned" style="padding-left:24px;top:${folderStickyTop(0)}px;z-index:30" onclick="toggleExpand('no-ba')">
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('no-ba')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
         ${checkboxHtml(isAll, `toggleNoBa()`, isSome)}
         <span class="material-symbols-outlined ticon">money_off</span>
@@ -2265,7 +2282,7 @@ function flatBaTree(){
     const isSome = picked>0 && !isAll;
     const countText = projects.length===all.length ? `(${all.length})` : `(${projects.length} / ${all.length})`;
     return `<div class="tbranch">
-        <div class="tnode is-folder" style="padding-left:24px;top:0;z-index:30" onclick="toggleExpand('${group.id}')">
+        <div class="tnode is-folder" data-depth="0" style="padding-left:24px;top:${folderStickyTop(0)}px;z-index:30" onclick="toggleExpand('${group.id}')">
           <button class="tchev" onclick="event.stopPropagation();toggleExpand('${group.id}')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
           ${checkboxHtml(isAll, `toggleBa('${group.id}')`, isSome)}
           <span class="material-symbols-outlined ticon">${cfg().parentIcon}</span>
