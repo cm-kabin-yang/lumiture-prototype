@@ -502,6 +502,10 @@ td.center .actions-cell{justify-content:center}
 /* 子項是單行 name (desc)，desc 用 hint 色 */
 .rmodal-body.is-component .tlabel{flex-direction:row;align-items:center;justify-content:flex-start;gap:6px}
 .tdesc{font-size:var(--lt-fs-14);color:var(--lt-color-text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 元件版 + 建議修正：箭頭移回左邊（跟縮排同一欄）、縮排步進改 16px。
+ * 只有這兩個差異，其餘視覺完全等於元件版。 */
+.rmodal-body.is-component.is-component-fixed .tchev{order:0;margin-left:0}
+.rmodal-body.is-component.is-component-fixed .tchev.ghost{display:block;visibility:hidden}
 .tempty-icon{display:block;font-size:32px;color:var(--lt-color-text-tertiary);margin-bottom:8px}
 .tempty-icon.is-success{color:var(--lt-color-success)}
 .tempty-title{font-size:var(--lt-fs-16);font-weight:600;color:var(--lt-color-text-primary);margin-bottom:4px}
@@ -1951,6 +1955,9 @@ const assign = {
   cloud:'gcp',         // gcp | aws | azure，決定名詞與資料來源
   /* component = 完全照 libs/lumiture-ui 的 GroupedMultiSelect（Cost Dashboard
    *             的 Tag / Label Value 下拉）語言，直接延伸到多層
+   * component-fix = 同上，只改兩個數字：縮排步進 32→16、箭頭從右移到左。
+   *             其餘（藍底 band、單行 name (id)、無引導線、無資料夾 icon、
+   *             不 sticky）完全不動，對現有九個消費端影響最小
    * tree      = 我原本做的樹狀版（左側箭頭、縮排引導線、巢狀 sticky）
    * 放兩套是為了讓 Kabin 實際感受「既有元件延伸到多層」會遇到什麼，
    * 而不是只讀我的文字分析。Demo FAB 可即時切換。 */
@@ -2104,8 +2111,11 @@ function checkboxHtml(checked, onclick, mixed, disabled){
  * 彈窗寬度。這個差異刻意保留，因為它正是「既有元件能不能直接長高」的關鍵。 */
 const INDENT_STEP_TREE = 16;
 const INDENT_STEP_COMPONENT = 32;   // = GroupedMultiSelectOptionItem 的 pl:'32px'
-function isComponentStyle(){ return assign.pickerStyle === 'component'; }
-function indentStep(){ return isComponentStyle() ? INDENT_STEP_COMPONENT : INDENT_STEP_TREE; }
+function isComponentStyle(){ return assign.pickerStyle.startsWith('component'); }
+function isComponentFixed(){ return assign.pickerStyle === 'component-fix'; }
+function indentStep(){
+  return (isComponentStyle() && !isComponentFixed()) ? INDENT_STEP_COMPONENT : INDENT_STEP_TREE;
+}
 const FOLDER_ROW_H = 40;   // sticky 疊放的 offset 要跟資料夾列高一致
 function indentPx(depth){ return 24 + depth * indentStep(); }
 function railsHtml(depth){
@@ -2363,7 +2373,7 @@ function renderAssign(){
           </div>
         </div>` : ''}
       </div>
-      <div class="rmodal-body ${isComponentStyle()?'is-component':'is-tree'}">${body}</div>
+      <div class="rmodal-body ${isComponentStyle()?'is-component':'is-tree'}${isComponentFixed()?' is-component-fixed':''}">${body}</div>
       <div class="rmodal-foot">
         <span class="rmodal-count">${assignable?`<b>${picked}</b> of ${assignable} unassigned ${assignable===1?cfg().noun:cfg().nounPlural} selected`:''}</span>
         <div style="display:flex;gap:8px">
@@ -2440,6 +2450,7 @@ window.DEMO_SCENARIOS = [
   {id:'assign-fail',   category:'assign', label:'Assign 失敗（toast）',           icon:'error', tip:'設計稿 #18-3 定義了成功與失敗兩種 toast，失敗也是關閉彈窗 + 左下角 toast。勾幾個再按 Assign 就會走失敗分支'},
 
   {id:'style-component', category:'style', label:'延伸既有元件（GroupedMultiSelect）', icon:'widgets', tip:'完全照 Cost Dashboard 那顆 Tag/Label 下拉的語言：父層藍底 band + 粗體 + (count) + 右側箭頭、子項單行 name (id)、縮排 32px、沒有引導線也沒有資料夾 icon、父層不 sticky。搭配「極端深度」情境看 10 層會怎樣'},
+  {id:'style-component-fix', category:'style', label:'元件版 + 建議修正（縮排 16px、箭頭移左）', icon:'build', tip:'跟元件版只差兩個數字：GroupedMultiSelectOptionItem 的 pl 從 32 改 16、GroupHeader 的 Expand IconButton 從 label 後面移到前面。其餘視覺完全不動。10 層縮排從 344px 降到 184px、標籤可用寬從 150px 回到 256px'},
   {id:'style-tree',      category:'style', label:'樹狀版（左側箭頭 + 引導線）',        icon:'account_tree', tip:'左側箭頭跟縮排同一欄、有垂直引導線、資料夾 icon、父層巢狀 sticky、縮排 16px、子項兩行 Name / ID。差別只有呈現，選取邏輯與資料完全共用'},
 ];
 window.DEMO_DEFAULT = 'admin';
@@ -2455,6 +2466,7 @@ window.DEMO_APPLY = function (id) {
   if (id === 'assign-nofld')   { assign.hasFolders = false; openAssign('gcp'); return; }
   if (id === 'assign-deep')    { showDeepTree(); return; }
   if (id === 'style-component'){ assign.pickerStyle='component'; if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
+  if (id === 'style-component-fix'){ assign.pickerStyle='component-fix'; if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
   if (id === 'style-tree')     { assign.pickerStyle='tree';      if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
   if (id === 'assign-first')   { setAssignedMode('none');  assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
   if (id === 'assign-drift')   { setAssignedMode('mixed'); assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
