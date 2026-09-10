@@ -1474,8 +1474,15 @@ function makeProjects(folderKey, count, baSplit, unassignedTail = 0){
   }
   return out;
 }
-/* GCP 只要求同一個 parent 底下的資料夾不同名，不同 parent 可以同名，
- * 所以底下刻意讓 platform 和 deprecated 各有一個叫 staging 的子資料夾。 */
+/* GCP 只要求同一個 parent 底下的資料夾不同名，不同 parent 可以同名，所以底下
+ * 刻意放了兩組同名情境，用來驗證「最小可區分路徑」（見 distinguishingSegments）：
+ *   ①一般同名：platform / staging 與 deprecated / staging
+ *     → 只要多顯示一段上層就分得出來
+ *   ②連上一層也同名：internal-tools / shared / staging 與 ml-services / shared / staging
+ *     → 顯示一段是 `shared / staging` 兩者相同、還是分不出來，所以要自動再往左
+ *       多加一段變成 `internal-tools / shared / staging`。這是 Kabin 2026-09-10
+ *       指出的極端情況，光靠「顯示緊鄰上一層」解不掉，必須真的比到唯一為止。
+ * 同一份清單裡因此會出現長度不同的路徑，那是刻意的：路徑只長到剛好夠區分。 */
 /* folderId 用 GCP 的數字形式。畫面上跟專案一樣走兩行 Name / ID，
  * 對齊 Resources 表格既有的「Project Name / ID」「Billing Account Name / ID」慣例。 */
 const FOLDER_TREE = [
@@ -1483,8 +1490,16 @@ const FOLDER_TREE = [
     {id:'f-platform-staging', name:'staging', folderId:'792354814932', projects:makeProjects('platform-staging',7,0,1), children:[]},
   ]},
   {id:'f-data', name:'data-warehouse', folderId:'104882735610', projects:makeProjects('data-warehouse',14,0,4), children:[]},
-  {id:'f-internal', name:'internal-tools', folderId:'238104765221', projects:makeProjects('internal-tools',11,0,0), children:[]},
-  {id:'f-ml', name:'ml-services', folderId:'551093428077', projects:makeProjects('ml-services',6), children:[]},
+  {id:'f-internal', name:'internal-tools', folderId:'238104765221', projects:makeProjects('internal-tools',8,0,0), children:[
+    {id:'f-internal-shared', name:'shared', folderId:'662014885309', projects:makeProjects('internal-shared',1), children:[
+      {id:'f-internal-shared-staging', name:'staging', folderId:'447120639855', projects:makeProjects('internal-staging',2), children:[]},
+    ]},
+  ]},
+  {id:'f-ml', name:'ml-services', folderId:'551093428077', projects:makeProjects('ml-services',3), children:[
+    {id:'f-ml-shared', name:'shared', folderId:'730558214076', projects:makeProjects('ml-shared',1), children:[
+      {id:'f-ml-shared-staging', name:'staging', folderId:'285974103628', projects:makeProjects('ml-staging',2), children:[]},
+    ]},
+  ]},
   {id:'f-consumer', name:'consumer-apps', folderId:'689213470558', projects:makeProjects('consumer-apps',6,0,6), children:[]},
   {id:'f-api', name:'api-gateway', folderId:'473820156904', projects:makeProjects('api-gateway',5), children:[]},
   {id:'f-mobile', name:'mobile-backend', folderId:'318447290613', projects:makeProjects('mobile-backend',4), children:[]},
@@ -2308,10 +2323,10 @@ function buildFolderPathIndex(){
     FOLDER_SAME_NAME.get(node.name).push(path);
   });
 }
-/* 回傳「要顯示幾段祖先」。同名者之間從右往左比，比到唯一為止。 */
+/* 回傳「為了跟同名者區分開來，最少要顯示幾段祖先」。名稱唯一時回傳 0。 */
 function distinguishingSegments(node){
   const mine = FOLDER_PATHS.get(node.id) || [];
-  if((FOLDER_NAME_COUNT.get(node.name)||0) <= 1) return mine.length ? 1 : 0;
+  if((FOLDER_NAME_COUNT.get(node.name)||0) <= 1) return 0;
   const others = (FOLDER_SAME_NAME.get(node.name)||[]).filter(path=>path !== mine);
   for(let take=1; take<=mine.length; take++){
     const suffix = mine.slice(mine.length - take).join('/');
@@ -2320,21 +2335,23 @@ function distinguishingSegments(node){
   }
   return mine.length;
 }
+/* 路徑只在「位置本身講不出來」的時候出現，一條規則兩種情況：
+ *   ①搜尋中：樹被打平，縮排跟 sticky 兩個線索同時失效，位置什麼都不說
+ *   ②深度超過縮排上限：第 5 層以上縮排不再增加，位置也不說了
+ * 其餘情況（正常展開的淺層樹）不顯示——上一層就在正上方，再寫一次是雜訊。
+ *
+ * 顯示幾段：至少一段（緊鄰的上一層，資訊量最高的那一段），同名者需要更多就給
+ * 更多，一路加到唯一為止。**刻意不顯示完整路徑**：十層的完整路徑是
+ * `corp / platform-ops / infra / prod / eu-west / …` 讀不完，而使用者要的是
+ * 「這是哪一個 staging」，不是背下整條路。 */
 function pathPrefix(depth, node){
   if(!FOLDER_PATHS) buildFolderPathIndex();
   const ancestors = FOLDER_PATHS.get(node.id) || [];
   if(!ancestors.length) return '';
-  /* 搜尋時整棵樹被打平、縮排跟 sticky 都失去意義，所以搜尋結果一律顯示完整
-   * 路徑（結果通常很少，放得下）。這正是路徑最該出現的地方：搜「staging」拿到
-   * 兩列一模一樣的東西，沒有路徑就選不下去。 */
-  if(assign.search){
-    return `<span class="tpath">${esc(ancestors.join(' / '))} / </span>`;
-  }
-  const needed = distinguishingSegments(node);
+  const flattened = !!assign.search;
   const deep = assign.indentCap && depth > INDENT_CAP;
-  /* 淺層而且名稱唯一時不顯示路徑：縮排已經講完了，再加路徑只是雜訊。 */
-  if(!deep && needed <= 1) return '';
-  const take = Math.max(needed, deep ? 1 : needed);
+  if(!flattened && !deep) return '';
+  const take = Math.min(ancestors.length, Math.max(1, distinguishingSegments(node)));
   const shown = ancestors.slice(ancestors.length - take);
   const elided = ancestors.length > take ? '… / ' : '';
   return `<span class="tpath">${elided}${esc(shown.join(' / '))} / </span>`;
