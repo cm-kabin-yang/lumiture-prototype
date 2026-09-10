@@ -473,6 +473,35 @@ td.center .actions-cell{justify-content:center}
 .tnode.is-selectall{border-bottom:1px solid var(--lt-color-border-default);position:sticky;top:0;z-index:40;background:var(--lt-color-bg-default)}
 .tnode.is-selectall .tname{font-weight:600}
 .tname.is-nocost{color:var(--lt-color-text-secondary);font-style:italic}
+/* ============================================================
+ * 元件版：忠實複製既有 GroupedMultiSelect 的視覺語言，再延伸到多層。
+ * 對照來源（LumiTure-FE）：
+ *   GroupHeader.tsx                → 父層：primary.light10 底 + 底部
+ *                                    light20 hairline + fontWeight 700 +
+ *                                    (count) + 右側 Expand icon button
+ *   GroupedMultiSelectOptionItem   → 子項：pl:'32px'、單行 name + (desc)
+ *   GroupedMultiSelectOption       → ITEM_HEIGHT = 40（固定列高）
+ * 刻意不補的：縮排引導線、資料夾 icon、巢狀 sticky——元件本來就沒有，
+ * 補了就不是「用既有元件做」而是又變回樹狀版了。
+ * ============================================================ */
+.rmodal-body.is-component .tnode{min-height:40px}
+.rmodal-body.is-component .tnode.is-project{min-height:40px}
+/* 父層＝整條 tint band（GroupHeader 的 sx） */
+.rmodal-body.is-component .tnode.is-folder{
+  position:static;                       /* 元件用 react-window 虛擬清單，sticky 在裡面無效 */
+  background:var(--lt-blue-10);
+  box-shadow:inset 0 -1px 0 0 var(--lt-blue-20);
+}
+.rmodal-body.is-component .tnode.is-folder:hover{background:var(--lt-blue-10)}
+.rmodal-body.is-component .tnode.is-folder .tname{font-weight:700}
+/* 收合箭頭移到最右（GroupHeader 把 IconButton 放在 label 後面） */
+.rmodal-body.is-component .tchev{order:9;margin-left:auto;color:var(--lt-color-primary)}
+.rmodal-body.is-component .tchev.ghost{display:none}
+/* 元件沒有資料夾 icon，父層只有 checkbox + 粗體字 */
+.rmodal-body.is-component .ticon{display:none}
+/* 子項是單行 name (desc)，desc 用 hint 色 */
+.rmodal-body.is-component .tlabel{flex-direction:row;align-items:center;justify-content:flex-start;gap:6px}
+.tdesc{font-size:var(--lt-fs-14);color:var(--lt-color-text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tempty-icon{display:block;font-size:32px;color:var(--lt-color-text-tertiary);margin-bottom:8px}
 .tempty-icon.is-success{color:var(--lt-color-success)}
 .tempty-title{font-size:var(--lt-fs-16);font-weight:600;color:var(--lt-color-text-primary);margin-bottom:4px}
@@ -1548,7 +1577,12 @@ function makeDeepTree(){
   const names = ['corp','platform-ops','infra','prod','eu-west','payments','ledger','settlement','fraud-review','archive']; // 10 層 = GCP 官方上限
   let node = null;
   for(let index=names.length-1; index>=0; index--){
-    node = {id:`deep-${index}`, name:names[index], folderId:String(500000000000+index*10193), projects:makeProjects(`deep-${names[index]}`, index===names.length-1?4:1), children:node?[node]:[]};
+    /* 第 4 個參數 unassignedTail 給滿，讓這棵合成樹的專案全部是「未指派」。
+     * 2026-09-08 改成「選單只列未指派」之後，這裡沒帶這個參數，整棵深樹
+     * 因為全部 assigned 而被過濾掉、極端深度情境等於是空的——那次我只用
+     * 一般情境驗證，沒回頭跑這個 demo，所以壞了兩天沒被發現。 */
+    const count = index===names.length-1 ? 4 : 1;
+    node = {id:`deep-${index}`, name:names[index], folderId:String(500000000000+index*10193), projects:makeProjects(`deep-${names[index]}`, count, 0, count), children:node?[node]:[]};
   }
   return node;
 }
@@ -1915,6 +1949,12 @@ function toggleResource(id){
 const assign = {
   open:false,
   cloud:'gcp',         // gcp | aws | azure，決定名詞與資料來源
+  /* component = 完全照 libs/lumiture-ui 的 GroupedMultiSelect（Cost Dashboard
+   *             的 Tag / Label Value 下拉）語言，直接延伸到多層
+   * tree      = 我原本做的樹狀版（左側箭頭、縮排引導線、巢狀 sticky）
+   * 放兩套是為了讓 Kabin 實際感受「既有元件延伸到多層」會遇到什麼，
+   * 而不是只讀我的文字分析。Demo FAB 可即時切換。 */
+  pickerStyle:'component',
   hasFolders:true,     // org 完全沒開資料夾時退回現行的 BA → Project 兩層
   loading:false,
   expanded:{},
@@ -2057,26 +2097,36 @@ function checkboxHtml(checked, onclick, mixed, disabled){
     <span class="checkbox__box"><span class="material-symbols-outlined checkbox__icon">${mixed?'remove':'check'}</span></span>
   </span>`;
 }
-/* GCP 允許 10 層。與其在某一層之後改用文字路徑說明（試過，縮排是一眼可見的
- * 視覺編碼，換成文字等於要使用者自己讀了再比對，反而更難懂），不如把步進縮小
- * 讓縮排一路撐到底：16px × 10 層 = 160px，660px 的彈窗放得下，階層也全程看得見。 */
-const INDENT_STEP = 16;
+/* GCP 允許 10 層。樹狀版把步進縮小讓縮排一路撐到底：16px × 10 層 = 160px，
+ * 660px 的彈窗放得下、階層全程看得見。
+ * 元件版則忠實沿用 GroupedMultiSelectOptionItem 寫死的 `pl:'32px'`——那個值
+ * 是為「只有一層子項」設計的，延伸到多層時 32px × 10 = 320px，會吃掉半個
+ * 彈窗寬度。這個差異刻意保留，因為它正是「既有元件能不能直接長高」的關鍵。 */
+const INDENT_STEP_TREE = 16;
+const INDENT_STEP_COMPONENT = 32;   // = GroupedMultiSelectOptionItem 的 pl:'32px'
+function isComponentStyle(){ return assign.pickerStyle === 'component'; }
+function indentStep(){ return isComponentStyle() ? INDENT_STEP_COMPONENT : INDENT_STEP_TREE; }
 const FOLDER_ROW_H = 40;   // sticky 疊放的 offset 要跟資料夾列高一致
-function indentPx(depth){ return 24 + depth * INDENT_STEP; }
+function indentPx(depth){ return 24 + depth * indentStep(); }
 function railsHtml(depth){
+  if(isComponentStyle()) return '';   // 既有元件沒有縮排引導線
   let out = '';
-  for(let level=0; level<depth; level++){ out += `<span class="trail" style="left:${32 + level*INDENT_STEP}px"></span>`; }
+  for(let level=0; level<depth; level++){ out += `<span class="trail" style="left:${32 + level*INDENT_STEP_TREE}px"></span>`; }
   return out;
 }
 function projectRow(project, depth){
+  /* 元件版：GroupedMultiSelectOptionItem 是單行 `name (desc)`，desc 用 hint 色，
+   * 所以資源 ID 走 desc 的位置、跟名稱同一行（元件的 row height 是固定 40px，
+   * 容不下兩行）。樹狀版維持兩行 Name / ID，對齊 Resources 表格的既有慣例。 */
+  const label = `<span class="tname ${project.name?'':'is-nocost'}">${hl(projectLabel(project))}</span>`;
+  const body = isComponentStyle()
+    ? `${label}<span class="tdesc">(${hl(project.resId)})</span>`
+    : `${label}<span class="tsub">${hl(project.resId)}</span>`;
   return `<div class="tnode is-project" style="padding-left:${indentPx(depth)}px" onclick="toggleProject('${project.id}')">${railsHtml(depth)}
     <span class="tchev ghost"></span>
     ${checkboxHtml(!!assign.selected[project.id], `toggleProject('${project.id}')`)}
     <span class="material-symbols-outlined ticon ghost">folder</span>
-    <div class="tlabel">
-      <span class="tname ${project.name?'':'is-nocost'}">${hl(projectLabel(project))}</span>
-      <span class="tsub">${hl(project.resId)}</span>
-    </div>
+    <div class="tlabel">${body}</div>
     ${(showFolderView() && !project.parent.none)?`<span class="ba-chip">${esc(project.parent.name)}</span>`:''}
   </div>`;
 }
@@ -2313,7 +2363,7 @@ function renderAssign(){
           </div>
         </div>` : ''}
       </div>
-      <div class="rmodal-body">${body}</div>
+      <div class="rmodal-body ${isComponentStyle()?'is-component':'is-tree'}">${body}</div>
       <div class="rmodal-foot">
         <span class="rmodal-count">${assignable?`<b>${picked}</b> of ${assignable} unassigned ${assignable===1?cfg().noun:cfg().nounPlural} selected`:''}</span>
         <div style="display:flex;gap:8px">
@@ -2363,6 +2413,7 @@ window.DEMO_CATEGORIES = [
   {id:'state',  label:'Page',      icon:'layers',      hint:'Group List 主畫面的資料狀態'},
   {id:'cloud',  label:'Resources', icon:'cloud',       hint:'Resources 分頁的雲端授權狀態'},
   {id:'assign', label:'Assign',    icon:'account_tree',hint:'Assign Resource 的資料夾樹選單'},
+  {id:'style',  label:'Picker',    icon:'style',       hint:'多層選單的兩種做法：延伸既有元件 vs 樹狀。同一份資料、同一套選取邏輯，只有呈現不同'},
 ];
 window.DEMO_SCENARIOS = [
   {id:'admin',      category:'role', label:'Admin',       icon:'admin_panel_settings', tip:'全部 availableActions 為 true'},
@@ -2387,6 +2438,9 @@ window.DEMO_SCENARIOS = [
   {id:'assign-drift',  category:'assign', label:'回訪：只剩沒指派的 16 個',     icon:'new_releases', tip:'指派過之後客戶又在 console 新增專案。依設計稿註記，選單只列尚未指派的，所以整個選單本身就是差異報告：88 → 16 列、10 個資料夾只剩 5 個。用 API 既有的 projects[].assigned 過濾'},
   {id:'assign-synced', category:'assign', label:'全部都已指派（選單空的）',       icon:'done_all', tip:'沒有東西可以加了，走空狀態並指向表格的 Unlink Resource。刻意不用 No Data 語彙，這不是出錯'},
   {id:'assign-fail',   category:'assign', label:'Assign 失敗（toast）',           icon:'error', tip:'設計稿 #18-3 定義了成功與失敗兩種 toast，失敗也是關閉彈窗 + 左下角 toast。勾幾個再按 Assign 就會走失敗分支'},
+
+  {id:'style-component', category:'style', label:'延伸既有元件（GroupedMultiSelect）', icon:'widgets', tip:'完全照 Cost Dashboard 那顆 Tag/Label 下拉的語言：父層藍底 band + 粗體 + (count) + 右側箭頭、子項單行 name (id)、縮排 32px、沒有引導線也沒有資料夾 icon、父層不 sticky。搭配「極端深度」情境看 10 層會怎樣'},
+  {id:'style-tree',      category:'style', label:'樹狀版（左側箭頭 + 引導線）',        icon:'account_tree', tip:'左側箭頭跟縮排同一欄、有垂直引導線、資料夾 icon、父層巢狀 sticky、縮排 16px、子項兩行 Name / ID。差別只有呈現，選取邏輯與資料完全共用'},
 ];
 window.DEMO_DEFAULT = 'admin';
 window.DEMO_APPLY = function (id) {
@@ -2400,6 +2454,8 @@ window.DEMO_APPLY = function (id) {
   if (id === 'assign-folder')  { assign.hasFolders = true;  openAssign('gcp'); setGroupBy('folder'); return; }
   if (id === 'assign-nofld')   { assign.hasFolders = false; openAssign('gcp'); return; }
   if (id === 'assign-deep')    { showDeepTree(); return; }
+  if (id === 'style-component'){ assign.pickerStyle='component'; if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
+  if (id === 'style-tree')     { assign.pickerStyle='tree';      if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
   if (id === 'assign-first')   { setAssignedMode('none');  assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
   if (id === 'assign-drift')   { setAssignedMode('mixed'); assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
   if (id === 'assign-synced')  { setAssignedMode('all');   assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
