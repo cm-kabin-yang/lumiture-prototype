@@ -2058,8 +2058,22 @@ function projectVisible(project){
   if(hitSelf) return true;
   return assign.groupBy === 'ba' && project.parent.name.toLowerCase().includes(term);
 }
+/* 一般情況只比對資料夾名稱——使用者要找 infra 就打 infra，**不必打整條路徑**。
+ * PM 擔心「顯示路徑會不會逼使用者打 corp/platform/infra 才搜得到」：不會，顯示
+ * 跟查詢是兩件事，路徑只回答「這是哪一個 infra」。
+ * 但工程師確實喜歡用路徑找東西，所以加一個漸進式的支援：**查詢字串裡有 `/` 才
+ * 切成路徑比對**（比對 `祖先/.../自己`）。沒人被迫打斜線，想用的人打得到，
+ * 跟 Gmail 的 `from:` 是同一種設計——強力功能靠語法 opt-in，不改變預設行為。 */
 function folderMatches(node){
-  return assign.search && node.name.toLowerCase().includes(assign.search.toLowerCase());
+  if(!assign.search) return false;
+  const term = assign.search.toLowerCase();
+  if(term.includes('/')){
+    if(!FOLDER_PATHS) buildFolderPathIndex();
+    const full = (FOLDER_PATHS.get(node.id) || []).concat(node.name).join('/').toLowerCase();
+    /* 空白容錯：使用者可能照畫面打「platform / staging」 */
+    return full.includes(term.replace(/\s*\/\s*/g, '/'));
+  }
+  return node.name.toLowerCase().includes(term);
 }
 /* 資料夾自己命中搜尋時，底下的專案整批留著，不然搜到資料夾卻看不到內容 */
 function visibleProjectsOf(node, inheritedMatch){
@@ -2270,12 +2284,60 @@ function projectRow(project, depth){
 /* 縮排封頂之後，第 5 層以上的層級靠這條祖先路徑表達，取代原本靠斜階梯表達。
  * 中段省略成「…」只留頭尾兩段，因為使用者要的是「我在哪條分支的底部」，
  * 不是背下整條路徑。 */
-function pathPrefix(depth, ancestors){
-  if(!assign.indentCap || depth <= INDENT_CAP || !ancestors.length) return '';
-  const head = ancestors[0];
-  const tail = ancestors[ancestors.length-1];
-  const middle = ancestors.length > 2 ? ' / … / ' : ' / ';
-  return `<span class="tpath">${esc(head)}${middle}${esc(tail)} / </span>`;
+/* 「只留頭尾」的第一版有 Kabin 抓到的洞：最上層跟最底層剛好同名時，
+ * `corp / … / corp` 分不出是哪一條分支。而且在我們的資料裡**頭那一段其實是噪音**
+ * ——深層資料夾的 root 幾乎都一樣（同一個 org），真正能區分的是緊鄰的上一層。
+ *
+ * 改成「最小可區分路徑」（VS Code 同名檔案 tab 的做法）：
+ *   1. 先掃全樹，統計每個資料夾名稱出現幾次
+ *   2. 名稱唯一 → 只顯示緊鄰的上一層（`… / eu-west / `）
+ *   3. 名稱重複 → 從右往左一段一段加，加到這條後綴在所有同名者之中唯一為止
+ * 所以 platform 底下的 staging 顯示 `platform / staging`、deprecated 底下的顯示
+ * `deprecated / staging`，兩個 staging 一眼分得出來。 */
+let FOLDER_PATHS = null;      // node.id → 祖先名稱陣列
+let FOLDER_NAME_COUNT = null; // 名稱 → 出現次數
+let FOLDER_SAME_NAME = null;  // 名稱 → 該名稱所有節點的祖先路徑陣列
+function buildFolderPathIndex(){
+  FOLDER_PATHS = new Map();
+  FOLDER_NAME_COUNT = new Map();
+  FOLDER_SAME_NAME = new Map();
+  walkFolders(cfg().folders(), (node, depth, path)=>{
+    FOLDER_PATHS.set(node.id, path);
+    FOLDER_NAME_COUNT.set(node.name, (FOLDER_NAME_COUNT.get(node.name)||0) + 1);
+    if(!FOLDER_SAME_NAME.has(node.name)) FOLDER_SAME_NAME.set(node.name, []);
+    FOLDER_SAME_NAME.get(node.name).push(path);
+  });
+}
+/* 回傳「要顯示幾段祖先」。同名者之間從右往左比，比到唯一為止。 */
+function distinguishingSegments(node){
+  const mine = FOLDER_PATHS.get(node.id) || [];
+  if((FOLDER_NAME_COUNT.get(node.name)||0) <= 1) return mine.length ? 1 : 0;
+  const others = (FOLDER_SAME_NAME.get(node.name)||[]).filter(path=>path !== mine);
+  for(let take=1; take<=mine.length; take++){
+    const suffix = mine.slice(mine.length - take).join('/');
+    const clash = others.some(path=>path.slice(Math.max(0, path.length - take)).join('/') === suffix);
+    if(!clash) return take;
+  }
+  return mine.length;
+}
+function pathPrefix(depth, node){
+  if(!FOLDER_PATHS) buildFolderPathIndex();
+  const ancestors = FOLDER_PATHS.get(node.id) || [];
+  if(!ancestors.length) return '';
+  /* 搜尋時整棵樹被打平、縮排跟 sticky 都失去意義，所以搜尋結果一律顯示完整
+   * 路徑（結果通常很少，放得下）。這正是路徑最該出現的地方：搜「staging」拿到
+   * 兩列一模一樣的東西，沒有路徑就選不下去。 */
+  if(assign.search){
+    return `<span class="tpath">${esc(ancestors.join(' / '))} / </span>`;
+  }
+  const needed = distinguishingSegments(node);
+  const deep = assign.indentCap && depth > INDENT_CAP;
+  /* 淺層而且名稱唯一時不顯示路徑：縮排已經講完了，再加路徑只是雜訊。 */
+  if(!deep && needed <= 1) return '';
+  const take = Math.max(needed, deep ? 1 : needed);
+  const shown = ancestors.slice(ancestors.length - take);
+  const elided = ancestors.length > take ? '… / ' : '';
+  return `<span class="tpath">${elided}${esc(shown.join(' / '))} / </span>`;
 }
 function folderRow(node, depth, ancestors = []){
   /* 選單只列未指派的，所以計數也只能算未指派的，
@@ -2304,7 +2366,7 @@ function folderRow(node, depth, ancestors = []){
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('${node.id}')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
         ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome)}
         <span class="material-symbols-outlined ticon">folder</span>
-        <div class="tlabel"><span class="tname">${pathPrefix(depth, ancestors)}${hl(node.name)} <span class="tcount ${selectable.length!==unassigned.length?'partial':''}">${countText}</span></span></div>
+        <div class="tlabel"><span class="tname">${pathPrefix(depth, node)}${hl(node.name)} <span class="tcount ${selectable.length!==unassigned.length?'partial':''}">${countText}</span></span></div>
       </div>${kids}
     </div>`;
 }
@@ -2469,6 +2531,7 @@ function renderAssign(){
   /* renderAssign 重建整個彈窗的 innerHTML，搜尋框會被換掉，游標就跑了——
    * debounce 一送出就打不下去，得再點回輸入框。渲染前記住焦點跟游標位置，
    * 渲染後補回去。（不是這輪的回饋，是順手修掉的既有問題。） */
+  buildFolderPathIndex();   // 換雲、塞深樹都會改變樹，索引每次重建（成本可忽略）
   const active = document.activeElement;
   const keepFocus = !!active && active.matches?.('.rmodal .search-box input');
   const caret = keepFocus ? active.selectionStart : null;
