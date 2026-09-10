@@ -1478,10 +1478,14 @@ function makeProjects(folderKey, count, baSplit, unassignedTail = 0){
  * 刻意放了兩組同名情境，用來驗證「最小可區分路徑」（見 distinguishingSegments）：
  *   ①一般同名：platform / staging 與 deprecated / staging
  *     → 只要多顯示一段上層就分得出來
- *   ②連上一層也同名：internal-tools / shared / staging 與 ml-services / shared / staging
- *     → 顯示一段是 `shared / staging` 兩者相同、還是分不出來，所以要自動再往左
- *       多加一段變成 `internal-tools / shared / staging`。這是 Kabin 2026-09-10
- *       指出的極端情況，光靠「顯示緊鄰上一層」解不掉，必須真的比到唯一為止。
+ *   ②頭尾都相同、差異只在中間某一層（Kabin 2026-09-10 指定的極端情況）：
+ *     regional / region-a / shared / staging 與 regional / region-b / shared / staging
+ *     → 頭（regional）一樣、尾（staging）一樣、緊鄰的上一層（shared）也一樣，
+ *       唯一的差別是中間那層。這正是「只顯示頭尾」會出事的原始情境：
+ *       `regional / … / staging` 兩列長得一模一樣，使用者只能猜。
+ *       最小可區分路徑會從右往左走到 region-* 才停，顯示成
+ *       `… / region-a / shared / staging`——**被省略的反而是頭**，因為頭兩邊都一樣、
+ *       不帶資訊；真正該露出來的是中間那一段。
  * 同一份清單裡因此會出現長度不同的路徑，那是刻意的：路徑只長到剛好夠區分。 */
 /* folderId 用 GCP 的數字形式。畫面上跟專案一樣走兩行 Name / ID，
  * 對齊 Resources 表格既有的「Project Name / ID」「Billing Account Name / ID」慣例。 */
@@ -1490,14 +1494,18 @@ const FOLDER_TREE = [
     {id:'f-platform-staging', name:'staging', folderId:'792354814932', projects:makeProjects('platform-staging',7,0,1), children:[]},
   ]},
   {id:'f-data', name:'data-warehouse', folderId:'104882735610', projects:makeProjects('data-warehouse',14,0,4), children:[]},
-  {id:'f-internal', name:'internal-tools', folderId:'238104765221', projects:makeProjects('internal-tools',8,0,0), children:[
-    {id:'f-internal-shared', name:'shared', folderId:'662014885309', projects:makeProjects('internal-shared',1), children:[
-      {id:'f-internal-shared-staging', name:'staging', folderId:'447120639855', projects:makeProjects('internal-staging',2), children:[]},
+  {id:'f-internal', name:'internal-tools', folderId:'238104765221', projects:makeProjects('internal-tools',11,0,0), children:[]},
+  {id:'f-ml', name:'ml-services', folderId:'551093428077', projects:makeProjects('ml-services',6), children:[]},
+  {id:'f-regional', name:'regional', folderId:'517420938166', projects:makeProjects('regional',2), children:[
+    {id:'f-reg-a', name:'region-a', folderId:'604198327745', projects:[], children:[
+      {id:'f-reg-a-shared', name:'shared', folderId:'662014885309', projects:[], children:[
+        {id:'f-reg-a-staging', name:'staging', folderId:'447120639855', projects:makeProjects('euw-staging',3), children:[]},
+      ]},
     ]},
-  ]},
-  {id:'f-ml', name:'ml-services', folderId:'551093428077', projects:makeProjects('ml-services',3), children:[
-    {id:'f-ml-shared', name:'shared', folderId:'730558214076', projects:makeProjects('ml-shared',1), children:[
-      {id:'f-ml-shared-staging', name:'staging', folderId:'285974103628', projects:makeProjects('ml-staging',2), children:[]},
+    {id:'f-reg-b', name:'region-b', folderId:'730558214076', projects:[], children:[
+      {id:'f-reg-b-shared', name:'shared', folderId:'285974103628', projects:[], children:[
+        {id:'f-reg-b-staging', name:'staging', folderId:'938471026553', projects:makeProjects('apac-staging',3), children:[]},
+      ]},
     ]},
   ]},
   {id:'f-consumer', name:'consumer-apps', folderId:'689213470558', projects:makeProjects('consumer-apps',6,0,6), children:[]},
