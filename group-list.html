@@ -512,7 +512,7 @@ td.center .actions-cell{justify-content:center}
  * 不等於證明它在 react-window 裡可行。真的要做的路徑是換成
  * @tanstack/react-virtual（package.json 已有，VirtualizedTable 已在用且
  * sticky header 有效）。 */
-.rmodal-body.is-component.is-component-fixed .tnode.is-folder[data-depth="0"]{position:sticky}
+.rmodal-body.is-component.is-component-fixed .tnode.is-folder{position:sticky}
 .rmodal-body.is-component.is-component-fixed .tchev{order:0;margin-left:0}
 .rmodal-body.is-component.is-component-fixed .tchev.ghost{display:block;visibility:hidden}
 .tempty-icon{display:block;font-size:32px;color:var(--lt-color-text-tertiary);margin-bottom:8px}
@@ -1980,6 +1980,7 @@ const assign = {
                       // 選取單位是專案、分組只是呈現，所以切換不會弄丟已勾的東西
 };
 let assignSearchTimer;
+let assignFetchTimer;
 
 /* ⚠️ 這個彈窗只列「尚未被指派的資源」，依設計稿註記
  * （Figma 11735:168385「僅顯示『尚未被 assign 的資源』」）。
@@ -2005,6 +2006,7 @@ function openAssign(cloud){
   assign.cloud = cloud || state.cloud || 'gcp';
   assign.open = true;
   assign.loading = true;
+  assign.searching = false;
   /* 照設計稿：預設收合，先看到第一層資料夾，展開才往下看。 */
   assign.expanded = {};
   assign.selected = {};
@@ -2022,12 +2024,16 @@ function projectVisible(project){
   if(project.assigned) return false;   // 已指派的不進這個選單（設計稿註記）
   if(!assign.search) return true;
   const term = assign.search.toLowerCase();
-  /* 搜尋範圍 = 畫面上看得到的東西。專案列有 name、ID，資料夾視角還在右邊掛了
-   * 帳單帳戶 chip，所以帳單帳戶名稱也要能搜到，不然使用者看著 chip 上的字
-   * 打進去卻搜不到。 */
-  return projectLabel(project).toLowerCase().includes(term)
-    || project.resId.toLowerCase().includes(term)
-    || project.parent.name.toLowerCase().includes(term);
+  /* 搜尋範圍＝「當下視角的分組軸」＋「專案本身」（2026-09-10 Kabin 定義）：
+   *   資料夾視角 → 資料夾名（folderMatches）＋ 專案 name / ID
+   *   帳單帳戶視角 → 帳單帳戶名（parent）＋ 專案 name / ID
+   * 已知取捨：資料夾視角的專案列右邊掛著帳單帳戶 chip，但那個名稱在這個視角
+   * 搜不到。看得見卻搜不到會讓人困惑，不過反過來（兩個視角都搜全部欄位）會讓
+   * 結果出現「不知道為什麼命中」的列，兩害相權取這邊，規則也比較講得清楚。 */
+  const hitSelf = projectLabel(project).toLowerCase().includes(term)
+    || project.resId.toLowerCase().includes(term);
+  if(hitSelf) return true;
+  return assign.groupBy === 'ba' && project.parent.name.toLowerCase().includes(term);
 }
 function folderMatches(node){
   return assign.search && node.name.toLowerCase().includes(assign.search.toLowerCase());
@@ -2101,13 +2107,42 @@ function findFolder(nodeId){
   walkFolders(FOLDER_TREE, node=>{ if(node.id===nodeId) found = node; });
   return found;
 }
+/* 團隊 2026-09-10 回饋「巢狀搜尋可能效能差 → 需要 skeleton」，時序刻意這樣排：
+ *   打字中：什麼都不做。debounce 期間就閃 skeleton 的話，每打一個字閃一次，
+ *           比慢更難用。
+ *   停手 500ms：送出查詢，只有清單區換成 skeleton（工具列跟底部計數不動，
+ *           不然整個彈窗會抖，使用者會以為彈窗重開了）。
+ *   結果回來：換成清單。demo 用 SEARCH_FETCH_MS 模擬，真實情況是 API 往返。
+ * 注意 skeleton 是承認慢、不是解決慢：真正的解法是 debounce（已做）＋ 後端索引。
+ * 實際是否需要這段等待要看 RD 給的數字（Dcard 是 2-3 層、88 個專案，
+ * react-window 本來就吃得下），所以 demo 值故意壓短。 */
+const SEARCH_FETCH_MS = 350;
 function onAssignSearch(value){
   clearTimeout(assignSearchTimer);
-  /* 對齊 FE ResourcesSearch 的 500ms debounce */
-  assignSearchTimer = setTimeout(()=>{ assign.search = value.trim(); renderAssign(); }, 500);
+  assignSearchTimer = setTimeout(()=>{
+    const term = value.trim();
+    if(term === assign.search) return;          // 內容沒變就不用重查
+    assign.searching = true;
+    renderAssign();
+    clearTimeout(assignFetchTimer);
+    assignFetchTimer = setTimeout(()=>{
+      assign.search = term;
+      assign.searching = false;
+      renderAssign();
+    }, SEARCH_FETCH_MS);
+  }, 500);
 }
 /* 切換分組不動 assign.selected，因為選取的是專案本身，跟怎麼分組無關 */
-function setGroupBy(mode){ assign.groupBy = mode; assign.expanded = {}; renderAssign(); }
+function setGroupBy(mode){
+  assign.groupBy = mode;
+  assign.expanded = {};
+  /* 兩個視角的搜尋範圍不一樣（見 projectVisible），還沒送出的查詢跨過去會用
+   * 錯的規則跑，連 skeleton 一起收掉。 */
+  clearTimeout(assignSearchTimer);
+  clearTimeout(assignFetchTimer);
+  assign.searching = false;
+  renderAssign();
+}
 
 function hl(text){
   if(!assign.search) return esc(text);
@@ -2144,8 +2179,13 @@ const SELECT_ALL_H = 40;   // 頂端 Select All 那列也是 sticky，資料夾�
  * Select All（z-index 40）壓在上面，所以第 0 層資料夾其實是釘在它底下、
  * 看不到——這是我加 Select All 那輪造成的 regression，樹狀版也一樣中。
  * component-fix 只釘第 0 層（不做巢狀），所以固定就是 Select All 的下緣。 */
-function folderStickyTop(depth){
-  return isComponentFixed() ? SELECT_ALL_H : SELECT_ALL_H + depth * FOLDER_ROW_H;
+/* sticky 一律釘在 Select All 那列下面的同一個位置，不隨深度累加（2026-09-10
+ * Kabin 定義）。所有資料夾列都 sticky 但共用同一個 top，深的 z-index 比淺的高，
+ * 所以捲到哪一層、被釘住的就是那一層——也就是「當下看到的專案所屬的最近一層
+ * 資料夾」。原本的 `SELECT_ALL_H + depth * FOLDER_ROW_H` 是把整條路徑都釘成一疊，
+ * 十層會吃掉 400px 的可視高度。 */
+function folderStickyTop(){
+  return SELECT_ALL_H;
 }
 function indentPx(depth){ return 24 + depth * indentStep(); }
 function railsHtml(depth){
@@ -2193,7 +2233,7 @@ function folderRow(node, depth){
       node.projects.filter(project => folderMatches(node) ? inFolderScope(project) : projectVisible(project)).map(project=>projectRow(project, depth+1)).join('')
     ) : '';
   return `<div class="tbranch">
-      <div class="tnode is-folder" data-depth="${depth}" style="padding-left:${indentPx(depth)}px;top:${folderStickyTop(depth)}px;z-index:${30-depth}"${node.folderId?` title="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth)}
+      <div class="tnode is-folder" data-depth="${depth}" style="padding-left:${indentPx(depth)}px;top:${folderStickyTop()}px;z-index:${30+depth}"${node.folderId?` title="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth)}
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('${node.id}')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
         ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome)}
         <span class="material-symbols-outlined ticon">folder</span>
@@ -2214,7 +2254,7 @@ function unassignedRow(){
   const expanded = !!assign.expanded['unassigned'] || !!assign.search;
   const kids = expanded ? visible.map(project=>projectRow(project,1)).join('') : '';
   return `<div class="tbranch">
-      <div class="tnode is-folder is-unassigned" style="padding-left:24px;top:${folderStickyTop(0)}px;z-index:30" onclick="toggleExpand('unassigned')">
+      <div class="tnode is-folder is-unassigned" style="padding-left:24px;top:${folderStickyTop()}px;z-index:30" onclick="toggleExpand('unassigned')">
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('unassigned')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
         ${checkboxHtml(isAll, `toggleUnassigned()`, isSome)}
         <span class="material-symbols-outlined ticon">folder_off</span>
@@ -2243,7 +2283,7 @@ function noBaRow(){
   const expanded = !!assign.expanded['no-ba'] || !!assign.search;
   const kids = expanded ? visible.map(project=>projectRow(project,1)).join('') : '';
   return `<div class="tbranch">
-      <div class="tnode is-folder is-unassigned" style="padding-left:24px;top:${folderStickyTop(0)}px;z-index:30" onclick="toggleExpand('no-ba')">
+      <div class="tnode is-folder is-unassigned" style="padding-left:24px;top:${folderStickyTop()}px;z-index:30" onclick="toggleExpand('no-ba')">
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('no-ba')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
         ${checkboxHtml(isAll, `toggleNoBa()`, isSome)}
         <span class="material-symbols-outlined ticon">money_off</span>
@@ -2295,7 +2335,7 @@ function flatBaTree(){
     const isSome = picked>0 && !isAll;
     const countText = projects.length===all.length ? `(${all.length})` : `(${projects.length} / ${all.length})`;
     return `<div class="tbranch">
-        <div class="tnode is-folder" data-depth="0" style="padding-left:24px;top:${folderStickyTop(0)}px;z-index:30" onclick="toggleExpand('${group.id}')">
+        <div class="tnode is-folder" data-depth="0" style="padding-left:24px;top:${folderStickyTop()}px;z-index:30" onclick="toggleExpand('${group.id}')">
           <button class="tchev" onclick="event.stopPropagation();toggleExpand('${group.id}')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
           ${checkboxHtml(isAll, `toggleBa('${group.id}')`, isSome)}
           <span class="material-symbols-outlined ticon">${cfg().parentIcon}</span>
@@ -2310,18 +2350,16 @@ function flatBaTree(){
 /* placeholder 要講出這個視角實際搜得到什麼。原本固定寫「folders or projects」，
  * 但在帳單帳戶視角裡沒有資料夾這個東西，而帳單帳戶名稱其實搜得到卻沒被提到。 */
 function searchPlaceholder(){
-  /* placeholder 要把這個視角實際搜得到的東西講完。資料夾視角三種都搜得到
-   * （資料夾名稱、上層名稱、資源 name / ID）；上層分組的視角沒有資料夾列，
-   * 搜資料夾名稱會出現「不知道為什麼命中」的結果，所以那個視角只講兩種。 */
+  /* placeholder 要把這個視角實際搜得到的東西講完，兩邊都是「分組軸 + 專案」：
+   *   資料夾視角 → Search folders or projects
+   *   帳單帳戶視角 → Search billing accounts or projects
+   * 併行之後搜尋框文字區只有 234px，這兩句都在寬度內（先前塞三個名詞才需要
+   * 省掉連接詞）。 */
   const c = cfg();
   if(c.searchHint) return `Search ${c.searchHint}`;
   const parent = c.parentLabel.toLowerCase() + 's';
   if(!showFolderView()) return `Search ${parent} or ${c.nounPlural}`;
-  /* 搜尋跟 Group by 併一行之後，搜尋框的文字區只有 234px。實測
-   * `Search folders, billing accounts, or projects` 要 300px、
-   * 拿掉 billing 之後 238px 還是差 8px，所以連 or 一起省掉（221px）。
-   * 三個可搜尋的東西都還在，placeholder 用頓列不接連接詞也是常見寫法。 */
-  return `Search folders, ${c.parentShort || parent}, ${c.nounPlural}`;
+  return `Search folders or ${c.nounPlural}`;
 }
 function baMatches(ba){
   return !!assign.search && ba.name.toLowerCase().includes(assign.search.toLowerCase());
@@ -2340,11 +2378,17 @@ function toggleBa(baId){ toggleScope(baProjects(baId)); }
 function renderAssign(){
   const root = document.getElementById('assign-root');
   if(!assign.open){ root.innerHTML=''; return; }
+  /* renderAssign 重建整個彈窗的 innerHTML，搜尋框會被換掉，游標就跑了——
+   * debounce 一送出就打不下去，得再點回輸入框。渲染前記住焦點跟游標位置，
+   * 渲染後補回去。（不是這輪的回饋，是順手修掉的既有問題。） */
+  const active = document.activeElement;
+  const keepFocus = !!active && active.matches?.('.rmodal .search-box input');
+  const caret = keepFocus ? active.selectionStart : null;
   const assignable = everyUnassigned().length;
   const picked = Object.keys(assign.selected).length;
 
   let body;
-  if(assign.loading){
+  if(assign.loading || assign.searching){
     body = `<div class="tskel">${Array.from({length:7}).map(()=>'<div class="skel"></div>').join('')}</div>`;
   } else if(!everyUnassigned().length){
     /* 全部都指派過就沒東西可加了。這裡刻意不用 No Data 那種語彙——
@@ -2413,8 +2457,12 @@ function renderAssign(){
       </div>
     </div>
   </div>`;
+  if(keepFocus){
+    const input = root.querySelector('.rmodal .search-box input');
+    if(input){ input.focus(); if(caret != null) input.setSelectionRange(caret, caret); }
+  }
 }
-/* Demo 用：把樹換成 7 層深的合成結構並整條展開 */
+/* Demo 用：整條 10 層一次全展開，方便截圖。平常點資料夾也會展開整條子樹。 */
 function showDeepTree(){
   if(!FOLDER_TREE.some(node=>node.id==='deep-0')) FOLDER_TREE.unshift(makeDeepTree());
   assign.hasFolders = true;
