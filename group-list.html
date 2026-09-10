@@ -2084,7 +2084,18 @@ function toggleScope(projects){
   projects.forEach(project=>{ if(allOn) delete assign.selected[project.id]; else assign.selected[project.id]=true; });
   renderAssign();
 }
-function toggleExpand(nodeId){ assign.expanded[nodeId] = !assign.expanded[nodeId]; renderAssign(); }
+/* 展開一個資料夾就把它底下整條子樹一起展開，收合也一起收。理由：預設收合的
+ * 前提下，如果一次只開一層，要看到 GCP 上限 10 層得點九次，中間每一層都只有
+ * 一個子資料夾、沒有東西可以判斷，那九下是純粹的操作稅。點一下看到整條路徑，
+ * 使用者才能一眼判斷這個資料夾底下到底有什麼。收合對稱處理，否則收起來再
+ * 打開會殘留上次的展開狀態。 */
+function toggleExpand(nodeId){
+  const open = !assign.expanded[nodeId];
+  assign.expanded[nodeId] = open;
+  const node = findFolder(nodeId);
+  if(node) walkFolders(node.children, child=>{ assign.expanded[child.id] = open; });
+  renderAssign();
+}
 function findFolder(nodeId){
   let found = null;
   walkFolders(FOLDER_TREE, node=>{ if(node.id===nodeId) found = node; });
