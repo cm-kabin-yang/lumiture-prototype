@@ -2001,15 +2001,26 @@ let assignSearchTimer;
  * （所以沒過濾、也沒辦法在送出時補上既有的），GCPAssignResources 每次
  * 開啟都是 useState([])。詳見 specs 的 §8.11。 */
 
+/* 極端深度那棵合成樹是預設資料的一部分（見檔尾 bootstrap），所以每次開選單
+ * 都把 deep-0..deep-9 這條鏈預先展開，一開檔就看得到 GCP 上限 10 層的縮排。
+ * 資料裡沒有這棵樹時這些 key 只是無害的多餘旗標。 */
+function defaultExpanded(){
+  const map = {};
+  for(let index=0; index<10; index++){ map[`deep-${index}`] = true; }
+  return map;
+}
 function openAssign(cloud){
   assign.cloud = cloud || state.cloud || 'gcp';
   assign.open = true;
   assign.loading = true;
-  assign.expanded = {};
+  assign.expanded = defaultExpanded();
   assign.selected = {};
   assign.forceFail = false;
   assign.search = '';
-  assign.groupBy = 'ba';
+  /* prototype 的展示預設走資料夾視角，因為現在討論中的骨架就是這個，而且
+   * 十層縮排只有在這個視角看得到。真實產品該預設哪一個還沒定案，不要把
+   * 這行當成設計結論。 */
+  assign.groupBy = 'folder';
   renderAssign();
   setTimeout(()=>{ assign.loading = false; renderAssign(); }, 500);
 }
@@ -2430,16 +2441,23 @@ function render(){
   const app = document.getElementById('app');
   app.innerHTML = state.view==='list' ? renderList() : renderDetail();
 }
-/* 預設讓整份工程調查結構都看得到：10 個資料夾、2 層巢狀（含刻意放的兩個
- * 同名 staging 分屬不同 parent）、88 個專案。因為選單只列未指派的，mock 原本
- * 「大部分已指派」的狀態只會露出 5 個資料夾，看不出巢狀跟同名這兩個關鍵特徵。
+/* 預設 = Demo FAB 那個「極端深度」情境，兩件事一起做：
+ * ①把 10 層那棵合成樹接到最前面（GCP 官方上限，也是現在跟 TL 在討論的
+ *   「第一層 T1、第二層 T2」那件事的最壞情況），開檔就看得到縮排到底長怎樣。
+ * ②所有專案設回未指派。選單只列未指派的，mock 原本「大部分已指派」的狀態
+ *   只露出 3 個資料夾，工程調查的巢狀跟兩個同名 staging 都看不到。
  * setAssignedMode() 會先把 mock 原值存進 ASSIGNED_SNAPSHOT，所以 Demo FAB 的
- * 「回訪：只剩沒指派的 16 個」還原得回去。 */
+ * 「回訪」情境還原得回去。 */
+if(!FOLDER_TREE.some(node=>node.id==='deep-0')) FOLDER_TREE.unshift(makeDeepTree());
 setAssignedMode('none');
 render();
 /* 讓 #assign 可以直接連到選單，方便貼進討論串請人看 */
 if(location.hash === '#assign'){ openDetail(1,'biz-dev'); state.tab='resources'; render(); openAssign(); }
 
+/* 這兩個數字改用算的，不寫死。之前 mock 加了「沒有帳單帳戶的專案」跟深樹之後，
+ * FAB 上寫死的 16／88 就跟畫面對不上了，寫成算的就不會再脫節。 */
+const DEMO_TOTAL = everyProject().length;
+const DEMO_DRIFT = [...ASSIGNED_SNAPSHOT.values()].filter(assigned=>!assigned).length;
 /* ---------- Demo scenarios（走 shared/demo-fab.js，不自寫 FAB） ---------- */
 window.DEMO_CATEGORIES = [
   {id:'role',   label:'Role',      icon:'person',      hint:'按鈕顯示與否由後端回傳的 availableActions 決定，這裡是 5 組對應的布林值組合'},
@@ -2467,8 +2485,8 @@ window.DEMO_SCENARIOS = [
   {id:'assign-folder', category:'assign', label:'切換到 Folder 視角', icon:'account_tree', tip:'10 個資料夾、2 層巢狀、88 個專案、10 個未分類，結構取自工程調查的實查結果'},
   {id:'assign-nofld',  category:'assign', label:'Org 沒有資料夾',               icon:'folder_off', tip:'報告沒涵蓋的 case。Folder 分頁仍然存在，點進去才看到「No folders in this organization」空狀態——跟雲端 pill tabs 的 not-authorized 是同一套語言，不預先把選項藏起來'},
   {id:'assign-deep',   category:'assign', label:'極端深度（10 層，GCP 上限）', icon:'unfold_more', tip:'合成資料，真實客戶只有 2 層；用來確認縮排在官方上限下不會壞版'},
-  {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:'全新群組，90 個專案（含 2 個沒有帳單帳戶的）都在選單裡'},
-  {id:'assign-drift',  category:'assign', label:'回訪：只剩沒指派的 18 個',     icon:'new_releases', tip:'指派過之後客戶又在 console 新增專案。依設計稿註記，選單只列尚未指派的，所以整個選單本身就是差異報告：90 → 18 列、10 個資料夾只剩 3 個。用 API 既有的 projects[].assigned 過濾'},
+  {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:`全新群組，${DEMO_TOTAL} 個專案全部在選單裡（含 2 個沒有帳單帳戶的，以及深度情境那棵 10 層樹）`},
+  {id:'assign-drift',  category:'assign', label:`回訪：只剩沒指派的 ${DEMO_DRIFT} 個`,     icon:'new_releases', tip:`指派過之後客戶又在 console 新增專案。依設計稿註記，選單只列尚未指派的，所以整個選單本身就是差異報告：${DEMO_TOTAL} → ${DEMO_DRIFT} 列，沒有未指派專案的資料夾整個不出現。用 API 既有的 projects[].assigned 過濾`},
   {id:'assign-synced', category:'assign', label:'全部都已指派（選單空的）',       icon:'done_all', tip:'沒有東西可以加了，走空狀態並指向表格的 Unlink Resource。刻意不用 No Data 語彙，這不是出錯'},
   {id:'assign-fail',   category:'assign', label:'Assign 失敗（toast）',           icon:'error', tip:'設計稿 #18-3 定義了成功與失敗兩種 toast，失敗也是關閉彈窗 + 左下角 toast。勾幾個再按 Assign 就會走失敗分支'},
 
