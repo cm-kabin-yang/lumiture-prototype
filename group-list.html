@@ -446,6 +446,15 @@ td.center .actions-cell{justify-content:center}
 .tnode.is-folder{position:sticky;background:var(--lt-color-bg-default)}
 .tnode.is-folder:hover{background:var(--lt-color-primary-bg)}
 .tnode.is-project{min-height:44px}
+/* 工具列下方的提示位（先前刻意留空給真警示用的那一格）。這裡是「切視角清掉
+ * 了勾選」，屬於使用者需要立刻知道且可以還原的事，所以用 warning 的琥珀色，
+ * 不是錯誤紅、也不是常駐說明的藍。 */
+.tnotice{display:flex;align-items:center;gap:8px;padding:10px 24px;background:var(--lt-color-warning-bg,#FFF6E5);
+  color:var(--lt-color-text-primary);font-size:13px;border-bottom:1px solid var(--lt-color-border-default)}
+.tnotice .material-symbols-outlined{font-size:18px;color:var(--lt-color-warning,#FC9A0F)}
+.tnotice-act{margin-left:auto;background:none;border:0;padding:0;cursor:pointer;font:inherit;
+  color:var(--lt-color-primary);font-weight:600}
+.tnotice-act:hover{text-decoration:underline}
 /* padding:0 是必要的，不是保險：<button> 的 UA 預設 padding 是 1px 6px，
  * 配上 box-sizing:border-box 跟固定 20x20，content box 只剩 8px 寬，
  * 20px 的 icon 放不進去就往右溢出 6px、往下 1px。結果是 hover 的灰色方塊
@@ -1972,6 +1981,12 @@ const assign = {
    * 而不是只讀我的文字分析。Demo FAB 可即時切換。 */
   pickerStyle:'component-fix',   // 2026-09-10 Kabin 定案走這個版本
   hasFolders:true,     // org 完全沒開資料夾時退回現行的 BA → Project 兩層
+  /* false ＝ 切 Group by 就清掉已勾選（開發團隊 2026-09-10 立場，RD 出兩支
+   * 獨立 API）。清掉時會在彈窗裡告知並給 Undo，不靜默。true ＝ 保留（UX
+   * 建議），Demo FAB 可切。 */
+  keepSelection:false,
+  clearedSelection:null,   // Undo 用，切視角清掉的那一份
+  clearedCount:0,
   loading:false,
   expanded:{},
   selected:{},
@@ -2007,6 +2022,8 @@ function openAssign(cloud){
   assign.open = true;
   assign.loading = true;
   assign.searching = false;
+  assign.clearedSelection = null;
+  assign.clearedCount = 0;
   /* 照設計稿：預設收合，先看到第一層資料夾，展開才往下看。 */
   assign.expanded = {};
   assign.selected = {};
@@ -2076,11 +2093,18 @@ function everyUnassigned(){ return everyProject().filter(project=>!project.assig
  * 沒有搜尋時 visibleProjectsOf(node,false) 就等於原本 selectableOf(node)，
  * 行為不變。 */
 function toggleFolder(nodeId){
+  forgetClearedNotice();
   const node = findFolder(nodeId);
   if(!node) return;
   toggleScope(visibleProjectsOf(node, false));
 }
+/* 使用者一旦重新勾東西就代表已經往前走了，Undo 的意義消失，提示收掉。 */
+function forgetClearedNotice(){
+  assign.clearedSelection = null;
+  assign.clearedCount = 0;
+}
 function toggleProject(projectId){
+  forgetClearedNotice();
   if(assign.selected[projectId]) delete assign.selected[projectId]; else assign.selected[projectId]=true;
   renderAssign();
 }
@@ -2133,7 +2157,21 @@ function onAssignSearch(value){
   }, 500);
 }
 /* 切換分組不動 assign.selected，因為選取的是專案本身，跟怎麼分組無關 */
+/* 開發團隊 2026-09-10 的立場是「切視角不保留勾選」（RD 出兩支獨立 API）。
+ * assign.keepSelection 預設 false ＝ 跟開發現況一致；Demo FAB 可以切成 true
+ * 看 UX 建議的版本。**不保留是可以的，靜默清空不行**——所以清掉時一定要
+ * 在彈窗裡講出來並給 Undo，成本只是把陣列留著。
+ * 這裡刻意不用 toast：toast 在彈窗外面的左下角，而這件事發生在彈窗裡；
+ * 工具列下方那個位置本來就是留給真警示的（T1 存檔連帶清子 T2、同步失敗）。 */
 function setGroupBy(mode){
+  if(!assign.keepSelection){
+    const picked = Object.keys(assign.selected);
+    if(picked.length){
+      assign.clearedSelection = { ...assign.selected };
+      assign.clearedCount = picked.length;
+      assign.selected = {};
+    }
+  }
   assign.groupBy = mode;
   assign.expanded = {};
   /* 兩個視角的搜尋範圍不一樣（見 projectVisible），還沒送出的查詢跨過去會用
@@ -2241,6 +2279,27 @@ function folderRow(node, depth){
       </div>${kids}
     </div>`;
 }
+function undoClearedSelection(){
+  if(!assign.clearedSelection) return;
+  assign.selected = assign.clearedSelection;
+  assign.clearedSelection = null;
+  assign.clearedCount = 0;
+  renderAssign();
+}
+function dismissClearedNotice(){
+  assign.clearedSelection = null;
+  assign.clearedCount = 0;
+  renderAssign();
+}
+function clearedNoticeHtml(){
+  if(!assign.clearedCount) return '';
+  const noun = assign.clearedCount === 1 ? cfg().noun : cfg().nounPlural;
+  return `<div class="tnotice">
+    <span class="material-symbols-outlined">info</span>
+    <span>Switching views cleared ${assign.clearedCount} selected ${esc(noun)}.</span>
+    <button class="tnotice-act" onclick="undoClearedSelection()">Undo</button>
+  </div>`;
+}
 function unassignedRow(){
   const inFilter = cfg().noFolder().filter(inFolderScope);   // 分母，不受搜尋影響
   const visible = inFilter.filter(projectVisible);              // 目前搜尋下真的看得到、選得到的
@@ -2307,7 +2366,7 @@ function allVisibleSelectable(){
   push(noBaInFilter());
   return out;
 }
-function toggleSelectAll(){ toggleScope(allVisibleSelectable()); }
+function toggleSelectAll(){ forgetClearedNotice(); toggleScope(allVisibleSelectable()); }
 function selectAllRow(){
   const scope = allVisibleSelectable();
   if(!scope.length) return '';
@@ -2447,6 +2506,7 @@ function renderAssign(){
           </div>
         </div>` : ''}
       </div>
+      ${clearedNoticeHtml()}
       <div class="rmodal-body ${isComponentStyle()?'is-component':'is-tree'}${isComponentFixed()?' is-component-fixed':''}">${body}</div>
       <div class="rmodal-foot">
         <span class="rmodal-count">${assignable?`<b>${picked}</b> of ${assignable} unassigned ${assignable===1?cfg().noun:cfg().nounPlural} selected`:''}</span>
@@ -2540,6 +2600,8 @@ window.DEMO_SCENARIOS = [
   {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:`全新群組，${DEMO_TOTAL} 個專案全部在選單裡（含 2 個沒有帳單帳戶的，以及深度情境那棵 10 層樹）`},
   {id:'assign-drift',  category:'assign', label:`回訪：只剩沒指派的 ${DEMO_DRIFT} 個`,     icon:'new_releases', tip:`指派過之後客戶又在 console 新增專案。依設計稿註記，選單只列尚未指派的，所以整個選單本身就是差異報告：${DEMO_TOTAL} → ${DEMO_DRIFT} 列，沒有未指派專案的資料夾整個不出現。用 API 既有的 projects[].assigned 過濾`},
   {id:'assign-synced', category:'assign', label:'全部都已指派（選單空的）',       icon:'done_all', tip:'沒有東西可以加了，走空狀態並指向表格的 Unlink Resource。刻意不用 No Data 語彙，這不是出錯'},
+  {id:'sel-clear',     category:'assign', label:'切視角清掉勾選（開發現況）', icon:'layers_clear', tip:'RD 出兩支獨立 API，開發團隊目前想要切視角就清空。不保留可以，靜默清空不行——所以清掉時在彈窗裡講出來並給 Undo，成本只是把陣列留著。先在帳單帳戶視角勾幾個再切 Folder'},
+  {id:'sel-keep',      category:'assign', label:'切視角保留勾選（UX 建議）',   icon:'checklist', tip:'勾選存的是專案 ID 集合、跟清單由哪支 API 給無關。已知代價：切過去之後那些勾選散在收合的資料夾裡，底部計數說 3 個但畫面上看不到，所以完整版該搭配一個「看目前選了什麼」的檢視'},
   {id:'assign-fail',   category:'assign', label:'Assign 失敗（toast）',           icon:'error', tip:'設計稿 #18-3 定義了成功與失敗兩種 toast，失敗也是關閉彈窗 + 左下角 toast。勾幾個再按 Assign 就會走失敗分支'},
 
   {id:'style-component', category:'style', label:'延伸既有元件（GroupedMultiSelect）', icon:'widgets', tip:'完全照 Cost Dashboard 那顆 Tag/Label 下拉的語言：父層藍底 band + 粗體 + (count) + 右側箭頭、子項單行 name (id)、縮排 32px、沒有引導線也沒有資料夾 icon、父層不 sticky。搭配「極端深度」情境看 10 層會怎樣'},
@@ -2564,6 +2626,8 @@ window.DEMO_APPLY = function (id) {
   if (id === 'assign-first')   { setAssignedMode('none');  assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
   if (id === 'assign-drift')   { setAssignedMode('mixed'); assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
   if (id === 'assign-synced')  { setAssignedMode('all');   assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
+  if (id === 'sel-clear')      { assign.keepSelection = false; if(!assign.open){ openAssign('gcp'); } else renderAssign(); showToast('切換 Group by 會清掉已勾選（開發團隊目前立場），清掉時會在彈窗裡告知並給 Undo'); return; }
+  if (id === 'sel-keep')       { assign.keepSelection = true;  if(!assign.open){ openAssign('gcp'); } else renderAssign(); showToast('切換 Group by 保留已勾選（UX 建議），勾選是專案 ID 的集合、跟視角無關'); return; }
   if (id === 'assign-fail')    { setAssignedMode('mixed'); assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); assign.forceFail = true; return; }
 };
 </script>
