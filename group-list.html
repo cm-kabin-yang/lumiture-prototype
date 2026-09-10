@@ -446,6 +446,9 @@ td.center .actions-cell{justify-content:center}
 .tnode.is-folder{position:sticky;background:var(--lt-color-bg-default)}
 .tnode.is-folder:hover{background:var(--lt-color-primary-bg)}
 .tnode.is-project{min-height:44px}
+/* 縮排封頂後補上的祖先路徑。次要文字色 + 正常字重，讓資料夾名稱仍然是這一列
+ * 唯一的粗體，路徑只是脈絡不是主體。 */
+.tpath{color:var(--lt-color-text-secondary);font-weight:400}
 /* 工具列下方的提示位（先前刻意留空給真警示用的那一格）。這裡是「切視角清掉
  * 了勾選」，屬於使用者需要立刻知道且可以還原的事，所以用 warning 的琥珀色，
  * 不是錯誤紅、也不是常駐說明的藍。 */
@@ -1984,6 +1987,9 @@ const assign = {
   /* false ＝ 切 Group by 就清掉已勾選（開發團隊 2026-09-10 立場，RD 出兩支
    * 獨立 API）。清掉時會在彈窗裡告知並給 Undo，不靜默。true ＝ 保留（UX
    * 建議），Demo FAB 可切。 */
+  /* true ＝ 縮排封頂在第 4 層 + 深層用祖先路徑補（2026-09-10 預設）。
+   * false ＝ 原本的線性縮排，留著對照「波動拳」長什麼樣。 */
+  indentCap:true,
   keepSelection:false,
   clearedSelection:null,   // Undo 用，切視角清掉的那一份
   clearedCount:0,
@@ -2225,11 +2231,24 @@ const SELECT_ALL_H = 40;   // 頂端 Select All 那列也是 sticky，資料夾�
 function folderStickyTop(){
   return SELECT_ALL_H;
 }
-function indentPx(depth){ return 24 + depth * indentStep(); }
+/* 縮排封頂在第 4 層（2026-09-10，回應 RD 的「波動拳」）。
+ * 線性縮排到十層時，左邊會出現一條 168px 的斜階梯：左半邊全空、名稱被擠掉、
+ * 整份清單看起來歪的。而且那個斜線本身沒有帶任何資訊，它只是「我有 9 個祖先」
+ * 的一個很佔空間的說法。
+ * 封頂之後第 5 層以上縮排不再增加，改用「祖先路徑文字」補上層級資訊
+ * （見 folderRow 的 tpath）。也就是縮排停止生長的那一刻，那塊空間改放真的內容，
+ * 深層的資訊密度是上升而不是下降。
+ * 真實情境（客戶最多 2-3 層）完全碰不到這個上限，畫面跟原本一模一樣。 */
+const INDENT_CAP = 4;
+function indentPx(depth){
+  const steps = assign.indentCap ? Math.min(depth, INDENT_CAP) : depth;
+  return 24 + steps * indentStep();
+}
 function railsHtml(depth){
   if(isComponentStyle()) return '';   // 既有元件沒有縮排引導線
   let out = '';
-  for(let level=0; level<depth; level++){ out += `<span class="trail" style="left:${32 + level*INDENT_STEP_TREE}px"></span>`; }
+  const shown = assign.indentCap ? Math.min(depth, INDENT_CAP) : depth;
+  for(let level=0; level<shown; level++){ out += `<span class="trail" style="left:${32 + level*INDENT_STEP_TREE}px"></span>`; }
   return out;
 }
 function projectRow(project, depth){
@@ -2248,7 +2267,17 @@ function projectRow(project, depth){
     ${(showFolderView() && !project.parent.none)?`<span class="ba-chip">${esc(project.parent.name)}</span>`:''}
   </div>`;
 }
-function folderRow(node, depth){
+/* 縮排封頂之後，第 5 層以上的層級靠這條祖先路徑表達，取代原本靠斜階梯表達。
+ * 中段省略成「…」只留頭尾兩段，因為使用者要的是「我在哪條分支的底部」，
+ * 不是背下整條路徑。 */
+function pathPrefix(depth, ancestors){
+  if(!assign.indentCap || depth <= INDENT_CAP || !ancestors.length) return '';
+  const head = ancestors[0];
+  const tail = ancestors[ancestors.length-1];
+  const middle = ancestors.length > 2 ? ' / … / ' : ' / ';
+  return `<span class="tpath">${esc(head)}${middle}${esc(tail)} / </span>`;
+}
+function folderRow(node, depth, ancestors = []){
   /* 選單只列未指派的，所以計數也只能算未指派的，
    * 不然「platform (24)」底下只掛 3 列，數字跟看到的東西對不起來 */
   const unassigned = allProjectsOf(node).filter(project=>!project.assigned);
@@ -2264,7 +2293,7 @@ function folderRow(node, depth){
     : `(${selectable.length} / ${unassigned.length})`;
   const expanded = !!assign.expanded[node.id] || !!assign.search;
   const kids = expanded ? (
-      node.children.filter(nodeHasVisible).map(child=>folderRow(child, depth+1)).join('') +
+      node.children.filter(nodeHasVisible).map(child=>folderRow(child, depth+1, ancestors.concat(node.name))).join('') +
       /* 資料夾自己命中搜尋時整批留著底下的專案，但「已指派的不進這個選單」這條
        * 規則不能跟著放掉——原本這裡只檢查帳單帳戶篩選，導致搜資料夾名稱時
        * 已指派的專案會冒出來，跟旁邊的計數對不起來。用 inFolderScope 一起擋掉。 */
@@ -2275,7 +2304,7 @@ function folderRow(node, depth){
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('${node.id}')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
         ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome)}
         <span class="material-symbols-outlined ticon">folder</span>
-        <div class="tlabel"><span class="tname">${hl(node.name)} <span class="tcount ${selectable.length!==unassigned.length?'partial':''}">${countText}</span></span></div>
+        <div class="tlabel"><span class="tname">${pathPrefix(depth, ancestors)}${hl(node.name)} <span class="tcount ${selectable.length!==unassigned.length?'partial':''}">${countText}</span></span></div>
       </div>${kids}
     </div>`;
 }
@@ -2600,6 +2629,8 @@ window.DEMO_SCENARIOS = [
   {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:`全新群組，${DEMO_TOTAL} 個專案全部在選單裡（含 2 個沒有帳單帳戶的，以及深度情境那棵 10 層樹）`},
   {id:'assign-drift',  category:'assign', label:`回訪：只剩沒指派的 ${DEMO_DRIFT} 個`,     icon:'new_releases', tip:`指派過之後客戶又在 console 新增專案。依設計稿註記，選單只列尚未指派的，所以整個選單本身就是差異報告：${DEMO_TOTAL} → ${DEMO_DRIFT} 列，沒有未指派專案的資料夾整個不出現。用 API 既有的 projects[].assigned 過濾`},
   {id:'assign-synced', category:'assign', label:'全部都已指派（選單空的）',       icon:'done_all', tip:'沒有東西可以加了，走空狀態並指向表格的 Unlink Resource。刻意不用 No Data 語彙，這不是出錯'},
+  {id:'indent-cap',     category:'style',  label:'縮排封頂 + 路徑（預設）',   icon:'format_indent_decrease', tip:'縮排到第 4 層就停止累加，第 5 層以上改用祖先路徑文字表達層級。真實情境（2-3 層）完全碰不到上限、畫面不變；十層時不會出現斜階梯，而且原本空白的左半邊改放真的內容'},
+  {id:'indent-linear',  category:'style',  label:'線性縮排（對照組：波動拳）', icon:'format_indent_increase', tip:'每層都累加 16px，第 10 層縮排 168px。左半邊全空、名稱被擠掉、清單看起來是歪的。展開極端深度那棵樹就看得到'},
   {id:'sel-clear',     category:'assign', label:'切視角清掉勾選（開發現況）', icon:'layers_clear', tip:'RD 出兩支獨立 API，開發團隊目前想要切視角就清空。不保留可以，靜默清空不行——所以清掉時在彈窗裡講出來並給 Undo，成本只是把陣列留著。先在帳單帳戶視角勾幾個再切 Folder'},
   {id:'sel-keep',      category:'assign', label:'切視角保留勾選（UX 建議）',   icon:'checklist', tip:'勾選存的是專案 ID 集合、跟清單由哪支 API 給無關。已知代價：切過去之後那些勾選散在收合的資料夾裡，底部計數說 3 個但畫面上看不到，所以完整版該搭配一個「看目前選了什麼」的檢視'},
   {id:'assign-fail',   category:'assign', label:'Assign 失敗（toast）',           icon:'error', tip:'設計稿 #18-3 定義了成功與失敗兩種 toast，失敗也是關閉彈窗 + 左下角 toast。勾幾個再按 Assign 就會走失敗分支'},
@@ -2626,6 +2657,8 @@ window.DEMO_APPLY = function (id) {
   if (id === 'assign-first')   { setAssignedMode('none');  assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
   if (id === 'assign-drift')   { setAssignedMode('mixed'); assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
   if (id === 'assign-synced')  { setAssignedMode('all');   assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
+  if (id === 'indent-cap')     { assign.indentCap = true;  if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
+  if (id === 'indent-linear')  { assign.indentCap = false; if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
   if (id === 'sel-clear')      { assign.keepSelection = false; if(!assign.open){ openAssign('gcp'); } else renderAssign(); showToast('切換 Group by 會清掉已勾選（開發團隊目前立場），清掉時會在彈窗裡告知並給 Undo'); return; }
   if (id === 'sel-keep')       { assign.keepSelection = true;  if(!assign.open){ openAssign('gcp'); } else renderAssign(); showToast('切換 Group by 保留已勾選（UX 建議），勾選是專案 ID 的集合、跟視角無關'); return; }
   if (id === 'assign-fail')    { setAssignedMode('mixed'); assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); assign.forceFail = true; return; }
