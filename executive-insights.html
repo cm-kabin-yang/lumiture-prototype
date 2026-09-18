@@ -1372,7 +1372,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
   'use strict';
 
   window.LUMITURE_NAV = [
-    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', disabled: true },
+    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', href: './overview.html' },
 
     { type: 'group', id: 'dashboard', label: 'Dashboard', items: [
       { id: 'cost-dashboard',     label: 'Cost Dashboard',     icon: 'dashboard',    href: './cost-dashboard.html' },
@@ -1395,7 +1395,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
       { id: 'group-list',         label: 'Group List',         icon: 'groups',          href: './group-list.html' },
       { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
       { id: 'authorization-list', label: 'Authorization List', icon: 'link',            href: './organization-settings.html' },
-      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
+      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', href: './group-list.html#admin' },
     ]},
   ];
 })();
@@ -2326,8 +2326,14 @@ Please try again in a few moments. If the problem persists, contact support.</di
  *       ],
  *       currency: 'USD',
  *       currencySymbol: '$',
+ *       tableLimit: 10,        // optional — 表格只列前 N 名（treemap 仍畫全部）
+ *       tableSymbol: '',       // optional — 表格金額前綴（預設同 currencySymbol）
+ *       showChange: true,      // optional — 表格多一欄 Change（Overview 用；對齊 FE Top10CostByFOCUSTable）
+ *       noCompareTip: '...',   // optional — Change 為 -- 時的 hover 文案（走 host page 的 [data-tip] tooltip）
  *     });
  *   <\/script>
+ *
+ *   同一組 el 重複呼叫 render() 會先 dispose 舊的 ECharts instance（切換幣別 / 期間重繪用）。
  *
  * Data schema (per entry):
  *   { name, spending, share?, changeRatio? }
@@ -2384,6 +2390,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
     '.lt-focus-table thead th.col-name{width:auto}',
     '.lt-focus-table thead th.col-spend{width:80px}',
     '.lt-focus-table thead th.col-share{width:60px}',
+    '.lt-focus-table thead th.col-change{width:72px}',
     /* tbody / tr 維持標準 table layout（display:table-row-group / display:table-row）讓 border-spacing 生效 */
     '.lt-focus-table td{padding:0 10px;height:25px;border-bottom:none;font-size:12px;color:#676767;vertical-align:middle;background:#fff}',
     '.lt-focus-table td.tx-right{text-align:right;font-weight:700}',
@@ -2391,6 +2398,11 @@ Please try again in a few moments. If the problem persists, contact support.</di
     '.lt-focus-table td.col-name{width:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;color:#262626}',
     '.lt-focus-table td.col-spend{width:80px;color:#0B6DD7;font-weight:700}',
     '.lt-focus-table td.col-share{width:60px;color:#262626;font-weight:700}',
+    /* Change 欄（opt-in `showChange`；對齊 FE Top10CostByFOCUSTable：+ 紅 / − 綠 / 0 或 null 顯示 -- 並帶 tooltip） */
+    '.lt-focus-table td.col-change{width:72px;font-weight:700;color:var(--lt-color-text-secondary,#676767);white-space:nowrap}',
+    '.lt-focus-table td.col-change.is-up{color:var(--lt-color-error,#FF403D)}',
+    '.lt-focus-table td.col-change.is-down{color:var(--lt-color-success,#00B5A6)}',
+    '.lt-focus-table td.col-change .lt-focus-nocmp{cursor:help}',
     '.lt-focus-table tbody tr:hover td{background:#F6F6F6}',
     /* Tooltip styling for ECharts */
     '.lt-focus-tooltip{font-family:\'Noto Sans\',sans-serif;font-size:12px;line-height:1.5}',
@@ -2530,12 +2542,17 @@ Please try again in a few moments. If the problem persists, contact support.</di
     // Default: show all (not just top 10). caller can pass limit
     var rows = opts.limit ? nonZero.slice(0, opts.limit) : nonZero;
 
-    var symbol = opts.currencySymbol || '$';
+    // 表格金額前綴預設跟 treemap 一樣；FE 的 Top10 表格其實不帶幣別前綴（幣別寫在卡片 `Cost (USD)`），
+    // caller 可傳 tableSymbol:'' 對齊 FE，順便避免 `USD 31.24K` 在 80px 欄裡折行
+    var symbol = (opts.tableSymbol !== undefined && opts.tableSymbol !== null) ? opts.tableSymbol : (opts.currencySymbol || '$');
 
     if (!rows.length) {
       el.innerHTML = '<div style="padding:24px;text-align:center;color:#B3B3B3;font-size:12px">No data</div>';
       return;
     }
+
+    var showChange = !!opts.showChange;
+    var noCompareTip = opts.noCompareTip || 'There is not enough data to compare to the previous period.';
 
     var thead =
       '<thead><tr>' +
@@ -2543,7 +2560,17 @@ Please try again in a few moments. If the problem persists, contact support.</di
         '<th class="col-name">Service Category</th>' +
         '<th class="col-spend tx-right">Spending</th>' +
         '<th class="col-share tx-right">Share</th>' +
+        (showChange ? '<th class="col-change tx-right">Change</th>' : '') +
       '</tr></thead>';
+
+    // Change 欄：對齊 FE Top10CostByFOCUSTable — 0 / null 都顯示 '--'（FE 用 !value 判斷）並帶 tooltip
+    function changeCell(d) {
+      var v = d.changeRatio;
+      if (!v) return '<td class="col-change tx-right"><span class="lt-focus-nocmp" data-tip="' + _esc(noCompareTip) + '">--</span></td>';
+      var cls = v > 0 ? ' is-up' : ' is-down';
+      var txt = (v > 0 ? '+' : '-') + nFormat(Math.abs(v) * 100) + '%';
+      return '<td class="col-change tx-right' + cls + '">' + _esc(txt) + '</td>';
+    }
 
     var tbody = '<tbody>' + rows.map(function (d, i) {
       var rank = i + 1;
@@ -2555,6 +2582,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
                '<td class="col-name" title="' + _esc(d.name) + '">' + _esc(d.name) + '</td>' +
                '<td class="col-spend tx-right">' + _esc(spending) + '</td>' +
                '<td class="col-share tx-right">' + _esc(share) + '</td>' +
+               (showChange ? changeCell(d) : '') +
              '</tr>';
     }).join('') + '</tbody>';
 
@@ -2571,6 +2599,17 @@ Please try again in a few moments. If the problem persists, contact support.</di
     if (!tEl) { console.warn('[focus-treemap] treemapEl not found'); return null; }
     if (!bEl) { console.warn('[focus-treemap] tableEl not found'); return null; }
 
+    // 同一個 el 重繪：先清掉舊 instance（避免 echarts.init 警告 + resizeAll 打到已 dispose 的 chart）
+    _instances = _instances.filter(function (i) {
+      if (i.treemapEl !== tEl) return true;
+      if (i.chart) i.chart.dispose();
+      return false;
+    });
+    if (typeof echarts !== 'undefined') {
+      var prev = echarts.getInstanceByDom(tEl);
+      if (prev) prev.dispose();
+    }
+
     var chart = _renderTreemap(tEl, config.data || [], {
       currency: config.currency,
       currencySymbol: config.currencySymbol,
@@ -2581,6 +2620,9 @@ Please try again in a few moments. If the problem persists, contact support.</di
       currency: config.currency,
       currencySymbol: config.currencySymbol,
       limit: config.tableLimit, // optional — default show all
+      tableSymbol: config.tableSymbol,     // optional — 表格金額前綴（預設同 currencySymbol；Overview 傳 '' 對齊 FE）
+      showChange: config.showChange,       // optional — 多一欄 Change（Overview 用；EI 預設不開，畫面不變）
+      noCompareTip: config.noCompareTip,   // optional — Change 為 -- 時的 tooltip 文案
     });
 
     var instance = { chart: chart, treemapEl: tEl, tableEl: bEl, config: config };

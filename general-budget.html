@@ -284,7 +284,7 @@ table.budget tbody tr.selected:hover td.fix{background:var(--pri-lt20)}
    Edit mode 4 欄全保留（PRD §7.5）；月份格寬度 88px view/edit 一致（無 layout jump）；月份區於窄螢幕橫滾
    When show-4col class is on .paper, 4 columns replace single .col-total */
 .col-cb{width:48px;min-width:48px;padding:0 8px!important;text-align:center;left:0}
-.col-cb input{accent-color:var(--pri);width:16px;height:16px;cursor:pointer;margin:0;vertical-align:middle}
+/* Checkbox visuals (was: .col-cb input{accent-color...}) moved to shared/lumiture-checkbox.js */
 .col-name{width:160px;min-width:160px;max-width:160px;left:48px;overflow:hidden;text-overflow:ellipsis}
 .col-gear{width:56px;min-width:56px;padding:0!important;text-align:center;left:208px}
 /* Single Total column (current prod baseline) — width unverified against Figma this round, left untouched;
@@ -1289,7 +1289,7 @@ function renderTable(){
 
   // Header — order: Budget → Spend → Spent % → Remaining (PRD §7.1; 4 欄全保留 view/edit 一致)
   let h = '<thead><tr>';
-  if(showCheckbox) h += '<th class="fix col-cb"><input type="checkbox" id="cb-all"></th>';
+  if(showCheckbox) h += '<th class="fix col-cb">' + LumiCheckbox.html({stateful:true, id:'cb-all'}) + '</th>';
   h += '<th class="fix col-name tx-left">Group Name</th>';
   if(showGear) h += '<th class="fix col-gear"></th>';
   if(show4col){
@@ -1335,7 +1335,7 @@ function renderTable(){
     const annualSpendVal = hasAnySpend ? annualSpend : null;
     const annualRemain = (total !== null && annualSpendVal !== null) ? (total - annualSpendVal) : null;
     b += `<tr data-gi="${gi}" class="${sel?'selected':''}">`;
-    if(showCheckbox) b += `<td class="fix col-cb"><input type="checkbox" class="cb-row" data-gi="${gi}" ${sel?'checked':''}></td>`;
+    if(showCheckbox) b += `<td class="fix col-cb">${LumiCheckbox.html({stateful:true, cls:'cb-row', checked:sel, attrs:{'data-gi':gi}})}</td>`;
     b += `<td class="fix col-name tx-left" data-tip-tip="${g.name}">${g.name}</td>`;
     if(showGear) b += `<td class="fix col-gear"><button class="gear-btn" data-gi="${gi}" aria-label="Row actions"><span class="material-symbols-outlined">settings</span></button></td>`;
     if(show4col){
@@ -1616,9 +1616,18 @@ function renderTable(){
 
   // Wire checkbox handlers
   if(showCheckbox){
-    const all = $('#cb-all');
-    all.checked = state.selected.size === data.length && data.length > 0;
-    all.addEventListener('change', e => {
+    /* 表頭全選框的三態一律走這裡算，渲染時與每次列勾選都叫一次。
+     * 之前只在渲染時設 .checked，而列勾選的 handler 不重繪也不回頭更新表頭，
+     * 所以全選後取消任一列，表頭還是滿勾；partial 也從來沒有 mixed 過。 */
+    const syncSelectAll = () => {
+      const n = state.selected.size;
+      LumiCheckbox.set('#cb-all', {
+        checked: n === data.length && data.length > 0,
+        mixed:   n > 0 && n < data.length
+      });
+    };
+    syncSelectAll();
+    $('#cb-all').addEventListener('change', e => {
       if(e.target.checked){ data.forEach((_,i)=>state.selected.add(i)); }
       else { state.selected.clear(); }
       updateBulkBar();
@@ -1630,6 +1639,7 @@ function renderTable(){
       updateBulkBar();
       const tr = e.target.closest('tr');
       tr.classList.toggle('selected', state.selected.has(gi));
+      syncSelectAll();
     }));
   }
   if(showGear){
@@ -2543,6 +2553,312 @@ renderFYPicker();
 <!-- Shared components — order matters: nav data must load BEFORE sidebar renderer.
      ?v=... is a cache-buster; bump when shared scripts change to force refetch. -->
 <script>
+/* === Inlined: shared/lumiture-checkbox.js === */
+/*!
+ * lumiture-checkbox.js — Lumiture Shared Checkbox v1
+ *
+ * Design spec: Lumiture-Guideline #Checkbox（S size / Primary / unchecked-checked-mixed）
+ *   16×16、--lt-radius-sm、border --lt-grey-300、checked/mixed 皆 --lt-color-primary
+ *   四態齊全：hover / focus-visible / disabled / mixed
+ *   mixed 用 remove icon、checked 用 check icon
+ *
+ * 為什麼不是純 span、也不是純原生 input
+ * ---------------------------------------------------------------------------
+ * group-list v3 當初改成純 span，理由是原生 input[type=checkbox] 在部分瀏覽器的
+ * unchecked 狀態會多畫出一個痕跡（實測與 accent-color、尺寸都無關，是瀏覽器畫
+ * 原生方框本身的痕跡）。但那個痕跡來自「被畫出來的」原生方框；把 input 藏成
+ * opacity:0 之後它一樣不存在，而 .checked / .indeterminate / :checked 三個介面
+ * 全部保留下來。
+ *
+ * 這件事有實際意義，因為既有 prototype 分成兩派狀態模型：
+ *   重繪派  caller 持有 Set/物件，傳 checked/mixed 進來，改變後重繪整塊
+ *           （group-list v3、cost-dashboard v2）
+ *   DOM 派  DOM 本身就是狀態，靠 el.checked / :checked 反推
+ *           （lumi-tag v8 的多選面板、rightsizing v1 的表格與 .sc-check）
+ * 純 span 會逼 DOM 派發明一套狀態層；純原生 input 會逼重繪派回頭補
+ * input.indeterminate（HTML 沒有這個屬性，只能渲染後補丁）。
+ *
+ * 解法是讓 CSS 同時吃兩種來源：
+ *   .checkbox input:checked ~ .checkbox__box   ← DOM 派
+ *   .checkbox.is-checked     .checkbox__box    ← 重繪派
+ * 兩條路落在同一組像素上，誰都不用改自己的模型。
+ *
+ * 附帶把原生語意拿回來：Space 鍵、label 關聯、form 參與、focus 目標都是免費的
+ * （group-list v3 的註記自己就寫過「原生 input 這些是免費的」）。
+ *
+ * ---------------------------------------------------------------------------
+ * 用法 A — 重繪派（caller 持有狀態）
+ *
+ *   LumiCheckbox.html({ checked, mixed, disabled, onclick })
+ *   → 傳 class，渲染時就決定，不需要渲染後補 indeterminate
+ *
+ *     rows.map(r => LumiCheckbox.html({
+ *       checked: sel.has(r.id),
+ *       onclick: `toggleRow('${r.id}')`
+ *     })).join('')
+ *
+ * 用法 B — DOM 派（DOM 即狀態）
+ *
+ *   LumiCheckbox.html({ stateful:true, checked, value, cls, onchange })
+ *   → 產生真的 input，el.checked / el.indeterminate / :checked 照常運作
+ *
+ *     `<label>${LumiCheckbox.html({ stateful:true, cls:'ms-chk', value:opt })}
+ *        <span>${opt}</span></label>`
+ *     panel.querySelectorAll('.ms-chk:checked')     // 照常
+ *     chkAll.indeterminate = true                    // 照常
+ *
+ * 兩種用法可以同檔混用，視覺完全一致。
+ *
+ * ---------------------------------------------------------------------------
+ * Exposes
+ *   LumiCheckbox.html(opts)   → HTML 字串
+ *   LumiCheckbox.el(opts)     → DOM 節點（需要直接 append 時用）
+ *   LumiCheckbox.input(elOrSelector) → 取出內部 input（stateful 用）
+ *   LumiCheckbox.set(elOrSelector, {checked, mixed, disabled})
+ *                             → 兩種模式共用的狀態設定，caller 不用管是哪一種
+ *
+ * opts
+ *   checked   bool    初始/當前選中
+ *   mixed     bool    部分選中（重繪派用 class；DOM 派請改設 input.indeterminate）
+ *   disabled  bool
+ *   stateful  bool    true = 產生真 input（DOM 派），false = 純 class（重繪派）
+ *   onclick   string  inline handler（重繪派慣用；自動包 event.stopPropagation）
+ *                     省略 = 這個 checkbox 只是外層控制項的視覺，會輸出
+ *                     aria-hidden 且不搶 tab 焦點、不擋外層的 onclick
+ *   onchange  string  inline handler（stateful 慣用）
+ *   value     string  stateful 的 input value
+ *   cls       string  額外掛在 input 上的 class（讓既有選擇器如 .ms-chk 繼續命中）
+ *   attrs     object  額外屬性，如 {'data-gi':3}。stateful 掛 input、重繪派掛外層
+ *   wrapTag   string  stateful 外層標籤，預設 'label'。外層已經是 <button>
+ *                     之類的互動元素時傳 'span'，避免巢狀 label 重複觸發
+ *   interactive bool  重繪派專用。它自己是一個控制項、但 handler 是外部
+ *                     addEventListener 綁的（不是 inline onclick）。會輸出
+ *                     role/tabindex，鍵盤以 this.click() 合成點擊
+ *   wrapCls   string  額外掛在外層 .checkbox 上的 class
+ *   id        string  input id（配 <label for>）
+ *   name      string  input name
+ *   label     string  右側文字；省略則只有方框
+ *   ariaLabel string  無可見文字時的無障礙名稱
+ *   title     string  原生 title 提示（掛在外層）
+ *   stop      bool    是否包 event.stopPropagation（預設 true）
+ */
+(function () {
+  'use strict';
+
+  /* ---- CSS（自我注入，載入即可用，不需各 prototype 複製）---- */
+  var CSS = [
+    '.checkbox{display:inline-flex;align-items:center;gap:8px;cursor:pointer;flex:0 0 auto;position:relative;vertical-align:middle}',
+    '.checkbox.is-disabled{cursor:not-allowed}',
+    /* 真 input 藏起來但保留在無障礙樹與 tab 序中。不用 display:none／visibility:hidden，
+     * 那兩個會讓它拿不到焦點，:focus-visible 就沒有東西可以掛。 */
+    '.checkbox input.checkbox__input{position:absolute;width:16px;height:16px;margin:0;opacity:0;cursor:inherit;z-index:1}',
+    '.checkbox input.checkbox__input:disabled{cursor:not-allowed}',
+    '.checkbox__box{display:inline-flex;align-items:center;justify-content:center;flex:0 0 16px;width:16px;height:16px;border:1px solid var(--lt-grey-300,#CCCCCC);border-radius:var(--lt-radius-sm,4px);background:#fff;transition:border-color 150ms ease,background 150ms ease,box-shadow 200ms ease}',
+    '.checkbox__icon{color:#fff;display:none;font-size:12px;line-height:1;font-variation-settings:\'FILL\' 1,\'wght\' 700,\'GRAD\' 0,\'opsz\' 20}',
+    '.checkbox__label{font-size:14px;color:var(--lt-color-text-primary,#262626);user-select:none}',
+    '.checkbox.is-disabled .checkbox__label{color:var(--lt-color-text-disabled,#B3B3B3)}',
+
+    /* hover */
+    '.checkbox:hover .checkbox__box{border-color:var(--lt-grey-400,#B3B3B3)}',
+
+    /* checked／mixed 的填色。左邊是 DOM 派（真 input），右邊是重繪派（class）。 */
+    '.checkbox__input:checked~.checkbox__box,',
+    '.checkbox__input:indeterminate~.checkbox__box,',
+    '.checkbox.is-checked .checkbox__box,',
+    '.checkbox.is-mixed .checkbox__box{background:var(--lt-color-primary,#004FB0);border-color:var(--lt-color-primary,#004FB0)}',
+
+    /* icon 切換全部走 CSS，兩個 icon 都渲染出來、由狀態決定露哪一個，
+     * 所以 DOM 派切換 input.checked 時不需要動 innerHTML。 */
+    '.checkbox__input:checked~.checkbox__box .checkbox__icon--check,',
+    '.checkbox.is-checked .checkbox__icon--check{display:inline-block}',
+    '.checkbox__input:indeterminate~.checkbox__box .checkbox__icon--check,',
+    '.checkbox.is-mixed .checkbox__icon--check{display:none}',
+    '.checkbox__input:indeterminate~.checkbox__box .checkbox__icon--mixed,',
+    '.checkbox.is-mixed .checkbox__icon--mixed{display:inline-block}',
+
+    /* hover on checked／mixed */
+    '.checkbox:hover .checkbox__input:checked~.checkbox__box,',
+    '.checkbox:hover .checkbox__input:indeterminate~.checkbox__box,',
+    '.checkbox:hover.is-checked .checkbox__box,',
+    '.checkbox:hover.is-mixed .checkbox__box{background:var(--lt-color-primary-hover,#0B6DD7);border-color:var(--lt-color-primary-hover,#0B6DD7)}',
+
+    /* focus-visible。真 input 走原生 :focus-visible；純 class 版焦點在外層 span 上。 */
+    '.checkbox__input:focus-visible~.checkbox__box,',
+    '.checkbox:focus-visible .checkbox__box{border-color:var(--lt-color-primary,#004FB0);box-shadow:0 0 0 3px rgba(0,79,176,.1);outline:none}',
+    '.checkbox:focus-visible{outline:none}',
+
+    /* disabled 最後宣告，蓋掉上面所有狀態 */
+    '.checkbox__input:disabled~.checkbox__box,',
+    '.checkbox.is-disabled .checkbox__box{border-color:var(--lt-grey-300,#CCCCCC);background:#fff;box-shadow:none}',
+    '.checkbox__input:disabled:checked~.checkbox__box,',
+    '.checkbox__input:disabled:indeterminate~.checkbox__box,',
+    '.checkbox.is-disabled.is-checked .checkbox__box,',
+    '.checkbox.is-disabled.is-mixed .checkbox__box{background:var(--lt-grey-300,#CCCCCC);border-color:var(--lt-grey-300,#CCCCCC)}'
+  ].join('');
+
+  function injectCSS() {
+    if (document.getElementById('lumi-checkbox-css')) return;
+    var style = document.createElement('style');
+    style.id = 'lumi-checkbox-css';
+    style.textContent = CSS;
+    (document.head || document.documentElement).appendChild(style);
+  }
+  injectCSS();   // documentElement 一定存在，不需要等 DOMContentLoaded
+
+  function attr(name, val) {
+    if (val === undefined || val === null || val === '') return '';
+    return ' ' + name + '="' + String(val).replace(/"/g, '&quot;') + '"';
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  var BOX =
+    '<span class="checkbox__box">' +
+      '<span class="material-symbols-outlined checkbox__icon checkbox__icon--check">check</span>' +
+      '<span class="material-symbols-outlined checkbox__icon checkbox__icon--mixed">remove</span>' +
+    '</span>';
+
+  /* 額外屬性（data-* 之類）。stateful 掛在 input 上，因為既有的委派 handler
+   * 都是從 input 讀 dataset；重繪派掛在外層 span 上，那裡才是可點擊的元素。 */
+  function extraAttrs(o) {
+    if (!o) return '';
+    var out = '';
+    for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) out += attr(k, o[k]);
+    return out;
+  }
+
+  function html(opts) {
+    opts = opts || {};
+    var checked  = !!opts.checked;
+    var mixed    = !!opts.mixed;
+    var disabled = !!opts.disabled;
+    var stop     = opts.stop !== false;
+
+    /* stateful 模式刻意不輸出 is-checked／is-mixed：那兩個 class 是渲染當下的
+     * 快照，caller 之後翻 input.checked 時不會跟著變，留著只會與真實狀態脫節。
+     * 該模式的狀態一律由 input 屬性表達，CSS 已經吃 :checked／:indeterminate。 */
+    var wrapCls = ['checkbox'];
+    if (disabled) wrapCls.push('is-disabled');
+    /* disabled 與 checked／mixed 是可疊加的，不是互斥的。基準版寫成三元互斥
+     * （disabled ? 'is-disabled' : mixed ? ... : checked ? ...），結果
+     * .is-disabled.is-checked 那條 CSS 永遠命中不了，disabled 的已選項目
+     * 會畫成空白框。這裡改成疊加。 */
+    if (!opts.stateful) {
+      if (mixed) wrapCls.push('is-mixed');
+      else if (checked) wrapCls.push('is-checked');
+    }
+    if (opts.wrapCls) wrapCls.push(opts.wrapCls);
+
+    var labelHtml = opts.label
+      ? '<span class="checkbox__label">' + esc(opts.label) + '</span>'
+      : '';
+
+    if (opts.stateful) {
+      /* DOM 派。外層用 <label>，點文字也會切換，是原生行為不需要 handler。
+       * mixed 在 HTML 沒有對應屬性，caller 照常設 input.indeterminate
+       * （CSS 已經吃 :indeterminate）。要在首次渲染就是 mixed 的話，用
+       * LumiCheckbox.set(el,{mixed:true}) 或直接 LumiCheckbox.input(el).indeterminate=true。 */
+      var inputCls = 'checkbox__input' + (opts.cls ? ' ' + opts.cls : '');
+      var oc = opts.onclick && stop
+        ? 'event.stopPropagation();' + opts.onclick
+        : opts.onclick;
+      /* 預設外層是 <label>，點文字也會切換（原生行為，不用 handler）。
+       * 但 <label> 不能巢狀在 <button> 裡（HTML 不合法，而且 label 會再轉發
+       * 一次點擊、跟按鈕自己的 handler 打對台變成切了又切回去）。lumi-tag 的
+       * .ms-item 就是按鈕包 checkbox，那種情況傳 wrapTag:'span'。 */
+      var tag = opts.wrapTag || 'label';
+      return '<' + tag + ' class="' + wrapCls.join(' ') + '"' + attr('title', opts.title) + '>' +
+        '<input type="checkbox" class="' + inputCls + '"' +
+          attr('id', opts.id) + attr('name', opts.name) + attr('value', opts.value) +
+          (checked ? ' checked' : '') + (disabled ? ' disabled' : '') +
+          attr('aria-label', opts.ariaLabel) + extraAttrs(opts.attrs) +
+          attr('onclick', oc) + attr('onchange', opts.onchange) +
+        '>' + BOX + labelHtml +
+      '</' + tag + '>';
+    }
+
+    /* 重繪派。沒有 input，狀態完全由 class 表達，caller 改變狀態後重繪整塊。
+     * role/tabindex/keydown 補回原生 input 免費提供的鍵盤操作。 */
+    var act = (disabled || !opts.onclick) ? ''
+      : ((stop ? 'event.stopPropagation();' : '') + opts.onclick);
+
+    /* 沒有自己的 onclick，代表點擊由外層（例如 .dropdown-item 整列）處理，
+     * 這個 checkbox 只是那個控制項的視覺。這時候不能宣告 role="checkbox"
+     * 也不能吃 tabindex：它不是控制項，掛上去只會多一個按不動的焦點站，
+     * 而且螢幕閱讀器會聽到兩個 checkbox。改成 aria-hidden 交給外層負責語意。
+     * 另外 act 空字串時絕對不能輸出 event.stopPropagation()，否則外層的
+     * onclick 會被自己的視覺元素擋掉。 */
+    if (!act && !disabled && !opts.interactive) {
+      return '<span class="' + wrapCls.join(' ') + '" aria-hidden="true"' +
+        attr('title', opts.title) + extraAttrs(opts.attrs) + '>' + BOX + labelHtml + '</span>';
+    }
+
+    /* 有 inline handler 就直接跑它；interactive 但 handler 是外部
+     * addEventListener 綁的（cost-dashboard 幾個 dropdown 就是這樣），
+     * 就用 this.click() 合成一次點擊，外部 listener 照樣會收到。 */
+    var keydown = act
+      ? "if(event.key===' '||event.key==='Enter'){event.preventDefault();" + act + '}'
+      : "if(event.key===' '||event.key==='Enter'){event.preventDefault();this.click()}";
+    return '<span class="' + wrapCls.join(' ') + '" role="checkbox"' +
+      ' aria-checked="' + (mixed ? 'mixed' : checked) + '"' +
+      ' aria-disabled="' + disabled + '"' +
+      ' tabindex="' + (disabled ? -1 : 0) + '"' +
+      attr('aria-label', opts.ariaLabel) + attr('title', opts.title) + extraAttrs(opts.attrs) +
+      attr('onclick', act) + attr('onkeydown', keydown) +
+    '>' + BOX + labelHtml + '</span>';
+  }
+
+  function el(opts) {
+    var d = document.createElement('div');
+    d.innerHTML = html(opts);
+    return d.firstElementChild;
+  }
+
+  /* 兩種模式共用的狀態設定。stateful 走 input 屬性，重繪派走 class，
+   * caller 不必知道自己拿到的是哪一種。 */
+  function set(target, st) {
+    var node = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!node) return null;
+    var wrap = node.classList && node.classList.contains('checkbox')
+      ? node : node.closest('.checkbox');
+    var inp = input(node);
+    st = st || {};
+    if (inp) {
+      if ('checked'  in st) inp.checked = !!st.checked;
+      if ('mixed'    in st) inp.indeterminate = !!st.mixed;
+      if ('disabled' in st) inp.disabled = !!st.disabled;
+    } else if (wrap) {
+      if ('mixed' in st || 'checked' in st) {
+        wrap.classList.toggle('is-mixed', !!st.mixed);
+        wrap.classList.toggle('is-checked', !st.mixed && !!st.checked);
+        wrap.setAttribute('aria-checked', st.mixed ? 'mixed' : !!st.checked);
+      }
+    }
+    if (wrap && 'disabled' in st) {
+      wrap.classList.toggle('is-disabled', !!st.disabled);
+      if (!inp) {
+        wrap.setAttribute('aria-disabled', !!st.disabled);
+        wrap.setAttribute('tabindex', st.disabled ? -1 : 0);
+      }
+    }
+    return wrap;
+  }
+
+  function input(target) {
+    var node = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!node) return null;
+    if (node.tagName === 'INPUT') return node;
+    return node.querySelector('.checkbox__input');
+  }
+
+  window.LumiCheckbox = { html: html, el: el, input: input, set: set, CSS: CSS };
+})();
+
+</script>
+<script>
 /* === Inlined: shared/currency-picker.js === */
 /*!
  * currency-picker.js — Lumiture Shared Currency Picker v3
@@ -2746,7 +3062,7 @@ renderFYPicker();
   'use strict';
 
   window.LUMITURE_NAV = [
-    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', disabled: true },
+    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', href: './overview.html' },
 
     { type: 'group', id: 'dashboard', label: 'Dashboard', items: [
       { id: 'cost-dashboard',     label: 'Cost Dashboard',     icon: 'dashboard',    href: './cost-dashboard.html' },
@@ -2769,7 +3085,7 @@ renderFYPicker();
       { id: 'group-list',         label: 'Group List',         icon: 'groups',          href: './group-list.html' },
       { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
       { id: 'authorization-list', label: 'Authorization List', icon: 'link',            href: './organization-settings.html' },
-      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
+      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', href: './group-list.html#admin' },
     ]},
   ];
 })();

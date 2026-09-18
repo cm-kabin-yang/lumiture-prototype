@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — Rightsizing v1 (Recommendation List + Scope Settings)</title>
+<title>Lumiture.ai — Rightsizing v2 (Usage Analysis P95 + 11 Metrics)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
@@ -109,12 +109,35 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-actions-row{display:flex;align-items:center;gap:10px;padding-bottom:6px}
 
 /* ==== Filter row ==== */
-.rs-filter{display:flex;align-items:center;gap:12px;margin-bottom:23px}
-.rs-sel{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff;color:var(--g700);font-size:14px;cursor:pointer;white-space:nowrap}
+/* 篩選列寬度對齊 Figma #01 的 Filter row：CSP 220 / Groups 200 / Types 100，gap 8，搜尋 284（2026-09-18 Kabin 改稿後量測） */
+.rs-filter{display:flex;align-items:center;gap:8px;margin-bottom:23px}
+.rs-sel{display:flex;align-items:center;justify-content:space-between;gap:6px;height:36px;padding:0 12px;box-sizing:border-box;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff;color:var(--g700);font-size:14px;cursor:pointer;white-space:nowrap;overflow:hidden}
+.rs-sel .ftxt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.rs-sel.on{border-color:var(--pri);color:var(--pri);font-weight:500}
+.rs-sel.on .lead,.rs-sel.on .tail{color:var(--pri)}
+.rs-fwrap{position:relative}
+.rs-fpop{display:none;position:absolute;top:42px;left:0;z-index:60;min-width:240px;max-width:320px;background:#fff;border:1px solid var(--g200,#E6E6E6);border-radius:var(--r-sm);box-shadow:0 4px 16px rgba(0,0,0,.14);padding:8px 0}
+.rs-fwrap.open .rs-fpop{display:block}
+.rs-fpop-list{max-height:260px;overflow-y:auto;overscroll-behavior:contain}
+.rs-fopt{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:14px;color:var(--g700);cursor:pointer}
+.rs-fopt:hover{background:var(--g100,#F2F2F2)}
+.rs-fopt.disabled{color:var(--g400);cursor:not-allowed}
+.rs-fopt.disabled:hover{background:none}
+.rs-fopt .note{margin-left:auto;font-size:12px;color:var(--g400)}
+.rs-fpop-foot{display:flex;justify-content:space-between;align-items:center;padding:8px 14px 2px;margin-top:4px;border-top:1px solid var(--g200,#E6E6E6)}
+.rs-fpop-clear{font-size:13px;color:var(--pri);font-weight:500;background:none;border:none;cursor:pointer;padding:0}
+.rs-fpop-clear[disabled]{color:var(--g400);cursor:default}
+.rs-fpop-count{font-size:12px;color:var(--g500)}
+/* 搜尋命中樣式：藍字 + 粗體、無底色（依 Figma #01-5 節點 8117:40065 實際渲染，2026-07 已查證） */
+.rs-hl{color:var(--pri-lt,#0B6DD7);font-weight:700}
+.rs-eot-opt{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);margin-bottom:8px;cursor:pointer;font-size:14px}
+.rs-eot-opt.on{border-color:var(--pri);background:rgba(0,79,176,.04)}
+.rs-eot-opt input[type=date]{margin-left:auto;font-family:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--tf-border);border-radius:4px}
+.rs-eot-manual{font-size:11px;color:var(--g400);margin-left:4px}
 .rs-sel .lead{color:var(--g500);font-size:16px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16}
 .rs-sel .material-symbols-outlined.tail{color:var(--g500);font-size:18px;font-variation-settings:'FILL' 0}
 .rs-sel:hover{border-color:var(--g400)}
-.rs-search{margin-left:auto;display:flex;align-items:center;gap:6px;height:36px;width:280px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff}
+.rs-search{margin-left:auto;flex:none;display:flex;align-items:center;gap:6px;height:36px;width:284px;box-sizing:border-box;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff}
 .rs-search:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 .rs-search .material-symbols-outlined{font-size:18px;color:var(--g400);font-variation-settings:'FILL' 0}
 .rs-search input{border:none;outline:none;background:none;width:100%;font-size:14px;color:var(--g700)}
@@ -125,7 +148,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-tblscroll::-webkit-scrollbar{width:9px;height:9px}
 .rs-tblscroll::-webkit-scrollbar-thumb{background:var(--g300);border-radius:5px}
 .rs-tblscroll::-webkit-scrollbar-track{background:transparent}
-table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;min-width:1960px}
+table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;min-width:2048px}
 .rstbl thead th{background:var(--pri-lt10);height:50px;padding:0 12px;text-align:left;font-weight:700;font-size:13px;color:var(--g700);position:sticky;top:0;z-index:3;box-shadow:inset 0 -1px 0 var(--g300);white-space:nowrap;vertical-align:middle}
 .rstbl td{height:50px;padding:0 12px;border-bottom:1px solid var(--g100);background:#fff;color:var(--g700);vertical-align:middle;white-space:nowrap}
 .rstbl tbody tr{cursor:pointer}
@@ -138,9 +161,10 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .rstbl tbody tr.sel td.fix{background:var(--pri-lt10)}
 .rstbl tbody tr.sel:hover td.fix{background:var(--pri-lt20)}
 .rs-c-sel{width:48px;min-width:48px;left:0;text-align:center;padding:0 8px!important}
-.rs-c-sel input{accent-color:var(--pri);width:16px;height:16px;cursor:pointer;margin:0;vertical-align:middle}
-.rs-c-target{width:236px;min-width:236px;left:48px}
-.rs-c-impact{width:112px;min-width:112px;left:284px;box-shadow:inset -1px 0 0 var(--g200)}
+/* checkbox appearance moved to shared/lumiture-checkbox.js (.checkbox / .checkbox__box) */
+.rs-c-target{width:240px;min-width:240px;max-width:240px;left:48px}   /* Figma 240px；max-width 鎖死，否則 table auto layout 會撐到 246、橫向捲動時被右邊的凍結欄蓋掉 10px */
+.rs-c-kind{width:100px;min-width:100px;left:288px}   /* Figma Type 欄 100px（2026-09-18 Kabin 改稿：Target → Type → Impact，四欄凍結） */
+.rs-c-impact{width:112px;min-width:112px;left:388px;box-shadow:inset -1px 0 0 var(--g200)}
 .rstbl thead th.rs-c-impact{box-shadow:inset 0 -1px 0 var(--g300),inset -1px 0 0 var(--g200)}
 .th-sort{display:inline-flex;align-items:center;gap:3px;cursor:pointer}
 .th-sort .material-symbols-outlined{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 0,'wght' 500}
@@ -148,7 +172,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 /* cells */
 .rs-prov{width:22px;height:22px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;background:transparent}
 .rs-prov svg{width:100%;height:100%}
-.rs-two{display:flex;align-items:center;gap:10px;min-width:0}
+.rs-two{display:flex;align-items:center;gap:10px;min-width:0;max-width:216px}   /* 240px 欄 − 24px padding：table auto layout 不吃 td 的 max-width，只能從內容鎖 */
 .rs-two-txt{display:flex;flex-direction:column;line-height:1.3;min-width:0}
 .rs-two-txt .nm{font-size:14px;color:var(--g700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px}
 .rs-two-txt .id{font-size:12px;color:var(--g500);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px}
@@ -170,7 +194,9 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .rs-c-rec,.rs-c-crit{white-space:normal!important}
 .rs-c-rec{width:280px;min-width:280px}.rs-c-crit{width:230px;min-width:230px}
 .rs-c-assign,.rs-c-resource{width:190px;min-width:190px}
-.rs-tag-cell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px;display:block}
+.rs-tag-cell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px;display:flex;align-items:center;gap:6px}
+.rs-tag-cell .t1{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rs-tagmore{flex:none;font-size:12px;font-weight:600;color:var(--g500);background:var(--g100,#F2F2F2);border-radius:10px;padding:1px 7px;cursor:default}
 
 /* ==== Empty / states ==== */
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:64px 24px;gap:12px;background:#fff;border-radius:var(--r-md)}
@@ -203,8 +229,10 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 /* ==== Modal ==== */
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:24px}
 .mo.active{display:flex}
-.modal{background:#fff;border-radius:var(--r-lg);padding:24px 32px;width:720px;max-width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.2)}
-.modal-sm{width:480px}
+.modal{background:#fff;border-radius:var(--r-lg);padding:24px 32px;width:660px;max-width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+/* Recommendation Details 依 Figma #12 master（Element / Popup / Recommendation Details）為 1000px，v1 誤用 CMDS 預設 660px */
+.modal.modal-xl{width:1000px}
+.modal-sm{width:440px}
 .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:12px}
 .mt{font-size:20px;font-weight:700;color:var(--g900);line-height:1.5;display:flex;align-items:center;gap:10px}
 .mt .material-symbols-outlined.warn-ic{color:var(--err);font-size:24px}
@@ -226,10 +254,13 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .dt-sec-t{font-size:16px;font-weight:700;color:var(--g700);margin-bottom:12px;display:flex;align-items:center;gap:6px}
 .dt-sec-t.lg{font-size:16px}
 .dt-util{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 24px}
+.dt-util-count{font-size:11px;font-weight:500;color:var(--g500);background:var(--g100,#F2F2F2);padding:2px 8px;border-radius:10px}
 .dt-util-item{display:flex;flex-direction:column;gap:3px}
 .dt-util-item .k{font-size:12px;font-weight:700;color:var(--g500)}
 .dt-util-item .v{font-size:14px;font-weight:500;color:var(--g700)}
 .dt-util-item .v.muted{color:var(--g400)}
+.dt-util-sub{font-size:11px;color:var(--g500);font-weight:400}
+.dt-util.is-storage .dt-util-item{flex-direction:row;align-items:baseline;gap:8px}
 .dt-analysis{font-size:13px;color:var(--g700);line-height:1.7}
 .dt-analysis.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .dt-toggle{margin-top:6px;font-size:13px;color:var(--pri);font-weight:500;display:inline-flex;align-items:center;gap:2px;background:none;border:none;cursor:pointer}
@@ -300,8 +331,9 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .sc-rule{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;color:var(--g700);margin-bottom:12px}
 .sc-num{width:72px;height:36px;text-align:center;border:1px solid var(--tf-border);border-radius:var(--r-sm);outline:none;font-size:14px;color:var(--g900)}
 .sc-num:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
-.sc-check{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--g700);cursor:pointer;margin-right:24px}
-.sc-check input{accent-color:var(--pri);width:16px;height:16px}
+/* layout (display/align-items/gap/cursor) now comes from shared/lumiture-checkbox.js .checkbox;
+   only the spacing between these two checkboxes is still ours */
+.sc-check{margin-right:24px}
 .sc-sub-t{font-size:14px;font-weight:700;color:var(--g700);margin:18px 0 12px}
 .sc-grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .sc-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
@@ -393,22 +425,23 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
           <span class="material-symbols-outlined ico-info" data-tip="<b>Rightsizing</b> recommendations help you match cloud resources to actual usage. Review each recommendation and apply, dismiss, or archive as appropriate.">info</span>
         </div>
       </div>
-      <div class="paper-desc">Certain resources might be used for backup or load balancing. Please verify the usage before applying changes.</div>
+      <div class="paper-desc">Certain resources might be used for backup or load balancing. Please verify the usage before applying changes.<br>
+        Recommendations are displayed in order of <b>Recommendation Date</b>, with the most recent on top. For recommendations from the same date, those with a higher <b>Estimated Savings</b> amount appear first.<br>
+        Columns can be sorted by clicking their headers.</div>
 
       <div class="tabs-row">
         <div class="tabs" id="rs-tabs"></div>
         <div class="rs-actions-row" id="rs-actions-row">
           <div id="rs-actions" style="display:flex;gap:10px"></div>
-          <button class="btn btn-o" onclick="toast('(Demo) Exporting current view to CSV…')"><span class="material-symbols-outlined">download</span>Export CSV</button>
+          <button class="btn btn-o" onclick="exportCsv()"><span class="material-symbols-outlined">download</span>Export CSV</button>
         </div>
       </div>
 
       <!-- Recommendation list paper -->
       <div class="paper" id="rs-paper">
         <div class="rs-filter" id="rs-filter">
-          <div class="rs-sel" onclick="toast('(Demo) Cloud Service Provider filter')"><span class="material-symbols-outlined lead">cloud</span>All Cloud Service Providers<span class="material-symbols-outlined tail">expand_more</span></div>
-          <div class="rs-sel" onclick="toast('(Demo) Group filter')"><span class="material-symbols-outlined lead">groups</span>All Groups<span class="material-symbols-outlined tail">expand_more</span></div>
-          <div class="rs-search"><span class="material-symbols-outlined">search</span><input id="rs-search-input" placeholder="Search items, resources, or label / tags" oninput="renderTable()"></div>
+          <span id="rs-filter-pills" style="display:flex;align-items:center;gap:8px;flex:none"></span>
+          <div class="rs-search"><span class="material-symbols-outlined">search</span><input id="rs-search-input" placeholder="Search items, resources, or label / tags" oninput="onSearchInput(this.value)"></div>
         </div>
 
         <div id="rs-tablearea"></div>
@@ -458,8 +491,8 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
         <div class="sc-rule">When the CPU usage rate is under <input class="sc-num" value="20"> %, mark as a candidate.</div>
         <div class="sc-rule">When the memory usage rate is under <input class="sc-num" value="30"> %, mark as a candidate.</div>
         <div style="margin-top:8px">
-          <label class="sc-check"><input type="checkbox" checked>Network EIPs</label>
-          <label class="sc-check"><input type="checkbox">Disk IOPS</label>
+          <label class="checkbox sc-check"><input type="checkbox" class="checkbox__input" checked><span class="checkbox__box"><span class="material-symbols-outlined checkbox__icon checkbox__icon--check">check</span><span class="material-symbols-outlined checkbox__icon checkbox__icon--mixed">remove</span></span><span class="checkbox__label">Network EIPs</span></label>
+          <label class="checkbox sc-check"><input type="checkbox" class="checkbox__input"><span class="checkbox__box"><span class="material-symbols-outlined checkbox__icon checkbox__icon--check">check</span><span class="material-symbols-outlined checkbox__icon checkbox__icon--mixed">remove</span></span><span class="checkbox__label">Disk IOPS</span></label>
         </div>
       </div>
 
@@ -492,7 +525,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
     </div>
 
     <div class="footer">
-      <span class="footer-version">Rightsizing Prototype<span class="ver-tag">v1</span></span>
+      <span class="footer-version">Rightsizing Prototype<span class="ver-tag">v2 · Usage Analysis P95</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
     </div>
   </div>
@@ -501,7 +534,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 <!-- ============ Modals ============ -->
 <!-- Recommendation Details -->
 <div class="mo" id="mo-detail">
-  <div class="modal">
+  <div class="modal modal-xl">
     <div class="mh"><div class="mt">Recommendation Details</div><button class="mx" onclick="closeModals()"><span class="material-symbols-outlined">close</span></button></div>
     <div class="mb" id="dt-body"></div>
   </div>
@@ -534,8 +567,360 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
   </div>
 </div>
 
+<!-- Edit End of Tracking（PRD：Advanced Settings 帶入預設，可逐列手動覆寫）
+     ⚠ 未對稿：Figma #01-4（8104:34739）有 Date Picker Calendar instance，本輪讀取 timeout 未核對視覺 -->
+<div class="mo" id="mo-eot">
+  <div class="modal modal-sm">
+    <div class="mh"><div class="mt">Edit End of Tracking</div><button class="mx" onclick="closeModals()"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="mdesc">Tracking stops accruing savings after this date. Editing it here overrides the default from <b>Scope Settings</b> for this recommendation only.</div>
+    <div class="mb" id="eot-body"></div>
+    <div class="mf">
+      <button class="btn btn-o" onclick="closeModals()">Cancel</button>
+      <button class="btn btn-p" onclick="saveEot()">Save</button>
+    </div>
+  </div>
+</div>
+
 <div class="tc" id="toast-container"></div>
 <div class="rs-tip" id="rs-tip"></div>
+
+<!-- Must load before the inline script below: that script calls LumiCheckbox.html()
+     synchronously at parse time (renderListPage() runs at the bottom of the block,
+     not deferred), so this cannot sit with the other shared scripts near </body>. -->
+<script>
+/* === Inlined: shared/lumiture-checkbox.js === */
+/*!
+ * lumiture-checkbox.js — Lumiture Shared Checkbox v1
+ *
+ * Design spec: Lumiture-Guideline #Checkbox（S size / Primary / unchecked-checked-mixed）
+ *   16×16、--lt-radius-sm、border --lt-grey-300、checked/mixed 皆 --lt-color-primary
+ *   四態齊全：hover / focus-visible / disabled / mixed
+ *   mixed 用 remove icon、checked 用 check icon
+ *
+ * 為什麼不是純 span、也不是純原生 input
+ * ---------------------------------------------------------------------------
+ * group-list v3 當初改成純 span，理由是原生 input[type=checkbox] 在部分瀏覽器的
+ * unchecked 狀態會多畫出一個痕跡（實測與 accent-color、尺寸都無關，是瀏覽器畫
+ * 原生方框本身的痕跡）。但那個痕跡來自「被畫出來的」原生方框；把 input 藏成
+ * opacity:0 之後它一樣不存在，而 .checked / .indeterminate / :checked 三個介面
+ * 全部保留下來。
+ *
+ * 這件事有實際意義，因為既有 prototype 分成兩派狀態模型：
+ *   重繪派  caller 持有 Set/物件，傳 checked/mixed 進來，改變後重繪整塊
+ *           （group-list v3、cost-dashboard v2）
+ *   DOM 派  DOM 本身就是狀態，靠 el.checked / :checked 反推
+ *           （lumi-tag v8 的多選面板、rightsizing v1 的表格與 .sc-check）
+ * 純 span 會逼 DOM 派發明一套狀態層；純原生 input 會逼重繪派回頭補
+ * input.indeterminate（HTML 沒有這個屬性，只能渲染後補丁）。
+ *
+ * 解法是讓 CSS 同時吃兩種來源：
+ *   .checkbox input:checked ~ .checkbox__box   ← DOM 派
+ *   .checkbox.is-checked     .checkbox__box    ← 重繪派
+ * 兩條路落在同一組像素上，誰都不用改自己的模型。
+ *
+ * 附帶把原生語意拿回來：Space 鍵、label 關聯、form 參與、focus 目標都是免費的
+ * （group-list v3 的註記自己就寫過「原生 input 這些是免費的」）。
+ *
+ * ---------------------------------------------------------------------------
+ * 用法 A — 重繪派（caller 持有狀態）
+ *
+ *   LumiCheckbox.html({ checked, mixed, disabled, onclick })
+ *   → 傳 class，渲染時就決定，不需要渲染後補 indeterminate
+ *
+ *     rows.map(r => LumiCheckbox.html({
+ *       checked: sel.has(r.id),
+ *       onclick: `toggleRow('${r.id}')`
+ *     })).join('')
+ *
+ * 用法 B — DOM 派（DOM 即狀態）
+ *
+ *   LumiCheckbox.html({ stateful:true, checked, value, cls, onchange })
+ *   → 產生真的 input，el.checked / el.indeterminate / :checked 照常運作
+ *
+ *     `<label>${LumiCheckbox.html({ stateful:true, cls:'ms-chk', value:opt })}
+ *        <span>${opt}</span></label>`
+ *     panel.querySelectorAll('.ms-chk:checked')     // 照常
+ *     chkAll.indeterminate = true                    // 照常
+ *
+ * 兩種用法可以同檔混用，視覺完全一致。
+ *
+ * ---------------------------------------------------------------------------
+ * Exposes
+ *   LumiCheckbox.html(opts)   → HTML 字串
+ *   LumiCheckbox.el(opts)     → DOM 節點（需要直接 append 時用）
+ *   LumiCheckbox.input(elOrSelector) → 取出內部 input（stateful 用）
+ *   LumiCheckbox.set(elOrSelector, {checked, mixed, disabled})
+ *                             → 兩種模式共用的狀態設定，caller 不用管是哪一種
+ *
+ * opts
+ *   checked   bool    初始/當前選中
+ *   mixed     bool    部分選中（重繪派用 class；DOM 派請改設 input.indeterminate）
+ *   disabled  bool
+ *   stateful  bool    true = 產生真 input（DOM 派），false = 純 class（重繪派）
+ *   onclick   string  inline handler（重繪派慣用；自動包 event.stopPropagation）
+ *                     省略 = 這個 checkbox 只是外層控制項的視覺，會輸出
+ *                     aria-hidden 且不搶 tab 焦點、不擋外層的 onclick
+ *   onchange  string  inline handler（stateful 慣用）
+ *   value     string  stateful 的 input value
+ *   cls       string  額外掛在 input 上的 class（讓既有選擇器如 .ms-chk 繼續命中）
+ *   attrs     object  額外屬性，如 {'data-gi':3}。stateful 掛 input、重繪派掛外層
+ *   wrapTag   string  stateful 外層標籤，預設 'label'。外層已經是 <button>
+ *                     之類的互動元素時傳 'span'，避免巢狀 label 重複觸發
+ *   interactive bool  重繪派專用。它自己是一個控制項、但 handler 是外部
+ *                     addEventListener 綁的（不是 inline onclick）。會輸出
+ *                     role/tabindex，鍵盤以 this.click() 合成點擊
+ *   wrapCls   string  額外掛在外層 .checkbox 上的 class
+ *   id        string  input id（配 <label for>）
+ *   name      string  input name
+ *   label     string  右側文字；省略則只有方框
+ *   ariaLabel string  無可見文字時的無障礙名稱
+ *   title     string  原生 title 提示（掛在外層）
+ *   stop      bool    是否包 event.stopPropagation（預設 true）
+ */
+(function () {
+  'use strict';
+
+  /* ---- CSS（自我注入，載入即可用，不需各 prototype 複製）---- */
+  var CSS = [
+    '.checkbox{display:inline-flex;align-items:center;gap:8px;cursor:pointer;flex:0 0 auto;position:relative;vertical-align:middle}',
+    '.checkbox.is-disabled{cursor:not-allowed}',
+    /* 真 input 藏起來但保留在無障礙樹與 tab 序中。不用 display:none／visibility:hidden，
+     * 那兩個會讓它拿不到焦點，:focus-visible 就沒有東西可以掛。 */
+    '.checkbox input.checkbox__input{position:absolute;width:16px;height:16px;margin:0;opacity:0;cursor:inherit;z-index:1}',
+    '.checkbox input.checkbox__input:disabled{cursor:not-allowed}',
+    '.checkbox__box{display:inline-flex;align-items:center;justify-content:center;flex:0 0 16px;width:16px;height:16px;border:1px solid var(--lt-grey-300,#CCCCCC);border-radius:var(--lt-radius-sm,4px);background:#fff;transition:border-color 150ms ease,background 150ms ease,box-shadow 200ms ease}',
+    '.checkbox__icon{color:#fff;display:none;font-size:12px;line-height:1;font-variation-settings:\'FILL\' 1,\'wght\' 700,\'GRAD\' 0,\'opsz\' 20}',
+    '.checkbox__label{font-size:14px;color:var(--lt-color-text-primary,#262626);user-select:none}',
+    '.checkbox.is-disabled .checkbox__label{color:var(--lt-color-text-disabled,#B3B3B3)}',
+
+    /* hover */
+    '.checkbox:hover .checkbox__box{border-color:var(--lt-grey-400,#B3B3B3)}',
+
+    /* checked／mixed 的填色。左邊是 DOM 派（真 input），右邊是重繪派（class）。 */
+    '.checkbox__input:checked~.checkbox__box,',
+    '.checkbox__input:indeterminate~.checkbox__box,',
+    '.checkbox.is-checked .checkbox__box,',
+    '.checkbox.is-mixed .checkbox__box{background:var(--lt-color-primary,#004FB0);border-color:var(--lt-color-primary,#004FB0)}',
+
+    /* icon 切換全部走 CSS，兩個 icon 都渲染出來、由狀態決定露哪一個，
+     * 所以 DOM 派切換 input.checked 時不需要動 innerHTML。 */
+    '.checkbox__input:checked~.checkbox__box .checkbox__icon--check,',
+    '.checkbox.is-checked .checkbox__icon--check{display:inline-block}',
+    '.checkbox__input:indeterminate~.checkbox__box .checkbox__icon--check,',
+    '.checkbox.is-mixed .checkbox__icon--check{display:none}',
+    '.checkbox__input:indeterminate~.checkbox__box .checkbox__icon--mixed,',
+    '.checkbox.is-mixed .checkbox__icon--mixed{display:inline-block}',
+
+    /* hover on checked／mixed */
+    '.checkbox:hover .checkbox__input:checked~.checkbox__box,',
+    '.checkbox:hover .checkbox__input:indeterminate~.checkbox__box,',
+    '.checkbox:hover.is-checked .checkbox__box,',
+    '.checkbox:hover.is-mixed .checkbox__box{background:var(--lt-color-primary-hover,#0B6DD7);border-color:var(--lt-color-primary-hover,#0B6DD7)}',
+
+    /* focus-visible。真 input 走原生 :focus-visible；純 class 版焦點在外層 span 上。 */
+    '.checkbox__input:focus-visible~.checkbox__box,',
+    '.checkbox:focus-visible .checkbox__box{border-color:var(--lt-color-primary,#004FB0);box-shadow:0 0 0 3px rgba(0,79,176,.1);outline:none}',
+    '.checkbox:focus-visible{outline:none}',
+
+    /* disabled 最後宣告，蓋掉上面所有狀態 */
+    '.checkbox__input:disabled~.checkbox__box,',
+    '.checkbox.is-disabled .checkbox__box{border-color:var(--lt-grey-300,#CCCCCC);background:#fff;box-shadow:none}',
+    '.checkbox__input:disabled:checked~.checkbox__box,',
+    '.checkbox__input:disabled:indeterminate~.checkbox__box,',
+    '.checkbox.is-disabled.is-checked .checkbox__box,',
+    '.checkbox.is-disabled.is-mixed .checkbox__box{background:var(--lt-grey-300,#CCCCCC);border-color:var(--lt-grey-300,#CCCCCC)}'
+  ].join('');
+
+  function injectCSS() {
+    if (document.getElementById('lumi-checkbox-css')) return;
+    var style = document.createElement('style');
+    style.id = 'lumi-checkbox-css';
+    style.textContent = CSS;
+    (document.head || document.documentElement).appendChild(style);
+  }
+  injectCSS();   // documentElement 一定存在，不需要等 DOMContentLoaded
+
+  function attr(name, val) {
+    if (val === undefined || val === null || val === '') return '';
+    return ' ' + name + '="' + String(val).replace(/"/g, '&quot;') + '"';
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  var BOX =
+    '<span class="checkbox__box">' +
+      '<span class="material-symbols-outlined checkbox__icon checkbox__icon--check">check</span>' +
+      '<span class="material-symbols-outlined checkbox__icon checkbox__icon--mixed">remove</span>' +
+    '</span>';
+
+  /* 額外屬性（data-* 之類）。stateful 掛在 input 上，因為既有的委派 handler
+   * 都是從 input 讀 dataset；重繪派掛在外層 span 上，那裡才是可點擊的元素。 */
+  function extraAttrs(o) {
+    if (!o) return '';
+    var out = '';
+    for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) out += attr(k, o[k]);
+    return out;
+  }
+
+  function html(opts) {
+    opts = opts || {};
+    var checked  = !!opts.checked;
+    var mixed    = !!opts.mixed;
+    var disabled = !!opts.disabled;
+    var stop     = opts.stop !== false;
+
+    /* stateful 模式刻意不輸出 is-checked／is-mixed：那兩個 class 是渲染當下的
+     * 快照，caller 之後翻 input.checked 時不會跟著變，留著只會與真實狀態脫節。
+     * 該模式的狀態一律由 input 屬性表達，CSS 已經吃 :checked／:indeterminate。 */
+    var wrapCls = ['checkbox'];
+    if (disabled) wrapCls.push('is-disabled');
+    /* disabled 與 checked／mixed 是可疊加的，不是互斥的。基準版寫成三元互斥
+     * （disabled ? 'is-disabled' : mixed ? ... : checked ? ...），結果
+     * .is-disabled.is-checked 那條 CSS 永遠命中不了，disabled 的已選項目
+     * 會畫成空白框。這裡改成疊加。 */
+    if (!opts.stateful) {
+      if (mixed) wrapCls.push('is-mixed');
+      else if (checked) wrapCls.push('is-checked');
+    }
+    if (opts.wrapCls) wrapCls.push(opts.wrapCls);
+
+    var labelHtml = opts.label
+      ? '<span class="checkbox__label">' + esc(opts.label) + '</span>'
+      : '';
+
+    if (opts.stateful) {
+      /* DOM 派。外層用 <label>，點文字也會切換，是原生行為不需要 handler。
+       * mixed 在 HTML 沒有對應屬性，caller 照常設 input.indeterminate
+       * （CSS 已經吃 :indeterminate）。要在首次渲染就是 mixed 的話，用
+       * LumiCheckbox.set(el,{mixed:true}) 或直接 LumiCheckbox.input(el).indeterminate=true。 */
+      var inputCls = 'checkbox__input' + (opts.cls ? ' ' + opts.cls : '');
+      var oc = opts.onclick && stop
+        ? 'event.stopPropagation();' + opts.onclick
+        : opts.onclick;
+      /* 預設外層是 <label>，點文字也會切換（原生行為，不用 handler）。
+       * 但 <label> 不能巢狀在 <button> 裡（HTML 不合法，而且 label 會再轉發
+       * 一次點擊、跟按鈕自己的 handler 打對台變成切了又切回去）。lumi-tag 的
+       * .ms-item 就是按鈕包 checkbox，那種情況傳 wrapTag:'span'。 */
+      var tag = opts.wrapTag || 'label';
+      return '<' + tag + ' class="' + wrapCls.join(' ') + '"' + attr('title', opts.title) + '>' +
+        '<input type="checkbox" class="' + inputCls + '"' +
+          attr('id', opts.id) + attr('name', opts.name) + attr('value', opts.value) +
+          (checked ? ' checked' : '') + (disabled ? ' disabled' : '') +
+          attr('aria-label', opts.ariaLabel) + extraAttrs(opts.attrs) +
+          attr('onclick', oc) + attr('onchange', opts.onchange) +
+        '>' + BOX + labelHtml +
+      '</' + tag + '>';
+    }
+
+    /* 重繪派。沒有 input，狀態完全由 class 表達，caller 改變狀態後重繪整塊。
+     * role/tabindex/keydown 補回原生 input 免費提供的鍵盤操作。 */
+    var act = (disabled || !opts.onclick) ? ''
+      : ((stop ? 'event.stopPropagation();' : '') + opts.onclick);
+
+    /* 沒有自己的 onclick，代表點擊由外層（例如 .dropdown-item 整列）處理，
+     * 這個 checkbox 只是那個控制項的視覺。這時候不能宣告 role="checkbox"
+     * 也不能吃 tabindex：它不是控制項，掛上去只會多一個按不動的焦點站，
+     * 而且螢幕閱讀器會聽到兩個 checkbox。改成 aria-hidden 交給外層負責語意。
+     * 另外 act 空字串時絕對不能輸出 event.stopPropagation()，否則外層的
+     * onclick 會被自己的視覺元素擋掉。 */
+    if (!act && !disabled && !opts.interactive) {
+      return '<span class="' + wrapCls.join(' ') + '" aria-hidden="true"' +
+        attr('title', opts.title) + extraAttrs(opts.attrs) + '>' + BOX + labelHtml + '</span>';
+    }
+
+    /* 有 inline handler 就直接跑它；interactive 但 handler 是外部
+     * addEventListener 綁的（cost-dashboard 幾個 dropdown 就是這樣），
+     * 就用 this.click() 合成一次點擊，外部 listener 照樣會收到。 */
+    var keydown = act
+      ? "if(event.key===' '||event.key==='Enter'){event.preventDefault();" + act + '}'
+      : "if(event.key===' '||event.key==='Enter'){event.preventDefault();this.click()}";
+    return '<span class="' + wrapCls.join(' ') + '" role="checkbox"' +
+      ' aria-checked="' + (mixed ? 'mixed' : checked) + '"' +
+      ' aria-disabled="' + disabled + '"' +
+      ' tabindex="' + (disabled ? -1 : 0) + '"' +
+      attr('aria-label', opts.ariaLabel) + attr('title', opts.title) + extraAttrs(opts.attrs) +
+      attr('onclick', act) + attr('onkeydown', keydown) +
+    '>' + BOX + labelHtml + '</span>';
+  }
+
+  function el(opts) {
+    var d = document.createElement('div');
+    d.innerHTML = html(opts);
+    return d.firstElementChild;
+  }
+
+  /* 兩種模式共用的狀態設定。stateful 走 input 屬性，重繪派走 class，
+   * caller 不必知道自己拿到的是哪一種。 */
+  function set(target, st) {
+    var node = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!node) return null;
+    var wrap = node.classList && node.classList.contains('checkbox')
+      ? node : node.closest('.checkbox');
+    var inp = input(node);
+    st = st || {};
+    if (inp) {
+      if ('checked'  in st) inp.checked = !!st.checked;
+      if ('mixed'    in st) inp.indeterminate = !!st.mixed;
+      if ('disabled' in st) inp.disabled = !!st.disabled;
+    } else if (wrap) {
+      if ('mixed' in st || 'checked' in st) {
+        wrap.classList.toggle('is-mixed', !!st.mixed);
+        wrap.classList.toggle('is-checked', !st.mixed && !!st.checked);
+        wrap.setAttribute('aria-checked', st.mixed ? 'mixed' : !!st.checked);
+      }
+    }
+    if (wrap && 'disabled' in st) {
+      wrap.classList.toggle('is-disabled', !!st.disabled);
+      if (!inp) {
+        wrap.setAttribute('aria-disabled', !!st.disabled);
+        wrap.setAttribute('tabindex', st.disabled ? -1 : 0);
+      }
+    }
+    return wrap;
+  }
+
+  function input(target) {
+    var node = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!node) return null;
+    if (node.tagName === 'INPUT') return node;
+    return node.querySelector('.checkbox__input');
+  }
+
+  window.LumiCheckbox = { html: html, el: el, input: input, set: set, CSS: CSS };
+})();
+
+</script>
+<script>
+/* 預覽面板防呆：app 的 Browser pane 會把本機檔案當 data: URL 載入，相對路徑的
+   shared/*.js 一律抓不到，renderTable() 呼叫 LumiCheckbox.html() 就會整個炸掉、
+   表格空白。這裡補一個最小替身，讓 prototype 在預覽面板也看得到；用瀏覽器正常
+   開檔時 shared 元件會先定義好，這段完全不會生效。 */
+if (typeof window.LumiCheckbox === 'undefined') {
+  console.warn('[prototype] shared/lumiture-checkbox.js 未載入（多半是在預覽面板用 data: URL 開的），改用原生 checkbox 替身。視覺與正式版不同。');
+  window.LumiCheckbox = {
+    html: function (o) {
+      o = o || {};
+      return '<label class="checkbox"><input type="checkbox"'
+        + (o.id ? ' id="' + o.id + '"' : '')
+        + (o.checked ? ' checked' : '')
+        + (o.disabled ? ' disabled' : '')
+        + (o.onchange ? ' onchange="' + o.onchange.replace(/"/g, '&quot;') + '"' : '')
+        + '>' + (o.label ? '<span>' + o.label + '</span>' : '') + '</label>';
+    },
+    set: function (sel, o) {
+      var el = typeof sel === 'string' ? document.querySelector(sel) : sel;
+      if (!el) return;
+      var box = el.tagName === 'INPUT' ? el : el.querySelector('input');
+      if (!box) return;
+      if (o && 'mixed' in o) box.indeterminate = !!o.mixed;
+      if (o && 'checked' in o) box.checked = !!o.checked;
+    }
+  };
+}
+</script>
 
 <script>
 /* ============================================================
@@ -547,8 +932,10 @@ var state = {
   page: 'list',           // list | scope
   tab: 'rec',             // rec | done | dismiss | archived
   currency: 'USD',
-  sort: { key:null, dir:1 },
+  sort: { key:'recDate', dir:-1 },   // PRD：預設最新的在最上面；同一天由 Est. Avoidance 高到低
   selection: {},          // recId -> true
+  filters: { prov:[], group:[], kind:[] },   // 多選；不同 filter 之間互為交集（PRD）
+  searchQ: '',            // 已 debounce 的查詢字串
 };
 var $ = function(s,r){ return (r||document).querySelector(s); };
 
@@ -568,10 +955,22 @@ var ANALYSIS = "Based on our analysis of the past 30 days of historical usage da
 // status: 0 To-Do, 1 Changed, 2 Error · impact: 0 Low, 1 Medium, 2 High
 function rec(o){
   return Object.assign({
-    impact:0, status:0, criteria:['Low CPU Utilization','Low Memory Utilization'],
+    kind:'vm', impact:0, status:0, criteria:['Low CPU Utilization','Low Memory Utilization'],
     assignTo:['Platform Team'], tags:['env:prod'], cpu:25.86, mem:17.0,
     actAmt:0, actRate:0
   }, o);
+}
+/* Object Storage 列（LT-2586，只做 GCP，見 specs/2026-09-18-object-storage-rightsizing-scope.md）。
+   kind:'storage' 的列不用 cpu/mem/from/to，改用 region/tier/儲存 7 指標。
+   同一個 bucket 只會出現一則自動分層或 lifecycle 建議（互斥），已在下方 mock 資料落實。 */
+function storageRec(o){
+  return rec(Object.assign({
+    kind:'storage', prov:'gcp', criteria:['--'],
+    region:'asia-east1', tier:'Standard',
+    storedBytes:'5.0 TB', objectCount:'625,000', readRatio:'3.9%',
+    readReqCount:'1,240,000', writeBytes:'420 GB', writeReqCount:'86,000',
+    classCostRatio:'Standard 100%'
+  }, o));
 }
 var DATA = {
   rec: [
@@ -585,6 +984,9 @@ var DATA = {
     rec({recId:'r8', prov:'gcp',   name:'shared-bastion-host-prod', id:'gce-bastion-01', impact:0, status:0, recDate:'17/08/2026', estAmt:423750, estRate:0.0907, recommendation:'Switch to a 1-year reserved instance commitment', eot:'End of Year', assignTo:['SRE'], resN:'bastion', resId:'gce-bastion-01', tags:['env:prod','role:bastion'], from:'e2-standard-4', to:'e2-standard-2', saving:188.20 }),
     rec({recId:'r9', prov:'aws',   name:'ml-training-gpu-instance', id:'i-0d5e6f7a8b9c0', impact:1, status:1, recDate:'16/08/2026', estAmt:392380, estRate:0.1407, recommendation:'Add lifecycle policies to move data to IA tier', eot:'End of Month', assignTo:['ML Infra'], resN:'ml-trainer', resId:'i-0d5e6f', tags:['env:prod','team:ml'], from:'g4dn.2xlarge', to:'g4dn.xlarge', saving:980.40 }),
     rec({recId:'r10', prov:'gcp',  name:'ml-training-gpu-instance-02', id:'gce-ml-2208', impact:0, status:0, recDate:'08/06/2026', estAmt:850060, estRate:0.1607, recommendation:'Optimize node group sizing for the training cluster', eot:'End of Quarter', assignTo:['ML Infra'], resN:'ml-cluster', resId:'gce-ml-2208', tags:['env:prod','team:ml'], from:'a2-highgpu-2g', to:'a2-highgpu-1g', saving:1240.55 }),
+    storageRec({recId:'s1', name:'demo-logs-bucket', id:'demo-logs-bucket', impact:1, status:0, recDate:'24/08/2026', estAmt:42.00, estRate:0.42, recommendation:'Enable Autoclass', eot:'End of Month', assignTo:['Platform Team'], resN:'demo-logs-bucket', resId:'demo-logs-bucket', tags:['env:prod'], region:'asia-east1', tier:'Standard', storedBytes:'5.0 TB', objectCount:'625,000', readRatio:'3.9%', readReqCount:'1,240,000', writeBytes:'420 GB', writeReqCount:'86,000', classCostRatio:'Standard 100%', saving:42.00 }),
+    storageRec({recId:'s2', name:'analytics-archive-bucket', id:'analytics-archive-bucket', impact:2, status:0, recDate:'23/08/2026', estAmt:186.40, estRate:0.61, recommendation:'Add lifecycle rule: objects older than 90 days → Nearline', eot:'End of Month', assignTo:['Data Platform'], resN:'analytics-archive-bucket', resId:'analytics-archive-bucket', tags:['env:prod'], region:'asia-east1', tier:'Standard', storedBytes:'18.2 TB', objectCount:'2,140,000', readRatio:'8.1%', readReqCount:'340,000', writeBytes:'12 GB', writeReqCount:'4,200', classCostRatio:'Standard 100%', saving:186.40 }),
+    storageRec({recId:'s3', name:'coldstore-compliance-bucket', id:'coldstore-compliance-bucket', impact:2, status:0, recDate:'19/08/2026', estAmt:410.75, estRate:0.74, recommendation:'Add lifecycle rule: objects older than 365 days → Archive', eot:'End of Year', assignTo:['Finance Ops'], resN:'coldstore-compliance-bucket', resId:'coldstore-compliance-bucket', tags:['env:prod','status:legacy'], region:'asia-east1', tier:'Standard', storedBytes:'62.0 TB', objectCount:'8,900,000', readRatio:'1.2%', readReqCount:'21,000', writeBytes:'0 GB', writeReqCount:'0', classCostRatio:'Standard 100%', saving:410.75 }),
   ],
   done: [
     rec({recId:'d1', prov:'gcp',   name:'DataInsights', id:'gce-di-0021', impact:2, status:1, recDate:'15/03/2025', estAmt:250300, estRate:0.1607, actAmt:241200, actRate:0.1502, recommendation:'Migrate to spot instances', eot:'End of Month', assignTo:['Analytics'], resN:'data-insights', resId:'gce-di-0021', tags:['env:prod'], from:'n2-standard-8', to:'n2-standard-4', saving:516.83 }),
@@ -601,19 +1003,30 @@ var DATA = {
   ],
 };
 
+/* ============================================================
+   分頁文案 2026-09-18 定案（refinement ticket LT-3399 §2）
+   ✅ 已定案：Done → Reviewed（顧問裁定）
+   ❌ 未改  ：Dismiss 維持不動（Ignored／Postponed／Snoozed 三個候選全被否決）
+   ⚠ 設計端暫擬、尚未有人拍板：
+     - rec 分頁的動作按鈕 'Review'（原 'Done'）
+     - done 分頁的動作按鈕 'Undo Review'（原 'Undo Completion'）
+   ✅ 已定案：KPI 卡 'Recommendations Reviewed'（原 'Optimization Completed'，2026-09-18 Kabin 定案）
+     理由：被 review 的是 recommendation 不是 optimization，且卡片數字 8 / 142 的分母就是 recommendations
+   完整經過與重啟條件見 specs/2026-09-16-rightsizing-tab-naming.md §0
+   ============================================================ */
 var TABS = [
   { id:'rec',      label:'Recommendations', badge:'999+' },
-  { id:'done',     label:'Done',            badge:'8' },
+  { id:'done',     label:'Reviewed',        badge:'8' },
   { id:'dismiss',  label:'Dismiss',         badge:'2' },
   { id:'archived', label:'Archived',        badge:'' },
 ];
 
 // Action buttons per tab (shown when ≥1 selected)
 var TAB_ACTIONS = {
-  rec:      [ {label:'Done', icon:'check', act:'done', tip:"The items will be transferred to 'Done'."},
+  rec:      [ {label:'Review', icon:'check', act:'done', tip:"The items will be transferred to 'Reviewed'."},
               {label:'Dismiss', icon:'block', act:'dismiss', tip:"Choose a reason, then move the items to 'Dismiss'."},
               {label:'Archive', icon:'archive', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
-  done:     [ {label:'Undo Completion', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
+  done:     [ {label:'Undo Review', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
               {label:'Archive', icon:'archive', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
   dismiss:  [ {label:'Undo', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
               {label:'Remove', icon:'delete', act:'remove', tip:'Permanently remove the selected items.'} ],
@@ -671,8 +1084,8 @@ function renderCards(){
         +'<span class="skeleton sk-line" style="width:140px;height:12px;margin-top:auto;align-self:flex-end"></span></div>';
     }).join('');
   } else if(nd){
-    var labels = ['Optimization Score','Optimization Completed','Current Monthly Cost Avoidance','Cost Avoidance to Date'];
-    var subs = ['Higher means more optimized','Completion progress not available','Avoidance not yet calculated','Start date not set'];
+    var labels = ['Optimization Score','Recommendations Reviewed','Current Monthly Cost Avoidance','Cost Avoidance to Date'];
+    var subs = ['Higher means more optimized','Review progress not available','Avoidance not yet calculated','Start date not set'];
     cards = labels.map(function(l,i){
       return '<div class="rs-card nd"><span class="lbl">'+l+(i===0?' <span class="material-symbols-outlined ico-info">info</span>':'')+'</span>'
         +'<span class="val">No Data</span><span class="sub">'+subs[i]+'</span></div>';
@@ -681,8 +1094,8 @@ function renderCards(){
     cards =
       '<div class="rs-card"><span class="lbl">Optimization Score <span class="material-symbols-outlined ico-info" data-tip="<b>Optimized Score</b> = (Total Cost − Avoidance Opportunities) / Total Cost × 100, for the current month. Higher means more optimized.">info</span></span>'
         +'<span class="val">83 <span class="slash">/ 100</span></span><span class="sub">Higher means more optimized</span></div>'
-      +'<div class="rs-card"><span class="lbl">Optimization Completed</span>'
-        +'<span class="val">8 <span class="slash">/ 142</span></span><span class="sub">5.63% completed</span></div>'
+      +'<div class="rs-card"><span class="lbl">Recommendations Reviewed</span>'
+        +'<span class="val">8 <span class="slash">/ 142</span></span><span class="sub">5.63% reviewed</span></div>'
       +'<div class="rs-card"><span class="lbl">Current Monthly Cost Avoidance</span>'
         +'<span class="val">9,750.02 <span class="unit">'+c+'</span></span><span class="sub pos">31.61% avoid on original $30.8K</span></div>'
       +'<div class="rs-card"><span class="lbl">Cost Avoidance to Date</span>'
@@ -714,11 +1127,205 @@ function renderActions(){
 /* ============================================================
    RENDER — table
 ============================================================ */
+/* 可 sorted 的欄位依 PRD「Recommendation List - Table」逐欄標注。
+   Impact 是 PRD 沒標、但設計稿表頭有箭頭（2026-09-15 Kabin 確認）→ 有做，依 Low/Medium/High 的序數排。
+   Recommendation 與 Criteria 是自由文字，設計稿也沒有箭頭 → 不給排序。 */
 var COLS = [
   {h:'Status', sort:'status'}, {h:'Rec. Date', sort:'recDate'}, {h:'Est. Avoidance', sort:'estAmt'},
   {h:'Recommendation'}, {h:'Criteria'}, {h:'Act. Avoidance', sort:'actAmt'}, {h:'End of Tracking', sort:'eot'},
-  {h:'Assigned to Group'}, {h:'Resource Name / ID'}, {h:'Label / Tag'}
+  {h:'Assigned to Group', sort:'assign'}, {h:'Resource Name / ID', sort:'resource'}, {h:'Label / Tag', sort:'tag'}
 ];
+/* Label / Tag 排序：數字優先於英文 → 英文 A~Z → 同字母時大寫優先（PRD 原文） */
+function tagCmp(a,b){
+  var an=/^\d/.test(a), bn=/^\d/.test(b);
+  if(an!==bn) return an?-1:1;
+  var la=a.toLowerCase(), lb=b.toLowerCase();
+  if(la!==lb) return la<lb?-1:1;
+  return a<b?-1:1;
+}
+function sortedTags(r){ return (r.tags||[]).slice().sort(tagCmp); }
+/* 一格只顯示第一個，其餘收進 +n，hover 看完整清單（PRD 原文） */
+function tagCell(r){
+  var t = sortedTags(r);
+  if(!t.length) return '<span class="rs-tag-cell">--</span>';
+  var rest = t.slice(1);
+  return '<span class="rs-tag-cell"><span class="t1">'+hl(t[0])+'</span>'
+    + (rest.length ? '<span class="rs-tagmore" data-tip="'+escTip(rest.join('<br>'))+'">+'+rest.length+'</span>' : '')
+    + '</span>';
+}
+/* ============================================================
+   P1：Filter & Search / Export CSV / Edit End of Tracking
+   規格來源：PRD「Recommendation List - Filter」「End of Tracking」段落。
+   ⚠ 未對稿：Figma #01-5（8117:40065）與 #01-4（8104:34739）本輪讀取時
+     Dev Mode MCP timeout，下拉選單與 date picker 的視覺細節尚未逐像素核對。
+   ✅ 已對稿：搜尋命中樣式（藍字粗體無底色）與 1 秒 debounce，依 8117:40065
+     的文字註記與實際渲染，2026-07 查證過。
+============================================================ */
+var _visibleRows = [];
+function thSort(label, key){
+  var on = state.sort.key===key ? ' on' : '';
+  var arrow = state.sort.key!==key ? 'swap_vert' : (state.sort.dir===1 ? 'arrow_upward' : 'arrow_downward');
+  return '<span class="th-sort'+on+'" onclick="setSort(\''+key+'\')">'+label+'<span class="material-symbols-outlined">'+arrow+'</span></span>';
+}
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function hl(txt){
+  var q = state.searchQ; var t = String(txt==null?'':txt);
+  if(!q) return esc(t);
+  var i = t.toLowerCase().indexOf(q);
+  if(i<0) return esc(t);
+  return esc(t.slice(0,i))+'<span class="rs-hl">'+esc(t.slice(i,i+q.length))+'</span>'+esc(t.slice(i+q.length));
+}
+function rowHaystack(r){
+  return (r.name+' '+r.id+' '+r.resN+' '+r.resId+' '+(r.tags||[]).join(' ')+' '+r.recommendation).toLowerCase();
+}
+/* 搜尋：停止輸入 1 秒後才送出（Figma #01-5 註記）。只重畫表格，不動工具列，所以焦點不會掉 */
+var _searchTimer = null;
+function onSearchInput(v){
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(function(){
+    state.searchQ = String(v||'').toLowerCase().trim();
+    renderTable();
+  }, 1000);
+}
+
+var FILTER_DEFS = [
+  /* w = Figma #01 Filter row 的固定寬度；設計稿的下拉沒有前置 icon（Types 100px 也塞不下），所以不畫 icon */
+  { key:'prov',  w:220, all:'All Cloud Service Providers',
+    opts:[{v:'aws',t:'AWS'},{v:'gcp',t:'Google Cloud'},{v:'azure',t:'Azure',note:'upcoming',disabled:true}] },
+  { key:'group', w:200, all:'All Groups', opts:null },
+  { key:'kind',  w:100, all:'All Types',
+    opts:[{v:'vm',t:'VM'},{v:'storage',t:'Storage'}] }
+  /* Label / Tag 篩選器：Figma #01 / #01-5 篩選列只有 CSP / Groups / Types 三個，2026-09-18 依設計稿移除；Label / Tag 靠搜尋框 */
+];
+function allRows(){ return DATA.rec.concat(DATA.done, DATA.dismiss, DATA.archived); }
+function filterOpts(key){
+  var d = FILTER_DEFS.filter(function(f){return f.key===key;})[0];
+  if(d.opts) return d.opts;
+  var seen = {}, out = [];
+  allRows().forEach(function(r){
+    ((key==='group') ? (r.assignTo||[]) : (r.tags||[])).forEach(function(v){
+      if(!seen[v]){ seen[v]=1; out.push({v:v,t:v}); }
+    });
+  });
+  return out.sort(function(a,b){ return a.t.localeCompare(b.t); });
+}
+function optLabel(key,v){
+  var o = filterOpts(key).filter(function(x){return x.v===v;})[0];
+  return o ? o.t : v;
+}
+/* 不同 filter 之間互為交集，同一個 filter 內多選為聯集（PRD） */
+function applyFilters(rows){
+  var f = state.filters;
+  if(f.prov.length)  rows = rows.filter(function(r){ return f.prov.indexOf(r.prov)>=0; });
+  if(f.group.length) rows = rows.filter(function(r){ return (r.assignTo||[]).some(function(g){ return f.group.indexOf(g)>=0; }); });
+  if(f.kind.length)  rows = rows.filter(function(r){ return f.kind.indexOf(r.kind)>=0; });
+  return rows;
+}
+function renderFilters(){
+  var host = $('#rs-filter-pills'); if(!host) return;
+  host.innerHTML = FILTER_DEFS.map(function(f){
+    var sel = state.filters[f.key];
+    var txt = sel.length===0 ? f.all : (sel.length===1 ? optLabel(f.key, sel[0]) : sel.length+' selected');
+    var opts = filterOpts(f.key).map(function(o){
+      var on = sel.indexOf(o.v)>=0;
+      if(o.disabled) return '<div class="rs-fopt disabled">'+LumiCheckbox.html({disabled:true})+esc(o.t)+'<span class="note">'+esc(o.note||'')+'</span></div>';
+      return '<div class="rs-fopt" onclick="toggleFilterOpt(\''+f.key+'\',\''+o.v.replace(/'/g,"\\'")+'\')">'
+        + LumiCheckbox.html({checked:on}) + esc(o.t) + (o.note?'<span class="note">'+esc(o.note)+'</span>':'') + '</div>';
+    }).join('');
+    return '<div class="rs-fwrap" id="fwrap-'+f.key+'">'
+      +'<div class="rs-sel'+(sel.length?' on':'')+'" style="width:'+f.w+'px" onclick="toggleFilterPop(\''+f.key+'\',event)">'
+        +'<span class="ftxt">'+esc(txt)+'</span>'
+        +'<span class="material-symbols-outlined tail">expand_more</span></div>'
+      +'<div class="rs-fpop"><div class="rs-fpop-list">'+opts+'</div>'
+        +'<div class="rs-fpop-foot"><button class="rs-fpop-clear" '+(sel.length?'':'disabled')+' onclick="clearFilter(\''+f.key+'\',event)">Clear</button>'
+        +'<span class="rs-fpop-count">'+sel.length+' selected</span></div></div></div>';
+  }).join('');
+}
+function toggleFilterPop(key,e){
+  if(e) e.stopPropagation();
+  var w = $('#fwrap-'+key), wasOpen = w && w.classList.contains('open');
+  closeFilterPops();
+  if(w && !wasOpen) w.classList.add('open');
+}
+function closeFilterPops(){
+  [].forEach.call(document.querySelectorAll('.rs-fwrap.open'), function(n){ n.classList.remove('open'); });
+}
+function toggleFilterOpt(key,v){
+  var a = state.filters[key], i = a.indexOf(v);
+  if(i>=0) a.splice(i,1); else a.push(v);
+  renderFilters(); renderTable();
+  var w = $('#fwrap-'+key); if(w) w.classList.add('open');   /* 多選：選完不關 */
+}
+function clearFilter(key,e){
+  if(e) e.stopPropagation();
+  state.filters[key] = [];
+  renderFilters(); renderTable();
+  var w = $('#fwrap-'+key); if(w) w.classList.add('open');
+}
+document.addEventListener('click', function(ev){
+  if(!ev.target.closest || !ev.target.closest('.rs-fwrap')) closeFilterPops();
+});
+
+/* Export CSV：真的下載目前這個分頁 + 篩選 + 搜尋之後看得到的列 */
+function csvCell(v){ var t = String(v==null?'':v); return /[",\n]/.test(t) ? '"'+t.replace(/"/g,'""')+'"' : t; }
+function exportCsv(){
+  var rows = _visibleRows.length ? _visibleRows : applyFilters(DATA[state.tab].slice());
+  var head = ['Target Item Name','Target Item ID','Type','Cloud','Impact','Status','Rec. Date',
+              'Est. Avoidance ('+state.currency+')','Est. Saving %','Recommendation','Criteria',
+              'Act. Avoidance ('+state.currency+')','End of Tracking','Assigned to Group',
+              'Resource Name','Resource ID','Label / Tag'];
+  var IMP = ['Low','Medium','High'], ST = ['To-Do','Changed','Error'];
+  var body = rows.map(function(r){
+    return [r.name, r.id, (r.kind==='storage'?'Storage':'VM'), r.prov.toUpperCase(), IMP[r.impact], ST[r.status], r.recDate,
+            r.estAmt, (r.estRate*100).toFixed(2)+'%', r.recommendation, (r.criteria||[]).join(' & '),
+            r.actAmt, r.eot, (r.assignTo||[]).join(' / '), r.resN, r.resId, (r.tags||[]).join(' / ')
+    ].map(csvCell).join(',');
+  });
+  var csv = '\ufeff' + [head.map(csvCell).join(',')].concat(body).join('\r\n');
+  var url = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
+  var a = document.createElement('a');
+  a.href = url; a.download = 'rightsizing-'+state.tab+'-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  toast(rows.length+' row(s) exported to CSV.');
+}
+
+/* Edit End of Tracking（PRD：預設由 Scope Settings 帶入，可手動改；改過之後設定頁再改不跟著動） */
+var EOT_PRESETS = ['End of Month','End of Quarter','End of Year'];
+var _eotRecId = null;
+function openEot(recId){
+  _eotRecId = recId;
+  var r = findRec(recId); if(!r) return;
+  var isDate = EOT_PRESETS.indexOf(r.eot) < 0;
+  var iso = '';
+  if(isDate){ var m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(r.eot); if(m) iso = m[3]+'-'+m[2]+'-'+m[1]; }
+  $('#eot-body').innerHTML = EOT_PRESETS.map(function(p){
+      return '<div class="rs-eot-opt'+(r.eot===p?' on':'')+'" onclick="pickEot(\''+p+'\')">'
+        +'<input type="radio" name="eot" '+(r.eot===p?'checked':'')+'>'+p+'</div>';
+    }).join('')
+    + '<div class="rs-eot-opt'+(isDate?' on':'')+'" onclick="pickEot(\'custom\')">'
+      +'<input type="radio" name="eot" '+(isDate?'checked':'')+'>Customized'
+      +'<input type="date" id="eot-date" value="'+iso+'" onclick="event.stopPropagation()" onchange="pickEot(\'custom\')"></div>';
+  openModal('mo-eot');
+}
+function pickEot(which){
+  var r = findRec(_eotRecId); if(!r) return;
+  if(which==='custom'){
+    var v = $('#eot-date') && $('#eot-date').value;
+    if(!v){ return; }
+    var d = v.split('-');
+    r.eot = d[2]+'/'+d[1]+'/'+d[0];
+  } else {
+    r.eot = which;
+  }
+  r.eotManual = true;
+  openEot(_eotRecId);
+}
+function saveEot(){
+  closeModals(); renderTable();
+  toast('End of tracking updated.');
+}
+
 function renderTable(){
   var area = $('#rs-tablearea');
 
@@ -729,53 +1336,59 @@ function renderTable(){
     return;
   }
 
-  var rows = DATA[state.tab].slice();
-  var q = ($('#rs-search-input') && $('#rs-search-input').value || '').toLowerCase().trim();
-  if(q){
-    rows = rows.filter(function(r){
-      return (r.name+' '+r.id+' '+r.resN+' '+r.resId+' '+r.tags.join(' ')+' '+r.recommendation).toLowerCase().indexOf(q)>=0;
-    });
-  }
+  var rows = applyFilters(DATA[state.tab].slice());
+  var q = state.searchQ;
+  if(q){ rows = rows.filter(function(r){ return rowHaystack(r).indexOf(q)>=0; }); }
+  _visibleRows = rows;
   if(state.sort.key){
     var k = state.sort.key, d = state.sort.dir;
     rows.sort(function(a,b){
       var va=a[k], vb=b[k];
       if(k==='recDate'){ va=dateNum(a.recDate); vb=dateNum(b.recDate); }
       if(k==='eot'){ va=String(a.eot); vb=String(b.eot); }
-      if(va<vb) return -1*d; if(va>vb) return 1*d; return 0;
+      if(k==='target'){ va=a.name.toLowerCase(); vb=b.name.toLowerCase(); }
+      if(k==='kind'){ va=a.kind; vb=b.kind; }
+      if(k==='assign'){ va=(a.assignTo||[]).join(', ').toLowerCase(); vb=(b.assignTo||[]).join(', ').toLowerCase(); }
+      if(k==='resource'){ va=a.resN.toLowerCase(); vb=b.resN.toLowerCase(); }
+      if(k==='tag'){ va=(sortedTags(a)[0]||''); vb=(sortedTags(b)[0]||''); if(va!==vb) return tagCmp(va,vb)*d; return 0; }
+      if(va<vb) return -1*d; if(va>vb) return 1*d;
+      /* PRD：同一天的推薦，Estimated Savings 高的在前 */
+      if(k==='recDate') return b.estAmt - a.estAmt;
+      return 0;
     });
   }
 
-  var ths = '<th class="fix rs-c-sel"><input type="checkbox" id="rs-selall" onchange="toggleAll(this.checked)"></th>'
-    +'<th class="fix rs-c-target tx-left">Target Item Name / ID</th>'
-    +'<th class="fix rs-c-impact tx-left">Impact</th>'
+  var selAll = DATA[state.tab];
+  var selN = selAll.filter(function(r){return state.selection[r.recId];}).length;
+  var selMixed = selN>0 && selN<selAll.length;
+  var ths = '<th class="fix rs-c-sel">'+LumiCheckbox.html({stateful:true,id:'rs-selall',
+      checked: selN>0 && selN===selAll.length, onchange:'toggleAll(this.checked)'})+'</th>'
+    +'<th class="fix rs-c-target tx-left">'+thSort('Target Item Name / ID','target')+'</th>'
+    +'<th class="fix rs-c-kind tx-left">'+thSort('Type','kind')+'</th>'
+    +'<th class="fix rs-c-impact tx-left">'+thSort('Impact','impact')+'</th>'
     + COLS.map(function(c){
-        if(c.sort){
-          var on = state.sort.key===c.sort?' on':'';
-          var arrow = state.sort.key!==c.sort?'swap_vert':(state.sort.dir===1?'arrow_upward':'arrow_downward');
-          return '<th><span class="th-sort'+on+'" onclick="setSort(\''+c.sort+'\')">'+c.h+'<span class="material-symbols-outlined">'+arrow+'</span></span></th>';
-        }
-        return '<th>'+c.h+'</th>';
+        return c.sort ? '<th>'+thSort(c.h, c.sort)+'</th>' : '<th>'+c.h+'</th>';
       }).join('');
 
   var trs = rows.map(function(r){
     var sel = state.selection[r.recId]?' sel':'';
-    var checked = state.selection[r.recId]?' checked':'';
+    var checked = !!state.selection[r.recId];
     var eotIsDate = /\d{2}\/\d{2}\/\d{4}/.test(r.eot);
     return '<tr class="'+sel.trim()+'" onclick="openDetail(\''+r.recId+'\')">'
-      +'<td class="fix rs-c-sel" onclick="event.stopPropagation()"><input type="checkbox"'+checked+' onchange="toggleRow(\''+r.recId+'\',this.checked)"></td>'
-      +'<td class="fix rs-c-target"><span class="rs-two">'+provBadge(r.prov)+'<span class="rs-two-txt"><span class="nm">'+r.name+'</span><span class="id">'+r.id+'</span></span></span></td>'
+      +'<td class="fix rs-c-sel" onclick="event.stopPropagation()">'+LumiCheckbox.html({stateful:true,checked:checked,onchange:'toggleRow(\''+r.recId+'\',this.checked)'})+'</td>'
+      +'<td class="fix rs-c-target"><span class="rs-two">'+provBadge(r.prov)+'<span class="rs-two-txt"><span class="nm">'+hl(r.name)+'</span><span class="id">'+(r.kind==='storage'?hl(r.region+' / '+r.tier):hl(r.id))+'</span></span></span></td>'
+      +'<td class="fix rs-c-kind">'+(r.kind==='storage'?'Storage':'VM')+'</td>'   /* 純文字，對齊 Figma Type 欄（14px Regular，無 chip）*/
       +'<td class="fix rs-c-impact">'+impactCell(r.impact)+'</td>'
       +'<td>'+statusCell(r.status)+'</td>'
       +'<td>'+r.recDate+'</td>'
       +'<td>'+avoidCell(r.estAmt, r.estRate, false)+'</td>'
-      +'<td class="rs-c-rec"><div class="rs-clamp">'+r.recommendation+'</div></td>'
+      +'<td class="rs-c-rec"><div class="rs-clamp">'+hl(r.recommendation)+'</div></td>'
       +'<td class="rs-c-crit"><div class="rs-clamp">'+r.criteria.join(' & ')+'</div></td>'
       +'<td>'+avoidCell(r.actAmt, r.actRate, true)+'</td>'
-      +'<td onclick="event.stopPropagation()"><span class="rs-eot">'+r.eot+'<span class="material-symbols-outlined" onclick="toast(\'(Demo) Edit end of tracking date\')">event</span></span></td>'
+      +'<td onclick="event.stopPropagation()"><span class="rs-eot">'+r.eot+(r.eotManual?'<span class="rs-eot-manual" title="Manually set. Changing the default in Scope Settings will not override this.">manual</span>':'')+'<span class="material-symbols-outlined" onclick="openEot(\''+r.recId+'\')">event</span></span></td>'
       +'<td class="rs-c-assign"><span class="rs-tag-cell">'+r.assignTo.join(', ')+'</span></td>'
-      +'<td class="rs-c-resource"><span class="rs-two-txt"><span class="nm">'+r.resN+'</span><span class="id">'+r.resId+'</span></span></td>'
-      +'<td><span class="rs-tag-cell">'+r.tags.join(', ')+'</span></td>'
+      +'<td class="rs-c-resource"><span class="rs-two-txt"><span class="nm">'+hl(r.resN)+'</span><span class="id">'+hl(r.resId)+'</span></span></td>'
+      +'<td>'+tagCell(r)+'</td>'
       +'</tr>';
   }).join('');
 
@@ -785,6 +1398,8 @@ function renderTable(){
     return;
   }
   area.innerHTML = '<div class="rs-tblwrap"><div class="rs-tblscroll"><table class="rstbl"><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div></div>';
+  // mixed 沒有對應的 HTML 屬性，checked 已在上面用屬性設好，這裡只補 indeterminate。
+  LumiCheckbox.set('#rs-selall', {mixed: selMixed});
   bindTips();
 }
 function dateNum(s){ var p=s.split('/'); return new Date(p[2],p[1]-1,p[0]).getTime(); }
@@ -799,24 +1414,17 @@ function skeletonTable(){
 /* ============================================================
    SELECTION + ACTIONS
 ============================================================ */
-function toggleRow(id, on){ if(on) state.selection[id]=true; else delete state.selection[id]; renderActions(); syncSelAll(); markRows(); }
+function toggleRow(id, on){ if(on) state.selection[id]=true; else delete state.selection[id]; renderActions(); markRows(); }
 function toggleAll(on){
   state.selection = {};
   if(on) DATA[state.tab].forEach(function(r){ state.selection[r.recId]=true; });
   renderTable(); renderActions();
 }
-function syncSelAll(){
-  var all = DATA[state.tab];
-  var box = $('#rs-selall'); if(!box) return;
-  var n = all.filter(function(r){return state.selection[r.recId];}).length;
-  box.checked = n>0 && n===all.length;
-  box.indeterminate = n>0 && n<all.length;
-}
 function markRows(){
   document.querySelectorAll('#rs-tablearea tbody tr').forEach(function(tr){});
   renderTable(); // simplest: re-render to reflect .sel
 }
-function setTab(t){ state.tab=t; state.selection={}; state.sort={key:null,dir:1}; renderTabs(); renderActions(); renderTable(); }
+function setTab(t){ state.tab=t; state.selection={}; state.sort={key:'recDate',dir:-1}; renderTabs(); renderActions(); renderTable(); }
 function setSort(k){
   if(state.sort.key===k) state.sort.dir*=-1; else { state.sort.key=k; state.sort.dir=1; }
   renderTable();
@@ -826,7 +1434,7 @@ function doAction(act){
   if(ids.length===0) return;
   if(act==='dismiss'){ openDismiss(); return; }
   if(act==='remove'){ openRemove(); return; }
-  var map = {done:"moved to 'Done'", undo:"restored to 'Recommendations'", archive:"transferred to 'Archived'"};
+  var map = {done:"moved to 'Reviewed'", undo:"restored to 'Recommendations'", archive:"transferred to 'Archived'"};
   toast(ids.length+' recommendation(s) '+map[act]+'.');
   state.selection={}; renderTable(); renderActions();
 }
@@ -846,22 +1454,57 @@ function openDetail(id){
   renderDetail(r);
   openModal('mo-detail');
 }
+/* ============================================================
+   Usage Analysis 指標（refinement ticket LT-3399 第 3 節）
+   11 項 = 8 項加 (P95) + 3 個新欄位。ticket 為權威，PRD 正本仍停在舊的 6 項。
+   group 用來模擬「資料源缺就整組掉」：
+     cpu     一定有（hypervisor 層就看得到）
+     mem     需要 in-guest agent（AWS CloudWatch agent / GCP Ops Agent），沒裝就沒有
+     disk    AWS 目前未收集（LT-3519）
+     net     AWS 目前數值灌水約 60 倍（LT-3519）
+     derived 由 30 天序列推導，資料覆蓋不足時算不出來
+============================================================ */
 var USAGE_METRICS = [
-  'Avg. CPU Utilization','Max. CPU Utilization','Avg. Memory Utilization'
+  { k:'Avg. CPU Utilization (P95)',         g:'cpu' },
+  { k:'Max. CPU Utilization (P95)',         g:'cpu' },
+  { k:'Avg. Memory Utilization (P95)',      g:'mem' },
+  { k:'Max. Memory Utilization (P95)',      g:'mem' },
+  { k:'Avg. Disk Total Ops Count (P95)',    g:'disk' },
+  { k:'Max. Disk Total Ops Count (P95)',    g:'disk' },
+  { k:'Avg. Network Total Ops Count (P95)', g:'net' },
+  { k:'Max. Network Total Ops Count (P95)', g:'net' },
+  { k:'Peak Hours',                         g:'derived' },
+  { k:'Weekday / Weekend Ratio',            g:'derived' },  /* ⚠ 名稱為設計端暫擬：ticket 寫「Weekday weekend ratio」，缺連接詞 */
+  { k:'Data Completeness',                  g:'derived' }
 ];
+/* 資料可得性情境。full = 11 項全有，是排版最壞情況，設計稿應照這個排 */
+var METRIC_PROFILES = {
+  full:    { cpu:1, mem:1, disk:1, net:1, derived:1 },
+  noagent: { cpu:1, mem:0, disk:1, net:1, derived:1 },
+  aws:     { cpu:1, mem:0, disk:0, net:0, derived:1 },
+  thin:    { cpu:1, mem:0, disk:0, net:0, derived:0 }
+};
+var _metricProfile = 'full';
+/* 缺值呈現方式：dash = 照 PRD 正本「無資料顯示 --」；hide = 照 Figma 註記「每次項目不同」整列不出現。兩份文件對這件事講法不同，做成可切換讓 Kabin 比較 */
+var _missingMode = 'dash';
+function metricAvailable(g){
+  var pf = METRIC_PROFILES[_metricProfile] || METRIC_PROFILES.full;
+  return !!pf[g];
+}
 function usageMetricVal(key, r){
   var cpu = r.cpu, mem = r.mem;
   var map = {
-    'Avg. CPU Utilization': cpu.toFixed(2)+'%',
-    'Max. CPU Utilization': (cpu*0.58).toFixed(2)+'%',
-    'GPU Utilization': '--',
-    'Avg. Memory Utilization': mem.toFixed(2)+'%',
-    'Max. Memory Utilization': (mem*0.89).toFixed(2)+'%',
-    'Avg. Disk Total Ops Count': (cpu*1.08).toFixed(2)+'%',
-    'Max. Disk Total Ops Count': '--',
-    'Avg. Network Total Ops Count': (cpu*2.4).toFixed(2)+'%',
-    'Max. Network Total Ops Count': (cpu*0.2).toFixed(2)+'%',
-    'Disk Utilization': (mem*1.3).toFixed(2)+'%'
+    'Avg. CPU Utilization (P95)':         cpu.toFixed(2)+'%',
+    'Max. CPU Utilization (P95)':         (cpu*1.42).toFixed(2)+'%',
+    'Avg. Memory Utilization (P95)':      mem.toFixed(2)+'%',
+    'Max. Memory Utilization (P95)':      (mem*1.31).toFixed(2)+'%',
+    'Avg. Disk Total Ops Count (P95)':    Math.round(cpu*128).toLocaleString()+' IOPS',
+    'Max. Disk Total Ops Count (P95)':    Math.round(cpu*412).toLocaleString()+' IOPS',
+    'Avg. Network Total Ops Count (P95)': Math.round(cpu*96).toLocaleString()+' pps',
+    'Max. Network Total Ops Count (P95)': Math.round(cpu*318).toLocaleString()+' pps',
+    'Peak Hours':                         '16:00 ~ 16:05',   /* ticket 原文示例 */
+    'Weekday / Weekend Ratio':            '68%',             /* ⚠ 設計端暫擬：ticket 只寫範圍 0%~100%，沒給示例值 */
+    'Data Completeness':                  'High'             /* 附錄：完整度 < 50% 會被標成 Insufficient Data 而不產生推薦，所以推薦裡看不到最低階 */
   };
   return map[key] || '--';
 }
@@ -878,13 +1521,147 @@ function buildInstCards(hours){
       + '</div>';
   }).join('');
 }
-function renderDetail(r){
-  var hours = 720;
-  var metrics = USAGE_METRICS.map(function(k){
-    var val = usageMetricVal(k, r);
-    var muted = val === '--' ? ' muted' : '';
-    return '<div class="dt-util-item"><span class="k">'+k+'</span><span class="v'+muted+'">'+val+'</span></div>';
+/* ============================================================
+   Object Storage 版 Detail（LT-2586，見 specs/2026-09-18-object-storage-rightsizing-scope.md §Step4）
+   四個區塊版面沿用 VM 版，只換內容物：
+   - Summary 第 4 行（Criteria Applied）整行移除，儲存沒有可回顯的門檻
+   - Usage Analysis 換一批 7 個儲存指標（CPU/Memory/IOPS 全部不顯示）
+   - Cost Calculator 不做輸入框，直接用該 bucket 觀測到的量算；卡片改各層級
+============================================================ */
+var STORAGE_USAGE_METRICS = [
+  { k:'Current Stored Bytes', f:function(r){ return r.storedBytes; } },
+  { k:'Object Count',         f:function(r){ return r.objectCount; } },
+  { k:'Read Ratio',           f:function(r){ return r.readRatio; },
+    tip:'Read Ratio is calculated as:  Read bytes ÷ Average stored bytes' }, /* Figma #18 / #18-1：算法改掛 info tooltip，不放第二行小字 */
+  { k:'Read Request Count',   f:function(r){ return r.readReqCount+' / mo'; } },
+  { k:'Write Bytes',          f:function(r){ return r.writeBytes+' / mo'; } },
+  { k:'Write Request Count',  f:function(r){ return r.writeReqCount+' / mo'; } },
+  { k:'Storage Class Cost Ratio', f:function(r){ return r.classCostRatio; } } /* 設計端定案：一行百分比，不做堆疊條 */
+];
+/* 各層級的月費卡：{單價}/GB retrieval、最短保存天數、每 GB 月費，取自 GCS 公告費率（見 research/object-storage-tiering-research.md）
+   ⚠ 單價為示意值：ticket §6.3 明定「金額、天數、層級名稱、指標數值一律由後端帶入」，正式數字由 API 給 */
+var STORAGE_CLASSES = [
+  { name:'Standard', min:null,  rate:null, gb:0.023 },
+  { name:'Nearline',  min:30,  rate:0.01, gb:0.013 },
+  { name:'Coldline',  min:90,  rate:0.02, gb:0.006 },
+  { name:'Archive',   min:365, rate:0.05, gb:0.0025 }
+];
+function storageClassCardLine2(cls){
+  if(cls.name==='Standard') return 'No minimum, no retrieval fee';
+  return cls.min+'-day minimum, $'+cls.rate.toFixed(2)+' / GB retrieval';
+}
+function storageTargetTier(r){
+  var m = /→\s*(Nearline|Coldline|Archive)\s*$/.exec(r.recommendation);
+  return m ? m[1] : null;
+}
+/* 五張卡一律全出：Standard / Nearline / Coldline / Archive + Autoclass（ticket §6.3「推薦最多 5 張」，
+   沒有寫 lifecycle 只給四張——先前版本自訂成 4 張，2026-09-18 對 ticket 後改正）。
+   月費 = 儲存費 + 檢索費 + 請求費；Autoclass 另含每千物件監控費，不收檢索費（ticket 原文）。
+   目前層級的月費當基準，建議層級的月費 = 基準 − 該列的 Est. Avoidance，畫面上的數字彼此對得起來。 */
+function buildStorageCostCards(r){
+  var target = storageTargetTier(r);
+  var isAutoclass = /Autoclass/.test(r.recommendation);
+  var base = STORAGE_CLASSES.filter(function(c){ return c.name===(r.tier||'Standard'); })[0] || STORAGE_CLASSES[0];
+  var gb = storageGB(r.storedBytes), objs = storageNum(r.objectCount);
+  var reads = storageNum(r.readReqCount), writes = storageNum(r.writeReqCount);
+  var readGB = gb * (parseFloat(r.readRatio)||0) / 100;
+  function classCost(cls){
+    var CLASS_A = { Standard:0.05, Nearline:0.10, Coldline:0.10, Archive:0.50 };   /* / 10,000 次 */
+    var CLASS_B = { Standard:0.004, Nearline:0.01, Coldline:0.05, Archive:0.50 };
+    return gb*cls.gb + (cls.rate?readGB*cls.rate:0)
+      + writes/10000*CLASS_A[cls.name] + reads/10000*CLASS_B[cls.name];
+  }
+  var baseCost = classCost(base);
+  var cards = STORAGE_CLASSES.map(function(cls){
+    var mo = cls.name===base.name ? baseCost : classCost(cls);
+    if(!isAutoclass && cls.name===target) mo = baseCost - r.saving;   /* 建議層級跟 Est. Avoidance 對齊 */
+    return { name:cls.name, line2:storageClassCardLine2(cls), unit:'$'+cls.gb+' / GB-mo',
+             mo:Math.max(mo,0), rec:!isAutoclass && cls.name===target };
+  });
+  cards.push({ name:'Autoclass', line2:'No minimum, $0.0025 / 1K objects monitoring',
+    unit:'Varies by class',
+    mo:Math.max(isAutoclass ? baseCost - r.saving : classCost(STORAGE_CLASSES[1]) + objs/1000*0.0025, 0),
+    rec:isAutoclass });
+  return cards.map(function(c){
+    return '<div class="dt-inst'+(c.rec?' rec':'')+'">'
+      + (c.rec?'<span class="recbadge"><span class="material-symbols-outlined">thumb_up</span>Recommended</span>':'')
+      + '<div class="nm">'+c.name+'</div>'
+      + '<div class="specs">'+c.line2+'</div>'
+      + '<div class="pr-mo">'+state.currency+' '+c.mo.toFixed(2)+' / mo</div>'
+      + '<div class="pr-hr">'+c.unit+'</div>'
+      + '</div>';
   }).join('');
+}
+/* '5.0 TB' / '420 GB' → GB；'625,000' → 625000 */
+function storageGB(v){
+  var m = /([\d.]+)\s*(TB|GB|MB)/i.exec(v||''); if(!m) return 0;
+  var n = parseFloat(m[1]), u = m[2].toUpperCase();
+  return u==='TB' ? n*1000 : u==='MB' ? n/1000 : n;
+}
+function storageNum(v){ return parseFloat(String(v||'').replace(/,/g,'')) || 0; }
+/* Storage 版 Summary 第 3 行：清單 Recommendation 欄逐句型轉成 by + 動名詞（PRD 只定句型，不另寫一套內容）
+   Enable Autoclass                                  → by enabling Autoclass
+   Add lifecycle rule: objects older than N days → X → by adding a lifecycle rule: objects older than N days → X */
+function storageChangeLine(rec){
+  var m;
+  if(/^Enable Autoclass/i.test(rec)) return 'by enabling <b>Autoclass</b>';
+  if((m = rec.match(/^Add lifecycle rule:\s*(.+?)\s*(?:→|->)\s*(\w+)/i))) return 'by adding a lifecycle rule: '+m[1]+' → <b>'+m[2]+'</b>';
+  return 'by '+rec.charAt(0).toLowerCase()+rec.slice(1);
+}
+function renderStorageDetail(r){
+  var metrics = STORAGE_USAGE_METRICS.map(function(m){
+    var tip = m.tip ? ' <span class="material-symbols-outlined ico-info" data-tip="'+esc(m.tip)+'">info</span>' : '';
+    return '<div class="dt-util-item"><span class="k">'+m.k+'</span><span class="v">'+m.f(r)+tip+'</span></div>';
+  }).join('');
+  $('#dt-body').innerHTML =
+    '<div class="dt-head">'
+      +'<div class="dt-target">'+provBadge(r.prov)+r.name+'</div>'
+      +'<div class="dt-saving">Estimated Avoidance: '+state.currency+' '+r.saving.toFixed(2)+' / month</div>'
+      /* 第 3 行動作句直接取清單那列的 Recommendation 欄，不另寫一套（PRD 明定） */
+      +'<div class="dt-change">'+storageChangeLine(r.recommendation)+'</div>'
+      /* 第 4 行（Criteria Applied）整行移除：儲存沒有可回顯的門檻 */
+    +'</div>'
+    +'<div class="dt-sec"><div class="dt-sec-t lg">Usage Analysis</div>'
+      /* Storage 版指標是「標籤 值」同一行（Figma #18）；VM 版維持上下兩行，所以只掛這個 modifier */
+      +'<div class="dt-util is-storage">'+metrics+'</div></div>'
+    +'<div class="dt-sec"><div class="dt-sec-t">Detailed Analysis</div>'
+      +'<div class="dt-analysis'+(_detailExpanded?'':' clamp')+'" id="dt-analysis">'+storageAnalysisText(r)+'</div>'
+      +'<button class="dt-toggle" onclick="toggleAnalysis()">'+(_detailExpanded?'Show Less <span class="material-symbols-outlined">expand_less</span>':'Show All <span class="material-symbols-outlined">expand_more</span>')+'</button>'
+    +'</div>'
+    /* Storage 版沒有輸入框，留著「Cost Calculator」這個字名不副實，且會與卡片標題疊成兩層標題；
+         改成單層標題，字用 ticket 原文 Recommended Storage Class Costs（2026-09-18 Kabin 定案） */
+    +'<div class="dt-sec">'
+      +'<div class="dt-calc-box">'
+        +'<div class="dt-insts-label">Recommended Storage Class Costs <span class="material-symbols-outlined ico-info" data-tip="AI Notice: All figures are based on real-time exchange rates at the time of generation and are for reference only.">info</span></div>'
+        +'<div class="dt-insts" id="dt-insts">'+buildStorageCostCards(r)+'</div>'
+      +'</div>'
+    +'</div>';
+  bindTips();
+}
+/* Detailed Analysis 必附尾句，四種建議各一句（PRD 原文，一字不改） */
+function storageAnalysisText(r){
+  if(/Autoclass/.test(r.recommendation)){
+    return 'This bucket has been consistently in Standard storage with a read ratio of '+r.readRatio+', which is low enough that enabling Autoclass would let objects move to colder, cheaper classes automatically as they age. You can turn auto-tiering off at any time, but objects already moved to a colder class do not move back on their own.';
+  }
+  var tier = storageTargetTier(r);
+  if(tier==='Archive'){
+    return 'This bucket has not been read in a long time (read ratio '+r.readRatio+') and holds '+r.storedBytes+' of data that has aged past the point where Standard storage makes sense. Archive has a 365-day minimum storage duration and the highest retrieval cost of any class. Confirm this data will not be read within a year before setting the rule.';
+  }
+  return 'This bucket holds '+r.storedBytes+' with a read ratio of '+r.readRatio+', consistent with data that is rarely accessed. Using a lifecycle rule to move objects to '+tier+' avoids retrieval and rewrite fees compared to moving them yourself. Moving objects back to a hotter class later means paying retrieval plus a rewrite, and deleting or moving them before the minimum storage duration is up adds an early deletion charge.';
+}
+
+function renderDetail(r){
+  if(r.kind==='storage'){ renderStorageDetail(r); return; }
+  var hours = 720;
+  var shown = USAGE_METRICS.filter(function(m){
+    return metricAvailable(m.g) || _missingMode === 'dash';
+  });
+  var metrics = shown.map(function(m){
+    var ok  = metricAvailable(m.g);
+    var val = ok ? usageMetricVal(m.k, r) : '--';
+    return '<div class="dt-util-item"><span class="k">'+m.k+'</span><span class="v'+(ok?'':' muted')+'">'+val+'</span></div>';
+  }).join('');
+  var mCount = shown.length, mAvail = shown.filter(function(m){return metricAvailable(m.g);}).length;
   $('#dt-body').innerHTML =
     '<div class="dt-head">'
       +'<div class="dt-target">'+provBadge(r.prov)+r.name+'</div>'
@@ -892,7 +1669,7 @@ function renderDetail(r){
       +'<div class="dt-change">by changing from <b>'+r.from+'</b> to <b>'+r.to+'</b></div>'
       +'<div class="dt-criteria">Criteria Applied: '+r.criteria.join(' & ')+'</div>'
     +'</div>'
-    +'<div class="dt-sec"><div class="dt-sec-t lg">Usage Analysis</div>'
+    +'<div class="dt-sec"><div class="dt-sec-t lg">Usage Analysis <span class="dt-util-count">'+mAvail+' of '+USAGE_METRICS.length+' available</span></div>'
       +'<div class="dt-util">'+metrics+'</div></div>'
     +'<div class="dt-sec"><div class="dt-sec-t">Detailed Analysis</div>'
       +'<div class="dt-analysis'+(_detailExpanded?'':' clamp')+'" id="dt-analysis">'+ANALYSIS+'</div>'
@@ -1002,7 +1779,7 @@ function renderListPage(){
   }
 
   // For all other states the normal layout is rendered first
-  renderCards(); renderTabs(); renderActions(); renderTable();
+  renderCards(); renderTabs(); renderActions(); renderFilters(); renderTable();
 
   if(state.pageState==='first-time'){
     normalBox.classList.add('rs-ft-blur');
@@ -1018,7 +1795,7 @@ function authState(){
   var sub = admin
     ? "Begin your cloud cost optimization journey by authorizing both your billing and usage data. You'll be able to identify underutilized instances, compare estimated vs. actual savings, and take action to maximize efficiency while reducing unnecessary cloud spend. Please click the button below to proceed with the authorization."
     : "To kickstart your cloud cost optimization journey, please reach out to your organization's administrator for authorization.";
-  var cta = admin ? '<button class="btn btn-p" onclick="toast(\'(Demo) Would navigate to Authorization Settings.\')"><span class="material-symbols-outlined">add</span>Add Your Authorization</button>' : '';
+  var cta = admin ? '<a class="btn btn-p" href="./organization-settings.html" style="text-decoration:none"><span class="material-symbols-outlined">add</span>Add Your Authorization</a>' : '';
   return '<div id="rs-statefull" class="rs-fullcard"><div class="empty-state" style="padding:0">'
     +'<span class="material-symbols-outlined">'+(admin?'lock_open':'lock')+'</span>'
     +'<div class="empty-state-title">Unlock the Potential of Your Cloud Data Today</div>'
@@ -1066,21 +1843,23 @@ function bindTips(){
     if(el._tipBound) return; el._tipBound=true;
     el.addEventListener('mouseenter', function(){ showTip(el); });
     el.addEventListener('mouseleave', hideTip);
-    el.addEventListener('mousemove', moveTip);
   });
 }
 var _tipEl;
 function showTip(el){
-  _tipEl = $('#rs-tip'); _tipEl.innerHTML = el.getAttribute('data-tip'); _tipEl.classList.add('show'); moveTipFor(el);
+  _tipEl = $('#rs-tip'); _tipEl.innerHTML = el.getAttribute('data-tip'); _tipEl.classList.add('show'); positionTip(el);
 }
-function moveTip(e){ if(_tipEl && _tipEl.classList.contains('show')) positionTip(e.clientX, e.clientY); }
-function moveTipFor(el){ var r=el.getBoundingClientRect(); positionTip(r.left+r.width/2, r.top); }
-function positionTip(x,y){
+/* Tooltip 定位（2026-09-18 Kabin 定義）：右邊緣對齊觸發元件的右邊緣，底部離元件上緣 4px。
+   不再跟著滑鼠跑，所以 mousemove 監聽一併移除。上方放不下才翻到元件下方，間距同樣 4px；
+   左右超出視窗時夾在 8px 內（此時右邊緣對齊會失效，但可讀性優先）。 */
+function positionTip(el){
   if(!_tipEl) return;
-  var w=_tipEl.offsetWidth, h=_tipEl.offsetHeight;
-  var left = Math.min(Math.max(8, x-w/2), window.innerWidth-w-8);
-  var top = y-h-10; if(top<8) top = y+18;
-  _tipEl.style.left=left+'px'; _tipEl.style.top=top+'px';
+  var r = el.getBoundingClientRect();
+  var w = _tipEl.offsetWidth, h = _tipEl.offsetHeight;
+  var left = Math.min(Math.max(8, r.right - w), window.innerWidth - w - 8);
+  var top = r.top - h - 4;
+  if(top < 8) top = r.bottom + 4;
+  _tipEl.style.left = left+'px'; _tipEl.style.top = top+'px';
 }
 function hideTip(){ if(_tipEl) _tipEl.classList.remove('show'); }
 
@@ -1106,6 +1885,8 @@ window.DEMO_PAGES = [
   { id:'role',  label:'Role',  icon:'person' },
   { id:'state', label:'State', icon:'layers' },
   { id:'modal', label:'Modal', icon:'open_in_new' },
+  { id:'usage', label:'Usage', icon:'monitoring' },     /* ⚠ 補漏：LT-3399 那輪加了 page:'usage' 情境卻沒加進這裡，分頁一直沒顯示 */
+  { id:'storage', label:'Storage', icon:'inventory_2' }, /* LT-2586 Object Storage */
 ];
 window.DEMO_SCENARIOS = [
   // View
@@ -1129,8 +1910,20 @@ window.DEMO_SCENARIOS = [
   { id:'rs-quota-depleted', page:'state', label:'AI Quota: 用盡（scans paused）', icon:'block', tip:'Rightsizing quota 用盡（used 1,000/1,000）：header 轉紅「● Rightsizing Scans: 0 / 1,000 left」+ Alert/Large banner（頂部 4px 紅 strip + warning icon + 文字）；Figma #01-6。無 Contact Sales（PM 決議）。' },
   // Modal
   { id:'modal-detail',  page:'modal', label:'Recommendation Details', icon:'analytics',  tip:'Figma #12 — 推薦細節彈窗：Usage Analysis + Detailed Analysis + Cost Calculator。' },
+  // Usage（LT-3399 第 3 節）
+  { id:'um-full',    page:'usage', label:'11 項全有（排版最壞情況）', icon:'grid_view',   tip:'資料最齊：11 項全部有值，4 行（3/3/3/2）。設計稿應照這個情境排版。' },
+  { id:'um-noagent', page:'usage', label:'未裝 agent（Memory 掉 2 項）', icon:'memory',   tip:'AWS 需 CloudWatch agent、GCP 需 Ops Agent 才有記憶體指標，沒裝就沒有。這是最常見的情況。' },
+  { id:'um-aws',     page:'usage', label:'AWS 現況（再掉 Disk / Network）', icon:'cloud_off', tip:'依你們自己的 LT-3519：AWS disk 從未收集、network 值灌水約 60 倍。修好前這四項不該顯示。' },
+  { id:'um-thin',    page:'usage', label:'資料最少（只剩 CPU 兩項）',  icon:'filter_2',  tip:'資料覆蓋不足，推導型欄位也算不出來。極端下限，用來看版面會不會垮。' },
+  { id:'um-dash',    page:'usage', label:'缺值顯示 --（PRD 正本）',     icon:'remove',    tip:'PRD 正本：「如果無相關數據，以 -- 顯示」。格位固定，好比較但會出現一整排 --。' },
+  { id:'um-hide',    page:'usage', label:'缺值整列隱藏（Figma 註記）', icon:'visibility_off', tip:'Figma #12 註記：「每次推薦顯示出項目不會相同」。畫面乾淨但行數會跳，且看不出「這台機器沒有記憶體資料」。' },
   { id:'modal-dismiss', page:'modal', label:'Dismiss Recommendations',icon:'block',      tip:'Figma #05 — Dismiss 原因單選彈窗（選 Other 才開放輸入）。' },
   { id:'modal-remove',  page:'modal', label:'Remove Recommendation',  icon:'delete',     tip:'Figma #10 — 刪除確認彈窗（列出即將刪除的項目）。' },
+  // Object Storage（LT-2586，只做 GCP，見 specs/2026-09-18-object-storage-rightsizing-scope.md）
+  { id:'os-mixed',     page:'storage', label:'混合清單（VM + Storage 同表）', icon:'view_list', tip:'驗證 Type 欄與雙語意欄位：同一張表同時有 VM 與 Storage 列。' },
+  { id:'os-autoclass', page:'storage', label:'Autoclass 建議',              icon:'auto_awesome', tip:'Detail：Summary 第 4 行（Criteria Applied）移除、Usage Analysis 7 格、Cost Calculator 顯示 Autoclass 卡。' },
+  { id:'os-nearline',  page:'storage', label:'Lifecycle → Nearline',        icon:'ac_unit', tip:'Detail：Detailed Analysis 附 Nearline 尾句（早期刪除罰金提醒）。' },
+  { id:'os-archive',   page:'storage', label:'Lifecycle → Archive（看警語）', icon:'warning', tip:'Detail：Archive 尾句警語最重，365 天最短保存期 + 全場最高檢索費。' },
 ];
 window.DEMO_DEFAULT = 'set';
 window.DEMO_APPLY = function(id){
@@ -1142,8 +1935,14 @@ window.DEMO_APPLY = function(id){
   if(id==='rs-quota-normal'){   if(state.page!=='list') showPage('list'); if(state.pageState!=='set') setPageState('set'); setRightsizingQuota(410,1000);  return; }
   if(['set','loading','first-time','empty','nodata','no-auth'].indexOf(id)>=0){ showPage('list'); setPageState(id); if(id==='set') setRightsizingQuota(410,1000); return; }
   if(id==='modal-detail'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); openDetail(DATA.rec[1].recId); return; }
+  if(['um-full','um-noagent','um-aws','um-thin'].indexOf(id)>=0){ _metricProfile = id.slice(3); showPage('list'); if(state.pageState!=='set') setPageState('set'); openDetail(DATA.rec[1].recId); return; }
+  if(id==='um-dash' || id==='um-hide'){ _missingMode = id.slice(3); showPage('list'); if(state.pageState!=='set') setPageState('set'); openDetail(DATA.rec[1].recId); return; }
   if(id==='modal-dismiss'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); state.selection={}; state.selection[DATA.rec[0].recId]=true; openDismiss(); return; }
   if(id==='modal-remove'){ showPage('list'); state.tab='dismiss'; renderTabs(); state.selection={}; state.selection[DATA.dismiss[0].recId]=true; renderTable(); openRemove(); return; }
+  if(id==='os-mixed'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); state.filters.kind=[]; renderFilters(); renderTable(); return; }
+  if(id==='os-autoclass'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); openDetail('s1'); return; }
+  if(id==='os-nearline'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); openDetail('s2'); return; }
+  if(id==='os-archive'){ showPage('list'); if(state.pageState!=='set') setPageState('set'); openDetail('s3'); return; }
 };
 
 /* ============================================================
@@ -1392,7 +2191,7 @@ bindTips();
   'use strict';
 
   window.LUMITURE_NAV = [
-    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', disabled: true },
+    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', href: './overview.html' },
 
     { type: 'group', id: 'dashboard', label: 'Dashboard', items: [
       { id: 'cost-dashboard',     label: 'Cost Dashboard',     icon: 'dashboard',    href: './cost-dashboard.html' },
@@ -1415,7 +2214,7 @@ bindTips();
       { id: 'group-list',         label: 'Group List',         icon: 'groups',          href: './group-list.html' },
       { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
       { id: 'authorization-list', label: 'Authorization List', icon: 'link',            href: './organization-settings.html' },
-      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
+      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', href: './group-list.html#admin' },
     ]},
   ];
 })();

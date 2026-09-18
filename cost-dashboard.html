@@ -9,6 +9,313 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<!-- checkbox 共用元件放 head：body 尾端的 inline script 會在 shared script block 之前執行 -->
+<script>
+/* === Inlined: shared/lumiture-checkbox.js === */
+/*!
+ * lumiture-checkbox.js — Lumiture Shared Checkbox v1
+ *
+ * Design spec: Lumiture-Guideline #Checkbox（S size / Primary / unchecked-checked-mixed）
+ *   16×16、--lt-radius-sm、border --lt-grey-300、checked/mixed 皆 --lt-color-primary
+ *   四態齊全：hover / focus-visible / disabled / mixed
+ *   mixed 用 remove icon、checked 用 check icon
+ *
+ * 為什麼不是純 span、也不是純原生 input
+ * ---------------------------------------------------------------------------
+ * group-list v3 當初改成純 span，理由是原生 input[type=checkbox] 在部分瀏覽器的
+ * unchecked 狀態會多畫出一個痕跡（實測與 accent-color、尺寸都無關，是瀏覽器畫
+ * 原生方框本身的痕跡）。但那個痕跡來自「被畫出來的」原生方框；把 input 藏成
+ * opacity:0 之後它一樣不存在，而 .checked / .indeterminate / :checked 三個介面
+ * 全部保留下來。
+ *
+ * 這件事有實際意義，因為既有 prototype 分成兩派狀態模型：
+ *   重繪派  caller 持有 Set/物件，傳 checked/mixed 進來，改變後重繪整塊
+ *           （group-list v3、cost-dashboard v2）
+ *   DOM 派  DOM 本身就是狀態，靠 el.checked / :checked 反推
+ *           （lumi-tag v8 的多選面板、rightsizing v1 的表格與 .sc-check）
+ * 純 span 會逼 DOM 派發明一套狀態層；純原生 input 會逼重繪派回頭補
+ * input.indeterminate（HTML 沒有這個屬性，只能渲染後補丁）。
+ *
+ * 解法是讓 CSS 同時吃兩種來源：
+ *   .checkbox input:checked ~ .checkbox__box   ← DOM 派
+ *   .checkbox.is-checked     .checkbox__box    ← 重繪派
+ * 兩條路落在同一組像素上，誰都不用改自己的模型。
+ *
+ * 附帶把原生語意拿回來：Space 鍵、label 關聯、form 參與、focus 目標都是免費的
+ * （group-list v3 的註記自己就寫過「原生 input 這些是免費的」）。
+ *
+ * ---------------------------------------------------------------------------
+ * 用法 A — 重繪派（caller 持有狀態）
+ *
+ *   LumiCheckbox.html({ checked, mixed, disabled, onclick })
+ *   → 傳 class，渲染時就決定，不需要渲染後補 indeterminate
+ *
+ *     rows.map(r => LumiCheckbox.html({
+ *       checked: sel.has(r.id),
+ *       onclick: `toggleRow('${r.id}')`
+ *     })).join('')
+ *
+ * 用法 B — DOM 派（DOM 即狀態）
+ *
+ *   LumiCheckbox.html({ stateful:true, checked, value, cls, onchange })
+ *   → 產生真的 input，el.checked / el.indeterminate / :checked 照常運作
+ *
+ *     `<label>${LumiCheckbox.html({ stateful:true, cls:'ms-chk', value:opt })}
+ *        <span>${opt}</span></label>`
+ *     panel.querySelectorAll('.ms-chk:checked')     // 照常
+ *     chkAll.indeterminate = true                    // 照常
+ *
+ * 兩種用法可以同檔混用，視覺完全一致。
+ *
+ * ---------------------------------------------------------------------------
+ * Exposes
+ *   LumiCheckbox.html(opts)   → HTML 字串
+ *   LumiCheckbox.el(opts)     → DOM 節點（需要直接 append 時用）
+ *   LumiCheckbox.input(elOrSelector) → 取出內部 input（stateful 用）
+ *   LumiCheckbox.set(elOrSelector, {checked, mixed, disabled})
+ *                             → 兩種模式共用的狀態設定，caller 不用管是哪一種
+ *
+ * opts
+ *   checked   bool    初始/當前選中
+ *   mixed     bool    部分選中（重繪派用 class；DOM 派請改設 input.indeterminate）
+ *   disabled  bool
+ *   stateful  bool    true = 產生真 input（DOM 派），false = 純 class（重繪派）
+ *   onclick   string  inline handler（重繪派慣用；自動包 event.stopPropagation）
+ *                     省略 = 這個 checkbox 只是外層控制項的視覺，會輸出
+ *                     aria-hidden 且不搶 tab 焦點、不擋外層的 onclick
+ *   onchange  string  inline handler（stateful 慣用）
+ *   value     string  stateful 的 input value
+ *   cls       string  額外掛在 input 上的 class（讓既有選擇器如 .ms-chk 繼續命中）
+ *   attrs     object  額外屬性，如 {'data-gi':3}。stateful 掛 input、重繪派掛外層
+ *   wrapTag   string  stateful 外層標籤，預設 'label'。外層已經是 <button>
+ *                     之類的互動元素時傳 'span'，避免巢狀 label 重複觸發
+ *   interactive bool  重繪派專用。它自己是一個控制項、但 handler 是外部
+ *                     addEventListener 綁的（不是 inline onclick）。會輸出
+ *                     role/tabindex，鍵盤以 this.click() 合成點擊
+ *   wrapCls   string  額外掛在外層 .checkbox 上的 class
+ *   id        string  input id（配 <label for>）
+ *   name      string  input name
+ *   label     string  右側文字；省略則只有方框
+ *   ariaLabel string  無可見文字時的無障礙名稱
+ *   title     string  原生 title 提示（掛在外層）
+ *   stop      bool    是否包 event.stopPropagation（預設 true）
+ */
+(function () {
+  'use strict';
+
+  /* ---- CSS（自我注入，載入即可用，不需各 prototype 複製）---- */
+  var CSS = [
+    '.checkbox{display:inline-flex;align-items:center;gap:8px;cursor:pointer;flex:0 0 auto;position:relative;vertical-align:middle}',
+    '.checkbox.is-disabled{cursor:not-allowed}',
+    /* 真 input 藏起來但保留在無障礙樹與 tab 序中。不用 display:none／visibility:hidden，
+     * 那兩個會讓它拿不到焦點，:focus-visible 就沒有東西可以掛。 */
+    '.checkbox input.checkbox__input{position:absolute;width:16px;height:16px;margin:0;opacity:0;cursor:inherit;z-index:1}',
+    '.checkbox input.checkbox__input:disabled{cursor:not-allowed}',
+    '.checkbox__box{display:inline-flex;align-items:center;justify-content:center;flex:0 0 16px;width:16px;height:16px;border:1px solid var(--lt-grey-300,#CCCCCC);border-radius:var(--lt-radius-sm,4px);background:#fff;transition:border-color 150ms ease,background 150ms ease,box-shadow 200ms ease}',
+    '.checkbox__icon{color:#fff;display:none;font-size:12px;line-height:1;font-variation-settings:\'FILL\' 1,\'wght\' 700,\'GRAD\' 0,\'opsz\' 20}',
+    '.checkbox__label{font-size:14px;color:var(--lt-color-text-primary,#262626);user-select:none}',
+    '.checkbox.is-disabled .checkbox__label{color:var(--lt-color-text-disabled,#B3B3B3)}',
+
+    /* hover */
+    '.checkbox:hover .checkbox__box{border-color:var(--lt-grey-400,#B3B3B3)}',
+
+    /* checked／mixed 的填色。左邊是 DOM 派（真 input），右邊是重繪派（class）。 */
+    '.checkbox__input:checked~.checkbox__box,',
+    '.checkbox__input:indeterminate~.checkbox__box,',
+    '.checkbox.is-checked .checkbox__box,',
+    '.checkbox.is-mixed .checkbox__box{background:var(--lt-color-primary,#004FB0);border-color:var(--lt-color-primary,#004FB0)}',
+
+    /* icon 切換全部走 CSS，兩個 icon 都渲染出來、由狀態決定露哪一個，
+     * 所以 DOM 派切換 input.checked 時不需要動 innerHTML。 */
+    '.checkbox__input:checked~.checkbox__box .checkbox__icon--check,',
+    '.checkbox.is-checked .checkbox__icon--check{display:inline-block}',
+    '.checkbox__input:indeterminate~.checkbox__box .checkbox__icon--check,',
+    '.checkbox.is-mixed .checkbox__icon--check{display:none}',
+    '.checkbox__input:indeterminate~.checkbox__box .checkbox__icon--mixed,',
+    '.checkbox.is-mixed .checkbox__icon--mixed{display:inline-block}',
+
+    /* hover on checked／mixed */
+    '.checkbox:hover .checkbox__input:checked~.checkbox__box,',
+    '.checkbox:hover .checkbox__input:indeterminate~.checkbox__box,',
+    '.checkbox:hover.is-checked .checkbox__box,',
+    '.checkbox:hover.is-mixed .checkbox__box{background:var(--lt-color-primary-hover,#0B6DD7);border-color:var(--lt-color-primary-hover,#0B6DD7)}',
+
+    /* focus-visible。真 input 走原生 :focus-visible；純 class 版焦點在外層 span 上。 */
+    '.checkbox__input:focus-visible~.checkbox__box,',
+    '.checkbox:focus-visible .checkbox__box{border-color:var(--lt-color-primary,#004FB0);box-shadow:0 0 0 3px rgba(0,79,176,.1);outline:none}',
+    '.checkbox:focus-visible{outline:none}',
+
+    /* disabled 最後宣告，蓋掉上面所有狀態 */
+    '.checkbox__input:disabled~.checkbox__box,',
+    '.checkbox.is-disabled .checkbox__box{border-color:var(--lt-grey-300,#CCCCCC);background:#fff;box-shadow:none}',
+    '.checkbox__input:disabled:checked~.checkbox__box,',
+    '.checkbox__input:disabled:indeterminate~.checkbox__box,',
+    '.checkbox.is-disabled.is-checked .checkbox__box,',
+    '.checkbox.is-disabled.is-mixed .checkbox__box{background:var(--lt-grey-300,#CCCCCC);border-color:var(--lt-grey-300,#CCCCCC)}'
+  ].join('');
+
+  function injectCSS() {
+    if (document.getElementById('lumi-checkbox-css')) return;
+    var style = document.createElement('style');
+    style.id = 'lumi-checkbox-css';
+    style.textContent = CSS;
+    (document.head || document.documentElement).appendChild(style);
+  }
+  injectCSS();   // documentElement 一定存在，不需要等 DOMContentLoaded
+
+  function attr(name, val) {
+    if (val === undefined || val === null || val === '') return '';
+    return ' ' + name + '="' + String(val).replace(/"/g, '&quot;') + '"';
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  var BOX =
+    '<span class="checkbox__box">' +
+      '<span class="material-symbols-outlined checkbox__icon checkbox__icon--check">check</span>' +
+      '<span class="material-symbols-outlined checkbox__icon checkbox__icon--mixed">remove</span>' +
+    '</span>';
+
+  /* 額外屬性（data-* 之類）。stateful 掛在 input 上，因為既有的委派 handler
+   * 都是從 input 讀 dataset；重繪派掛在外層 span 上，那裡才是可點擊的元素。 */
+  function extraAttrs(o) {
+    if (!o) return '';
+    var out = '';
+    for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) out += attr(k, o[k]);
+    return out;
+  }
+
+  function html(opts) {
+    opts = opts || {};
+    var checked  = !!opts.checked;
+    var mixed    = !!opts.mixed;
+    var disabled = !!opts.disabled;
+    var stop     = opts.stop !== false;
+
+    /* stateful 模式刻意不輸出 is-checked／is-mixed：那兩個 class 是渲染當下的
+     * 快照，caller 之後翻 input.checked 時不會跟著變，留著只會與真實狀態脫節。
+     * 該模式的狀態一律由 input 屬性表達，CSS 已經吃 :checked／:indeterminate。 */
+    var wrapCls = ['checkbox'];
+    if (disabled) wrapCls.push('is-disabled');
+    /* disabled 與 checked／mixed 是可疊加的，不是互斥的。基準版寫成三元互斥
+     * （disabled ? 'is-disabled' : mixed ? ... : checked ? ...），結果
+     * .is-disabled.is-checked 那條 CSS 永遠命中不了，disabled 的已選項目
+     * 會畫成空白框。這裡改成疊加。 */
+    if (!opts.stateful) {
+      if (mixed) wrapCls.push('is-mixed');
+      else if (checked) wrapCls.push('is-checked');
+    }
+    if (opts.wrapCls) wrapCls.push(opts.wrapCls);
+
+    var labelHtml = opts.label
+      ? '<span class="checkbox__label">' + esc(opts.label) + '</span>'
+      : '';
+
+    if (opts.stateful) {
+      /* DOM 派。外層用 <label>，點文字也會切換，是原生行為不需要 handler。
+       * mixed 在 HTML 沒有對應屬性，caller 照常設 input.indeterminate
+       * （CSS 已經吃 :indeterminate）。要在首次渲染就是 mixed 的話，用
+       * LumiCheckbox.set(el,{mixed:true}) 或直接 LumiCheckbox.input(el).indeterminate=true。 */
+      var inputCls = 'checkbox__input' + (opts.cls ? ' ' + opts.cls : '');
+      var oc = opts.onclick && stop
+        ? 'event.stopPropagation();' + opts.onclick
+        : opts.onclick;
+      /* 預設外層是 <label>，點文字也會切換（原生行為，不用 handler）。
+       * 但 <label> 不能巢狀在 <button> 裡（HTML 不合法，而且 label 會再轉發
+       * 一次點擊、跟按鈕自己的 handler 打對台變成切了又切回去）。lumi-tag 的
+       * .ms-item 就是按鈕包 checkbox，那種情況傳 wrapTag:'span'。 */
+      var tag = opts.wrapTag || 'label';
+      return '<' + tag + ' class="' + wrapCls.join(' ') + '"' + attr('title', opts.title) + '>' +
+        '<input type="checkbox" class="' + inputCls + '"' +
+          attr('id', opts.id) + attr('name', opts.name) + attr('value', opts.value) +
+          (checked ? ' checked' : '') + (disabled ? ' disabled' : '') +
+          attr('aria-label', opts.ariaLabel) + extraAttrs(opts.attrs) +
+          attr('onclick', oc) + attr('onchange', opts.onchange) +
+        '>' + BOX + labelHtml +
+      '</' + tag + '>';
+    }
+
+    /* 重繪派。沒有 input，狀態完全由 class 表達，caller 改變狀態後重繪整塊。
+     * role/tabindex/keydown 補回原生 input 免費提供的鍵盤操作。 */
+    var act = (disabled || !opts.onclick) ? ''
+      : ((stop ? 'event.stopPropagation();' : '') + opts.onclick);
+
+    /* 沒有自己的 onclick，代表點擊由外層（例如 .dropdown-item 整列）處理，
+     * 這個 checkbox 只是那個控制項的視覺。這時候不能宣告 role="checkbox"
+     * 也不能吃 tabindex：它不是控制項，掛上去只會多一個按不動的焦點站，
+     * 而且螢幕閱讀器會聽到兩個 checkbox。改成 aria-hidden 交給外層負責語意。
+     * 另外 act 空字串時絕對不能輸出 event.stopPropagation()，否則外層的
+     * onclick 會被自己的視覺元素擋掉。 */
+    if (!act && !disabled && !opts.interactive) {
+      return '<span class="' + wrapCls.join(' ') + '" aria-hidden="true"' +
+        attr('title', opts.title) + extraAttrs(opts.attrs) + '>' + BOX + labelHtml + '</span>';
+    }
+
+    /* 有 inline handler 就直接跑它；interactive 但 handler 是外部
+     * addEventListener 綁的（cost-dashboard 幾個 dropdown 就是這樣），
+     * 就用 this.click() 合成一次點擊，外部 listener 照樣會收到。 */
+    var keydown = act
+      ? "if(event.key===' '||event.key==='Enter'){event.preventDefault();" + act + '}'
+      : "if(event.key===' '||event.key==='Enter'){event.preventDefault();this.click()}";
+    return '<span class="' + wrapCls.join(' ') + '" role="checkbox"' +
+      ' aria-checked="' + (mixed ? 'mixed' : checked) + '"' +
+      ' aria-disabled="' + disabled + '"' +
+      ' tabindex="' + (disabled ? -1 : 0) + '"' +
+      attr('aria-label', opts.ariaLabel) + attr('title', opts.title) + extraAttrs(opts.attrs) +
+      attr('onclick', act) + attr('onkeydown', keydown) +
+    '>' + BOX + labelHtml + '</span>';
+  }
+
+  function el(opts) {
+    var d = document.createElement('div');
+    d.innerHTML = html(opts);
+    return d.firstElementChild;
+  }
+
+  /* 兩種模式共用的狀態設定。stateful 走 input 屬性，重繪派走 class，
+   * caller 不必知道自己拿到的是哪一種。 */
+  function set(target, st) {
+    var node = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!node) return null;
+    var wrap = node.classList && node.classList.contains('checkbox')
+      ? node : node.closest('.checkbox');
+    var inp = input(node);
+    st = st || {};
+    if (inp) {
+      if ('checked'  in st) inp.checked = !!st.checked;
+      if ('mixed'    in st) inp.indeterminate = !!st.mixed;
+      if ('disabled' in st) inp.disabled = !!st.disabled;
+    } else if (wrap) {
+      if ('mixed' in st || 'checked' in st) {
+        wrap.classList.toggle('is-mixed', !!st.mixed);
+        wrap.classList.toggle('is-checked', !st.mixed && !!st.checked);
+        wrap.setAttribute('aria-checked', st.mixed ? 'mixed' : !!st.checked);
+      }
+    }
+    if (wrap && 'disabled' in st) {
+      wrap.classList.toggle('is-disabled', !!st.disabled);
+      if (!inp) {
+        wrap.setAttribute('aria-disabled', !!st.disabled);
+        wrap.setAttribute('tabindex', st.disabled ? -1 : 0);
+      }
+    }
+    return wrap;
+  }
+
+  function input(target) {
+    var node = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!node) return null;
+    if (node.tagName === 'INPUT') return node;
+    return node.querySelector('.checkbox__input');
+  }
+
+  window.LumiCheckbox = { html: html, el: el, input: input, set: set, CSS: CSS };
+})();
+
+</script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; overscroll-behavior: none; }
@@ -663,12 +970,13 @@ tbody tr.untagged td:first-child { color: #676767; font-style: italic; }
 .dropdown-item:hover { background: #F2FAFF; }
 /* Truncation 全站通則：dropdown 內部 label / value 過長一律 `…` 截斷，不可換行
    排除 icon-only spans / 排除空的 icon-spacer span（給對齊用，不該吃 flex 空間） */
-.dropdown-item > span:not(.material-symbols-outlined):not(.arrow):not(:empty),
+.dropdown-item > span:not(.material-symbols-outlined):not(.arrow):not(.checkbox):not(:empty),
 .dropdown-item > strong { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Currently selected single-choice item (e.g. Group By) — light blue wash, no checkmark */
 .dropdown-item.active { background: #EFF7FF; font-weight: 500; }
 .dropdown-item.active:hover { background: #E6F2FF; }
-.dropdown-item input[type="checkbox"] { margin: 0; cursor: pointer; }
+/* 原本的 .dropdown-item input[type="checkbox"] 規則已移除：checkbox 改用
+   shared/lumiture-checkbox.js，樣式由該檔自我注入。 */
 .dropdown-item.section-header { background: #F2FAFF; color: #004FB0; font-size: 13px; font-weight: 700; cursor: pointer; padding: 6px 12px; border-top: 1px solid #D1EEFF; margin-bottom: 0; /* override 全域 .section-header { margin-bottom:12px } — dropdown 內部 rows 不要間距 */ }
 .dropdown-item.section-header:first-child { border-top: none; }
 .dropdown-item.section-header:hover { background: #E6F5FF; }
@@ -2346,6 +2654,29 @@ function renderDetailsTable(dim, sortedKeys, groups, totalCost, xLabels) {
 // =================================================================
 // LUMITAG FILTER DROPDOWN
 // =================================================================
+/* Figma 2185:129692（Dropdown 搜尋行為，註記寫明「所有 Dropdown Menu 皆套用此搜尋行為」）：
+ *   「呈現搜尋結果時，全選選項調整為 [Select All 3 Result(s)]，{3} 表示結果筆數。
+ *     點擊 [Select All] 僅勾選搜尋結果中的項目」
+ * 先前這一支的每個 Select All 都直接把完整清單塞進 selection、完全不看搜尋，
+ * 所以搜尋篩出 3 筆、按下全選會把畫面上看不到的幾十筆一起選走。
+ * group-list 與 lumi-tag 早就只作用在可見列上，這支是唯一的例外。
+ * N 一律數「可勾選的值」而不是列數（分組標頭不可勾，不該計入）。 */
+function selectAllLabel(searching, n) {
+  return searching ? `Select All ${n} Result(s)` : 'Select All';
+}
+
+/* key → 目前看得到的值。分組式 dropdown 的 renderer 與 Select All handler
+ * 共用這一份，避免兩邊各算一次過濾又算得不一樣。 */
+function visibleByKey(keys, valuesOf, search) {
+  const q = (search || '').toLowerCase();
+  const out = {};
+  keys.forEach(k => {
+    const vals = valuesOf(k);
+    out[k] = !q ? vals : vals.filter(v => v.toLowerCase().includes(q));
+  });
+  return out;
+}
+
 function renderLumiTagList(filterText = '') {
   const list = document.getElementById('lumitag-list');
   // 保留 scroll 位置 — 避免點 item 時 list 跳回頂部（沒搜尋時）
@@ -2382,12 +2713,18 @@ function renderLumiTagList(filterText = '') {
 
   const totalChecked = dims.reduce((s, d) => s + lumiTagState[d].checked.size, 0);
   const totalAvailable = dims.reduce((s, d) => s + lumiTagData[d].values.length + (lumiTagData[d].showUntagged ? 1 : 0), 0);
-  const allChecked = totalChecked === totalAvailable && totalChecked > 0;
+  // 搜尋中時，全選的作用域與勾選判斷都收斂到搜尋結果
+  const lumiSearching = !!filterText;
+  const lumiVisible = lumiTagVisibleValues(filterText);
+  const lumiVisibleCount = dims.reduce((n, d) => n + (lumiVisible[d] ? lumiVisible[d].length : 0), 0);
+  const allChecked = lumiSearching
+    ? lumiVisibleCount > 0 && dims.every(d => (lumiVisible[d] || []).every(v => lumiTagState[d].checked.has(v)))
+    : totalChecked === totalAvailable && totalChecked > 0;
 
   // Select All only — Expand All 已移除（per 2026-05 review：search auto-expand 已涵蓋同類情境，避免兩種控制混在同列造成視覺干擾）
   let html = `<div class="dropdown-item" onclick="toggleSelectAllLumiTag()">
-    <input type="checkbox" ${allChecked ? 'checked' : ''}>
-    <strong>Select All</strong>
+    ${LumiCheckbox.html({checked: allChecked})}
+    <strong>${selectAllLabel(lumiSearching, lumiVisibleCount)}</strong>
   </div><div class="dropdown-divider"></div>`;
 
   dims.forEach(dim => {
@@ -2399,14 +2736,14 @@ function renderLumiTagList(filterText = '') {
     const allValues = [...data.values, ...(data.showUntagged ? ['Untagged'] : [])];
     const search = filterText.toLowerCase();
     const matchDim = !search || dim.toLowerCase().includes(search);
-    const matchedValues = !search ? allValues : allValues.filter(v => v.toLowerCase().includes(search));
+    const matchedValues = lumiVisible[dim];
     if (search && !matchDim && matchedValues.length === 0) return;
 
     // Auto-expand when search hits values（避免使用者手動展開每個 key 才能看到命中項）
     const effectiveExpanded = state.expanded || (search && matchedValues.length > 0 && matchedValues.length < allValues.length);
 
     html += `<div class="dropdown-item section-header ${effectiveExpanded ? '' : 'collapsed'}" onclick="event.stopPropagation(); toggleLumiTagDim('${dim}')">
-      <input type="checkbox" ${cnt > 0 ? 'checked' : ''} data-dim="${dim}" onclick="event.stopPropagation(); toggleAllValuesForDim('${dim}')">
+      ${LumiCheckbox.html({checked: cnt > 0, mixed: cnt > 0 && cnt < allValues.length, attrs:{'data-dim':dim}, onclick:`toggleAllValuesForDim('${dim}')`})}
       <span style="flex:1; display:inline-flex; align-items:baseline; gap:4px; min-width:0;">
         <strong>${dim}</strong>
         <span style="color:#676767; font-size:12px; font-weight:400;">(${allValues.length})</span>
@@ -2424,7 +2761,7 @@ function renderLumiTagList(filterText = '') {
         const isMeta = isMetaValue(v);
         // 「(Untagged)」走括號 + italic + 灰色（.untagged-item class 已內建 italic/gray）
         html += `<div class="dropdown-item value-item ${isMeta ? 'untagged-item' : ''}" onclick="toggleLumiTagValue('${dim}', '${v}')">
-          <input type="checkbox" ${isChecked ? 'checked' : ''}>
+          ${LumiCheckbox.html({checked: isChecked})}
           <span>${fmtMetaValueText(v)}</span>
         </div>`;
       });
@@ -2435,15 +2772,8 @@ function renderLumiTagList(filterText = '') {
   // Restore scroll — 用 rAF 延後到 click event 結束後（避免被 browser auto-scroll 蓋掉）
   if (!filterText) setTimeout(() => { list.scrollTop = prevScroll; }, 0);
 
-  // Set indeterminate state for key-level checkboxes (partial selection)
-  dims.forEach(dim => {
-    const chk = list.querySelector(`input[data-dim="${dim}"]`);
-    if (!chk) return;
-    const data = lumiTagData[dim];
-    const allValues = [...data.values, ...(data.showUntagged ? ['Untagged'] : [])];
-    const cnt = lumiTagState[dim].checked.size;
-    chk.indeterminate = cnt > 0 && cnt < allValues.length;
-  });
+  // mixed 狀態已在渲染當下決定（LumiCheckbox 吃 mixed 參數），
+  // 不再需要渲染後回頭補 input.indeterminate。
 }
 
 function toggleLumiTagDropdown(e) {
@@ -2478,34 +2808,49 @@ function toggleLumiTagValue(dim, value) {
   applyChanges();
 }
 
+/* renderer 與 Select All handler 共用同一份「現在看得到哪些值」，
+ * 兩邊各自算過濾就是先前列與選取對不上的成因。 */
+function lumiTagVisibleValues(filterText) {
+  const search = (filterText || '').toLowerCase();
+  const out = {};
+  lumiTagDimensions.forEach(dim => {
+    const data = lumiTagData[dim];
+    const allValues = [...data.values, ...(data.showUntagged ? ['Untagged'] : [])];
+    out[dim] = !search ? allValues : allValues.filter(v => v.toLowerCase().includes(search));
+  });
+  return out;
+}
+
+function currentLumiTagSearch() {
+  const el = document.getElementById('lumitag-search-input');
+  return el ? el.value : '';
+}
+
 function toggleAllValuesForDim(dim) {
   const state = lumiTagState[dim];
-  const data = lumiTagData[dim];
-  const allValues = [...data.values, ...(data.showUntagged ? ['Untagged'] : [])];
-  if (state.checked.size === allValues.length) {
-    state.checked.clear();
+  const search = currentLumiTagSearch();
+  // 只作用在這個 dim 目前看得到的值上；沒搜尋時可見值 = 全部，行為與過去相同
+  const scope = lumiTagVisibleValues(search)[dim];
+  if (scope.length && scope.every(v => state.checked.has(v))) {
+    scope.forEach(v => state.checked.delete(v));
   } else {
-    allValues.forEach(v => state.checked.add(v));
+    scope.forEach(v => state.checked.add(v));
   }
-  renderLumiTagList(document.getElementById('lumitag-search-input').value);
+  renderLumiTagList(search);
   applyChanges();
 }
 
 function toggleSelectAllLumiTag() {
-  const allChecked = lumiTagDimensions.every(d => {
-    const data = lumiTagData[d];
-    const total = data.values.length + (data.showUntagged ? 1 : 0);
-    return lumiTagState[d].checked.size === total;
-  });
+  const search = currentLumiTagSearch();
+  const visible = lumiTagVisibleValues(search);
+  const total = lumiTagDimensions.reduce((n, d) => n + visible[d].length, 0);
+  const allChecked = total > 0 &&
+    lumiTagDimensions.every(d => visible[d].every(v => lumiTagState[d].checked.has(v)));
   lumiTagDimensions.forEach(d => {
-    if (allChecked) {
-      lumiTagState[d].checked.clear();
-    } else {
-      const data = lumiTagData[d];
-      [...data.values, ...(data.showUntagged ? ['Untagged'] : [])].forEach(v => lumiTagState[d].checked.add(v));
-    }
+    if (allChecked) visible[d].forEach(v => lumiTagState[d].checked.delete(v));
+    else visible[d].forEach(v => lumiTagState[d].checked.add(v));
   });
-  renderLumiTagList(document.getElementById('lumitag-search-input').value);
+  renderLumiTagList(search);
   applyChanges();
 }
 
@@ -3451,7 +3796,7 @@ function openLabelTagValuesDropdown(e, triggerEl, fieldId) {
 
   function render(searchText = '') {
     const filtered = searchText ? items.filter(i => i.toLowerCase().includes(searchText.toLowerCase())) : items;
-    const allChecked = items.length > 0 && items.every(i => selectedSet.has(i));
+    const allChecked = filtered.length > 0 && filtered.every(i => selectedSet.has(i));
     let html = `
       <div class="dropdown-search">
         <span class="material-symbols-outlined search-icon">search</span>
@@ -3459,8 +3804,8 @@ function openLabelTagValuesDropdown(e, triggerEl, fieldId) {
       </div>
       <div class="dropdown-list">
         <div class="dropdown-item" data-action="select-all">
-          <input type="checkbox" ${allChecked ? 'checked' : ''}>
-          <strong>Select All</strong>
+          ${LumiCheckbox.html({checked: allChecked})}
+          <strong>${selectAllLabel(!!searchText, filtered.length)}</strong>
         </div>
         <div class="dropdown-item section-header" style="background:#0E3A82;">
           <strong>Key = ${key}</strong>
@@ -3471,7 +3816,7 @@ function openLabelTagValuesDropdown(e, triggerEl, fieldId) {
       filtered.forEach(v => {
         const checked = selectedSet.has(v);
         html += `<div class="dropdown-item value-item" data-value="${v}">
-          <input type="checkbox" ${checked ? 'checked' : ''}>
+          ${LumiCheckbox.html({checked: checked})}
           <span>${v}</span>
         </div>`;
       });
@@ -3483,8 +3828,9 @@ function openLabelTagValuesDropdown(e, triggerEl, fieldId) {
       menu.querySelector('input').focus();
     });
     menu.querySelector('[data-action="select-all"]').onclick = () => {
-      if (items.every(i => selectedSet.has(i))) selectedSet.clear();
-      else items.forEach(i => selectedSet.add(i));
+      // 只動搜尋結果；沒搜尋時 filtered === items，行為與過去相同
+      if (filtered.length && filtered.every(i => selectedSet.has(i))) filtered.forEach(i => selectedSet.delete(i));
+      else filtered.forEach(i => selectedSet.add(i));
       render(searchText);
       updateLabelTagValuesSummary(fieldId);
     };
@@ -3537,7 +3883,11 @@ function openLabelHierDropdown(e, triggerEl, fieldId) {
     const q = search.toLowerCase();
     const totalChecked = keys.reduce((s, k) => s + labelHierState[fieldId][k].checked.size, 0);
     const totalAvail   = keys.reduce((s, k) => s + data[k].length, 0);
-    const allChecked   = totalChecked === totalAvail && totalChecked > 0;
+    const vis          = visibleByKey(keys, k => data[k], q);
+    const visCount     = keys.reduce((n, k) => n + vis[k].length, 0);
+    const allChecked   = q
+      ? visCount > 0 && keys.every(k => vis[k].every(v => labelHierState[fieldId][k].checked.has(v)))
+      : totalChecked === totalAvail && totalChecked > 0;
 
     // Select All only — Expand All 已移除（per 2026-05 review）
     let html = `
@@ -3547,15 +3897,15 @@ function openLabelHierDropdown(e, triggerEl, fieldId) {
       </div>
       <div class="dropdown-list" style="overscroll-behavior:contain;">
         <div class="dropdown-item" data-action="select-all">
-          <input type="checkbox" ${allChecked ? 'checked' : ''}>
-          <strong>Select All</strong>
+          ${LumiCheckbox.html({checked: allChecked})}
+          <strong>${selectAllLabel(!!q, visCount)}</strong>
         </div>
         <div class="dropdown-divider"></div>`;
 
     keys.forEach(k => {
       const state = labelHierState[fieldId][k];
       const values = data[k];
-      const matchedVals = !q ? values : values.filter(v => v.toLowerCase().includes(q));
+      const matchedVals = vis[k];
       const matchKey = !q || k.toLowerCase().includes(q);
       if (q && !matchKey && matchedVals.length === 0) return;
       const cnt = state.checked.size;
@@ -3564,7 +3914,7 @@ function openLabelHierDropdown(e, triggerEl, fieldId) {
       const effectiveExpanded = state.expanded || (q && matchedVals.length > 0 && matchedVals.length < values.length);
 
       html += `<div class="dropdown-item section-header ${effectiveExpanded ? '' : 'collapsed'}" data-key="${k}" data-action="toggle-key">
-        <input type="checkbox" ${cnt > 0 ? 'checked' : ''} data-label-key="${k}" data-field="${fieldId}">
+        ${LumiCheckbox.html({checked: cnt > 0, mixed: cnt > 0 && cnt < data[k].length, interactive:true, attrs:{'data-label-key':k,'data-field':fieldId}})}
         <span style="flex:1; display:inline-flex; align-items:baseline; gap:4px; min-width:0;">
           <strong>${k}</strong>
           <span style="color:#676767; font-size:12px; font-weight:400;">(${values.length})</span>
@@ -3580,7 +3930,7 @@ function openLabelHierDropdown(e, triggerEl, fieldId) {
           const isMeta = isMetaValue(v);
           // value 為 meta（如 '(empty)'）時套 untagged-item class（italic + 灰色）
           html += `<div class="dropdown-item value-item${isMeta ? ' untagged-item' : ''}" data-key="${k}" data-value="${v}" data-action="toggle-value">
-            <input type="checkbox" ${state.checked.has(v) ? 'checked' : ''}>
+            ${LumiCheckbox.html({checked: state.checked.has(v)})}
             <span>${fmtMetaValueText(v)}</span>
           </div>`;
         });
@@ -3599,13 +3949,7 @@ function openLabelHierDropdown(e, triggerEl, fieldId) {
     inp.addEventListener('input', e2 => { renderMenu(e2.target.value); menu.querySelector('.dropdown-search input').focus(); });
     if (search) inp.focus();
 
-    // Indeterminate state for key checkboxes
-    keys.forEach(k => {
-      const chk = menu.querySelector(`input[data-label-key="${k}"]`);
-      if (!chk) return;
-      const cnt = labelHierState[fieldId][k].checked.size;
-      chk.indeterminate = cnt > 0 && cnt < data[k].length;
-    });
+    // mixed 狀態已在渲染當下決定，不再需要渲染後補 input.indeterminate。
 
     // Toggle key expand/collapse
     menu.querySelectorAll('[data-action="toggle-key"]').forEach(el => {
@@ -3628,14 +3972,16 @@ function openLabelHierDropdown(e, triggerEl, fieldId) {
     });
 
     // Key-level checkbox (select all values in key)
-    menu.querySelectorAll('input[data-label-key]').forEach(chkEl => {
+    menu.querySelectorAll('[data-label-key]').forEach(chkEl => {
       chkEl.addEventListener('click', e2 => {
         e2.stopPropagation();
         const k = chkEl.dataset.labelKey;
         const state = labelHierState[fieldId][k];
-        if (state.checked.size === data[k].length) state.checked.clear();
-        else data[k].forEach(v => state.checked.add(v));
-        renderMenu(menu.querySelector('.dropdown-search input').value);
+        const cur = menu.querySelector('.dropdown-search input').value;
+        const scope = visibleByKey([k], kk => data[kk], cur)[k];
+        if (scope.length && scope.every(v => state.checked.has(v))) scope.forEach(v => state.checked.delete(v));
+        else scope.forEach(v => state.checked.add(v));
+        renderMenu(cur);
         updateLabelHierSummary(fieldId); applyChanges();
       });
     });
@@ -3643,12 +3989,15 @@ function openLabelHierDropdown(e, triggerEl, fieldId) {
     // Select All (top)
     menu.querySelector('[data-action="select-all"]').addEventListener('click', e2 => {
       e2.stopPropagation();
-      const allCh = keys.every(k => labelHierState[fieldId][k].checked.size === data[k].length);
+      const cur = menu.querySelector('.dropdown-search input').value;
+      const scope = visibleByKey(keys, k => data[k], cur);
+      const n = keys.reduce((t, k) => t + scope[k].length, 0);
+      const allCh = n > 0 && keys.every(k => scope[k].every(v => labelHierState[fieldId][k].checked.has(v)));
       keys.forEach(k => {
-        if (allCh) labelHierState[fieldId][k].checked.clear();
-        else data[k].forEach(v => labelHierState[fieldId][k].checked.add(v));
+        if (allCh) scope[k].forEach(v => labelHierState[fieldId][k].checked.delete(v));
+        else scope[k].forEach(v => labelHierState[fieldId][k].checked.add(v));
       });
-      renderMenu(menu.querySelector('.dropdown-search input').value);
+      renderMenu(cur);
       updateLabelHierSummary(fieldId); applyChanges();
     });
   }
@@ -3743,7 +4092,7 @@ function renderMultiDropdownContent(menu, fieldId, items, selectedSet, searchTex
   // 保留現有 scroll 位置 — 避免點 item 時 list 跳回頂部（per Kabin 2026-05-15 反饋）
   const prevScroll = menu.querySelector('.dropdown-list')?.scrollTop || 0;
   const filtered = searchText ? items.filter(i => i.toLowerCase().includes(searchText.toLowerCase())) : items;
-  const allChecked = items.length > 0 && items.every(i => selectedSet.has(i));
+  const allChecked = filtered.length > 0 && filtered.every(i => selectedSet.has(i));
   let html = `
     <div class="dropdown-search">
       <span class="material-symbols-outlined search-icon">search</span>
@@ -3751,8 +4100,8 @@ function renderMultiDropdownContent(menu, fieldId, items, selectedSet, searchTex
     </div>
     <div class="dropdown-list">
       <div class="dropdown-item" data-action="select-all">
-        <input type="checkbox" ${allChecked ? 'checked' : ''}>
-        <strong>Select All</strong>
+        ${LumiCheckbox.html({checked: allChecked})}
+        <strong>${selectAllLabel(!!searchText, filtered.length)}</strong>
       </div>
       <div class="dropdown-divider"></div>`;
   if (filtered.length === 0) {
@@ -3761,7 +4110,7 @@ function renderMultiDropdownContent(menu, fieldId, items, selectedSet, searchTex
     filtered.forEach(item => {
       const checked = selectedSet.has(item);
       html += `<div class="dropdown-item value-item" data-value="${item}">
-        <input type="checkbox" ${checked ? 'checked' : ''}>
+        ${LumiCheckbox.html({checked: checked})}
         <span>${item}</span>
       </div>`;
     });
@@ -3780,8 +4129,8 @@ function renderMultiDropdownContent(menu, fieldId, items, selectedSet, searchTex
     menu.querySelector('input[type="text"]').focus();
   });
   menu.querySelector('[data-action="select-all"]').onclick = () => {
-    if (items.every(i => selectedSet.has(i))) selectedSet.clear();
-    else items.forEach(i => selectedSet.add(i));
+    if (filtered.length && filtered.every(i => selectedSet.has(i))) filtered.forEach(i => selectedSet.delete(i));
+    else filtered.forEach(i => selectedSet.add(i));
     renderMultiDropdownContent(menu, fieldId, items, selectedSet, searchText);
     afterFilterChange(fieldId);
   };
@@ -3801,7 +4150,11 @@ function renderHierDropdownContent(menu, fieldId, itemsObj, state, searchText=''
   const keys = Object.keys(itemsObj);
   const allValuesCount = keys.reduce((s,k) => s + itemsObj[k].length, 0);
   const totalSelected = keys.reduce((s,k) => s + (state.values[k]?.size || 0), 0);
-  const allChecked = totalSelected === allValuesCount && totalSelected > 0;
+  const hvis = visibleByKey(keys, k => itemsObj[k], searchText);
+  const hvisCount = keys.reduce((n,k) => n + hvis[k].length, 0);
+  const allChecked = searchText
+    ? hvisCount > 0 && keys.every(k => hvis[k].every(v => state.values[k]?.has(v)))
+    : totalSelected === allValuesCount && totalSelected > 0;
   let html = `
     <div class="dropdown-search">
       <span class="material-symbols-outlined search-icon">search</span>
@@ -3809,8 +4162,8 @@ function renderHierDropdownContent(menu, fieldId, itemsObj, state, searchText=''
     </div>
     <div class="dropdown-list">
       <div class="dropdown-item" data-action="select-all">
-        <input type="checkbox" ${allChecked ? 'checked' : ''}>
-        <strong>Select All</strong>
+        ${LumiCheckbox.html({checked: allChecked})}
+        <strong>${selectAllLabel(!!searchText, hvisCount)}</strong>
       </div>
       <div class="dropdown-divider"></div>`;
   keys.forEach(key => {
@@ -3819,10 +4172,10 @@ function renderHierDropdownContent(menu, fieldId, itemsObj, state, searchText=''
     const expanded = state._expandedKey === key;
     const checkedCount = state.values[key].size;
     const matchKey = !searchText || key.toLowerCase().includes(searchText.toLowerCase());
-    const matchedVals = !searchText ? values : values.filter(v => v.toLowerCase().includes(searchText.toLowerCase()));
+    const matchedVals = hvis[key];
     if (searchText && !matchKey && matchedVals.length === 0) return;
     html += `<div class="dropdown-item section-header ${expanded ? '' : 'collapsed'}" data-key="${key}">
-      <input type="checkbox" ${checkedCount > 0 ? 'checked' : ''} data-action="key-toggle" data-key="${key}">
+      ${LumiCheckbox.html({checked: checkedCount > 0, mixed: checkedCount > 0 && checkedCount < values.length, interactive:true, attrs:{'data-action':'key-toggle','data-key':key}})}
       <strong>${key}</strong>
       <span style="margin-left:auto; font-size:11px; opacity:0.85;">${checkedCount > 0 ? `(${checkedCount} selected)` : ''}</span>
       <span class="material-symbols-outlined arrow">expand_more</span>
@@ -3832,7 +4185,7 @@ function renderHierDropdownContent(menu, fieldId, itemsObj, state, searchText=''
       visibleValues.forEach(v => {
         const checked = state.values[key].has(v);
         html += `<div class="dropdown-item value-item" data-key="${key}" data-value="${v}">
-          <input type="checkbox" ${checked ? 'checked' : ''}>
+          ${LumiCheckbox.html({checked: checked})}
           <span>${v}</span>
         </div>`;
       });
@@ -3852,11 +4205,13 @@ function renderHierDropdownContent(menu, fieldId, itemsObj, state, searchText=''
   });
   // select all
   menu.querySelector('[data-action="select-all"]').onclick = () => {
-    const allOn = keys.every(k => state.values[k] && state.values[k].size === itemsObj[k].length);
+    const scope = visibleByKey(keys, k => itemsObj[k], searchText);
+    const n = keys.reduce((t,k) => t + scope[k].length, 0);
+    keys.forEach(k => { if (!state.values[k]) state.values[k] = new Set(); });
+    const allOn = n > 0 && keys.every(k => scope[k].every(v => state.values[k].has(v)));
     keys.forEach(k => {
-      if (!state.values[k]) state.values[k] = new Set();
-      if (allOn) state.values[k].clear();
-      else itemsObj[k].forEach(v => state.values[k].add(v));
+      if (allOn) scope[k].forEach(v => state.values[k].delete(v));
+      else scope[k].forEach(v => state.values[k].add(v));
     });
     renderHierDropdownContent(menu, fieldId, itemsObj, state, searchText);
     afterFilterChange(fieldId);
@@ -3865,7 +4220,9 @@ function renderHierDropdownContent(menu, fieldId, itemsObj, state, searchText=''
   menu.querySelectorAll('.section-header').forEach(el => {
     el.onclick = e => {
       // ignore if click was on key-toggle checkbox (handled below)
-      if (e.target.dataset.action === 'key-toggle') return;
+      // checkbox 現在是 span 有子節點，點擊落在 .checkbox__box 上，
+      // e.target.dataset 讀不到，要往上找。
+      if (e.target.closest('[data-action="key-toggle"]')) return;
       const k = el.dataset.key;
       state._expandedKey = state._expandedKey === k ? null : k;
       renderHierDropdownContent(menu, fieldId, itemsObj, state, searchText);
@@ -3877,9 +4234,10 @@ function renderHierDropdownContent(menu, fieldId, itemsObj, state, searchText=''
       e.stopPropagation();
       const k = el.dataset.key;
       if (!state.values[k]) state.values[k] = new Set();
-      const allOn = state.values[k].size === itemsObj[k].length;
-      if (allOn) state.values[k].clear();
-      else itemsObj[k].forEach(v => state.values[k].add(v));
+      const scope = visibleByKey([k], kk => itemsObj[kk], searchText)[k];
+      const allOn = scope.length > 0 && scope.every(v => state.values[k].has(v));
+      if (allOn) scope.forEach(v => state.values[k].delete(v));
+      else scope.forEach(v => state.values[k].add(v));
       renderHierDropdownContent(menu, fieldId, itemsObj, state, searchText);
       afterFilterChange(fieldId);
     };
@@ -5174,7 +5532,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
   'use strict';
 
   window.LUMITURE_NAV = [
-    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', disabled: true },
+    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', href: './overview.html' },
 
     { type: 'group', id: 'dashboard', label: 'Dashboard', items: [
       { id: 'cost-dashboard',     label: 'Cost Dashboard',     icon: 'dashboard',    href: './cost-dashboard.html' },
@@ -5197,7 +5555,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
       { id: 'group-list',         label: 'Group List',         icon: 'groups',          href: './group-list.html' },
       { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
       { id: 'authorization-list', label: 'Authorization List', icon: 'link',            href: './organization-settings.html' },
-      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
+      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', href: './group-list.html#admin' },
     ]},
   ];
 })();

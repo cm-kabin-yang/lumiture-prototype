@@ -275,6 +275,313 @@
  * ============================================================ */
 
 </style>
+<!-- checkbox 共用元件放 head：body 尾端的 inline script 會在 shared script block 之前執行 -->
+<script>
+/* === Inlined: shared/lumiture-checkbox.js === */
+/*!
+ * lumiture-checkbox.js — Lumiture Shared Checkbox v1
+ *
+ * Design spec: Lumiture-Guideline #Checkbox（S size / Primary / unchecked-checked-mixed）
+ *   16×16、--lt-radius-sm、border --lt-grey-300、checked/mixed 皆 --lt-color-primary
+ *   四態齊全：hover / focus-visible / disabled / mixed
+ *   mixed 用 remove icon、checked 用 check icon
+ *
+ * 為什麼不是純 span、也不是純原生 input
+ * ---------------------------------------------------------------------------
+ * group-list v3 當初改成純 span，理由是原生 input[type=checkbox] 在部分瀏覽器的
+ * unchecked 狀態會多畫出一個痕跡（實測與 accent-color、尺寸都無關，是瀏覽器畫
+ * 原生方框本身的痕跡）。但那個痕跡來自「被畫出來的」原生方框；把 input 藏成
+ * opacity:0 之後它一樣不存在，而 .checked / .indeterminate / :checked 三個介面
+ * 全部保留下來。
+ *
+ * 這件事有實際意義，因為既有 prototype 分成兩派狀態模型：
+ *   重繪派  caller 持有 Set/物件，傳 checked/mixed 進來，改變後重繪整塊
+ *           （group-list v3、cost-dashboard v2）
+ *   DOM 派  DOM 本身就是狀態，靠 el.checked / :checked 反推
+ *           （lumi-tag v8 的多選面板、rightsizing v1 的表格與 .sc-check）
+ * 純 span 會逼 DOM 派發明一套狀態層；純原生 input 會逼重繪派回頭補
+ * input.indeterminate（HTML 沒有這個屬性，只能渲染後補丁）。
+ *
+ * 解法是讓 CSS 同時吃兩種來源：
+ *   .checkbox input:checked ~ .checkbox__box   ← DOM 派
+ *   .checkbox.is-checked     .checkbox__box    ← 重繪派
+ * 兩條路落在同一組像素上，誰都不用改自己的模型。
+ *
+ * 附帶把原生語意拿回來：Space 鍵、label 關聯、form 參與、focus 目標都是免費的
+ * （group-list v3 的註記自己就寫過「原生 input 這些是免費的」）。
+ *
+ * ---------------------------------------------------------------------------
+ * 用法 A — 重繪派（caller 持有狀態）
+ *
+ *   LumiCheckbox.html({ checked, mixed, disabled, onclick })
+ *   → 傳 class，渲染時就決定，不需要渲染後補 indeterminate
+ *
+ *     rows.map(r => LumiCheckbox.html({
+ *       checked: sel.has(r.id),
+ *       onclick: `toggleRow('${r.id}')`
+ *     })).join('')
+ *
+ * 用法 B — DOM 派（DOM 即狀態）
+ *
+ *   LumiCheckbox.html({ stateful:true, checked, value, cls, onchange })
+ *   → 產生真的 input，el.checked / el.indeterminate / :checked 照常運作
+ *
+ *     `<label>${LumiCheckbox.html({ stateful:true, cls:'ms-chk', value:opt })}
+ *        <span>${opt}</span></label>`
+ *     panel.querySelectorAll('.ms-chk:checked')     // 照常
+ *     chkAll.indeterminate = true                    // 照常
+ *
+ * 兩種用法可以同檔混用，視覺完全一致。
+ *
+ * ---------------------------------------------------------------------------
+ * Exposes
+ *   LumiCheckbox.html(opts)   → HTML 字串
+ *   LumiCheckbox.el(opts)     → DOM 節點（需要直接 append 時用）
+ *   LumiCheckbox.input(elOrSelector) → 取出內部 input（stateful 用）
+ *   LumiCheckbox.set(elOrSelector, {checked, mixed, disabled})
+ *                             → 兩種模式共用的狀態設定，caller 不用管是哪一種
+ *
+ * opts
+ *   checked   bool    初始/當前選中
+ *   mixed     bool    部分選中（重繪派用 class；DOM 派請改設 input.indeterminate）
+ *   disabled  bool
+ *   stateful  bool    true = 產生真 input（DOM 派），false = 純 class（重繪派）
+ *   onclick   string  inline handler（重繪派慣用；自動包 event.stopPropagation）
+ *                     省略 = 這個 checkbox 只是外層控制項的視覺，會輸出
+ *                     aria-hidden 且不搶 tab 焦點、不擋外層的 onclick
+ *   onchange  string  inline handler（stateful 慣用）
+ *   value     string  stateful 的 input value
+ *   cls       string  額外掛在 input 上的 class（讓既有選擇器如 .ms-chk 繼續命中）
+ *   attrs     object  額外屬性，如 {'data-gi':3}。stateful 掛 input、重繪派掛外層
+ *   wrapTag   string  stateful 外層標籤，預設 'label'。外層已經是 <button>
+ *                     之類的互動元素時傳 'span'，避免巢狀 label 重複觸發
+ *   interactive bool  重繪派專用。它自己是一個控制項、但 handler 是外部
+ *                     addEventListener 綁的（不是 inline onclick）。會輸出
+ *                     role/tabindex，鍵盤以 this.click() 合成點擊
+ *   wrapCls   string  額外掛在外層 .checkbox 上的 class
+ *   id        string  input id（配 <label for>）
+ *   name      string  input name
+ *   label     string  右側文字；省略則只有方框
+ *   ariaLabel string  無可見文字時的無障礙名稱
+ *   title     string  原生 title 提示（掛在外層）
+ *   stop      bool    是否包 event.stopPropagation（預設 true）
+ */
+(function () {
+  'use strict';
+
+  /* ---- CSS（自我注入，載入即可用，不需各 prototype 複製）---- */
+  var CSS = [
+    '.checkbox{display:inline-flex;align-items:center;gap:8px;cursor:pointer;flex:0 0 auto;position:relative;vertical-align:middle}',
+    '.checkbox.is-disabled{cursor:not-allowed}',
+    /* 真 input 藏起來但保留在無障礙樹與 tab 序中。不用 display:none／visibility:hidden，
+     * 那兩個會讓它拿不到焦點，:focus-visible 就沒有東西可以掛。 */
+    '.checkbox input.checkbox__input{position:absolute;width:16px;height:16px;margin:0;opacity:0;cursor:inherit;z-index:1}',
+    '.checkbox input.checkbox__input:disabled{cursor:not-allowed}',
+    '.checkbox__box{display:inline-flex;align-items:center;justify-content:center;flex:0 0 16px;width:16px;height:16px;border:1px solid var(--lt-grey-300,#CCCCCC);border-radius:var(--lt-radius-sm,4px);background:#fff;transition:border-color 150ms ease,background 150ms ease,box-shadow 200ms ease}',
+    '.checkbox__icon{color:#fff;display:none;font-size:12px;line-height:1;font-variation-settings:\'FILL\' 1,\'wght\' 700,\'GRAD\' 0,\'opsz\' 20}',
+    '.checkbox__label{font-size:14px;color:var(--lt-color-text-primary,#262626);user-select:none}',
+    '.checkbox.is-disabled .checkbox__label{color:var(--lt-color-text-disabled,#B3B3B3)}',
+
+    /* hover */
+    '.checkbox:hover .checkbox__box{border-color:var(--lt-grey-400,#B3B3B3)}',
+
+    /* checked／mixed 的填色。左邊是 DOM 派（真 input），右邊是重繪派（class）。 */
+    '.checkbox__input:checked~.checkbox__box,',
+    '.checkbox__input:indeterminate~.checkbox__box,',
+    '.checkbox.is-checked .checkbox__box,',
+    '.checkbox.is-mixed .checkbox__box{background:var(--lt-color-primary,#004FB0);border-color:var(--lt-color-primary,#004FB0)}',
+
+    /* icon 切換全部走 CSS，兩個 icon 都渲染出來、由狀態決定露哪一個，
+     * 所以 DOM 派切換 input.checked 時不需要動 innerHTML。 */
+    '.checkbox__input:checked~.checkbox__box .checkbox__icon--check,',
+    '.checkbox.is-checked .checkbox__icon--check{display:inline-block}',
+    '.checkbox__input:indeterminate~.checkbox__box .checkbox__icon--check,',
+    '.checkbox.is-mixed .checkbox__icon--check{display:none}',
+    '.checkbox__input:indeterminate~.checkbox__box .checkbox__icon--mixed,',
+    '.checkbox.is-mixed .checkbox__icon--mixed{display:inline-block}',
+
+    /* hover on checked／mixed */
+    '.checkbox:hover .checkbox__input:checked~.checkbox__box,',
+    '.checkbox:hover .checkbox__input:indeterminate~.checkbox__box,',
+    '.checkbox:hover.is-checked .checkbox__box,',
+    '.checkbox:hover.is-mixed .checkbox__box{background:var(--lt-color-primary-hover,#0B6DD7);border-color:var(--lt-color-primary-hover,#0B6DD7)}',
+
+    /* focus-visible。真 input 走原生 :focus-visible；純 class 版焦點在外層 span 上。 */
+    '.checkbox__input:focus-visible~.checkbox__box,',
+    '.checkbox:focus-visible .checkbox__box{border-color:var(--lt-color-primary,#004FB0);box-shadow:0 0 0 3px rgba(0,79,176,.1);outline:none}',
+    '.checkbox:focus-visible{outline:none}',
+
+    /* disabled 最後宣告，蓋掉上面所有狀態 */
+    '.checkbox__input:disabled~.checkbox__box,',
+    '.checkbox.is-disabled .checkbox__box{border-color:var(--lt-grey-300,#CCCCCC);background:#fff;box-shadow:none}',
+    '.checkbox__input:disabled:checked~.checkbox__box,',
+    '.checkbox__input:disabled:indeterminate~.checkbox__box,',
+    '.checkbox.is-disabled.is-checked .checkbox__box,',
+    '.checkbox.is-disabled.is-mixed .checkbox__box{background:var(--lt-grey-300,#CCCCCC);border-color:var(--lt-grey-300,#CCCCCC)}'
+  ].join('');
+
+  function injectCSS() {
+    if (document.getElementById('lumi-checkbox-css')) return;
+    var style = document.createElement('style');
+    style.id = 'lumi-checkbox-css';
+    style.textContent = CSS;
+    (document.head || document.documentElement).appendChild(style);
+  }
+  injectCSS();   // documentElement 一定存在，不需要等 DOMContentLoaded
+
+  function attr(name, val) {
+    if (val === undefined || val === null || val === '') return '';
+    return ' ' + name + '="' + String(val).replace(/"/g, '&quot;') + '"';
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  var BOX =
+    '<span class="checkbox__box">' +
+      '<span class="material-symbols-outlined checkbox__icon checkbox__icon--check">check</span>' +
+      '<span class="material-symbols-outlined checkbox__icon checkbox__icon--mixed">remove</span>' +
+    '</span>';
+
+  /* 額外屬性（data-* 之類）。stateful 掛在 input 上，因為既有的委派 handler
+   * 都是從 input 讀 dataset；重繪派掛在外層 span 上，那裡才是可點擊的元素。 */
+  function extraAttrs(o) {
+    if (!o) return '';
+    var out = '';
+    for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) out += attr(k, o[k]);
+    return out;
+  }
+
+  function html(opts) {
+    opts = opts || {};
+    var checked  = !!opts.checked;
+    var mixed    = !!opts.mixed;
+    var disabled = !!opts.disabled;
+    var stop     = opts.stop !== false;
+
+    /* stateful 模式刻意不輸出 is-checked／is-mixed：那兩個 class 是渲染當下的
+     * 快照，caller 之後翻 input.checked 時不會跟著變，留著只會與真實狀態脫節。
+     * 該模式的狀態一律由 input 屬性表達，CSS 已經吃 :checked／:indeterminate。 */
+    var wrapCls = ['checkbox'];
+    if (disabled) wrapCls.push('is-disabled');
+    /* disabled 與 checked／mixed 是可疊加的，不是互斥的。基準版寫成三元互斥
+     * （disabled ? 'is-disabled' : mixed ? ... : checked ? ...），結果
+     * .is-disabled.is-checked 那條 CSS 永遠命中不了，disabled 的已選項目
+     * 會畫成空白框。這裡改成疊加。 */
+    if (!opts.stateful) {
+      if (mixed) wrapCls.push('is-mixed');
+      else if (checked) wrapCls.push('is-checked');
+    }
+    if (opts.wrapCls) wrapCls.push(opts.wrapCls);
+
+    var labelHtml = opts.label
+      ? '<span class="checkbox__label">' + esc(opts.label) + '</span>'
+      : '';
+
+    if (opts.stateful) {
+      /* DOM 派。外層用 <label>，點文字也會切換，是原生行為不需要 handler。
+       * mixed 在 HTML 沒有對應屬性，caller 照常設 input.indeterminate
+       * （CSS 已經吃 :indeterminate）。要在首次渲染就是 mixed 的話，用
+       * LumiCheckbox.set(el,{mixed:true}) 或直接 LumiCheckbox.input(el).indeterminate=true。 */
+      var inputCls = 'checkbox__input' + (opts.cls ? ' ' + opts.cls : '');
+      var oc = opts.onclick && stop
+        ? 'event.stopPropagation();' + opts.onclick
+        : opts.onclick;
+      /* 預設外層是 <label>，點文字也會切換（原生行為，不用 handler）。
+       * 但 <label> 不能巢狀在 <button> 裡（HTML 不合法，而且 label 會再轉發
+       * 一次點擊、跟按鈕自己的 handler 打對台變成切了又切回去）。lumi-tag 的
+       * .ms-item 就是按鈕包 checkbox，那種情況傳 wrapTag:'span'。 */
+      var tag = opts.wrapTag || 'label';
+      return '<' + tag + ' class="' + wrapCls.join(' ') + '"' + attr('title', opts.title) + '>' +
+        '<input type="checkbox" class="' + inputCls + '"' +
+          attr('id', opts.id) + attr('name', opts.name) + attr('value', opts.value) +
+          (checked ? ' checked' : '') + (disabled ? ' disabled' : '') +
+          attr('aria-label', opts.ariaLabel) + extraAttrs(opts.attrs) +
+          attr('onclick', oc) + attr('onchange', opts.onchange) +
+        '>' + BOX + labelHtml +
+      '</' + tag + '>';
+    }
+
+    /* 重繪派。沒有 input，狀態完全由 class 表達，caller 改變狀態後重繪整塊。
+     * role/tabindex/keydown 補回原生 input 免費提供的鍵盤操作。 */
+    var act = (disabled || !opts.onclick) ? ''
+      : ((stop ? 'event.stopPropagation();' : '') + opts.onclick);
+
+    /* 沒有自己的 onclick，代表點擊由外層（例如 .dropdown-item 整列）處理，
+     * 這個 checkbox 只是那個控制項的視覺。這時候不能宣告 role="checkbox"
+     * 也不能吃 tabindex：它不是控制項，掛上去只會多一個按不動的焦點站，
+     * 而且螢幕閱讀器會聽到兩個 checkbox。改成 aria-hidden 交給外層負責語意。
+     * 另外 act 空字串時絕對不能輸出 event.stopPropagation()，否則外層的
+     * onclick 會被自己的視覺元素擋掉。 */
+    if (!act && !disabled && !opts.interactive) {
+      return '<span class="' + wrapCls.join(' ') + '" aria-hidden="true"' +
+        attr('title', opts.title) + extraAttrs(opts.attrs) + '>' + BOX + labelHtml + '</span>';
+    }
+
+    /* 有 inline handler 就直接跑它；interactive 但 handler 是外部
+     * addEventListener 綁的（cost-dashboard 幾個 dropdown 就是這樣），
+     * 就用 this.click() 合成一次點擊，外部 listener 照樣會收到。 */
+    var keydown = act
+      ? "if(event.key===' '||event.key==='Enter'){event.preventDefault();" + act + '}'
+      : "if(event.key===' '||event.key==='Enter'){event.preventDefault();this.click()}";
+    return '<span class="' + wrapCls.join(' ') + '" role="checkbox"' +
+      ' aria-checked="' + (mixed ? 'mixed' : checked) + '"' +
+      ' aria-disabled="' + disabled + '"' +
+      ' tabindex="' + (disabled ? -1 : 0) + '"' +
+      attr('aria-label', opts.ariaLabel) + attr('title', opts.title) + extraAttrs(opts.attrs) +
+      attr('onclick', act) + attr('onkeydown', keydown) +
+    '>' + BOX + labelHtml + '</span>';
+  }
+
+  function el(opts) {
+    var d = document.createElement('div');
+    d.innerHTML = html(opts);
+    return d.firstElementChild;
+  }
+
+  /* 兩種模式共用的狀態設定。stateful 走 input 屬性，重繪派走 class，
+   * caller 不必知道自己拿到的是哪一種。 */
+  function set(target, st) {
+    var node = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!node) return null;
+    var wrap = node.classList && node.classList.contains('checkbox')
+      ? node : node.closest('.checkbox');
+    var inp = input(node);
+    st = st || {};
+    if (inp) {
+      if ('checked'  in st) inp.checked = !!st.checked;
+      if ('mixed'    in st) inp.indeterminate = !!st.mixed;
+      if ('disabled' in st) inp.disabled = !!st.disabled;
+    } else if (wrap) {
+      if ('mixed' in st || 'checked' in st) {
+        wrap.classList.toggle('is-mixed', !!st.mixed);
+        wrap.classList.toggle('is-checked', !st.mixed && !!st.checked);
+        wrap.setAttribute('aria-checked', st.mixed ? 'mixed' : !!st.checked);
+      }
+    }
+    if (wrap && 'disabled' in st) {
+      wrap.classList.toggle('is-disabled', !!st.disabled);
+      if (!inp) {
+        wrap.setAttribute('aria-disabled', !!st.disabled);
+        wrap.setAttribute('tabindex', st.disabled ? -1 : 0);
+      }
+    }
+    return wrap;
+  }
+
+  function input(target) {
+    var node = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!node) return null;
+    if (node.tagName === 'INPUT') return node;
+    return node.querySelector('.checkbox__input');
+  }
+
+  window.LumiCheckbox = { html: html, el: el, input: input, set: set, CSS: CSS };
+})();
+
+</script>
 <style>
 /* Compatibility aliases — v7 既有短名 token 對映到 tokens.css 長名 token。
  * body code 沿用舊短名；衝突值（與 tokens.css 不同）以註解標明，待後續對齊 Figma 後決定。 */
@@ -366,7 +673,7 @@
 .tag-key-sel{min-width:110px}.tag-key-lbl{font-size:12px;color:var(--g400);white-space:nowrap;flex-shrink:0;align-self:center;padding:0 2px}
 .tag-val-wrap{flex:1;min-width:140px;position:relative}.tag-val-wrap .val-txt{width:100%;min-width:0}.val-txt:disabled{background:var(--g100);color:var(--g400);cursor:not-allowed;border-color:var(--g200);pointer-events:none}.tag-val-wrap[data-tip]:hover::after{left:0;transform:none;white-space:nowrap;min-width:0;width:max-content;max-width:340px}
 .tv-of{font-size:13px;color:var(--g500);white-space:nowrap;flex-shrink:0;align-self:center;padding:0 2px}
-.ms-wrap{flex:1;min-width:140px;position:relative}.ms-trigger{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:4px 8px;border:1px solid var(--g200);border-radius:var(--r-sm);background:var(--wh);min-height:34px;cursor:pointer;user-select:none;transition:border-color .15s;position:relative}.ms-trigger:hover{border-color:var(--g400)}.ms-trigger.open{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}.ms-placeholder{color:var(--g400);font-size:12px;pointer-events:none;line-height:1.75}.ms-panel{position:absolute;top:calc(100% + 4px);right:0;left:auto;min-width:260px;width:max-content;max-width:340px;background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.16);z-index:200;display:none}.ms-panel.open{display:block}.ms-search{padding:8px;border-bottom:1px solid var(--g100);position:relative}.ms-search input{width:100%;padding:6px 32px 6px 10px;border:1px solid var(--g200);border-radius:var(--r-sm);font-size:13px;outline:none;font-family:inherit}.ms-search input:focus{border-color:var(--pri)}.ms-search .material-symbols-outlined{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--g400);pointer-events:none}.ms-list{max-height:240px;overflow-y:auto}.ms-item{display:flex;align-items:center;justify-content:flex-start;gap:10px;padding:8px 12px;cursor:pointer;font-size:13px;transition:background .1s;border:none;background:none;width:100%;text-align:left;color:var(--g800);line-height:1.4}.ms-item:hover{background:var(--g50)}.ms-item input[type=checkbox]{width:15px;height:15px;accent-color:var(--pri);cursor:pointer;flex-shrink:0;margin:0;display:block}.ms-divider{height:1px;background:var(--g100);margin:0}.ms-empty{padding:12px;font-size:13px;color:var(--g400);text-align:center}
+.ms-wrap{flex:1;min-width:140px;position:relative}.ms-trigger{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:4px 8px;border:1px solid var(--g200);border-radius:var(--r-sm);background:var(--wh);min-height:34px;cursor:pointer;user-select:none;transition:border-color .15s;position:relative}.ms-trigger:hover{border-color:var(--g400)}.ms-trigger.open{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}.ms-placeholder{color:var(--g400);font-size:12px;pointer-events:none;line-height:1.75}.ms-panel{position:absolute;top:calc(100% + 4px);right:0;left:auto;min-width:260px;width:max-content;max-width:340px;background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.16);z-index:200;display:none}.ms-panel.open{display:block}.ms-search{padding:8px;border-bottom:1px solid var(--g100);position:relative}.ms-search input{width:100%;padding:6px 32px 6px 10px;border:1px solid var(--g200);border-radius:var(--r-sm);font-size:13px;outline:none;font-family:inherit}.ms-search input:focus{border-color:var(--pri)}.ms-search .material-symbols-outlined{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--g400);pointer-events:none}.ms-list{max-height:240px;overflow-y:auto}.ms-item{display:flex;align-items:center;justify-content:flex-start;gap:10px;padding:8px 12px;cursor:pointer;font-size:13px;transition:background .1s;border:none;background:none;width:100%;text-align:left;color:var(--g800);line-height:1.4}.ms-item:hover{background:var(--g50)}/* .ms-item input[type=checkbox] 規則已移除：checkbox 改用 shared/lumiture-checkbox.js（樣式由該檔自我注入、尺寸改為 Guideline 的 16px）。 */.ms-divider{height:1px;background:var(--g100);margin:0}.ms-empty{padding:12px;font-size:13px;color:var(--g400);text-align:center}
 .chip{display:inline-flex;align-items:center;gap:2px;background:var(--pri-lt10);color:var(--pri);border:1px solid var(--pri-lt20);border-radius:20px;padding:1px 8px 1px 10px;font-size:12px;font-weight:500;white-space:nowrap;line-height:1.6}.chip-x{cursor:pointer;font-size:14px;color:var(--g400);margin-left:2px;line-height:1;display:inline-flex;align-items:center}.chip-x:hover{color:var(--err)}
 .st{font-size:18px;font-weight:700;color:var(--g900)}.sd{font-size:13px;color:var(--g500);margin-bottom:16px}
 .cpv{background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);padding:16px;margin-top:16px}.cpv-bar{display:flex;height:24px;border-radius:var(--r-sm);overflow:hidden;margin-bottom:8px}.cpv-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--wh);min-width:2px}.cpv-leg{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--g500);margin-bottom:8px}.cpv-li{display:flex;align-items:center;gap:4px}.cpv-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}.cpv-unalloc{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--warn-lt);border-radius:var(--r-sm);margin-top:8px;font-size:13px;font-weight:500;color:#EC6F09}.cpv-unalloc .material-symbols-outlined{font-size:16px;color:var(--warn)}.cpv-success{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;background:#E6FFF8;border-radius:var(--r-sm);margin-top:8px;font-size:13px;font-weight:500;color:#00B5A6;text-align:center}.cpv-success .material-symbols-outlined{font-size:16px;color:#00B5A6}
@@ -959,7 +1266,7 @@ btn.closest('.csp-picker').classList.remove('open');
 function closePickers(){document.querySelectorAll('.csp-picker.open').forEach(p=>p.classList.remove('open'))}
 
 function getMsOpts(f,key){if(FIELD_VALUES[f])return FIELD_VALUES[f];if(getFieldOpset(f)==='tag'&&key)return TAG_VALUE_OPTS[key]||[];return[]}
-function buildMsWrap(opts,initVals){const itemsHtml=opts.length?opts.map(opt=>{const chk=initVals.includes(opt)?'checked':'';return`<button class="ms-item" type="button" onclick="msTglItem(this)"><input type="checkbox" class="ms-chk" value="${opt}" ${chk} onclick="event.stopPropagation();msUpdTrigger(this)"><span>${opt}</span></button>`}).join(''):'<div class="ms-empty">No options</div>';return`<div class="ms-wrap"><div class="ms-trigger" onclick="toggleMs(this)"><span class="ms-placeholder">Select values…</span><span class="ms-arr material-symbols-outlined">expand_more</span></div><div class="ms-panel"><div class="ms-search"><input type="text" placeholder="Search values…" oninput="filterMs(this)"><span class="material-symbols-outlined">search</span></div><div class="ms-list"><button class="ms-item" type="button" onclick="msTglAll(this)"><input type="checkbox" class="ms-chk-all" onclick="event.stopPropagation()" onchange="msTglAll(this.closest('button'))"><span>Select All</span></button><div class="ms-divider"></div>${itemsHtml}</div></div></div>`}
+function buildMsWrap(opts,initVals){const itemsHtml=opts.length?opts.map(opt=>{const chk=initVals.includes(opt)?'checked':'';return`<button class="ms-item" data-label="${opt.replace(/"/g,'&quot;')}" type="button" onclick="msTglItem(this)">${LumiCheckbox.html({stateful:true, wrapTag:'span', cls:'ms-chk', value:opt, checked:!!chk, onclick:'msUpdTrigger(this)'})}<span>${opt}</span></button>`}).join(''):'<div class="ms-empty">No options</div>';return`<div class="ms-wrap"><div class="ms-trigger" onclick="toggleMs(this)"><span class="ms-placeholder">Select values…</span><span class="ms-arr material-symbols-outlined">expand_more</span></div><div class="ms-panel"><div class="ms-search"><input type="text" placeholder="Search values…" oninput="filterMs(this)"><span class="material-symbols-outlined">search</span></div><div class="ms-list"><button class="ms-item" type="button" onclick="msTglAll(this)">${LumiCheckbox.html({stateful:true, wrapTag:'span', cls:'ms-chk-all', onclick:'event.stopPropagation()', stop:false, onchange:"msTglAll(this.closest('button'))"})}<span class="ms-selall-lbl">Select All</span></button><div class="ms-divider"></div>${itemsHtml}</div></div></div>`}
 
 function updBacBtn(ca){const bac=ca.querySelector('.bac');if(!bac)return;const count=ca.querySelectorAll('.cr').length;bac.disabled=count>=20;if(count>=20)bac.setAttribute('data-tip','Maximum 20 conditions per rule reached');else bac.removeAttribute('data-tip')}
 function addCR(ca,f,o,v,conn,k){const rows=ca.querySelectorAll('.cr');if(rows.length>=20){toast('Maximum 20 conditions per rule reached',1);return}const ab=ca.querySelector('.bac');const r=document.createElement('div');r.className='cr';
@@ -999,11 +1306,44 @@ function updCrmState(ca){
 }
 
 function toggleMs(trigger){const panel=trigger.nextElementSibling;const isOpen=panel.classList.contains('open');document.querySelectorAll('.ms-panel.open').forEach(p=>{p.classList.remove('open');p.previousElementSibling?.classList.remove('open')});if(!isOpen){panel.classList.add('open');trigger.classList.add('open');setTimeout(()=>panel.querySelector('.ms-search input')?.focus(),50)}}
-function filterMs(inp){const q=inp.value.toLowerCase();inp.closest('.ms-panel').querySelectorAll('.ms-item:not(:first-child)').forEach(item=>{const txt=(item.querySelector('span')?.textContent||item.textContent).toLowerCase();item.style.display=txt.includes(q)?'':'none'});msUpdAllState(inp.closest('.ms-panel'))}
+/* 依 Figma 2185:129692（Dropdown 搜尋行為，註記「所有 Dropdown Menu 皆套用」）：
+ * 「呈現搜尋結果時，全選選項調整為 [Select All 3 Result(s)]…點擊 [Select All]
+ *  僅勾選搜尋結果中的項目」。
+ *
+ * 這裡原本用 item.querySelector('span') 取選項文字來比對搜尋字串——2026-09-11
+ * 把 checkbox 換成共用元件之後，元件本身在 <button> 內插入的第一個 span
+ * 是 checkbox 的視覺外殼（.checkbox 本身、以及裡面的 check／remove icon
+ * span），比選項文字 <span>opt</span> 更早出現在 DOM 裡，querySelector('span')
+ * 撈到的其實是 icon 的文字（textContent 恆為 "checkremove"）。結果是搜尋永遠
+ * 比對不到任何真正的選項文字，打字之後清單全部消失——這是遷移造成的迴歸，
+ * 不是原本就有的行為。改成 data-label（渲染時就寫進 button 上）就不用管
+ * checkbox 元件內部長什麼樣。 */
+function msVisibleChks(panel){
+  return Array.from(panel.querySelectorAll('.ms-item:not(:first-child) .ms-chk'))
+    .filter(c=>c.closest('.ms-item').style.display!=='none');
+}
+function filterMs(inp){
+  const q=inp.value.toLowerCase();
+  const panel=inp.closest('.ms-panel');
+  let visN=0;
+  panel.querySelectorAll('.ms-item:not(:first-child)').forEach(item=>{
+    const txt=(item.dataset.label||item.textContent).toLowerCase();
+    const hit=txt.includes(q);
+    item.style.display=hit?'':'none';
+    if(hit) visN++;
+  });
+  const lbl=panel.querySelector('.ms-selall-lbl');
+  if(lbl) lbl.textContent = q ? `Select All ${visN} Result(s)` : 'Select All';
+  msUpdAllState(panel);
+}
 function msTglItem(btn){const chk=btn.querySelector('.ms-chk');if(chk){chk.checked=!chk.checked;msUpdTrigger(chk)}}
-function msTglAll(btn){const panel=btn.closest('.ms-panel');const chkAll=panel.querySelector('.ms-chk-all');const visible=Array.from(panel.querySelectorAll('.ms-item:not(:first-child) .ms-chk')).filter(c=>c.closest('.ms-item').style.display!=='none');const allChecked=visible.length>0&&visible.every(c=>c.checked);const newState=!allChecked;chkAll.checked=newState;chkAll.indeterminate=false;visible.forEach(c=>c.checked=newState);msRefreshTrigger(panel.previousElementSibling,panel);}
+function msTglAll(btn){const panel=btn.closest('.ms-panel');const chkAll=panel.querySelector('.ms-chk-all');const visible=msVisibleChks(panel);const allChecked=visible.length>0&&visible.every(c=>c.checked);const newState=!allChecked;chkAll.checked=newState;chkAll.indeterminate=false;visible.forEach(c=>c.checked=newState);msRefreshTrigger(panel.previousElementSibling,panel);}
 function msUpdTrigger(chk){const panel=chk.closest('.ms-panel');msRefreshTrigger(panel.previousElementSibling,panel);msUpdAllState(panel);simMatch(chk)}
-function msUpdAllState(panel){if(!panel)return;const all=panel.querySelectorAll('.ms-item:not(:first-child) .ms-chk');const chkd=panel.querySelectorAll('.ms-item:not(:first-child) .ms-chk:checked');const chkAll=panel.querySelector('.ms-chk-all');if(!chkAll)return;if(chkd.length===0){chkAll.checked=false;chkAll.indeterminate=false}else if(chkd.length===all.length){chkAll.checked=true;chkAll.indeterminate=false}else{chkAll.checked=false;chkAll.indeterminate=true}}
+/* checked/mixed 的分母原本是「面板裡所有值」，不是「搜尋後看得到的值」——
+ * msTglAll() 早就只作用在可見列上，這裡跟它對不起來：搜尋篩出 3 個都勾了，
+ * 但因為分母還是全部 8 個，表頭會顯示 mixed 而不是 checked。改成跟
+ * msTglAll() 同一份 msVisibleChks()，兩邊分母永遠一致。 */
+function msUpdAllState(panel){if(!panel)return;const all=msVisibleChks(panel);const chkd=all.filter(c=>c.checked);const chkAll=panel.querySelector('.ms-chk-all');if(!chkAll)return;if(chkd.length===0){chkAll.checked=false;chkAll.indeterminate=false}else if(chkd.length===all.length){chkAll.checked=true;chkAll.indeterminate=false}else{chkAll.checked=false;chkAll.indeterminate=true}}
 function msRefreshTrigger(trigger,panel){const vals=Array.from(panel.querySelectorAll('.ms-chk:checked')).map(c=>c.value);const total=panel.querySelectorAll('.ms-item:not(:first-child)').length;const arr=trigger.querySelector('.ms-arr');Array.from(trigger.childNodes).forEach(n=>{if(n!==arr)n.remove();});if(!vals.length){const ph=document.createElement('span');ph.className='ms-placeholder';ph.textContent='Select values…';trigger.insertBefore(ph,arr);trigger.removeAttribute('data-tip');return;}const lbl=document.createElement('span');lbl.className='ms-count-lbl';lbl.textContent=`${vals.length} of ${total} selected`;trigger.insertBefore(lbl,arr);const MAX_TIP=5;const shown=vals.slice(0,MAX_TIP).map(v=>`• ${v}`).join('\n');const extra=vals.length-MAX_TIP;const tip=extra>0?`${shown}\n...+${extra} more, view full list in dropdown list.`:shown;trigger.setAttribute('data-tip',tip);}
 function updOpMode(sel){
 const row=sel.closest('.cr');const op=sel.value;
@@ -1081,7 +1421,7 @@ if(mode==='multi'){
   if(divider){
     while(divider.nextSibling)divider.nextSibling.remove();
     const opts=getMsOpts(f,key);
-    const itemsHtml=opts.length?opts.map(opt=>`<button class="ms-item" type="button" onclick="msTglItem(this)"><input type="checkbox" class="ms-chk" value="${opt}" onclick="event.stopPropagation();msUpdTrigger(this)"><span>${opt}</span></button>`).join(''):'<div class="ms-empty">No values available</div>';
+    const itemsHtml=opts.length?opts.map(opt=>`<button class="ms-item" data-label="${opt.replace(/"/g,'&quot;')}" type="button" onclick="msTglItem(this)">${LumiCheckbox.html({stateful:true, wrapTag:'span', cls:'ms-chk', value:opt, onclick:'msUpdTrigger(this)'})}<span>${opt}</span></button>`).join(''):'<div class="ms-empty">No values available</div>';
     divider.insertAdjacentHTML('afterend',itemsHtml);
   }
   msUpdAllState(panel);msRefreshTrigger(row.querySelector('.ms-trigger'),panel);
@@ -1451,7 +1791,7 @@ el.innerHTML=`<div class="pg-hdr"><a class="back-btn" href="#" onclick="go('list
 <div class="card" style="margin-bottom:24px"><div class="st" style="margin-bottom:8px">Assign Tags to Matched Resources</div><p class="sd">Select which LumiTag keys and values to assign to the matched resources.</p><div id="ba-a"></div><button class="btn btn-o btn-sm" onclick="addBA()" style="margin-top:8px"><span class="material-symbols-outlined">add</span>Add Tag</button><div id="ba-h" style="margin-top:16px;padding:8px 12px;background:var(--pri-lt10);border-radius:var(--r-sm);font-size:13px;color:var(--pri);display:none"><span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle">info</span> <span id="ba-ht"></span></div></div>
 <div class="sbtm"><button class="btn btn-s" onclick="go('list')">Cancel</button><div class="ssp"></div><button class="btn btn-p" onclick="toast('Batch rules created and applied!');go('list')"><span class="material-symbols-outlined">check_circle</span>Preview & Apply</button></div>`;addBC();addBA()}
 
-function addBC(){const c=document.getElementById('ba-c');const rows=c.querySelectorAll('.cr');const r=document.createElement('div');r.className='cr';const ch=rows.length>0?`<select class="csel"><option>AND</option><option>OR</option></select>`:`<span class="wl">WHERE</span>`;const opts=getMsOpts('project');const itemsHtml=opts.map(opt=>`<button class="ms-item" type="button" onclick="msTglItem(this)"><input type="checkbox" class="ms-chk" value="${opt}" onclick="event.stopPropagation();msUpdTrigger(this)">${opt}</button>`).join('');r.innerHTML=`${ch}<select class="field-sel" onchange="updMsField(this)">${fOpts('GCP')}</select><select class="op-sel" onchange="updValInput(this)">${oOpts()}</select><div class="ms-wrap"><div class="ms-trigger" onclick="toggleMs(this)"><span class="ms-placeholder">Select values…</span></div><div class="ms-panel"><div class="ms-search"><input type="text" placeholder="Search values…" oninput="filterMs(this)"><span class="material-symbols-outlined">search</span></div><div class="ms-list"><button class="ms-item" type="button" onclick="msTglAll(this)"><input type="checkbox" class="ms-chk-all" onclick="event.stopPropagation();msTglAll(this.closest('.ms-item'))">&nbsp;Select All</button><div class="ms-divider"></div>${itemsHtml}</div></div></div><button class="crm" onclick="this.closest('.cr').remove()">—</button>`;c.appendChild(r)}
+function addBC(){const c=document.getElementById('ba-c');const rows=c.querySelectorAll('.cr');const r=document.createElement('div');r.className='cr';const ch=rows.length>0?`<select class="csel"><option>AND</option><option>OR</option></select>`:`<span class="wl">WHERE</span>`;const opts=getMsOpts('project');const itemsHtml=opts.map(opt=>`<button class="ms-item" data-label="${opt.replace(/"/g,'&quot;')}" type="button" onclick="msTglItem(this)">${LumiCheckbox.html({stateful:true, wrapTag:'span', cls:'ms-chk', value:opt, onclick:'msUpdTrigger(this)'})}${opt}</button>`).join('');r.innerHTML=`${ch}<select class="field-sel" onchange="updMsField(this)">${fOpts('GCP')}</select><select class="op-sel" onchange="updValInput(this)">${oOpts()}</select><div class="ms-wrap"><div class="ms-trigger" onclick="toggleMs(this)"><span class="ms-placeholder">Select values…</span></div><div class="ms-panel"><div class="ms-search"><input type="text" placeholder="Search values…" oninput="filterMs(this)"><span class="material-symbols-outlined">search</span></div><div class="ms-list"><button class="ms-item" type="button" onclick="msTglAll(this)">${LumiCheckbox.html({stateful:true, wrapTag:'span', cls:'ms-chk-all', onclick:"msTglAll(this.closest('.ms-item'))"})}&nbsp;<span class="ms-selall-lbl">Select All</span></button><div class="ms-divider"></div>${itemsHtml}</div></div></div><button class="crm" onclick="this.closest('.cr').remove()">—</button>`;c.appendChild(r)}
 
 function addBA(){const c=document.getElementById('ba-a');const tO=S.tags.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');const r=document.createElement('div');r.className='ta';r.innerHTML=`<select class="fsel bts" onchange="ubv(this)">${tO}</select><span class="teq">=</span><select class="fsel bvs"></select><button class="crm" onclick="this.closest('.ta').remove();ubh()">—</button>`;c.appendChild(r);ubv(r.querySelector('.bts'));ubh()}
 function ubv(s){const t=S.tags.find(x=>x.id===s.value);const vs=s.closest('.ta').querySelector('.bvs');if(t)vs.innerHTML=t.values.map(v=>`<option>${v.name}</option>`).join('')+'<option>+ New value...</option>';ubh()}
@@ -1879,7 +2219,7 @@ window.LUMITURE_ACTIVE='lumitag';
   'use strict';
 
   window.LUMITURE_NAV = [
-    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', disabled: true },
+    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', href: './overview.html' },
 
     { type: 'group', id: 'dashboard', label: 'Dashboard', items: [
       { id: 'cost-dashboard',     label: 'Cost Dashboard',     icon: 'dashboard',    href: './cost-dashboard.html' },
@@ -1902,7 +2242,7 @@ window.LUMITURE_ACTIVE='lumitag';
       { id: 'group-list',         label: 'Group List',         icon: 'groups',          href: './group-list.html' },
       { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
       { id: 'authorization-list', label: 'Authorization List', icon: 'link',            href: './organization-settings.html' },
-      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
+      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', href: './group-list.html#admin' },
     ]},
   ];
 })();

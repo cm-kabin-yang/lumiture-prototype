@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — Group List v2 (Folder Tree Resource Picker)</title>
+<title>Lumiture.ai — Group List v3 (Full Design Coverage)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -325,7 +325,10 @@ table{border-collapse:collapse;width:100%;min-width:760px;text-align:left;table-
 thead th{position:sticky;top:0;z-index:2;height:50px;padding:7px 16px 8px;background:var(--lt-color-primary-bg);border-bottom:1px solid var(--lt-color-border-default);color:var(--lt-color-text-heading);font-size:var(--lt-fs-14);font-weight:700;white-space:nowrap}
 th.center,td.center{text-align:center}
 th.sortable{cursor:pointer;user-select:none}
-th.sortable:hover{background:var(--lt-grey-200)}
+/* 表頭不做整格灰底 hover（Kabin 2026-09-11）：那是一整片色塊，比它要表達的
+ * 「這欄可排序」重太多，而且表頭是標籤列、不是清單項目。排序的常駐線索是那顆
+ * 箭頭（未選中灰、選中藍）＋ cursor:pointer，hover 只需要把箭頭加深就夠。 */
+th.sortable:hover .sort-ic{color:var(--lt-color-text-secondary)!important}
 .th-sort{display:inline-flex;align-items:center;gap:4px}
 th.sortable.center .th-sort{justify-content:center;width:100%}
 .sort-ic{font-size:16px!important;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20!important}
@@ -345,22 +348,7 @@ tbody tr.pending td{background:var(--lt-grey-100);color:var(--lt-grey-400)}
 td.center .actions-cell{justify-content:center}
 .status-text{font-size:14px}
 .status-text.inactive{color:var(--lt-color-text-secondary)}
-/* Checkbox（Guideline #Checkbox，S size／Primary／unchecked-checked-mixed）。
- * 原生 input[type=checkbox] + accent-color 在部分瀏覽器的 unchecked 狀態會多畫出
- * 一個小圓點（換成 appearance:none 徒手畫框線就會消失，實測跟 accent-color、
- * 尺寸都無關，單純是瀏覽器畫原生 checkbox 本身的痕跡）。改成 Guideline 定義的
- * span 版自訂 checkbox，順便對齊規範沒有走完的 mixed 狀態視覺。 */
-.checkbox{display:inline-flex;align-items:center;gap:8px;cursor:pointer;flex:0 0 auto}
-.checkbox.is-disabled{cursor:not-allowed}
-.checkbox__box{display:inline-flex;align-items:center;justify-content:center;flex:0 0 16px;width:16px;height:16px;border:1px solid var(--lt-grey-300);border-radius:var(--lt-radius-sm);background:#fff;transition:border-color 150ms ease,background 150ms ease,box-shadow 200ms ease}
-.checkbox__icon{color:#fff;display:none;font-size:12px;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 20}
-.checkbox:hover .checkbox__box{border-color:var(--lt-grey-400)}
-.checkbox.is-checked .checkbox__box,.checkbox.is-mixed .checkbox__box{background:var(--lt-color-primary);border-color:var(--lt-color-primary)}
-.checkbox.is-checked .checkbox__icon,.checkbox.is-mixed .checkbox__icon{display:inline-block}
-.checkbox:hover.is-checked .checkbox__box,.checkbox:hover.is-mixed .checkbox__box{background:var(--lt-color-primary-hover);border-color:var(--lt-color-primary-hover)}
-.checkbox:focus-visible .checkbox__box{border-color:var(--lt-color-primary);box-shadow:0 0 0 3px rgba(0,79,176,.1);outline:none}
-.checkbox.is-disabled .checkbox__box{border-color:var(--lt-grey-300);background:#fff}
-.checkbox.is-disabled.is-checked .checkbox__box,.checkbox.is-disabled.is-mixed .checkbox__box{background:var(--lt-grey-300);border-color:var(--lt-grey-300)}
+/* Checkbox 已抽成共用元件 → shared/lumiture-checkbox.js（CSS 由該檔自我注入）。 */
 
 /* ---- tabs (primary, underline) ---- */
 .tabs-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:1px solid var(--lt-color-border-default);margin-bottom:20px}
@@ -392,7 +380,7 @@ td.center .actions-cell{justify-content:center}
 .empty-state.small{min-height:180px}
 .empty-state .material-symbols-outlined{font-size:64px;color:var(--lt-blue-30);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48;margin-bottom:12px}
 .empty-title{font-size:16px;font-weight:700;margin:0 0 4px;color:var(--lt-color-text-heading)}
-.empty-copy{margin:0;max-width:420px;color:var(--lt-color-text-secondary);line-height:1.65;white-space:pre-line}
+.empty-copy{margin:0;color:var(--lt-color-text-secondary);line-height:1.65;white-space:pre-line}   /* v3：拿掉 v2 的 max-width:420px，#01-2 / #05-1 的兩行文案被它擠成三行（不要加設計稿沒有的 max-width） */
 .empty-state.error .material-symbols-outlined{color:var(--lt-color-error);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
 .empty-state .btn{margin-top:16px}
 
@@ -472,6 +460,9 @@ td.center .actions-cell{justify-content:center}
 .tnode .ticon.ghost{visibility:hidden}
 .tnode.is-folder .ticon{color:var(--lt-color-primary)}
 .tnode.is-unassigned .ticon{color:var(--lt-grey-400)}
+/* 多 org 時這一組排在所有 org 區段之外，用一條實線把它跟上一個 org 切開，
+ * 不然它緊貼在最後一個 org 的資料夾底下，會被讀成屬於那個 org。 */
+.tnode.is-cross-org{border-top:1px solid var(--lt-color-border-default)}
 .tlabel{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
 .tname{font-size:var(--lt-fs-14);color:var(--lt-color-text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tnode.is-folder .tname{font-weight:600}
@@ -479,10 +470,26 @@ td.center .actions-cell{justify-content:center}
 .tsub{font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tcount{font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);font-weight:400;font-variant-numeric:tabular-nums}
 .tcount.partial{color:var(--lt-color-warning)}
+.ba-chip.is-org-chip{background:var(--lt-blue-10);color:var(--lt-color-primary)}
 .ba-chip{flex:0 0 auto;font-size:11px;color:var(--lt-color-text-secondary);background:var(--lt-grey-100);border-radius:var(--lt-radius-xs);padding:2px 8px;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
 .hl{color:var(--lt-blue-60);font-weight:700}
 /* Select All 是清單的總開關，不是樹的一部分，用一條底線跟樹分開 */
 .tnode.is-selectall{border-bottom:1px solid var(--lt-color-border-default);position:sticky;top:0;z-index:40;background:var(--lt-color-bg-default)}
+/* org 區段標頭。比資料夾列深一階（blue-20 vs blue-10），字級小一階，
+ * 沒有 checkbox / chevron 也不可點——讓它一眼就不是「可以勾的東西」。 */
+/* min-height 壓到 32px 要連 .tnode 的 padding 4px 上下一起收掉，不然會被撐回 40。
+ * 比資料夾列矮一階是刻意的：它不是可勾選的列，體積就不該跟那些列一樣。 */
+/* padding-left 16px：.tnode 的 base padding-left 是 0（各列自己用 inline 的
+ * indentPx() 決定），標頭沒有 inline padding 就會貼齊左邊緣。取 16 而不是
+ * 資料夾列的 24，是讓標頭的左緣比列還外面一點，強化「這是區段不是列」。
+ * icon 與文字之間 8px（8px grid；原本寫 6px 是離格的）。 */
+.tnode.is-org{position:sticky;z-index:35;min-height:32px;padding:0 24px 0 16px;gap:8px;cursor:default;
+  background:var(--lt-blue-20,#CCE0F5);box-shadow:inset 0 -1px 0 0 var(--lt-blue-30,#99C1EB)}
+.tnode.is-org:hover{background:var(--lt-blue-20,#CCE0F5)}
+.tnode.is-org .org-icon{font-size:16px;color:var(--lt-color-primary);flex:0 0 auto;
+  font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
+.tnode.is-org .org-name{font-size:var(--lt-fs-12);font-weight:600;color:var(--lt-color-text-primary);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tnode.is-selectall .tname{font-weight:600}
 .tname.is-nocost{color:var(--lt-color-text-secondary);font-style:italic}
 /* ============================================================
@@ -498,6 +505,12 @@ td.center .actions-cell{justify-content:center}
  * ============================================================ */
 .rmodal-body.is-component .tnode{min-height:40px}
 .rmodal-body.is-component .tnode.is-project{min-height:40px}
+/* 這條要跟上面同一個選擇器深度，否則 .tnode.is-org 的 32px 搶不過 0,3,0。 */
+.rmodal-body.is-component .tnode.is-org{min-height:32px}
+/* 元件版（非 fix）用 react-window，列會變成 absolute，sticky 在裡面無效——
+ * org 標頭跟資料夾列受同一個限制，所以那個對照版本要一起退回 static，
+ * 不然會給人「元件版做得到 sticky」的錯覺。 */
+.rmodal-body.is-component:not(.is-component-fixed) .tnode.is-org{position:static}
 /* 父層＝整條 tint band（GroupHeader 的 sx） */
 .rmodal-body.is-component .tnode.is-folder{
   position:static;                       /* 元件用 react-window 虛擬清單，sticky 在裡面無效 */
@@ -535,6 +548,153 @@ td.center .actions-cell{justify-content:center}
 .tskel{padding:8px 24px}
 .tskel .skel{height:36px;margin-bottom:8px}
 
+
+/* ============================================================
+ * v3 P1 — Create Group wizard（Figma #08 系列）
+ * 彈窗 800×720：#08 的 instance「IAM / Group List / Create Group」實測 800×720，
+ * 註記也寫「由於後面步驗需要展示較多內容，因此彈窗高度先固定為最大值的 720px」。
+ * 這是 CMDS 660px 預設的例外，依據是設計稿本身（#11 的便利貼也提到
+ * 「create group 流程優化…連帶出現一些寬度 800px 的彈窗，其餘都是 700px」）。
+ * ============================================================ */
+.wz-backdrop{position:fixed;inset:0;z-index:2000;background:var(--lt-modal-backdrop);display:grid;place-items:center;padding:24px}
+.wz{width:min(800px,100%);height:min(720px,calc(100vh - 48px));display:flex;background:#fff;border-radius:15px;box-shadow:var(--lt-modal-shadow);overflow:hidden}   /* Figma: rounded-[15px]，不對應任何既有 --lt-radius-* token（get_design_context 核對） */
+/* 左側垂直 stepper：done / active 都是藍色實心勾（#30 第一、二步同時是勾），
+ * 未到的步驟是灰色空心圓 + 灰字。步驟之間一條 2px 直線接在圓心下方。 */
+.wz-steps{flex:0 0 200px;padding:32px 8px 32px 24px;display:flex;flex-direction:column;border-right:1px solid transparent}
+.wz-step{display:flex;align-items:flex-start;gap:10px;font-size:14px;font-weight:700;line-height:24.5px;color:var(--lt-grey-400)}   /* get_design_context：Body Bold 14px、icon-text gap 10px，不是 13px/600/18px/8px */
+.wz-step .wz-dot{width:20px;height:20px;flex:0 0 20px;border-radius:50%;border:2px solid var(--lt-grey-300);background:#fff;display:grid;place-items:center;margin-top:-1px}
+.wz-step .wz-dot .material-symbols-outlined{display:none;font-size:14px;color:#fff;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 20}
+.wz-step.done,.wz-step.active{color:var(--lt-color-primary)}
+.wz-step.done .wz-dot,.wz-step.active .wz-dot{background:var(--lt-color-primary);border-color:var(--lt-color-primary)}
+.wz-step.done .wz-dot .material-symbols-outlined,.wz-step.active .wz-dot .material-symbols-outlined{display:block}
+.wz-line{width:2px;height:30px;background:var(--lt-grey-200);margin:6px 0 6px 9px;flex:0 0 auto}   /* Figma connector 是 30px，不是 26（get_design_context 核對） */
+.wz-pane{flex:1;min-width:0;display:flex;flex-direction:column;padding:24px}
+.wz-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:32px}   /* Figma Content: gap-32，不是 24（get_design_context 核對） */
+.wz-head h3{margin:0;font-size:var(--lt-fs-20);font-weight:var(--lt-fw-bold);line-height:30px}   /* Figma: CM Typography/Headers/H4 20px Bold（get_variable_defs 核對，不是 v2 沿用的 18px） */
+.wz-desc{margin:0 0 32px;font-size:var(--lt-fs-14);color:var(--lt-color-text-primary);line-height:var(--lt-leading-tight)}   /* 同上，Content gap-32 統一套用 */
+.wz-body{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto;overscroll-behavior:contain}
+.wz-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:16px}
+.wz-foot .btn{min-width:100px}
+.wz-foot-right{display:flex;gap:8px;margin-left:auto}
+.wz-skip{font-size:13px}
+/* 內嵌的資源選單：#31 / #37 把清單裝在一個帶框線的容器裡，這裡復用 v2 的
+ * picker（工具列 + 提示條 + 清單），只換外殼。 */
+.wz-picker{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--lt-color-border-default);border-radius:5px;overflow:hidden}
+.wz-picker .rmodal-tools{padding:12px 16px}
+.wz-picker .rmodal-body{border-bottom:0}
+.wz-picker .tnotice{padding:8px 16px}
+.wz-count{margin-top:8px}
+.spin{animation:wzspin 1s linear infinite;font-size:18px}
+@keyframes wzspin{to{transform:rotate(360deg)}}
+
+/* ---- form fields（#08 / #30 / #11：藍色粗體小標籤 + 36px 輸入框 + 12px 灰色說明） ---- */
+.fld{margin-bottom:32px}   /* 同上：Content 內每個區塊（欄位、欄位群組）之間固定 gap-32，不是 20（get_design_context 核對 #08 / #09 皆同） */
+.fld-lbl{display:block;font-size:var(--lt-fs-12);font-weight:700;color:var(--lt-color-primary);margin-bottom:4px;line-height:1.4}   /* Text Field 元件內建 label→input gap 是 4px，不是 6（get_design_context 核對） */
+.fld-lbl .req{color:var(--lt-color-error);margin-left:2px}
+.ipt{width:100%;height:36px;border:1px solid var(--lt-grey-300);border-radius:5px;padding:0 8px;font-size:14px;background:#fff;color:var(--lt-color-text-primary)}   /* Figma: State/Border Main #CCCCCC + 8px 水平內距（get_design_context 核對，原本邊框 12px 內距都是猜的） */
+.ipt::placeholder{color:var(--lt-grey-400)}
+.ipt-lg{height:44px}   /* #09 Edit Group 用的是 Text Field / Large（44px），不是其餘表單共用的 Medium（36px）（get_design_context 核對，只在這一個彈窗看到 Large，範圍縮到只有這裡） */
+.ipt:focus{outline:none;border-color:var(--lt-color-primary)}
+.fld.has-error .ipt{border-color:var(--lt-color-error)}
+.fld.has-error .ipt:focus{border-color:var(--lt-color-error)}
+.fld-err{font-size:var(--lt-fs-12);color:var(--lt-color-error);margin-top:4px;line-height:1.4}
+.fld-help{font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);margin-top:6px;line-height:1.5;padding-left:8px}
+.sel{position:relative}
+.sel select.ipt{appearance:none;-webkit-appearance:none;padding-right:32px;cursor:pointer}
+.sel::after{content:'arrow_drop_down';font-family:'Material Symbols Outlined';position:absolute;right:8px;top:6px;font-size:22px;color:var(--lt-color-text-secondary);pointer-events:none}
+/* Error Details 折疊區（#08-2、#11-1）：預設展開、內容過高才出捲軸、點標題可收合
+ * 只剩標題。註記說樣式參考 CMDS，這裡照截圖：外框 + 紅色警示 icon + 粗體標題 +
+ * 右側 chevron。 */
+.errbox{border:1px solid var(--lt-color-border-default);border-radius:5px;margin-top:8px;overflow:hidden;background:#fff}
+.errbox-head{display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;border:0;background:#fff;font:inherit;font-size:13px;font-weight:700;color:var(--lt-color-text-primary);cursor:pointer;text-align:left}
+.errbox-head .warn{color:var(--lt-color-error);font-size:18px}
+.errbox-head .chev{margin-left:auto;font-size:20px;color:var(--lt-color-text-secondary);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20}
+.errbox-body{border-top:1px solid var(--lt-color-border-default);padding:12px 16px;font-size:var(--lt-fs-12);line-height:1.6;max-height:132px;overflow:auto;overscroll-behavior:contain;color:var(--lt-color-text-primary)}
+.errbox-body ul{margin:8px 0 0;padding-left:18px}
+.errbox-body::-webkit-scrollbar{width:6px}
+.errbox-body::-webkit-scrollbar-thumb{background:var(--lt-grey-300);border-radius:3px}
+
+/* ---- Resources 子分頁 segmented control（#03-3 / #03-4）：Project|Label、Account|Tag。
+ * 選中的那格淺藍底 + 藍字 + 深藍計數 pill；未選白底灰字 + 灰計數 pill。 ---- */
+.seg{display:inline-flex;border:1px solid var(--lt-color-border-default);border-radius:5px;overflow:hidden;flex:0 0 auto}
+.seg-btn{height:36px;padding:0 12px;border:0;background:#fff;font-size:13px;font-weight:600;color:var(--lt-color-text-secondary);cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:inherit}
+.seg-btn+.seg-btn{border-left:1px solid var(--lt-color-border-default)}
+.seg-btn:hover{background:var(--lt-grey-50)}
+.seg-btn.active{background:var(--lt-color-primary-bg);color:var(--lt-color-primary)}
+.seg-cnt{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;border-radius:10px;padding:0 6px;font-size:11px;font-weight:700;background:var(--lt-grey-200);color:var(--lt-color-text-secondary);font-variant-numeric:tabular-nums}
+.seg-btn.active .seg-cnt{background:var(--lt-blue-90);color:#fff}
+.res-toolbar-left{display:flex;align-items:center;gap:12px;min-width:0}
+.res-toolbar-left .search-box{width:240px}
+
+/* ---- Assign Resource by Label / Tag（#56 / #57）：800px 寬、高度 hug。
+ * 下拉面板（#56-1 / #57-1）會超出彈窗底部，所以彈窗本身不能 overflow:hidden。 ---- */
+.lmodal{width:min(800px,100%);background:#fff;border-radius:var(--lt-radius-lg);box-shadow:var(--lt-modal-shadow);padding:24px;position:relative}
+.lmodal .rmodal-head{padding:0;margin-bottom:20px}
+.dd{position:relative}
+.dd-trigger{width:100%;height:36px;border:1px solid var(--lt-grey-300);border-radius:5px;padding:0 32px 0 12px;background:#fff;text-align:left;font:inherit;font-size:14px;color:var(--lt-color-text-primary);cursor:pointer;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}   /* 同上 */
+.dd-trigger.placeholder{color:var(--lt-grey-400)}
+.dd-trigger:focus-visible{outline:none;border-color:var(--lt-color-primary)}
+.dd.is-open .dd-trigger{border-color:var(--lt-color-primary)}
+.dd-trigger:disabled{background:var(--lt-grey-50);color:var(--lt-grey-300);cursor:not-allowed}
+.dd-caret{position:absolute;right:8px;top:6px;font-size:22px;color:var(--lt-color-text-secondary);pointer-events:none;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
+.dd-panel{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:60;background:#fff;border:1px solid var(--lt-color-border-default);border-radius:6px;box-shadow:var(--lt-shadow-dialog);padding:10px;max-height:360px;display:flex;flex-direction:column;overflow:hidden}   /* 上一版猜 elevation/1（MUI Paper 陰影）是錯的——get_design_context 直接讀到這個元件自己的 shadow-[0px_0px_6px_...rgba(0,0,0,0.2)]，就是站台既有的扁平 Dialog/Card/Dropdown 陰影 --lt-shadow-dialog。get_variable_defs 那次抓到的 elevation/1 屬於同一個畫布範圍內的別的東西，不是這個下拉本身。順帶核對：外距 10px、圓角 6px、清單列 40px（見下） */
+.dd-search{padding:0 0 8px;border-bottom:1px solid var(--lt-color-border-default);margin-bottom:8px}   /* .dd-panel 已經有 10px 外距，搜尋框不用再自己內縮；改成搜尋列跟清單之間畫一條分隔線（get_design_context：Line 73） */
+.dd-search .search-box{width:100%}
+/* #56-1 的搜尋 icon 在右邊（跟頁面搜尋框相反），照設計稿 */
+.dd-search .search-box input{padding:0 36px 0 12px;height:32px}
+.dd-search .search-box .material-symbols-outlined{left:auto;right:9px;top:6px}
+.dd-list{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding-bottom:4px}
+.dd-list::-webkit-scrollbar{width:6px}
+.dd-list::-webkit-scrollbar-thumb{background:var(--lt-grey-300);border-radius:3px}
+.dd-row{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 8px;border-radius:5px;cursor:pointer;font-size:14px;color:var(--lt-color-text-primary)}   /* get_design_context：40px 列高、8px gap、14px 字（原本 30px/10px/13px 都是猜的） */
+.dd-row:hover{background:var(--lt-color-primary-bg)}
+/* 上層列是深藍色整條 band（#56-1「Billing Account = Cleveland-client-01 (…)」） */
+.dd-row.group{background:var(--lt-blue-90);color:#fff;font-weight:700;font-size:16px;position:sticky;top:0;z-index:2;border-radius:0}   /* 2026-09-11 Kabin 核可：深藏青 #002663（--lt-blue-90）才對，
+   get_design_context 上次讀到的 #0b6dd7 是誤判。
+   已知未來方向：這個分組列之後會改成跟 Cost Dashboard 篩選器／LumiTag 那組一樣的 Light 10（淺藍底
+   --lt-blue-10 #f2faff）風格，但那個模式在目前的 codebase 裡還沒有現成範例可抄（cost-dashboard 的
+   groupby-dropdown 目前的 section 分隔只是純文字小標籤，不是色塊），屬於之後才會做的改版，這輪不動。 */
+.dd-row.group:hover{background:var(--lt-blue-90)}
+.dd-row.group .dd-id{color:rgba(255,255,255,.72);font-weight:400}
+.dd-row.group .checkbox__box{border-color:#fff}
+.dd-row.child{padding-left:32px}   /* get_design_context：32px 縮排，不是 28 */
+.dd-id{font-size:12px;color:var(--lt-color-text-secondary)}
+.dd-empty{padding:16px;font-size:13px;color:var(--lt-color-text-secondary);text-align:center}
+.dd-lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+
+/* ---- v3 P2：Group / User CRUD 彈窗（#09 / #10 / #10-1 / #11 / #12 / #13） ----
+ * 寬度照 Figma instance 實測：Edit Group / Remove Group / Edit User / Remove User 640、
+ * Group Deletion Not Allowed 655、Invite User 800（跟 Create Group 同一顆元件）。
+ * ⚠️ CMDS 預設 660 與這裡量到的 640 差 20px，已列入回報請 Kabin 確認哪個是準的。 */
+.dlg.fm{padding:24px 32px;border-radius:15px}   /* Figma「Modal / Left Aligned / Field」：px-32 py-24 + rounded-15，不是 v2 .dlg 沿用的 24px 全邊 + --lt-radius-lg（get_design_context 核對 #09） */
+.dlg.fm.is-warn{border-radius:10px}   /* Remove Group／Remove User／Group Deletion Not Allowed 用的是「Modal / Left Aligned / Normal」，圓角 10px，不是 Field 變體的 15px（get_design_context 核對 #10／#13） */
+.fm-head{display:flex;align-items:center;gap:15px;margin-bottom:32px}   /* Normal 變體：icon-標題 gap 15px、Content 統一 32px 間距，不是 10px/20px（get_design_context 核對） */
+.fm-head h3{margin:0;font-size:var(--lt-fs-20);font-weight:var(--lt-fw-bold);line-height:30px;flex:1}   /* 同上，H4 20px Bold */
+/* #10 / #13 的警示 icon 是深色實心三角，不是琥珀色（跟 v2 Unlink 那顆不同，照各自的稿） */
+.fm-head .material-symbols-outlined.fm-warn{font-size:30px;color:var(--lt-color-text-primary)}   /* Warning icon 是 30x30，不是 24（get_design_context 核對） */
+.fm-name{color:var(--lt-color-primary);font-weight:500}   /* Figma 群組/使用者名稱是 Medium 500，不是預設 400（get_design_context 核對） */
+.fld-static{font-size:14px;color:var(--lt-color-text-primary);padding:2px 0}
+/* .fm 內的 .wz-desc（Invite Admin/Invite User）沒有另外驗證出不同的間距，拿掉原本猜的 20px override，直接繼承上面驗證過的 32px */
+.fm .dlg-body{margin-bottom:32px;line-height:24.5px}   /* 同一個 Content gap-32 規則，不是 24；行高 24.5px（Body Regular）（get_design_context 核對） */
+.fm .dlg-actions{gap:16px}   /* #09 的 action row 是 gap-16，v2 的 .dlg-actions 預設 8px 是 Unlink Resource 自己的稿，不動、只在 .fm 範圍覆寫（get_design_context 核對） */
+
+
+/* ---- v3 P3：Admin List、逐清單 loading、零碎狀態 ---- */
+/* 麵包屑（#06 註記：最多一行、每項最大寬約 135px、超過顯示 …） */
+.crumb{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.crumb-item{display:inline-block;max-width:135px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+/* Learn More 連結（#01 / #02 / #07）：問號 icon + 深灰底線粗體小字，放在卡片內表格下方 */
+.learn-more{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.learn{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;padding:0;cursor:pointer;font:inherit;font-size:var(--lt-fs-12);font-weight:700;color:var(--lt-color-text-primary);text-decoration:underline}
+.learn .material-symbols-outlined{font-size:16px;color:var(--lt-color-text-secondary);text-decoration:none}
+.learn:hover{color:var(--lt-color-primary)}
+/* Skeleton 表頭（#32–#35）：表頭是一條灰色 band 裡放灰條，沒有欄位文字 */
+thead th.skel-th{background:var(--lt-grey-100)}
+.skel-th .skel{height:14px;width:60%}
+/* 讀取中的分頁列：維持樣式但不可點（#34 註記「用來顯示使用者身處何處的 tab / button group 等元件需維持原樣式，但點擊無作用」） */
+.is-loading-ui{pointer-events:none}
+
 /* ---- toast ---- */
 .toast{position:fixed;left:24px;bottom:24px;z-index:4000;display:flex;align-items:center;gap:10px;max-width:440px;border-radius:var(--lt-radius-sm);padding:12px 16px;background:var(--lt-color-success);color:#fff;box-shadow:var(--lt-shadow-overlay-strong);font-size:14px;transform:translateY(100px);opacity:0;transition:var(--lt-transition-base)}
 .toast.error{background:var(--lt-color-error)}
@@ -559,7 +719,7 @@ td.center .actions-cell{justify-content:center}
       <section id="app" aria-live="polite"></section>
     </main>
     <div class="footer">
-      <span class="footer-version">Group List Prototype<span class="ver-tag">v2 · Folder Tree</span></span>
+      <span class="footer-version">Group List Prototype<span class="ver-tag">v3 · Full Design Coverage</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
     </div>
   </div>
@@ -568,9 +728,318 @@ td.center .actions-cell{justify-content:center}
 <div class="toast" id="toast"><span class="material-symbols-outlined" id="toast-icon">check_circle</span><span id="toast-text"></span></div>
 <div id="dialog-root"></div>
 <div id="assign-root"></div>
+<div id="tag-root"></div>
+<div id="wizard-root"></div>
+<div id="form-root"></div>
 
 
-<script>window.LUMITURE_ACTIVE='group-list'; window.LUMITURE_USER={role:'Admin',plan:'Standard',quota:{analyses:{used:32,total:80},rightsizing:{used:410,total:1000},refreshDate:'2 Jul. 2026'}};</script>
+<script>window.LUMITURE_ACTIVE = location.hash==='#admin' ? 'admin-list' : 'group-list';   // v3：Admin List 也在這支檔案裡（#admin） window.LUMITURE_USER={role:'Admin',plan:'Standard',quota:{analyses:{used:32,total:80},rightsizing:{used:410,total:1000},refreshDate:'2 Jul. 2026'}};</script>
+<script>
+/* === Inlined: shared/lumiture-checkbox.js === */
+/*!
+ * lumiture-checkbox.js — Lumiture Shared Checkbox v1
+ *
+ * Design spec: Lumiture-Guideline #Checkbox（S size / Primary / unchecked-checked-mixed）
+ *   16×16、--lt-radius-sm、border --lt-grey-300、checked/mixed 皆 --lt-color-primary
+ *   四態齊全：hover / focus-visible / disabled / mixed
+ *   mixed 用 remove icon、checked 用 check icon
+ *
+ * 為什麼不是純 span、也不是純原生 input
+ * ---------------------------------------------------------------------------
+ * group-list v3 當初改成純 span，理由是原生 input[type=checkbox] 在部分瀏覽器的
+ * unchecked 狀態會多畫出一個痕跡（實測與 accent-color、尺寸都無關，是瀏覽器畫
+ * 原生方框本身的痕跡）。但那個痕跡來自「被畫出來的」原生方框；把 input 藏成
+ * opacity:0 之後它一樣不存在，而 .checked / .indeterminate / :checked 三個介面
+ * 全部保留下來。
+ *
+ * 這件事有實際意義，因為既有 prototype 分成兩派狀態模型：
+ *   重繪派  caller 持有 Set/物件，傳 checked/mixed 進來，改變後重繪整塊
+ *           （group-list v3、cost-dashboard v2）
+ *   DOM 派  DOM 本身就是狀態，靠 el.checked / :checked 反推
+ *           （lumi-tag v8 的多選面板、rightsizing v1 的表格與 .sc-check）
+ * 純 span 會逼 DOM 派發明一套狀態層；純原生 input 會逼重繪派回頭補
+ * input.indeterminate（HTML 沒有這個屬性，只能渲染後補丁）。
+ *
+ * 解法是讓 CSS 同時吃兩種來源：
+ *   .checkbox input:checked ~ .checkbox__box   ← DOM 派
+ *   .checkbox.is-checked     .checkbox__box    ← 重繪派
+ * 兩條路落在同一組像素上，誰都不用改自己的模型。
+ *
+ * 附帶把原生語意拿回來：Space 鍵、label 關聯、form 參與、focus 目標都是免費的
+ * （group-list v3 的註記自己就寫過「原生 input 這些是免費的」）。
+ *
+ * ---------------------------------------------------------------------------
+ * 用法 A — 重繪派（caller 持有狀態）
+ *
+ *   LumiCheckbox.html({ checked, mixed, disabled, onclick })
+ *   → 傳 class，渲染時就決定，不需要渲染後補 indeterminate
+ *
+ *     rows.map(r => LumiCheckbox.html({
+ *       checked: sel.has(r.id),
+ *       onclick: `toggleRow('${r.id}')`
+ *     })).join('')
+ *
+ * 用法 B — DOM 派（DOM 即狀態）
+ *
+ *   LumiCheckbox.html({ stateful:true, checked, value, cls, onchange })
+ *   → 產生真的 input，el.checked / el.indeterminate / :checked 照常運作
+ *
+ *     `<label>${LumiCheckbox.html({ stateful:true, cls:'ms-chk', value:opt })}
+ *        <span>${opt}</span></label>`
+ *     panel.querySelectorAll('.ms-chk:checked')     // 照常
+ *     chkAll.indeterminate = true                    // 照常
+ *
+ * 兩種用法可以同檔混用，視覺完全一致。
+ *
+ * ---------------------------------------------------------------------------
+ * Exposes
+ *   LumiCheckbox.html(opts)   → HTML 字串
+ *   LumiCheckbox.el(opts)     → DOM 節點（需要直接 append 時用）
+ *   LumiCheckbox.input(elOrSelector) → 取出內部 input（stateful 用）
+ *   LumiCheckbox.set(elOrSelector, {checked, mixed, disabled})
+ *                             → 兩種模式共用的狀態設定，caller 不用管是哪一種
+ *
+ * opts
+ *   checked   bool    初始/當前選中
+ *   mixed     bool    部分選中（重繪派用 class；DOM 派請改設 input.indeterminate）
+ *   disabled  bool
+ *   stateful  bool    true = 產生真 input（DOM 派），false = 純 class（重繪派）
+ *   onclick   string  inline handler（重繪派慣用；自動包 event.stopPropagation）
+ *                     省略 = 這個 checkbox 只是外層控制項的視覺，會輸出
+ *                     aria-hidden 且不搶 tab 焦點、不擋外層的 onclick
+ *   onchange  string  inline handler（stateful 慣用）
+ *   value     string  stateful 的 input value
+ *   cls       string  額外掛在 input 上的 class（讓既有選擇器如 .ms-chk 繼續命中）
+ *   attrs     object  額外屬性，如 {'data-gi':3}。stateful 掛 input、重繪派掛外層
+ *   wrapTag   string  stateful 外層標籤，預設 'label'。外層已經是 <button>
+ *                     之類的互動元素時傳 'span'，避免巢狀 label 重複觸發
+ *   interactive bool  重繪派專用。它自己是一個控制項、但 handler 是外部
+ *                     addEventListener 綁的（不是 inline onclick）。會輸出
+ *                     role/tabindex，鍵盤以 this.click() 合成點擊
+ *   wrapCls   string  額外掛在外層 .checkbox 上的 class
+ *   id        string  input id（配 <label for>）
+ *   name      string  input name
+ *   label     string  右側文字；省略則只有方框
+ *   ariaLabel string  無可見文字時的無障礙名稱
+ *   title     string  原生 title 提示（掛在外層）
+ *   stop      bool    是否包 event.stopPropagation（預設 true）
+ */
+(function () {
+  'use strict';
+
+  /* ---- CSS（自我注入，載入即可用，不需各 prototype 複製）---- */
+  var CSS = [
+    '.checkbox{display:inline-flex;align-items:center;gap:8px;cursor:pointer;flex:0 0 auto;position:relative;vertical-align:middle}',
+    '.checkbox.is-disabled{cursor:not-allowed}',
+    /* 真 input 藏起來但保留在無障礙樹與 tab 序中。不用 display:none／visibility:hidden，
+     * 那兩個會讓它拿不到焦點，:focus-visible 就沒有東西可以掛。 */
+    '.checkbox input.checkbox__input{position:absolute;width:16px;height:16px;margin:0;opacity:0;cursor:inherit;z-index:1}',
+    '.checkbox input.checkbox__input:disabled{cursor:not-allowed}',
+    '.checkbox__box{display:inline-flex;align-items:center;justify-content:center;flex:0 0 16px;width:16px;height:16px;border:1px solid var(--lt-grey-300,#CCCCCC);border-radius:var(--lt-radius-sm,4px);background:#fff;transition:border-color 150ms ease,background 150ms ease,box-shadow 200ms ease}',
+    '.checkbox__icon{color:#fff;display:none;font-size:12px;line-height:1;font-variation-settings:\'FILL\' 1,\'wght\' 700,\'GRAD\' 0,\'opsz\' 20}',
+    '.checkbox__label{font-size:14px;color:var(--lt-color-text-primary,#262626);user-select:none}',
+    '.checkbox.is-disabled .checkbox__label{color:var(--lt-color-text-disabled,#B3B3B3)}',
+
+    /* hover */
+    '.checkbox:hover .checkbox__box{border-color:var(--lt-grey-400,#B3B3B3)}',
+
+    /* checked／mixed 的填色。左邊是 DOM 派（真 input），右邊是重繪派（class）。 */
+    '.checkbox__input:checked~.checkbox__box,',
+    '.checkbox__input:indeterminate~.checkbox__box,',
+    '.checkbox.is-checked .checkbox__box,',
+    '.checkbox.is-mixed .checkbox__box{background:var(--lt-color-primary,#004FB0);border-color:var(--lt-color-primary,#004FB0)}',
+
+    /* icon 切換全部走 CSS，兩個 icon 都渲染出來、由狀態決定露哪一個，
+     * 所以 DOM 派切換 input.checked 時不需要動 innerHTML。 */
+    '.checkbox__input:checked~.checkbox__box .checkbox__icon--check,',
+    '.checkbox.is-checked .checkbox__icon--check{display:inline-block}',
+    '.checkbox__input:indeterminate~.checkbox__box .checkbox__icon--check,',
+    '.checkbox.is-mixed .checkbox__icon--check{display:none}',
+    '.checkbox__input:indeterminate~.checkbox__box .checkbox__icon--mixed,',
+    '.checkbox.is-mixed .checkbox__icon--mixed{display:inline-block}',
+
+    /* hover on checked／mixed */
+    '.checkbox:hover .checkbox__input:checked~.checkbox__box,',
+    '.checkbox:hover .checkbox__input:indeterminate~.checkbox__box,',
+    '.checkbox:hover.is-checked .checkbox__box,',
+    '.checkbox:hover.is-mixed .checkbox__box{background:var(--lt-color-primary-hover,#0B6DD7);border-color:var(--lt-color-primary-hover,#0B6DD7)}',
+
+    /* focus-visible。真 input 走原生 :focus-visible；純 class 版焦點在外層 span 上。 */
+    '.checkbox__input:focus-visible~.checkbox__box,',
+    '.checkbox:focus-visible .checkbox__box{border-color:var(--lt-color-primary,#004FB0);box-shadow:0 0 0 3px rgba(0,79,176,.1);outline:none}',
+    '.checkbox:focus-visible{outline:none}',
+
+    /* disabled 最後宣告，蓋掉上面所有狀態 */
+    '.checkbox__input:disabled~.checkbox__box,',
+    '.checkbox.is-disabled .checkbox__box{border-color:var(--lt-grey-300,#CCCCCC);background:#fff;box-shadow:none}',
+    '.checkbox__input:disabled:checked~.checkbox__box,',
+    '.checkbox__input:disabled:indeterminate~.checkbox__box,',
+    '.checkbox.is-disabled.is-checked .checkbox__box,',
+    '.checkbox.is-disabled.is-mixed .checkbox__box{background:var(--lt-grey-300,#CCCCCC);border-color:var(--lt-grey-300,#CCCCCC)}'
+  ].join('');
+
+  function injectCSS() {
+    if (document.getElementById('lumi-checkbox-css')) return;
+    var style = document.createElement('style');
+    style.id = 'lumi-checkbox-css';
+    style.textContent = CSS;
+    (document.head || document.documentElement).appendChild(style);
+  }
+  injectCSS();   // documentElement 一定存在，不需要等 DOMContentLoaded
+
+  function attr(name, val) {
+    if (val === undefined || val === null || val === '') return '';
+    return ' ' + name + '="' + String(val).replace(/"/g, '&quot;') + '"';
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  var BOX =
+    '<span class="checkbox__box">' +
+      '<span class="material-symbols-outlined checkbox__icon checkbox__icon--check">check</span>' +
+      '<span class="material-symbols-outlined checkbox__icon checkbox__icon--mixed">remove</span>' +
+    '</span>';
+
+  /* 額外屬性（data-* 之類）。stateful 掛在 input 上，因為既有的委派 handler
+   * 都是從 input 讀 dataset；重繪派掛在外層 span 上，那裡才是可點擊的元素。 */
+  function extraAttrs(o) {
+    if (!o) return '';
+    var out = '';
+    for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) out += attr(k, o[k]);
+    return out;
+  }
+
+  function html(opts) {
+    opts = opts || {};
+    var checked  = !!opts.checked;
+    var mixed    = !!opts.mixed;
+    var disabled = !!opts.disabled;
+    var stop     = opts.stop !== false;
+
+    /* stateful 模式刻意不輸出 is-checked／is-mixed：那兩個 class 是渲染當下的
+     * 快照，caller 之後翻 input.checked 時不會跟著變，留著只會與真實狀態脫節。
+     * 該模式的狀態一律由 input 屬性表達，CSS 已經吃 :checked／:indeterminate。 */
+    var wrapCls = ['checkbox'];
+    if (disabled) wrapCls.push('is-disabled');
+    /* disabled 與 checked／mixed 是可疊加的，不是互斥的。基準版寫成三元互斥
+     * （disabled ? 'is-disabled' : mixed ? ... : checked ? ...），結果
+     * .is-disabled.is-checked 那條 CSS 永遠命中不了，disabled 的已選項目
+     * 會畫成空白框。這裡改成疊加。 */
+    if (!opts.stateful) {
+      if (mixed) wrapCls.push('is-mixed');
+      else if (checked) wrapCls.push('is-checked');
+    }
+    if (opts.wrapCls) wrapCls.push(opts.wrapCls);
+
+    var labelHtml = opts.label
+      ? '<span class="checkbox__label">' + esc(opts.label) + '</span>'
+      : '';
+
+    if (opts.stateful) {
+      /* DOM 派。外層用 <label>，點文字也會切換，是原生行為不需要 handler。
+       * mixed 在 HTML 沒有對應屬性，caller 照常設 input.indeterminate
+       * （CSS 已經吃 :indeterminate）。要在首次渲染就是 mixed 的話，用
+       * LumiCheckbox.set(el,{mixed:true}) 或直接 LumiCheckbox.input(el).indeterminate=true。 */
+      var inputCls = 'checkbox__input' + (opts.cls ? ' ' + opts.cls : '');
+      var oc = opts.onclick && stop
+        ? 'event.stopPropagation();' + opts.onclick
+        : opts.onclick;
+      /* 預設外層是 <label>，點文字也會切換（原生行為，不用 handler）。
+       * 但 <label> 不能巢狀在 <button> 裡（HTML 不合法，而且 label 會再轉發
+       * 一次點擊、跟按鈕自己的 handler 打對台變成切了又切回去）。lumi-tag 的
+       * .ms-item 就是按鈕包 checkbox，那種情況傳 wrapTag:'span'。 */
+      var tag = opts.wrapTag || 'label';
+      return '<' + tag + ' class="' + wrapCls.join(' ') + '"' + attr('title', opts.title) + '>' +
+        '<input type="checkbox" class="' + inputCls + '"' +
+          attr('id', opts.id) + attr('name', opts.name) + attr('value', opts.value) +
+          (checked ? ' checked' : '') + (disabled ? ' disabled' : '') +
+          attr('aria-label', opts.ariaLabel) + extraAttrs(opts.attrs) +
+          attr('onclick', oc) + attr('onchange', opts.onchange) +
+        '>' + BOX + labelHtml +
+      '</' + tag + '>';
+    }
+
+    /* 重繪派。沒有 input，狀態完全由 class 表達，caller 改變狀態後重繪整塊。
+     * role/tabindex/keydown 補回原生 input 免費提供的鍵盤操作。 */
+    var act = (disabled || !opts.onclick) ? ''
+      : ((stop ? 'event.stopPropagation();' : '') + opts.onclick);
+
+    /* 沒有自己的 onclick，代表點擊由外層（例如 .dropdown-item 整列）處理，
+     * 這個 checkbox 只是那個控制項的視覺。這時候不能宣告 role="checkbox"
+     * 也不能吃 tabindex：它不是控制項，掛上去只會多一個按不動的焦點站，
+     * 而且螢幕閱讀器會聽到兩個 checkbox。改成 aria-hidden 交給外層負責語意。
+     * 另外 act 空字串時絕對不能輸出 event.stopPropagation()，否則外層的
+     * onclick 會被自己的視覺元素擋掉。 */
+    if (!act && !disabled && !opts.interactive) {
+      return '<span class="' + wrapCls.join(' ') + '" aria-hidden="true"' +
+        attr('title', opts.title) + extraAttrs(opts.attrs) + '>' + BOX + labelHtml + '</span>';
+    }
+
+    /* 有 inline handler 就直接跑它；interactive 但 handler 是外部
+     * addEventListener 綁的（cost-dashboard 幾個 dropdown 就是這樣），
+     * 就用 this.click() 合成一次點擊，外部 listener 照樣會收到。 */
+    var keydown = act
+      ? "if(event.key===' '||event.key==='Enter'){event.preventDefault();" + act + '}'
+      : "if(event.key===' '||event.key==='Enter'){event.preventDefault();this.click()}";
+    return '<span class="' + wrapCls.join(' ') + '" role="checkbox"' +
+      ' aria-checked="' + (mixed ? 'mixed' : checked) + '"' +
+      ' aria-disabled="' + disabled + '"' +
+      ' tabindex="' + (disabled ? -1 : 0) + '"' +
+      attr('aria-label', opts.ariaLabel) + attr('title', opts.title) + extraAttrs(opts.attrs) +
+      attr('onclick', act) + attr('onkeydown', keydown) +
+    '>' + BOX + labelHtml + '</span>';
+  }
+
+  function el(opts) {
+    var d = document.createElement('div');
+    d.innerHTML = html(opts);
+    return d.firstElementChild;
+  }
+
+  /* 兩種模式共用的狀態設定。stateful 走 input 屬性，重繪派走 class，
+   * caller 不必知道自己拿到的是哪一種。 */
+  function set(target, st) {
+    var node = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!node) return null;
+    var wrap = node.classList && node.classList.contains('checkbox')
+      ? node : node.closest('.checkbox');
+    var inp = input(node);
+    st = st || {};
+    if (inp) {
+      if ('checked'  in st) inp.checked = !!st.checked;
+      if ('mixed'    in st) inp.indeterminate = !!st.mixed;
+      if ('disabled' in st) inp.disabled = !!st.disabled;
+    } else if (wrap) {
+      if ('mixed' in st || 'checked' in st) {
+        wrap.classList.toggle('is-mixed', !!st.mixed);
+        wrap.classList.toggle('is-checked', !st.mixed && !!st.checked);
+        wrap.setAttribute('aria-checked', st.mixed ? 'mixed' : !!st.checked);
+      }
+    }
+    if (wrap && 'disabled' in st) {
+      wrap.classList.toggle('is-disabled', !!st.disabled);
+      if (!inp) {
+        wrap.setAttribute('aria-disabled', !!st.disabled);
+        wrap.setAttribute('tabindex', st.disabled ? -1 : 0);
+      }
+    }
+    return wrap;
+  }
+
+  function input(target) {
+    var node = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!node) return null;
+    if (node.tagName === 'INPUT') return node;
+    return node.querySelector('.checkbox__input');
+  }
+
+  window.LumiCheckbox = { html: html, el: el, input: input, set: set, CSS: CSS };
+})();
+
+</script>
 <script>
 /* === Inlined: shared/lumiture-nav.js === */
 /*!
@@ -601,7 +1070,7 @@ td.center .actions-cell{justify-content:center}
   'use strict';
 
   window.LUMITURE_NAV = [
-    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', disabled: true },
+    { type: 'item', id: 'overview', label: 'Overview', icon: 'home', href: './overview.html' },
 
     { type: 'group', id: 'dashboard', label: 'Dashboard', items: [
       { id: 'cost-dashboard',     label: 'Cost Dashboard',     icon: 'dashboard',    href: './cost-dashboard.html' },
@@ -624,7 +1093,7 @@ td.center .actions-cell{justify-content:center}
       { id: 'group-list',         label: 'Group List',         icon: 'groups',          href: './group-list.html' },
       { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
       { id: 'authorization-list', label: 'Authorization List', icon: 'link',            href: './organization-settings.html' },
-      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', disabled: true },
+      { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', href: './group-list.html#admin' },
     ]},
   ];
 })();
@@ -1397,9 +1866,10 @@ function tier2GroupsFor(t1){
   for(let index=0;index<t1.tier2;index++){
     out.push({id:t1.id+'-t2-'+index, name:pick(['Regional Team','Vendor Ops','Contract Review','Field Support','Data Stewardship','Partner Success','Compliance Desk','Access Review'],index)+' '+(index+1), resource:(index*3)%9, lastUpdated:pick(['2 days ago','1 week ago','3 weeks ago','2 months ago'],index), creator:pick(NAME_POOL,index+2), created:'0'+((index%9)+1)+'/05/2025'});
   }
+  T2_BY_T1[t1.id] = out;   // v3：記住產生的清單，Edit / Remove / Create 才會留在資料裡
   return out;
 }
-function usersFor(groupId){
+function buildUsers(groupId){
   const seedBase = groupId.length;
   const count = 3 + (seedBase % 4);
   const roles = ['manager','member'];
@@ -1409,6 +1879,12 @@ function usersFor(groupId){
     out.push({id:groupId+'-u'+index, name, email:personEmail(name), role:pick(roles,index+seedBase), active: index%4!==3, lastLogin:pick(['2 hours ago','Yesterday','3 days ago','2 weeks ago','1 month ago'],index+seedBase)});
   }
   return out;
+}
+/* v3：成員清單改成可變的（Invite / Edit / Remove User 會改它），第一次取用時才產生 */
+const USERS_CACHE = new Map();
+function usersFor(groupId){
+  if(!USERS_CACHE.has(groupId)) USERS_CACHE.set(groupId, buildUsers(groupId));
+  return USERS_CACHE.get(groupId);
 }
 const GCP_PROJECTS=[['finops-prod-core','proj-8837201'],['data-pipeline-svc','proj-1029384'],['ml-training-eu','proj-5563820'],['web-frontend-stg','proj-7729103']];
 const GCP_BAS=[['CloudMile Master Billing','012ABC-34DEF5-6789GH'],['CloudMile APAC','019JKL-22MNO3-4567PQ']];
@@ -1437,7 +1913,6 @@ function resourcesFor(groupId, cloud){
  *   10 個資料夾、2 層巢狀、88 個專案、10 個沒有資料夾、
  *   一個資料夾橫跨兩個帳單帳戶、以及兩個同名資料夾分屬不同 parent。
  * ============================================================ */
-const ORG_DOMAIN = 'example-corp.com';
 const GCP_BILLING_ACCOUNTS = [
   {id:'ba-main', name:'corp-main-billing'},
   {id:'ba-secondary', name:'corp-apac-billing'},
@@ -1515,6 +1990,36 @@ const FOLDER_TREE = [
     {id:'f-depr-staging', name:'staging', folderId:'915630482771', projects:makeProjects('legacy-staging',5), children:[]},
   ]},
 ];
+/* GCP 官方階層是 Organization → Folder → Project，org 是根節點且「使用 folder
+ * 必須先有 org」（cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy）。
+ * 同一個 LumiTure 租戶可以授權多個 GCP org，不同 org 底下可以有同名資料夾。
+ *
+ * **org 刻意不做成樹的一層**，做成區段標頭。三個理由：
+ *   ①org 不是使用者自己建的分組，是授權邊界，跟 folder 是不同種類的東西
+ *   ②做成樹節點會多吃一層縮排，而縮排已經封頂在第 4 層（見 INDENT_CAP）
+ *   ③做成標頭之後「位置本身就說了這是 org」，org 就不用進最小可區分路徑，
+ *     `pathPrefix()` 完全不用改。前例：GitHub 選 repository 的下拉，org 是
+ *     區段標頭、repo 才是可選的列。
+ * 代價：沒有「一鍵勾選整個 org」。這是指派彈窗，過度指派是這裡唯一的破壞性
+ * 錯誤，而頂端 Select all 本來就能全選，所以判斷這個代價可以接受。 */
+const GCP_ORGS = [
+  {id:'org-acme', name:'acme-corp.com',  orgId:'583920174466', folders:FOLDER_TREE},
+  /* 第二個 org 只在 Demo FAB 的多 org 情境出現。刻意讓它也有一個叫 platform
+   * 的第一層資料夾，用來驗證「同名但分屬不同 org」靠區段標頭就分得出來、
+   * 不需要在路徑裡加 org 那一段。 */
+  {id:'org-beta', name:'beta-inc.com', orgId:'774103628590', folders:[
+    {id:'b-platform', name:'platform', folderId:'118273640591', projects:makeProjects('beta-platform',6,0,2), children:[]},
+    {id:'b-analytics', name:'analytics', folderId:'339471028866', projects:makeProjects('beta-analytics',4,0,3), children:[]},
+  ]},
+];
+/* 每個專案蓋上所屬 org 的名稱。只有帳單帳戶視角的 chip 會用到——資料夾視角靠
+ * 區段標頭，不需要逐列標。 */
+GCP_ORGS.forEach(org=>{
+  walkFolders(org.folders, node=>{ node.projects.forEach(p=>{ p.orgName = org.name; }); });
+});
+/* 授權中的 org。單一 org 是常態，多 org 才長出區段標頭。 */
+function activeOrgs(){ return assign.multiOrg ? GCP_ORGS : [GCP_ORGS[0]]; }
+function isMultiOrg(){ return activeOrgs().length > 1; }
 /* 沒有資料夾、直接掛在 organization 底下的 10 個專案（報告第三節） */
 const UNASSIGNED_PROJECTS = makeProjects('ungrouped',10,0,3);
 /* 沒有帳單帳戶的專案：刻意不塞進資料夾樹，因為設計稿要求「統一顯示在清單
@@ -1580,7 +2085,7 @@ const PICKER = {
     noun:'project', nounPlural:'projects',
     supportsFolders:true,
     groups:()=>GCP_BILLING_ACCOUNTS,
-    folders:()=>FOLDER_TREE,
+    folders:()=>activeOrgs().flatMap(org=>org.folders),
     noFolder:()=>UNASSIGNED_PROJECTS,
     orphans:()=>NO_BA_PROJECTS,
   },
@@ -1658,6 +2163,8 @@ const state = {
   cloud:'gcp',
   selectedResources:{},
   pendingDialog:null,
+  pendingUnlink:null,
+  resSub:{gcp:'primary', aws:'primary', azure:'primary'},   // Resources 子分頁（Project|Label / Account|Tag），每朵雲各自記
   sort:{t1:{key:null,dir:0}, tier2:{key:null,dir:0}, members:{key:null,dir:0}, resources:{key:null,dir:0}},
 };
 function actions(){return ROLE_ACTIONS[state.role]}
@@ -1675,12 +2182,17 @@ function showToast(text,type='success'){
   t.classList.add('show');
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3400);
 }
-function deferredAction(label){ showToast(label+' — 這個彈窗留待下一階段規劃（本輪只重建 List / Details 主畫面）'); }
+function deferredAction(label){ showToast(label+'：設計稿尚無這張畫面或內容待確認，本版留佔位（見 CLAUDE.md Group List v3 段落）'); }
 
-/* ---------- confirm dialog (Unlink Resource only — the one interaction worth showing live) ---------- */
-function openUnlinkDialog(groupId, cloud, ids){
+/* ---------- confirm dialog: Unlink Resource（#20）。v2 行為維持不變（規則：#18-2 兩張同編號的稿都不動）；
+ * v3 只是多了 Label / Tag 那條入口，bucket 以 '-tag' 結尾時 names 從 label 表找、確認後從已指派集合移除。 ---------- */
+function openUnlinkDialog(groupId, cloud, ids, bucket){
+  bucket = bucket || cloud;
   const root=document.getElementById('dialog-root');
-  const names = resourcesFor(groupId,cloud).filter(r=>ids.includes(r.id)).map(r=>r.name);
+  const names = bucket.endsWith('-tag')
+    ? assignedTagsFor(groupId, cloud).filter(t=>ids.includes(t.id)).map(t=>`${t.key} = ${t.value}`)
+    : resourcesFor(groupId,cloud).filter(r=>ids.includes(r.id)).map(r=>r.name);
+  state.pendingUnlink = {ids, bucket};
   root.innerHTML = `<div class="dlg-backdrop" onclick="if(event.target===this)closeDialog()">
     <div class="dlg">
       <div class="dlg-head"><span class="material-symbols-outlined">warning</span><h3>Unlink Resource</h3></div>
@@ -1694,7 +2206,13 @@ function openUnlinkDialog(groupId, cloud, ids){
 }
 function closeDialog(){document.getElementById('dialog-root').innerHTML='';}
 function confirmUnlink(groupId,cloud){
-  state.selectedResources[cloud]={};
+  const pending = state.pendingUnlink || {ids:[], bucket:cloud};
+  state.selectedResources[pending.bucket]={};
+  if(pending.bucket.endsWith('-tag')){
+    const set = assignedTagSet(groupId, cloud);
+    pending.ids.forEach(id=>set.delete(id));
+  }
+  state.pendingUnlink = null;
   closeDialog();
   showToast('Resource unlinked from the group.');
   render();
@@ -1768,15 +2286,16 @@ function groupTable(groups, opts){
     : [['Group Name','name'],['Resource','resource'],['Last Updated','lastUpdated'],['Creator','creator'],['Time Created','created']];
   const accessors = {name:g=>g.name.toLowerCase(), resource:g=>g.resource, tier2:g=>g.tier2, lastUpdated:g=>relTimeToDays(g.lastUpdated), creator:g=>g.creator.toLowerCase(), created:g=>dateToTs(g.created)};
   if(state.pageState==='loading'){
-    const headCells = colDefs.map(([label])=>'<th>'+label+'</th>').join('') + (showAction?'<th>Action</th>':'');
-    return `<div class="table-wrap"><table>${groupCols(opts.showTier2, showAction)}<thead><tr>${headCells}</tr></thead><tbody>${skeletonRows(colDefs.length+(showAction?1:0))}</tbody></table></div>`;
+    /* #32：表頭也是灰條、沒有欄位文字 */
+    return skeletonTable(colDefs.length+(showAction?1:0), groupCols(opts.showTier2, showAction));
   }
   if(!groups.length){
-    return `<div class="empty-state small error"><div><span class="material-symbols-outlined">group_off</span>
+    /* #01-2 / #02-2：清單 icon 淺藍（不是錯誤紅）、空狀態裡沒有第二顆 Create Group（右上那顆就是入口）。
+     * v2 照 FE EmptyState type="error" 做成紅 icon + 內嵌按鈕，這裡改回設計稿。 */
+    return `<div class="empty-state"><div><span class="material-symbols-outlined">list_alt</span>
       <p class="empty-title">No Groups Yet</p>
       <p class="empty-copy">It seems like there are no groups created yet.
 Please create a new group or contact your administrator for assistance.</p>
-      ${actions().createGroup?'<button class="btn btn-pri" onclick="deferredAction(\'Create Group\')"><span class="material-symbols-outlined">add</span>Create Group</button>':''}
       </div></div>`;
   }
   const rows = sortRows(groups, tableKey, accessors).map(g=>{
@@ -1788,8 +2307,8 @@ Please create a new group or contact your administrator for assistance.</p>
     tds.push(`<td>${esc(g.lastUpdated)}</td>`, `<td class="cell-ellipsis">${esc(g.creator)}</td>`, `<td>${esc(g.created)}</td>`);
     if(showAction){
       tds.push(`<td><div class="actions-cell">
-        <button class="btn-icon" data-testid="edit-group-button" onclick="event.stopPropagation();deferredAction('Edit Group')" title="Edit Group"><span class="material-symbols-outlined">edit</span></button>
-        ${actions().removeGroup?'<button class="btn-icon danger" data-testid="remove-group-button" onclick="event.stopPropagation();deferredAction(\'Remove Group\')" title="Remove Group"><span class="material-symbols-outlined">delete</span></button>':''}
+        <button class="btn-icon" data-testid="edit-group-button" onclick="event.stopPropagation();openEditGroup('${g.id}',${opts.tier===2?`'${opts.t1IdForRow}'`:'null'})" title="Edit Group"><span class="material-symbols-outlined">edit</span></button>
+        ${actions().removeGroup?`<button class="btn-icon danger" data-testid="remove-group-button" onclick="event.stopPropagation();openRemoveGroup('${g.id}',${opts.tier===2?`'${opts.t1IdForRow}'`:'null'})" title="Remove Group"><span class="material-symbols-outlined">delete</span></button>`:''}
         </div></td>`);
     }
     const clickTarget = opts.tier===2 ? `openDetail(2,'${opts.t1IdForRow}','${g.id}')` : `openDetail(1,'${g.id}')`;
@@ -1810,7 +2329,7 @@ function renderList(){
   }
   const total = state.pageState==='empty' ? 0 : T1_GROUPS.length;
   const groups = state.pageState==='empty' ? [] : T1_GROUPS;
-  const titleCount = state.pageState==='loading' ? 0 : total;
+  const titleCount = total;   // #32：讀取中標題的計數照樣顯示（註記「群組名稱以及群組/資源數量等需讀取內容，可先按照上圖呈現」）
   return `<h1 class="org-title">${ORG_NAME}</h1>
     <div class="card">
       <div class="section-head">
@@ -1818,13 +2337,10 @@ function renderList(){
           <h2>Tier 1 Group List (${titleCount})</h2>
           <p>You can quickly view the Tier 1 group information here, and click on each group to check details such as group members.</p>
         </div>
-        ${actions().createGroup ? `<button class="btn btn-pri" ${state.pageState==='loading'?'disabled':''} onclick="deferredAction('Create Group')"><span class="material-symbols-outlined">add</span>Create Group</button>` : ''}
+        ${actions().createGroup ? `<button class="btn btn-pri" ${state.pageState==='loading'?'disabled':''} onclick="openCreateGroup(1)"><span class="material-symbols-outlined">add</span>Create Group</button>` : ''}
       </div>
       ${groupTable(groups, {showTier2:true, editable:actions().editGroup, tier:1, sortTable:'t1'})}
-    </div>
-    <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
-      <button class="link-btn" style="color:var(--lt-color-text-secondary)" onclick="deferredAction('Learn More About Organization and Role')">ⓘ Learn More About Organization and Role</button>
-      <button class="link-btn" style="color:var(--lt-color-text-secondary)" onclick="deferredAction('Learn More About Authorization and Resource Assignment')">ⓘ Learn More About Authorization and Resource Assignment</button>
+      ${learnMoreHtml(true)}
     </div>`;
 }
 
@@ -1835,7 +2351,7 @@ function goToTab(tier,t1id,t2id,tab){
 }
 function openDetail(tier, t1id, t2id){
   state.view='detail'; state.tier=tier; state.t1Id=t1id; state.t2Id=t2id||null;
-  state.tab = arguments[3] || 'group-members'; state.cloud='gcp'; state.selectedResources={};
+  state.tab = arguments[3] || 'group-members'; state.cloud='gcp'; state.selectedResources={}; state.resSub={gcp:'primary', aws:'primary', azure:'primary'};
   render();
 }
 function backToList(){ state.view='list'; render(); }
@@ -1843,20 +2359,27 @@ function backToList(){ state.view='list'; render(); }
 function tabsHeader(group, tier){
   const memberCount = usersFor(group.id).length;
   const resourceCount = group.resource;
-  const tabs = [ {id:'group-members', label:`Group Members (${memberCount})`} , {id:'resources', label:`Resources (${resourceCount})`} ];
-  if(tier===1) tabs.push({id:'tier-2-groups', label:`Tier 2 Groups (${group.tier2})`});
-  return `<div class="tabs-row"><div class="tabs">${tabs.map(t=>`<button class="tab ${state.tab===t.id?'active':''}" onclick="state.tab='${t.id}';render()">${t.label}</button>`).join('')}</div></div>`;
+  /* #33：讀取中的 tab 不顯示計數（Group Members / Resources / Tier 2 Group），讀完才補上 */
+  const loading = state.pageState==='loading';
+  const count = n => loading ? '' : ` (${n})`;
+  const tabs = [ {id:'group-members', label:`Group Members${count(memberCount)}`} , {id:'resources', label:`Resources${count(resourceCount)}`} ];
+  if(tier===1) tabs.push({id:'tier-2-groups', label:`Tier 2 Group${count(group.tier2)}`});   // #02 / #33 寫「Tier 2 Group」單數，v2 原本是 Groups
+  return `<div class="tabs-row"><div class="tabs ${loading?'is-loading-ui':''}">${tabs.map(t=>`<button class="tab ${state.tab===t.id?'active':''}" onclick="state.tab='${t.id}';render()">${t.label}</button>`).join('')}</div></div>`;
 }
 
 function membersTab(group){
   if(state.pageState==='loading'){
-    return `<p class="section-copy">You can explore the details of this group here, including members, resources, and subgroups belonging to this group.</p>
-      <div class="table-wrap"><table><thead><tr><th>User Name</th><th>Email</th><th class="center">Role</th><th class="center">Active Status</th><th class="center">Last Login</th></tr></thead><tbody>${skeletonRows(5)}</tbody></table></div>`;
+    /* #33：說明文字與 Invite User 按鈕（disabled）照常出現，表格整個 skeleton */
+    return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px">
+      <p class="section-copy">You can explore the details of this group here, including members, resources, and subgroups belonging to this group.</p>
+      ${actions().inviteUser?'<button class="btn btn-pri" disabled><span class="material-symbols-outlined">person_add</span>Invite User</button>':''}
+    </div>${skeletonTable(6)}`;
   }
   const users = usersFor(group.id);
   const showAction = actions().editUser || actions().removeUser;
   if(!users.length){
-    return `<div class="empty-state small error"><div><span class="material-symbols-outlined">person_off</span>
+    /* #05-1：人像 icon 淺藍，通用文案 */
+    return `<div class="empty-state"><div><span class="material-symbols-outlined">group</span>
       <p class="empty-title">No Users Yet</p>
       <p class="empty-copy">There are currently no users assigned to this group.
 Invite users to the group or check with your administrator if assistance is needed.</p></div></div>`;
@@ -1870,8 +2393,8 @@ Invite users to the group or check with your administrator if assistance is need
       <td class="center"><span class="status-text ${u.active?'':'inactive'}">${u.active?'Active':'Inactive'}</span></td>
       <td class="center">${esc(u.lastLogin)}</td>
       ${showAction?`<td class="center"><div class="actions-cell">
-        ${actions().editUser?'<button class="btn-icon" data-testid="edit-user-button" onclick="deferredAction(\'Edit User\')" title="Edit"><span class="material-symbols-outlined">edit</span></button>':''}
-        ${actions().removeUser?'<button class="btn-icon danger" data-testid="delete-user-button" onclick="deferredAction(\'Remove User\')" title="Remove"><span class="material-symbols-outlined">delete</span></button>':''}
+        ${actions().editUser?`<button class="btn-icon" data-testid="edit-user-button" onclick="openEditUser('${group.id}','${u.id}')" title="Edit"><span class="material-symbols-outlined">edit</span></button>`:''}
+        ${actions().removeUser?`<button class="btn-icon danger" data-testid="delete-user-button" ${u.email===CURRENT_USER_EMAIL?'disabled':''} onclick="openRemoveUser('${group.id}','${u.id}')" title="Remove"><span class="material-symbols-outlined">delete</span></button>`:''}
         </div></td>`:''}
     </tr>`).join('');
   const headCells = colDefs.map(([label,key,centered])=>sortHeader(label,'members',key,centered)).join('') + (showAction?'<th class="center">Action</th>':'');
@@ -1880,7 +2403,7 @@ Invite users to the group or check with your administrator if assistance is need
     : '<colgroup><col style="width:25%"><col style="width:30%"><col style="width:13%"><col style="width:16%"><col style="width:16%"></colgroup>';
   return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px">
       <p class="section-copy">You can explore the details of this group here, including members, resources, and subgroups belonging to this group.</p>
-      ${actions().inviteUser?'<button class="btn btn-pri" onclick="deferredAction(\'Invite User\')"><span class="material-symbols-outlined">person_add</span>Invite User</button>':''}
+      ${actions().inviteUser?`<button class="btn btn-pri" onclick="openInviteUser('${group.id}')"><span class="material-symbols-outlined">person_add</span>Invite User</button>`:''}
     </div>
     <div class="table-wrap"><table>${memberCols}<thead><tr>${headCells}</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
@@ -1893,15 +2416,27 @@ const CLOUD_META = {
 function resourcesTab(group){
   const isT2 = state.tier===2;
   const notAuthorized = state.cloudAuth==='gcp-only' && state.cloud!=='gcp';
+  const pillTabs = (clickable) => `<div class="pill-tabs">${Object.keys(CLOUD_META).map(c=>clickable
+    ? `<button class="pill-tab ${c===state.cloud?'active':''}" onclick="state.cloud='${c}';render()"><span class="csp-dot" style="background:${CLOUD_META[c].dot}"></span>${CLOUD_META[c].label}</button>`
+    : `<span class="pill-tab ${c===state.cloud?'active':''}"><span class="csp-dot" style="background:${CLOUD_META[c].dot}"></span>${CLOUD_META[c].label}</span>`).join('')}</div>`;
   const body = () => {
     if(state.pageState==='loading'){
-      return `<div class="pill-tabs">${Object.keys(CLOUD_META).map(c=>`<span class="pill-tab ${c===state.cloud?'active':''}"><span class="csp-dot" style="background:${CLOUD_META[c].dot}"></span>${CLOUD_META[c].label}</span>`).join('')}</div>
-        <div class="res-toolbar"><div class="search-box"><span class="material-symbols-outlined">search</span><input disabled placeholder="Search resources"></div></div>
-        <div class="table-wrap"><table><colgroup><col style="width:48px"><col style="width:42%"><col><col style="width:80px"></colgroup><thead><tr><th></th><th>${CLOUD_META[state.cloud].col1}</th><th>${CLOUD_META[state.cloud].col2}</th><th>Action</th></tr></thead><tbody>${skeletonRows(4)}</tbody></table></div>`;
+      /* #34：雲端分頁、Project|Label 子分頁（含計數）、搜尋框都留著但不可操作，Assign Resource disabled，表格 skeleton */
+      const subL = state.resSub[state.cloud] || 'primary';
+      const termsL = TAG_TERMS[state.cloud];
+      return pillTabs(false) + `
+        <div class="res-toolbar">
+          <div class="res-toolbar-left">
+            <div class="seg is-loading-ui"><button class="seg-btn ${subL==='primary'?'active':''}">${CLOUD_META[state.cloud].col1}<span class="seg-cnt">${resourcesFor(group.id, state.cloud).length}</span></button><button class="seg-btn ${subL==='tag'?'active':''}">${esc(termsL.tab)}<span class="seg-cnt">${assignedTagsFor(group.id, state.cloud).length}</span></button></div>
+            <div class="search-box"><span class="material-symbols-outlined">search</span><input disabled placeholder="Search resources"></div>
+          </div>
+          <div class="res-toolbar-actions">${actions().assignResource?'<button class="btn btn-pri" disabled><span class="material-symbols-outlined">add_link</span>Assign Resource</button>':''}</div>
+        </div>
+        ${skeletonTable(4, '<colgroup><col style="width:48px"><col style="width:42%"><col><col style="width:80px"></colgroup>')}`;
     }
     if(notAuthorized){
       const isAdmin = state.role==='admin';
-      return `<div class="pill-tabs">${Object.keys(CLOUD_META).map(c=>`<button class="pill-tab ${c===state.cloud?'active':''}" onclick="state.cloud='${c}';render()"><span class="csp-dot" style="background:${CLOUD_META[c].dot}"></span>${CLOUD_META[c].label}</button>`).join('')}</div>
+      return pillTabs(true) + `
         <div class="empty-state error"><div>
           <span class="material-symbols-outlined">${isAdmin?'lock_open':'lock'}</span>
           <p class="empty-title">${CLOUD_META[state.cloud].label} is not authorized</p>
@@ -1909,33 +2444,71 @@ function resourcesTab(group){
           ${isAdmin?'<a class="btn btn-pri" href="./organization-settings.html" style="text-decoration:none"><span class="material-symbols-outlined">link</span>Go to Authorization List</a>':''}
         </div></div>`;
     }
-    const resources = resourcesFor(group.id, state.cloud);
-    const selected = state.selectedResources[state.cloud] || {};
-    const selectedIds = Object.keys(selected).filter(id=>selected[id]);
+    /* v3：每朵雲的 Resources 分成兩個子分頁（#03-3 / #03-4）——
+     *   GCP   Project | Label
+     *   AWS   Account | Tag
+     *   Azure Resource Group | Label（照「Please Refer to Google Cloud」註記）
+     * 兩個子分頁各自有自己的表格、勾選集合、Assign Resource 彈窗（Project 開 v2 的
+     * folder picker、Label 開 #56）。Unlink 走同一個 #20 彈窗。 */
+    const sub = state.resSub[state.cloud] || 'primary';
+    const terms = TAG_TERMS[state.cloud];
+    const projects = resourcesFor(group.id, state.cloud);
+    const tags = assignedTagsFor(group.id, state.cloud);
+    const bucketKey = sub==='tag' ? state.cloud+'-tag' : state.cloud;
+    const rowsData = sub==='tag' ? tags : projects;
+    const selected = state.selectedResources[bucketKey] || {};
+    const selectedIds = rowsData.map(r=>r.id).filter(id=>selected[id]);
     const canRemove = actions().removeResource;
     const canAssign = actions().assignResource;
+    const allOn = rowsData.length>0 && selectedIds.length===rowsData.length;
+    const someOn = selectedIds.length>0 && !allOn;
+    const idsCsv = rowsData.map(r=>"'"+r.id+"'").join(',');
     let tableBlock;
-    if(!resources.length){
-      tableBlock = `<div class="empty-state"><div><span class="material-symbols-outlined">inventory_2</span>
+    if(!rowsData.length){
+      tableBlock = `<div class="empty-state"><div><span class="material-symbols-outlined">add_link</span>
         <p class="empty-title">No Resources Yet</p>
         <p class="empty-copy">No resources have been assigned to this group yet.
 Please assign new resources or reach out to your administrator for help.</p></div></div>`;
+    } else if(sub==='tag'){
+      const tagAccessors = {key:r=>r.key.toLowerCase(), value:r=>r.value.toLowerCase(), parent:r=>r.parent.name.toLowerCase()};
+      const rows = sortRows(tags, 'resources', tagAccessors).map(r=>`<tr class="${selected[r.id]?'selected':''}">
+          <td>${canRemove?checkboxHtml(!!selected[r.id], `toggleResource('${r.id}','${bucketKey}')`):''}</td>
+          <td class="cell-ellipsis">${esc(r.key)}</td>
+          <td class="cell-ellipsis">${esc(r.value)}</td>
+          <td class="cell-double"><div class="l1">${esc(r.parent.name)}</div><div class="l2">${esc(r.parent.id)}</div></td>
+          <td><button class="btn-icon ${canRemove?'danger':''}" ${canRemove?'':'disabled'} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'],'${bucketKey}')" title="Unlink Resource"><span class="material-symbols-outlined">link_off</span></button></td>
+        </tr>`).join('');
+      /* #03-5：表頭第一格是全選 checkbox（部分勾選時顯示 mixed） */
+      tableBlock = `<div class="table-wrap"><table><colgroup><col style="width:48px"><col style="width:22%"><col style="width:22%"><col><col style="width:80px"></colgroup><thead><tr>
+          <th>${canRemove?checkboxHtml(allOn, `toggleAllResources('${bucketKey}',[${idsCsv}])`, someOn):''}</th>
+          ${sortHeader(terms.colKey,'resources','key')}${sortHeader(terms.colValue,'resources','value')}${sortHeader(terms.colParent,'resources','parent')}<th>Action</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     } else {
       const resAccessors = {col1:r=>r.name.toLowerCase(), col2:r=>r.parentName.toLowerCase()};
-      const rows = sortRows(resources, 'resources', resAccessors).map(r=>`<tr class="${selected[r.id]?'selected':''}">
-          <td>${canRemove?checkboxHtml(!!selected[r.id], `toggleResource('${r.id}')`):''}</td>
+      const rows = sortRows(projects, 'resources', resAccessors).map(r=>`<tr class="${selected[r.id]?'selected':''}">
+          <td>${canRemove?checkboxHtml(!!selected[r.id], `toggleResource('${r.id}','${bucketKey}')`):''}</td>
           <td class="cell-double"><div class="l1">${esc(r.name)}</div><div class="l2">${esc(r.subId)}</div></td>
           <td class="cell-double"><div class="l1">${esc(r.parentName)}</div><div class="l2">${esc(r.parentId)}</div></td>
-          <td><button class="btn-icon ${r.canRemove&&canRemove?'danger':''}" ${!(r.canRemove&&canRemove)?'disabled':''} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'])" title="Unlink Resource"><span class="material-symbols-outlined">link_off</span></button></td>
+          <td><button class="btn-icon ${r.canRemove&&canRemove?'danger':''}" ${!(r.canRemove&&canRemove)?'disabled':''} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'],'${bucketKey}')" title="Unlink Resource"><span class="material-symbols-outlined">link_off</span></button></td>
         </tr>`).join('');
-      tableBlock = `<div class="table-wrap"><table><colgroup><col style="width:48px"><col style="width:42%"><col><col style="width:80px"></colgroup><thead><tr><th></th>${sortHeader(CLOUD_META[state.cloud].col1,'resources','col1')}${sortHeader(CLOUD_META[state.cloud].col2,'resources','col2')}<th>Action</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      tableBlock = `<div class="table-wrap"><table><colgroup><col style="width:48px"><col style="width:42%"><col><col style="width:80px"></colgroup><thead><tr>
+          <th>${canRemove?checkboxHtml(allOn, `toggleAllResources('${bucketKey}',[${idsCsv}])`, someOn):''}</th>
+          ${sortHeader(CLOUD_META[state.cloud].col1,'resources','col1')}${sortHeader(CLOUD_META[state.cloud].col2,'resources','col2')}<th>Action</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     }
-    return `<div class="pill-tabs">${Object.keys(CLOUD_META).map(c=>`<button class="pill-tab ${c===state.cloud?'active':''}" onclick="state.cloud='${c}';render()"><span class="csp-dot" style="background:${CLOUD_META[c].dot}"></span>${CLOUD_META[c].label}</button>`).join('')}</div>
+    const seg = `<div class="seg" role="tablist">
+        <button class="seg-btn ${sub==='primary'?'active':''}" role="tab" aria-selected="${sub==='primary'}" onclick="setResSub('primary')">${CLOUD_META[state.cloud].col1}<span class="seg-cnt">${projects.length}</span></button>
+        <button class="seg-btn ${sub==='tag'?'active':''}" role="tab" aria-selected="${sub==='tag'}" onclick="setResSub('tag')">${esc(terms.tab)}<span class="seg-cnt">${tags.length}</span></button>
+      </div>`;
+    /* #03-5：Unlink Resource 是藍色 outline（跟 Assign Resource 同一組主色），不是紅色。
+     * v2 做成 danger 紅框是設計端自己加的，這裡改回設計稿。 */
+    const assignClick = sub==='tag' ? `openTagAssign('${state.cloud}')` : `openAssign('${state.cloud}')`;
+    return pillTabs(true) + `
       <div class="res-toolbar">
-        <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="Search resources" oninput="showToast('Filtering… (prototype does not filter mock data)')"></div>
+        <div class="res-toolbar-left">${seg}
+          <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="Search resources" oninput="showToast('Filtering… (prototype does not filter mock data)')"></div>
+        </div>
         <div class="res-toolbar-actions">
-          ${(canRemove && selectedIds.length)?`<button class="btn btn-out danger" onclick="openUnlinkDialog('${group.id}','${state.cloud}',[${selectedIds.map(id=>"'"+id+"'").join(',')}])"><span class="material-symbols-outlined">link_off</span>Unlink Resource</button>`:''}
-          ${canAssign?`<button class="btn btn-pri" data-testid="assign-resource-button" onclick="openAssign('${state.cloud}')"><span class="material-symbols-outlined">add_link</span>Assign Resource</button>`:''}
+          ${(canRemove && selectedIds.length)?`<button class="btn btn-out" onclick="openUnlinkDialog('${group.id}','${state.cloud}',[${selectedIds.map(id=>"'"+id+"'").join(',')}],'${bucketKey}')"><span class="material-symbols-outlined">link_off</span>Unlink Resource</button>`:''}
+          ${canAssign?`<button class="btn btn-pri" data-testid="assign-resource-button" onclick="${assignClick}"><span class="material-symbols-outlined">add_link</span>Assign Resource</button>`:''}
         </div>
       </div>
       ${tableBlock}`;
@@ -1949,7 +2522,11 @@ function renderDetail(){
   const group = isT2 ? findT2(state.t1Id, state.t2Id) : t1;
   if(!group){ state.view='list'; return renderList(); }
   const backHref = isT2 && state.role==='t2-member' ? null : null; // both roles route back to list in this prototype scope
-  const crumb = isT2 ? `${ORG_NAME} / ${t1.name}` : `${ORG_NAME} /`;
+  /* #06 註記：麵包屑每項最多約 135px、超過顯示 …（.crumb-item） */
+  const crumb = isT2
+    ? `<span class="crumb-item">${esc(ORG_NAME)}</span> / <span class="crumb-item" title="${esc(t1.name)}">${esc(t1.name)}</span>`
+    : `<span class="crumb-item">${esc(ORG_NAME)}</span> /`;
+  const loading = state.pageState==='loading';
   let body;
   if(state.tab==='group-members') body = membersTab(group);
   else if(state.tab==='resources') body = resourcesTab(group);
@@ -1960,12 +2537,12 @@ function renderDetail(){
   }
   return `<button class="go-back" onclick="backToList()"><span class="material-symbols-outlined">arrow_back</span><span class="go-back-label">Back to Group List</span></button>
     <div class="card">
-      <div class="crumb">${esc(crumb)}</div>
+      <div class="crumb">${crumb}</div>
       <div class="section-head" style="align-items:center;margin-bottom:20px">
         <h1 style="font-size:24px;font-weight:700;margin:0">${esc(group.name)}</h1>
         <div style="display:flex;gap:8px">
-          ${actions().editGroup?`<button class="btn btn-out" onclick="deferredAction('Edit Group')"><span class="material-symbols-outlined">edit</span>Edit Group</button>`:''}
-          ${actions().removeGroup?`<button class="btn btn-out danger" onclick="deferredAction('Remove Group')"><span class="material-symbols-outlined">delete</span>Remove Group</button>`:''}
+          ${actions().editGroup?`<button class="btn btn-out" ${loading?'disabled':''} onclick="openEditGroup('${group.id}',${isT2?`'${t1.id}'`:'null'})"><span class="material-symbols-outlined">edit</span>Edit Group</button>`:''}
+          ${actions().removeGroup?`<button class="btn btn-out danger" ${loading?'disabled':''} onclick="openRemoveGroup('${group.id}',${isT2?`'${t1.id}'`:'null'})"><span class="material-symbols-outlined">delete</span>Remove Group</button>`:''}
         </div>
       </div>
       ${tabsHeader(group, isT2?2:1)}
@@ -1974,15 +2551,24 @@ function renderDetail(){
           <h2>Tier 2 Group List (${t1.tier2})</h2>
           <p>You can quickly view the Tier 2 group information here, and click on each group to check details such as group members.</p>
         </div>
-        ${actions().createGroup?`<button class="btn btn-pri" onclick="deferredAction('Create Group')"><span class="material-symbols-outlined">add</span>Create Group</button>`:''}
+        ${actions().createGroup?`<button class="btn btn-pri" ${loading?'disabled':''} onclick="openCreateGroup(2)"><span class="material-symbols-outlined">add</span>Create Group</button>`:''}
       </div>` : ''}
       ${body}
+      ${learnMoreHtml(true)}
     </div>`;
 }
-function toggleResource(id){
-  if(!state.selectedResources[state.cloud]) state.selectedResources[state.cloud]={};
-  const bucket = state.selectedResources[state.cloud];
-  bucket[id] = !bucket[id];
+function toggleResource(id, bucket){
+  bucket = bucket || state.cloud;
+  if(!state.selectedResources[bucket]) state.selectedResources[bucket]={};
+  const list = state.selectedResources[bucket];
+  list[id] = !list[id];
+  render();
+}
+/* 表頭全選（#03-5）：全開就全關，否則全開 */
+function toggleAllResources(bucket, ids){
+  const list = state.selectedResources[bucket] || {};
+  const allOn = ids.length>0 && ids.every(id=>list[id]);
+  state.selectedResources[bucket] = allOn ? {} : Object.fromEntries(ids.map(id=>[id,true]));
   render();
 }
 
@@ -1996,6 +2582,7 @@ function toggleResource(id){
  * ============================================================ */
 const assign = {
   open:false,
+  host:'modal',        // modal | wizard —— 選單被誰裝著（v3：Create Group 第 3/4 步內嵌同一個選單）
   cloud:'gcp',         // gcp | aws | azure，決定名詞與資料來源
   /* component = 完全照 libs/lumiture-ui 的 GroupedMultiSelect（Cost Dashboard
    *             的 Tag / Label Value 下拉）語言，直接延伸到多層
@@ -2012,6 +2599,15 @@ const assign = {
    * 建議），Demo FAB 可切。 */
   /* true ＝ 縮排封頂在第 4 層 + 深層用祖先路徑補（2026-09-10 預設）。
    * false ＝ 原本的線性縮排，留著對照「波動拳」長什麼樣。 */
+  /* 是否授權了多個 GCP org。true 才長出 org 區段標頭，單一 org 畫面完全不變。 */
+  multiOrg:false,
+  /* 深層樹的路徑策略，Kabin 2026-09-11 問「只有第五層後有路徑會不會很怪」而做的
+   * 三個可切換對照：
+   *   'deep'  = 現況。縮排封頂後才出現路徑
+   *   'all'   = 每一列都顯示緊鄰上層（語言一致，但淺層全是冗餘）
+   *   'micro' = 封頂後改用 4px 微縮排維持鏈狀感，路徑只留給同名／搜尋
+   * 真實客戶只有 2-3 層，三者在真實情境下畫面完全相同，差別只在第五層之後。 */
+  pathMode:'deep',
   indentCap:true,
   keepSelection:false,
   clearedSelection:null,   // Undo 用，切視角清掉的那一份
@@ -2046,9 +2642,12 @@ let assignFetchTimer;
  * （所以沒過濾、也沒辦法在送出時補上既有的），GCPAssignResources 每次
  * 開啟都是 useState([])。詳見 specs 的 §8.11。 */
 
-function openAssign(cloud){
+/* 選單的狀態重置抽成 startAssignPicker()，因為 v3 起有兩個宿主：
+ *   modal  = Resources 分頁的 Assign Resource 彈窗（v2 原本的用法）
+ *   wizard = Create Group 第 3 / 4 步（#31 / #37）內嵌同一個選單
+ * renderAssign() 依 assign.host 決定重畫哪一個外殼，選取 / 搜尋 / 分組邏輯完全共用。 */
+function startAssignPicker(cloud){
   assign.cloud = cloud || state.cloud || 'gcp';
-  assign.open = true;
   assign.loading = true;
   assign.searching = false;
   assign.clearedSelection = null;
@@ -2058,10 +2657,16 @@ function openAssign(cloud){
   assign.selected = {};
   assign.forceFail = false;
   assign.search = '';
+  assign.typed = null;
   /* 預設維持現行的帳單帳戶視角（既有客戶操作不變），資料夾是切過去的第二個視角。 */
   assign.groupBy = 'ba';
-  renderAssign();
   setTimeout(()=>{ assign.loading = false; renderAssign(); }, 500);
+}
+function openAssign(cloud){
+  startAssignPicker(cloud);
+  assign.host = 'modal';
+  assign.open = true;
+  renderAssign();
 }
 function closeAssign(){ assign.open = false; renderAssign(); }
 
@@ -2177,14 +2782,28 @@ function findFolder(nodeId){
 /* 團隊 2026-09-10 回饋「巢狀搜尋可能效能差 → 需要 skeleton」，時序刻意這樣排：
  *   打字中：什麼都不做。debounce 期間就閃 skeleton 的話，每打一個字閃一次，
  *           比慢更難用。
- *   停手 500ms：送出查詢，只有清單區換成 skeleton（工具列跟底部計數不動，
+ *   停手 1000ms：送出查詢，只有清單區換成 skeleton（工具列跟底部計數不動，
  *           不然整個彈窗會抖，使用者會以為彈窗重開了）。
  *   結果回來：換成清單。demo 用 SEARCH_FETCH_MS 模擬，真實情況是 API 往返。
  * 注意 skeleton 是承認慢、不是解決慢：真正的解法是 debounce（已做）＋ 後端索引。
  * 實際是否需要這段等待要看 RD 給的數字（Dcard 是 2-3 層、88 個專案，
- * react-window 本來就吃得下），所以 demo 值故意壓短。 */
+ * react-window 本來就吃得下），所以 demo 值故意壓短。
+ *
+ * ⚠️ 2026-09-11 debounce 數值改source：原本 500ms 只是「沿用現行 Resources
+ * 表格搜尋（FE ResourcesSearch）」的暫定值，`specs/2026-09-10-assign-picker-
+ * design-notes.md` 自己都還標著「可直接貼 Figma」──代表這個數字從來沒有
+ * 真的進過設計稿。跟 rightsizing／rate-optimization 那邊的 debounce 一比對，
+ * 那邊是查證過 Figma 節點 8117:40065 的文字註記「停止輸入約一秒後才觸發」，
+ * 有設計稿背書。Kabin 定的優先序是設計稿 > 前端既有值，所以這裡改採
+ * 1000ms 對齊 rightsizing，不再抄 FE 現況。design notes 那份文件也一併改了，
+ * 之後真的要貼 Figma 時不會把已經作廢的理由帶過去。 */
+const ASSIGN_DEBOUNCE_MS = 1000;
 const SEARCH_FETCH_MS = 350;
 function onAssignSearch(value){
+  /* v3 順手修：debounce 送出後、結果回來前那段 skeleton 期間，renderAssign 會把搜尋框
+   * 重繪成 assign.search（還是舊值），使用者剛打的字會消失 350ms 再回來。把正在輸入的
+   * 字串另外記著，重繪時用它。 */
+  assign.typed = value;
   clearTimeout(assignSearchTimer);
   assignSearchTimer = setTimeout(()=>{
     const term = value.trim();
@@ -2194,10 +2813,11 @@ function onAssignSearch(value){
     clearTimeout(assignFetchTimer);
     assignFetchTimer = setTimeout(()=>{
       assign.search = term;
+      assign.typed = null;
       assign.searching = false;
       renderAssign();
     }, SEARCH_FETCH_MS);
-  }, 500);
+  }, ASSIGN_DEBOUNCE_MS);
 }
 /* 切換分組不動 assign.selected，因為選取的是專案本身，跟怎麼分組無關 */
 /* 開發團隊 2026-09-10 的立場是「切視角不保留勾選」（RD 出兩支獨立 API）。
@@ -2222,6 +2842,7 @@ function setGroupBy(mode){
   clearTimeout(assignSearchTimer);
   clearTimeout(assignFetchTimer);
   assign.searching = false;
+  assign.typed = null;
   renderAssign();
 }
 
@@ -2232,15 +2853,11 @@ function hl(text){
   if(at < 0) return esc(text);
   return esc(text.slice(0,at)) + '<span class="hl">' + esc(text.slice(at, at+term.length)) + '</span>' + esc(text.slice(at+term.length));
 }
-/* Guideline #Checkbox 的 span 版元件，不是 input——mixed 狀態原本要靠 JS 補設
- * input.indeterminate（HTML 屬性沒有這個狀態），改成純 class 之後不用再補這一步。
- * 用 role="checkbox" + tabindex + Enter/Space 補鍵盤操作，原生 input 這些是免費的。 */
+/* 薄包裝 → shared/lumiture-checkbox.js。這支檔案全程是重繪模型（caller 持有
+ * assign.selected 等狀態、改變後重繪整塊），所以走共用元件的 class 路徑，
+ * 不產生真的 input。簽名維持不變，呼叫端一處都不用改。 */
 function checkboxHtml(checked, onclick, mixed, disabled){
-  const state = disabled ? 'is-disabled' : (mixed ? 'is-mixed' : (checked ? 'is-checked' : ''));
-  const act = disabled ? '' : `event.stopPropagation();${onclick}`;
-  return `<span class="checkbox ${state}" role="checkbox" aria-checked="${mixed?'mixed':!!checked}" aria-disabled="${!!disabled}" tabindex="${disabled?-1:0}" onclick="${act}" onkeydown="if((event.key===' '||event.key==='Enter')&&!${!!disabled}){event.preventDefault();${act}}">
-    <span class="checkbox__box"><span class="material-symbols-outlined checkbox__icon">${mixed?'remove':'check'}</span></span>
-  </span>`;
+  return LumiCheckbox.html({checked:checked, mixed:mixed, disabled:disabled, onclick:onclick});
 }
 /* GCP 允許 10 層。樹狀版把步進縮小讓縮排一路撐到底：16px × 10 層 = 160px，
  * 660px 的彈窗放得下、階層全程看得見。
@@ -2265,8 +2882,12 @@ const SELECT_ALL_H = 40;   // 頂端 Select All 那列也是 sticky，資料夾�
  * 所以捲到哪一層、被釘住的就是那一層——也就是「當下看到的專案所屬的最近一層
  * 資料夾」。原本的 `SELECT_ALL_H + depth * FOLDER_ROW_H` 是把整條路徑都釘成一疊，
  * 十層會吃掉 400px 的可視高度。 */
+const ORG_HEADER_H = 32;
+/* 多 org 時資料夾要釘在 org 標頭底下，不然捲動時「我在哪個 org」會被蓋掉。
+ * 只多這一層是可以接受的（40 + 32 = 72px），跟先前否決的「整條路徑疊成一落」
+ * 不同——那個是十層各 40px。 */
 function folderStickyTop(){
-  return SELECT_ALL_H;
+  return SELECT_ALL_H + (isMultiOrg() && showFolderView() ? ORG_HEADER_H : 0);
 }
 /* 縮排封頂在第 4 層（2026-09-10，回應 RD 的「波動拳」）。
  * 線性縮排到十層時，左邊會出現一條 168px 的斜階梯：左半邊全空、名稱被擠掉、
@@ -2277,9 +2898,21 @@ function folderStickyTop(){
  * 深層的資訊密度是上升而不是下降。
  * 真實情境（客戶最多 2-3 層）完全碰不到這個上限，畫面跟原本一模一樣。 */
 const INDENT_CAP = 4;
+/* 封頂後的縮排步進。取 8px 而不是 4px：8px 在 Guideline 的格線上（4px 只准用於
+ * icon 與文字之間的微間距），而且相鄰兩列 8px 的差是明確看得出來的。
+ * 第 10 層總縮排 24 + 4×16 + 5×8 = 128px，比線性的 168px 少 40px，名稱欄多拿回
+ * 那 40px；同時層級關係一路到底都還是「看」得出來的，不用讀文字去解。 */
+const MICRO_STEP = 8;
 function indentPx(depth){
   const steps = assign.indentCap ? Math.min(depth, INDENT_CAP) : depth;
-  return 24 + steps * indentStep();
+  const base = 24 + steps * indentStep();
+  /* micro 模式：封頂之後每層再疊 4px。相鄰兩列 4px 的差是看得出來的，
+   * 所以深層的鏈狀關係不會塌成「一排兄弟」；而 5 層 × 4px 只多 20px，
+   * 不會回到線性縮排那種 168px 的斜階梯。 */
+  if(assign.pathMode === 'micro' && assign.indentCap && depth > INDENT_CAP){
+    return base + (depth - INDENT_CAP) * MICRO_STEP;
+  }
+  return base;
 }
 function railsHtml(depth){
   if(isComponentStyle()) return '';   // 既有元件沒有縮排引導線
@@ -2287,6 +2920,13 @@ function railsHtml(depth){
   const shown = assign.indentCap ? Math.min(depth, INDENT_CAP) : depth;
   for(let level=0; level<shown; level++){ out += `<span class="trail" style="left:${32 + level*INDENT_STEP_TREE}px"></span>`; }
   return out;
+}
+/* 帳單帳戶視角沒有 org 分段（一個帳單帳戶可以付費給跨 org 的專案，所以 org
+ * 在那個視角不是乾淨的父層），位置講不出 org，只好標在列上。資料夾視角不標，
+ * 因為上面的區段標頭已經說了。 */
+function orgChipHtml(project){
+  if(!isMultiOrg() || showFolderView() || !project.orgName) return '';
+  return `<span class="ba-chip is-org-chip">${esc(project.orgName)}</span>`;
 }
 function projectRow(project, depth){
   /* 元件版：GroupedMultiSelectOptionItem 是單行 `name (desc)`，desc 用 hint 色，
@@ -2301,7 +2941,7 @@ function projectRow(project, depth){
     ${checkboxHtml(!!assign.selected[project.id], `toggleProject('${project.id}')`)}
     <span class="material-symbols-outlined ticon ghost">folder</span>
     <div class="tlabel">${body}</div>
-    ${(showFolderView() && !project.parent.none)?`<span class="ba-chip">${esc(project.parent.name)}</span>`:''}
+    ${orgChipHtml(project)}${(showFolderView() && !project.parent.none)?`<span class="ba-chip">${esc(project.parent.name)}</span>`:''}
   </div>`;
 }
 /* 縮排封頂之後，第 5 層以上的層級靠這條祖先路徑表達，取代原本靠斜階梯表達。
@@ -2357,8 +2997,26 @@ function pathPrefix(depth, node){
   const ancestors = FOLDER_PATHS.get(node.id) || [];
   if(!ancestors.length) return '';
   const flattened = !!assign.search;
-  const deep = assign.indentCap && depth > INDENT_CAP;
-  if(!flattened && !deep) return '';
+  const capped = assign.indentCap && depth > INDENT_CAP;
+  const needed = distinguishingSegments(node) > 0;
+  /* `needed`（名稱跟別人衝突）是正確性問題，跟選哪個模式無關——三個模式都要顯示，
+   * 不然使用者捲到 `platform > staging` 的專案列表，sticky 釘住的標頭只寫
+   * `staging (7)`，完全看不出是哪個 staging（deprecated 底下也有一個）。
+   * 這不是假設，是 Bater 工程調查裡真實存在的同名資料夾，2026-09-11 才發現
+   * `deep` 模式的原始條件（flattened || capped）漏掉了這一項，深度 1 遠低於
+   * 封頂線 4，正常瀏覽時永遠不會消歧。
+   *
+   * 何時顯示路徑：
+   *   一律：搜尋中，或名稱跟別人衝突（不分模式，這是正確性底線）
+   *   'all'   → 再加上每一列都顯示（除了第一層，它沒有祖先）
+   *   'micro' → 沒有額外情況，封頂後靠微縮排表達層級
+   *   'deep'  → 再加上深度超過封頂線（現況：靠路徑補償縮排停止累加）
+   */
+  const show = flattened
+    || needed
+    || (assign.pathMode === 'all')
+    || (assign.pathMode === 'deep' && capped);
+  if(!show) return '';
   const take = Math.min(ancestors.length, Math.max(1, distinguishingSegments(node)));
   const shown = ancestors.slice(ancestors.length - take);
   const elided = ancestors.length > take ? '… / ' : '';
@@ -2434,7 +3092,7 @@ function unassignedRow(){
         ${checkboxHtml(isAll, `toggleUnassigned()`, isSome)}
         <span class="material-symbols-outlined ticon">folder_off</span>
         <div class="tlabel"><span class="tname">No folder <span class="tcount ${visible.length!==inFilter.length?'partial':''}">${countText}</span></span>
-        <span class="tsub">Projects sitting directly under ${ORG_DOMAIN}</span></div>
+        <span class="tsub">Projects sitting directly under ${esc(activeOrgs()[0].name)}</span></div>
       </div>${kids}
     </div>`;
 }
@@ -2458,7 +3116,7 @@ function noBaRow(){
   const expanded = !!assign.expanded['no-ba'] || !!assign.search;
   const kids = expanded ? visible.map(project=>projectRow(project,1)).join('') : '';
   return `<div class="tbranch">
-      <div class="tnode is-folder is-unassigned" style="padding-left:24px;top:${folderStickyTop()}px;z-index:30" onclick="toggleExpand('no-ba')">
+      <div class="tnode is-folder is-unassigned${isMultiOrg()?' is-cross-org':''}" style="padding-left:24px;top:${folderStickyTop()}px;z-index:30" onclick="toggleExpand('no-ba')">
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('no-ba')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
         ${checkboxHtml(isAll, `toggleNoBa()`, isSome)}
         <span class="material-symbols-outlined ticon">money_off</span>
@@ -2483,6 +3141,15 @@ function allVisibleSelectable(){
   return out;
 }
 function toggleSelectAll(){ forgetClearedNotice(); toggleScope(allVisibleSelectable()); }
+/* org 區段標頭：刻意長得不像資料夾列——沒有 checkbox、沒有展開箭頭、不可點、
+ * 字級小一階。四個線索同時在講「這不是資料夾」，不是只靠顏色。
+ * 明度往上加深（org blue-20 > folder blue-10 > project 白底），層級一眼讀得出來。 */
+function orgHeaderRow(org){
+  return `<div class="tnode is-org" style="top:${SELECT_ALL_H}px" title="Organization ID: ${esc(org.orgId)}">
+      <span class="material-symbols-outlined org-icon">domain</span>
+      <span class="org-name">${hl(org.name)}</span>
+    </div>`;
+}
 function selectAllRow(){
   const scope = allVisibleSelectable();
   if(!scope.length) return '';
@@ -2550,16 +3217,9 @@ function baProjects(baId){
 }
 function toggleBa(baId){ toggleScope(baProjects(baId)); }
 
-function renderAssign(){
-  const root = document.getElementById('assign-root');
-  if(!assign.open){ root.innerHTML=''; return; }
-  /* renderAssign 重建整個彈窗的 innerHTML，搜尋框會被換掉，游標就跑了——
-   * debounce 一送出就打不下去，得再點回輸入框。渲染前記住焦點跟游標位置，
-   * 渲染後補回去。（不是這輪的回饋，是順手修掉的既有問題。） */
+/* 選單本體（工具列 + 提示條 + 清單 + 計數）跟外殼分開。modal 與 wizard 兩個宿主都吃這一份。 */
+function assignPickerParts(){
   buildFolderPathIndex();   // 換雲、塞深樹都會改變樹，索引每次重建（成本可忽略）
-  const active = document.activeElement;
-  const keepFocus = !!active && active.matches?.('.rmodal .search-box input');
-  const caret = keepFocus ? active.selectionStart : null;
   const assignable = everyUnassigned().length;
   const picked = Object.keys(assign.selected).length;
 
@@ -2583,15 +3243,24 @@ function renderAssign(){
     const tree = flatBaTree() + noBaRow();
     body = tree ? selectAllRow() + tree : `<div class="tempty">No resources match your search.</div>`;
   } else {
-    const tree = cfg().folders().filter(nodeHasVisible).map(node=>folderRow(node,0)).join('') + unassignedRow() + noBaRow();
+    /* 多 org：每個 org 一段，標頭 + 該 org 底下有內容的資料夾。
+     * 單一 org：完全不出現標頭，跟改版前一模一樣。 */
+    const multi = isMultiOrg();
+    /* 「No folder」是直接掛在 organization 底下的專案，所以它屬於某一個 org，
+     * 要排在該 org 的區段裡面。mock 只有一組，歸在第一個 org；真實資料是每個
+     * org 各自有自己的一組。
+     * 「Projects without Billing Account」相反，那是跨 org 的桶子（帳單帳戶可以
+     * 付費給跨 org 的專案），所以排在所有 org 區段之外、最底部，並在多 org 時
+     * 加一條分隔線，不然會被讀成屬於最後一個 org。 */
+    const tree = activeOrgs().map((org, index)=>{
+      const rows = org.folders.filter(nodeHasVisible).map(node=>folderRow(node,0)).join('')
+        + (index === 0 ? unassignedRow() : '');
+      if(!rows) return '';                       // 這個 org 被搜尋濾光就整段不出現
+      return (multi ? orgHeaderRow(org) : '') + rows;
+    }).join('') + noBaRow();
     body = tree ? selectAllRow() + tree : `<div class="tempty">No resources match your search.</div>`;
   }
 
-  /* 原本這段banner 塞了 4-5 句話（分組規則 + 只列未指派 + 去哪移除 + 新資源要重開），
-   * Kabin 反饋太長。砍到每個模式只留「這個模式特有的一句」，
-   * 「只列未指派 / 去哪移除」兩句所有模式共用，只講一次。
-   * 「新增的資源要重開才看得到」這句拿掉——「只列未指派」已經隱含這件事，
-   * 不需要再展開講一次重開的機制。 */
   /* 原本這裡有一塊藍底常駐說明，收掉了（Kabin 2026-09-09 決定）。三件事
    * 各自歸位：「只列未指派」→ 底部計數的 unassigned 這個字、視角行為 →
    * Group by 的 info tooltip、「要移除去表格 Unlink」→ 空狀態已經有。
@@ -2600,20 +3269,9 @@ function renderAssign(){
    * 指出這件事該比照本檔 resourcesTab() 的雲端 pill tabs 做——tab 永遠
    * 顯示，沒資料的那個點下去才出現空狀態，不要預先把選項藏起來再用文字
    * 解釋為什麼看不到。所以 Group by 的 Folder 分頁永遠在，這個 org 真的
-   * 沒有資料夾時，點進 Folder 才在 rmodal-body 出現對應空狀態
-   * （見下方 assign.groupBy==='folder' && !assign.hasFolders 分支）。 */
-
-  root.innerHTML = `<div class="rmodal-backdrop" onclick="if(event.target===this)closeAssign()">
-    <div class="rmodal" role="dialog" aria-label="Assign Resource">
-      <div class="rmodal-head">
-        <div>
-          <h3>Assign Resource: ${esc(cfg().cloudLabel)}</h3>
-          <p>Select the ${esc(cfg().cloudLabel)} resources you want to assign to this group.</p>
-        </div>
-        <button class="rmodal-close" onclick="closeAssign()" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
-      </div>
-      <div class="rmodal-tools">
-        <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="${searchPlaceholder()}" value="${esc(assign.search)}" oninput="onAssignSearch(this.value)"></div>
+   * 沒有資料夾時，點進 Folder 才在 rmodal-body 出現對應空狀態。 */
+  const tools = `<div class="rmodal-tools">
+        <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="${searchPlaceholder()}" value="${esc(assign.typed != null ? assign.typed : assign.search)}" oninput="onAssignSearch(this.value)"></div>
         ${showGroupByToggle() ? `<div class="groupby-toggle">
           <span class="lbl">Group by</span>
           <span class="material-symbols-outlined gb-info" title="${esc(GROUPBY_HELP)}">info</span>
@@ -2622,28 +3280,48 @@ function renderAssign(){
             <button class="pill-tab ${assign.groupBy==='folder'?'active':''}" onclick="setGroupBy('folder')"><span class="material-symbols-outlined" style="font-size:16px">folder</span>Folder</button>
           </div>
         </div>` : ''}
+      </div>`;
+  const bodyCls = `rmodal-body ${isComponentStyle()?'is-component':'is-tree'}${isComponentFixed()?' is-component-fixed':''}`;
+  const count = assignable ? `<b>${picked}</b> of ${assignable} unassigned ${assignable===1?cfg().noun:cfg().nounPlural} selected` : '';
+  return {tools, notice:clearedNoticeHtml(), body, bodyCls, count, picked, assignable};
+}
+function renderAssign(){
+  if(assign.host==='wizard'){ renderWizard(); return; }
+  const root = document.getElementById('assign-root');
+  if(!assign.open){ root.innerHTML=''; return; }
+  /* renderAssign 重建整個彈窗的 innerHTML，搜尋框會被換掉，游標就跑了——
+   * debounce 一送出就打不下去，得再點回輸入框。渲染前記住焦點跟游標位置，
+   * 渲染後補回去。（不是這輪的回饋，是順手修掉的既有問題。） */
+  const focus = captureFocus();
+  const parts = assignPickerParts();
+  root.innerHTML = `<div class="rmodal-backdrop" onclick="if(event.target===this)closeAssign()">
+    <div class="rmodal assign-picker" role="dialog" aria-label="Assign Resource">
+      <div class="rmodal-head">
+        <div>
+          <h3>Assign Resource: ${esc(cfg().cloudLabel)}</h3>
+          <p>Select the ${esc(cfg().cloudLabel)} resources you want to assign to this group.</p>
+        </div>
+        <button class="rmodal-close" onclick="closeAssign()" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
       </div>
-      ${clearedNoticeHtml()}
-      <div class="rmodal-body ${isComponentStyle()?'is-component':'is-tree'}${isComponentFixed()?' is-component-fixed':''}">${body}</div>
+      ${parts.tools}
+      ${parts.notice}
+      <div class="${parts.bodyCls}">${parts.body}</div>
       <div class="rmodal-foot">
-        <span class="rmodal-count">${assignable?`<b>${picked}</b> of ${assignable} unassigned ${assignable===1?cfg().noun:cfg().nounPlural} selected`:''}</span>
+        <span class="rmodal-count">${parts.count}</span>
         <div style="display:flex;gap:8px">
           <button class="btn btn-out" onclick="closeAssign()">Cancel</button>
-          <button class="btn btn-pri" ${picked?'':'disabled'} onclick="confirmAssign()">Assign</button>
+          <button class="btn btn-pri" ${parts.picked?'':'disabled'} onclick="confirmAssign()">Assign</button>
         </div>
       </div>
     </div>
   </div>`;
-  if(keepFocus){
-    const input = root.querySelector('.rmodal .search-box input');
-    if(input){ input.focus(); if(caret != null) input.setSelectionRange(caret, caret); }
-  }
+  restoreFocus(root, focus);
 }
 /* Demo 用：整條 10 層一次全展開，方便截圖。平常點資料夾也會展開整條子樹。 */
 function showDeepTree(){
   if(!FOLDER_TREE.some(node=>node.id==='deep-0')) FOLDER_TREE.unshift(makeDeepTree());
   assign.hasFolders = true;
-  openAssign();
+  openAssign('gcp');   // 深樹是 GCP 的；v2 沒帶參數，停在 AWS 分頁時會開成 AWS 選單（v3 順手修）
   setGroupBy('folder');
   setTimeout(()=>{
     for(let index=0; index<10; index++){ assign.expanded[`deep-${index}`] = true; }
@@ -2663,11 +3341,804 @@ function confirmAssign(){
   showToast(failed ? ASSIGN_TOAST.error : ASSIGN_TOAST.success, failed ? 'error' : 'success');
 }
 
+
+/* ============================================================
+ * v3 P1 ①  Resources 的第二種指派維度：Label（GCP）/ Tag（AWS）
+ * 設計稿：#03-3 11875:94955（GCP Label 表格）、#03-4 11947:105062（AWS Tag 表格）、
+ *         #56 11934:103522 / #56-1 11934:104107（GCP 指派彈窗 + 下拉）、
+ *         #57 11948:106610 / #57-1 11948:106613（AWS）。
+ * Azure：canvas 上四張 Azure frame 全是「Please Refer to Google Cloud」註記，
+ * 所以 Azure 照 GCP 的結構與文案走（子分頁叫 Label、欄位叫 Label Keys / Values）。
+ * ⚠️ Azure 原生術語是 Tag 不是 Label，這裡照註記做但要回 Figma 確認，見交付回報。
+ * ============================================================ */
+const TAG_TERMS = {
+  gcp:  {tab:'Label', keys:'Label Keys', values:'Label Values', keyPh:'Select Label Key', valuePh:'Select Label Value',
+         searchKeys:'Search label keys',                 // #56-1 原文
+         searchValues:'Search label values',             // 設計端暫擬：#56-1 只畫了 Keys 的下拉，Values 的搜尋 placeholder 比照造句
+         parentPrefix:'Billing Account', keyPrefix:'Label Key',
+         colKey:'Label Key', colValue:'Label Value', colParent:'Billing Account (Label belongs to)'},
+  aws:  {tab:'Tag', keys:'Tag Keys', values:'Tag Values', keyPh:'Select Tag Key', valuePh:'Select Tag Value',
+         searchKeys:'Search Tag keys',                   // #57-1 原文（Tag 大寫、跟 GCP 的「Search label keys」大小寫不一致，照稿不改，已列入設計稿問題）
+         searchValues:'Search Tag values',               // 設計端暫擬，比照 #57-1 的大小寫
+         parentPrefix:'Management Account', keyPrefix:'Tag Key',
+         colKey:'Tag Key', colValue:'Tag Value', colParent:'Management Account (Tag belongs to)'},
+  azure:{tab:'Tag', keys:'Tag Keys', values:'Tag Values', keyPh:'Select Tag Key', valuePh:'Select Tag Value',
+         // 2026-09-11 Kabin 裁決：Azure 子分頁改叫 Tag（跟 AWS 同一個詞、符合 Azure 原生術語），
+         // 但流程／版面仍照 GCP 既有結構（雙層下拉、key→value），只是換詞不是重新設計。
+         searchKeys:'Search Tag keys', searchValues:'Search Tag values',
+         parentPrefix:'Subscription', keyPrefix:'Tag Key',
+         colKey:'Tag Key', colValue:'Tag Value', colParent:'Subscription (Tag belongs to)'},
+};
+/* 上層（Billing Account / Management Account / Subscription）。GCP 沿用 Resources 表格
+ * 既有的 GCP_BAS，另外兩朵雲補第二個上層，讓「上層 → key」的分組看得出來。 */
+const TAG_PARENTS = {
+  gcp:   GCP_BAS.map(([name,id])=>({id, name})),
+  aws:   [{id:'112233445566', name:'CloudMile-Org-Root'}, {id:'998811223344', name:'CloudMile-Org-Sandbox'}],
+  azure: [{id:'/subscriptions/c5d7a1e2', name:'Corporate-BI-Data'}, {id:'/subscriptions/9a1f77c0', name:'Corporate-Web-Prod'}],
+};
+const TAG_KEYS = {
+  gcp:   {application:['crm-system','security-monitoring','iot-platform','hr-portal'], 'billing-account':['shared','dedicated'], compliance:['pci-dss','sox'], 'cost-center':['cc-1001','cc-2040','cc-3300'], environment:['prod','staging','dev']},
+  aws:   {Application:['payments','checkout','search'], CostCenter:['fin-01','eng-02'], ManagedBy:['terraform','console'], WorkloadType:['batch','web','ml'], Environment:['Prod','Staging','Dev']},
+  azure: {environment:['prod','staging','dev'], owner:['finops','platform'], 'cost-center':['cc-1001','cc-2040'], workload:['bi','web']},
+};
+/* 每朵雲的 label/tag 全集：(上層, key, value) 三元組。不是每個上層都有每個 key，
+ * 否則兩個上層底下的清單會一模一樣、看不出分組的意義。 */
+function buildTagUniverse(cloud){
+  const out = [];
+  const keys = Object.keys(TAG_KEYS[cloud]);
+  TAG_PARENTS[cloud].forEach((parent, pi)=>keys.forEach((key, ki)=>{
+    if(pi>0 && (pi+ki)%3===2) return;
+    TAG_KEYS[cloud][key].forEach(value=>out.push({id:`${parent.id}|${key}|${value}`, parent, key, value}));
+  }));
+  return out;
+}
+const TAG_UNIVERSE = {gcp:buildTagUniverse('gcp'), aws:buildTagUniverse('aws'), azure:buildTagUniverse('azure')};
+/* 每個群組已指派的 label/tag（mock，從全集裡等距抽幾個）。存成 Set，指派 / Unlink 會改它，
+ * 所以 #56 彈窗「只列尚未指派的」跟表格能對得上。 */
+const TAG_ASSIGNED = {};
+function assignedTagSet(groupId, cloud){
+  const key = groupId+'|'+cloud;
+  if(!TAG_ASSIGNED[key]){
+    const seed = groupId.length + (cloud==='aws'?1:cloud==='azure'?2:0);
+    const universe = TAG_UNIVERSE[cloud];
+    TAG_ASSIGNED[key] = new Set(universe.filter((tag, index)=>(index+seed)%5===0).map(tag=>tag.id).slice(0, 4 + seed%3));
+  }
+  return TAG_ASSIGNED[key];
+}
+function assignedTagsFor(groupId, cloud){
+  const set = assignedTagSet(groupId, cloud);
+  return TAG_UNIVERSE[cloud].filter(tag=>set.has(tag.id));
+}
+function unassignedTagsFor(groupId, cloud){
+  const set = assignedTagSet(groupId, cloud);
+  return TAG_UNIVERSE[cloud].filter(tag=>!set.has(tag.id));
+}
+function currentGroupId(){ return state.tier===2 ? state.t2Id : state.t1Id; }
+function setResSub(sub){ state.resSub[state.cloud] = sub; render(); }
+
+/* ---- #56 / #57 彈窗 ---- */
+const tagPick = {open:false, cloud:'gcp', groupId:null, keys:{}, values:{}, dd:null, search:'', loading:false, forceFail:false};
+function openTagAssign(cloud){
+  tagPick.cloud = cloud || state.cloud;
+  tagPick.groupId = currentGroupId();
+  tagPick.open = true; tagPick.loading = true;
+  tagPick.keys = {}; tagPick.values = {}; tagPick.dd = null; tagPick.search = '';
+  renderTagAssign();
+  setTimeout(()=>{ tagPick.loading = false; renderTagAssign(); }, 500);
+}
+function closeTagAssign(){ tagPick.open = false; renderTagAssign(); }
+function tagTerms(){ return TAG_TERMS[tagPick.cloud]; }
+function tagPool(){ return unassignedTagsFor(tagPick.groupId, tagPick.cloud); }
+function tagHit(text){ return !tagPick.search || text.toLowerCase().includes(tagPick.search.toLowerCase()); }
+/* Keys 下拉：上層 → key（#56-1 註記「Label Key 的上層為 Billing Account」）。
+ * 只列還有未指派 value 的 (上層, key) 組合。 */
+function tagKeyGroups(){
+  const groups = [];
+  TAG_PARENTS[tagPick.cloud].forEach(parent=>{
+    const keys = [...new Set(tagPool().filter(tag=>tag.parent.id===parent.id).map(tag=>tag.key))].filter(tagHit);
+    if(keys.length) groups.push({id:parent.id, label:`${tagTerms().parentPrefix} = ${parent.name}`, sub:parent.id, items:keys.map(key=>({id:`${parent.id}|${key}`, label:key}))});
+  });
+  return groups;
+}
+/* Values 下拉：key → value（註記「Label Value 的上層為 Label Key」）。同一個 key 在
+ * 兩個上層都被選到時，value 右邊補上層名稱，不然兩列 prod 分不出是哪一個。
+ * 分組列的文案「Label Key = application」是比照 Keys 下拉的「Billing Account = …」造句
+ * （設計端暫擬，#56-1 沒畫 Values 展開的樣子）。 */
+function tagValueGroups(){
+  const pool = tagPool().filter(tag=>tagPick.keys[`${tag.parent.id}|${tag.key}`]);
+  const byKey = new Map();
+  pool.forEach(tag=>{ if(!byKey.has(tag.key)) byKey.set(tag.key, []); byKey.get(tag.key).push(tag); });
+  const groups = [];
+  byKey.forEach((tags, key)=>{
+    const multiParent = new Set(tags.map(tag=>tag.parent.id)).size > 1;
+    const items = tags.filter(tag=>tagHit(tag.value)).map(tag=>({id:tag.id, label:tag.value, sub:multiParent?tag.parent.name:''}));
+    if(items.length) groups.push({id:'key|'+key, label:`${tagTerms().keyPrefix} = ${key}`, sub:'', items});
+  });
+  return groups;
+}
+function ddOpen(kind){
+  tagPick.dd = tagPick.dd===kind ? null : kind;
+  tagPick.search = '';
+  renderTagAssign();
+}
+function ddCloseAll(){ if(tagPick.dd){ tagPick.dd = null; tagPick.search=''; renderTagAssign(); } }
+function ddBucket(kind){ return kind==='keys' ? tagPick.keys : tagPick.values; }
+/* 取消一個 key 時，底下已勾的 value 一起清掉，不然 Values 欄位會留著看不到的勾選 */
+function pruneValues(){
+  Object.keys(tagPick.values).forEach(id=>{
+    const [parentId, key] = id.split('|');
+    if(!tagPick.keys[`${parentId}|${key}`]) delete tagPick.values[id];
+  });
+}
+function ddToggle(kind, id){
+  const bucket = ddBucket(kind);
+  if(bucket[id]) delete bucket[id]; else bucket[id] = true;
+  if(kind==='keys') pruneValues();
+  renderTagAssign();
+}
+function ddToggleGroup(kind, groupId){
+  const groups = kind==='keys' ? tagKeyGroups() : tagValueGroups();
+  const group = groups.find(item=>item.id===groupId);
+  if(!group) return;
+  ddToggleMany(kind, group.items.map(item=>item.id));
+}
+function ddToggleAll(kind){
+  const groups = kind==='keys' ? tagKeyGroups() : tagValueGroups();
+  ddToggleMany(kind, groups.flatMap(group=>group.items.map(item=>item.id)));
+}
+function ddToggleMany(kind, ids){
+  const bucket = ddBucket(kind);
+  const allOn = ids.length>0 && ids.every(id=>bucket[id]);
+  ids.forEach(id=>{ if(allOn) delete bucket[id]; else bucket[id]=true; });
+  if(kind==='keys') pruneValues();
+  renderTagAssign();
+}
+function hlTag(text){
+  if(!tagPick.search) return esc(text);
+  const at = text.toLowerCase().indexOf(tagPick.search.toLowerCase());
+  if(at<0) return esc(text);
+  return esc(text.slice(0,at))+'<span class="hl">'+esc(text.slice(at,at+tagPick.search.length))+'</span>'+esc(text.slice(at+tagPick.search.length));
+}
+function ddPanelHtml(kind){
+  const groups = kind==='keys' ? tagKeyGroups() : tagValueGroups();
+  const bucket = ddBucket(kind);
+  const all = groups.flatMap(group=>group.items);
+  const allOn = all.length>0 && all.every(item=>bucket[item.id]);
+  const someOn = !allOn && all.some(item=>bucket[item.id]);
+  const rows = groups.map(group=>{
+    const on = group.items.every(item=>bucket[item.id]);
+    const some = !on && group.items.some(item=>bucket[item.id]);
+    return `<div class="dd-row group" onclick="ddToggleGroup('${kind}','${esc(group.id)}')">${checkboxHtml(on, `ddToggleGroup('${kind}','${esc(group.id)}')`, some)}<span class="dd-lbl">${esc(group.label)}${group.sub?` <span class="dd-id">(${esc(group.sub)})</span>`:''}</span></div>`
+      + group.items.map(item=>`<div class="dd-row child" onclick="ddToggle('${kind}','${esc(item.id)}')">${checkboxHtml(!!bucket[item.id], `ddToggle('${kind}','${esc(item.id)}')`)}<span class="dd-lbl">${hlTag(item.label)}${item.sub?` <span class="dd-id">(${esc(item.sub)})</span>`:''}</span></div>`).join('');
+  }).join('');
+  return `<div class="dd-panel" onclick="event.stopPropagation()">
+    <div class="dd-search"><div class="search-box"><input data-f="dd-search" placeholder="${esc(kind==='keys'?tagTerms().searchKeys:tagTerms().searchValues)}" value="${esc(tagPick.search)}" oninput="tagPick.search=this.value;renderTagAssign()"><span class="material-symbols-outlined">search</span></div></div>
+    <div class="dd-list">
+      ${all.length?`<div class="dd-row" onclick="ddToggleAll('${kind}')">${checkboxHtml(allOn, `ddToggleAll('${kind}')`, someOn)}<span class="dd-lbl">Select All</span></div>`:''}
+      ${rows}
+      ${all.length?'':`<div class="dd-empty">${tagPick.search?'No results match your search.':'No options available.'}</div>`}
+    </div></div>`;
+}
+function tagTriggerText(kind){
+  const bucket = ddBucket(kind);
+  const ids = Object.keys(bucket);
+  if(!ids.length) return '';
+  if(kind==='keys') return [...new Set(ids.map(id=>id.split('|')[1]))].join(', ');
+  return ids.map(id=>id.split('|')[2]).join(', ');
+}
+function renderTagAssign(){
+  const root = document.getElementById('tag-root');
+  if(!tagPick.open){ root.innerHTML=''; return; }
+  const focus = captureFocus();
+  const terms = tagTerms();
+  const cloudLabel = CLOUD_META[tagPick.cloud].label;
+  const keyCount = Object.keys(tagPick.keys).length;
+  const valueCount = Object.keys(tagPick.values).length;
+  const keyText = tagTriggerText('keys'), valueText = tagTriggerText('values');
+  let fields;
+  if(tagPick.loading){
+    fields = `<div class="fld"><div class="skel" style="height:14px;width:80px;margin-bottom:8px"></div><div class="skel" style="height:36px"></div></div>
+      <div class="fld"><div class="skel" style="height:14px;width:90px;margin-bottom:8px"></div><div class="skel" style="height:36px"></div></div>`;
+  } else if(!tagPool().length){
+    /* 全部指派過：沿用 v2 專案選單的空狀態語彙，不是 No Data */
+    fields = `<div class="tempty" style="min-height:160px"><span class="material-symbols-outlined tempty-icon is-success">check_circle</span>
+      <div class="tempty-title">Everything is already assigned</div>
+      <div>All ${esc(cloudLabel)} ${esc(terms.tab.toLowerCase())}s are assigned to this group. To remove one, select it in the Resources table and use Unlink Resource.</div></div>`;
+  } else {
+    fields = `<div class="fld dd ${tagPick.dd==='keys'?'is-open':''}"><label class="fld-lbl">${esc(terms.keys)}</label>
+        <button class="dd-trigger ${keyText?'':'placeholder'}" onclick="event.stopPropagation();ddOpen('keys')">${keyText?esc(keyText):esc(terms.keyPh)}</button><span class="material-symbols-outlined dd-caret" style="top:30px">arrow_drop_down</span>
+        ${tagPick.dd==='keys'?ddPanelHtml('keys'):''}</div>
+      <!-- Values 在還沒選任何 Key 之前 disabled：value 的上層是 key（#56-1 註記），沒有 key 就沒有可分組的 value。
+           這個 disabled 是設計端暫擬，設計稿只畫了兩個欄位都是 placeholder 的樣子。 -->
+      <div class="fld dd ${tagPick.dd==='values'?'is-open':''}"><label class="fld-lbl">${esc(terms.values)}</label>
+        <button class="dd-trigger ${valueText?'':'placeholder'}" ${keyCount?'':'disabled'} onclick="event.stopPropagation();ddOpen('values')">${valueText?esc(valueText):esc(terms.valuePh)}</button><span class="material-symbols-outlined dd-caret" style="top:30px">arrow_drop_down</span>
+        ${tagPick.dd==='values'?ddPanelHtml('values'):''}</div>`;
+  }
+  root.innerHTML = `<div class="rmodal-backdrop" onclick="if(event.target===this)closeTagAssign()">
+    <div class="lmodal" role="dialog" aria-label="Assign Resource" onclick="ddCloseAll()">
+      <div class="rmodal-head">
+        <div><h3>Assign Resource: ${esc(cloudLabel)}</h3><p>Select the ${esc(cloudLabel)} resources you want to assign to this group.</p></div>
+        <button class="rmodal-close" onclick="closeTagAssign()" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      ${fields}
+      <div class="dlg-actions" style="margin-top:4px">
+        <button class="btn btn-out" onclick="closeTagAssign()">Cancel</button>
+        <button class="btn btn-pri" ${valueCount?'':'disabled'} onclick="confirmTagAssign()">Assign</button>
+      </div>
+    </div></div>`;
+  restoreFocus(root, focus);
+}
+/* #56 註記：「[Assign] submit 成功與否則透過 toast 回饋，參照 #18-3」→ 沿用 ASSIGN_TOAST */
+function confirmTagAssign(){
+  const failed = tagPick.forceFail;
+  if(!failed){
+    const set = assignedTagSet(tagPick.groupId, tagPick.cloud);
+    Object.keys(tagPick.values).forEach(id=>set.add(id));
+  }
+  tagPick.forceFail = false;
+  closeTagAssign();
+  showToast(failed ? ASSIGN_TOAST.error : ASSIGN_TOAST.success, failed ? 'error' : 'success');
+  render();
+}
+
+/* 重繪 innerHTML 會弄掉輸入框的焦點與游標（v2 在 assign 搜尋框就踩過）。
+ * 這裡做成通用版：帶 data-f 的輸入框、或 .assign-picker 裡的搜尋框，渲染前記住、渲染後補回。 */
+function captureFocus(){
+  const active = document.activeElement;
+  if(!active || !active.matches) return null;
+  let selector = null;
+  if(active.dataset && active.dataset.f) selector = `[data-f="${active.dataset.f}"]`;
+  else if(active.matches('.assign-picker .search-box input')) selector = '.assign-picker .search-box input';
+  if(!selector) return null;
+  let caret = null;
+  try { caret = active.selectionStart; } catch(_) { caret = null; }
+  return {selector, caret};
+}
+function restoreFocus(root, focus){
+  if(!focus) return;
+  const el = root.querySelector(focus.selector);
+  if(!el) return;
+  el.focus();
+  if(focus.caret != null){ try { el.setSelectionRange(focus.caret, focus.caret); } catch(_) {} }
+}
+
+/* ============================================================
+ * v3 P1 ②  Create Group 三步 wizard
+ * 設計稿 section「設計稿已完成優化，但尚未排入開發（因此 Azure、Add Resource 更新部分
+ * 也尚未跟上調整）」：
+ *   #08   11735:168560  Group Information
+ *   #08-1 11735:168602  Error Message（格式錯誤即時顯示）
+ *   #08-2 11735:168590  Error Details（按 Next 後由 API 判斷、折疊區呈現）
+ *   #30   11735:168565  Invite User（欄位同 #11、錯誤同 #11-1、非必填可跳過）
+ *   #31   11735:168570  Assign Resource: Google Cloud
+ *   #37   11735:168580  Assign Resource: AWS（最後一步，按鈕是 Submit）
+ *   #08-3 11735:168488  Toast
+ * 刻意偏離 canvas 的地方：
+ *   - #31 / #37 畫的資源選單是舊版（section 名稱自己寫「Add Resource 更新部分也尚未跟上
+ *     調整」），這裡直接復用 v2 做好的 assign picker（folder / BA 雙視角、最小可區分路徵、
+ *     搜尋時序），不照 canvas 重畫。
+ *   - Stepper 有第五步「Finish」但 canvas 沒有對應畫面，#08-3 說按 Submit 就關閉彈窗 +
+ *     toast，所以 Finish 永遠不會被渲染成畫面（列入設計稿問題）。
+ *   - Stepper 只有 Google Cloud 與 AWS，沒有 Azure（section 名稱說 Azure 尚未跟上），照稿。
+ * ============================================================ */
+const WZ_STEPS = [
+  {id:'info',   label:'Group Information',                    title:'Create Group'},
+  {id:'invite', label:'Invite User',                          title:'Invite User'},
+  {id:'gcp',    label:'Assign Resource:<br>Google Cloud',     title:'Assign Resource: Google Cloud'},
+  {id:'aws',    label:'Assign Resource:<br>AWS',              title:'Assign Resource: AWS'},
+  {id:'finish', label:'Finish',                               title:'Finish'},
+];
+const wizard = {open:false, tier:1, step:0, name:'', managers:'', role:'member', emails:'', errors:{}, apiError:null, errOpen:true,
+  picks:{gcp:{}, aws:{}}, checking:false, submitting:false, forceFail:false, forceApiError:false};
+const EMAIL_RE = /^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/;
+const EMAIL_ERR = 'Some email addresses are invalid or duplicated.';          // #08-1 / #11-1 原文
+const NAME_EMPTY_ERR = 'Group name cannot be empty.';                         // #08-1 原文
+const API_FIELD_ERR = 'Error encountered. Please check the details below.';   // #08-2 原文
+const API_DETAIL_COPY = 'You need to remove the users below; they are already in other groups.'; // #08-2 / #11-1 原文
+const CREATE_TOAST = {success:'Group created successfully.', error:'Unable to create group. Please try again later.'}; // #08-3 原文
+const EMAIL_HELP = 'Use commas (",") as separators for adding multiple members.<br>*If there are any newly registered members, please remind them to check their inbox for the account activation email.'; // #08 / #30 原文
+/* API 端「已在其他群組」的模擬：mock 裡所有群組成員的 email 都算已被佔用。
+ * Demo FAB 有一個強制觸發的情境，不用真的去查誰是成員。 */
+const TAKEN_EMAILS = (()=>{ const set = new Set(); T1_GROUPS.forEach(group=>usersFor(group.id).forEach(user=>set.add(user.email.toLowerCase()))); return set; })();
+function splitEmails(text){ return String(text||'').split(',').map(item=>item.trim()).filter(Boolean); }
+function emailListError(text){
+  const list = splitEmails(text);
+  const seen = new Set();
+  for(const email of list){
+    if(!EMAIL_RE.test(email)) return EMAIL_ERR;
+    const key = email.toLowerCase();
+    if(seen.has(key)) return EMAIL_ERR;
+    seen.add(key);
+  }
+  return null;
+}
+function openCreateGroup(tier){
+  Object.assign(wizard, {open:true, tier:tier||1, step:0, name:'', managers:'', role:'member', emails:'', errors:{}, apiError:null, errOpen:true,
+    picks:{gcp:{}, aws:{}}, checking:false, submitting:false});
+  renderWizard();
+}
+function closeWizard(){
+  wizard.open = false;
+  wizard.seq = (wizard.seq||0) + 1;   // 讓還在路上的 API check / submit timer 作廢
+  wizard.forceFail = false; wizard.forceApiError = false;
+  if(assign.host==='wizard'){ assign.host='modal'; assign.open=false; }
+  renderWizard();
+}
+/* 格式錯誤即時檢查（#08-1 註記「[Add Manager]：email 格式需即時檢查，即時顯示錯誤提示」）。
+ * 只在錯誤狀態有變化時重繪，減少打字時的閃動；焦點與游標由 captureFocus 保住。 */
+function wizardLiveValidate(field){
+  const before = wizard.errors[field] || null;
+  let after = null;
+  if(field==='name') after = wizard.errors.name ? (wizard.name.trim() ? null : NAME_EMPTY_ERR) : null;   // 名稱只在按過 Next 之後才即時清除
+  if(field==='managers' || field==='emails') after = emailListError(wizard[field]);
+  if(wizard.apiError && wizard.apiError.field===field){ wizard.apiError = null; before !== after || renderWizard(); }
+  if(before !== after){ if(after) wizard.errors[field]=after; else delete wizard.errors[field]; renderWizard(); }
+}
+function wizardValidateInfo(){
+  wizard.errors = {};
+  if(!wizard.name.trim()) wizard.errors.name = NAME_EMPTY_ERR;
+  const emailErr = emailListError(wizard.managers);
+  if(emailErr) wizard.errors.managers = emailErr;
+  renderWizard();
+  return !Object.keys(wizard.errors).length;
+}
+function wizardValidateInvite(){
+  wizard.errors = {};
+  const emailErr = emailListError(wizard.emails);
+  if(emailErr) wizard.errors.emails = emailErr;
+  renderWizard();
+  return !Object.keys(wizard.errors).length;
+}
+/* #08-2：按 Next 後由 API 判斷（這裡用 600ms 模擬往返，期間 Next 轉圈、不可再按）。
+ * 失敗 → 欄位紅框 + 「Error encountered…」+ 預設展開的 Error Details；註記說錯誤排解完前
+ * 不能前往下一步。 */
+function wizardApiCheck(field, emails, onPass){
+  const taken = wizard.forceApiError ? emails.slice() : emails.filter(email=>TAKEN_EMAILS.has(email.toLowerCase()));
+  if(!emails.length || (!taken.length)){ onPass(); return; }
+  wizard.checking = true; renderWizard();
+  const seq = (wizard.seq = (wizard.seq||0) + 1);
+  setTimeout(()=>{
+    if(wizard.seq !== seq || !wizard.open) return;
+    wizard.checking = false;
+    wizard.errors[field] = API_FIELD_ERR;
+    wizard.apiError = {field, emails:taken};
+    wizard.errOpen = true;
+    renderWizard();
+  }, 600);
+}
+function wizardGo(step){
+  wizard.step = step; wizard.apiError = null; wizard.errors = {};
+  const id = WZ_STEPS[step].id;
+  if(id==='gcp' || id==='aws') enterWizardPicker(id); else { if(assign.host==='wizard') assign.host='modal'; renderWizard(); }
+}
+function enterWizardPicker(cloud){
+  startAssignPicker(cloud);
+  assign.host = 'wizard';
+  assign.selected = {...wizard.picks[cloud]};   // 回到這一步時要看到上次勾的
+  renderWizard();
+}
+function leaveWizardPicker(){
+  const id = WZ_STEPS[wizard.step].id;
+  if(id==='gcp' || id==='aws') wizard.picks[id] = {...assign.selected};
+}
+function wizardNext(){
+  if(wizard.checking || wizard.submitting) return;
+  const id = WZ_STEPS[wizard.step].id;
+  if(id==='info'){ if(!wizardValidateInfo()) return; wizardApiCheck('managers', splitEmails(wizard.managers), ()=>wizardGo(1)); return; }
+  if(id==='invite'){ if(!wizardValidateInvite()) return; wizardApiCheck('emails', splitEmails(wizard.emails), ()=>wizardGo(2)); return; }
+  if(id==='gcp'){ leaveWizardPicker(); wizardGo(3); return; }
+}
+function wizardPrev(){
+  if(wizard.checking || wizard.submitting) return;
+  leaveWizardPicker();
+  wizardGo(wizard.step-1);
+}
+/* #08 註記：「[Skip Steps and Create Group]：按下後檢查欄位上所有值是否符合格式，不符合顯示
+ * 錯誤頁面，符合則跳過後面步驟直接創立群組。」所以要先回到第一步驗證，也要跑一次 API 檢查。 */
+function wizardSkipAndCreate(){
+  if(wizard.checking || wizard.submitting) return;
+  leaveWizardPicker();
+  const inviteOk = !emailListError(wizard.emails);
+  if(!inviteOk){ wizardGo(1); wizardValidateInvite(); return; }
+  wizard.step = 0; wizard.apiError = null;
+  if(!wizardValidateInfo()) return;
+  wizardApiCheck('managers', splitEmails(wizard.managers), ()=>wizardSubmit());
+}
+function wizardSubmit(){
+  if(wizard.submitting) return;
+  leaveWizardPicker();
+  wizard.submitting = true; renderWizard();
+  const seq = (wizard.seq = (wizard.seq||0) + 1);
+  setTimeout(()=>{
+    if(wizard.seq !== seq || !wizard.open) return;
+    const failed = wizard.forceFail;
+    if(!failed) addCreatedGroup();
+    closeWizard();
+    showToast(failed ? CREATE_TOAST.error : CREATE_TOAST.success, failed ? 'error' : 'success');
+    render();
+  }, 800);
+}
+/* 建好的群組直接長進清單，讓 demo 看得到結果。creator 用 mock 名單第一位代表「目前登入者」。 */
+function addCreatedGroup(){
+  const resource = Object.keys(wizard.picks.gcp).length + Object.keys(wizard.picks.aws).length;
+  const base = {name:wizard.name.trim(), resource, lastUpdated:'Just now', creator:NAME_POOL[0], created:new Date().toLocaleDateString('en-GB')};
+  if(wizard.tier===2){
+    const t1 = findT1(state.t1Id);
+    if(!t1) return;
+    tier2GroupsFor(t1).push({id:t1.id+'-t2-new-'+Date.now(), ...base});
+    t1.tier2 = tier2GroupsFor(t1).length;
+  } else {
+    T1_GROUPS.push({id:'new-'+Date.now(), tier2:0, ...base});
+  }
+}
+/* Error Details 折疊區（#08-2 / #11-1）。ctx 是 wizard 或 fm，rerender 是對應的重繪函式名。 */
+function errBoxHtml(ctx, rerender){
+  ctx = ctx || wizard; rerender = rerender || 'renderWizard';
+  if(!ctx.apiError) return '';
+  const owner = ctx===wizard ? 'wizard' : 'fm';
+  return `<div class="errbox">
+    <button class="errbox-head" type="button" onclick="${owner}.errOpen=!${owner}.errOpen;${rerender}()" aria-expanded="${ctx.errOpen}">
+      <span class="material-symbols-outlined warn">warning</span>Error Details
+      <span class="material-symbols-outlined chev">${ctx.errOpen?'expand_less':'expand_more'}</span>
+    </button>
+    ${ctx.errOpen?`<div class="errbox-body">${API_DETAIL_COPY}<ul>${ctx.apiError.emails.map(email=>`<li>${esc(email)}</li>`).join('')}</ul></div>`:''}
+  </div>`;
+}
+function wizardInfoStep(){
+  const errors = wizard.errors;
+  return `<p class="wz-desc">Name your group and assign manager.</p>
+    <div class="fld ${errors.name?'has-error':''}"><label class="fld-lbl">Group Name<span class="req">*</span></label>
+      <input class="ipt" data-f="wz-name" placeholder="Please enter the group name" value="${esc(wizard.name)}" oninput="wizard.name=this.value;wizardLiveValidate('name')">
+      ${errors.name?`<div class="fld-err">${esc(errors.name)}</div>`:''}</div>
+    <!-- Add Manager 非必填（#08 便利貼「PM 決策此欄位非必填」） -->
+    <div class="fld ${errors.managers?'has-error':''}"><label class="fld-lbl">Add Manager</label>
+      <input class="ipt" data-f="wz-managers" placeholder="Please enter the manager's email address" value="${esc(wizard.managers)}" oninput="wizard.managers=this.value;wizardLiveValidate('managers')">
+      ${errors.managers?`<div class="fld-err">${esc(errors.managers)}</div>`:''}
+      ${wizard.apiError && wizard.apiError.field==='managers' ? errBoxHtml() : ''}
+      <div class="fld-help">${EMAIL_HELP}</div></div>`;
+}
+function wizardInviteStep(){
+  const errors = wizard.errors;
+  return `<p class="wz-desc">Invite members and assign their roles within the group.</p>
+    <div class="fld"><label class="fld-lbl">Role</label>
+      <div class="sel"><select class="ipt" data-f="wz-role" onchange="wizard.role=this.value">
+        <option value="member" ${wizard.role==='member'?'selected':''}>Member</option>
+        <option value="manager" ${wizard.role==='manager'?'selected':''}>Manager</option>
+      </select></div></div>
+    <div class="fld ${errors.emails?'has-error':''}"><label class="fld-lbl">Email</label>
+      <input class="ipt" data-f="wz-emails" placeholder="Please enter the user's email address" value="${esc(wizard.emails)}" oninput="wizard.emails=this.value;wizardLiveValidate('emails')">
+      ${errors.emails?`<div class="fld-err">${esc(errors.emails)}</div>`:''}
+      ${wizard.apiError && wizard.apiError.field==='emails' ? errBoxHtml() : ''}
+      <div class="fld-help">${EMAIL_HELP}</div></div>`;
+}
+/* #31 / #37 便利貼問 RD：「判斷使用者是否已經做好 GCP / AWS 授權，若無，直接跳過未授權的雲的
+ * 指派步驟？若可，Stepper 也能隱藏那些步驟嗎？若不可，則需要定義空狀態下的 action button」。
+ * 這題還沒有答案，所以這裡走「不可」那一邊：步驟照常出現，內容區顯示 Resources 分頁既有的
+ * not-authorized 空狀態，Next / Submit 維持可按（這一步本來就非必填、可跳過）。 */
+function wizardPickerStep(cloud){
+  const label = CLOUD_META[cloud].label;
+  const notAuthorized = state.cloudAuth==='gcp-only' && cloud!=='gcp';
+  const desc = `<p class="wz-desc">Select the ${esc(label)} resources you want to assign to this group.</p>`;
+  if(notAuthorized){
+    const isAdmin = state.role==='admin';
+    return desc + `<div class="wz-picker"><div class="empty-state error" style="min-height:100%"><div>
+      <span class="material-symbols-outlined">${isAdmin?'lock_open':'lock'}</span>
+      <p class="empty-title">${esc(label)} is not authorized</p>
+      <p class="empty-copy">${isAdmin?`Authorize ${esc(label)} in Authorization List before assigning resources from this provider.`:'Please reach out to your administrator to authorize this cloud provider.'}</p>
+    </div></div></div>`;
+  }
+  const parts = assignPickerParts();
+  return desc + `<div class="wz-picker assign-picker">${parts.tools}${parts.notice}<div class="${parts.bodyCls}">${parts.body}</div></div>
+    <div class="wz-count rmodal-count">${parts.count}</div>`;
+}
+function renderWizard(){
+  const root = document.getElementById('wizard-root');
+  if(!wizard.open){ root.innerHTML=''; return; }
+  const focus = captureFocus();
+  const step = WZ_STEPS[wizard.step];
+  const busy = wizard.checking || wizard.submitting;
+  const steps = WZ_STEPS.map((item, index)=>{
+    const cls = index<wizard.step ? 'done' : index===wizard.step ? 'active' : '';
+    return `<div class="wz-step ${cls}"><span class="wz-dot"><span class="material-symbols-outlined">check</span></span><span>${item.label}</span></div>` + (index<WZ_STEPS.length-1?'<div class="wz-line"></div>':'');
+  }).join('');
+  let body = '';
+  if(step.id==='info') body = wizardInfoStep();
+  else if(step.id==='invite') body = wizardInviteStep();
+  else if(step.id==='gcp' || step.id==='aws') body = wizardPickerStep(step.id);
+  const spinner = `<span class="material-symbols-outlined spin">progress_activity</span>`;
+  const left = step.id==='aws' ? '' : `<button class="link-btn wz-skip" ${busy?'disabled':''} onclick="wizardSkipAndCreate()">Skip Steps and Create Group</button>`;
+  const back = wizard.step===0
+    ? `<button class="btn btn-out" ${busy?'disabled':''} onclick="closeWizard()">Cancel</button>`
+    : `<button class="btn btn-out" ${busy?'disabled':''} onclick="wizardPrev()">Previous</button>`;
+  const forward = step.id==='aws'
+    ? `<button class="btn btn-pri" ${busy?'disabled':''} onclick="wizardSubmit()">${wizard.submitting?spinner:''}Submit</button>`
+    : `<button class="btn btn-pri" ${busy?'disabled':''} onclick="wizardNext()">${wizard.checking||wizard.submitting?spinner:''}Next</button>`;
+  /* 點背景不關閉：這是多步表單，誤觸就會把填了一半的東西弄掉。設計稿沒定義，設計端暫定。 */
+  root.innerHTML = `<div class="wz-backdrop">
+    <div class="wz" role="dialog" aria-label="Create Group">
+      <aside class="wz-steps">${steps}</aside>
+      <div class="wz-pane">
+        <div class="wz-head"><h3>${step.title}</h3><button class="rmodal-close" onclick="closeWizard()" aria-label="Close"><span class="material-symbols-outlined">close</span></button></div>
+        <div class="wz-body">${body}</div>
+        <div class="wz-foot">${left}<div class="wz-foot-right">${back}${forward}</div></div>
+      </div>
+    </div></div>`;
+  restoreFocus(root, focus);
+}
+
+
+/* ============================================================
+ * v3 P2  Group / User CRUD
+ *   #09   11735:168435  Popup: Edit Group（註記「目前只有 Group Name 可供編輯」）
+ *   #09-1 11735:168480  Toast: Group updated / Unable to update group
+ *   #10   11735:168440  Popup: Remove Group
+ *   #10-1 11735:168445  Popup: Group Deletion Not Allowed（有成員就不能刪）
+ *   #10-2 11735:168484  Toast: Group removed / Unable to remove group
+ *   #11   11735:168369  Popup: Invite User（⚠️ 這張只畫了 Role，沒有 Email 欄；#11-1 有，照 #11-1）
+ *   #11-1 11735:168421  Invite User 錯誤（格式錯誤 + API Error Details）
+ *   #11-2 / #11-3       Toast: User invited / Unable to invite user
+ *   #12   11735:168458  frame 名稱寫「Popup: Edit Group」，畫面其實是 **Edit User**
+ *                       （User Name 唯讀、Role 可改）。所以「#09 與 #12 同名」跟「Edit User
+ *                       沒有編號彈窗」是同一件事：#12 命名錯了。兩個「Edit User」容器
+ *                       （11735:168225 / 168229）是空的 Page Format。
+ *   #12-1 11735:168468  Toast: User updated / Unable to update user
+ *   #13   11735:168463  Popup: Remove User
+ *   #13-1 11735:168476  frame 名稱寫 Toast: Updated，內容是 User removed / Unable to remove user
+ * T2 的 Create / Edit / Remove Group、Invite / Edit / Remove User 都是「Same as T1」註記，同一組彈窗。
+ * ============================================================ */
+const CURRENT_USER_EMAIL = personEmail(NAME_POOL[0]);   // mock 的「目前登入者」：#02 註記說不能刪自己
+const fm = {kind:null, busy:false, forceFail:false, forceApiError:false, groupId:null, t1Id:null, userId:null, name:'', role:'member', emails:'', errors:{}, apiError:null, errOpen:true};
+const FM_TOAST = {
+  editGroup:          {ok:'Group updated successfully.', err:'Unable to update group. Please try again later.'},   // #09-1
+  removeGroup:        {ok:'Group removed successfully.', err:'Unable to remove group. Please try again later.'},   // #10-2
+  editUser:           {ok:'User updated successfully.',  err:'Unable to update user. Please try again later.'},    // #12-1
+  inviteUser:         {ok:'User invited successfully.',  err:'Unable to invite user. Please try again later.'},    // #11-2 / #11-3
+  removeUser:         {ok:'User removed successfully.',  err:'Unable to remove user. Please try again later.'},    // #13-1
+  inviteAdmin:        {ok:'Admin invited successfully.', err:'Unable to invite admin. Please try again later.'},   // 設計端暫擬（#07 系列沒畫 toast）
+};
+function openFm(kind, data){
+  Object.assign(fm, {kind, busy:false, groupId:null, t1Id:null, userId:null, name:'', role:'member', emails:'', errors:{}, apiError:null, errOpen:true}, data);
+  renderFm();
+}
+function closeFm(){ fm.kind = null; fm.seq = (fm.seq||0) + 1; fm.forceFail = false; fm.forceApiError = false; renderFm(); }
+function fmGroup(){ return fm.t1Id ? findT2(fm.t1Id, fm.groupId) : findT1(fm.groupId); }
+function fmUser(){ return usersFor(fm.groupId).find(user=>user.id===fm.userId); }
+function openEditGroup(groupId, t1Id){
+  const group = t1Id ? findT2(t1Id, groupId) : findT1(groupId);
+  openFm('editGroup', {groupId, t1Id:t1Id||null, name:group?group.name:''});
+}
+/* #10-1 的觸發條件照文案：「must first remove all members from this group and any of its subgroups」
+ * → 自己有成員、或（T1 時）任何一個子 T2 有成員，都不能刪。 */
+function groupHasMembers(groupId, t1Id){
+  if(usersFor(groupId).length) return true;
+  if(!t1Id){ const t1 = findT1(groupId); return !!t1 && tier2GroupsFor(t1).some(t2=>usersFor(t2.id).length>0); }
+  return false;
+}
+function openRemoveGroup(groupId, t1Id){
+  openFm(groupHasMembers(groupId, t1Id) ? 'deletionNotAllowed' : 'removeGroup', {groupId, t1Id:t1Id||null});
+}
+function openInviteUser(groupId){ openFm('inviteUser', {groupId, t1Id: state.tier===2 ? state.t1Id : null}); }
+function openEditUser(groupId, userId){
+  const user = usersFor(groupId).find(item=>item.id===userId);
+  openFm('editUser', {groupId, t1Id: state.tier===2 ? state.t1Id : null, userId, role:user?user.role:'member'});
+}
+function openRemoveUser(groupId, userId){ openFm('removeUser', {groupId, t1Id: state.tier===2 ? state.t1Id : null, userId}); }
+function fmLiveEmail(){
+  const before = fm.errors.emails || null;
+  const after = emailListError(fm.emails);
+  if(fm.apiError) fm.apiError = null;
+  if(before !== after || !after){ if(after) fm.errors.emails = after; else delete fm.errors.emails; renderFm(); }
+}
+function fmSubmit(){
+  if(fm.busy) return;
+  if(fm.kind==='editGroup' && !fm.name.trim()){ fm.errors.name = NAME_EMPTY_ERR; renderFm(); return; }   // 沿用 #08-1 文案（#09 沒畫錯誤態，設計端暫擬）
+  if(fm.kind==='inviteUser' || fm.kind==='inviteAdmin'){ const err = emailListError(fm.emails); if(err){ fm.errors.emails = err; renderFm(); return; } }
+  fm.busy = true; renderFm();
+  /* 每次送出帶一個序號：timer 回來時彈窗若已關掉或換成別的 kind，就當這次送出作廢。
+   * 否則連續操作（或 Demo FAB 連點）時，上一個彈窗的 timer 會拿新彈窗的狀態去跑。 */
+  const kind = fm.kind, seq = (fm.seq = (fm.seq||0) + 1);
+  setTimeout(()=>{
+    if(fm.seq !== seq || fm.kind !== kind) return;
+    fm.busy = false;
+    if(fm.kind==='inviteUser' || fm.kind==='inviteAdmin'){
+      /* #11-1：API 判斷「已在其他群組」→ Error Details（#07-1 註記「其餘填寫＆格式檢查等行為定義同 UI #11-1」）。⚠️ 同一張稿的黃色便利貼寫「202601
+       * 『使用者不可重複存在於不同群組』定義已改掉（目前可）」，所以這個錯誤態可能已經是
+       * 死路，照稿留著但已列入回報。 */
+      const list = splitEmails(fm.emails);
+      const taken = fm.forceApiError ? list.slice() : list.filter(email=>TAKEN_EMAILS.has(email.toLowerCase()));
+      if(taken.length){ fm.errors.emails = API_FIELD_ERR; fm.apiError = {field:'emails', emails:taken}; fm.errOpen = true; renderFm(); return; }
+    }
+    const failed = fm.forceFail;
+    const toast = FM_TOAST[fm.kind];
+    if(!failed) fmApply();
+    closeFm();
+    showToast(failed ? toast.err : toast.ok, failed ? 'error' : 'success');
+    render();
+  }, 600);
+}
+function fmApply(){
+  const group = fmGroup();
+  if(fm.kind==='editGroup' && group){ group.name = fm.name.trim(); group.lastUpdated = 'Just now'; }
+  if(fm.kind==='removeGroup'){
+    if(fm.t1Id){
+      const t1 = findT1(fm.t1Id);
+      const list = tier2GroupsFor(t1);
+      const index = list.findIndex(item=>item.id===fm.groupId);
+      if(index>=0) list.splice(index,1);
+      t1.tier2 = list.length;
+      if(state.view==='detail' && state.tier===2 && state.t2Id===fm.groupId) openDetail(1, t1.id, null, 'tier-2-groups');
+    } else {
+      const index = T1_GROUPS.findIndex(item=>item.id===fm.groupId);
+      if(index>=0) T1_GROUPS.splice(index,1);
+      if(state.view==='detail' && state.t1Id===fm.groupId) state.view = 'list';
+    }
+  }
+  if(fm.kind==='editUser'){ const user = fmUser(); if(user) user.role = fm.role; }
+  if(fm.kind==='removeUser'){ const list = usersFor(fm.groupId); const index = list.findIndex(user=>user.id===fm.userId); if(index>=0) list.splice(index,1); }
+  if(fm.kind==='inviteAdmin'){
+    splitEmails(fm.emails).forEach((email, index)=>ADMINS.push({id:`adm-inv-${Date.now()}-${index}`, name:'', email, role:'admin', active:false, lastLogin:'--'}));
+  }
+  if(fm.kind==='inviteUser'){
+    /* 剛邀請、還沒啟用的人：名字未知（顯示 --）、Inactive、沒登入過。設計端暫擬，#11-2 只講「發送帳號啟用信」。 */
+    const list = usersFor(fm.groupId);
+    splitEmails(fm.emails).forEach((email, index)=>list.push({id:`${fm.groupId}-inv-${Date.now()}-${index}`, name:'', email, role:fm.role, active:false, lastLogin:'--'}));
+  }
+}
+function renderFm(){
+  const root = document.getElementById('form-root');
+  if(!fm.kind){ root.innerHTML=''; return; }
+  const focus = captureFocus();
+  const busy = fm.busy;
+  const spinner = `<span class="material-symbols-outlined spin">progress_activity</span>`;
+  const closeBtn = `<button class="rmodal-close" onclick="closeFm()" aria-label="Close"><span class="material-symbols-outlined">close</span></button>`;
+  const cancel = `<button class="btn btn-out" ${busy?'disabled':''} onclick="closeFm()">Cancel</button>`;
+  const primary = (label, disabled) => `<button class="btn btn-pri" ${busy||disabled?'disabled':''} onclick="fmSubmit()">${busy?spinner:''}${label}</button>`;
+  let width = 640, html = '';
+  if(fm.kind==='editGroup'){
+    html = `<div class="fm-head"><h3>Edit Group</h3>${closeBtn}</div>
+      <div class="fld ${fm.errors.name?'has-error':''}"><label class="fld-lbl">Group Name</label>
+        <input class="ipt ipt-lg" data-f="fm-name" value="${esc(fm.name)}" oninput="fm.name=this.value;if(fm.errors.name&&this.value.trim()){delete fm.errors.name;renderFm()}">
+        ${fm.errors.name?`<div class="fld-err">${esc(fm.errors.name)}</div>`:''}</div>
+      <div class="dlg-actions">${cancel}${primary('Edit Group')}</div>`;
+  } else if(fm.kind==='editUser'){
+    const user = fmUser();
+    html = `<div class="fm-head"><h3>Edit User</h3>${closeBtn}</div>
+      <div class="fld"><div class="fld-lbl">User Name</div><div class="fld-static">${esc(user ? (user.name.trim() || user.email) : '')}</div></div>
+      <div class="fld"><label class="fld-lbl">Role</label><div class="sel"><select class="ipt" data-f="fm-role" onchange="fm.role=this.value">
+        <option value="manager" ${fm.role==='manager'?'selected':''}>Manager</option>
+        <option value="member" ${fm.role==='member'?'selected':''}>Member</option>
+      </select></div></div>
+      <div class="dlg-actions">${cancel}${primary('Edit User')}</div>`;
+  } else if(fm.kind==='inviteUser'){
+    width = 800;
+    const hasEmails = splitEmails(fm.emails).length>0;
+    html = `<div class="fm-head"><h3>Invite User</h3>${closeBtn}</div>
+      <p class="wz-desc">Invite members and assign their roles within the group.</p>
+      <div class="fld"><label class="fld-lbl">Role</label><div class="sel"><select class="ipt" data-f="fm-role" onchange="fm.role=this.value">
+        <option value="member" ${fm.role==='member'?'selected':''}>Member</option>
+        <option value="manager" ${fm.role==='manager'?'selected':''}>Manager</option>
+      </select></div></div>
+      <div class="fld ${fm.errors.emails?'has-error':''}"><label class="fld-lbl">Email</label>
+        <input class="ipt" data-f="fm-emails" placeholder="Please enter the user's email address" value="${esc(fm.emails)}" oninput="fm.emails=this.value;fmLiveEmail()">
+        ${fm.errors.emails?`<div class="fld-err">${esc(fm.errors.emails)}</div>`:''}
+        ${fm.apiError ? errBoxHtml(fm, 'renderFm') : ''}
+        <div class="fld-help">${EMAIL_HELP}</div></div>
+      <div class="dlg-actions">${cancel}${primary('Invite User', !hasEmails)}</div>`;
+  } else if(fm.kind==='inviteAdmin'){
+    /* #07-1：只有 Email（必填），沒有 Role；placeholder 與說明文字同 #11。寬度未量到，比照 #09 用 640。 */
+    const hasEmails = splitEmails(fm.emails).length>0;
+    html = `<div class="fm-head"><h3>Invite Admin</h3>${closeBtn}</div>
+      <div class="fld ${fm.errors.emails?'has-error':''}"><label class="fld-lbl">Email<span class="req">*</span></label>
+        <input class="ipt" data-f="fm-emails" placeholder="Please enter the user's email address" value="${esc(fm.emails)}" oninput="fm.emails=this.value;fmLiveEmail()">
+        ${fm.errors.emails?`<div class="fld-err">${esc(fm.errors.emails)}</div>`:''}
+        ${fm.apiError ? errBoxHtml(fm, 'renderFm') : ''}
+        <div class="fld-help">${EMAIL_HELP}</div></div>
+      <div class="dlg-actions">${cancel}${primary('Invite Admin', !hasEmails)}</div>`;
+  } else if(fm.kind==='removeGroup'){
+    const group = fmGroup();
+    /* #10 的主按鈕在稿上寫「Remove user」，是複製 #13 留下的錯字；這裡改成 Remove group
+     * （沿用稿上小寫第二個字的寫法），已列入設計稿問題。 */
+    html = `<div class="fm-head"><span class="material-symbols-outlined fm-warn">warning</span><h3>Remove Group</h3>${closeBtn}</div>
+      <div class="dlg-body">Are you sure you want to remove this group: <span class="fm-name">${esc(group?group.name:'')}</span>?</div>
+      <div class="dlg-actions">${cancel}${primary('Remove group')}</div>`;
+  } else if(fm.kind==='deletionNotAllowed'){
+    width = 655;
+    html = `<div class="fm-head"><span class="material-symbols-outlined fm-warn">warning</span><h3>Group Deletion Not Allowed</h3>${closeBtn}</div>
+      <div class="dlg-body">To delete this group, you must first remove all members from this group and any of its subgroups.</div>
+      <div class="dlg-actions"><button class="btn btn-pri" onclick="closeFm()">Got it</button></div>`;
+  } else if(fm.kind==='removeUser'){
+    const user = fmUser();
+    html = `<div class="fm-head"><span class="material-symbols-outlined fm-warn">warning</span><h3>Remove User</h3>${closeBtn}</div>
+      <div class="dlg-body">Are you sure you want to remove: <span class="fm-name">${esc(user ? (user.name.trim() || user.email) : '')}</span>?<br>This action is irreversible. Data belonging to the member will also be cleared.</div>
+      <div class="dlg-actions">${cancel}${primary('Remove user')}</div>`;
+  }
+  const isWarn = ['removeGroup','deletionNotAllowed','removeUser'].includes(fm.kind);   // 「Modal / Left Aligned / Normal」變體，圓角跟 Field 變體不同
+  root.innerHTML = `<div class="dlg-backdrop" onclick="if(event.target===this&&!fm.busy)closeFm()">
+    <div class="dlg fm${isWarn?' is-warn':''}" style="width:min(${width}px,100%)" role="dialog">${html}</div></div>`;
+  restoreFocus(root, focus);
+}
+
+
+/* ============================================================
+ * v3 P3 ①  Admin List（#07 11735:168322 / #07-1 168532 / #07-2 168528 / #35 168554）
+ * 這是 sidebar 上另一個項目（Admin List），在這支 prototype 裡用 #admin hash 切成獨立 view。
+ * 註記：只有 Admin 以上層級看得到；Owner 固定第一位；不能移除自己與 Owner。
+ * mock 把「目前登入者」設成 Owner，所以第一列的刪除鈕 disabled 同時滿足兩個條件（跟 #07 一致）。
+ * 沒有畫的：Remove Admin 的確認彈窗（#07 有垃圾桶 icon，但 canvas 沒有對應的 popup）→ 留佔位。
+ * ============================================================ */
+const ADMINS = [
+  {id:'adm-owner', name:NAME_POOL[0], email:CURRENT_USER_EMAIL, role:'owner', active:true, lastLogin:'Today'},
+  {id:'adm-1', name:NAME_POOL[1], email:personEmail(NAME_POOL[1]), role:'admin', active:false, lastLogin:'11 months ago'},
+  {id:'adm-2', name:NAME_POOL[2], email:personEmail(NAME_POOL[2]), role:'admin', active:true,  lastLogin:'14 days ago'},
+  {id:'adm-3', name:NAME_POOL[3], email:personEmail(NAME_POOL[3]), role:'admin', active:true,  lastLogin:'2 weeks ago'},
+  {id:'adm-4', name:NAME_POOL[4], email:personEmail(NAME_POOL[4]), role:'admin', active:true,  lastLogin:'1 day ago'},
+  {id:'adm-5', name:NAME_POOL[5], email:personEmail(NAME_POOL[5]), role:'admin', active:false, lastLogin:'--'},   // 沒登入過：#07 用 -- 表示
+];
+const ADMIN_TOAST = {ok:'Admin invited successfully.', err:'Unable to invite admin. Please try again later.'};   // 設計端暫擬：#07 系列沒畫 toast，比照 #11-2 / #11-3 造句
+function learnMoreHtml(both){
+  return `<div class="learn-more">
+    <button class="learn" onclick="deferredAction('Learn More About Organization and Role')"><span class="material-symbols-outlined">help</span>Learn More About Organization and Role</button>
+    ${both?`<button class="learn" onclick="deferredAction('Learn More About Authorization and Resource Assignment')"><span class="material-symbols-outlined">help</span>Learn More About Authorization and Resource Assignment</button>`:''}
+  </div>`;
+}
+/* #32–#35 的 skeleton：表頭是灰 band 裡的灰條、不顯示欄位文字 */
+function skeletonTable(cols, colgroup){
+  const head = Array.from({length:cols}).map(()=>'<th class="skel-th"><div class="skel"></div></th>').join('');
+  return `<div class="table-wrap"><table>${colgroup||''}<thead><tr>${head}</tr></thead><tbody>${skeletonRows(cols)}</tbody></table></div>`;
+}
+function openAdminList(){ state.view = 'admin'; render(); }
+function renderAdmin(){
+  const loading = state.pageState==='loading';
+  const canSee = state.role==='admin';
+  const cols = '<colgroup><col style="width:22%"><col style="width:26%"><col style="width:12%"><col style="width:14%"><col style="width:15%"><col style="width:11%"></colgroup>';
+  let body;
+  if(!canSee){
+    /* 註記「只有權限在 Admin 以上層級者可看見此頁面」，沒畫非 Admin 看到什麼。設計端暫擬：沿用 no-access 語彙。 */
+    body = `<div class="empty-state error"><div><span class="material-symbols-outlined">lock</span>
+      <p class="empty-title">Admin List is only available to administrators</p>
+      <p class="empty-copy">Please reach out to your administrator if you need access.</p></div></div>`;
+  } else if(loading){
+    body = skeletonTable(6, cols);
+  } else if(state.pageState==='nodata'){
+    body = `<div class="empty-state error"><div><span class="material-symbols-outlined">cloud_off</span>
+      <p class="empty-title">Unable to load Admin List</p>
+      <p class="empty-copy">Please try again. If the problem persists, contact your administrator.</p>
+      <button class="btn btn-pri" onclick="state.pageState='set';render()">Retry</button></div></div>`;
+  } else {
+    /* Owner 固定第一位，其餘照原順序（#07 註記） */
+    const rows = [...ADMINS].sort((a,b)=>(a.role==='owner'?0:1)-(b.role==='owner'?0:1)).map(admin=>{
+      const locked = admin.role==='owner' || admin.email===CURRENT_USER_EMAIL;
+      return `<tr>
+        <td class="cell-ellipsis">${esc(admin.name.trim()||'--')}</td>
+        <td class="cell-ellipsis">${esc(admin.email)}</td>
+        <td class="center">${admin.role==='owner'?'Owner':'Admin'}</td>
+        <td class="center"><span class="status-text ${admin.active?'':'inactive'}">${admin.active?'Active':'Inactive'}</span></td>
+        <td class="center">${esc(admin.lastLogin)}</td>
+        <td class="center"><div class="actions-cell"><button class="btn-icon danger" ${locked?'disabled':''} onclick="deferredAction('Remove Admin')" title="Remove"><span class="material-symbols-outlined">delete</span></button></div></td>
+      </tr>`;
+    }).join('');
+    body = `<div class="table-wrap"><table>${cols}<thead><tr><th>User Name</th><th>Email</th><th class="center">Role</th><th class="center">Active Status</th><th class="center">Last Login</th><th class="center">Action</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
+  return `<div class="card">
+    <h1 class="org-title">Admin List</h1>
+    <div class="section-head" style="align-items:center">
+      <p class="section-copy">This page provides detailed information on all users who share admin privileges with you and their account activity.</p>
+      ${canSee?`<button class="btn btn-pri" ${loading?'disabled':''} onclick="openInviteAdmin()"><span class="material-symbols-outlined">add</span>Invite Admin</button>`:''}
+    </div>
+    ${body}
+    ${learnMoreHtml(false)}
+  </div>`;
+}
+function openInviteAdmin(){ openFm('inviteAdmin', {}); }
+
 /* ---------- top-level render ---------- */
 function render(){
   const app = document.getElementById('app');
-  app.innerHTML = state.view==='list' ? renderList() : renderDetail();
+  app.innerHTML = state.view==='admin' ? renderAdmin() : state.view==='list' ? renderList() : renderDetail();
 }
+/* sidebar 的 Group List / Admin List 都指向這支檔案（差一個 #admin），點了只會改 hash，
+ * 直接 reload 讓 LUMITURE_ACTIVE 與 view 重新算，不用另外同步 sidebar 的 active 樣式。 */
+window.addEventListener('hashchange', ()=>location.reload());
 /* 預設 = Demo FAB 那個「極端深度」情境，兩件事一起做：
  * ①把 10 層那棵合成樹接到最前面（GCP 官方上限，也是現在跟 TL 在討論的
  *   「第一層 T1、第二層 T2」那件事的最壞情況）。照設計稿預設收合，所以它是
@@ -2682,6 +4153,7 @@ setAssignedMode('none');
 render();
 /* 讓 #assign 可以直接連到選單，方便貼進討論串請人看 */
 if(location.hash === '#assign'){ openDetail(1,'biz-dev'); state.tab='resources'; render(); openAssign(); }
+if(location.hash === '#admin'){ openAdminList(); }
 
 /* 這兩個數字改用算的，不寫死。之前 mock 加了「沒有帳單帳戶的專案」跟深樹之後，
  * FAB 上寫死的 16／88 就跟畫面對不上了，寫成算的就不會再脫節。 */
@@ -2694,6 +4166,10 @@ window.DEMO_CATEGORIES = [
   {id:'cloud',  label:'Resources', icon:'cloud',       hint:'Resources 分頁的雲端授權狀態'},
   {id:'assign', label:'Assign',    icon:'account_tree',hint:'Assign Resource 的資料夾樹選單'},
   {id:'style',  label:'Picker',    icon:'style',       hint:'多層選單的兩種做法：延伸既有元件 vs 樹狀。同一份資料、同一套選取邏輯，只有呈現不同'},
+  {id:'create', label:'Create',    icon:'group_add',   hint:'v3：Create Group 三步 wizard（#08 / #30 / #31 / #37）。第 3、4 步內嵌的是 v2 做好的資源選單，不是 canvas 上的舊版'},
+  {id:'tag',    label:'Label/Tag', icon:'sell',        hint:'v3：Resources 的第二種指派維度（#03-3 / #03-4 / #56 / #57）。Project|Label、Account|Tag 子分頁，Assign 開 key → value 兩層下拉'},
+  {id:'crud',   label:'CRUD',      icon:'edit_note',   hint:'v3 P2：Group / User 的 Edit / Remove / Invite 彈窗（#09 / #10 / #10-1 / #11 / #12 / #13）與各自的 toast'},
+  {id:'p3',     label:'Admin/Load', icon:'manage_accounts', hint:'v3 P3：Admin List 頁（#07 系列）、逐清單 loading（#32–#35）、No Group / No Member 空狀態'},
 ];
 window.DEMO_SCENARIOS = [
   {id:'admin',      category:'role', label:'Admin',       icon:'admin_panel_settings', tip:'全部 availableActions 為 true'},
@@ -2717,6 +4193,11 @@ window.DEMO_SCENARIOS = [
   {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:`全新群組，${DEMO_TOTAL} 個專案全部在選單裡（含 2 個沒有帳單帳戶的，以及深度情境那棵 10 層樹）`},
   {id:'assign-drift',  category:'assign', label:`回訪：只剩沒指派的 ${DEMO_DRIFT} 個`,     icon:'new_releases', tip:`指派過之後客戶又在 console 新增專案。依設計稿註記，選單只列尚未指派的，所以整個選單本身就是差異報告：${DEMO_TOTAL} → ${DEMO_DRIFT} 列，沒有未指派專案的資料夾整個不出現。用 API 既有的 projects[].assigned 過濾`},
   {id:'assign-synced', category:'assign', label:'全部都已指派（選單空的）',       icon:'done_all', tip:'沒有東西可以加了，走空狀態並指向表格的 Unlink Resource。刻意不用 No Data 語彙，這不是出錯'},
+  {id:'org-multi',      category:'assign', label:'多個 GCP Organization',      icon:'domain', tip:'同一租戶授權兩個 GCP org（acme-corp.com / beta-inc.com），兩邊都有第一層資料夾叫 platform。org 做成區段標頭不是樹的一層：位置本身就說了它是 org，所以最小可區分路徑完全不用改。帳單帳戶視角沒有 org 分段（一個 BA 可跨 org 付費），那裡才在專案列標 org chip'},
+  {id:'org-single',     category:'assign', label:'單一 GCP Organization（預設）', icon:'business_center', tip:'常態。org 區段標頭整條不 render，畫面跟加 org 之前一模一樣，資料夾仍釘在 Select all 底下'},
+  {id:'path-deep',      category:'style',  label:'路徑：封頂後才出現（預設）', icon:'subdirectory_arrow_right', tip:'現況。第 1-4 層純名稱＋縮排，第 5 層起縮排封頂、改用祖先路徑。真實情境 2-3 層完全碰不到，差別只在極端深度'},
+  {id:'path-all',       category:'style',  label:'路徑：每一列都顯示',       icon:'format_list_bulleted', tip:'語言一致、沒有第五層那個轉折，但淺層每一列都在重複正上方那一列的名字，而客戶真實情境就是淺層。名稱也被路徑往右推'},
+  {id:'path-micro',     category:'style',  label:'路徑：封頂後改 8px 縮排', icon:'compress', tip:'封頂後每層再疊 8px（在格線上），深層的鏈狀關係不會塌成一排兄弟，所以路徑只留給同名與搜尋。第 10 層總縮排 128px，線性是 168px'},
   {id:'indent-cap',     category:'style',  label:'縮排封頂 + 路徑（預設）',   icon:'format_indent_decrease', tip:'縮排到第 4 層就停止累加，第 5 層以上改用祖先路徑文字表達層級。真實情境（2-3 層）完全碰不到上限、畫面不變；十層時不會出現斜階梯，而且原本空白的左半邊改放真的內容'},
   {id:'indent-linear',  category:'style',  label:'線性縮排（對照組：波動拳）', icon:'format_indent_increase', tip:'每層都累加 16px，第 10 層縮排 168px。左半邊全空、名稱被擠掉、清單看起來是歪的。展開極端深度那棵樹就看得到'},
   {id:'sel-clear',     category:'assign', label:'切視角清掉勾選（開發現況）', icon:'layers_clear', tip:'RD 出兩支獨立 API，開發團隊目前想要切視角就清空。不保留可以，靜默清空不行——所以清掉時在彈窗裡講出來並給 Undo，成本只是把陣列留著。先在帳單帳戶視角勾幾個再切 Folder'},
@@ -2726,6 +4207,39 @@ window.DEMO_SCENARIOS = [
   {id:'style-component', category:'style', label:'延伸既有元件（GroupedMultiSelect）', icon:'widgets', tip:'完全照 Cost Dashboard 那顆 Tag/Label 下拉的語言：父層藍底 band + 粗體 + (count) + 右側箭頭、子項單行 name (id)、縮排 32px、沒有引導線也沒有資料夾 icon、父層不 sticky。搭配「極端深度」情境看 10 層會怎樣'},
   {id:'style-component-fix', category:'style', label:'元件版 + 建議修正（縮排 16px、箭頭移左）', icon:'build', tip:'跟元件版只差兩個數字：GroupedMultiSelectOptionItem 的 pl 從 32 改 16、GroupHeader 的 Expand IconButton 從 label 後面移到前面。其餘視覺完全不動。10 層縮排從 344px 降到 184px、標籤可用寬從 150px 回到 256px'},
   {id:'style-tree',      category:'style', label:'樹狀版（左側箭頭 + 引導線）',        icon:'account_tree', tip:'左側箭頭跟縮排同一欄、有垂直引導線、資料夾 icon、父層巢狀 sticky、縮排 16px、子項兩行 Name / ID。差別只有呈現，選取邏輯與資料完全共用'},
+
+  {id:'wz-open',   category:'create', label:'開啟 Create Group wizard',        icon:'add_circle', tip:'#08：800×720、左側五步 stepper。Group Name 必填、Add Manager 非必填（PM 決策）。Skip Steps and Create Group 會先驗證格式再直接建立'},
+  {id:'wz-format', category:'create', label:'Step 1 格式錯誤（即時）',          icon:'error_outline', tip:'#08-1：Group Name 空白 → 「Group name cannot be empty.」；email 格式錯或重複 → 「Some email addresses are invalid or duplicated.」，邊打邊檢查'},
+  {id:'wz-apierr', category:'create', label:'Step 1 API 錯誤（Error Details）', icon:'report', tip:'#08-2：按 Next 後由 API 判斷「已在其他群組」，欄位紅框 + 預設展開的 Error Details 折疊區，排解完前不能往下。這個情境強制觸發；平常填任何既有成員的 email（如 alfonso.vetrovs@cloudmile.com）也會'},
+  {id:'wz-invite', category:'create', label:'Step 2 Invite User',              icon:'person_add', tip:'#30：欄位同 #11（Role 預設 Member、Email 多筆逗號分隔），非必填可跳過'},
+  {id:'wz-gcp',    category:'create', label:'Step 3 Assign GCP（復用 v2 選單）', icon:'cloud', tip:'#31：canvas 上畫的是舊版選單（section 名稱寫「Add Resource 更新部分也尚未跟上調整」），所以直接復用 v2 的 folder / BA 雙視角選單。勾的東西 Previous / Next 來回不會掉'},
+  {id:'wz-noauth', category:'create', label:'Step 4 AWS 未授權',                icon:'lock', tip:'#31/#37 便利貼問 RD 能不能跳過未授權的雲、Stepper 能不能隱藏那些步驟。沒答案前走「不可」那邊：步驟照常出現、內容顯示 not-authorized 空狀態、Submit 仍可按（這步本來就非必填）'},
+  {id:'wz-fail',   category:'create', label:'Submit 失敗（toast）',             icon:'cloud_off', tip:'#08-3：失敗也是關閉彈窗 + 左下角紅色 toast「Unable to create group. Please try again later.」'},
+
+  {id:'tag-gcp',    category:'tag', label:'GCP：Label 子分頁 + Assign by Label', icon:'label', tip:'#03-3 / #56：Resources 切到 Label 子分頁，表格變 Label Key / Label Value / Billing Account；Assign Resource 開 #56。下拉 Keys 上層是 Billing Account、Values 上層是 Label Key（#56-1）'},
+  {id:'tag-aws',    category:'tag', label:'AWS：Tag 子分頁 + Assign by Tag',     icon:'sell', tip:'#03-4 / #57：同一套結構換成 Tag Key / Tag Value / Management Account'},
+  {id:'tag-synced', category:'tag', label:'Label 全部已指派（彈窗空狀態）',     icon:'done_all', tip:'#56 註記「僅顯示尚未被 assign 的資源」→ 全部指派過就沒有選項，沿用 v2 的「Everything is already assigned」語彙'},
+  {id:'tag-fail',   category:'tag', label:'Assign by Label 失敗（toast）',       icon:'error', tip:'#56 註記：成功與否透過 toast 回饋，參照 #18-3'},
+  {id:'res-multi',  category:'tag', label:'Resource List 多選態（#03-5）',        icon:'checklist', tip:'勾選數列後右上出現藍色 outline 的 Unlink Resource（設計稿是藍框不是紅框），表頭 checkbox 可全選 / 顯示 mixed'},
+
+  {id:'crud-edit-group',   category:'crud', label:'Edit Group（#09）',                 icon:'edit',          tip:'640px，只有 Group Name 可改（設計稿註記）。存檔後清單與 detail 的名稱跟著變，toast 照 #09-1'},
+  {id:'crud-remove-block', category:'crud', label:'Remove Group 被擋（#10-1）',        icon:'block',         tip:'群組或子群組還有成員就不能刪：先跳 Group Deletion Not Allowed，單一 Got it。mock 裡幾乎每個群組都有成員，所以預設都會撞到這張'},
+  {id:'crud-remove-group', category:'crud', label:'Remove Group 確認（#10）',          icon:'delete',        tip:'把 Human Resources 的成員清空後打開，走到真正的確認彈窗。⚠️ 設計稿主按鈕寫「Remove user」，這裡改成 Remove group 並列入設計稿問題'},
+  {id:'crud-invite',       category:'crud', label:'Invite User（#11）',                icon:'person_add',    tip:'800px，Role 預設 Member + Email 多筆逗號分隔。⚠️ #11 那張只畫了 Role 沒有 Email 欄，照 #11-1 補上'},
+  {id:'crud-invite-err',   category:'crud', label:'Invite User API 錯誤（#11-1）',     icon:'report',        tip:'Error Details 折疊區，跟 Create Group 第一步同一個元件。⚠️ 同張稿的便利貼說「不可重複存在於不同群組」的規則 202601 已取消，這個錯誤態可能已是死路'},
+  {id:'crud-edit-user',    category:'crud', label:'Edit User（#12，frame 名寫錯）',    icon:'manage_accounts', tip:'frame 名稱是「Popup: Edit Group」但畫面是 Edit User：User Name 唯讀、只有 Role 可改。所以「#09/#12 同名」跟「Edit User 沒編號彈窗」是同一個命名錯誤'},
+  {id:'crud-remove-user',  category:'crud', label:'Remove User（#13）',                icon:'person_remove', tip:'「This action is irreversible…」，主按鈕照稿寫小寫的 Remove user。表格裡 mock 的目前登入者（Alfonso Vetrovs）那列刪除鈕 disabled，對應 #02 註記「不能刪自己」'},
+  {id:'crud-fail',         category:'crud', label:'下一個 CRUD 動作失敗（toast）',     icon:'cloud_off',     tip:'把 forceFail 打開，接下來任何一個 Edit / Remove / Invite 送出都走失敗 toast，看完自動關掉'},
+  {id:'members-empty',     category:'crud', label:'Group Members 空狀態（#05-1）',     icon:'person_off',    tip:'把 Legal 的成員清空：Tab 顯示 (0)、表格換成 No Users Yet 通用文案'},
+
+  {id:'admin-list',    category:'p3', label:'Admin List（#07）',              icon:'manage_accounts', tip:'sidebar 的 Admin List 也指到這支檔案（#admin）。Owner 固定第一列、刪除鈕 disabled（不可移除 Owner 與自己）。Remove Admin 沒有對應彈窗，留佔位'},
+  {id:'admin-invite',  category:'p3', label:'Invite Admin（#07-1 / #07-2）',  icon:'person_add',      tip:'只有 Email（必填），格式錯誤即時顯示；API 錯誤走 Error Details（註記說行為同 #11-1）。toast 文案設計端暫擬'},
+  {id:'admin-loading', category:'p3', label:'Admin List 讀取中（#35）',       icon:'hourglass_top',   tip:'Invite Admin disabled + 表格 skeleton（表頭也是灰條）'},
+  {id:'admin-noaccess',category:'p3', label:'Admin List 非 Admin 看到什麼',   icon:'lock',            tip:'註記「只有 Admin 以上層級可看見」，沒畫非 Admin 的畫面。設計端暫擬 no-access 空狀態，切回 Admin 角色即恢復'},
+  {id:'load-detail',   category:'p3', label:'Group Details 讀取中（#33）',    icon:'hourglass_top',   tip:'tab 不顯示計數、Edit / Remove Group 與 Invite User disabled、表格 skeleton'},
+  {id:'load-res',      category:'p3', label:'Resource List 讀取中（#34）',    icon:'hourglass_top',   tip:'雲端分頁與 Project|Label 子分頁維持原樣但不可點、搜尋框 disabled、Assign Resource disabled'},
+  {id:'load-list',     category:'p3', label:'Group List 讀取中（#32）',       icon:'hourglass_top',   tip:'標題計數照常顯示（註記：需讀取的數量可先按上圖呈現）、Create Group disabled、表頭灰條'},
+  {id:'no-group',      category:'p3', label:'No Group（#01-2 / #02-2）',      icon:'list_alt',        tip:'清單 icon 淺藍、通用文案、空狀態內不再放第二顆 Create Group（右上那顆就是入口）'},
 ];
 window.DEMO_DEFAULT = 'admin';
 window.DEMO_APPLY = function (id) {
@@ -2745,11 +4259,56 @@ window.DEMO_APPLY = function (id) {
   if (id === 'assign-first')   { setAssignedMode('none');  assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
   if (id === 'assign-drift')   { setAssignedMode('mixed'); assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
   if (id === 'assign-synced')  { setAssignedMode('all');   assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
+  if (id === 'org-multi')       { assign.multiOrg = true;  assign.hasFolders = true; if(!assign.open){ openAssign('gcp'); } setGroupBy('folder'); return; }
+  if (id === 'org-single')      { assign.multiOrg = false; assign.hasFolders = true; if(!assign.open){ openAssign('gcp'); } setGroupBy('folder'); return; }
+  if (id === 'path-deep')      { assign.pathMode='deep';  assign.indentCap=true; if(!assign.open){ openAssign('gcp'); } setGroupBy('folder'); return; }
+  if (id === 'path-all')       { assign.pathMode='all';   assign.indentCap=true; if(!assign.open){ openAssign('gcp'); } setGroupBy('folder'); return; }
+  if (id === 'path-micro')     { assign.pathMode='micro'; assign.indentCap=true; if(!assign.open){ openAssign('gcp'); } setGroupBy('folder'); return; }
   if (id === 'indent-cap')     { assign.indentCap = true;  if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
   if (id === 'indent-linear')  { assign.indentCap = false; if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
   if (id === 'sel-clear')      { assign.keepSelection = false; if(!assign.open){ openAssign('gcp'); } else renderAssign(); showToast('切換 Group by 會清掉已勾選（開發團隊目前立場），清掉時會在彈窗裡告知並給 Undo'); return; }
   if (id === 'sel-keep')       { assign.keepSelection = true;  if(!assign.open){ openAssign('gcp'); } else renderAssign(); showToast('切換 Group by 保留已勾選（UX 建議），勾選是專案 ID 的集合、跟視角無關'); return; }
   if (id === 'assign-fail')    { setAssignedMode('mixed'); assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); assign.forceFail = true; return; }
+
+  /* ---- v3 P1：Create Group wizard ---- */
+  const toList = () => { if(state.view!=='list'){ state.view='list'; render(); } };
+  if (id === 'wz-open')   { toList(); openCreateGroup(1); return; }
+  if (id === 'wz-format') { toList(); openCreateGroup(1); wizard.managers='mile.dsk, koe@mdl.com,'; wizardValidateInfo(); return; }
+  if (id === 'wz-apierr') { toList(); openCreateGroup(1); wizard.forceApiError=true; wizard.name='Cohort Integration'; wizard.managers='cameron.cooper@five9.com, geole.chan@five9.com, halweo.ieation@five9.com'; renderWizard(); showToast('按 Next 就會看到 Error Details（這個情境把所有 email 都當成已在其他群組）'); return; }
+  if (id === 'wz-invite') { toList(); openCreateGroup(1); wizard.name='Cohort Integration'; wizardGo(1); return; }
+  if (id === 'wz-gcp')    { toList(); state.cloudAuth='all'; openCreateGroup(1); wizard.name='Cohort Integration'; wizardGo(2); return; }
+  if (id === 'wz-noauth') { toList(); state.cloudAuth='gcp-only'; render(); openCreateGroup(1); wizard.name='Cohort Integration'; wizardGo(3); return; }
+  if (id === 'wz-fail')   { toList(); openCreateGroup(1); wizard.name='Cohort Integration'; wizard.forceFail=true; wizardGo(3); showToast('按 Submit 會走失敗分支'); return; }
+
+  /* ---- v3 P1：Label / Tag ---- */
+  const toResources = (cloud, sub) => { openDetail(1,'biz-dev',null,'resources'); state.cloud=cloud; state.resSub[cloud]=sub; render(); };
+  if (id === 'tag-gcp')    { toResources('gcp','tag'); openTagAssign('gcp'); return; }
+  if (id === 'tag-aws')    { toResources('aws','tag'); openTagAssign('aws'); return; }
+  if (id === 'tag-synced') { toResources('gcp','tag'); const set=assignedTagSet('biz-dev','gcp'); TAG_UNIVERSE.gcp.forEach(t=>set.add(t.id)); render(); openTagAssign('gcp'); return; }
+  if (id === 'tag-fail')   { toResources('gcp','tag'); openTagAssign('gcp'); tagPick.forceFail=true; return; }
+  if (id === 'res-multi')  { toResources('gcp','primary'); const ids=resourcesFor('biz-dev','gcp').map(r=>r.id); state.selectedResources.gcp=Object.fromEntries(ids.slice(0,Math.max(1,ids.length-1)).map(i=>[i,true])); render(); return; }
+
+  /* ---- v3 P2：CRUD ---- */
+  const toMembers = (t1) => { openDetail(1, t1, null, 'group-members'); };
+  if (id === 'crud-edit-group')   { toMembers('biz-dev'); openEditGroup('biz-dev', null); return; }
+  if (id === 'crud-remove-block') { toMembers('biz-dev'); openRemoveGroup('biz-dev', null); return; }
+  if (id === 'crud-remove-group') { USERS_CACHE.set('hr', []); toMembers('hr'); openRemoveGroup('hr', null); return; }
+  if (id === 'crud-invite')       { toMembers('biz-dev'); openInviteUser('biz-dev'); return; }
+  if (id === 'crud-invite-err')   { toMembers('biz-dev'); openInviteUser('biz-dev'); fm.forceApiError=true; fm.role='manager'; fm.emails='cameron.cooper@five9.com, geole.chan@five9.com, halweo.ieation@five9.com'; renderFm(); showToast('按 Invite User 就會看到 Error Details（這個情境把所有 email 都當成已在其他群組）'); return; }
+  if (id === 'crud-edit-user')    { toMembers('biz-dev'); openEditUser('biz-dev', usersFor('biz-dev')[1].id); return; }
+  if (id === 'crud-remove-user')  { toMembers('partnerships'); openRemoveUser('partnerships', usersFor('partnerships')[1].id); return; }   // partnerships 的第 4 位是 mock 的目前登入者，刪除鈕會是 disabled
+  if (id === 'crud-fail')         { fm.forceFail = true; showToast('下一個 Edit / Remove / Invite 送出會走失敗 toast'); return; }
+  if (id === 'members-empty')     { USERS_CACHE.set('legal', []); toMembers('legal'); return; }
+
+  /* ---- v3 P3 ---- */
+  if (id === 'admin-list')     { state.pageState='set'; state.role='admin'; openAdminList(); return; }
+  if (id === 'admin-invite')   { state.pageState='set'; state.role='admin'; openAdminList(); openInviteAdmin(); return; }
+  if (id === 'admin-loading')  { state.role='admin'; openAdminList(); state.pageState='loading'; render(); return; }
+  if (id === 'admin-noaccess') { state.pageState='set'; state.role='t1-manager'; openAdminList(); return; }
+  if (id === 'load-detail')    { toMembers('biz-dev'); state.pageState='loading'; render(); return; }
+  if (id === 'load-res')       { openDetail(1,'biz-dev',null,'resources'); state.pageState='loading'; render(); return; }
+  if (id === 'load-list')      { state.view='list'; state.pageState='loading'; render(); return; }
+  if (id === 'no-group')       { state.view='list'; state.pageState='empty'; render(); return; }
 };
 </script>
 <script>
