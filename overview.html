@@ -7,274 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
-<style>
-/* === Inlined: shared/tokens.css === */
-/* ============================================================
- * Lumiture Design Tokens
- * ============================================================
- * 來源：Figma CMDS + prototype scan + 8 項設計決策 (2026-05-12)
- * 命名規範：W3C Design Tokens spec（長名結構化 BEM）
- * 三層架構：Primitive → Semantic → Component
- * 完整決策紀錄：~/.claude/.../project_design_tokens_decisions.md
- * ============================================================ */
-
-:root {
-
-  /* ============================================================
-   * LAYER 1 — PRIMITIVE
-   * 原子層：純色號 / 純數值；不直接給 component 用
-   * ============================================================ */
-
-  /* --- Color: Brand Sky Blue (對齊 Figma Theme: LumiTure.ai/Primary) --- */
-  --lt-blue-10: #F2FAFF;   /* Figma: Primary/Light 10 */
-  --lt-blue-20: #D1EEFF;   /* Figma: Primary/Light 20 */
-  --lt-blue-30: #9ED7FF;   /* Figma: Primary/Light 30 */
-  --lt-blue-60: #0B6DD7;   /* Figma: Primary/Light */
-  --lt-blue-70: #004FB0;   /* Figma: Primary/Main */
-  --lt-blue-90: #002663;   /* Figma: Primary/Dark */
-
-  /* --- Color: Brand Turquoise (對齊 Figma Theme: LumiTure.ai/Secondary) --- */
-  --lt-turquoise-10: #F0FFFF;   /* Figma: Turquoise 10 */
-  --lt-turquoise-20: #DBFDFF;   /* Figma: Turquoise 20 */
-  --lt-turquoise-30: #B0F8FF;   /* Figma: Turquoise 30 */
-  --lt-turquoise-60: #4ADFFF;   /* Figma: Turquoise 60 (Chart) */
-  --lt-turquoise-70: #34B5D9;   /* Figma: Secondary/Main */
-  --lt-turquoise-80: #228EB3;   /* Figma: Secondary/Dark */
-
-  /* --- Color: Grey (9 階；同值不同 token = 為未來情境換色保留彈性) --- */
-  --lt-grey-50:  #F6F6F6;
-  --lt-grey-100: #F2F2F2;
-  --lt-grey-200: #E6E6E6;
-  --lt-grey-300: #CCCCCC;
-  --lt-grey-400: #B3B3B3;
-  --lt-grey-500: #676767;
-  --lt-grey-600: #676767;   /* 暫同 500；保留為 icon-default 等情境獨立換色用 */
-  --lt-grey-700: #262626;
-  --lt-grey-800: #262626;   /* 暫同 700；保留為 heading 等情境獨立換色用 */
-  --lt-grey-900: #262626;   /* 暫同 700；保留為 highest contrast 情境用 */
-
-  /* --- Color: Black / White --- */
-  --lt-black: #000000;
-  --lt-white: #FFFFFF;
-
-  /* --- Color: Chart Palette (對齊 Figma General Behavior 規範)
-   * 來源：Figma file 🧞‍♂️-General-Behavior, node 1642-36013
-   * 使用規則：圖表配色一律按 1→10 順序套用；超過 10 個則循環使用
-   * 命名按官方 "#N Main" 編號 + 視覺色名註解
-   */
-  --lt-chart-1:  #7A8BA9;   /* CMDS Color Kit Main #1 — Navy Blue 50 */
-  --lt-chart-2:  #9ED7FF;   /* CMDS Color Kit Main #2 — Sky Blue 30 (corrected from #86CBFC 2026-05-21; #86CBFC is GCP brand color, not CMDS palette) */
-  --lt-chart-3:  #9CF3FF;   /* CMDS Color Kit Main #3 — Turquoise Blue 40 */
-  --lt-chart-4:  #00DCC2;   /* CMDS Color Kit Main #4 — Green 60 */
-  --lt-chart-5:  #94F29D;   /* CMDS Color Kit Main #5 — Emerald Green 40 */
-  --lt-chart-6:  #F3BE68;   /* CMDS Color Kit Main #6 — Tangerine Orange 40 */
-  --lt-chart-7:  #F4B581;   /* CMDS Color Kit Main #7 — Lantern Orange 50 */
-  --lt-chart-8:  #FFA4A9;   /* CMDS Color Kit Main #8 — Red 30 */
-  --lt-chart-9:  #FE89C1;   /* CMDS Color Kit Main #9 — Fuchsia 30 */
-  --lt-chart-10: #C096FF;   /* CMDS Color Kit Main #10 — Purple 40 */
-  --lt-chart-11: #B3B3B3;   /* CMDS Color Kit Main #11 — Gray 30 (for n+1 fallback) */
-
-  /* --- Color: Functional (TBC — Figma 未做 Variable，待下輪 audit) --- */
-  --lt-color-success-base:  #00B5A6;   /* TBC: Figma audit needed */
-  --lt-color-success-dark:  #008F88;   /* TBC: Figma audit needed */
-  --lt-color-success-light: #E6FFF8;   /* TBC: Figma audit needed */
-  --lt-color-error-base:    #FF403D;   /* TBC: Figma audit needed */
-  --lt-color-error-light:   #FFEBEF;   /* TBC: Figma audit needed */
-  --lt-color-warning-base:  #FC9A0F;   /* TBC: Figma audit needed */
-  --lt-color-warning-light: #FEF3E1;   /* TBC: Figma audit needed */
-  --lt-color-info-base:     #0B6DD7;   /* = blue-60，符合 Figma info usage */
-  --lt-color-info-light:    #E6F6FF;   /* TBC: Figma audit needed */
-
-  /* --- Spacing: 嚴格 8px grid，4px 為微間距例外 --- */
-  --lt-space-0:    0;
-  --lt-space-4:    4px;     /* 例外：僅限 icon-text gap、border-thin 等微間距 */
-  --lt-space-8:    8px;
-  --lt-space-16:   16px;
-  --lt-space-24:   24px;
-  --lt-space-32:   32px;
-  --lt-space-48:   48px;
-  --lt-space-64:   64px;
-  --lt-space-96:   96px;
-  --lt-space-128:  128px;
-
-  /* --- Radius --- */
-  --lt-radius-none:   0;
-  --lt-radius-xs:     3px;      /* chips / badges / 薄狀指示器 (源自 lumi-tag v7 5 處用法) */
-  --lt-radius-sm:     4px;
-  --lt-radius-md:     8px;
-  --lt-radius-lg:     12px;
-  --lt-radius-xl:     16px;
-  --lt-radius-pill:   9999px;   /* pill button / chip — 矩形元素的最大圓角 */
-  --lt-radius-circle: 50%;      /* 圓形 icon / avatar / toggle dot — 形狀無關 */
-
-  /* --- Typography: Font Family --- */
-  --lt-font-sans: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'PingFang TC', sans-serif;
-  --lt-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
-
-  /* --- Typography: Font Size (對齊 Figma 8 階；13px 為例外備用) --- */
-  --lt-fs-12: 12px;   /* Figma: Caption */
-  --lt-fs-13: 13px;   /* 例外：半 body 半 caption 過渡用；不在 Figma 主規範 */
-  --lt-fs-14: 14px;   /* Figma: Body / Button Regular 1 / Link */
-  --lt-fs-16: 16px;   /* Figma: H6 / Button 2 */
-  --lt-fs-18: 18px;   /* Figma: H5 / Subtitle */
-  --lt-fs-20: 20px;   /* Figma: H4 */
-  --lt-fs-24: 24px;   /* Figma: H3 */
-  --lt-fs-36: 36px;   /* Figma: H2 */
-  --lt-fs-48: 48px;   /* Figma: H1 */
-
-  /* --- Typography: Font Weight --- */
-  --lt-fw-regular:  400;
-  --lt-fw-medium:   500;
-  --lt-fw-semibold: 600;   /* Figma: Button Medium 2 */
-  --lt-fw-bold:     700;
-
-  /* --- Typography: Line Height (對齊 Figma; Body 系列 1.75) --- */
-  --lt-leading-heading: 1.25;   /* Figma: H1 */
-  --lt-leading-tight:   1.5;    /* Figma: H2-H6 / Caption / Button / Link */
-  --lt-leading-body:    1.75;   /* Figma: Body Regular/Medium/Bold */
-
-  /* --- Typography: Letter Spacing (對齊 Figma: 全部 0) --- */
-  --lt-tracking-normal: 0;
-
-  /* --- Shadow: 對齊 CMDS Figma 規範 (2026-05-12 audit)
-   * 來源：Figma node 20599-107518 — CMDS 4 個官方 shadow variables
-   * 命名按「用途」而非「強度」(Cell / Button / Chip / Dialog)，跟 Material/Tailwind 不同
-   * Overlay 系列為 Lumiture 補充規範（CMDS 未涵蓋的較強 floating overlay 場景）
-   */
-  --lt-shadow-cell:   0 2px 0 0 rgba(0, 0, 0, 0.2);              /* 銳邊，blur=0；table row 分隔線替代 */
-  --lt-shadow-button: 0 2px 14px 0 rgba(137, 174, 255, 0.2);     /* 藍色 tinted，#89AEFF；clickable elevation */
-  --lt-shadow-chip:   0 2px 4px 0 rgba(0, 0, 0, 0.3);            /* chip / tag 用，較深 opacity */
-  --lt-shadow-dialog: 0 0 6px 0 rgba(0, 0, 0, 0.2);              /* Card / Dialog / Dropdown 共用；無 offset */
-  --lt-shadow-overlay:        0 4px 12px rgba(0, 0, 0, 0.14);    /* CMDS 未涵蓋；popover / floating menu */
-  --lt-shadow-overlay-strong: 0 4px 16px rgba(0, 0, 0, 0.18);    /* CMDS 未涵蓋；drawer / 較重 overlay */
-
-  /* --- Transition --- */
-  --lt-transition-fast: .15s ease;
-  --lt-transition-base: .2s ease;
-  --lt-transition-slow: .3s ease;
-
-  /* --- Z-index --- */
-  --lt-z-base:     0;
-  --lt-z-elevated: 10;
-  --lt-z-sticky:   100;
-  --lt-z-dropdown: 1000;
-  --lt-z-modal:    2000;
-  --lt-z-tooltip:  3000;
-  --lt-z-toast:    4000;
-
-
-  /* ============================================================
-   * LAYER 2 — SEMANTIC
-   * 語意層：引用 primitive，描述用途；component 預設用此層
-   * ============================================================ */
-
-  /* --- Color: Brand --- */
-  --lt-color-primary:         var(--lt-blue-70);
-  --lt-color-primary-hover:   var(--lt-blue-60);
-  --lt-color-primary-active:  var(--lt-blue-90);
-  --lt-color-primary-bg:      var(--lt-blue-10);
-  --lt-color-primary-bg-emphasized: var(--lt-blue-20);
-
-  --lt-color-secondary:       var(--lt-turquoise-70);
-  --lt-color-secondary-hover: var(--lt-turquoise-60);
-  --lt-color-secondary-bg:    var(--lt-turquoise-10);
-
-  /* --- Color: Functional (alias) --- */
-  --lt-color-success: var(--lt-color-success-base);
-  --lt-color-error:   var(--lt-color-error-base);
-  --lt-color-warning: var(--lt-color-warning-base);
-  --lt-color-info:    var(--lt-color-info-base);
-
-  /* --- Color: Text --- */
-  --lt-color-text-primary:   var(--lt-grey-700);   /* 內文預設 */
-  --lt-color-text-secondary: var(--lt-grey-500);   /* 次要文字 */
-  --lt-color-text-tertiary:  var(--lt-grey-400);   /* hint / placeholder */
-  --lt-color-text-disabled:  var(--lt-grey-400);
-  --lt-color-text-inverse:   var(--lt-white);
-  --lt-color-text-link:      var(--lt-blue-60);
-  --lt-color-text-heading:   var(--lt-grey-800);   /* 為未來 heading 獨立換色預留 */
-  --lt-color-text-icon:      var(--lt-grey-600);   /* 為未來 icon 獨立換色預留 */
-
-  /* --- Color: Background --- */
-  --lt-color-bg-default:    var(--lt-white);
-  --lt-color-bg-subtle:     var(--lt-grey-50);
-  --lt-color-bg-emphasized: var(--lt-grey-100);
-  --lt-color-bg-disabled:   var(--lt-grey-100);
-  --lt-color-bg-inverse:    var(--lt-blue-90);
-  --lt-color-bg-overlay:    rgba(0, 0, 0, 0.5);
-
-  /* --- Color: Border --- */
-  --lt-color-border-default: var(--lt-grey-200);
-  --lt-color-border-strong:  var(--lt-grey-300);
-  --lt-color-border-focus:   var(--lt-color-primary);
-  --lt-color-border-input:   #DCE3EC;   /* prototype --tf-border；略不同於 grey-200 */
-  --lt-color-border-error:   var(--lt-color-error-base);
-
-
-  /* ============================================================
-   * LAYER 3 — COMPONENT
-   * 元件層：給特定元件使用；引用 semantic
-   * ============================================================ */
-
-  /* --- Sidebar (深海軍藍) --- */
-  --lt-sidebar-width:      250px;
-  --lt-sidebar-bg:         var(--lt-blue-90);
-  --lt-sidebar-text:       rgba(255, 255, 255, 0.85);
-  --lt-sidebar-text-muted: rgba(255, 255, 255, 0.50);
-  --lt-sidebar-hover-bg:   rgba(255, 255, 255, 0.06);
-  --lt-sidebar-active-bg:  var(--lt-color-primary);
-
-  /* --- Topbar --- */
-  --lt-topbar-bg:     var(--lt-white);
-  --lt-topbar-shadow: var(--lt-shadow-dialog);   /* CMDS Dialog shadow（Card 級別 elevation）*/
-
-  /* --- Card --- */
-  --lt-card-bg:      var(--lt-color-bg-default);
-  --lt-card-radius:  var(--lt-radius-md);
-  --lt-card-shadow:  var(--lt-shadow-dialog);    /* CMDS 明確規範 Card 用 Dialog shadow */
-  --lt-card-padding: var(--lt-space-24);
-
-  /* --- Button --- */
-  --lt-button-radius:     var(--lt-radius-sm);
-  --lt-button-padding-x:  var(--lt-space-16);
-  --lt-button-padding-y:  var(--lt-space-8);
-  --lt-button-focus-ring: 0 0 0 3px rgba(0, 79, 176, 0.10);
-
-  /* --- Input / Text Field --- */
-  --lt-input-bg:        var(--lt-color-bg-default);
-  --lt-input-border:    var(--lt-color-border-input);
-  --lt-input-radius:    var(--lt-radius-sm);
-  --lt-input-padding-x: var(--lt-space-16);
-  --lt-input-padding-y: var(--lt-space-8);
-
-  /* --- Modal --- */
-  --lt-modal-radius:   var(--lt-radius-lg);
-  --lt-modal-shadow:   var(--lt-shadow-dialog);  /* CMDS Dialog shadow（Modal = Dialog 同類）*/
-  --lt-modal-padding:  var(--lt-space-24);
-  --lt-modal-backdrop: rgba(0, 0, 0, 0.5);
-
-  /* --- Tooltip --- */
-  --lt-tooltip-bg:      #3C3C3C;            /* 對齊 Lumiture-Guideline.md 規範；非品牌色，刻意不引用 brand token */
-  --lt-tooltip-text:    var(--lt-white);
-  --lt-tooltip-radius:  var(--lt-radius-sm);
-  --lt-tooltip-padding: var(--lt-space-8);
-}
-
-
-/* ============================================================
- * NOT YET DEFINED (Pass 3+)
- * ============================================================
- * - ~~Chart palette~~ ✅ 已加入（2026-05-12 從 Figma General Behavior file audit）
- * - Gradient tokens (Figma 有 Lumiture.ai Blue / Orange / Lemon C 等)
- * - Opacity tokens (Figma 有 CM Opacity Color 系列)
- * - Composite typography tokens (--lt-type-h1, --lt-type-body 等 style sets)
- * - Focus / Inset shadow 特殊變體
- * - Dark mode 對應 token
- *
- * Shadow 結構待 Figma audit：v7/v8 用單層、tokens.css 主階用雙層；Overlay 已用單層作折衷
- * ============================================================ */
-
-</style>
+<link rel="stylesheet" href="../shared/tokens.css?v=2026-09-11">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 <style>
 /* ============================================================
@@ -1829,7 +1562,7 @@ const COPY = {
   ],
   noCompare: 'There is not enough data to\n compare to the previous period.',
   exceeded: (amount, pct) => `${amount}\nThe cost had exceeded ${pct}% of your budget.`,
-  top10: { title: 'Top 10 Highest Spending Team', btn: 'See Full Rankings', btnTip: 'View the complete spending ranking chart for all teams',
+  top10: { title: 'Top 10 Highest Spending Groups', btn: 'See Full Rankings', btnTip: 'View the complete spending ranking chart for all groups',
            note: '*Please note that this chart is displayed on a group basis.\nThe total amount in this chart may not match the organization’s total amount due to the duplication of resources assigned to multiple groups.' },
   byCloud: { title: 'Cost by Cloud', legend: ['Actual Cost', 'Remaining Budget', 'Budget Overrun'] },
   focus: { title: 'Cost by FOCUS Framework',
@@ -1901,7 +1634,7 @@ const DATA_VARIANTS = {
   'no-compare':  { budget: 1200000, warning: 0.8, alert: 1.0, compare: false },
 };
 
-/* Top 10 Highest Spending Team — SpendingGroup[]（本月）；This Year 用 ×(當月序) 加抖動 */
+/* Top 10 Highest Spending Groups — SpendingGroup[]（本月）；This Year 用 ×(當月序) 加抖動 */
 const GROUPS_MONTH = [
   { groupName: 'Platform Engineering',  gcpCost: 18240.5, awsCost: 9120.2,  azureCost: null,   budget: 30000 },
   { groupName: 'Data Science',          gcpCost: 12880.1, awsCost: 4450.0,  azureCost: 2020.4, budget: 16000 },
@@ -2593,7 +2326,7 @@ window.DEMO_PAGES = [
   { id: 'data',  label: 'Data',  icon: 'dataset' },
 ];
 window.DEMO_SCENARIOS = [
-  { id: 'admin', page: 'role', label: 'Owner / Admin', icon: 'admin_panel_settings', tip: 'No-auth 畫面有「Add Your Authorization」按鈕；看得到 Top 10 Highest Spending Team。' },
+  { id: 'admin', page: 'role', label: 'Owner / Admin', icon: 'admin_panel_settings', tip: 'No-auth 畫面有「Add Your Authorization」按鈕；看得到 Top 10 Highest Spending Groups。' },
   { id: 't1m',   page: 'role', label: 'T1 Manager',    icon: 'supervisor_account',   tip: 'No-auth 畫面只有「請聯絡管理員」文案、無按鈕；看得到 Top 10。' },
   { id: 't1mb',  page: 'role', label: 'T1 Member',     icon: 'badge',                tip: '同 T1 Manager；這頁沒有 Manager / Member 差異。' },
   { id: 't2m',   page: 'role', label: 'T2 Manager',    icon: 'person',               tip: '後端不回傳 spending ranking（availableActions.viewSpendingRanking = false）→ Top 10 整張卡不顯示。FE 現況是前端用 depth 判斷，這裡改資料驅動。' },
