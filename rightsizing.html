@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — Rightsizing v2 (Usage Analysis P95 + 11 Metrics)</title>
+<title>Lumiture.ai — Rightsizing v2 (Object Storage Delivery Adjustments)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
@@ -148,7 +148,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-tblscroll::-webkit-scrollbar{width:9px;height:9px}
 .rs-tblscroll::-webkit-scrollbar-thumb{background:var(--g300);border-radius:5px}
 .rs-tblscroll::-webkit-scrollbar-track{background:transparent}
-table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;min-width:2048px}
+table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;min-width:1888px}
 .rstbl thead th{background:var(--pri-lt10);height:50px;padding:0 12px;text-align:left;font-weight:700;font-size:13px;color:var(--g700);position:sticky;top:0;z-index:3;box-shadow:inset 0 -1px 0 var(--g300);white-space:nowrap;vertical-align:middle}
 .rstbl td{height:50px;padding:0 12px;border-bottom:1px solid var(--g100);background:#fff;color:var(--g700);vertical-align:middle;white-space:nowrap}
 .rstbl tbody tr{cursor:pointer}
@@ -195,8 +195,6 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .rs-c-rec{width:280px;min-width:280px}.rs-c-crit{width:230px;min-width:230px}
 .rs-c-assign,.rs-c-resource{width:190px;min-width:190px}
 .rs-tag-cell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px;display:flex;align-items:center;gap:6px}
-.rs-tag-cell .t1{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rs-tagmore{flex:none;font-size:12px;font-weight:600;color:var(--g500);background:var(--g100,#F2F2F2);border-radius:10px;padding:1px 7px;cursor:default}
 
 /* ==== Empty / states ==== */
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:64px 24px;gap:12px;background:#fff;border-radius:var(--r-md)}
@@ -276,13 +274,14 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .dt-insts{display:flex;gap:10px;flex-wrap:nowrap}
 .dt-inst{flex:1;min-width:100px;border:1px solid var(--g200);border-radius:var(--r-md);padding:16px 10px 12px;text-align:center;position:relative;background:#fff}
 .dt-inst.rec{border-color:var(--ok);background:var(--ok-lt)}
-.dt-inst .nm{font-size:13px;font-weight:700;color:var(--g900);margin-bottom:4px}
+.dt-inst .nm{font-size:13px;font-weight:700;color:var(--g900);margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:4px}
+/* 推薦標示：thumb_up 與名稱同一行（設計稿 #12 與 #18 兩版皆然，2026-09-21 對稿）。
+   舊版是浮在卡片上緣的綠色膠囊 + "Recommended" 文字，設計稿沒有那個東西。 */
+.dt-inst .rec-ic{font-size:14px;color:var(--ok);font-variation-settings:'FILL' 1}
 .dt-inst .specs{font-size:11px;color:var(--g500);margin-bottom:6px}
 .dt-inst .pr-mo{font-size:13px;font-weight:700;color:var(--g900)}
 .dt-inst.rec .pr-mo{color:var(--ok-dk)}
 .dt-inst .pr-hr{font-size:11px;color:var(--g500);margin-top:2px}
-.dt-inst .recbadge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--ok);color:#fff;font-size:10px;font-weight:700;padding:1px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:2px;white-space:nowrap}
-.dt-inst .recbadge .material-symbols-outlined{font-size:12px}
 .dt-calc-empty{text-align:center;padding:24px 16px;font-size:13px;color:var(--g400);line-height:1.6}
 
 /* Dismiss modal radios */
@@ -525,7 +524,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
     </div>
 
     <div class="footer">
-      <span class="footer-version">Rightsizing Prototype<span class="ver-tag">v2 · Usage Analysis P95</span></span>
+      <span class="footer-version">Rightsizing Prototype<span class="ver-tag">v2 · Object Storage Delivery Adjustments</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
     </div>
   </div>
@@ -1133,26 +1132,10 @@ function renderActions(){
 var COLS = [
   {h:'Status', sort:'status'}, {h:'Rec. Date', sort:'recDate'}, {h:'Est. Avoidance', sort:'estAmt'},
   {h:'Recommendation'}, {h:'Criteria'}, {h:'Act. Avoidance', sort:'actAmt'}, {h:'End of Tracking', sort:'eot'},
-  {h:'Assigned to Group', sort:'assign'}, {h:'Resource Name / ID', sort:'resource'}, {h:'Label / Tag', sort:'tag'}
+  {h:'Assigned to Group', sort:'assign'}, {h:'Resource Name / ID', sort:'resource'}
 ];
-/* Label / Tag 排序：數字優先於英文 → 英文 A~Z → 同字母時大寫優先（PRD 原文） */
-function tagCmp(a,b){
-  var an=/^\d/.test(a), bn=/^\d/.test(b);
-  if(an!==bn) return an?-1:1;
-  var la=a.toLowerCase(), lb=b.toLowerCase();
-  if(la!==lb) return la<lb?-1:1;
-  return a<b?-1:1;
-}
-function sortedTags(r){ return (r.tags||[]).slice().sort(tagCmp); }
-/* 一格只顯示第一個，其餘收進 +n，hover 看完整清單（PRD 原文） */
-function tagCell(r){
-  var t = sortedTags(r);
-  if(!t.length) return '<span class="rs-tag-cell">--</span>';
-  var rest = t.slice(1);
-  return '<span class="rs-tag-cell"><span class="t1">'+hl(t[0])+'</span>'
-    + (rest.length ? '<span class="rs-tagmore" data-tip="'+escTip(rest.join('<br>'))+'">+'+rest.length+'</span>' : '')
-    + '</span>';
-}
+/* Label / Tag 欄 2026-09-21 依設計稿移除（#01-1 已無此欄，master 裡是隱藏不是刪除，可逆）。
+   `tags` 欄位刻意保留在資料與 rowHaystack 裡：篩選器與欄位都拿掉之後，搜尋框是唯一還找得到 label / tag 的地方。 */
 /* ============================================================
    P1：Filter & Search / Export CSV / Edit End of Tracking
    規格來源：PRD「Recommendation List - Filter」「End of Tracking」段落。
@@ -1273,12 +1256,12 @@ function exportCsv(){
   var head = ['Target Item Name','Target Item ID','Type','Cloud','Impact','Status','Rec. Date',
               'Est. Avoidance ('+state.currency+')','Est. Saving %','Recommendation','Criteria',
               'Act. Avoidance ('+state.currency+')','End of Tracking','Assigned to Group',
-              'Resource Name','Resource ID','Label / Tag'];
+              'Resource Name','Resource ID'];
   var IMP = ['Low','Medium','High'], ST = ['To-Do','Changed','Error'];
   var body = rows.map(function(r){
     return [r.name, r.id, (r.kind==='storage'?'Storage':'VM'), r.prov.toUpperCase(), IMP[r.impact], ST[r.status], r.recDate,
             r.estAmt, (r.estRate*100).toFixed(2)+'%', r.recommendation, (r.criteria||[]).join(' & '),
-            r.actAmt, r.eot, (r.assignTo||[]).join(' / '), r.resN, r.resId, (r.tags||[]).join(' / ')
+            r.actAmt, r.eot, (r.assignTo||[]).join(' / '), r.resN, r.resId
     ].map(csvCell).join(',');
   });
   var csv = '\ufeff' + [head.map(csvCell).join(',')].concat(body).join('\r\n');
@@ -1350,7 +1333,6 @@ function renderTable(){
       if(k==='kind'){ va=a.kind; vb=b.kind; }
       if(k==='assign'){ va=(a.assignTo||[]).join(', ').toLowerCase(); vb=(b.assignTo||[]).join(', ').toLowerCase(); }
       if(k==='resource'){ va=a.resN.toLowerCase(); vb=b.resN.toLowerCase(); }
-      if(k==='tag'){ va=(sortedTags(a)[0]||''); vb=(sortedTags(b)[0]||''); if(va!==vb) return tagCmp(va,vb)*d; return 0; }
       if(va<vb) return -1*d; if(va>vb) return 1*d;
       /* PRD：同一天的推薦，Estimated Savings 高的在前 */
       if(k==='recDate') return b.estAmt - a.estAmt;
@@ -1388,7 +1370,6 @@ function renderTable(){
       +'<td onclick="event.stopPropagation()"><span class="rs-eot">'+r.eot+(r.eotManual?'<span class="rs-eot-manual" title="Manually set. Changing the default in Scope Settings will not override this.">manual</span>':'')+'<span class="material-symbols-outlined" onclick="openEot(\''+r.recId+'\')">event</span></span></td>'
       +'<td class="rs-c-assign"><span class="rs-tag-cell">'+r.assignTo.join(', ')+'</span></td>'
       +'<td class="rs-c-resource"><span class="rs-two-txt"><span class="nm">'+hl(r.resN)+'</span><span class="id">'+hl(r.resId)+'</span></span></td>'
-      +'<td>'+tagCell(r)+'</td>'
       +'</tr>';
   }).join('');
 
@@ -1513,8 +1494,7 @@ function buildInstCards(hours){
     var mo = it.base * (hours/720);
     var hr = mo / (hours||720);
     return '<div class="dt-inst'+(it.rec?' rec':'')+'">'
-      + (it.rec?'<span class="recbadge"><span class="material-symbols-outlined">thumb_up</span>Recommended</span>':'')
-      + '<div class="nm">'+it.name+'</div>'
+      + '<div class="nm">'+(it.rec?'<span class="material-symbols-outlined rec-ic">thumb_up</span>':'')+it.name+'</div>'
       + '<div class="specs">'+it.vcpu+' vCPU · '+it.ram+' GB RAM</div>'
       + '<div class="pr-mo">'+state.currency+' '+mo.toFixed(2)+' / mo</div>'
       + '<div class="pr-hr">'+state.currency+' '+hr.toFixed(3)+' / hr</div>'
@@ -1548,7 +1528,7 @@ var STORAGE_CLASSES = [
 ];
 function storageClassCardLine2(cls){
   if(cls.name==='Standard') return 'No minimum, no retrieval fee';
-  return cls.min+'-day minimum, $'+cls.rate.toFixed(2)+' / GB retrieval';
+  return cls.min+'-day minimum, $'+cls.rate.toFixed(3)+' / GB retrieval';
 }
 function storageTargetTier(r){
   var m = /→\s*(Nearline|Coldline|Archive)\s*$/.exec(r.recommendation);
@@ -1582,10 +1562,13 @@ function buildStorageCostCards(r){
     unit:'Varies by class',
     mo:Math.max(isAutoclass ? baseCost - r.saving : classCost(STORAGE_CLASSES[1]) + objs/1000*0.0025, 0),
     rec:isAutoclass });
+  /* 推薦的那張抽到最左，其餘維持由熱到冷的自然順序（2026-09-21 Kabin 改稿，#18 是 Autoclass 排第一）。
+     VM 版的推薦卡剛好也在最左，但那是機型由小到大的自然結果；儲存版是刻意把推薦抽前面。 */
+  cards.sort(function(a,b){ return (b.rec?1:0)-(a.rec?1:0); });
   return cards.map(function(c){
+    /* 推薦標示：thumb_up 與名稱同一行、無 "Recommended" 文字（設計稿 VM #12 與 Storage #18 兩版皆然） */
     return '<div class="dt-inst'+(c.rec?' rec':'')+'">'
-      + (c.rec?'<span class="recbadge"><span class="material-symbols-outlined">thumb_up</span>Recommended</span>':'')
-      + '<div class="nm">'+c.name+'</div>'
+      + '<div class="nm">'+(c.rec?'<span class="material-symbols-outlined rec-ic">thumb_up</span>':'')+c.name+'</div>'
       + '<div class="specs">'+c.line2+'</div>'
       + '<div class="pr-mo">'+state.currency+' '+c.mo.toFixed(2)+' / mo</div>'
       + '<div class="pr-hr">'+c.unit+'</div>'
