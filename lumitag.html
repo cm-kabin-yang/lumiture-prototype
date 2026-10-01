@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — LumiTag v8 (Tokens Migration)</title>
+<title>Lumiture.ai — LumiTag v9 (Allocation Card · Phase 1 Exploration)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
@@ -202,6 +202,7 @@
   --lt-color-bg-disabled:   var(--lt-grey-100);
   --lt-color-bg-inverse:    var(--lt-blue-90);
   --lt-color-bg-overlay:    rgba(0, 0, 0, 0.5);
+  --lt-color-bg-skeleton:   var(--lt-grey-200);   /* 骨架屏；2026-09-24 定，對應前端 gray.skeleton → gray.10；用途命名，日後可單獨換色 */
 
   /* --- Color: Border --- */
   --lt-color-border-default: var(--lt-grey-200);
@@ -726,6 +727,130 @@ tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g20
 .sidebar.collapsed .ns-arrow{display:none!important}
 .sidebar.collapsed .sb-group.collapsed .sb-children{display:block}
 /* Demo FAB styles → see prototypes/shared/demo-fab.js */
+/* Figma #01 註記「隱藏上方第三張卡：Resource Coverage Rate」（BE 建議拿掉、PM 同意）→ v9 對齊 Figma 與 FE，只留兩張 */
+.cg>.card.mc:nth-child(3){display:none}
+.cg{grid-template-columns:repeat(2,1fr)!important}
+/* ===== v9 — Allocation card（Phase 1 探索版） ===== */
+.v9-add-menu{position:absolute;z-index:500;background:var(--wh);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.14);padding:8px 0;width:320px;overscroll-behavior:contain}
+.v9-add-menu button{display:flex;align-items:flex-start;gap:12px;width:100%;padding:10px 16px;border:none;background:none;text-align:left;cursor:pointer;font-family:inherit}
+.v9-add-menu button:hover{background:var(--lt-grey-50,#F6F6F6)}
+.v9-add-menu .material-symbols-outlined{font-size:20px;color:var(--pri);margin-top:1px;font-variation-settings:'FILL' 1}
+.v9-add-menu strong{display:block;font-size:14px;font-weight:600;color:var(--g900)}
+.v9-add-menu em{display:block;font-style:normal;font-size:12px;color:var(--g500);margin-top:2px}
+.vc.ac{border:1px solid var(--pri-lt20);background:var(--wh);box-shadow:inset 4px 0 0 var(--sec)}
+.vc.ac.collapsed .ac-body{display:none}
+.vc.ac.ac-err{border-color:var(--err)}
+.ac-badge{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:12px;background:var(--sec-lt10);color:var(--sec-dk);font-size:12px;font-weight:600}
+.ac-badge .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 1}
+.ac-meta{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--g500);cursor:default}
+.ac-meta-item{}
+.ac-meta-dot{color:var(--g300)}
+.ac-body{padding-left:36px}
+.ac-sec{display:flex;flex-direction:column;gap:2px;margin:8px 0}
+.ac-sec-t{font-size:13px;font-weight:700;color:var(--g800)}
+.ac-sec-d{font-size:12px;color:var(--g500)}
+.ac-match{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g700);padding:8px 12px;background:var(--g50);border-radius:var(--r-sm);margin-top:8px}
+.ac-match .material-symbols-outlined{font-size:18px;color:var(--g400)}
+.ac-muted{color:var(--g500)}
+.ac-sample{margin-left:auto;font-size:12px;color:var(--g500);border:1px dashed var(--g300);border-radius:10px;padding:1px 8px;cursor:help}
+.ac-rows{display:flex;flex-direction:column;gap:8px}
+/* 一列＝可往下長的容器：第一行是 value／Share／金額，下方 .ac-row-ext 預留給 Phase 2 的「認定條件」（Phase 1 為空、不佔高度）；
+ * Share 欄 96px 預留 Phase 3 Fixed Proportional 的百分比輸入框 */
+.ac-row{display:flex;flex-direction:column;gap:4px}
+.ac-row-main{display:grid;grid-template-columns:minmax(200px,320px) 96px 112px 28px;align-items:center;gap:12px}
+.ac-row-ext:empty{display:none}
+.ac-row .ac-sel,.ac-row .ac-txt{height:36px;padding:0 10px;border:1px solid var(--g300);border-radius:var(--r-sm);font-size:14px;font-family:inherit;background:var(--wh);color:var(--g900)}
+.ac-w{font-size:14px;font-weight:600;color:var(--g900);text-align:right;font-variant-numeric:tabular-nums}
+.ac-amt{font-size:13px;color:var(--g500);text-align:right;font-variant-numeric:tabular-nums}
+.ac-row-hint{font-size:12px;color:var(--warn)}
+.ac-row-basis{font-size:12px;color:var(--g500)}
+.ac-row-basis:empty{display:none}
+.ac-row.is-new .ac-row-main{animation:v9-row-flash 1.6s ease}
+@keyframes v9-row-flash{0%,60%{background:var(--pri-lt10);box-shadow:0 0 0 4px var(--pri-lt10)}100%{background:transparent;box-shadow:none}}
+.v9-link-banner{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-4px 0 12px;padding:8px 12px;border-radius:var(--r-sm);background:var(--pri-lt10);font-size:13px;color:var(--g800)}
+.v9-link-banner .material-symbols-outlined{font-size:18px;color:var(--pri)}
+.v9-link-banner a{color:var(--pri);font-weight:500}
+.v9-add-menu-empty{padding:10px 16px;font-size:13px;color:var(--g500)}
+.ac-row-hint:empty{display:none}
+.ac-row.is-zero .ac-w{color:var(--g400)}
+.ac-alerts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.ac-alerts:empty{display:none}
+.ac-alert{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:var(--r-sm);font-size:13px;line-height:1.6}
+.ac-alert .material-symbols-outlined{font-size:18px;margin-top:1px;font-variation-settings:'FILL' 1}
+.ac-alert.warn{background:var(--warn-lt);color:var(--g800)}.ac-alert.warn .material-symbols-outlined{color:var(--warn)}
+.ac-alert.info{background:var(--info-lt);color:var(--g800)}.ac-alert.info .material-symbols-outlined{color:var(--pri)}
+.ac-alert.neutral{background:var(--g50);color:var(--g700)}.ac-alert.neutral .material-symbols-outlined{color:var(--g400)}
+.ac-alert-act{margin-top:8px}
+.ac-alert-sub{margin-top:4px}
+.ac-alert code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:rgba(0,0,0,.05);padding:0 4px;border-radius:4px}
+.vni-hint{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--pri);margin:-4px 0 8px 108px}
+.vni-hint .material-symbols-outlined{font-size:16px}
+.vh input.vni.vni-dd{padding-right:38px;background:var(--wh) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z' fill='%23676767'/%3E%3C/svg%3E") no-repeat right 12px center/18px}
+.v9-name-dd button.is-cur{color:var(--pri);font-weight:600}
+.v9-name-dd .v9-name-dd-new{border-top:1px solid var(--g200,#E6E6E6);margin-top:4px;color:var(--pri);display:flex;align-items:center;gap:4px}
+.v9-name-dd .v9-name-dd-new .material-symbols-outlined{font-size:18px}
+.ac-rows-h{display:grid;grid-template-columns:minmax(200px,320px) 96px 112px 28px;gap:12px;font-size:12px;color:var(--g500);margin-bottom:4px}
+.ac-rows-h>span:nth-child(2),.ac-rows-h>span:nth-child(3){text-align:right;display:flex;justify-content:flex-end;align-items:center;gap:2px}
+.ac-rows-h .material-symbols-outlined{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 1;cursor:help}
+.v9-name-dd{position:absolute;z-index:500;background:var(--wh);border-radius:var(--r-sm);box-shadow:0 4px 16px rgba(0,0,0,.14);padding:4px 0;max-height:240px;overflow:auto;overscroll-behavior:contain}
+.v9-name-dd-h{font-size:12px;color:var(--g500);padding:6px 12px}
+.v9-name-dd button{display:block;width:100%;text-align:left;padding:8px 12px;border:none;background:none;font-size:14px;font-family:inherit;color:var(--g900);cursor:pointer}
+.v9-name-dd button:hover{background:var(--lt-grey-50,#F6F6F6)}
+.v9-hid{font-size:16px;color:var(--g400);vertical-align:middle;margin-left:6px;cursor:help;font-variation-settings:'FILL' 1}
+.v9-amt-cell{display:flex;align-items:center;justify-content:flex-end;gap:10px;white-space:nowrap}
+.v9-split-bar{display:inline-flex;height:6px;width:72px;border-radius:3px;overflow:hidden;background:var(--g100);cursor:help}
+.v9-split-bar span{display:block;height:100%}
+.v9-split-bar span.is-alloc{opacity:.45;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.6) 0 3px,transparent 3px 6px)}
+.v9-est{font-size:12px;padding:0 6px;border-radius:8px;background:var(--g100);color:var(--g600);cursor:help}
+.v9-pill{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:10px;font-size:12px;font-weight:600;margin-right:8px}
+.v9-pill.ok{background:var(--ok-lt);color:var(--ok-dk)}.v9-pill.warn{background:var(--warn-lt);color:#B26A00}.v9-pill.muted{background:var(--g100);color:var(--g600)}
+.v9-warn-t{color:#B26A00}
+.v9-ac-line{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-top:1px solid var(--g100);font-size:14px;color:var(--g800);line-height:1.6}
+.v9-ac-line:first-of-type{border-top:none}
+/* 版面 A′：分兩區 */
+.v9-zone{margin:20px 0 12px;padding-top:16px;border-top:2px solid var(--g200)}
+.v9-zone-h{display:flex;align-items:center;gap:8px}
+.v9-zone-h>.material-symbols-outlined{font-size:20px;color:var(--sec-dk);font-variation-settings:'FILL' 1}
+.v9-zone-t{font-size:16px;font-weight:700;color:var(--g900)}
+.v9-zone-d{font-size:12px;color:var(--g500);margin:4px 0 0 28px}
+.v9-zone-empty{font-size:13px;color:var(--g500);margin:12px 0 0 28px;padding:12px 16px;border:1px dashed var(--g300);border-radius:var(--r-md)}
+/* 分攤前／分攤後 */
+.v9-seg{display:inline-flex;border:1px solid var(--g300);border-radius:var(--r-sm);overflow:hidden}
+.v9-seg button{height:32px;padding:0 12px;border:none;background:var(--wh);font-size:13px;font-family:inherit;color:var(--g600);cursor:pointer}
+.v9-seg button+button{border-left:1px solid var(--g300)}
+.v9-seg button.on{background:var(--pri-lt10);color:var(--pri);font-weight:600}
+.v9-pool-seg{background:repeating-linear-gradient(45deg,#C5CEDA 0 4px,#E3E8EF 4px 8px)!important}
+.v9-pool-row td{background:var(--g50)}
+/* ⏸ PARKED：已設計、PM 尚未安排開發 / UX 提案 */
+.v9-parked{border:1px dashed var(--g300);box-shadow:none;background:repeating-linear-gradient(-45deg,var(--wh) 0 12px,var(--g50) 12px 13px)}
+.v9-parked-top{display:flex;justify-content:flex-end;margin-bottom:8px}
+.v9-parked-badge{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:12px;background:var(--g100);color:var(--g700);font-size:12px;font-weight:600;cursor:help}
+.v9-parked-badge .material-symbols-outlined{font-size:16px}
+.v9-parked-badge.is-proposal{background:var(--warn-lt);color:#8A5300}
+.v9-conf summary{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600;color:var(--g900);list-style:none}
+.v9-conf summary::-webkit-details-marker{display:none}
+.v9-conf summary .material-symbols-outlined{font-size:20px;color:var(--warn)}
+.v9-conf .v9-conf-arr{margin-left:auto;color:var(--g400)!important;transition:transform .15s}
+.v9-conf[open] .v9-conf-arr{transform:rotate(180deg)}
+.v9-conf-item{padding:12px 0 0 28px}
+.v9-conf-res{font-size:13px;font-weight:600;color:var(--g800);margin-bottom:4px}
+.v9-conf-rule{font-size:13px;color:var(--g500);line-height:1.8}
+.v9-conf-rule.is-win{color:var(--g800)}
+.v9-kube-line{display:flex;align-items:flex-start;gap:8px;padding:12px 16px;background:var(--g50);border-top:1px solid var(--g200);font-size:13px;color:var(--g800);line-height:1.6;border-radius:0 0 var(--r-sm) var(--r-sm)}
+.v9-kube-line>:first-child{flex-shrink:0;white-space:nowrap}
+.v9-kube-line>.material-symbols-outlined{font-size:18px;color:var(--pri);font-variation-settings:'FILL' 1;margin-top:1px}
+.v9-kube-line code{font-size:12px;background:var(--wh);border:1px solid var(--g200);padding:0 4px;border-radius:4px}
+.v9-kube{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--g800);line-height:1.6}
+.v9-kube>.material-symbols-outlined{color:var(--warn);font-variation-settings:'FILL' 1}
+.v9-kube code{font-size:12px;background:var(--g100);padding:1px 4px;border-radius:4px}
+/* v9：下拉箭頭離右緣 12px（瀏覽器預設太貼邊） */
+select:not([multiple]){-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z' fill='%23676767'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 12px center!important;background-size:18px!important;padding-right:38px!important}
+/* v9：Coverage 長條百分比改深色字（白字疊淺色底對比不足） */
+#v-preview .aseg .seg-pct{color:var(--g900)}
+.v9-name-dd button{display:flex!important;align-items:center;gap:8px}
+.v9-name-dd button .v9-dd-meta{margin-left:auto;font-size:12px;color:var(--g500);white-space:nowrap}
+.v9-name-dd button.is-hi{background:var(--lt-grey-50,#F6F6F6)}
+.v9-name-dd button mark{background:none;color:inherit;font-weight:700}
 </style>
 </head>
 <body>
@@ -740,7 +865,7 @@ tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g20
 <div class="view" id="v-preview"></div>
 <div class="view" id="v-batch"></div>
 </div>
-<div class="footer"><span class="footer-version">LumiTag Prototype<span class="ver-tag">v8 · Tokens Migration</span></span><span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin · Special thanks to Jessie, Bater &amp; Consulting Team</span></div>
+<div class="footer"><span class="footer-version">LumiTag Prototype<span class="ver-tag">v9 · Allocation Card</span></span><span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin · Special thanks to Jessie, Bater &amp; Consulting Team</span></div>
 </div>
 </div>
 <div class="mo" id="mo"><div class="modal" id="mc"></div></div>
@@ -813,7 +938,7 @@ const FIELD_OPSET={
   labels:'tag',tags:'tag',tag:'tag'
 };
 const FIELD_VALUES={
-  service_description:['App Engine','BigQuery','Cloud Armor','Cloud CDN','Cloud DNS','Cloud Functions','Cloud Monitoring','Cloud Run','Cloud Spanner','Cloud SQL','Cloud Storage','Compute Engine','Dataflow','Filestore','GKE','Pub/Sub','Vertex AI','VPC Network'],
+  service_description:['App Engine','BigQuery','Cloud Armor','Cloud CDN','Cloud DNS','Cloud Functions','Cloud Logging','Cloud Monitoring','Cloud Run','Cloud Spanner','Cloud SQL','Cloud Storage','Compute Engine','Dataflow','Filestore','GKE','Pub/Sub','Support','Vertex AI','VPC Network'],
   location_region:['us-east1','us-central1','us-west1','us-west2','asia-east1','asia-northeast1','asia-southeast1','europe-west1','europe-west4'],
   line_item_product_code:['AmazonEC2','AmazonS3','AmazonRDS','AWSLambda','AmazonEKS','AmazonCloudFront','AmazonRoute53','AmazonDynamoDB','AmazonRedshift','AWSDataTransfer'],
   product_region_code:['us-east-1','us-west-1','us-west-2','ap-southeast-1','ap-northeast-1','eu-west-1','eu-central-1'],
@@ -822,7 +947,7 @@ const FIELD_VALUES={
   ServiceCategory:['Compute','Storage','Database','Networking','AI and Machine Learning','Analytics','Management and Governance','Security','Developer Tools'],
   RegionId:['us-east-1','us-central1','eastus','ap-southeast-1','cn-hangzhou'],
   billing_account_id:['012345-6789AB-CDEF01','9876AB-543210-FEDCBA','111AAA-222BBB-333CCC'],
-  project_id:['prd-backend-001','prd-frontend-002','prd-data-005','dev-backend-003','dev-ml-006','stg-infra-004'],
+  project_id:['prd-platform-gke','prd-backend-001','prd-frontend-002','prd-data-005','prd-shared-services','dev-backend-003','dev-ml-006','stg-infra-004'],
   resource_name:['instance-prod-1','instance-prod-2','cloud-sql-prod','gcs-logs-bucket','gke-prod-cluster','cloud-func-processor'],
   bill_payer_account_id:['123456789012'],
   line_item_usage_account_id:['987654321098','111122223333','444455556666','777788889999'],
@@ -833,11 +958,13 @@ const FIELD_VALUES={
   SubAccountId:['167283940511','998877665544','112233445566']
 };
 const TAG_KEY_VALUES={
-  labels:['app','budget','compliance','component','cost-center','department','env','lifecycle','owner','phase','project','service','team','tier','version'],
+  labels:['app','budget','compliance','component','cost-center','department','env','goog-k8s-cluster-name','k8s-namespace','lifecycle','owner','phase','project','service','team','tier','version'],
   tags:['App','CostCenter','Department','Env','Name','Owner','Project','Service','Team','Version'],
   tag:['app','cost-center','department','env','owner','project','service','team']
 };
 const TAG_VALUE_OPTS={
+  'goog-k8s-cluster-name':['shared-gke','data-gke'],
+  'k8s-namespace':['backend','frontend','data-pipeline','kube:unallocated','kube:system-overhead'],
   env:['development','staging','production','qa','test'],
   Env:['development','staging','production','qa','test'],
   app:['frontend','backend','api','worker','scheduler','database'],
@@ -864,7 +991,7 @@ const TAG_VALUE_OPTS={
   lifecycle:['prod','staging','dev','decom','archived'],
   budget:['opex','capex','r&d','marketing','infrastructure'],
 };
-const buildTagKeySelect=(f,k)=>{const opts=TAG_KEY_VALUES[f]||[];const hasK=k&&!opts.includes(k);const ph=f==='labels'?'Select Label Key':'Select Tag Key';return`<select class="tag-key-sel op-sel-vis" onchange="updTagKeyState(this)"><option value="" disabled${!k?' selected':''}>${ph}</option>${hasK?`<option value="${k}" selected>${k}</option>`:''}${opts.map(v=>`<option value="${v}"${v===k?' selected':''}>${v}</option>`).join('')}</select>`;};
+const buildTagKeySelect=(f,k)=>{const opts=(TAG_KEY_VALUES[f]||[]).filter(x=>!(typeof S!=='undefined'&&S._k8sNorm&&f==='labels'&&Object.values(V9_K8S_MAP).includes(x)&&x!==k));const hasK=k&&!opts.includes(k);const ph=f==='labels'?'Select Label Key':(f==='k8s'?'Select Dimension':'Select Tag Key');return`<select class="tag-key-sel op-sel-vis" onchange="updTagKeyState(this)"><option value="" disabled${!k?' selected':''}>${ph}</option>${hasK?`<option value="${k}" selected>${k}</option>`:''}${opts.map(v=>`<option value="${v}"${v===k?' selected':''}>${v}</option>`).join('')}</select>`;};
 const getFieldOpset=f=>FIELD_OPSET[f]||'enum';
 const getInputMode=(f,op)=>((FIELD_VALUES[f]||getFieldOpset(f)==='tag')&&(op==='is'||op==='is_not'))?'multi':'text';
 const defaultField=csp=>({GCP:'project_id',AWS:'line_item_usage_account_id',Azure:'ResourceGroupId',FOCUS:'SubAccountId'})[csp]||'project_id';
@@ -893,9 +1020,9 @@ const getFieldPlaceholder=f=>({
 const buildOpOpts=(opset,sel)=>(FIELD_OPERATORSETS[opset]||FIELD_OPERATORSETS.enum).map(([v,l])=>`<option value="${v}"${v===sel?' selected':''}>${l}</option>`).join('');
 const OPS=[['is','is'],['is_not','is not'],['contains','contains'],['not_contains','not contains'],['starts_with','starts with'],['ends_with','ends with'],['exists','exists'],['not_exists','not exists']];
 const cspOpts=(s)=>CSP_LIST.map(([v,l])=>`<option value="${v}"${v===s?' selected':''}>${l}</option>`).join('');
-const fOpts=(csp,s)=>(CSP_FIELDS[csp]||CSP_FIELDS.GCP).map(([v,l])=>`<option value="${v}"${v===s?' selected':''}>${l}</option>`).join('');
-const TAG_FIELD_DISP={labels:'Label Key',tags:'Tag Key',tag:'Tag Key'};
-const fOptsTagAware=(csp,s)=>(CSP_FIELDS[csp]||CSP_FIELDS.GCP).map(([v,l])=>`<option value="${v}"${v===s?' selected':''}>${TAG_FIELD_DISP[v]||l}</option>`).join('');
+const fOpts=(csp,s)=>(CSP_FIELDS[csp]||CSP_FIELDS.GCP).map(([v,l])=>`<option value="${v}"${v===s?' selected':''}>${l}</option>`).join('')+(typeof v9K8sOpts==='function'?v9K8sOpts(csp,s):'');
+const TAG_FIELD_DISP={labels:'Label Key',tags:'Tag Key',tag:'Tag Key',k8s:'Kubernetes'};
+const fOptsTagAware=(csp,s)=>(CSP_FIELDS[csp]||CSP_FIELDS.GCP).map(([v,l])=>`<option value="${v}"${v===s?' selected':''}>${TAG_FIELD_DISP[v]||l}</option>`).join('')+(typeof v9K8sOpts==='function'?v9K8sOpts(csp,s):'');
 const oOpts=(s)=>OPS.map(([v,l])=>`<option value="${v}"${v===s?' selected':''}>${l}</option>`).join('');
 const fmt=n=>'$'+n.toLocaleString();
 /* CURRENCIES — flags defined in shared/currency-picker.js (CurrencyPicker.CURRENCIES) */
@@ -1076,22 +1203,22 @@ function _skTR(){const r=`<tr class="sk-row"><td><span class="skeleton" style="d
 
 function renderList(){const el=document.getElementById('v-list');
 if(S._noAuth){el.innerHTML=`<div class="pg-hdr"><div class="pg-hdr-row"><div><div class="pg-title">LumiTag</div></div></div></div><div class="card">${_mkES({icon:'lock',ic:'var(--sec)',ttl:'Authorize Your Cloud Account to Start Organizing Costs.',sub:'By authorizing, you can leverage LumiTags to categorize and allocate spend without altering your cloud environment. Gain full visibility into your cost distribution across teams and projects instantly.',btn:'Add Your Authorization',bfn:"toast('Navigating to Authorization setup...')"})}</div>`;return;}
-if(S._listError){const _errPGH=`<div class="pg-hdr"><div class="pg-hdr-row"><div><div class="pg-title">LumiTag</div><div class="pg-desc">Allocate cloud costs with precision using LumiTags. By <strong>EXCLUDING CREDITS</strong>, we provide a clearer view of your actual expenditure.</div></div><div class="pg-hdr-r" style="flex-shrink:0"><div style="font-size:13px;color:var(--g400)">Last Updated —</div></div></div></div>`;const _errMC=`<div class="cg">${['Allocation Accuracy Index','Untagged Cost','Resource Coverage Rate'].map(lbl=>`<div class="card mc"><div class="ml">${lbl}</div><div class="mv" style="font-size:22px;font-weight:500;color:var(--g400);line-height:1.4;padding:6px 0">No Data</div><div class="ms" style="color:var(--g300)">—</div></div>`).join('')}</div>`;const _errTbl=`<div class="card" style="padding:0;overflow:hidden;margin-top:16px"><div style="display:flex;align-items:center;gap:0;padding:4px 24px;border-bottom:1px solid var(--g100)"><div class="tabs" style="pointer-events:none;opacity:.5;flex:1"><div class="tab active">All Tags</div><div class="tab">Active</div><div class="tab">Inactive</div></div><div style="display:inline-flex;align-items:center;gap:8px;padding:8px 0"><div class="ts" style="pointer-events:none;opacity:.45"><span class="material-symbols-outlined">search</span><input type="text" placeholder="Search LumiTags..." disabled style="width:200px"></div><button class="btn btn-p" disabled style="opacity:.4;cursor:not-allowed;height:36px"><span class="material-symbols-outlined">add</span>Create LumiTag</button></div></div>${_mkES({icon:'error',cirBg:'var(--pri-lt20)',ic:'var(--pri)',ttl:'Something Went Wrong',sub:'Please ensure you have a stable internet connection and try refreshing the page.'})}</div>`;el.innerHTML=_errPGH+_errMC+_errTbl;return;}
-if(S._skeleton){const _skPGH=`<div class="pg-hdr"><div class="pg-hdr-row"><div><div class="pg-title">LumiTag</div><div class="pg-desc">Allocate cloud costs with precision using LumiTags. By <strong>EXCLUDING CREDITS</strong>, we provide a clearer view of your actual expenditure and highlight true opportunities for optimization.</div></div><div class="pg-hdr-r" style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="skeleton" style="display:inline-block;width:240px;height:14px"></span><span class="skeleton" style="display:inline-block;width:80px;height:14px;margin-top:4px"></span></div></div></div>`;const _skTbl=`<div class="card" style="padding:0;overflow:hidden;margin-top:0"><div style="display:flex;align-items:center;gap:0;padding:4px 24px;border-bottom:1px solid var(--g100)"><div class="tabs" style="pointer-events:none;flex:1"><div class="tab active">All Tags</div><div class="tab">Active</div><div class="tab">Inactive</div></div><div style="display:inline-flex;align-items:center;gap:8px;padding:8px 0"><div class="ts" style="pointer-events:none;opacity:.6"><span class="material-symbols-outlined">search</span><input type="text" placeholder="Search LumiTags..." disabled style="width:200px"></div><button class="btn btn-p" disabled style="opacity:.4;cursor:not-allowed;height:36px"><span class="material-symbols-outlined">add</span>Create LumiTag</button></div></div>${_skTR()}</div>`;el.innerHTML=_skPGH+_skMC()+_skTbl;return;}
+if(S._listError){const _errPGH=`<div class="pg-hdr"><div class="pg-hdr-row"><div><div class="pg-title">LumiTag</div><div class="pg-desc">Allocate cloud costs with precision using LumiTags. By <strong>EXCLUDING CREDITS</strong>, we provide a clearer view of your actual expenditure.</div></div><div class="pg-hdr-r" style="flex-shrink:0"><div style="font-size:13px;color:var(--g400)">Last Updated —</div></div></div></div>`;const _errMC=`<div class="cg">${['Allocation Accuracy Index','Untagged Cost','Resource Coverage Rate'].map(lbl=>`<div class="card mc"><div class="ml">${lbl}</div><div class="mv" style="font-size:22px;font-weight:500;color:var(--g400);line-height:1.4;padding:6px 0">No Data</div><div class="ms" style="color:var(--g300)">—</div></div>`).join('')}</div>`;const _errTbl=`<div class="card" style="padding:0;overflow:hidden;margin-top:16px"><div style="display:flex;align-items:center;gap:0;padding:4px 24px;border-bottom:1px solid var(--g100)"><div class="tabs" style="pointer-events:none;opacity:.5;flex:1"><div class="tab active">All Tags</div><div class="tab">Active</div><div class="tab">Inactive</div></div><div style="display:inline-flex;align-items:center;gap:8px;padding:8px 0"><div class="ts" style="pointer-events:none;opacity:.45"><span class="material-symbols-outlined">search</span><input type="text" placeholder="Search LumiTag" disabled style="width:200px"></div><button class="btn btn-p" disabled style="opacity:.4;cursor:not-allowed;height:36px"><span class="material-symbols-outlined">add</span>Create LumiTag</button></div></div>${_mkES({icon:'error',cirBg:'var(--pri-lt20)',ic:'var(--pri)',ttl:'Something Went Wrong',sub:'Please ensure you have a stable internet connection and try refreshing the page.'})}</div>`;el.innerHTML=_errPGH+_errMC+_errTbl;return;}
+if(S._skeleton){const _skPGH=`<div class="pg-hdr"><div class="pg-hdr-row"><div><div class="pg-title">LumiTag</div><div class="pg-desc">Allocate cloud costs with precision using LumiTags. By <strong>EXCLUDING CREDITS</strong>, we provide a clearer view of your actual expenditure and highlight true opportunities for optimization.</div></div><div class="pg-hdr-r" style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="skeleton" style="display:inline-block;width:240px;height:14px"></span><span class="skeleton" style="display:inline-block;width:80px;height:14px;margin-top:4px"></span></div></div></div>`;const _skTbl=`<div class="card" style="padding:0;overflow:hidden;margin-top:0"><div style="display:flex;align-items:center;gap:0;padding:4px 24px;border-bottom:1px solid var(--g100)"><div class="tabs" style="pointer-events:none;flex:1"><div class="tab active">All Tags</div><div class="tab">Active</div><div class="tab">Inactive</div></div><div style="display:inline-flex;align-items:center;gap:8px;padding:8px 0"><div class="ts" style="pointer-events:none;opacity:.6"><span class="material-symbols-outlined">search</span><input type="text" placeholder="Search LumiTag" disabled style="width:200px"></div><button class="btn btn-p" disabled style="opacity:.4;cursor:not-allowed;height:36px"><span class="material-symbols-outlined">add</span>Create LumiTag</button></div></div>${_skTR()}</div>`;el.innerHTML=_skPGH+_skMC()+_skTbl;return;}
 const actT=S.tags.filter(t=>t.status==='active');const aai=actT.length?String(Math.round(actT.reduce((s,t)=>s+(aCost(t)/t.totalCost)*100,0)/actT.length)):'0';const avgUnallocCost=actT.length?actT.reduce((s,t)=>s+(t.totalCost-aCost(t)),0)/actT.length:0;const upct=actT.length?(100-parseFloat(aai)).toFixed(1):'100.0';const comp=actT.length?(actT.reduce((s,t)=>s+(aRes(t)/t.totalRes)*100,0)/actT.length).toFixed(2):'0.00';
 const dftCount=S.tags.filter(t=>t.status==='inactive').length;const actCount=S.tags.filter(t=>t.status==='active').length;
 let h='';
 h+=`<div class="pg-hdr"><div class="pg-hdr-row"><div><div class="pg-title">LumiTag</div><div class="pg-desc">Allocate cloud costs with precision using LumiTags. By <strong>EXCLUDING CREDITS</strong>, we provide a clearer view of your actual expenditure and highlight true opportunities for optimization.</div></div><div class="pg-hdr-r" style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--g500)"><span>Last Updated 2026-04-15</span><span class="info-tip"><span class="material-symbols-outlined" style="font-size:16px">info</span><span class="tip-box" style="min-width:280px;max-width:320px">Data reflects the latest sync from your cloud billing sources. Due to provider-side latency, figures may differ slightly from final billing statements.</span></span></div><div style="position:relative"><button class="curr-btn" onclick="CurrencyPicker.open(this,'${S._currency}',pickCurrency)"><span class="curr-flag">${(CurrencyPicker.CURRENCIES.find(c=>c.code===S._currency)||{flag:''}).flag}</span><span class="curr-code">${S._currency}</span><span class="material-symbols-outlined">expand_more</span></button></div></div></div></div>`;
 if(S.bannerOn)h+=`<div class="banner"><span class="material-symbols-outlined banner-ic">lightbulb</span><div class="banner-t"><div class="banner-tt">Get started with FinOps Foundation recommended tags</div><div class="banner-d">We've pre-configured 5 essential LumiTag keys. Customize them to match your organization's needs.</div></div><button class="btn btn-o btn-sm" onclick="toast('5 preset tags activated!');S.bannerOn=false;renderList()"><span class="material-symbols-outlined">rocket_launch</span>Get Started</button><span class="material-symbols-outlined banner-cl" onclick="S.bannerOn=false;renderList()">close</span></div>`;
 h+=`<div class="cg"><div class="card mc"><div class="ml">Allocation Accuracy Index <span class="info-tip"><span class="material-symbols-outlined">info</span><span class="tip-box">AAI measures how well your cloud cost is tagged with LumiTags. A score of 100 means all cost is fully allocated. Due to data latency from cloud service providers, values may differ slightly from final billing.</span></span></div><div class="mv" style="color:var(--g900)">${aai}<span style="font-size:18px;font-weight:500;color:var(--g400)"> / 100</span></div><div class="ms">Cloud cost tagged</div></div><div class="card mc"><div class="ml">Untagged Cost <span class="info-tip"><span class="material-symbols-outlined">info</span><span class="tip-box">The total cost of resources that have not been assigned to any LumiTag value. Excludes credits. Due to data latency from cloud service providers, values may differ slightly from final billing.</span></span></div><div class="mv" style="color:var(--g900)">${fmtCurr(avgUnallocCost)}</div><div class="ms">${upct}% cost remains untagged</div></div><div class="card mc"><div class="ml">Resource Coverage Rate <span class="info-tip"><span class="material-symbols-outlined">info</span><span class="tip-box">The percentage of resources (by count) that have been assigned to at least one LumiTag. A higher rate means better tagging coverage across your cloud resources. Due to data latency from cloud service providers, values may differ slightly from final billing.</span></span></div><div class="mv" style="color:var(--g900)">${comp}%</div><div class="ms">Resources successfully tagged</div></div></div>`;
-h+=`<div class="card" style="padding:24px;overflow:hidden"><div><div class="tabs-row"><div class="tabs"><div class="tab ${S._tab==='all'?'active':''}" onclick="S._tab='all';renderList()">All<span class="tab-ct">(${S.tags.length})</span></div><div class="tab ${S._tab==='active'?'active':''}" onclick="S._tab='active';renderList()">Active<span class="tab-ct">(${actCount})</span></div><div class="tab ${S._tab==='inactive'?'active':''}" onclick="S._tab='inactive';renderList()">Inactive<span class="tab-ct">(${dftCount})</span></div></div><div class="ts"><span class="material-symbols-outlined">search</span><input type="text" placeholder="Search LumiTags..." oninput="filterTbl(this.value)"></div><!-- Batch Create Rules - hidden for Phase 1, uncomment to enable: <button class="btn btn-o" onclick="go('batch')"><span class="material-symbols-outlined">dynamic_feed</span>Batch Create Rules</button> -->${S.tags.length>=500?`<span data-tip="You've reached the 500 LumiTag limit. Remove existing tags to create new ones." style="display:inline-flex"><button class="btn btn-p" disabled style="opacity:.5;cursor:not-allowed;pointer-events:none"><span class="material-symbols-outlined">add</span>Create LumiTag</button></span>`:`<button class="btn btn-p" onclick="go('create')"><span class="material-symbols-outlined">add</span>Create LumiTag</button>`}</div></div>`;
+h+=`<div class="card" style="padding:24px;overflow:hidden"><div><div class="tabs-row"><div class="tabs"><div class="tab ${S._tab==='all'?'active':''}" onclick="S._tab='all';renderList()">All Tags<span class="tab-ct">(${S.tags.length})</span></div><div class="tab ${S._tab==='active'?'active':''}" onclick="S._tab='active';renderList()">Active<span class="tab-ct">(${actCount})</span></div><div class="tab ${S._tab==='inactive'?'active':''}" onclick="S._tab='inactive';renderList()">Inactive<span class="tab-ct">(${dftCount})</span></div></div><div class="ts"><span class="material-symbols-outlined">search</span><input type="text" placeholder="Search LumiTag" oninput="filterTbl(this.value)"></div><!-- Batch Create Rules - hidden for Phase 1, uncomment to enable: <button class="btn btn-o" onclick="go('batch')"><span class="material-symbols-outlined">dynamic_feed</span>Batch Create Rules</button> -->${S.tags.length>=500?`<span data-tip="You've reached the 500 LumiTag limit. Remove existing tags to create new ones." style="display:inline-flex"><button class="btn btn-p" disabled style="opacity:.5;cursor:not-allowed;pointer-events:none"><span class="material-symbols-outlined">add</span>Create LumiTag</button></span>`:`<button class="btn btn-p" onclick="go('create')"><span class="material-symbols-outlined">add</span>Create LumiTag</button>`}</div></div>`;
 let filtered=S._tab==='all'?[...S.tags]:S.tags.filter(t=>t.status===S._tab);
 if(S._sort==='coverage'){filtered.sort((a,b)=>{const ca=aRes(a)/a.totalRes,cb=aRes(b)/b.totalRes;return S._sortDir==='asc'?ca-cb:cb-ca})}
 else if(S._sort==='modified'){filtered.sort((a,b)=>S._sortDir==='asc'?a.modified.localeCompare(b.modified):b.modified.localeCompare(a.modified))}
 else if(S._sort==='name'){filtered.sort((a,b)=>S._sortDir==='asc'?a.name.localeCompare(b.name):b.name.localeCompare(a.name))}
 function sortIcon(col){const isActive=S._sort===col;const arrow=isActive?(S._sortDir==='asc'?'arrow_upward':'arrow_downward'):'arrow_upward';const color=isActive?'var(--pri)':'var(--g300)';return ` <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;color:${color};font-variation-settings:'FILL' 0,'wght' 600,'GRAD' 0,'opsz' 20">${arrow}</span>`}
 const thS='cursor:pointer;user-select:none';
-if(S.tags.length===0){h+=`<div style="padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px"><span class="material-symbols-outlined" style="font-size:56px;color:var(--pri-lt30);font-variation-settings:'FILL' 1,'wght' 300,'GRAD' 0,'opsz' 48">sell</span><div style="font-size:16px;font-weight:700;color:var(--g900)">Get Started with LumiTag</div><div style="font-size:14px;color:var(--g500);max-width:480px;line-height:1.6"><a href="#" onclick="go('create');return false" style="color:var(--pri);font-weight:500">Create your first LumiTag</a> to start allocating cloud costs by team, project, or cost center.</div></div></div>`;}else{h+=`<div class="tbl-scroll"><table id="tbl"><thead><tr><th style="width:28%;${thS}" onclick="toggleSort('name')">LumiTag${sortIcon('name')}</th><th style="width:16%;${thS}" onclick="toggleSort('coverage')">Coverage <span class="info-tip" onclick="event.stopPropagation()"><span class="material-symbols-outlined">info</span><span class="tip-box">The percentage of total cloud cost covered by this LumiTag. A tag with 100% coverage means all resources have been assigned a value under this tag key.</span></span>${sortIcon('coverage')}</th><th style="width:10%">Status</th><th style="width:14%">Last Editor</th><th style="width:14%;${thS}" onclick="toggleSort('modified')">Last Modified${sortIcon('modified')}</th><th style="width:8%">Actions</th></tr></thead><tbody>`;filtered.forEach(t=>{const ar=aRes(t);const cp=pct(ar,t.totalRes);const cc=covC(parseFloat(cp));const isDft=t.status==='inactive';h+=`<tr class="${isDft?'dft ':''} row-click" data-n="${t.name.toLowerCase()}" onclick="if(!event.target.closest('.ab'))go('edit','${t.id}')"><td><div class="tkn">${t.name}</div><div class="tkv">${t.values.length} values${t.preset?' · FinOps Recommended':''}</div></td><td><div class="cb"><div class="ct"><div class="cf${cc}" style="width:${cp}%"></div></div><span class="cp">${cp}%</span></div></td><td><span class="badge ${isDft?'b-ina':'b-act'}"><span class="bd"></span>${isDft?'Inactive':'Active'}</span></td><td style="font-size:13px;color:var(--g600)">${t.editor}</td><td style="font-size:13px;color:var(--g500)">${fmtDate(t.modified)}</td><td><button class="ab dng" onclick="event.stopPropagation();delTag('${t.id}')"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></td></tr>`});h+='</tbody></table></div></div>';}el.innerHTML=h}
+if(S.tags.length===0){h+=`<div style="padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px"><span class="material-symbols-outlined" style="font-size:56px;color:var(--pri-lt30);font-variation-settings:'FILL' 1,'wght' 300,'GRAD' 0,'opsz' 48">sell</span><div style="font-size:16px;font-weight:700;color:var(--g900)">Get Started with LumiTag</div><div style="font-size:14px;color:var(--g500);max-width:480px;line-height:1.6"><a href="#" onclick="go('create');return false" style="color:var(--pri);font-weight:500">Create your first LumiTag</a> to start allocating cloud costs by team, project, or cost center.</div></div></div>`;}else{h+=`<div class="tbl-scroll"><table id="tbl"><thead><tr><th style="width:28%;${thS}" onclick="toggleSort('name')">LumiTag${sortIcon('name')}</th><th style="width:16%;${thS}" onclick="toggleSort('coverage')">Coverage <span class="info-tip" onclick="event.stopPropagation()"><span class="material-symbols-outlined">info</span><span class="tip-box">The percentage of total cloud cost covered by this LumiTag. A tag with 100% coverage means all resources have been assigned a value under this tag key.</span></span>${sortIcon('coverage')}</th><th style="width:10%">Status</th><th style="width:14%">Last Editor</th><th style="width:14%;${thS}" onclick="toggleSort('modified')">Last Modified${sortIcon('modified')}</th><th style="width:8%">Action</th></tr></thead><tbody>`;filtered.forEach(t=>{const ar=aRes(t);const cp=pct(ar,t.totalRes);const cc=covC(parseFloat(cp));const isDft=t.status==='inactive';h+=`<tr class="${isDft?'dft ':''} row-click" data-n="${t.name.toLowerCase()}" onclick="if(!event.target.closest('.ab'))go('edit','${t.id}')"><td><div class="tkn">${t.name}${v9ListIcon(t)}</div><div class="tkv">${v9ValueCount(t)} values${t.preset?' · FinOps Recommended':''}</div></td><td><div class="cb"><div class="ct"><div class="cf${cc}" style="width:${cp}%"></div></div><span class="cp">${cp}%</span></div></td><td><span class="badge ${isDft?'b-ina':'b-act'}"><span class="bd"></span>${isDft?'Inactive':'Active'}</span></td><td style="font-size:13px;color:var(--g600)">${t.editor}</td><td style="font-size:13px;color:var(--g500)">${fmtDate(t.modified)}</td><td><button class="ab dng" onclick="event.stopPropagation();delTag('${t.id}')"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></td></tr>`});h+='</tbody></table></div></div>';}el.innerHTML=h}
 function filterTbl(q){q=q.toLowerCase();document.querySelectorAll('#tbl tbody tr').forEach(r=>{r.style.display=r.dataset.n&&r.dataset.n.includes(q)?'':'none'})}
 function toggleSort(col){if(S._sort===col){if(S._sortDir==='asc')S._sortDir='desc';else{S._sort='none';S._sortDir='asc'}}else{S._sort=col;S._sortDir=col==='coverage'?'asc':'desc'}renderList()}
 function pickCurrency(c){S._currency=c;renderList();}
@@ -1106,7 +1233,7 @@ el.innerHTML=`<div class="pg-hdr"><a class="back-btn" href="#" onclick="showLeav
 <div class="fh" id="cr-hint" style="margin-top:6px">Use lowercase letters, numbers, and hyphens. e.g., cost-center. Tag key name cannot be changed once applied.</div>
 </div>
 <div class="card" style="margin-bottom:24px">
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:16px;font-weight:700;color:var(--g900)">Tag Values</span><button id="cr-add-val-btn" class="btn btn-p" onclick="tryAddVC('cr-vals')"><span class="material-symbols-outlined">add</span>Add Value</button></div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:16px;font-weight:700;color:var(--g900)">Tag Values</span><button id="cr-add-val-btn" class="btn btn-p" onclick="v9OpenAddMenu(this,'cr-vals')"><span class="material-symbols-outlined">add</span>Add<span class="material-symbols-outlined" style="font-size:18px;margin-left:2px">expand_more</span></button></div>
 <div id="cr-vals"></div>
 <div class="vals-empty-box" id="cr-vals-empty"><div class="vals-empty-title">No Value Added</div><div class="vals-empty-sub">Add value and condition to define the tag scope.</div></div>
 <div class="vals-err" id="cr-vals-err"><span class="material-symbols-outlined">error</span>Please add at least one tag value before previewing.</div>
@@ -1135,14 +1262,14 @@ ${noticeBanner}<div class="card" style="margin-bottom:16px">
 ${nameInput}
 </div>
 <div class="card" style="margin-bottom:24px">
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:16px;font-weight:700;color:var(--g900)">Tag Values</span><button id="ed-add-val-btn" class="btn btn-p" onclick="tryAddVC('ed-vals')"><span class="material-symbols-outlined">add</span>Add Value</button></div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:16px;font-weight:700;color:var(--g900)">Tag Values</span><button id="ed-add-val-btn" class="btn btn-p" onclick="v9OpenAddMenu(this,'ed-vals')"><span class="material-symbols-outlined">add</span>Add<span class="material-symbols-outlined" style="font-size:18px;margin-left:2px">expand_more</span></button></div>
 <div id="ed-vals"></div>
 <div class="vals-empty-box" id="ed-vals-empty" style="display:none"><div class="vals-empty-title">No Value Added</div><div class="vals-empty-sub">Add value and condition to define the tag scope.</div></div>
 <div class="vals-err" id="ed-vals-err"><span class="material-symbols-outlined">error</span>Please add at least one tag value before previewing.</div>
 <div class="tag-rules-info">A cost record matches this tag value when <strong>ANY</strong> data source block's conditions are met. Within each block, conditions are evaluated from left to right. Use <strong>AND</strong> to narrow results or <strong>OR</strong> to broaden them. Each block supports up to 20 conditions.<br>To ensure data integrity, values are applied by <strong>priority order</strong>. Each resource is mapped to a single value within this key's scope, with automatic deduplication across rules.<br>Note: Data will not be allocated to this tag value if no conditions are met.</div>
 </div>
 <div class="sbtm"><button class="btn btn-s" onclick="showLeaveConfirm('list')">Cancel</button><div class="ssp"></div><button class="btn btn-o" onclick="saveEdit('${t.id}',true)">Save as Inactive Tag</button><button class="btn btn-p" onclick="saveEdit('${t.id}',false)">Coverage Preview</button></div>`;
-t.values.forEach(v=>addVC('ed-vals',v.name,v.cspBlocks,v.res,v.cost));S._isDirty=false;el.oninput=()=>S._isDirty=true;el.onchange=()=>S._isDirty=true;}
+t.values.forEach(v=>v.type==='alloc'?addAC('ed-vals',v):addVC('ed-vals',v.name,v.cspBlocks,v.res,v.cost));v9Sched('ed-vals');S._isDirty=false;el.oninput=()=>S._isDirty=true;el.onchange=()=>S._isDirty=true;}
 
 function renderCPV(t){const ar=aRes(t);const ac=aCost(t);const ur=t.totalRes-ar;const uc=t.totalCost-ac;const ap=pct(ac,t.totalCost);const up=pct(uc,t.totalCost);
 let bar='';let leg='';t.values.forEach((v,i)=>{const p=pct(v.cost,t.totalCost);if(parseFloat(p)>0)bar+=`<div class="cpv-seg" style="width:${p}%;background:${COLORS[i%8]}">${parseFloat(p)>5?p+'%':''}</div>`;leg+=`<div class="cpv-li"><div class="cpv-dot" style="background:${COLORS[i%8]}"></div>${v.name} ${pct(v.cost,t.totalCost)}%</div>`});
@@ -1184,7 +1311,7 @@ function addVC(cid,vname,cspBlocks,mres,mcost,insertAfterEl){
 const ctn=document.getElementById(cid);const emptyEl=document.getElementById(cid+'-empty');if(emptyEl)emptyEl.style.display='none';
 const num=ctn.querySelectorAll('.vc').length+1;const d=document.createElement('div');d.className='vc';d.draggable=true;
 d.setAttribute('data-orig-res',mres!==undefined?mres:'');d.setAttribute('data-orig-cost',mcost!==undefined?mcost:'');
-d.innerHTML=`<div class="vh"><button class="vc-collapse" onclick="tglVC(this)" data-tip="Collapse this Value Rule"><span class="material-symbols-outlined">expand_less</span></button><span class="dh material-symbols-outlined" data-tip="Drag to reorder priority when conditions conflict">drag_indicator</span><span class="pn">${num}</span><input type="text" placeholder="Value Name (e.g., Production)" value="${vname||''}" maxlength="256" class="vni" oninput="simMatch(this);updVniLimit(this)"><button class="vc-copy" onclick="copyVC(this)" data-tip="Duplicate this Value&apos;s Conditions"><span class="material-symbols-outlined" style="font-size:16px">content_copy</span></button><span class="material-symbols-outlined rv" data-tip="Remove this Value" onclick="S._isDirty=true;this.closest('.vc').remove();renum('${cid}');updCPV('${cid}')">close</span></div><div class="csp-blocks-area"></div><div class="add-csp-wrap"><button class="add-csp-btn" onclick="showCspPicker(this)"><span class="material-symbols-outlined">add</span>Add Data Source</button><div class="csp-picker"></div></div>`;
+d.innerHTML=`<div class="vh"><button class="vc-collapse" onclick="tglVC(this)" data-tip="Collapse this Value Rule"><span class="material-symbols-outlined">expand_less</span></button><span class="dh material-symbols-outlined" data-tip="Drag to reorder priority when conditions conflict">drag_indicator</span><span class="pn">${num}</span><input type="text" placeholder="Please enter Value Name" value="${vname||''}" maxlength="256" class="vni" oninput="simMatch(this);updVniLimit(this)"><button class="vc-copy" onclick="copyVC(this)" data-tip="Duplicate this Value&apos;s Conditions"><span class="material-symbols-outlined" style="font-size:16px">content_copy</span></button><span class="material-symbols-outlined rv" data-tip="Remove this Value" onclick="S._isDirty=true;this.closest('.vc').remove();renum('${cid}');updCPV('${cid}')">close</span></div><div class="csp-blocks-area"></div><div class="add-csp-wrap"><button class="add-csp-btn" onclick="showCspPicker(this)"><span class="material-symbols-outlined">add</span>Add Data Source</button><div class="csp-picker"></div></div>`;
 if(insertAfterEl&&insertAfterEl.parentNode===ctn){ctn.insertBefore(d,insertAfterEl.nextSibling);}else{ctn.appendChild(d);}
 const blocksArea=d.querySelector('.csp-blocks-area');
 const blocks=cspBlocks&&cspBlocks.length>0?cspBlocks:[{csp:'GCP',conds:[]}];
@@ -1208,6 +1335,8 @@ area.appendChild(block);
 const ca=block.querySelector('.ca');
 if(conds&&conds.length>0)conds.forEach((c,i)=>addCR(ca,c.f,c.o,c.v,i>0?(c.c||'AND'):'',c.k||''));
 const ab=document.createElement('button');ab.className='bac';ab.style.marginLeft='4px';ab.innerHTML='<span class="material-symbols-outlined">add</span>Add Condition';ab.onclick=function(){S._isDirty=true;addCR(ca,'','','','')};ca.appendChild(ab);
+/* v9：Figma #03-1「預設給予一條 Rule 並呈現預設選項」。v8 新卡沒有預設條件列，這裡補上（空白 block 才補） */
+if(!conds||!conds.length)addCR(ca,csp==='GCP'?'billing_account_id':'','','','');
 }
 
 function showCspSwitch(btn){
@@ -1381,7 +1510,7 @@ if(newMode==='multi'&&!hasMsWrap){
   if(inp){inp.value='';inp.placeholder=op==='matches'?getMatchesPlaceholder():(isTag?'tag value, e.g. production':getFieldPlaceholder(f));updMatchesHint(inp);}
 }}
 function updVniLimit(inp){if(inp.value.length>=256){inp.style.borderColor='var(--err)';inp.setAttribute('data-tip','Value name cannot exceed 256 characters.');}else{inp.style.borderColor='';inp.removeAttribute('data-tip');}}
-function updMatchesHint(inp){const row=inp.closest('.cr');const op=row?.querySelector('.op-sel-vis')?.value;const hint=row?.querySelector('.matches-hint');if(!hint)return;if(inp.value.length>=512){hint.textContent='Condition value cannot exceed 512 characters.';hint.style.color='var(--err)';hint.style.display='';return;}if(op!=='matches'){hint.style.display='none';return}const val=inp.value.trim();if(!val){hint.style.display='none';return}try{new RegExp(val);hint.style.display='none'}catch(e){hint.textContent='Invalid regex: '+(e.message.split(':').pop()?.trim()||e.message);hint.style.color='';hint.style.display=''}}
+function updMatchesHint(inp){const row=inp.closest('.cr');const op=row?.querySelector('.op-sel-vis:not(.tag-key-sel)')?.value;const hint=row?.querySelector('.matches-hint');if(!hint)return;if(inp.value.length>=512){hint.textContent='Condition value cannot exceed 512 characters.';hint.style.color='var(--err)';hint.style.display='';return;}if(op!=='matches'){hint.style.display='none';return}const val=inp.value.trim();if(!val){hint.style.display='none';return}try{new RegExp(val);hint.style.display='none'}catch(e){hint.textContent='Invalid regex: '+(e.message.split(':').pop()?.trim()||e.message);hint.style.color='';hint.style.display=''}}
 function updMsField(fieldSel){
 const row=fieldSel.closest('.cr');const f=fieldSel.value;
 const csp=row.closest('.csp-block')?.dataset.csp||'GCP';
@@ -1412,7 +1541,7 @@ function updValInput(opSel){/* kept for compatibility */}
 function updTagKeyState(sel){
 const row=sel.closest('.cr');const key=sel.value;
 const f=row.querySelector('.field-sel')?.value;
-const op=row.querySelector('.op-sel-vis')?.value;
+const op=row.querySelector('.op-sel-vis:not(.tag-key-sel)')?.value;
 const mode=getInputMode(f,op);
 if(mode==='multi'){
   // 重載 multi-select 選項
@@ -1438,7 +1567,7 @@ const cspBlocks=[];
 card.querySelectorAll('.csp-block').forEach(block=>{
 const csp=block.dataset.csp||'GCP';const conds=[];
 block.querySelectorAll('.cr').forEach(row=>{
-const fSel=row.querySelector('.field-sel');const opSel=row.querySelector('.op-sel-vis');const cs=row.querySelector('.csel');const txtInput=row.querySelector('.val-txt');
+const fSel=row.querySelector('.field-sel');const opSel=row.querySelector('.op-sel-vis:not(.tag-key-sel)');const cs=row.querySelector('.csel');const txtInput=row.querySelector('.val-txt');
 const checked=Array.from(row.querySelectorAll('.ms-chk:checked')).map(c=>c.value);
 const v=txtInput?txtInput.value.trim():checked.join(',');
 const fVal=fSel?.value||defaultField(csp);const k=row.querySelector('.tag-key-sel')?.value||'';
@@ -1483,13 +1612,14 @@ else cpvEl.innerHTML=`${title}<div class="cpv-bar">${bar}</div><div class="cpv-l
 function collectVals(cid){
 const vals=[];
 document.getElementById(cid).querySelectorAll('.vc').forEach(card=>{
+if(card.classList.contains('ac')){vals.push(v9CollectAC(card));return;}
 const name=card.querySelector('.vni')?.value.trim()||'';
 const cspBlocks=[];
 card.querySelectorAll('.csp-block').forEach(block=>{
 const csp=block.dataset.csp||'GCP';
 const conds=[];
 block.querySelectorAll('.cr').forEach(row=>{
-const fSel=row.querySelector('.field-sel');const opSel=row.querySelector('.op-sel-vis');const cs=row.querySelector('.csel');const txtInput=row.querySelector('.val-txt');
+const fSel=row.querySelector('.field-sel');const opSel=row.querySelector('.op-sel-vis:not(.tag-key-sel)');const cs=row.querySelector('.csel');const txtInput=row.querySelector('.val-txt');
 const checked=Array.from(row.querySelectorAll('.ms-chk:checked')).map(c=>c.value).filter(Boolean);
 const v=txtInput?txtInput.value.trim():checked.join(',');
 const f=fSel?.value||defaultField(csp);const k=row.querySelector('.tag-key-sel')?.value||'';
@@ -1515,7 +1645,7 @@ const inp=document.getElementById('cr-name');
 validateName(inp,'cr');
 if(!inp.value.trim())showNameRequired(inp,'cr');
 if(!inp.value.trim()||inp.classList.contains('err'))return;
-const vals=collectVals('cr-vals');
+if(!v9ValidateAC('cr-vals'))return;const vals=collectVals('cr-vals');
 const valsErrEl=document.getElementById('cr-vals-err');
 const emptyBox=document.getElementById('cr-vals-empty');
 if(!asDraft&&vals.length===0){
@@ -1526,6 +1656,7 @@ if(!asDraft&&vals.length===0){
 if(valsErrEl)valsErrEl.classList.remove('show');
 if(emptyBox)emptyBox.classList.remove('err-border');
 const nt={id:gid(),name:inp.value.trim(),preset:false,status:'inactive',editor:'Kabin Yang',modified:new Date().toISOString().slice(0,10),totalRes:831,totalCost:222050,values:vals};
+if(vals.some(v=>v.type==='alloc'))nt.rows=DEMO_ROWS;
 S._tmp=nt;S._isNew=true;
 if(asDraft){S.tags.push({...nt});S._tmp=null;S._isNew=false;go('list');toast('Tag saved as inactive successfully.')}
 else go('preview',nt.id)}
@@ -1534,7 +1665,7 @@ function saveEdit(id,asDraft){
 const t=S.tags.find(x=>x.id===id);if(!t)return;
 const inp=document.getElementById('ed-name');
 if(!inp.disabled){validateName(inp,'ed',id);if(!inp.value.trim())showNameRequired(inp,'ed');if(!inp.value.trim()||inp.classList.contains('err'))return;}
-const vals=collectVals('ed-vals');
+if(!v9ValidateAC('ed-vals'))return;const vals=collectVals('ed-vals');
 const valsErrEl=document.getElementById('ed-vals-err');
 const emptyBox=document.getElementById('ed-vals-empty');
 if(!asDraft&&vals.length===0){
@@ -1546,6 +1677,7 @@ if(valsErrEl)valsErrEl.classList.remove('show');
 if(emptyBox)emptyBox.classList.remove('err-border');
 const name=inp.value.trim()||t.name;
 S._tmp={...t,name,status:'inactive',editor:'Kabin Yang',modified:new Date().toISOString().slice(0,10),values:vals};S._isNew=false;
+if(vals.some(v=>v.type==='alloc')&&!S._tmp.rows)S._tmp.rows=DEMO_ROWS;
 if(asDraft)showSaveDraftModal(id,t.wasActive||t.status==='active')
 else go('preview',id)}
 
@@ -1553,6 +1685,7 @@ else go('preview',id)}
 function renderPreview(id){
 const t=S._tmp||S.tags.find(x=>x.id===id);if(!t){go('list');return}
 const el=document.getElementById('v-preview');
+if(!S._previewLoading&&v9UsesEngine(t)){v9RenderPreview(t,el);return;}
 
 // === SKELETON STATE ===
 if(S._previewLoading){
@@ -2013,6 +2146,765 @@ window.LUMITURE_ACTIVE='lumitag';
 })();
 </script>
 
+<script>
+/* ============================================================
+ * LumiTag v9 — Allocation card（PRD 2026-09-24 Phase 1：Variable Proportional ＋ Spend）
+ * ------------------------------------------------------------
+ * 範圍：Create/Edit 的 allocation card、Preview 的直接／分攤拆分、List 的隱藏標示、Apply 確認。
+ * 來源：Notion「Advanced LumiTag Product Spec」（2026-09-24）＋ Specs RD doc § Update 2026-09-29。
+ *
+ * ⚠ ASSUMPTION：設計端先照假設做、尚未有人拍板的地方，用 `grep -n "ASSUMPTION"` 一次列出。
+ * ⏸ PARKED：已經設計好、PM 尚未安排開發的東西，用 `grep -n "PARKED"` 一次列出。
+ *    畫面上一律用 v9ParkedBadge() 標示，Demo FAB 可以整批隱藏（看「上線版會長怎樣」）。
+ *
+ * 計算只對「有 rows 的 tag」（cost-owner 示範帳單、或新建且含 allocation card 的 tag）做真的；
+ * 其他 v8 的 tag 維持原本的假數字，不受影響。
+ * ============================================================ */
+
+/* ---------- 示範帳單：跟提問清單裡講過的例子同一份（×1000） ---------- */
+const V9_ROW=(o)=>Object.assign({csp:'GCP',billing_account_id:'012345-6789AB-CDEF01',location_region:'asia-east1'},o);
+const DEMO_ROWS=[
+  V9_ROW({id:'r1',project_id:'prd-platform-gke',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'gke-shared-pool-node-a',labels:{'goog-k8s-cluster-name':'shared-gke','k8s-namespace':'backend'},cost:30000}),
+  V9_ROW({id:'r2',project_id:'prd-platform-gke',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'gke-shared-pool-node-b',labels:{'goog-k8s-cluster-name':'shared-gke','k8s-namespace':'frontend'},cost:10000}),
+  V9_ROW({id:'r3',project_id:'prd-platform-gke',service_description:'GKE',sku_description:'Zonal Kubernetes Clusters',resource_name:'shared-gke',labels:{'goog-k8s-cluster-name':'shared-gke'},cost:10000}),
+  V9_ROW({id:'r4',project_id:'prd-platform-gke',service_description:'Compute Engine',sku_description:'Balanced PD Capacity',resource_name:'pvc-shared-disk-01',labels:{'goog-k8s-cluster-name':'shared-gke'},cost:10000}),
+  V9_ROW({id:'r5',project_id:'prd-platform-gke',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'gke-shared-pool-node-a',labels:{'goog-k8s-cluster-name':'shared-gke','k8s-namespace':'kube:unallocated'},cost:35000}),
+  V9_ROW({id:'r6',project_id:'prd-platform-gke',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'gke-shared-pool-node-b',labels:{'goog-k8s-cluster-name':'shared-gke','k8s-namespace':'kube:system-overhead'},cost:5000}),
+  V9_ROW({id:'r7',project_id:'prd-backend-001',service_description:'Cloud SQL',sku_description:'Cloud SQL for PostgreSQL: vCPU',resource_name:'cloud-sql-prod',labels:{team:'backend'},cost:20000})
+];
+/* 沒開 GKE cost allocation 的同一個 cluster：①②⑤⑥ 合成一列、沒有 namespace（RD doc 決定 12） */
+const DEMO_ROWS_NO_NS=[
+  V9_ROW({id:'n1',project_id:'prd-platform-gke',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'gke-shared-pool',labels:{'goog-k8s-cluster-name':'shared-gke'},cost:80000}),
+  DEMO_ROWS[2],DEMO_ROWS[3],DEMO_ROWS[6]
+];
+
+S._deptModel=true;   // ⚠ ASSUMPTION（Q-A）：RD 決定 3 的部門模型；PRD 寫 value card 表單不變，待 PM 對齊
+S._showParked=true;
+S._layout='zones';   // 2026-09-30 Kabin 偏好分兩區 → 預設 A′；'mixed'＝A 同一個清單（現行 PRD，移到 Demo FAB「已不採用」分組當對照）
+
+/* Kubernetes 正規化維度（PRD 條件欄位清單「Kubernetes 正規化維度」）⚠ ASSUMPTION（Q-G）
+ * 開：GCP 條件的第一個下拉多一組 Kubernetes（Cluster／Namespace／Workload），Label Key 清單藏起重複的三個原生 label
+ *     （已經選了的照常顯示）；node pool 與 k8s-label/* 沒有對應欄位，留在 Label Key。
+ * 關：PRD 現行的原生 label 寫法（The Value of Label Key k8s-namespace equals …），Demo FAB「設定」可切回對照。
+ * 只在 GCP 出現（PRD：僅在該 CSP 有資料時出現；RD doc 決定 12：Phase 1 K8s 維度只有 GCP）。 */
+/* 2026-10-01 Kabin 選 A：做法 A＝跟 Label 一樣兩段式（[Kubernetes ▾] [Namespace ▾]），不用新元件；
+ * 分組下拉（optgroup）是設計系統沒有的樣式，移到 Demo FAB「已不採用」當對照 */
+S._k8sMode='twostep'; // 'twostep'（預設）｜'grouped'（已不採用）｜'native'（PRD 現行寫法）
+S._k8sNorm=true;
+const V9_K8S_MAP={k8s_cluster:'goog-k8s-cluster-name',k8s_namespace:'k8s-namespace',k8s_workload:'k8s-workload-name'};
+const V9_K8S_DIM={Cluster:'goog-k8s-cluster-name',Namespace:'k8s-namespace',Workload:'k8s-workload-name'};
+FIELD_OPSET.k8s='tag';
+TAG_KEY_VALUES.k8s=['Cluster','Namespace','Workload'];
+TAG_VALUE_OPTS.Cluster=TAG_VALUE_OPTS['goog-k8s-cluster-name'];
+TAG_VALUE_OPTS.Namespace=TAG_VALUE_OPTS['k8s-namespace'];
+TAG_VALUE_OPTS.Workload=['api-server','web-frontend','etl-pipeline'];
+const V9_K8S_LABEL={k8s_cluster:'Cluster',k8s_namespace:'Namespace',k8s_workload:'Workload'};
+FIELD_OPERATORSETS.k8s=FIELD_OPERATORSETS.tag;
+Object.keys(V9_K8S_MAP).forEach(f=>FIELD_OPSET[f]='k8s');
+FIELD_VALUES.k8s_cluster=TAG_VALUE_OPTS['goog-k8s-cluster-name'];
+FIELD_VALUES.k8s_namespace=TAG_VALUE_OPTS['k8s-namespace'];
+FIELD_VALUES.k8s_workload=['api-server','web-frontend','etl-pipeline'];
+function v9K8sOpts(csp,sel){
+  if(!S._k8sNorm||csp!=='GCP')return '';
+  if(S._k8sMode==='twostep')return `<option value="k8s"${sel==='k8s'?' selected':''}>Kubernetes</option>`;
+  return `<optgroup label="Kubernetes">${Object.keys(V9_K8S_MAP).map(f=>`<option value="${f}"${f===sel?' selected':''}>${V9_K8S_LABEL[f]}</option>`).join('')}</optgroup>`;
+}
+function v9K8sConvConds(conds,mode){
+  if(mode===true)mode=S._k8sMode||'twostep';if(mode===false)mode='native';
+  const rev=Object.fromEntries(Object.entries(V9_K8S_MAP).map(([a,b])=>[b,a]));
+  const revDim=Object.fromEntries(Object.entries(V9_K8S_DIM).map(([a,b])=>[b,a]));
+  return (conds||[]).map(c=>{
+    let n=c;
+    if(V9_K8S_MAP[c.f])n=Object.assign({},c,{f:'labels',k:V9_K8S_MAP[c.f]});
+    else if(c.f==='k8s')n=Object.assign({},c,{f:'labels',k:V9_K8S_DIM[c.k]});
+    if(n.f!=='labels'||!revDim[n.k])return n;
+    if(mode==='grouped')return Object.assign({},n,{f:rev[n.k],k:''});
+    if(mode==='twostep')return Object.assign({},n,{f:'k8s',k:revDim[n.k]});
+    return n;
+  });
+}
+function v9K8sConvValues(values,mode){(values||[]).forEach(v=>(v.cspBlocks||[]).forEach(b=>{b.conds=v9K8sConvConds(b.conds,mode)}))}
+const V9_CARDS={
+  backend:{name:'Backend',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'k8s-namespace',o:'is',v:'backend',c:''},{f:'labels',k:'team',o:'is',v:'backend',c:'OR'}]}]},
+  frontend:{name:'Frontend',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'k8s-namespace',o:'is',v:'frontend',c:''}]}]},
+  infra:{name:'Infrastructure',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'k8s-namespace',o:'starts_with',v:'kube:',c:''}]}]},
+  dataPlatform:{name:'Data Platform',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'is',v:'prd-backend-001',c:''}]}]},
+  alloc:(recipients,cluster)=>({type:'alloc',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'goog-k8s-cluster-name',o:'is',v:cluster||'shared-gke',c:''}]}],recipients:recipients||['Backend','Frontend'],res:0,cost:0})
+};
+const v9Clone=o=>JSON.parse(JSON.stringify(o));
+function v9Tag(id,values,extra){
+  return Object.assign({id,name:'cost-owner',preset:false,status:'active',wasActive:true,editor:'Kabin Yang',modified:'2026-09-29',totalRes:10000,totalCost:120000,rows:DEMO_ROWS,
+    values:(()=>{const vs=values.map((v,i)=>Object.assign({id:'cv'+i,res:0,cost:0},v9Clone(v)));v9K8sConvValues(vs,S._k8sNorm?S._k8sMode:'native');return vs})()},extra||{});
+}
+const V9_DEFAULT_VALUES=[V9_CARDS.backend,V9_CARDS.frontend,V9_CARDS.alloc()];
+S.tags.unshift(v9Tag('co',V9_DEFAULT_VALUES));
+_ORIG_TAGS.unshift(v9Clone(S.tags[0]));
+/* 非 K8s 的共用費示範（2026-10-01）：Support Plan 與共用專案，沒有 cluster 名牌，比例跟整個 tag key 的直接成本比 */
+const DEMO_ROWS_SHARED=[
+  V9_ROW({id:'s1',project_id:'prd-backend-001',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'backend-api-vm',labels:{},cost:40000}),
+  V9_ROW({id:'s2',project_id:'prd-frontend-002',service_description:'Cloud Run',sku_description:'CPU Allocation Time',resource_name:'web-frontend',labels:{},cost:20000}),
+  V9_ROW({id:'s3',project_id:'prd-data-005',service_description:'BigQuery',sku_description:'Analysis',resource_name:'analytics-warehouse',labels:{},cost:20000}),
+  V9_ROW({id:'s4',project_id:'',service_description:'Support',sku_description:'Enhanced Support',resource_name:'',labels:{},cost:6000}),
+  V9_ROW({id:'s5',project_id:'prd-shared-services',service_description:'Cloud Logging',sku_description:'Log Storage',resource_name:'central-logging',labels:{},cost:8000}),
+  V9_ROW({id:'s6',project_id:'prd-shared-services',service_description:'VPC Network',sku_description:'Network Inter Zone Egress',resource_name:'shared-vpc',labels:{},cost:6000})
+];
+const V9_SHARED_CARDS=[
+  {name:'Backend',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'is',v:'prd-backend-001',c:''}]}]},
+  {name:'Frontend',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'is',v:'prd-frontend-002',c:''}]}]},
+  {name:'Data',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'is',v:'prd-data-005',c:''}]}]},
+  {type:'alloc',cspBlocks:[{csp:'GCP',conds:[{f:'service_description',o:'is',v:'Support',c:''}]}],recipients:['Backend','Frontend','Data'],res:0,cost:0},
+  {type:'alloc',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'is',v:'prd-shared-services',c:''}]}],recipients:['Backend','Frontend','Data'],res:0,cost:0}
+];
+S.tags.splice(1,0,v9Tag('os',V9_SHARED_CARDS,{name:'owner-team',rows:DEMO_ROWS_SHARED,totalCost:100000,modified:'2026-10-01'}));
+_ORIG_TAGS.splice(1,0,v9Clone(S.tags[1]));
+/* 完整範例做法 B（2026-10-01）：只用 value card，Cluster 剩下的錢整筆給 Infrastructure。排在 cost-owner（做法 A）後面方便對照 */
+V9_CARDS.infraCluster={name:'Infrastructure',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'goog-k8s-cluster-name',o:'is',v:'shared-gke',c:''}]}]};
+S.tags.splice(1,0,v9Tag('cd',[V9_CARDS.backend,V9_CARDS.frontend,V9_CARDS.infraCluster],{name:'cost-owner-direct',modified:'2026-10-01'}));
+_ORIG_TAGS.splice(1,0,v9Clone(S.tags[1]));
+/* 混用陷阱：Backend 只用 Project 抓，在共用 cluster 裡沒有直接成本 */
+V9_CARDS.backendByProject={name:'Backend',cspBlocks:[{csp:'GCP',conds:[{f:'project_id',o:'is',v:'prd-backend-001',c:''}]}]};
+/* 混用陷阱也放進清單（2026-10-01）：可以存，系統不擋，只在卡上與 Preview 提醒。Backend 只用 Project 抓，在 shared-gke 沒有直接成本 */
+{const t=v9Tag('cm',[V9_CARDS.backendByProject,V9_CARDS.frontend,V9_CARDS.alloc()],{name:'cost-owner-mixed',modified:'2026-10-01'});
+ const at=S.tags.findIndex(x=>x.id==='os');S.tags.splice(at+1,0,t);_ORIG_TAGS.splice(at+1,0,v9Clone(t));}
+/* H 的情境（2026-10-01）：沒有 allocation card，cluster 的空位、管理費、硬碟都留在 Untagged，Preview 的 Untagged 列下方出現空位說明 */
+{const t=v9Tag('ci',[V9_CARDS.backend,V9_CARDS.frontend],{name:'cost-owner-idle',modified:'2026-10-01'});
+ const at=S.tags.findIndex(x=>x.id==='cm');S.tags.splice(at+1,0,t);_ORIG_TAGS.splice(at+1,0,v9Clone(t));}
+
+/* ============================================================
+ * 計算引擎：照 PRD 計算規則 ＋ RD doc 決定 4
+ *   1. 每一列從最上面的卡往下比，第一張符合的卡拿走（不分卡型）
+ *   2. value card：整列給那個 value（direct）
+ *   3. allocation card：進 pool，照 Spend 分：
+ *      帶 cluster label 的列 → 只跟同一個 project + cluster 裡的 direct cost 比
+ *      其他列 → 跟整個 tag key 的 direct cost 比
+ *      比例算不出來（分母 0）→ 留在 Untagged
+ * ============================================================ */
+function v9Val(row,c){if(V9_K8S_MAP[c.f])return (row.labels||{})[V9_K8S_MAP[c.f]];if(c.f==='k8s')return (row.labels||{})[V9_K8S_DIM[c.k]];return getFieldOpset(c.f)==='tag'?(row.labels||{})[c.k]:row[c.f]}
+function v9EvalCond(row,c){
+  const raw=v9Val(row,c);const val=raw==null?'':String(raw);const has=raw!=null;
+  const list=String(c.v||'').split(',').map(x=>x.trim()).filter(Boolean);const one=list[0]||'';
+  switch(c.o){
+    case 'is':return has&&list.includes(val);
+    case 'is_not':return !list.includes(val);
+    case 'contains':return has&&!!one&&val.toLowerCase().includes(one.toLowerCase());
+    case 'not_contains':return !one||!val.toLowerCase().includes(one.toLowerCase());
+    case 'starts_with':return has&&!!one&&val.startsWith(one);
+    case 'ends_with':return has&&!!one&&val.endsWith(one);
+    case 'matches':try{return has&&!!one&&new RegExp(one).test(val)}catch(e){return false}
+  }
+  return false;
+}
+function v9EvalBlock(row,b){
+  if(b.csp!==row.csp)return false;
+  const conds=(b.conds||[]).filter(c=>c.f&&(c.v||'').length&&(getFieldOpset(c.f)!=='tag'||c.k));
+  if(!conds.length)return false;
+  let r=v9EvalCond(row,conds[0]);
+  for(let i=1;i<conds.length;i++){const e=v9EvalCond(row,conds[i]);r=conds[i].c==='OR'?(r||e):(r&&e)}
+  return r;
+}
+function v9EvalCard(row,card){return (card.cspBlocks||[]).some(b=>v9EvalBlock(row,b))}
+function v9Part(row){const cl=(row.labels||{})['goog-k8s-cluster-name'];return cl?`${row.project_id}|${cl}`:'*'}
+function v9PartLabel(p){return p==='*'?'across the tag key':`cluster ${p.split('|')[1]}`}
+
+function v9Compute(cards,rows){
+  const R={direct:{},alloc:{},untagged:0,untaggedRows:[],total:0,cards:[],resByValue:{},resDirect:{},order:[],multi:[]};
+  const directPart={};const pools=cards.map(()=>[]);
+  cards.forEach((c,i)=>R.cards[i]={type:c.type||'value',name:c.name,matched:0,matchedRes:new Set(),allocated:0,unallocated:0,noWeight:[],byRecip:{},stolenBelow:0,stolenBy:new Set(),takenAbove:0,takenBy:new Set(),noNsParts:new Set()});
+  const addRes=(name,row)=>{(R.resByValue[name]=R.resByValue[name]||new Set()).add(row.resource_name)};
+  const seen=n=>{if(n&&!R.order.includes(n))R.order.push(n)};
+  cards.forEach(c=>{if(c.type!=='alloc')seen(c.name)});
+  cards.forEach(c=>{if(c.type==='alloc')(c.recipients||[]).forEach(seen)});
+  rows.forEach(row=>{
+    R.total+=row.cost;
+    const hits=cards.map((c,i)=>v9EvalCard(row,c)?i:-1).filter(i=>i>=0);
+    const vHits=hits.filter(i=>cards[i].type!=='alloc'&&cards[i].name);
+    if(vHits.length>1)R.multi.push({row,hits:vHits});           // ⏸ PARKED：Rule Conflicts 只看 value card 之間的重疊
+    const i=hits[0];
+    // 資訊用：這張 allocation card 的條件有抓到、但被上面的卡先拿走
+    hits.slice(1).forEach(j=>{if(cards[j].type==='alloc'&&i!==undefined&&cards[i].type!=='alloc'){R.cards[j].takenAbove+=row.cost;R.cards[j].takenBy.add(cards[i].name||`Card #${i+1}`)}});
+    if(i===undefined){R.untagged+=row.cost;R.untaggedRows.push(row);return}
+    const c=cards[i];
+    if(c.type==='alloc'){
+      pools[i].push(row);R.cards[i].matched+=row.cost;R.cards[i].matchedRes.add(row.resource_name);
+      // 順序衝突：這一列也符合下面某張「在分攤名單裡」的 value card
+      hits.slice(1).forEach(j=>{const cj=cards[j];if(cj.type!=='alloc'&&(c.recipients||[]).includes(cj.name)){R.cards[i].stolenBelow+=row.cost;R.cards[i].stolenBy.add(cj.name)}});
+      return;
+    }
+    if(!c.name){R.untagged+=row.cost;R.untaggedRows.push(row);return}
+    R.direct[c.name]=(R.direct[c.name]||0)+row.cost;addRes(c.name,row);(R.resDirect[c.name]=R.resDirect[c.name]||new Set()).add(row.resource_name);
+    const p=v9Part(row);(directPart[p]=directPart[p]||{})[c.name]=((directPart[p]||{})[c.name]||0)+row.cost;
+  });
+  // 把 pool 依 Spend 分出去
+  cards.forEach((c,i)=>{
+    if(c.type!=='alloc')return;const info=R.cards[i];
+    const recips=[...new Set((c.recipients||[]).filter(Boolean))];const usedParts=new Set();
+    pools[i].forEach(row=>{
+      const p=v9Part(row);usedParts.add(p);
+      const base=p==='*'?R.direct:(directPart[p]||{});
+      const sum=recips.reduce((s,n)=>s+(base[n]||0),0);
+      if(p!=='*'&&!rows.some(r=>v9Part(r)===p&&(r.labels||{})['k8s-namespace']))info.noNsParts.add(p);
+      if(!sum){R.untagged+=row.cost;R.untaggedRows.push(row);info.unallocated+=row.cost;if(!info.noWeight.includes(p))info.noWeight.push(p);return}
+      recips.forEach(n=>{const amt=row.cost*(base[n]||0)/sum;if(!amt)return;R.alloc[n]=(R.alloc[n]||0)+amt;info.byRecip[n]=(info.byRecip[n]||0)+amt;info.allocated+=amt;addRes(n,row)});
+    });
+    // 權重依據：每個 value 在這些範圍裡的直接成本（每個範圍只算一次）
+    info.basis={};usedParts.forEach(p=>{const base=p==='*'?R.direct:(directPart[p]||{});recips.forEach(n=>info.basis[n]=(info.basis[n]||0)+(base[n]||0))});
+    info.basisWhere=usedParts.size===1?([...usedParts][0]==='*'?'across the tag key':`in ${[...usedParts][0].split('|')[1]}`):'where this shared cost sits';
+    info.reason=!info.matched?'no-match':!info.allocated?'no-weight':info.unallocated?'partial':'ok';
+  });
+  return R;
+}
+
+/* ---------- 讀 DOM 上的卡片（跟 collectVals 同一套欄位） ---------- */
+function v9ReadBlocks(card){
+  const out=[];
+  card.querySelectorAll('.csp-block').forEach(block=>{
+    const csp=block.dataset.csp||'GCP';const conds=[];
+    block.querySelectorAll('.cr').forEach(row=>{
+      const fSel=row.querySelector('.field-sel');const opSel=row.querySelector('.op-sel-vis:not(.tag-key-sel)');const cs=row.querySelector('.csel');const txt=row.querySelector('.val-txt');
+      const checked=Array.from(row.querySelectorAll('.ms-chk:checked')).map(c=>c.value).filter(Boolean);
+      const f=fSel?.value||defaultField(csp);
+      conds.push({f,k:row.querySelector('.tag-key-sel')?.value||'',o:opSel?.value||defOpForField(f),v:txt?txt.value.trim():checked.join(','),c:cs?.value||''});
+    });
+    if(conds.length)out.push({csp,conds});
+  });
+  return out;
+}
+function v9ReadRecipients(card){return Array.from(card.querySelectorAll('.ac-row')).map(r=>(r.querySelector('.ac-sel')?.value||r.querySelector('.ac-txt')?.value||'').trim()).filter(v=>v&&v!=='__new__')}
+function v9ReadCards(cid){
+  const ctn=document.getElementById(cid);if(!ctn)return[];
+  return Array.from(ctn.querySelectorAll(':scope > .vc')).map(card=>card.classList.contains('ac')
+    ?{type:'alloc',cspBlocks:v9ReadBlocks(card),recipients:v9ReadRecipients(card),el:card}
+    :{type:'value',name:card.querySelector('.vni')?.value.trim()||'',cspBlocks:v9ReadBlocks(card),el:card});
+}
+function v9CollectAC(card){return {id:gvid(),type:'alloc',name:'',cspBlocks:v9ReadBlocks(card),recipients:v9ReadRecipients(card),res:0,cost:0}}
+function v9RowsFor(cid){
+  if(cid==='ed-vals'){const t=S.tags.find(x=>x.id===S._curEdit);if(t&&t.rows)return t.rows}
+  return DEMO_ROWS;
+}
+function v9IsSampleData(cid){if(cid!=='ed-vals')return true;const t=S.tags.find(x=>x.id===S._curEdit);return !(t&&t.rows)}
+function v9ValueNames(cid,exceptCard){
+  const names=[];v9ReadCards(cid).forEach(c=>{if(c.type!=='alloc'&&c.name&&c.el!==exceptCard&&!names.includes(c.name))names.push(c.name)});
+  return names;
+}
+
+/* ---------- 格式 ---------- */
+const v9fmt=n=>n>=100000?fmtK(n):fmtCurr(Math.round(n*100)/100);
+const v9pct=(a,b)=>b>0?(a/b*100).toFixed(2)+'%':'—';
+function v9ParkedBadge(kind){
+  // ⏸ PARKED 標示：kind='parked' 已設計、PM 尚未安排開發；kind='proposal' UX 提案、尚未決定
+  const t=kind==='proposal'
+    ?['UX 提案','這是設計端的提案，PRD 沒有或列在「待考慮」，還沒決定要不要做。']
+    :['已設計・PM 尚未安排開發','這個設計已經完成，但 PM 還沒安排開發。先保留在 prototype，之後可以直接拿來用。'];
+  return `<span class="v9-parked-badge${kind==='proposal'?' is-proposal':''}" data-tip="${t[1]}"><span class="material-symbols-outlined">${kind==='proposal'?'lightbulb':'pause_circle'}</span>${t[0]}</span>`;
+}
+
+/* ============================================================
+ * +Add 選單（PRD：+Add 的卡型選項）
+ * ⚠ ASSUMPTION：兩個選項的說明文案是設計端暫擬
+ * ============================================================ */
+function v9OpenAddMenu(btn,cid){
+  document.querySelectorAll('.v9-add-menu').forEach(m=>m.remove());
+  const m=document.createElement('div');m.className='v9-add-menu';
+  m.innerHTML=`<button type="button" onclick="v9CloseAddMenu();tryAddVC('${cid}');v9Sched('${cid}')"><span class="material-symbols-outlined">sell</span><span><strong>Value card</strong><em>Assign matching cost to one value.</em></span></button>
+<button type="button" onclick="v9CloseAddMenu();v9TryAddAC('${cid}')"><span class="material-symbols-outlined">call_split</span><span><strong>Allocation card</strong><em>Split shared cost across values.</em></span></button>`;
+  document.body.appendChild(m);
+  const r=btn.getBoundingClientRect();m.style.top=(r.bottom+window.scrollY+4)+'px';m.style.left=(r.right+window.scrollX-m.offsetWidth)+'px';
+  setTimeout(()=>document.addEventListener('click',v9CloseAddMenu,{once:true}),0);
+}
+/* Add Value：從還沒加入的既有 value 挑；最下面「Create value card…」是 UX 提案（Kabin 2026-10-01）：
+ * 跳去新增一張 value card，名稱填好就自動加進這張 allocation card，並提供「Back to allocation card」 */
+function v9AcId(ac){if(!ac.dataset.acid)ac.dataset.acid='ac'+Math.random().toString(36).slice(2,8);return ac.dataset.acid}
+function v9OpenRecipMenu(btn,cid){
+  v9CloseAddMenu();
+  const ac=btn.closest('.ac');const acid=v9AcId(ac);const have=v9ReadRecipients(ac);
+  const avail=v9ValueNames(cid).filter(n=>!have.includes(n));
+  const esc=n=>n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  const m=document.createElement('div');m.className='v9-add-menu';
+  m.innerHTML=(avail.length?avail.map(n=>`<button type="button" onclick="v9CloseAddMenu();v9AddRecipRow(document.querySelector('[data-acid=${acid}]'),'${esc(n)}','${cid}');v9Sched('${cid}')"><span class="material-symbols-outlined">sell</span><span><strong>${n}</strong></span></button>`).join('')
+      :`<div class="v9-add-menu-empty">Every value with a value card is already in this list.</div>`)
+    +(S._showParked?`<button type="button" onclick="v9CloseAddMenu();v9CreateForAC('${acid}','${cid}')"><span class="material-symbols-outlined">add</span><span><strong>Create value card… ${v9ParkedBadge('proposal')}</strong><em>Set up the value first, then it joins this split.</em></span></button>`:'');
+  document.body.appendChild(m);
+  const r=btn.getBoundingClientRect();m.style.top=(r.bottom+window.scrollY+4)+'px';m.style.left=(r.left+window.scrollX)+'px';
+  setTimeout(()=>document.addEventListener('click',v9CloseAddMenu,{once:true}),0);
+}
+function v9AcNum(acid){const ac=document.querySelector(`[data-acid=${acid}]`);return ac?[...ac.parentNode.querySelectorAll('.vc')].indexOf(ac)+1:''}
+function v9CreateForAC(acid,cid){
+  tryAddVC(cid);
+  const ctn=document.getElementById(cid);const cards=[...ctn.querySelectorAll('.vc:not(.ac)')];const card=cards[cards.length-1];if(!card)return;
+  card.dataset.linkAc=acid;
+  const b=document.createElement('div');b.className='v9-link-banner';
+  b.innerHTML=`<span class="material-symbols-outlined">call_split</span><span class="v9-link-txt">Name this value to add it to allocation card #${v9AcNum(acid)}.</span><a href="#" onclick="event.preventDefault();v9BackToAC('${acid}')">Back to allocation card</a>`;
+  card.querySelector('.vh').after(b);
+  v9Sched(cid);
+  setTimeout(()=>{const t=card.querySelector('.v9-link-txt');if(t)t.textContent=`Name this value to add it to allocation card #${v9AcNum(acid)}.`;card.scrollIntoView({behavior:'smooth',block:'center'});card.classList.add('vc-new');setTimeout(()=>card.classList.remove('vc-new'),1400);card.querySelector('.vni')?.focus()},120);
+}
+function v9BackToAC(acid){
+  const ac=document.querySelector(`[data-acid=${acid}]`);if(!ac)return;
+  ac.scrollIntoView({behavior:'smooth',block:'center'});
+  const rows=[...ac.querySelectorAll('.ac-row')];const last=rows[rows.length-1];
+  if(last){last.classList.remove('is-new');void last.offsetWidth;last.classList.add('is-new')}
+}
+document.addEventListener('focusout',e=>{
+  const inp=e.target;if(!inp.classList||!inp.classList.contains('vni'))return;
+  const card=inp.closest('.vc');if(!card||!card.dataset.linkAc)return;
+  setTimeout(()=>{
+    const name=inp.value.trim();if(!name)return;
+    const acid=card.dataset.linkAc;const ac=document.querySelector(`[data-acid=${acid}]`);if(!ac)return;
+    const cid=ac.closest('[id]').id;
+    if(!v9ReadRecipients(ac).includes(name)){v9AddRecipRow(ac,name,cid);v9Sched(cid)}
+    const t=card.querySelector('.v9-link-txt');if(t)t.textContent=`${name} is added to allocation card #${v9AcNum(acid)}. Add conditions so it has direct cost to split by.`;
+  },60);
+});
+/* H 一鍵建立：回到 Edit，在 value 區最上面建一張 Namespace starts with kube: 的卡，名稱留空並 focus
+ * 系統不知道空位該給哪個團隊，所以名稱要使用者自己選（通常是基礎架構團隊）；確認後再跑一次 Coverage Preview */
+function v9KubeCreate(id){
+  go('edit',id);
+  setTimeout(()=>{
+    const cid='ed-vals';const ctn=document.getElementById(cid);if(!ctn)return;
+    const conds=v9K8sConvConds([{f:'labels',k:'k8s-namespace',o:'starts_with',v:'kube:',c:''}],S._k8sNorm?S._k8sMode:'native');
+    addVC(cid,'',[{csp:'GCP',conds}]);
+    const cards=[...ctn.querySelectorAll('.vc')];const card=cards[cards.length-1];
+    const first=ctn.querySelector('.vc');if(first&&first!==card)ctn.insertBefore(card,first);
+    renum(cid);S._isDirty=true;
+    const b=document.createElement('div');b.className='v9-link-banner';
+    b.innerHTML=`<span class="material-symbols-outlined">info</span><span>This card takes unused cluster capacity (<code>kube:*</code>). Choose the value that should own it, usually your infrastructure team, then run Coverage Preview again.</span>`;
+    card.querySelector('.vh').after(b);
+    v9Sched(cid);
+    toast('Card added. Choose a value for it, then preview again.');
+    setTimeout(()=>{card.scrollIntoView({behavior:'smooth',block:'center'});card.classList.add('vc-new');setTimeout(()=>card.classList.remove('vc-new'),1400);card.querySelector('.vni')?.focus()},150);
+  },150);
+}
+function v9CloseAddMenu(){document.querySelectorAll('.v9-add-menu').forEach(m=>m.remove())}
+
+/* ============================================================
+ * Allocation card
+ * ============================================================ */
+function v9TryAddAC(cid){
+  const count=document.getElementById(cid)?.querySelectorAll('.vc').length||0;if(count>=1000){toast('Maximum 1,000 values per tag reached',1);return}
+  S._isDirty=true;
+  const names=v9ValueNames(cid);
+  // 新卡一律加在最下面（Q-C 的 UX 建議：預設就放在不會吃掉 value card 的位置）
+  const card=addAC(cid,{cspBlocks:[{csp:'GCP',conds:[]}],recipients:names});
+  requestAnimationFrame(()=>{card.classList.add('vc-new');card.scrollIntoView({behavior:'smooth',block:'nearest'});setTimeout(()=>card.classList.remove('vc-new'),1400)});
+  v9Sched(cid);
+}
+/* 分攤依據相關的文案集中在這裡（Phase 1 只有 Spend）。
+ * Phase 2（Requests／Usage）、Phase 3（Even Split／Fixed Proportional）加新依據時，補一組同樣欄位就好，不用改卡片結構。 */
+const V9_BASIS_COPY={
+  spend:{
+    meta:'Split by Spend',
+    metaTip:"Shared cost is split by each value's spend. More ways to split are coming later.",
+    splitDesc:"Each value's share follows its direct cost from value cards.",
+    shareTip:"Shared cost is split day by day, using each day's spend. This share adds up the last 30 days, so it can differ from each value's spend ratio for the whole period.",
+    noShareHere:n=>`${n} has no direct cost in this cluster, so it receives nothing. Add a ${S._k8sNorm?'Namespace':'k8s-namespace'} condition to the ${n} value card if ${n} runs in this cluster.`,
+    noShareAny:n=>`${n} has no direct cost from value cards, so it receives nothing.`,
+    noWeight:(amt,where)=>`${amt} can't be split because none of these values has direct cost in ${where} this period. It stays Untagged.`,
+    previewSplit:(amt,who)=>`${amt} split across ${who} by spend.`,
+    basis:(amt,where)=>`Based on ${amt} direct cost ${where}.`,
+  }
+};
+const v9Basis=()=>V9_BASIS_COPY.spend;
+function addAC(cid,cfg){
+  const ctn=document.getElementById(cid);const emptyEl=document.getElementById(cid+'-empty');if(emptyEl)emptyEl.style.display='none';
+  const num=ctn.querySelectorAll('.vc').length+1;const d=document.createElement('div');d.className='vc ac';d.draggable=true;
+  d.innerHTML=`<div class="vh"><button class="vc-collapse" onclick="tglVC(this)" data-tip="Collapse this Value Rule"><span class="material-symbols-outlined">expand_less</span></button><span class="dh material-symbols-outlined" data-tip="Drag to reorder priority when conditions conflict">drag_indicator</span><span class="pn">${num}</span>
+<span class="ac-badge"><span class="material-symbols-outlined">call_split</span>Allocation card</span>
+<span class="ac-meta" data-tip="${v9Basis().metaTip}"><span class="ac-meta-item">Variable Proportional</span><span class="ac-meta-dot">·</span><span class="ac-meta-item">${v9Basis().meta}</span></span>
+<span style="flex:1"></span><span class="material-symbols-outlined rv" data-tip="Remove this Value" onclick="S._isDirty=true;this.closest('.vc').remove();renum('${cid}');updCPV('${cid}')">close</span></div>
+<div class="ac-body">
+<div class="ac-sec"><span class="ac-sec-t">Shared cost to split</span><span class="ac-sec-d">Cost that matches these conditions and hasn't been taken by a card above.</span></div>
+<div class="csp-blocks-area"></div><div class="add-csp-wrap"><button class="add-csp-btn" onclick="showCspPicker(this)"><span class="material-symbols-outlined">add</span>Add Data Source</button><div class="csp-picker"></div></div>
+<div class="ac-match" data-acmatch></div>
+<div class="ac-sec" style="margin-top:16px"><span class="ac-sec-t">Split across</span><span class="ac-sec-d">${v9Basis().splitDesc}</span></div>
+<div class="ac-rows-h"><span>Value</span><span>Share<span class="material-symbols-outlined" data-tip="${v9Basis().shareTip}">info</span></span><span>Last 30 days</span><span></span></div>
+<div class="ac-rows"></div>
+<button class="bac ac-addrow" type="button" onclick="v9OpenRecipMenu(this,'${cid}')"><span class="material-symbols-outlined">add</span>Add Value</button>
+<div class="ac-alerts"></div>
+</div>`;
+  ctn.appendChild(d);
+  (cfg.cspBlocks&&cfg.cspBlocks.length?cfg.cspBlocks:[{csp:'GCP',conds:[]}]).forEach(b=>addCspBlock(d,b.csp,b.conds));
+  updAddCspBtn(d);
+  (cfg.recipients&&cfg.recipients.length?cfg.recipients:['']).forEach(n=>v9AddRecipRow(d,n,cid));
+  d.addEventListener('dragstart',e=>{e.dataTransfer.setData('text','');d.style.opacity='.4';window._dc=d});
+  d.addEventListener('dragend',()=>{d.style.opacity='1';window._dc=null;ctn.querySelectorAll('.vc').forEach(c=>c.classList.remove('dov'))});
+  d.addEventListener('dragover',e=>{e.preventDefault();d.classList.add('dov')});
+  d.addEventListener('dragleave',()=>d.classList.remove('dov'));
+  d.addEventListener('drop',e=>{e.preventDefault();d.classList.remove('dov');if(window._dc&&window._dc!==d){ctn.insertBefore(window._dc,d);renum(cid)}});
+  return d;
+}
+/* 權重清單的一列
+ * 部門模型 ON（RD 決定 3）：下拉選既有 value，可新增 → ⚠ ASSUMPTION
+ * 部門模型 OFF（PRD 字面「同名即同一 value」）：自由輸入名稱 */
+function v9AddRecipRow(card,name,cidHint){
+  const cid=cidHint||card.closest('[id]')?.id;const wrap=card.querySelector('.ac-rows');
+  const r=document.createElement('div');r.className='ac-row';
+  r.innerHTML=`<div class="ac-row-main">${v9RecipInput(cid,name,card)}<span class="ac-w">—</span><span class="ac-amt"></span><button class="crm" type="button" data-tip="Remove this Value" onclick="S._isDirty=true;const c=this.closest('.ac');this.closest('.ac-row').remove();v9Sched('${cid}')">—</button></div><div class="ac-row-basis"></div><div class="ac-row-ext"></div><div class="ac-row-hint"></div>`;
+  wrap.appendChild(r);
+}
+function v9RecipInput(cid,name,card){
+  if(!S._deptModel)return `<input class="ac-txt" type="text" placeholder="Please enter Value Name" value="${name||''}">`;
+  // Phase 1 依 Spend 分：沒有 value card 的 value 永遠分到 0，所以這裡只列已經有 value card 的 value，不給新增。
+  // ⚠ 這個限制只在分攤依據是 Spend 時成立：Phase 2 每列有自己的認定條件、Phase 3 Even Split／Fixed Proportional 不看直接成本，都要開放新增
+  const names=v9ValueNames(cid);const orphan=name&&!names.includes(name);
+  if(!names.length&&!orphan)return `<select class="ac-sel" disabled><option>Add a value card first</option></select>`;
+  return `<select class="ac-sel" onchange="v9Sched(this.closest('[id]').id)"><option value="" ${!name?'selected':''} disabled>Select a value</option>${names.map(n=>`<option value="${n}"${n===name?' selected':''}>${n}</option>`).join('')}${orphan?`<option value="${name}" selected>${name} (no value card)</option>`:''}</select>`;
+}
+function v9RecipChange(sel){
+  if(sel.value!=='__new__'){v9Sched(sel.closest('[id]').id);return}
+  const inp=document.createElement('input');inp.className='ac-txt';inp.type='text';inp.placeholder='Please enter Value Name';
+  sel.replaceWith(inp);inp.focus();
+  inp.addEventListener('blur',()=>{const v=inp.value.trim();const cid=inp.closest('[id]')?.id;if(!v){inp.replaceWith(v9FromHtml(v9RecipInput(cid,'')));v9Sched(cid);return}
+    const s=v9FromHtml(v9RecipInput(cid,v));inp.replaceWith(s);v9Sched(cid)},{once:true});
+}
+function v9FromHtml(h){const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild}
+function v9MoveToBottom(btn){const card=btn.closest('.vc');const ctn=card.parentNode;ctn.appendChild(card);S._isDirty=true;renum(ctn.id);card.scrollIntoView({behavior:'smooth',block:'nearest'});card.classList.add('vc-new');setTimeout(()=>card.classList.remove('vc-new'),1400)}
+
+/* ============================================================
+ * 版面 A′：分兩區（UX 提案）
+ * value card 在上、allocation card 固定在下，中間一條分隔。allocation card 永遠只接到 value card 沒拿走的錢，
+ * 所以 PRD「不分卡型、依順序第一張符合」的順序陷阱在這個版面不會發生。
+ * 只有順序真的錯了才搬動 DOM，避免打字時把焦點弄掉。
+ * ============================================================ */
+function v9EnforceZones(cid){
+  const ctn=document.getElementById(cid);if(!ctn)return false;
+  let zone=ctn.querySelector(':scope > .v9-zone');
+  if(!v9ZonesOn()){if(zone)zone.remove();return false}  // 隱藏暫緩設計＝看上線版 → 回到 PRD 的混合清單
+  const kids=Array.from(ctn.querySelectorAll(':scope > .vc'));
+  if(!kids.length){if(zone)zone.remove();return false}
+  if(!zone){zone=document.createElement('div');zone.className='v9-zone';zone.innerHTML=`<div class="v9-zone-h"><span class="material-symbols-outlined">call_split</span><span class="v9-zone-t">Shared Cost Allocation</span>${v9ParkedBadge('proposal')}</div><div class="v9-zone-d">Allocation cards always run after value cards, so they only receive cost that no value card has taken. Drag to reorder within each section.</div><div class="v9-zone-empty">No allocation cards yet. Use <strong>Add → Allocation card</strong> to split shared cost.</div>`;ctn.appendChild(zone)}
+  const vals=kids.filter(c=>!c.classList.contains('ac'));const acs=kids.filter(c=>c.classList.contains('ac'));
+  const want=[...vals,zone,...acs];const cur=Array.from(ctn.querySelectorAll(':scope > .vc, :scope > .v9-zone'));
+  const moved=want.some((el,i)=>cur[i]!==el);
+  if(moved)want.forEach(el=>ctn.appendChild(el));
+  zone.querySelector('.v9-zone-empty').style.display=acs.length?'none':'';
+  return moved;
+}
+function v9ZonesOn(){return S._layout==='zones'&&S._showParked}
+/* 分兩區時，計算也要照「value card 在前、allocation card 在後」的順序（Preview、List 不經過 DOM） */
+function v9Ordered(values){return v9ZonesOn()?[...values.filter(v=>v.type!=='alloc'),...values.filter(v=>v.type==='alloc')]:values}
+function v9SetLayout(mode){
+  S._layout=mode;
+  const v=document.querySelector('.view.active')?.id;
+  if(v==='v-edit'&&S._curEdit){go('edit',S._curEdit)}
+  else if(v==='v-create'){v9EnforceZones('cr-vals');v9Sched('cr-vals')}
+  else if(v==='v-preview'){const t=S._tmp||S.tags.find(x=>x.id===S._curEdit);if(t)go('preview',t.id)}
+  else{
+    // 在 List 頁切換時看不出差別 → 開預設的 cost-owner 編輯頁
+    _demoClean();const t=v9Tag('__demo__',V9_DEFAULT_VALUES,{_demo:true});S.tags.push(t);_v9NoFabSwitch(()=>go('edit','__demo__'));
+  }
+  toast(mode==='zones'?'Layout A′: allocation cards in their own section (UX proposal).':'Layout A: one mixed list (current PRD).');
+}
+
+/* PRD：allocation card 缺來源條件或無任何 value 列 → 不可儲存（含 Save as Inactive）
+ * ⚠ ASSUMPTION：錯誤訊息文案 */
+function v9ValidateAC(cid){
+  let ok=true;
+  v9ReadCards(cid).filter(c=>c.type==='alloc').forEach(c=>{
+    const hasCond=c.cspBlocks.some(b=>b.conds.some(x=>(x.v||'').length));
+    const bad=!hasCond||!c.recipients.length;c.el.classList.toggle('ac-err',bad);if(bad)ok=false;
+  });
+  if(!ok)toast('Each allocation card needs at least one condition and one value.',1);
+  return ok;
+}
+
+/* ============================================================
+ * 即時更新：卡上的符合金額、權重、提醒
+ * ============================================================ */
+const _v9T={};
+function v9Sched(cid){if(!cid)return;clearTimeout(_v9T[cid]);_v9T[cid]=setTimeout(()=>v9UpdAll(cid),60)}
+['input','change','click'].forEach(ev=>document.addEventListener(ev,e=>{const c=e.target.closest&&e.target.closest('#cr-vals,#ed-vals');if(c)v9Sched(c.id)}));
+const _v9Renum=renum;renum=function(cid){
+  const crossed=v9EnforceZones(cid);
+  _v9Renum(cid);v9Sched(cid);
+  if(crossed&&window._v9Dragged)toast('Allocation cards stay below value cards in this layout.');
+  window._v9Dragged=false;
+};
+document.addEventListener('drop',e=>{if(e.target.closest&&e.target.closest('#cr-vals,#ed-vals'))window._v9Dragged=true},true);
+
+function v9UpdAll(cid){
+  v9ApplyNameMode();
+  if(v9EnforceZones(cid))_v9Renum(cid);
+  const cards=v9ReadCards(cid);if(!cards.length)return;
+  const rows=v9RowsFor(cid);const R=v9Compute(cards,rows);
+  // 權重清單的下拉選項跟著 value card 名稱更新
+  cards.forEach(c=>{if(c.type!=='alloc')return;c.el.querySelectorAll('.ac-sel').forEach(sel=>{const cur=sel.value;const fresh=v9FromHtml(v9RecipInput(cid,cur&&cur!=='__new__'?cur:''));if(fresh.innerHTML!==sel.innerHTML){sel.innerHTML=fresh.innerHTML;sel.value=cur}})});
+  cards.forEach((c,i)=>{
+    if(c.type!=='alloc'){v9UpdNameHint(c,cards,i);return}
+    const info=R.cards[i];const el=c.el;
+    const sample=v9IsSampleData(cid)?`<span class="ac-sample" data-tip="這個 tag 沒有示範帳單，數字借用 cost-owner 的示範帳單計算。">Sample bill</span>`:'';
+    el.querySelector('[data-acmatch]').innerHTML=info.matched
+      ?`<span class="material-symbols-outlined">receipt_long</span><span>Last 30 days: <strong>${v9fmt(info.matched)}</strong> matched · ${info.matchedRes.size} resource${info.matchedRes.size>1?'s':''}</span>${sample}`
+      :`<span class="material-symbols-outlined">receipt_long</span><span class="ac-muted">No cost matches these conditions in the last 30 days.</span>${sample}`;
+    // 權重：⚠ ASSUMPTION（Q-B）顯示最近 30 天合計的比例，每天、每個 cluster 各自算的細節留給 Preview
+    el.querySelectorAll('.ac-row').forEach(r=>{
+      const n=(r.querySelector('.ac-sel')?.value||r.querySelector('.ac-txt')?.value||'').trim();
+      const amt=info.byRecip[n]||0;const w=info.allocated?amt/info.allocated:0;
+      r.querySelector('.ac-w').textContent=n&&info.allocated?(w*100).toFixed(2)+'%':'—';
+      r.querySelector('.ac-amt').textContent=n&&info.allocated?v9fmt(amt):'';
+      const hint=r.querySelector('.ac-row-hint');
+      const noDirect=n&&info.matched&&!amt;
+      hint.textContent=noDirect?(R.direct[n]>0?v9Basis().noShareHere(n):v9Basis().noShareAny(n)):'';
+      r.querySelector('.ac-row-basis').textContent=(n&&amt>0&&(info.basis||{})[n])?v9Basis().basis(v9fmt(info.basis[n]),info.basisWhere):'';
+      r.classList.toggle('is-zero',!!noDirect);
+    });
+    // 提醒
+    const al=[];
+    if(info.stolenBelow){al.push(`<div class="ac-alert warn"><span class="material-symbols-outlined">warning</span><div>${v9fmt(info.stolenBelow)} of this cost also matches <strong>${[...info.stolenBy].join(', ')}</strong> below. Because this card is above them, that cost is being split instead of assigned directly.<div class="ac-alert-act"><button class="btn btn-o btn-sm" type="button" onclick="v9MoveToBottom(this)">Move to bottom</button></div></div></div>`)}
+    if(info.noNsParts.size){al.push(`<div class="ac-alert info"><span class="material-symbols-outlined">info</span><div><strong>${[...info.noNsParts].map(p=>p.split('|')[1]).join(', ')}</strong> has no namespace-level cost, so value cards can't match its teams. Turn on GKE cost allocation for this cluster. GKE pricing doesn't change, but your billing export gets more detail rows, which may increase BigQuery storage and query costs. Data appears within 3 days, and earlier periods aren't backfilled.</div></div>`)} // ⚠ ASSUMPTION（Q-F）文案；內容取自 RD doc 決定 12＋Bater 2026-09-29 Notion 留言（BigQuery 費用可能增加）
+    if(info.reason==='no-weight'||info.reason==='partial'){al.push(`<div class="ac-alert warn"><span class="material-symbols-outlined">error</span><div>${v9Basis().noWeight(v9fmt(info.unallocated),info.noWeight.map(v9PartLabel).join(', '))}${(()=>{const cl=info.noWeight.filter(p=>p!=='*').map(p=>p.split('|')[1]);return cl.length?`<div class="ac-alert-sub">If ${cl.length>1?'a cluster':'this cluster'} belongs to one team, add a value card with <code>goog-k8s-cluster-name equals ${cl[0]}</code> to assign it directly.</div>`:''})()}</div></div>`)} // 替代做法取自 Bater 2026-09-29 Notion 留言（〔待考慮〕「整個 tag key 範圍」的重啟條件）
+    if(info.takenAbove){al.push(`<div class="ac-alert neutral"><span class="material-symbols-outlined">info</span><div>${v9fmt(info.takenAbove)} matching these conditions is already assigned by <strong>${[...info.takenBy].join(', ')}</strong> above.</div></div>`)}
+    el.querySelector('.ac-alerts').innerHTML=al.join('');
+    el.classList.remove('ac-err');
+  });
+}
+/* 部門模型：同名 value card 提示「同一個 value、金額加總」 */
+function v9UpdNameHint(c,cards,i){
+  let h=c.el.querySelector('.vni-hint');
+  const dupIdx=S._deptModel&&c.name?cards.findIndex((o,j)=>j!==i&&o.type!=='alloc'&&o.name===c.name):-1;
+  if(dupIdx<0){if(h)h.remove();return}
+  if(!h){h=document.createElement('div');h.className='vni-hint';c.el.querySelector('.vh').after(h)}
+  h.innerHTML=`<span class="material-symbols-outlined">link</span>Same value as card #${dupIdx+1}. Their costs add up in reports.`;
+}
+
+/* 部門模型：value name 欄＝combobox（打字＋列出相近的既有 value＋明確的 Create "xxx"）⚠ ASSUMPTION（Q-A）
+ * RD 2026-09-29 留言寫「從下拉選單選部門（可當場新增）」。combobox 同樣是「從清單選、可當場新增」，
+ * 但建立新 value 不用多一步（新 tag 大部分卡片都是新名字）。防重複靠「打字時看得到既有的」＋大小寫不同自動併入。
+ * 清單在正式產品是獨立的 value 資料；prototype 從目前所有卡片推出來。部門模型 OFF（PRD 字面）：維持 v8 的自由輸入。 */
+function v9AllValueNames(cid,exceptCard){
+  const names=v9ValueNames(cid,exceptCard);
+  v9ReadCards(cid).forEach(c=>{if(c.type==='alloc')v9ReadRecipients(c.el).forEach(n=>{if(!names.includes(n))names.push(n)})});
+  return names;
+}
+function v9UsedBy(cid,exceptCard){
+  const m={};v9ReadCards(cid).forEach((c,i)=>{if(c.el===exceptCard)return;
+    const add=(n,l)=>{if(!n)return;(m[n]=m[n]||[]).push(l)};
+    if(c.type==='alloc')v9ReadRecipients(c.el).forEach(n=>add(n,`split by #${i+1}`));else add(c.name,`card #${i+1}`)});
+  return m;
+}
+function v9ApplyNameMode(){
+  document.querySelectorAll('.vc:not(.ac) .vni').forEach(inp=>{
+    inp.classList.toggle('vni-dd',!!S._deptModel);inp.readOnly=false;
+    inp.placeholder=S._deptModel?'Enter or select a value':'Please enter Value Name';
+    inp.setAttribute('autocomplete','off');
+  });
+}
+const v9IsNameInp=e=>S._deptModel&&e&&e.classList&&e.classList.contains('vni');
+document.addEventListener('focusin',e=>{if(v9IsNameInp(e.target)){e.target._typed=false;v9ShowNameDD(e.target)}});
+document.addEventListener('input',e=>{if(v9IsNameInp(e.target)&&!e.target._picking){e.target._hi=-1;e.target._typed=true;v9ShowNameDD(e.target)}});
+document.addEventListener('keydown',e=>{const inp=e.target;if(!v9IsNameInp(inp))return;const dd=document.querySelector('.v9-name-dd');
+  const btns=dd?[...dd.querySelectorAll('button')]:[];
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){if(!btns.length)return;e.preventDefault();const d=e.key==='ArrowDown'?1:-1;inp._hi=((inp._hi??-1)+d+btns.length)%btns.length;btns.forEach((b,i)=>b.classList.toggle('is-hi',i===inp._hi));btns[inp._hi].scrollIntoView({block:'nearest'})}
+  else if(e.key==='Enter'){e.preventDefault();const b=btns[inp._hi??-1]||btns.find(x=>x.dataset.exact);if(b)b.dispatchEvent(new MouseEvent('mousedown'));else inp.blur()}
+  else if(e.key==='Escape'){document.querySelectorAll('.v9-name-dd').forEach(d=>d.remove())}});
+document.addEventListener('focusout',e=>{const inp=e.target;if(!inp.classList||!inp.classList.contains('vni'))return;
+  setTimeout(()=>document.querySelectorAll('.v9-name-dd').forEach(d=>d.remove()),150);
+  if(!S._deptModel)return;
+  // 只差大小寫＝同一個 value：直接換成既有的名稱，不會默默多出一個
+  const v=inp.value.trim();const cid=inp.closest('[id]')?.id;const hit=v&&v9AllValueNames(cid,inp.closest('.vc')).find(n=>n.toLowerCase()===v.toLowerCase());
+  if(hit&&hit!==inp.value){inp.value=hit;inp._picking=true;inp.dispatchEvent(new Event('input',{bubbles:true}));inp._picking=false;setTimeout(()=>document.querySelectorAll('.v9-name-dd').forEach(d=>d.remove()),0)}
+});
+function v9ShowNameDD(inp){
+  document.querySelectorAll('.v9-name-dd').forEach(d=>d.remove());
+  const cid=inp.closest('[id]')?.id;const card=inp.closest('.vc');const q=inp._typed?inp.value.trim():'';const ql=q.toLowerCase();const cur=inp.value.trim();
+  const used=v9UsedBy(cid,card);
+  const all=v9AllValueNames(cid,card);
+  const names=all.filter(n=>!ql||n.toLowerCase().includes(ql));
+  const exact=all.find(n=>n.toLowerCase()===ql);
+  const showCreate=q&&!exact;
+  if(!names.length&&!showCreate)return;
+  const esc=n=>n.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  const hl=n=>{if(!ql)return n;const i=n.toLowerCase().indexOf(ql);return i<0?n:n.slice(0,i)+'<mark>'+n.slice(i,i+q.length)+'</mark>'+n.slice(i+q.length)};
+  const dd=document.createElement('div');dd.className='v9-name-dd';
+  dd.innerHTML=(names.length?`<div class="v9-name-dd-h">Values in this tag</div>`:'')
+    +names.map(n=>`<button type="button" class="${!q&&n===cur?'is-cur':''}" ${n===exact?'data-exact="1"':''} onmousedown="event.preventDefault();v9PickName(this,'${esc(n)}')"><span>${hl(n)}</span><span class="v9-dd-meta">${(used[n]||[]).slice(0,2).join(', ')}</span></button>`).join('')
+    +(showCreate?`<button type="button" class="v9-name-dd-new" onmousedown="event.preventDefault();v9PickName(this,'${esc(q)}')"><span class="material-symbols-outlined">add</span>Create "${q.replace(/</g,'&lt;')}"</button>`:'');
+  document.body.appendChild(dd);const r=inp.getBoundingClientRect();dd.style.top=(r.bottom+window.scrollY+2)+'px';dd.style.left=(r.left+window.scrollX)+'px';dd.style.minWidth=r.width+'px';
+  dd._inp=inp;
+}
+function v9PickName(btn,n){const inp=btn.closest('.v9-name-dd')._inp;inp.value=n;inp._hi=-1;inp._picking=true;inp.dispatchEvent(new Event('input',{bubbles:true}));inp._picking=false;document.querySelectorAll('.v9-name-dd').forEach(d=>d.remove());inp.blur()}
+
+/* ============================================================
+ * List：含 allocation card 的 key
+ * ⚠ ASSUMPTION（Q-D）：icon 與 tooltip 文案
+ * ============================================================ */
+function v9HasAlloc(t){return (t.values||[]).some(v=>v.type==='alloc')}
+function v9ListIcon(t){return v9HasAlloc(t)?`<span class="material-symbols-outlined v9-hid" data-tip="Hidden from Managers and Members in Cost Dashboard. This tag splits shared cost, and split amounts can reveal costs outside their access.">visibility_off</span>`:''}
+function v9ValueCount(t){const names=new Set();(t.values||[]).forEach(v=>{if(v.type==='alloc')(v.recipients||[]).forEach(n=>names.add(n));else if(v.name)names.add(v.name);else names.add(v.id)});return names.size}
+function v9UsesEngine(t){return !!t.rows}
+/* List 的 coverage 用 v8 的 res 加總算；有帳單的 tag 改成照金額回填，讓 List 跟 Preview 對得起來 */
+function v9SyncStats(t){
+  if(!t.rows)return;const R=v9Compute(v9Ordered(t.values).map(v=>Object.assign({},v)),t.rows);
+  t.totalRes=10000;let first=true;
+  t.values.forEach(v=>{v.res=0;v.cost=v.type==='alloc'?0:((R.direct[v.name]||0)+(R.alloc[v.name]||0));if(first&&v.type!=='alloc'){v.res=Math.round((R.total-R.untagged)/R.total*10000);first=false}});
+}
+const _v9RenderList=renderList;renderList=function(){S.tags.forEach(v9SyncStats);_v9RenderList()};
+
+/* ============================================================
+ * Preview（有帳單的 tag）
+ * ============================================================ */
+function v9RenderPreview(t,el){
+  const cards=v9Ordered(t.values).map(v=>Object.assign({},v));const R=v9Compute(cards,t.rows);
+  const names=R.order.filter(n=>(R.direct[n]||0)+(R.alloc[n]||0)>0||cards.some(c=>c.name===n));
+  /* 分攤前／分攤後（AWS Cost Categories 的做法，2026-09-29 Kabin 同意試做）⚠ ASSUMPTION：UX 提案，PRD 沒有
+   * 分攤前：每個 value 只算 direct，每張 allocation card 抓到的錢單獨列成「Shared cost」一列，還沒分出去 */
+  const acAll=cards.map((c,i)=>({c,i,info:R.cards[i]})).filter(x=>x.c.type==='alloc');
+  const canToggle=S._showParked&&acAll.length>0;
+  const before=canToggle&&S._pvMode==='before';
+  const vals=names.map(n=>({name:n,direct:R.direct[n]||0,alloc:before?0:(R.alloc[n]||0),res:((before?R.resDirect:R.resByValue)[n]||new Set()).size})).map(v=>Object.assign(v,{total:v.direct+v.alloc})).sort((a,b)=>b.total-a.total);
+  const pools=before?acAll.filter(x=>x.info.matched>0).map(x=>({name:`Shared cost · Card #${x.i+1}`,total:x.info.matched,res:x.info.matchedRes.size,to:(x.c.recipients||[]).join(', ')||'—'})):[];
+  const T=R.total;const uc=before?R.untagged-acAll.reduce((s,x)=>s+x.info.unallocated,0):R.untagged;const up=T?uc/T*100:0;
+  // Chart
+  let bar='<div class="abar">';let leg='<div class="aleg">';
+  vals.forEach((v,i)=>{const p=T?v.total/T*100:0;if(p>0){bar+=`<div class="aseg" style="width:${p}%;background:${COLORS[i%9]}" onmouseenter="showSegTip(event,'${v.name.replace(/'/g,'&apos;')}','${COLORS[i%9]}','${v9fmt(v.total)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${p.toFixed(2)}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${COLORS[i%9]}"></div>${v.name}</div>`}});
+  pools.forEach(pl=>{const p=T?pl.total/T*100:0;bar+=`<div class="aseg v9-pool-seg" style="width:${p}%" onmouseenter="showSegTip(event,'${pl.name}','#9AA7B8','${v9fmt(pl.total)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${p.toFixed(2)}%</span></div>`;leg+=`<div class="li"><div class="ld v9-pool-seg"></div>${pl.name}</div>`});
+  if(up>0){bar+=`<div class="aseg" style="width:${up}%;background:${CLR_UNTAGGED}" onmouseenter="showSegTip(event,'Untagged','${CLR_UNTAGGED}','${v9fmt(uc)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${up.toFixed(2)}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${CLR_UNTAGGED}"></div>Untagged</div>`}
+  bar+='</div>';leg+='</div>';
+  // Table：每個 value 拆直接／分攤（Q-9 的 UX 建議）⚠ ASSUMPTION
+  const colW=`<colgroup><col style="width:22%"><col style="width:30%"><col style="width:18%"><col style="width:30%"></colgroup>`;
+  let trows='';
+  vals.forEach((v,i)=>{
+    const color=COLORS[i%9];const dp=v.total?v.direct/v.total*100:0;const esc=v.name.replace(/'/g,'&apos;');
+    // 一列維持 50px（Guideline 表格規範）：拆分用一條細的堆疊條＋Estimated，金額細節放 tooltip
+    const tip=`Direct ${v9fmt(v.direct)} + Allocated ${v9fmt(v.alloc)}. Allocated amounts are estimates calculated from your rules, not measured cost.`;
+    const split=v.alloc?`<span class="v9-split-bar" data-tip="${tip}"><span style="width:${dp}%;background:${color}"></span><span class="is-alloc" style="width:${100-dp}%;background:${color}"></span></span>`:'';
+    const est=v.alloc?`<span class="v9-est" data-tip="${tip}">Estimated</span>`:'';
+    if(v.total>0)trows+=`<tr><td><div class="li"><div class="ld" style="background:${color}"></div>${v.name}</div></td><td style="text-align:right"><div class="v9-amt-cell">${split}<span>${v9fmt(v.total)}</span>${est}</div></td><td>${v9pct(v.total,T)}</td><td><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="color:var(--g600);white-space:nowrap">${v.res} resource${v.res>1?'s':''}</span><a href="#" onclick="event.preventDefault();showMatchedModal('${esc}',${v.res},${Math.round(v.total)})" style="color:var(--pri);font-size:12px;font-weight:500;white-space:nowrap">View Details →</a></div></td></tr>`;
+    else trows+=`<tr class="nm"><td><div class="li"><div class="ld" style="background:var(--g200)"></div>${v.name}</div></td><td style="text-align:right;color:var(--g400)">${S._currency} 0</td><td style="color:var(--g400)">0%</td><td><span style="font-size:12px;color:var(--g400)">No resources matched</span></td></tr>`;
+  });
+  pools.forEach(pl=>{trows+=`<tr class="v9-pool-row"><td><div class="li"><span class="material-symbols-outlined" style="font-size:16px;color:var(--g500)">call_split</span>${pl.name}</div></td><td style="text-align:right">${v9fmt(pl.total)}</td><td>${v9pct(pl.total,T)}</td><td><span style="font-size:12px;color:var(--g500)">To be split across ${pl.to}</span></td></tr>`});
+  const untaggedFooter=uc>0
+    ?`<table class="pt" style="width:100%;table-layout:fixed;border-top:2px solid var(--g200)">${colW}<tbody><tr class="ua"><td><div class="li"><span class="material-symbols-outlined" style="font-size:16px">warning</span><strong>Untagged</strong></div></td><td style="text-align:right;font-weight:700">${v9fmt(uc)}</td><td>${up.toFixed(2)}%</td><td><a href="#" onclick="event.preventDefault();showUnallocModal(${Math.round(uc)})" style="color:var(--pri);font-size:12px;font-weight:500;white-space:nowrap">View Untagged →</a></td></tr></tbody></table>`
+    :(before&&pools.length)
+    ?`<div style="text-align:center;color:var(--g600);padding:14px 16px;background:var(--g50);border-top:1px solid var(--g200);border-radius:0 0 var(--r-sm) var(--r-sm)">Before allocation: ${v9fmt(pools.reduce((s,p)=>s+p.total,0))} is shared cost waiting to be split. Switch to <strong>After allocation</strong> to see the final amounts.</div>`
+    :(()=>{const splitAmt=acAll.reduce((s,x)=>s+x.info.allocated,0);
+      // 有分攤時不說「全部標記成功」：分出去的是依規則估算的金額（PRD 計算規則「結果性質：估算值，非量測值」）
+      return splitAmt>0
+        ?`<div style="text-align:center;color:var(--ok-dk);font-weight:700;padding:14px 16px;background:var(--ok-lt);border-top:1px solid #B2EFE7;border-radius:0 0 var(--r-sm) var(--r-sm)"><span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:6px">check_circle</span>All cost is assigned to a value. ${v9fmt(splitAmt)} of it is split from shared cost, so it's an estimate.</div>`
+        :`<div style="text-align:center;color:var(--ok-dk);font-weight:700;padding:14px 16px;background:var(--ok-lt);border-top:1px solid #B2EFE7;border-radius:0 0 var(--r-sm) var(--r-sm)"><span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:6px">celebration</span>100% Coverage Achieved! All resources are successfully tagged and accounted for.</div>`})();
+  // 分攤狀態（PRD：未攤分標示，兩種原因）⚠ ASSUMPTION 文案
+  const acList=cards.map((c,i)=>({c,i,info:R.cards[i]})).filter(x=>x.c.type==='alloc');
+  const acHtml=acList.length?`<div class="card" style="margin-bottom:24px"><div class="st" style="margin-bottom:12px">Shared Cost Allocation</div>${acList.map(({c,i,info})=>{
+    const who=(c.recipients||[]).join(', ')||'—';
+    const line=info.reason==='no-match'?`<span class="v9-pill muted">Not split</span>No cost matched this card's conditions in the last 30 days.`
+      :info.reason==='no-weight'?`<span class="v9-pill warn">Not split</span>${v9fmt(info.unallocated)} stays Untagged: none of ${who} has direct cost in ${info.noWeight.map(v9PartLabel).join(', ')}.`
+      :info.reason==='partial'?`<span class="v9-pill ok">Split</span>${v9fmt(info.allocated)} split across ${who}. <span class="v9-warn-t">${v9fmt(info.unallocated)} stays Untagged: no direct cost in ${info.noWeight.map(v9PartLabel).join(', ')}.</span>`
+      :`<span class="v9-pill ok">Split</span>${v9Basis().previewSplit(v9fmt(info.allocated),who)}`;
+    const zeroNames=(c.recipients||[]).filter(n=>info.matched&&!(info.byRecip||{})[n]&&R.direct[n]>0&&info.noWeight.length===0);
+    const zeroHtml=zeroNames.length&&info.reason!=='no-match'?`<div class="v9-warn-t" style="margin-top:4px">${zeroNames.map(n=>v9Basis().noShareHere(n)).join(' ')}</div>`:'';
+    return `<div class="v9-ac-line"><span class="pn">${i+1}</span><div>${line}${zeroHtml}</div></div>`}).join('')}</div>`:'';
+  // ⏸ PARKED：Rule Conflicts（Figma #05 / #05-1 的隱藏元件，註記「暫不實作」）
+  const conflictHtml=(S._showParked&&R.multi.length)?(()=>{
+    const cspName={GCP:'Google Cloud',AWS:'AWS',Azure:'Azure',FOCUS:'FOCUS'};
+    const condTxt=cd=>{const fl=V9_K8S_LABEL[cd.f]||(CSP_FIELDS.GCP.concat(CSP_FIELDS.AWS,CSP_FIELDS.Azure,CSP_FIELDS.FOCUS)).find(x=>x[0]===cd.f)?.[1]||cd.f;const opl=(FIELD_OPERATORSETS[getFieldOpset(cd.f)]||[]).find(x=>x[0]===cd.o)?.[1]||cd.o;
+      const subj=cd.f==='k8s'?`Kubernetes ${cd.k}`:getFieldOpset(cd.f)==='tag'?`The value of label key “${cd.k}”`:fl;return `${subj} ${opl} "${cd.v}"`};
+    // 列出「真的讓這一列符合」的那個 data source block 的完整條件，不是只列第一條
+    const ruleTxt=(ci,row)=>{const c=cards[ci];const b=(c.cspBlocks||[]).find(x=>v9EvalBlock(row,x))||(c.cspBlocks||[])[0];if(!b)return `Rule ${ci+1} → ${c.name}`;
+      const body=b.conds.map((cd,k)=>(k?` ${cd.c||'AND'} `:'')+condTxt(cd)).join('');return `Rule ${ci+1}: ${cspName[b.csp]||b.csp} → ${body} → ${c.name}`};
+    return `<div class="card v9-parked" style="margin-bottom:24px"><div class="v9-parked-top">${v9ParkedBadge('parked')}</div>
+<details class="v9-conf"><summary><span class="material-symbols-outlined">call_merge</span>${R.multi.length} Resource${R.multi.length>1?'s':''} Matched Multiple Rules<span class="material-symbols-outlined v9-conf-arr">expand_more</span></summary>
+${R.multi.map(m=>`<div class="v9-conf-item"><div class="v9-conf-res">${m.row.resource_name}</div>${m.hits.map((h,k)=>`<div class="v9-conf-rule${k===0?' is-win':''}">${ruleTxt(h,m.row)}${k===0?' <span class="v9-pill ok">Applied</span>':''}</div>`).join('')}</div>`).join('')}</details></div>`})():'';
+  // UX 提案（Q-H）：空位留在 Untagged 時提示建一張 kube: 的卡
+  const kubeUntagged=R.untaggedRows.filter(r=>((r.labels||{})['k8s-namespace']||'').startsWith('kube:')).reduce((s,r)=>s+r.cost,0);
+  // UX 提案（Q-H）：Untagged 裡有 kube:* 成本時，Untagged 列下面加一行說明＋建議；2026-10-01 加回一鍵建立（做法 3），按下回 Edit、卡片建好、名稱留空讓使用者選
+  const kubeCond=S._k8sNorm?'Namespace starts with kube:':'k8s-namespace starts with kube:';
+  const kubeHtml='';
+  const kubeLine=(S._showParked&&kubeUntagged>0&&!before)?`<div class="v9-kube-line">${v9ParkedBadge('proposal')}<span class="material-symbols-outlined">info</span><span><strong>${v9fmt(kubeUntagged)}</strong> of Untagged is unused cluster capacity (<code>kube:*</code>). Most teams assign it to their infrastructure team with a value card: <code>${kubeCond}</code>.<div class="ac-alert-act"><button class="btn btn-o btn-sm" type="button" onclick="v9KubeCreate('${t.id}')">Create this value card</button></div></span></div>`:'';
+  const cover=T-uc;const valCount=vals.filter(v=>v.total>0).length;
+  el.innerHTML=`<div class="pg-hdr"><a class="back-btn" href="#" onclick="showLeaveConfirm('list');return false"><span class="material-symbols-outlined">arrow_back</span>LumiTag List</a><div class="pg-hdr-row"><div class="pg-title">Coverage Preview</div></div></div>
+<div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div class="st">Coverage for LumiTag: ${t.name}</div><span style="font-size:13px;color:var(--g500)">Total 30 Days Spend: <strong style="color:var(--g900)">${fmtFull(T)}</strong></span></div>${bar}${leg}</div>
+${acHtml}
+<div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div class="st">Spend Breakdown</div>${canToggle?`<span style="flex:1"></span>${v9ParkedBadge('proposal')}<div class="v9-seg" role="tablist"><button type="button" class="${before?'':'on'}" onclick="S._pvMode='after';go('preview','${t.id}')">After allocation</button><button type="button" class="${before?'on':''}" onclick="S._pvMode='before';go('preview','${t.id}')">Before allocation</button></div>`:''}</div><div class="pt-wrap"><table class="pt" style="table-layout:fixed">${colW}<thead><tr><th>Tag Value</th><th style="text-align:right">30 Days Spend</th><th>Share of Spend</th><th>Resources <span class="info-tip"><span class="material-symbols-outlined">info</span><span class="tip-box">After shared cost is split, one resource can count toward several values, so these numbers don't add up.</span></span></th></tr></thead><tbody>${trows}</tbody></table></div>${untaggedFooter}${kubeLine}</div>
+${kubeHtml}${conflictHtml}
+<div class="sbtm"><button class="btn btn-o" onclick="${S._isNew?`go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_back</span>Back to Edit</button><div class="ssp"></div><button class="btn btn-o" onclick="showSaveDraftModal('${t.id}',${!!S.tags.find(x=>x.id===t.id&&x.status==='active')})">Save as Inactive Tag</button><button class="btn btn-p" onclick="v9ShowApply('${t.id}',${cover},${uc},${valCount})"><span class="material-symbols-outlined">check_circle</span>Apply LumiTag</button></div>`;
+  setTimeout(()=>{el.querySelectorAll('.aseg').forEach(s=>{if(s.offsetWidth<44){const sp=s.querySelector('.seg-pct');if(sp)sp.style.visibility='hidden'}})},50);
+}
+
+/* Apply 確認（沿用 #08），加上「成員會看不到這個 key」的提醒（PRD 邊界情況：加入第一張 allocation card）
+ * ⚠ ASSUMPTION：提醒文案；只在「原本沒有 allocation card、這次加了」時出現 */
+function v9ShowApply(id,cover,uc,valCount){
+  const t=S._tmp||S.tags.find(x=>x.id===id);if(!t)return;
+  const orig=S.tags.find(x=>x.id===id);const firstAlloc=v9HasAlloc(t)&&!(orig&&orig.status==='active'&&v9HasAlloc(orig)&&orig!==t);
+  const total=cover+uc;const cr=total?(cover/total*100).toFixed(2):'0.00';
+  const thumb=`<span class="material-symbols-outlined" style="font-size:22px;color:var(--ok);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24">thumb_up</span>`; // 同 v8／Figma #08 的 100% / USD 0 特殊呈現
+  const notice=firstAlloc?`<div class="notice n-warn" style="margin-bottom:20px;align-items:flex-start"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">visibility_off</span><div>This tag splits shared cost. After you apply it, <strong>Managers and Members won't see ${t.name}</strong> in Cost Dashboard, because split amounts can reveal costs outside their access.</div></div>`:'';
+  showModal(`<div class="mh"><div style="display:flex;align-items:center;gap:10px"><span class="material-symbols-outlined" style="font-size:22px;color:var(--warn);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20">warning</span><span class="mt">Apply LumiTag</span></div><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div>
+<p style="margin-bottom:16px;color:var(--g700);line-height:1.8">LumiTag <strong>${t.name}</strong> will be integrated as a primary dimension in all reports and dashboards. Please confirm the summary below:</p>
+<p style="margin-bottom:20px;color:var(--g700)">Applying this tag will cover <strong style="color:var(--pri)">${v9fmt(cover)}</strong> of your total spend.</p>${notice}
+<div style="background:var(--pri-lt10);border:1px solid var(--pri-lt20);border-radius:var(--r-md);padding:20px 24px;margin-bottom:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+<div><div style="font-size:12px;color:var(--g500);margin-bottom:6px">Tag Values</div><div style="font-weight:700;font-size:22px;color:var(--g900)">${valCount}</div></div>
+<div><div style="font-size:12px;color:var(--g500);margin-bottom:6px">Coverage Rate</div><div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:22px;color:${uc<=0?'var(--ok)':'var(--g900)'}">${uc<=0?thumb:''}${uc<=0?'100':cr}%</div></div>
+<div><div style="font-size:12px;color:var(--g500);margin-bottom:6px">Untagged Spend</div><div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:22px;color:${uc<=0?'var(--ok)':'var(--err)'}">${uc<=0?thumb+S._currency+' 0':v9fmt(uc)}</div></div></div>
+<div class="mf"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="confirmApply('${id}')">Apply LumiTag</button></div>`);
+}
+
+/* ============================================================
+ * Demo FAB：Allocation 分頁
+ * ============================================================ */
+window.DEMO_PAGES.push({id:'alloc',label:'Allocation',icon:'call_split'});
+window.DEMO_SCENARIOS.push(
+  // ── 基本流程 ──
+  {id:'v9-default',     tab:'alloc',group:'基本流程',label:'Edit：共用 cluster 分給 Backend、Frontend',icon:'call_split',tip:'Backend 直接 $50K（含 Cloud SQL）＋分到 $45K＝$95K；Frontend 直接 $10K＋分到 $15K＝$25K；Untagged $0。'},
+  {id:'v9-value-only',   tab:'alloc',group:'基本流程',label:'只用 value card（剩下的整筆給一個團隊）',icon:'sell',tip:'不用 allocation card：Backend、Frontend 用 Namespace 抓，最後一張 Infrastructure 用 Cluster 接住剩下的管理費、硬碟與空位，整筆給基礎架構。Infrastructure 要排在最下面，不然會先把整個 cluster 抓走。'},
+  {id:'v9-preview',     tab:'alloc',group:'基本流程',label:'Preview：分攤後',icon:'visibility',tip:'Spend Breakdown 每一列拆成 Direct 與 Allocated（Estimated）。'},
+  {id:'v9-before',      tab:'alloc',group:'基本流程',label:'Preview：分攤前（UX 提案）',icon:'compare',tip:'AWS 的做法：先看每個 value 的直接成本，共用費單獨一列「Shared cost」，還沒分出去。'},
+  {id:'v9-first-alloc', tab:'alloc',group:'基本流程',label:'在已套用的 key 加第一張 allocation card',icon:'add_circle',tip:'cost-owner 目前只有兩張 value card。用 Add → Allocation card 加一張，再到 Preview 按 Apply，會看到「成員將看不到這個 key」的提醒。'},
+  {id:'v9-list',        tab:'alloc',group:'基本流程',label:'List：含 allocation card 的 key',icon:'list',tip:'cost-owner 名稱旁的 icon：成員在 Cost Dashboard 看不到。'},
+  // ── 資料狀況 ──
+  {id:'v9-infra',       tab:'alloc',group:'資料狀況',label:'空位先歸 Infrastructure',icon:'dns',tip:'Infrastructure 先拿走 kube:* 的 $40K，allocation card 只分管理費和磁碟 $20K。'},
+  {id:'v9-no-ns',       tab:'alloc',group:'資料狀況',label:'Cluster 沒開 GKE cost allocation',icon:'visibility_off',tip:'帳單上沒有 namespace，value card 抓不到，整個 cluster 的錢都留在 Untagged。'},
+  {id:'v9-mixed-trap',   tab:'alloc',group:'資料狀況',label:'Backend 只用 Project 抓（分不到共用 cluster）',icon:'error',tip:'Backend 的 value card 只寫 Project，在 shared-gke 裡沒有直接成本，所以 allocation card 分給它 0。卡上與 Preview 都會提醒補 Namespace 條件。'},
+  {id:'v9-no-match',    tab:'alloc',group:'資料狀況',label:'條件抓不到任何錢（未攤分）',icon:'search_off',tip:'條件寫 data-gke，這份帳單沒有這個 cluster。'},
+  {id:'v9-zero',        tab:'alloc',group:'資料狀況',label:'分給沒有 value card 的 value（Data）',icon:'exposure_zero',tip:'Data 沒有任何 value card，直接花費永遠是 0，永遠分不到錢。'},
+  // ── 暫緩的設計 ──
+  {id:'v9-conflict',    tab:'alloc',group:'暫緩的設計',label:'⏸ Rule Conflicts（兩張 value card 重疊）',icon:'call_merge',tip:'Cloud SQL 同時符合 Backend 與 Data Platform。Preview 會出現 Figma #05 的 Rule Conflicts 元件（已設計、PM 尚未安排開發）。'},
+  // ── 設定（切換後停在目前畫面） ──
+  {id:'v9-layout-zones',tab:'alloc',group:'設定（切換後停在目前畫面）',label:'版面 A′：分兩區（預設）',icon:'splitscreen',tip:'value card 在上、allocation card 固定在下面一區，兩種卡之間的順序問題不會發生。'},
+  {id:'v9-k8s-norm',   tab:'alloc',group:'設定（切換後停在目前畫面）',label:'K8s 條件：正規化維度，兩段式（預設）',icon:'hub',tip:'跟 Label 一樣兩段式：第一個下拉選 Kubernetes，右邊再選 Cluster／Namespace／Workload。不用新元件。Label Key 清單藏起重複的三個原生 label。對應提問清單 G。'},
+  {id:'v9-k8s-native', tab:'alloc',group:'設定（切換後停在目前畫面）',label:'K8s 條件：原生 label（PRD 現行寫法）',icon:'label',tip:'The Value of Label Key k8s-namespace equals …，要多選一個 label key。'},
+  {id:'v9-dept-on',     tab:'alloc',group:'設定（切換後停在目前畫面）',label:'部門模型：開（RD 決定 3，預設）',icon:'link',tip:'value card 名稱欄是 combobox：打字時列出相近的既有 value（標出被哪張卡用），新名字選「Create」；只差大小寫會直接用既有的。權重清單只能選已經有 value card 的 value。同名顯示「Same value as card #N」。'},
+  {id:'v9-dept-off',    tab:'alloc',group:'設定（切換後停在目前畫面）',label:'部門模型：關（PRD 字面）',icon:'link_off',tip:'權重清單自由打字；打錯字就會變成另一個 value。'},
+  {id:'v9-parked-on',   tab:'alloc',group:'設定（切換後停在目前畫面）',label:'顯示暫緩的設計（預設）',icon:'pause_circle',tip:'顯示「已設計・PM 尚未安排開發」與「UX 提案」的區塊。'},
+  {id:'v9-parked-off',  tab:'alloc',group:'設定（切換後停在目前畫面）',label:'隱藏暫緩的設計（看 PRD 原版）',icon:'hide_source',tip:'只看 PRD Phase 1 範圍內的畫面，版面也會回到 A。'},
+  // ── 已不採用（留著對照） ──
+  {id:'v9-k8s-grouped', tab:'alloc',group:'已不採用（留著對照）',label:'K8s 條件：分組下拉（設計系統沒有這個樣式）',icon:'segment',tip:'第一個下拉用分組標題列出 Cluster／Namespace／Workload，少點一次，但 Lumiture 單選下拉沒有分組樣式，要新做元件。2026-10-01 改用兩段式。'},
+  {id:'v9-layout-mixed',tab:'alloc',group:'已不採用（留著對照）',label:'版面 A：同一個清單（現行 PRD）',icon:'view_agenda',tip:'allocation card 跟 value card 混在一起，可以拖到任何位置。Kabin 2026-09-30 偏好改成分兩區，這個版面留著對照。'},
+  {id:'v9-wrong-order', tab:'alloc',group:'已不採用（留著對照）',label:'版面 A 的問題：allocation card 被拖到最上面',icon:'swap_vert',tip:'只在版面 A 會發生：它先抓走整個 cluster $100K，比例算不出來，$100K 全部變成 Untagged。點這個會自動切到版面 A。'}
+);
+/* Demo FAB：點情境之後停在使用者最後點的頁籤（2026-09-30 Kabin）。
+ * go() 會呼叫 demoFabSwitchTab() 讓面板跟著畫面換頁籤，套用情境的那一次先把它關掉。
+ * 使用者自己在產品裡點（例如點某個 tag 進 Edit）仍然會跟著切，那是原本就有的同步行為。 */
+function _v9NoFabSwitch(fn){const orig=window.demoFabSwitchTab;window.demoFabSwitchTab=function(){};try{return fn()}finally{window.demoFabSwitchTab=orig}}
+const _v9DemoApply=window.DEMO_APPLY;
+window.DEMO_APPLY=function(name,btn){return _v9NoFabSwitch(()=>_v9DemoApplyInner(name,btn))};
+function _v9DemoApplyInner(name,btn){
+  if(!name.startsWith('v9-'))return _v9DemoApply(name,btn);
+  document.querySelectorAll('.demo-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');
+  if(name==='v9-layout-mixed'||name==='v9-layout-zones'){v9SetLayout(name==='v9-layout-zones'?'zones':'mixed');return}
+  const k8sSet=mode=>{S._k8sMode=mode;S._k8sNorm=mode!=='native';[S.tags,_ORIG_TAGS,[S._tmp]].forEach(list=>(list||[]).forEach(t=>{if(t&&t.rows)v9K8sConvValues(t.values,mode)}))};
+  const settings={'v9-k8s-norm':()=>k8sSet('twostep'),'v9-k8s-grouped':()=>k8sSet('grouped'),'v9-k8s-native':()=>k8sSet('native'),'v9-dept-on':()=>S._deptModel=true,'v9-dept-off':()=>S._deptModel=false,'v9-parked-on':()=>S._showParked=true,'v9-parked-off':()=>S._showParked=false};
+  if(settings[name]){settings[name]();const v=document.querySelector('.view.active')?.id;if(v==='v-edit'&&S._curEdit)go('edit',S._curEdit);else if(v==='v-preview'){const t=S._tmp||S.tags.find(x=>x.id===S._curEdit);if(t)go('preview',t.id)}else go('list');toast('Demo setting updated.');return}
+  _demoClean();
+  // 「已不採用」分組只是對照：看完回到其他情境時，版面自動回到預設 A′
+  S._layout='zones';
+  if(S._k8sMode==='grouped')k8sSet('twostep');
+  const C=V9_CARDS;let values=V9_DEFAULT_VALUES,rows=DEMO_ROWS,dest='edit';
+  if(name==='v9-infra')values=[C.infra,C.backend,C.frontend,C.alloc()];
+  if(name==='v9-wrong-order'){values=[C.alloc(),C.backend,C.frontend];S._layout='mixed'}
+  if(name==='v9-zero')values=[C.backend,C.frontend,C.alloc(['Backend','Frontend','Data'])];
+  if(name==='v9-no-ns')rows=DEMO_ROWS_NO_NS;
+  if(name==='v9-value-only')values=[C.backend,C.frontend,C.infraCluster];
+  if(name==='v9-mixed-trap')values=[C.backendByProject,C.frontend,C.alloc()];
+  if(name==='v9-no-match')values=[C.backend,C.frontend,C.alloc(null,'data-gke')];
+  if(name==='v9-conflict'){values=[C.backend,C.frontend,C.dataPlatform,C.alloc()];dest='preview'}
+  if(name==='v9-preview'){dest='preview';S._pvMode='after'}
+  if(name==='v9-before'){dest='preview';S._pvMode='before'}
+  if(name==='v9-first-alloc')values=[C.backend,C.frontend];
+  if(name==='v9-list'){S.tags=v9Clone(_ORIG_TAGS);go('list');return}
+  const t=v9Tag('__demo__',values,{_demo:true,rows});S.tags.push(t);
+  if(dest==='preview'){S._tmp=v9Clone(t);S._tmp.rows=rows;S._isNew=false;S._curEdit='__demo__';go('preview','__demo__')}else go('edit','__demo__');
+}
+
+</script>
 <!-- SHARED COMPONENTS — order matters: nav data must load BEFORE sidebar renderer.
      ?v=... is a cache-buster; bump when shared scripts change to force refetch. -->
 <script>
@@ -2993,6 +3885,7 @@ window.LUMITURE_ACTIVE='lumitag';
  *     page:      string?,          // matches DEMO_PAGES[].id (alias: 'tab' for backwards compat)
  *     category:  string?,          // matches DEMO_CATEGORIES[].id
  *     isNoData:  boolean?,         // groups under "no data" sub-divider
+ *     group:     string?,          // 2026-09-30：同一頁內的分組小標（依第一次出現的順序排）。沒寫 group 的頁面行為完全不變
  *     disabled:  boolean?,         // shows "Soon" badge, not clickable
  *   }
  *
@@ -3090,6 +3983,9 @@ window.LUMITURE_ACTIVE='lumitag';
     '.demo-sub-sep{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;',
     'color:#9CAEC4;letter-spacing:.4px;text-transform:uppercase;margin:10px 0 6px}',
     '.demo-sub-sep::before,.demo-sub-sep::after{content:\'\';flex:1;height:1px;background:rgba(14,58,130,.1)}',
+    /* Group header（scenario.group，2026-09-30） */
+    '.demo-grp-sep{font-size:11px;font-weight:700;color:#676767;margin:12px 0 6px;letter-spacing:0}',
+    '.demo-grp-sep:first-child{margin-top:0}',
 
     /* Button group */
     '.demo-buttons{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}',
@@ -3194,7 +4090,17 @@ window.LUMITURE_ACTIVE='lumitag';
     }
     var normal = scenarios.filter(function (s) { return !s.isNoData; });
     var noData = scenarios.filter(function (s) { return s.isNoData; });
-    var html = _renderGroup(normal);
+    var html = '';
+    if (normal.some(function (s) { return !!s.group; })) {
+      var order = [];
+      normal.forEach(function (s) { var g = s.group || ''; if (order.indexOf(g) < 0) order.push(g); });
+      order.forEach(function (g) {
+        if (g) html += '<div class="demo-grp-sep">' + _esc(g) + '</div>';
+        html += _renderGroup(normal.filter(function (s) { return (s.group || '') === g; }));
+      });
+    } else {
+      html = _renderGroup(normal);
+    }
     if (noData.length) {
       html += '<div class="demo-sub-sep">no data</div>' + _renderGroup(noData);
     }
