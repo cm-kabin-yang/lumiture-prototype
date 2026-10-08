@@ -855,15 +855,21 @@ tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g20
 .v9-parked-badge{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:12px;background:var(--g100);color:var(--g700);font-size:12px;font-weight:600;cursor:help}
 .v9-parked-badge .material-symbols-outlined{font-size:16px}
 .v9-parked-badge.is-proposal{background:var(--warn-lt);color:#8A5300}
-.v9-conf summary{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600;color:var(--g900);list-style:none}
+/* Rule Conflicts：照 Figma #05-1「Rule Conflicts」元件（2026-10-08 對稿：標題 18/700、右側 30px 收合鈕、每個資源一張框線卡、生效／未生效用 icon 區分） */
+.v9-conf summary{display:flex;align-items:center;gap:16px;cursor:pointer;font-size:18px;font-weight:700;line-height:1.5;color:var(--g900);list-style:none}
 .v9-conf summary::-webkit-details-marker{display:none}
-.v9-conf summary .material-symbols-outlined{font-size:20px;color:var(--warn)}
-.v9-conf .v9-conf-arr{margin-left:auto;color:var(--g400)!important;transition:transform .15s}
+.v9-conf .v9-conf-arr{margin-left:auto;width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:24px;color:#676767;transition:transform .15s}
+.v9-conf summary:hover .v9-conf-arr{background:var(--g100)}
 .v9-conf[open] .v9-conf-arr{transform:rotate(180deg)}
-.v9-conf-item{padding:12px 0 0 28px}
-.v9-conf-res{font-size:13px;font-weight:600;color:var(--g800);margin-bottom:4px}
-.v9-conf-rule{font-size:13px;color:var(--g500);line-height:1.8}
-.v9-conf-rule.is-win{color:var(--g800)}
+.v9-conf-list{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.v9-conf-item{border:1px solid #CCCCCC;border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:8px;background:var(--wh)}
+.v9-conf-res{font-size:16px;font-weight:700;line-height:1.5;color:var(--g900)}
+.v9-conf-rule{display:flex;align-items:flex-start;gap:8px;font-size:14px;font-weight:400;line-height:1.75;color:#B3B3B3}
+.v9-conf-rule .material-symbols-outlined{font-size:20px;line-height:24px;color:#B3B3B3;font-variation-settings:'FILL' 1;flex-shrink:0}
+.v9-conf-rule.is-win{color:var(--g900)}
+.v9-conf-rule.is-win .material-symbols-outlined{color:#00B5A6}
+/* allocation card 的 Add Value：跟最後一列拉開，間距同 Add Condition（條件列 margin-bottom 20px） */
+.ac-addrow{margin-top:20px}
 .v9-kube-line{display:flex;align-items:flex-start;gap:8px;padding:12px 16px;background:var(--g50);border-top:1px solid var(--g200);font-size:13px;color:var(--g800);line-height:1.6;border-radius:0 0 var(--r-sm) var(--r-sm)}
 .v9-kube-line>:first-child{flex-shrink:0;white-space:nowrap}
 .v9-kube-line>.material-symbols-outlined{font-size:18px;color:var(--pri);font-variation-settings:'FILL' 1;margin-top:1px}
@@ -2911,8 +2917,8 @@ function v9RenderPreview(t,el){
     const ruleTxt=(ci,row)=>{const c=cards[ci];const b=(c.cspBlocks||[]).find(x=>v9EvalBlock(row,x))||(c.cspBlocks||[])[0];if(!b)return `Rule ${ci+1} → ${c.name}`;
       const body=b.conds.map((cd,k)=>(k?` ${cd.c||'AND'} `:'')+condTxt(cd)).join('');return `Rule ${ci+1}: ${cspName[b.csp]||b.csp} → ${body} → ${c.name}`};
     return `<div class="card v9-parked" style="margin-bottom:24px"><div class="v9-parked-top">${v9ParkedBadge('parked')}</div>
-<details class="v9-conf"><summary><span class="material-symbols-outlined">call_merge</span>${R.multi.length} Resource${R.multi.length>1?'s':''} Matched Multiple Rules<span class="material-symbols-outlined v9-conf-arr">expand_more</span></summary>
-${R.multi.map(m=>`<div class="v9-conf-item"><div class="v9-conf-res">${m.row.resource_name}</div>${m.hits.map((h,k)=>`<div class="v9-conf-rule${k===0?' is-win':''}">${ruleTxt(h,m.row)}${k===0?' <span class="v9-pill ok">Applied</span>':''}</div>`).join('')}</div>`).join('')}</details></div>`})():'';
+<details class="v9-conf"><summary>${R.multi.length} Resource${R.multi.length>1?'s':''} Matched Multiple Rules<span class="material-symbols-outlined v9-conf-arr">expand_more</span></summary>
+<div class="v9-conf-list">${R.multi.map(m=>`<div class="v9-conf-item"><div class="v9-conf-res">${m.row.resource_name}</div>${m.hits.map((h,k)=>`<div class="v9-conf-rule${k===0?' is-win':''}"><span class="material-symbols-outlined">${k===0?'task_alt':'cancel'}</span><span>${ruleTxt(h,m.row)}</span></div>`).join('')}</div>`).join('')}</div></details></div>`})():'';
   // UX 提案（Q-H）：空位留在 Untagged 時提示建一張 kube: 的卡
   const kubeUntagged=R.untaggedRows.filter(r=>((r.labels||{})['k8s-namespace']||'').startsWith('kube:')).reduce((s,r)=>s+r.cost,0);
   // UX 提案（Q-H）：Untagged 裡有 kube:* 成本時，Untagged 列下面加一行說明＋建議；2026-10-01 加回一鍵建立（做法 3），按下回 Edit、卡片建好、名稱留空讓使用者選
@@ -2925,13 +2931,13 @@ ${R.multi.map(m=>`<div class="v9-conf-item"><div class="v9-conf-res">${m.row.res
 ${acHtml}
 <div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div class="st">Spend Breakdown</div>${canToggle?`<span style="flex:1"></span>${v9ParkedBadge('proposal')}<div class="v9-seg" role="tablist"><button type="button" class="${before?'':'on'}" onclick="S._pvMode='after';go('preview','${t.id}')">After allocation</button><button type="button" class="${before?'on':''}" onclick="S._pvMode='before';go('preview','${t.id}')">Before allocation</button></div>`:''}</div><div class="pt-wrap"><table class="pt" style="table-layout:fixed">${colW}<thead><tr><th>Tag Value</th>${twoCol?`<th style="text-align:right">Direct <span class="info-tip" tabindex="0" data-tip="Cost that value cards assign to this value."><span class="material-symbols-outlined">info</span></span></th><th style="text-align:right">Allocated <span class="info-tip" tabindex="0" data-tip="Shared cost that allocation cards split to this value. It's an estimate from your rules, not measured cost."><span class="material-symbols-outlined">info</span></span></th>`:''}<th style="text-align:right">30 Days Spend</th><th>Share of Spend</th><th>Resources <span class="info-tip" tabindex="0" data-tip="After shared cost is split, one resource can count toward several values, so these numbers don't add up."><span class="material-symbols-outlined">info</span></span></th></tr></thead><tbody>${trows}</tbody></table></div>${untaggedFooter}${kubeLine}</div>
 ${kubeHtml}${conflictHtml}
-<div class="sbtm"><button class="btn btn-o" onclick="${S._isNew?`go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_circle_left</span>Back to Edit</button><div class="ssp"></div><button class="btn btn-o" onclick="showSaveDraftModal('${t.id}',${!!S.tags.find(x=>x.id===t.id&&x.status==='active')})">Save as Inactive Tag</button><button class="btn btn-p" onclick="v9ShowApply('${t.id}',${cover},${uc},${valCount})">Apply LumiTag</button></div>`;
+<div class="sbtm"><button class="btn btn-o" onclick="${S._isNew?`go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_circle_left</span>Back to Edit</button><div class="ssp"></div><button class="btn btn-o" onclick="showSaveDraftModal('${t.id}',${!!S.tags.find(x=>x.id===t.id&&x.status==='active')})">Save as Inactive Tag</button><button class="btn btn-p" onclick="v9ShowApply('${t.id}',${cover},${uc},${valCount},${acAll.reduce((s,x)=>s+(x.info.allocated||0),0)})">Apply LumiTag</button></div>`;
   setTimeout(()=>{el.querySelectorAll('.aseg').forEach(s=>{if(s.offsetWidth<44){const sp=s.querySelector('.seg-pct');if(sp)sp.style.visibility='hidden'}})},50);
 }
 
 /* Apply 確認（沿用 #08），加上「成員會看不到這個 key」的提醒（PRD 邊界情況：加入第一張 allocation card）
  * ⚠ ASSUMPTION：提醒文案；只在「原本沒有 allocation card、這次加了」時出現 */
-function v9ShowApply(id,cover,uc,valCount){
+function v9ShowApply(id,cover,uc,valCount,splitAmt){
   const t=S._tmp||S.tags.find(x=>x.id===id);if(!t)return;
   const orig=S.tags.find(x=>x.id===id);const firstAlloc=v9HasAlloc(t)&&!(orig&&orig.status==='active'&&v9HasAlloc(orig)&&orig!==t);
   const total=cover+uc;const cr=total?(cover/total*100).toFixed(2):'0.00';
@@ -2941,7 +2947,7 @@ function v9ShowApply(id,cover,uc,valCount){
   const notice=lastAllocGone?`<div class="notice n-info" style="margin-bottom:20px;align-items:flex-start"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">visibility</span><div>This tag no longer splits shared cost. After you apply it, <strong>Managers and Members will see ${t.name}</strong> in Cost Dashboard again.</div></div>`:firstAlloc?`<div class="notice n-warn" style="margin-bottom:20px;align-items:flex-start"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">visibility_off</span><div>This tag splits shared cost. After you apply it, <strong>Managers and Members won't see ${t.name}</strong> in Cost Dashboard, because split amounts can reveal costs outside their access.</div></div>`:'';
   showModal(`<div class="mh"><div><span class="material-symbols-outlined mh-ic" style="color:var(--warn)">warning</span><span class="mt">Apply LumiTag</span></div><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div>
 <p style="margin-bottom:30px;color:var(--g900);line-height:1.75">LumiTag <strong>${t.name}</strong> will be integrated as a primary dimension in all reports and dashboards. <br>Please confirm the summary below:</p>
-<p style="margin-bottom:8px;color:var(--g900)">Applying this tag will cover <strong style="color:var(--pri)">${v9fmt(cover)}</strong> of your total spend.</p>${notice}
+<p style="margin-bottom:8px;color:var(--g900)">Applying this tag will cover <strong style="color:var(--pri)">${v9fmt(cover)}</strong> of your total spend.${splitAmt>0?`<br><span style="font-size:12px;color:var(--g600)">Includes ${v9fmt(splitAmt)} split from shared cost (estimated).</span>`:''}</p>${notice}
 <div style="background:var(--pri-lt10);border:1px solid var(--pri-lt20);border-radius:var(--r-md);padding:16px;margin-bottom:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
 <div><div class="lt-mlabel">Tag Values</div><div style="font-weight:700;font-size:14px;color:var(--g900)">${valCount}</div></div>
 <div><div style="font-size:12px;color:var(--g500);margin-bottom:6px">Coverage Rate</div><div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:22px;color:${uc<=0?'var(--ok)':'var(--g900)'}">${uc<=0?thumb:''}${uc<=0?'100':cr}%</div></div>
