@@ -202,6 +202,7 @@
   --lt-color-bg-disabled:   var(--lt-grey-100);
   --lt-color-bg-inverse:    var(--lt-blue-90);
   --lt-color-bg-overlay:    rgba(0, 0, 0, 0.5);
+  --lt-color-bg-skeleton:   var(--lt-grey-200);   /* 骨架屏；2026-09-24 定，對應前端 gray.skeleton → gray.10；用途命名，日後可單獨換色 */
 
   /* --- Color: Border --- */
   --lt-color-border-default: var(--lt-grey-200);
@@ -254,7 +255,7 @@
   --lt-modal-backdrop: rgba(0, 0, 0, 0.5);
 
   /* --- Tooltip --- */
-  --lt-tooltip-bg:      #3C3C3C;            /* 對齊 Lumiture-Guideline.md 規範；非品牌色，刻意不引用 brand token */
+  --lt-tooltip-bg:      #31383E;            /* 2026-10-09 Kabin 裁決改成 Figma 量到的值（原 #3C3C3C）；對齊 Lumiture-Guideline.md 規範；非品牌色，刻意不引用 brand token */
   --lt-tooltip-text:    var(--lt-white);
   --lt-tooltip-radius:  var(--lt-radius-sm);
   --lt-tooltip-padding: var(--lt-space-8);
@@ -427,12 +428,40 @@ td.center .actions-cell{justify-content:center}
 .tnode{position:relative;display:flex;align-items:center;gap:8px;min-height:40px;padding:4px 24px 4px 0;cursor:default}
 /* 每一層畫一條垂直引導線，否則子資料夾跟同層專案縮排相同、讀不出誰屬於誰 */
 .trail{position:absolute;top:0;bottom:0;width:1px;background:var(--lt-color-border-default)}
-.tnode:hover{background:var(--lt-color-primary-bg)}
+/* Folder 欄的直式路徑 tooltip（2026-09-24）。表格是平的，階層只能靠這裡講：
+ * 每層一行、每層縮 16px、左邊畫跟彈窗同一種引導線，外層跟彈窗用同一套視覺語言。
+ * 深底白字照 Guideline 非圖表 tooltip（--lt-tooltip-*），max-width 600px。 */
+.fptip{position:fixed;z-index:2000;max-width:600px;background:var(--lt-tooltip-bg,#31383E);color:var(--lt-tooltip-text,#fff);border-radius:var(--lt-tooltip-radius,4px);padding:var(--lt-tooltip-padding,8px) 12px;font-size:12px;line-height:20px;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.16)}
+.fptip-row{position:relative;white-space:nowrap;color:rgba(255,255,255,.72)}
+.fptip-row.is-self{color:#fff;font-weight:600}
+.fptip-org{display:flex;align-items:center;gap:4px;color:rgba(255,255,255,.72);padding-bottom:4px;margin-bottom:4px;border-bottom:1px solid rgba(255,255,255,.16)}
+.fptip-org .material-symbols-outlined{font-size:14px;font-variation-settings:'FILL' 1}
+.fptip-rail{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.24)}
+td.has-fptip{cursor:default}
+td.has-fptip:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:-2px}
+/* 樹狀版＋資料夾底色（2026-09-24 Kabin 試 C 之後提的版本）：
+ * 引導線常駐（跟樹狀版一樣），停留時只把「所屬父層」那一條加深一階，
+ * 不是讓線出現或消失，所以游標移動時畫面沒有東西在跳。
+ * 資料夾列用 --lt-blue-10 底色；專案列 hover 改灰階，不然 hover 中的專案列
+ * 會跟資料夾列同色，被讀成資料夾。 */
+.rmodal-body.is-tinted .tnode.is-folder{background:var(--lt-blue-10);box-shadow:inset 0 -1px 0 0 var(--lt-blue-20)}
+.rmodal-body.is-tinted .tnode.is-folder:hover{background:var(--lt-blue-20)}
+.rmodal-body.is-tinted .trail{transition:background-color .12s}
+/* 對照：VS Code 預設（workbench.tree.renderIndentGuides = onHover）。
+ * 游標不在清單上時完全不畫線；游標一進清單，所有線一起淡入，所屬父層那條照樣加深。
+ * 跟 C 的差別：線是整片一起出現，不會一列一列跟著游標跑。鍵盤 focus 在清單內也算進入 */
+.rmodal-body.is-rails-onhover .trail{opacity:0;transition:opacity .15s,background-color .12s}
+.rmodal-body.is-rails-onhover:hover .trail,
+.rmodal-body.is-rails-onhover:focus-within .trail{opacity:1}
+.hguide{position:absolute;top:0;bottom:0;width:1px;background:var(--lt-blue-60,#0B6DD7);opacity:0;pointer-events:none;transition:opacity .12s}
+/* 白底列 hover 用 CM Hover #F6F6F6（Guideline 狀態色「白色背景 hover」、Dropdown Item hover）。
+ * 淡藍 #F2FAFF 在 Dropdown 規範裡是 Selected，拿來當 hover 會跟選取狀態混淆（2026-09-24 統一） */
+.tnode:hover{background:var(--lt-grey-50)}
 /* 資料夾列在自己的子樹範圍內黏在頂端。因為 .tbranch 把子項包起來，
  * 黏著會在子樹捲完時自然結束，不會一路疊到底。收合的資料夾 .tbranch
  * 高度等於自己那一列，等於沒有黏著空間，行為自動退回一般列。 */
 .tnode.is-folder{position:sticky;background:var(--lt-color-bg-default)}
-.tnode.is-folder:hover{background:var(--lt-color-primary-bg)}
+.tnode.is-folder:hover{background:var(--lt-grey-50)}
 .tnode.is-project{min-height:44px}
 /* 縮排封頂後補上的祖先路徑。次要文字色 + 正常字重，讓資料夾名稱仍然是這一列
  * 唯一的粗體，路徑只是脈絡不是主體。 */
@@ -492,6 +521,14 @@ td.center .actions-cell{justify-content:center}
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tnode.is-selectall .tname{font-weight:600}
 .tname.is-nocost{color:var(--lt-color-text-secondary);font-style:italic}
+.is-nofolder{color:var(--lt-color-text-secondary);font-style:italic}
+.fpath{color:var(--lt-color-text-secondary)}
+/* Folder 欄中段截斷（2026-09-24）：原本整格 text-overflow 從尾巴切，1024px 寬時
+ * 顯示成「corp / … / payment…」，最重要的資料夾本身反而被切掉。
+ * 改成兩段：路徑可以縮到只剩「…」，資料夾名稱不縮（只有自己比整格還長時才截） */
+.fcell{display:flex;min-width:0;max-width:100%}
+.fcell .fpath{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fcell .fown{flex:0 0 auto;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* ============================================================
  * 元件版：忠實複製既有 GroupedMultiSelect 的視覺語言，再延伸到多層。
  * 對照來源（LumiTure-FE）：
@@ -1084,14 +1121,14 @@ thead th.skel-th{background:var(--lt-grey-100)}
 
     { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
       { id: 'general-budget',    label: 'General Budget',    icon: 'savings',              href: './general-budget.html' },
-      { id: 'customized-budget', label: 'Customized Budget', icon: 'tune',                 disabled: true },
-      { id: 'anomaly-detection', label: 'Anomaly Detection', icon: 'notifications_active', disabled: true },
+      { id: 'customized-budget', label: 'Customized Budget', icon: 'tune',                 href: './customized-budget.html' },
+      { id: 'anomaly-detection', label: 'Anomaly Detection', icon: 'notifications_active', href: './anomaly-detection.html' },
     ]},
 
     { type: 'group', id: 'org', label: 'Organization Settings', items: [
-      { id: 'lumitag',            label: 'LumiTag',            icon: 'sell',            href: './lumitag.html' },
       { id: 'group-list',         label: 'Group List',         icon: 'groups',          href: './group-list.html' },
-      { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
+      { id: 'lumitag',            label: 'LumiTag',            icon: 'sell',            href: './lumitag.html' },
+      { id: 'all-resource-list',  label: 'All Resource List',  icon: 'folder_data',     href: './all-resource-list.html' },
       { id: 'authorization-list', label: 'Authorization List', icon: 'link',            href: './organization-settings.html' },
       { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', href: './group-list.html#admin' },
     ]},
@@ -1146,67 +1183,85 @@ thead th.skel-th{background:var(--lt-grey-100)}
     '.lt-sidebar{width:var(--lt-sb-w);min-width:0;background:var(--lt-sb-bg);color:#fff;',
     'position:sticky;top:0;height:100vh;z-index:100;overflow:hidden;',
     'flex-shrink:0;',
-    'display:flex;flex-direction:column;transition:width .2s ease;scrollbar-width:none}',
+    'display:flex;flex-direction:column;transition:width .2s ease;scrollbar-width:none;',
+    /* 2026-10-02 對 Figma LumiTag #01：Side Navbar 三層陰影 */
+    'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12)}',
     '.lt-sidebar::-webkit-scrollbar{display:none}',
     '.lt-sidebar.lt-collapsed{width:64px}',
 
     /* Logo block */
-    '.lt-sb-logo{padding:16px 20px;display:flex;align-items:center;gap:10px;',
-    'font-size:18px;font-weight:700;color:#fff;border-bottom:1px solid var(--lt-sb-border);',
-    'min-height:68px;box-sizing:border-box;white-space:nowrap;overflow:hidden;flex-shrink:0}',
-    '.lt-sb-logo-wrap{position:relative;width:32px;height:32px;flex-shrink:0}',
-    '.lt-sb-logo-wrap svg{width:32px;height:32px;display:block}',
-    /* PROTOTYPE tag — cyan caps below the icon */
-    '.lt-sb-proto{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);',
-    'background:var(--lt-sb-bg);color:#34B5D9;font-size:6px;font-weight:700;',
-    'padding:1px 3px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px;',
-    'line-height:1.2;white-space:nowrap}',
-    '.lt-sb-logo-text{transition:opacity .2s}',
-    '.lt-sidebar.lt-collapsed .lt-sb-logo-text{opacity:0;width:0;overflow:hidden}',
-    '.lt-sidebar.lt-collapsed .lt-sb-proto{display:none}',
-    '.lt-sidebar.lt-collapsed .lt-sb-logo{padding:16px;justify-content:center;gap:0}',
+    '.lt-sb-logo{position:relative;padding:0 24px;display:flex;align-items:center;gap:6px;',
+    'font-size:18px;font-weight:700;color:#fff;border-bottom:none;',
+    'height:64px;box-sizing:border-box;white-space:nowrap;overflow:hidden;flex-shrink:0}',
+    '.lt-sb-logo-wrap{width:39px;height:28px;flex-shrink:0}',
+    '.lt-sb-logo-wrap svg{width:39px;height:28px;display:block;overflow:visible}',
+    /* hover 變形（2026-10-05 Kabin 試做）：圓環白→青、短條青→白 0.18s，腳 scaleY 0→1 從圓環裡長出來 0.22s；只有連結狀態才有 */
+    'a.lt-sb-logo{text-decoration:none;cursor:pointer}',
+    'a.lt-sb-logo:focus-visible{outline:2px solid #4ADFFF;outline-offset:-6px;border-radius:8px}',
+    '.lt-i-ring{fill:#FFF;transition:fill .18s ease}',
+    '.lt-i-short{fill:#4ADFFF;transition:fill .18s ease}',
+    '.lt-i-leg{fill:#4ADFFF;transform:scaleY(0);transform-box:fill-box;transform-origin:50% 0;transition:transform .22s cubic-bezier(.2,.8,.2,1) .04s}',
+    'a.lt-sb-logo:hover .lt-i-ring,a.lt-sb-logo:focus-visible .lt-i-ring{fill:#4ADFFF}',
+    'a.lt-sb-logo:hover .lt-i-short,a.lt-sb-logo:focus-visible .lt-i-short{fill:#FFF}',
+    'a.lt-sb-logo:hover .lt-i-leg,a.lt-sb-logo:focus-visible .lt-i-leg{transform:scaleY(1)}',
+    '@media (prefers-reduced-motion:reduce){.lt-i-ring,.lt-i-short,.lt-i-leg,.lt-sb-proto-x{transition:none}}',
+    '.lt-sb-logo-text{transition:opacity .2s;color:#fff;font-size:18px;line-height:1}',
+    /* 2026-10-05 Kabin 選 C1：正式 logo 不動，產品名後面接線框膠囊標示 prototype。完整的 PROTOTYPE 塞不下（sidebar 250px，膠囊只剩約 53px），所以寫 PROTO；
+       9px、青色 #4ADFFF（對比 9.12:1），右緣實測 228.6px，在 nav 項目右緣 234px 以內。原本的 P 標誌存成 shared/prototype-p-mark.svg */
+    '.lt-sb-proto{flex-shrink:0;padding:0 4px;border:1px solid #4ADFFF;border-radius:999px;color:#4ADFFF;',
+    'font-size:9px;font-weight:700;letter-spacing:.02em;line-height:14px;transition:opacity .2s;display:inline-flex}',
+    /* hover 時 PROTO 展開成 PROTOTYPE：TYPE 用 max-width 0→30px 推出來。完整字要 63px，所以平常的膠囊也收緊成字距 .02em、內距 4（右緣 243.8px，離 sidebar 邊 6px） */
+    '.lt-sb-proto-x{display:inline-block;max-width:0;overflow:hidden;vertical-align:top;transition:max-width .22s cubic-bezier(.2,.8,.2,1) .04s}',
+    'a.lt-sb-logo:hover .lt-sb-proto-x,a.lt-sb-logo:focus-visible .lt-sb-proto-x{max-width:30px}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo-text,.lt-sidebar.lt-collapsed .lt-sb-proto{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo{padding:0;justify-content:center;gap:0}',
+    /* 收合時膠囊放不下，改顯示 prototype 專用 P 標誌（shared/prototype-p-mark.svg），收合後也看得出是 prototype（2026-10-05 Kabin） */
+    '.lt-sb-logo-p{display:none;width:36.8px;height:32px;flex-shrink:0}',
+    '.lt-sb-logo-p svg{width:36.8px;height:32px;display:block;overflow:visible}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo-wrap{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo-p{display:block}',
 
     /* Nav scroll area — 內部捲動，sidebar 外層不捲（寬敞 padding 對齊原始設計） */
-    '.lt-sb-nav{flex:1;padding:8px 12px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}',
+    '.lt-sb-nav{flex:1;padding:16px 16px 8px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}',
     '.lt-sb-nav::-webkit-scrollbar{width:6px}',
     '.lt-sb-nav::-webkit-scrollbar-track{background:transparent}',
     '.lt-sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}',
     '.lt-sb-nav::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.25)}',
 
     /* Top-level item (no group) — 寬敞 padding，font-size 14px */
-    '.lt-sb-item{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;',
-    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
-    'text-decoration:none;white-space:nowrap;overflow:hidden;margin-bottom:2px}',
+    '.lt-sb-item{display:flex;align-items:center;gap:8px;padding:8px;min-height:40px;box-sizing:border-box;cursor:pointer;',
+    'font-size:14px;font-weight:400;line-height:24px;color:#fff;border-radius:4px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden;margin-bottom:8px}',
     '.lt-sb-item:hover{background:var(--lt-sb-hov);color:#fff}',
-    '.lt-sb-item.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-item.lt-active{background:var(--lt-sb-active);color:#fff}',
     '.lt-sb-item.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
-    '.lt-sb-item .material-symbols-outlined{font-size:20px;opacity:.9;flex-shrink:0}',
+    '.lt-sb-item .material-symbols-outlined{font-size:24px;flex-shrink:0}',
 
     /* Group section */
-    '.lt-sb-group{margin-bottom:4px}',
+    '.lt-sb-group{margin-bottom:0}',
     '.lt-sb-group-hdr{display:flex;align-items:center;justify-content:space-between;',
-    'padding:18px 14px 10px;font-size:14px;font-weight:700;color:#fff;',
-    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:.2px}',
+    'padding:8px;min-height:40px;box-sizing:border-box;margin-bottom:8px;font-size:14px;font-weight:500;line-height:24px;color:#fff;border-radius:4px;',
+    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0}',
     '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
     '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
-    '.lt-sb-group-arrow{font-size:18px;transition:transform .18s;opacity:.85;flex-shrink:0}',
+    '.lt-sb-group-arrow{font-size:24px;transition:transform .18s;flex-shrink:0}',
     '.lt-sb-group.lt-collapsed .lt-sb-group-arrow{transform:rotate(180deg)}',
     '.lt-sb-group.lt-collapsed .lt-sb-group-children{display:none}',
 
     /* Sub-item (inside group) — 一致 14px font，11px 垂直 padding */
-    '.lt-sb-subitem{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;',
-    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
-    'text-decoration:none;white-space:nowrap;overflow:hidden}',
+    '.lt-sb-subitem{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 24px;min-height:40px;box-sizing:border-box;cursor:pointer;',
+    'font-size:14px;font-weight:400;line-height:24px;color:#fff;border-radius:4px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden;margin-bottom:8px}',
     '.lt-sb-subitem:hover{background:var(--lt-sb-hov);color:#fff}',
-    '.lt-sb-subitem.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-subitem.lt-active{background:var(--lt-sb-active);color:#fff}',
     '.lt-sb-subitem.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
-    '.lt-sb-subitem .material-symbols-outlined{font-size:18px;opacity:.9;flex-shrink:0}',
+    '.lt-sb-subitem .material-symbols-outlined{font-size:24px;flex-shrink:0}',
 
     /* Collapsed state — hide labels, center icons */
     '.lt-sidebar.lt-collapsed .lt-sb-item span:not(.material-symbols-outlined),',
     '.lt-sidebar.lt-collapsed .lt-sb-subitem span:not(.material-symbols-outlined){display:none}',
     '.lt-sidebar.lt-collapsed .lt-sb-item,',
-    '.lt-sidebar.lt-collapsed .lt-sb-subitem{padding:10px 0;justify-content:center;border-radius:0}',
+    '.lt-sidebar.lt-collapsed .lt-sb-subitem{padding:8px 0;justify-content:center;border-radius:0}',
     '.lt-sidebar.lt-collapsed .lt-sb-group-hdr > span:first-child{display:none}',
     '.lt-sidebar.lt-collapsed .lt-sb-group-arrow{display:none}',
     '.lt-sidebar.lt-collapsed .lt-sb-group-hdr{padding:8px 0;justify-content:center}',
@@ -1233,19 +1288,29 @@ thead th.skel-th{background:var(--lt-grey-100)}
     document.head.appendChild(s);
   }
 
-  // ===== Canonical Logo (concentric circles + PROTOTYPE tag + LumiTure.ai) =====
-  var LOGO_HTML =
-    '<div class="lt-sb-logo">' +
-      '<div class="lt-sb-logo-wrap">' +
-        '<svg viewBox="0 0 32 32" fill="none" aria-hidden="true">' +
-          '<circle cx="16" cy="16" r="13" stroke="#FFF" stroke-width="2" fill="none"/>' +
-          '<circle cx="16" cy="16" r="7" stroke="#FFF" stroke-width="2" fill="none"/>' +
-          '<circle cx="16" cy="16" r="3" fill="#FFF"/>' +
-        '</svg>' +
-        '<span class="lt-sb-proto">PROTOTYPE</span>' +
-      '</div>' +
+  // ===== Logo：正式 Lumiture logo＋LumiTure.ai＋PROTO 膠囊 =====
+  // ===== Prototype 專用 P 標誌（收合狀態＋favicon 用；正本 shared/prototype-p-mark.svg） =====
+  var P_MARK_INNER = '<defs><mask id="ltPring" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#000"/><circle cx="25.0413" cy="14" r="14.1" fill="#fff"/></mask><mask id="ltPbars" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#fff"/><circle cx="25.0413" cy="14" r="14" fill="#000"/></mask><mask id="ltPmask" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#fff"/><circle cx="25.0413" cy="14" r="11.2" fill="#000"/></mask></defs><path d="M25.0413 0C32.7731 0.00012318 39.0413 6.26809 39.0413 14C39.0413 21.7319 32.7731 27.9999 25.0413 28C21.8903 28 18.983 26.9582 16.6434 25.2014C16.582 25.1553 16.5075 25.1299 16.4307 25.1299H10.5422C10.2772 25.1299 10.0349 24.9801 9.91625 24.7432L8.61254 22.1367C8.49619 21.904 8.66584 21.6299 8.92602 21.6299H12.6564C12.9342 21.6299 13.103 21.3205 12.9622 21.081C12.5841 20.4379 12.2558 19.7621 11.983 19.0586C11.93 18.9218 11.7992 18.8301 11.6525 18.8301H1.96704C1.70205 18.8301 1.45971 18.6803 1.34106 18.4434L0.0373491 15.8369C-0.0790086 15.6042 0.090642 15.3301 0.350826 15.3301H10.7202C10.9265 15.3301 11.0876 15.1526 11.0737 14.9468C11.0524 14.6339 11.0413 14.3182 11.0413 14C11.0413 13.6356 11.0551 13.2745 11.0825 12.9171C11.0983 12.71 10.9367 12.5303 10.729 12.5303H0.52563C0.265515 12.5303 0.0959761 12.2561 0.212154 12.0234L1.51586 9.41699C1.63443 9.17986 1.87673 9.0303 2.14184 9.03027H11.708C11.8534 9.03027 11.9832 8.94026 12.0372 8.8053C12.3188 8.10088 12.6561 7.4248 13.0436 6.7823C13.188 6.54274 13.0195 6.22949 12.7398 6.22949H5.07544C4.81536 6.22938 4.64663 5.95629 4.76294 5.72363L6.06567 3.11719C6.1842 2.88012 6.42661 2.72959 6.69165 2.72949H16.6204C16.6952 2.72949 16.768 2.70541 16.8285 2.66148C19.1355 0.987609 21.973 0 25.0413 0ZM25.0413 2.7998C18.8557 2.7998 13.8411 7.81441 13.8411 14C13.8411 20.1856 18.8557 25.2002 25.0413 25.2002C31.2267 25.2001 36.2415 20.1855 36.2415 14C36.2415 7.81449 31.2267 2.79993 25.0413 2.7998Z" fill="#FFF" mask="url(#ltPbars)"/><path d="M25.0413 0C32.7731 0.00012318 39.0413 6.26809 39.0413 14C39.0413 21.7319 32.7731 27.9999 25.0413 28C21.8903 28 18.983 26.9582 16.6434 25.2014C16.582 25.1553 16.5075 25.1299 16.4307 25.1299H10.5422C10.2772 25.1299 10.0349 24.9801 9.91625 24.7432L8.61254 22.1367C8.49619 21.904 8.66584 21.6299 8.92602 21.6299H12.6564C12.9342 21.6299 13.103 21.3205 12.9622 21.081C12.5841 20.4379 12.2558 19.7621 11.983 19.0586C11.93 18.9218 11.7992 18.8301 11.6525 18.8301H1.96704C1.70205 18.8301 1.45971 18.6803 1.34106 18.4434L0.0373491 15.8369C-0.0790086 15.6042 0.090642 15.3301 0.350826 15.3301H10.7202C10.9265 15.3301 11.0876 15.1526 11.0737 14.9468C11.0524 14.6339 11.0413 14.3182 11.0413 14C11.0413 13.6356 11.0551 13.2745 11.0825 12.9171C11.0983 12.71 10.9367 12.5303 10.729 12.5303H0.52563C0.265515 12.5303 0.0959761 12.2561 0.212154 12.0234L1.51586 9.41699C1.63443 9.17986 1.87673 9.0303 2.14184 9.03027H11.708C11.8534 9.03027 11.9832 8.94026 12.0372 8.8053C12.3188 8.10088 12.6561 7.4248 13.0436 6.7823C13.188 6.54274 13.0195 6.22949 12.7398 6.22949H5.07544C4.81536 6.22938 4.64663 5.95629 4.76294 5.72363L6.06567 3.11719C6.1842 2.88012 6.42661 2.72959 6.69165 2.72949H16.6204C16.6952 2.72949 16.768 2.70541 16.8285 2.66148C19.1355 0.987609 21.973 0 25.0413 0ZM25.0413 2.7998C18.8557 2.7998 13.8411 7.81441 13.8411 14C13.8411 20.1856 18.8557 25.2002 25.0413 25.2002C31.2267 25.2001 36.2415 20.1855 36.2415 14C36.2415 7.81449 31.2267 2.79993 25.0413 2.7998Z" fill="#4ADFFF" mask="url(#ltPring)"/><path d="M13.094 21.298L15.227 19.995L15.45 14L24.480 33.503A0.35 0.35 0 0 1 24.162 34.000L21.246 34.000A0.7 0.7 0 0 1 20.648 33.665Z" fill="#4ADFFF" mask="url(#ltPmask)"/><path d="M6.45275 22.0168C6.33418 21.7797 6.09179 21.6299 5.82665 21.6299H3.32559C3.06541 21.6299 2.89618 21.9037 3.01254 22.1364L4.3158 24.7429C4.43438 24.9801 4.67676 25.1299 4.9419 25.1299H7.44297C7.70315 25.1299 7.87237 24.8561 7.75601 24.6234L6.45275 22.0168Z" fill="#FFF"/><path d="M25.0413 5.59998C29.6803 5.60019 33.4407 9.3613 33.4407 14.0004C33.4405 18.6392 29.6801 22.3996 25.0413 22.3998C20.4022 22.3998 16.6411 18.6394 16.6409 14.0004C16.6409 9.36117 20.4021 5.59998 25.0413 5.59998ZM25.0403 8.39978C24.0472 8.39988 23.1146 8.65916 22.3059 9.11267C23.4354 9.14717 24.3409 10.0716 24.3411 11.2094C24.3411 12.3691 23.4003 13.3099 22.2405 13.3099C21.105 13.3097 20.1818 12.4079 20.1438 11.2816C19.6961 12.0864 19.4408 13.0131 19.4407 13.9994C19.4407 17.092 21.9478 19.5997 25.0403 19.6C28.1331 19.6 30.6409 17.0922 30.6409 13.9994C30.6406 10.9069 28.1329 8.39978 25.0403 8.39978Z" fill="#FFF"/>';
+  // favicon：深藍圓角底，白色速度條在淺色分頁列上才看得到
+  var FAVICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#002663"/>' +
+    '<g transform="translate(8.55 11.6) scale(1.2)">' + P_MARK_INNER + '</g></svg>';
+
+  // 正式 logo 的圖形拆成五層（同一條原版 path 用 mask 分出速度條／圓環），hover 時圓環轉青、P 的腳從圓環長出來、左下短條轉白＝收合狀態那個 P 標誌
+  var LOGO_ICON = '<svg viewBox="0 0 40 28" fill="none" aria-hidden="true"><defs><mask id="ltHring" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#000"/><circle cx="25.0413" cy="14" r="14.1" fill="#fff"/></mask><mask id="ltHbars" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#fff"/><circle cx="25.0413" cy="14" r="14" fill="#000"/></mask><mask id="ltHleg" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#fff"/><circle cx="25.0413" cy="14" r="11.2" fill="#000"/></mask></defs><path d="M25.0413 0C32.7731 0.00012318 39.0413 6.26809 39.0413 14C39.0413 21.7319 32.7731 27.9999 25.0413 28C21.8903 28 18.983 26.9582 16.6434 25.2014C16.582 25.1553 16.5075 25.1299 16.4307 25.1299H10.5422C10.2772 25.1299 10.0349 24.9801 9.91625 24.7432L8.61254 22.1367C8.49619 21.904 8.66584 21.6299 8.92602 21.6299H12.6564C12.9342 21.6299 13.103 21.3205 12.9622 21.081C12.5841 20.4379 12.2558 19.7621 11.983 19.0586C11.93 18.9218 11.7992 18.8301 11.6525 18.8301H1.96704C1.70205 18.8301 1.45971 18.6803 1.34106 18.4434L0.0373491 15.8369C-0.0790086 15.6042 0.090642 15.3301 0.350826 15.3301H10.7202C10.9265 15.3301 11.0876 15.1526 11.0737 14.9468C11.0524 14.6339 11.0413 14.3182 11.0413 14C11.0413 13.6356 11.0551 13.2745 11.0825 12.9171C11.0983 12.71 10.9367 12.5303 10.729 12.5303H0.52563C0.265515 12.5303 0.0959761 12.2561 0.212154 12.0234L1.51586 9.41699C1.63443 9.17986 1.87673 9.0303 2.14184 9.03027H11.708C11.8534 9.03027 11.9832 8.94026 12.0372 8.8053C12.3188 8.10088 12.6561 7.4248 13.0436 6.7823C13.188 6.54274 13.0195 6.22949 12.7398 6.22949H5.07544C4.81536 6.22938 4.64663 5.95629 4.76294 5.72363L6.06567 3.11719C6.1842 2.88012 6.42661 2.72959 6.69165 2.72949H16.6204C16.6952 2.72949 16.768 2.70541 16.8285 2.66148C19.1355 0.987609 21.973 0 25.0413 0ZM25.0413 2.7998C18.8557 2.7998 13.8411 7.81441 13.8411 14C13.8411 20.1856 18.8557 25.2002 25.0413 25.2002C31.2267 25.2001 36.2415 20.1855 36.2415 14C36.2415 7.81449 31.2267 2.79993 25.0413 2.7998Z" fill="#FFF" mask="url(#ltHbars)"/><path class="lt-i-ring" d="M25.0413 0C32.7731 0.00012318 39.0413 6.26809 39.0413 14C39.0413 21.7319 32.7731 27.9999 25.0413 28C21.8903 28 18.983 26.9582 16.6434 25.2014C16.582 25.1553 16.5075 25.1299 16.4307 25.1299H10.5422C10.2772 25.1299 10.0349 24.9801 9.91625 24.7432L8.61254 22.1367C8.49619 21.904 8.66584 21.6299 8.92602 21.6299H12.6564C12.9342 21.6299 13.103 21.3205 12.9622 21.081C12.5841 20.4379 12.2558 19.7621 11.983 19.0586C11.93 18.9218 11.7992 18.8301 11.6525 18.8301H1.96704C1.70205 18.8301 1.45971 18.6803 1.34106 18.4434L0.0373491 15.8369C-0.0790086 15.6042 0.090642 15.3301 0.350826 15.3301H10.7202C10.9265 15.3301 11.0876 15.1526 11.0737 14.9468C11.0524 14.6339 11.0413 14.3182 11.0413 14C11.0413 13.6356 11.0551 13.2745 11.0825 12.9171C11.0983 12.71 10.9367 12.5303 10.729 12.5303H0.52563C0.265515 12.5303 0.0959761 12.2561 0.212154 12.0234L1.51586 9.41699C1.63443 9.17986 1.87673 9.0303 2.14184 9.03027H11.708C11.8534 9.03027 11.9832 8.94026 12.0372 8.8053C12.3188 8.10088 12.6561 7.4248 13.0436 6.7823C13.188 6.54274 13.0195 6.22949 12.7398 6.22949H5.07544C4.81536 6.22938 4.64663 5.95629 4.76294 5.72363L6.06567 3.11719C6.1842 2.88012 6.42661 2.72959 6.69165 2.72949H16.6204C16.6952 2.72949 16.768 2.70541 16.8285 2.66148C19.1355 0.987609 21.973 0 25.0413 0ZM25.0413 2.7998C18.8557 2.7998 13.8411 7.81441 13.8411 14C13.8411 20.1856 18.8557 25.2002 25.0413 25.2002C31.2267 25.2001 36.2415 20.1855 36.2415 14C36.2415 7.81449 31.2267 2.79993 25.0413 2.7998Z" mask="url(#ltHring)"/><g mask="url(#ltHleg)"><path class="lt-i-leg" d="M13.094 21.298L15.227 19.995L15.45 14L24.480 33.503A0.35 0.35 0 0 1 24.162 34.000L21.246 34.000A0.7 0.7 0 0 1 20.648 33.665Z"/></g><path class="lt-i-short" d="M6.45275 22.0168C6.33418 21.7797 6.09179 21.6299 5.82665 21.6299H3.32559C3.06541 21.6299 2.89618 21.9037 3.01254 22.1364L4.3158 24.7429C4.43438 24.9801 4.67676 25.1299 4.9419 25.1299H7.44297C7.70315 25.1299 7.87237 24.8561 7.75601 24.6234L6.45275 22.0168Z"/><path d="M25.0413 5.59998C29.6803 5.60019 33.4407 9.3613 33.4407 14.0004C33.4405 18.6392 29.6801 22.3996 25.0413 22.3998C20.4022 22.3998 16.6411 18.6394 16.6409 14.0004C16.6409 9.36117 20.4021 5.59998 25.0413 5.59998ZM25.0403 8.39978C24.0472 8.39988 23.1146 8.65916 22.3059 9.11267C23.4354 9.14717 24.3409 10.0716 24.3411 11.2094C24.3411 12.3691 23.4003 13.3099 22.2405 13.3099C21.105 13.3097 20.1818 12.4079 20.1438 11.2816C19.6961 12.0864 19.4408 13.0131 19.4407 13.9994C19.4407 17.092 21.9478 19.5997 25.0403 19.6C28.1331 19.6 30.6409 17.0922 30.6409 13.9994C30.6406 10.9069 28.1329 8.39978 25.0403 8.39978Z" fill="#FFF"/></svg>';
+
+  // logo 連到 Overview（從 LUMITURE_NAV 拿 href）；在 Overview 頁本身不連自己，也就沒有 hover 變形
+  function _renderLogo() {
+    var nav = window.LUMITURE_NAV || [];
+    var home = nav.filter(function (e) { return e.type === 'item' && e.id === 'overview'; })[0];
+    var linked = home && home.href && !home.disabled && window.LUMITURE_ACTIVE !== 'overview';
+    var open = linked ? '<a class="lt-sb-logo is-link" href="' + _esc(home.href) + '" title="Go to Overview">' : '<div class="lt-sb-logo">';
+    return open +
+      '<div class="lt-sb-logo-wrap">' + LOGO_ICON + '</div>' +
       '<span class="lt-sb-logo-text">LumiTure.ai</span>' +
-    '</div>';
+      '<span class="lt-sb-proto" title="Prototype">PROTO<span class="lt-sb-proto-x">TYPE</span></span>' +
+      '<div class="lt-sb-logo-p" aria-hidden="true"><svg viewBox="0 0 39.10 34.00" fill="none">' + P_MARK_INNER + '</svg></div>' +
+    (linked ? '</a>' : '</div>');
+  }
 
   // ===== Helpers =====
   function _esc(s) {
@@ -1313,7 +1378,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
     }
     // If mount is not already a sidebar, wrap it
     mount.classList.add('lt-sidebar');
-    mount.innerHTML = LOGO_HTML + _renderNav() + _renderCollapseBtn();
+    mount.innerHTML = _renderLogo() + _renderNav() + _renderCollapseBtn();
 
     // Group toggle
     mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
@@ -1356,9 +1421,19 @@ thead th.skel-th{background:var(--lt-grey-100)}
     rerender: _render,
   };
 
+  // 頁面自己沒設 favicon 才補，分頁列一眼分得出 prototype 跟正式站
+  function _injectFavicon() {
+    if (document.querySelector('link[rel~="icon"]')) return;
+    var l = document.createElement('link');
+    l.rel = 'icon'; l.type = 'image/svg+xml';
+    l.href = 'data:image/svg+xml,' + encodeURIComponent(FAVICON_SVG);
+    document.head.appendChild(l);
+  }
+
   // ===== INIT =====
   function _init() {
     _injectCSS();
+    _injectFavicon();
     _render();
     // Dispatch resize so chart libraries (ECharts 等) 重新測量容器
     // —— 避免 inline script 已先 init chart 後，shared CSS 才 inject 導致 layout shift
@@ -1477,14 +1552,15 @@ thead th.skel-th{background:var(--lt-grey-100)}
   // ===== CSS =====
   var CSS = [
     /* ---------- Topbar 容器 ---------- */
-    '.lt-topbar{background:#002663;padding:14px 32px;display:flex;align-items:center;justify-content:flex-end;gap:16px;',
-    'position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px;box-sizing:border-box}',
+    /* 2026-10-02 照 Figma LumiTag #01：高 64、左右內距 24、無底線；帳號區與紅點是刻意的，不動 */
+    '.lt-topbar{background:#002663;padding:14px 24px;display:flex;align-items:center;justify-content:flex-end;gap:16px;',
+    'position:sticky;top:0;z-index:50;border-bottom:none;min-height:64px;box-sizing:border-box}',
 
     /* Icon button */
     '.lt-tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;',
-    'cursor:pointer;color:rgba(255,255,255,.7);background:none;border:none;padding:0;position:relative;font-family:inherit;transition:background .15s,color .15s}',
+    'cursor:pointer;color:#fff;background:none;border:none;padding:0;position:relative;font-family:inherit;transition:background .15s,color .15s}',
     '.lt-tb-ic:hover{background:rgba(255,255,255,.08);color:#fff}',
-    '.lt-tb-ic .material-symbols-outlined{font-size:22px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 22}',
+    '.lt-tb-ic .material-symbols-outlined{font-size:30px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 30}',
     '.lt-tb-ic .lt-tb-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:#FF403D;',
     'border:2px solid #002663;border-radius:50%}',
 
@@ -1533,8 +1609,8 @@ thead th.skel-th{background:var(--lt-grey-100)}
     '.lt-q-label{font-size:12.5px;color:rgba(255,255,255,.9);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
     '.lt-q-val{font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:3px}',
     '.lt-q-val .material-symbols-outlined{font-size:13px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 13}',
-    /* hover tooltip（Lumiture 非圖表 tooltip 規範：#3C3C3C 深底白字） */
-    '.lt-q-tip{position:absolute;top:calc(100% + 2px);left:8px;right:8px;z-index:5;background:#3C3C3C;color:#fff;',
+    /* hover tooltip（Lumiture 非圖表 tooltip 規範：#31383E 深底白字） */
+    '.lt-q-tip{position:absolute;top:calc(100% + 2px);left:8px;right:8px;z-index:5;background:#31383E;color:#fff;',
     'font-size:11.5px;font-weight:400;line-height:1.45;padding:8px 10px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.3);',
     'opacity:0;visibility:hidden;transform:translateY(-2px);transition:opacity .12s,transform .12s;pointer-events:none}',
     '.lt-q-item.has-tip:hover .lt-q-tip,.lt-q-item.has-tip:focus-within .lt-q-tip{opacity:1;visibility:visible;transform:none}',
@@ -1892,14 +1968,216 @@ const AWS_ACCOUNTS=[['prod-payments','876543210987'],['staging-web','32109876543
 const AWS_MGMT=[['CloudMile-Org-Root','112233445566']];
 const AZ_RG=[['rg-prod-web','/resourceGroups/rg-prod-web'],['rg-corp-bi','/resourceGroups/rg-corp-bi']];
 const AZ_SUB=[['Corporate-BI-Data','/subscriptions/c5d7a1e2']];
+/* 欄位用的資料夾標籤：跟彈窗共用「最小可區分路徑」，但這裡要連自己的名字一起給
+ * （彈窗的 pathPrefix() 只給祖先，因為資料夾自己的名字就是那一列的標題）。
+ * 名稱唯一 → 只有自己（`staging`）；跟別人撞名 → 往上補到夠區分（`platform / staging`）。
+ * ⚠️ 已知限制：第一層資料夾跨 org 撞名時補不出東西（沒有祖先可爬，org 依設計不在樹裡），
+ * 兩列會同樣顯示 `platform`。那個 case 要靠 org 欄解，見 CLAUDE.md。 */
+function folderColumnParts(node, cloud){
+  const ancestors = hierIndex(cloud).paths.get(node.id) || [];
+  /* 尾段規則跟彈窗的 pathPrefix() 一樣：`Math.max(1, …)` 至少一層祖先，
+   * 撞名就往上補到夠區分。彈窗靠縮排講層級、表格沒有縮排，所以這個下限不能省。 */
+  const take = Math.min(ancestors.length, Math.max(1, distinguishingSegments(node, cloud)));
+  const shown = take ? ancestors.slice(ancestors.length - take) : [];
+  /* 保留最上層（2026-09-22，Kabin：「看不出可能有十層的階層關係」）。
+   * 彈窗刻意不顯示 root，理由是深層資料夾的 root 幾乎都一樣、是噪音——
+   * 但那個理由的前提是**區段標頭與縮排已經在講範圍**。平的表格兩者都沒有，
+   * root 在這裡反而是真資訊：它是第一層容器之一，等於說出這在哪個大分區。
+   * 中段一律用「…」帶過、不標數量（Kabin：層數不重要，重要的是哪個資料夾）。 */
+  const root = ancestors.length ? ancestors[0] : null;
+  const rootShown = root !== null && shown[0] !== root;
+  const elided = ancestors.length - take - (rootShown ? 1 : 0) > 0;
+  return {root: rootShown ? root : null, elided, ancestors: shown, own: node.name};
+}
+function folderColumnSegments(node, cloud){
+  const {root, elided, ancestors, own} = folderColumnParts(node, cloud);
+  const head = [];
+  if(root) head.push(root);
+  if(elided) head.push('…');
+  return {prefix: head.concat(ancestors), own};
+}
+/* 顯示用：路徑走次要色、容器自己走主要色。
+ * 彈窗那邊名稱是粗體（它是那一列的標題），表格這裡刻意不粗——
+ * 第一欄（Project／Account／Resource Group）才是這張表的主角，兩欄都粗會互搶。 */
+/* 搜尋時的規則（2026-09-24）：命中的那一層如果剛好被省略成「…」，就把它換回來顯示，
+ * 不然高亮落在看不到的地方，使用者不知道這列為什麼被搜到。
+ * 做法：先算平常會顯示哪幾層（root、尾段祖先、自己），再把命中的層加進去，
+ * 依原順序排好，中間有跳號的地方補「…」。 */
+/* 內外共用：回傳要顯示的路徑段（已高亮、含「…」）與名稱本身。
+ * 表格的 Folder 欄跟彈窗搜尋結果都走這一支，所以同一個資料夾在兩個地方寫法一定一樣 */
+function hierDisplayParts(node, cloud, q){
+  const full = folderColumnSegmentsFull(node, cloud);
+  const last = full.length - 1;
+  const {root, ancestors} = folderColumnParts(node, cloud);
+  const show = new Set([last]);
+  if(root) show.add(0);
+  for(let i = last - ancestors.length; i < last; i++) show.add(i);
+  if(q) full.forEach((seg, i)=>{ if(seg.toLowerCase().includes(q)) show.add(i); });
+  const idx = [...show].sort((a,b)=>a-b);
+  const parts = [];
+  idx.forEach((i, n)=>{ if(n > 0 && i - idx[n-1] > 1) parts.push('…'); if(i !== last) parts.push(hlq(full[i], q)); });
+  return {parts, own: hlq(full[last], q)};
+}
+function folderColumnHtml(node, cloud, q){
+  const {parts, own} = hierDisplayParts(node, cloud, q);
+  /* 最後那個「 / 」放在名稱那段、不放在路徑那段：路徑被截時才會是「fraud-revie… / archive」，
+   * 而不是分隔符跟著被截掉、黏成「fraud-revie…archive」 */
+  const lead = parts.join(' / ');
+  return `<span class="fcell">${lead?`<span class="fpath">${lead}</span>`:''}<span class="fown">${lead?'<span class="fpath">\u00a0/\u00a0</span>':''}${own}</span></span>`;
+}
+/* Folder 欄 tooltip：hover 與鍵盤 focus 都會出現（原生 title 只有 hover、而且排版不了）。
+ * 每一行替它的每個上層畫一條線，位置 = 那一層文字起點往左 10px，跟彈窗的線
+ * 「對齊上層箭頭中心」是同一個邏輯，只是 tooltip 裡沒有箭頭，改對齊文字起點前的空位。 */
+/* 多 org 時第一行是 org（domain icon＋名稱），對應彈窗裡的 org 區段標頭：
+ * 它是區段不是樹的一層，所以資料夾不因為它多縮一層，跟彈窗一樣 */
+function fpathTipHtml(segs, org){
+  const head = org ? `<div class="fptip-org"><span class="material-symbols-outlined">domain</span>${esc(org)}</div>` : '';
+  return head + segs.map((seg, level)=>{
+    let rails = '';
+    for(let l=0; l<level; l++) rails += `<span class="fptip-rail" style="left:${l*16 + 5}px"></span>`;
+    return `<div class="fptip-row${level===segs.length-1?' is-self':''}" style="padding-left:${level*16}px">${rails}${esc(seg)}</div>`;
+  }).join('');
+}
+function showFpathTip(cell){
+  hideFpathTip();
+  const segs = (cell.getAttribute('data-fpath') || '').split('\n').filter(Boolean);
+  if(!segs.length) return;
+  const tip = document.createElement('div');
+  tip.className = 'fptip'; tip.id = 'fptip'; tip.setAttribute('role','tooltip');
+  tip.innerHTML = fpathTipHtml(segs, cell.getAttribute('data-forg'));
+  document.body.appendChild(tip);
+  const r = cell.getBoundingClientRect(), t = tip.getBoundingClientRect();
+  let top = r.bottom + 4;
+  if(top + t.height > window.innerHeight - 8) top = r.top - t.height - 4;   // 下面放不下就翻到上面
+  const left = Math.min(r.left + 8, window.innerWidth - t.width - 8);
+  tip.style.top = top + 'px'; tip.style.left = Math.max(8, left) + 'px';
+}
+function hideFpathTip(){ const t = document.getElementById('fptip'); if(t) t.remove(); }
+document.addEventListener('mouseover', e=>{
+  const cell = e.target.closest && e.target.closest('td.has-fptip');
+  if(cell){ if(!document.getElementById('fptip') || document.getElementById('fptip')._for !== cell){ showFpathTip(cell); const t=document.getElementById('fptip'); if(t) t._for = cell; } }
+  else hideFpathTip();
+});
+document.addEventListener('focusin', e=>{ const cell = e.target.closest && e.target.closest('td.has-fptip'); if(cell) showFpathTip(cell); });
+document.addEventListener('focusout', e=>{ if(e.target.closest && e.target.closest('td.has-fptip')) hideFpathTip(); });
+document.addEventListener('scroll', hideFpathTip, true);
+/* 排序與搜尋用的純文字版（排序拿 HTML 去比會把標籤也比進去） */
+function folderColumnText(node, cloud){
+  const {prefix, own} = folderColumnSegments(node, cloud);
+  return prefix.concat(own).join(' / ');
+}
+function folderColumnSegmentsFull(node, cloud){
+  return (hierIndex(cloud).paths.get(node.id) || []).concat(node.name);
+}
+function folderColumnFullPath(node, cloud){
+  return folderColumnSegmentsFull(node, cloud).join(' / ');
+}
+/* 排序鍵：完整路徑，不是畫面上的縮寫字串。
+ * 縮寫版裡的「…」(U+2026) 排在所有英文字母後面，深層資料夾會被丟到同一個 root 的
+ * 最底下，不會緊貼著它的上層。分隔符用 \u0001（比任何可見字元都小），
+ * 所以一個資料夾底下的子層一定緊接在它後面，依這欄排序就等於攤平的樹。 */
+function folderSortKey(node, cloud){
+  return folderColumnSegmentsFull(node, cloud).join('\u0001').toLowerCase();
+}
+/* 外層表格的 GCP 資料改成從資料夾樹取，不再用另一套 GCP_PROJECTS / GCP_BAS。
+ * 那兩套原本是各自獨立的 mock（表格是 finops-prod-core + CloudMile Master Billing，
+ * 樹裡是 reporting-iac + corp-main-billing），同一個專案在彈窗與表格會長得完全不一樣。
+ * 加上 Folder 欄之後這個矛盾會直接被看見（欄位值對不上彈窗裡的樹），所以一併統一。
+ * ⚠️ 刻意不看 `p.assigned`：那個旗標是彈窗「只列未指派」的情境開關（Demo FAB 的
+ * assign-first／drift／synced 在切它，預設是全部未指派），不是「這個群組擁有什麼」。
+ * 拿它當表格的資料來源，表格會跟著彈窗情境一起變空。 */
+/* 把 extra 平均插進 base，不要接在尾端。
+ * 接尾端的話那些列會全部落在 pool 最後一段，而取樣 seed 打不到那麼後面，
+ * 等於那個狀態在畫面上永遠不會出現（No folder 跟第二個 org 都踩過這個坑）。
+ * 順序在這裡本來就沒有語意，平均散開才能讓每個狀態都被看得到。 */
+function spreadInto(base, extra){
+  if(!extra.length) return base;
+  const queue = extra.slice();
+  const step = Math.max(1, Math.floor(base.length / extra.length));
+  const out = [];
+  base.forEach((row, index)=>{
+    out.push(row);
+    if(index % step === step - 1 && queue.length) out.push(queue.shift());
+  });
+  return out.concat(queue);
+}
+function gcpProjectPool(){
+  /* 每個 org 各自收一份再交錯，不是一個 org 接著一個 org。
+   * 真實情況本來就可能有一個群組同時指派到兩個 org 的專案，
+   * 那正是 Organization 欄存在的理由，所以交錯不是 demo 作弊、是比較貼近真實。 */
+  const perOrg = activeOrgs().map(org=>{
+    const rows = [];
+    walkFolders(org.folders, node=>{
+      node.projects.forEach(p=>rows.push({p, folder:node, org}));
+    });
+    return rows;
+  });
+  const foldered = perOrg.reduce((acc, rows)=>acc.length ? spreadInto(acc, rows) : rows, []);
+  const loose = UNASSIGNED_PROJECTS.map(p=>({p, folder:null, org:activeOrgs()[0]}));
+  return spreadInto(foldered, loose);
+}
+/* Demo 專用的策展列（`state.hierShowcase`）。一般情境的列是依 groupId 取樣的，
+ * 深度落在哪裡是隨機的，所以「階層位置欄在各種深度長怎樣」這件事要嘛看不到、
+ * 要嘛得一組一組翻。這個情境直接把第 1／2／4／7／10 層跟 No folder 排在一起，
+ * 讓深度範圍一眼看完。**只有 Demo FAB 會開**，真實流程不會走到。 */
+const HIER_SHOWCASE = {
+  /* 第 1 層／第 2 層撞名／第 4 層中間層撞名（regional 兩條只差中間那段）／第 7 層／第 10 層／沒有歸屬 */
+  gcp:   ['f-data', 'f-platform-staging', 'f-reg-a-staging', 'deep-6', 'deep-9', null],
+  aws:   ['ou-security', 'ou-wk-staging', 'ou-sb-staging', 'ou-pay-ledger', null],
+  azure: ['mg-decom', 'mg-corp-prod', 'mg-lz-prod', 'mg-edge', null],
+};
+function findHierNode(cloud, id){
+  let hit = null;
+  walkFolders(hierarchyTree(cloud), node=>{ if(node.id === id) hit = node; });
+  return hit;
+}
+function showcaseRows(cloud){
+  const pool = cloud==='gcp' ? gcpProjectPool()
+    : (cloud==='aws' ? AWS_PICK_ACCOUNTS : AZURE_RESOURCE_GROUPS).map(r=>({p:r, folder:r.hier, org:null}));
+  return (HIER_SHOWCASE[cloud]||[]).map((nodeId, index)=>{
+    const node = nodeId ? findHierNode(cloud, nodeId) : null;
+    /* 找一個真的住在那個容器底下的資源，沒有就從 pool 借一個名字，
+     * 重點是演欄位不是演資料完整性 */
+    const owned = node && node.projects && node.projects.length ? node.projects[0] : null;
+    const res = owned || pool[index % pool.length].p;
+    const org = cloud==='gcp'
+      ? (pool.find(r=>r.p===res) || {}).org || activeOrgsFor('gcp')[0]
+      : (node ? orgForHier(node, cloud) : activeOrgsFor(cloud)[0]);
+    return {id:`showcase-${cloud}-${index}`, name:res.name||NO_COST_LABEL, subId:res.resId,
+      parentName:res.parent.name, parentId:res.parent.id,
+      folderNode:node, orgName:org && org.name, orgId:org && org.orgId, canRemove:true};
+  });
+}
 function resourcesFor(groupId, cloud){
+  if(state.hierShowcase) return showcaseRows(cloud);
   const seedBase = groupId.length + (cloud==='aws'?1:cloud==='azure'?2:0);
   const count = 1 + (seedBase % 4);
   const out=[];
   for(let index=0;index<count;index++){
-    if(cloud==='gcp'){const p=pick(GCP_PROJECTS,seedBase+index), b=pick(GCP_BAS,seedBase+index); out.push({id:groupId+'-gcp'+index, name:p[0], subId:p[1], parentName:b[0], parentId:b[1], canRemove:index!==0||true});}
-    else if(cloud==='aws'){const a=pick(AWS_ACCOUNTS,seedBase+index), m=pick(AWS_MGMT,0); out.push({id:groupId+'-aws'+index, name:a[0], subId:a[1], parentName:m[0], parentId:m[1], canRemove:true});}
-    else {const r=pick(AZ_RG,seedBase+index), s=pick(AZ_SUB,0); out.push({id:groupId+'-az'+index, name:r[0], subId:r[1], parentName:s[0], parentId:s[1], canRemove:true});}
+    if(cloud==='gcp'){
+      /* 取樣用質數步長打散：原本 pick(pool, seedBase+index) 的 seed 只有 2~22，
+       * 永遠落在 pool 最前面幾筆，導致同一組的資源全擠在相鄰資料夾、而且
+       * 排在尾端的 No folder 專案永遠取不到（那個狀態看不到等於沒做）。 */
+      const pool = gcpProjectPool();
+      const row = pool.length ? pick(pool, seedBase*37 + index*53) : null;
+      if(!row) continue;
+      out.push({id:groupId+'-gcp'+index, name:row.p.name||NO_COST_LABEL, subId:row.p.resId,
+        parentName:row.p.parent.name, parentId:row.p.parent.id,
+        folderNode:row.folder, orgName:row.org.name, orgId:row.org.orgId, canRemove:true});
+    }
+    else {
+      /* AWS / Azure 跟 GCP 走同一套：從該雲自己的巢狀樹取，資源身上帶著 `hier`
+       * （attachHierarchy 掛的），所以階層欄三朵雲用同一個機制長出來。
+       * 原本這兩朵雲是從 AWS_ACCOUNTS / AZ_RG 這組只有 2~3 筆的常數取，
+       * 跟彈窗用的 AWS_PICK_ACCOUNTS / AZURE_RESOURCE_GROUPS 是兩個平行宇宙，
+       * 跟 GCP 先前那個矛盾一模一樣，一併收掉。 */
+      const pool = cloud==='aws' ? AWS_PICK_ACCOUNTS : AZURE_RESOURCE_GROUPS;
+      const res = pick(pool, seedBase*37 + index*53);
+      const org = res.hier ? orgForHier(res.hier, cloud) : activeOrgsFor(cloud)[0];
+      out.push({id:`${groupId}-${cloud}${index}`, name:res.name, subId:res.resId,
+        parentName:res.parent.name, parentId:res.parent.id,
+        folderNode:res.hier, orgName:org && org.name, orgId:org && org.orgId, canRemove:true});
+    }
   }
   return out;
 }
@@ -2075,6 +2353,106 @@ const AZURE_RESOURCE_GROUPS = makeFlatResources('azure', [
   'rg-web-stg','rg-aks-dev','rg-devops','rg-legacy-vm',
 ], AZURE_SUBSCRIPTIONS, 10, [2,7,11,13], (name)=>`${name}-eastasia`);
 
+/* ============================================================
+ * 三朵雲的巢狀容器樹（2026-09-22）
+ * 深度上限照各雲官方規格：GCP folder 10 層、AWS OU 5 層、Azure MG 6 層
+ * （Azure 的 6 層不含 root 與 subscription）。三朵雲都有巢狀容器、都可以深，
+ * 所以「階層位置」是三雲共通的欄位槽，不是 GCP 特例：
+ *     可指派資源     階層位置              付費歸屬
+ *     Project        Folder                Billing Account
+ *     Account        Organizational Unit   Management Account
+ *     Resource Group Management Group      Subscription
+ * 每棵樹都刻意放兩種東西：一條到該雲上限的深鏈（驗證深層呈現），
+ * 以及一組同名節點（驗證最小可區分路徑）。
+ * `take` = 這個節點直接掛幾個資源，由 attachHierarchy() 依序從扁平清單發配，
+ * 讓樹與彈窗用的扁平清單指到同一批物件，不會像 GCP 那樣長出兩個平行宇宙。 */
+const AWS_OU_TREE = [
+  {id:'ou-workloads', name:'Workloads', take:2, children:[
+    {id:'ou-prod', name:'Prod', take:2, children:[
+      {id:'ou-payments', name:'Payments', take:1, children:[
+        {id:'ou-pay-core', name:'Core', take:1, children:[
+          {id:'ou-pay-ledger', name:'Ledger', take:1, children:[]},   // 第 5 層＝AWS 上限
+        ]},
+      ]},
+    ]},
+    {id:'ou-wk-staging', name:'Staging', take:2, children:[]},        // 與 Sandbox/Staging 同名
+  ]},
+  {id:'ou-sandbox', name:'Sandbox', take:1, children:[
+    {id:'ou-sb-staging', name:'Staging', take:2, children:[]},        // 同名的另一個
+  ]},
+  {id:'ou-security', name:'Security', take:3, children:[]},
+  {id:'ou-infra', name:'Infrastructure', take:3, children:[]},
+];
+const AZURE_MG_TREE = [
+  {id:'mg-corp', name:'Corp', take:1, children:[
+    {id:'mg-platform', name:'Platform', take:1, children:[
+      {id:'mg-connectivity', name:'Connectivity', take:1, children:[
+        {id:'mg-hub', name:'Hub', take:1, children:[
+          {id:'mg-eastasia', name:'EastAsia', take:1, children:[
+            {id:'mg-edge', name:'Edge', take:1, children:[]},          // 第 6 層＝Azure 上限
+          ]},
+        ]},
+      ]},
+    ]},
+    {id:'mg-corp-prod', name:'Prod', take:2, children:[]},             // 與 LandingZones/Prod 同名
+  ]},
+  {id:'mg-landing', name:'LandingZones', take:1, children:[
+    {id:'mg-lz-prod', name:'Prod', take:2, children:[]},               // 同名的另一個
+  ]},
+  {id:'mg-decom', name:'Decommissioned', take:2, children:[]},
+];
+/* 三朵雲的授權邊界（2026-09-22）。GCP／AWS 都叫 Organization，Azure 叫 Tenant
+ * （Entra directory），名稱各自照原生術語，機制共用同一個 multiOrg 旗標。
+ * GCP 的 org 本來就各自帶自己的 folder 樹（GCP_ORGS），AWS／Azure 這兩棵樹是
+ * 單一棵，所以改用「第一層容器各自歸屬哪個 org」來切——真實世界也是這樣，
+ * 每個 root OU / root MG 都屬於一個 organization / tenant。 */
+const CLOUD_ORGS = {
+  aws: [
+    {id:'aws-org-acme', name:'acme-corp', orgId:'o-a1b2c3d4e5'},
+    {id:'aws-org-beta', name:'beta-inc',  orgId:'o-z9y8x7w6v5'},
+  ],
+  azure: [
+    {id:'az-tenant-acme', name:'acme.onmicrosoft.com', orgId:'72f988bf-86f1-41af-91ab-2d7cd011db47'},
+    {id:'az-tenant-beta', name:'beta.onmicrosoft.com', orgId:'8a1c9e33-0b57-4d2a-9f60-1e8b77a4c512'},
+  ],
+};
+function activeOrgsFor(cloud){
+  if(cloud === 'gcp') return activeOrgs();
+  const list = CLOUD_ORGS[cloud] || [];
+  return assign.multiOrg ? list : list.slice(0, 1);
+}
+/* AWS／Azure：第一層容器前半歸第一個 org、後半歸第二個。
+ * 單一 org 時全部歸同一個，欄位本來就不會顯示。 */
+function orgForHier(node, cloud){
+  const orgs = activeOrgsFor(cloud);
+  if(orgs.length <= 1) return orgs[0];
+  const roots = hierarchyTree(cloud);
+  const path = hierIndex(cloud).paths.get(node.id) || [];
+  const rootName = path.length ? path[0] : node.name;
+  const index = roots.findIndex(r=>r.name === rootName);
+  return orgs[index >= Math.ceil(roots.length / 2) ? 1 : 0];
+}
+/* 把扁平清單的資源依序發配到樹上，兩邊指向同一批物件（不是複製）。
+ * 資源比 take 總和多的時候，剩下的掛回第一個根節點，不讓任何資源沒有位置。 */
+function attachHierarchy(resources, tree){
+  let cursor = 0;
+  walkFolders(tree, node=>{
+    node.projects = [];
+    for(let n=0; n<(node.take||0) && cursor<resources.length; n++){
+      const res = resources[cursor++];
+      res.hier = node;
+      node.projects.push(res);
+    }
+  });
+  while(cursor < resources.length){
+    const res = resources[cursor++];
+    res.hier = tree[0];
+    tree[0].projects.push(res);
+  }
+}
+attachHierarchy(AWS_PICK_ACCOUNTS, AWS_OU_TREE);
+attachHierarchy(AZURE_RESOURCE_GROUPS, AZURE_MG_TREE);
+
 /* 每朵雲的名詞與資料。彈窗的標題、副標、placeholder、底部計數都從這裡長出來，
  * 免得三份文案各自寫死之後慢慢走鐘。 */
 const PICKER = {
@@ -2162,9 +2540,11 @@ const state = {
   tab:'group-members',  // group-members | resources | tier-2-groups
   cloud:'gcp',
   selectedResources:{},
+  hierShowcase:false,   // Demo FAB「階層深度示意」用，真實流程不會開
   pendingDialog:null,
   pendingUnlink:null,
-  resSub:{gcp:'primary', aws:'primary', azure:'primary'},   // Resources 子分頁（Project|Label / Account|Tag），每朵雲各自記
+  resSub:{gcp:'primary', aws:'primary', azure:'primary'},
+  resSearch:{gcp:'', aws:'', azure:''},   // Resources 表格搜尋字串，每朵雲各自記（同 FE createPlatformResourcesStore）   // Resources 子分頁（Project|Label / Account|Tag），每朵雲各自記
   sort:{t1:{key:null,dir:0}, tier2:{key:null,dir:0}, members:{key:null,dir:0}, resources:{key:null,dir:0}},
 };
 function actions(){return ROLE_ACTIONS[state.role]}
@@ -2409,10 +2789,53 @@ Invite users to the group or check with your administrator if assistance is need
 }
 
 const CLOUD_META = {
-  gcp:{label:'Google Cloud', col1:'Project', col2:'Billing Account (Project belongs to)', dot:'conic-gradient(from 35deg,#4285f4 0 25%,#34a853 0 50%,#fbbc05 0 75%,#ea4335 0)'},
-  aws:{label:'AWS', col1:'Account', col2:'Management Account (Account belongs to)', dot:'#ff9900'},
-  azure:{label:'Azure', col1:'Resource Group', col2:'Subscription (Resource Group belongs to)', dot:'#0078d4'},
+  /* col2 拿掉「(Project belongs to)」這類後綴（2026-09-24，⚠ 偏離 production 文案，待跟團隊提）：
+   * 表格結構已經說了每列是一個資源，後綴是在補結構負責的事；而且它在 1440px 就被截成
+   * 「Billing Account (Project belongs」，已經不只是冗、是看不完整。Label/Tag 子分頁同步 */
+  gcp:{label:'Google Cloud', col1:'Project', hierCol:'Folder', orgCol:'Organization', col2:'Billing Account', dot:'conic-gradient(from 35deg,#4285f4 0 25%,#34a853 0 50%,#fbbc05 0 75%,#ea4335 0)'},
+  aws:{label:'AWS', col1:'Account', hierCol:'Organizational Unit', orgCol:'Organization', col2:'Management Account', dot:'#ff9900'},
+  azure:{label:'Azure', col1:'Resource Group', hierCol:'Management Group', orgCol:'Tenant', col2:'Subscription', dot:'#0078d4'},
 };
+/* ===== Resources 表格搜尋（2026-09-24 做成真的） =====
+ * 行為照 FE ResourcesSearch：前端篩選（API 一次抓回整個群組）、500ms debounce、
+ * 不分大小寫的「包含」、每朵雲各自一份字串、命中字全部高亮。
+ * FE 現況只比對「資源 name/ID ＋ 上層 name/ID」；這裡多比對兩個欄位：
+ *   ① 階層位置的完整路徑（每一層都算，所以搜 platform 會列出它整棵子樹的專案）
+ *   ② Organization（多 org 時才有這欄）
+ * ⚠ 這兩個欄位 FE 的 /resources/assigned 回傳目前沒有，要先請後端補。 */
+function resQuery(){ return (state.resSearch[state.cloud] || '').trim().toLowerCase(); }
+function hlq(text, q){
+  const str = String(text == null ? '' : text);
+  if(!q) return esc(str);
+  const low = str.toLowerCase(); let out = '', from = 0, at;
+  while((at = low.indexOf(q, from)) >= 0){
+    out += esc(str.slice(from, at)) + '<span class="hl">' + esc(str.slice(at, at + q.length)) + '</span>';
+    from = at + q.length;
+  }
+  return out + esc(str.slice(from));
+}
+function resourceMatches(r, q){
+  if(!q) return true;
+  const hay = [r.name, r.subId, r.parentName, r.parentId, r.orgName, r.orgId];
+  if(r.folderNode){
+    const segs = folderColumnSegmentsFull(r.folderNode, state.cloud);
+    hay.push(...segs, segs.join(' / '));
+  }
+  return hay.some(v => v && String(v).toLowerCase().includes(q));
+}
+let _resSearchTimer = null;
+function onResSearch(input){
+  const value = input.value;
+  clearTimeout(_resSearchTimer);
+  _resSearchTimer = setTimeout(()=>{
+    state.resSearch[state.cloud] = value;
+    const caret = input.selectionStart;
+    render();
+    /* render() 整頁重建，輸入框會失焦；照彈窗那套把焦點與游標還回去 */
+    const el = document.getElementById('res-search');
+    if(el){ el.focus(); try{ el.setSelectionRange(caret, caret); }catch(_){} }
+  }, 500);
+}
 function resourcesTab(group){
   const isT2 = state.tier===2;
   const notAuthorized = state.cloudAuth==='gcp-only' && state.cloud!=='gcp';
@@ -2452,7 +2875,9 @@ function resourcesTab(group){
      * folder picker、Label 開 #56）。Unlink 走同一個 #20 彈窗。 */
     const sub = state.resSub[state.cloud] || 'primary';
     const terms = TAG_TERMS[state.cloud];
-    const projects = resourcesFor(group.id, state.cloud);
+    const allProjects = resourcesFor(group.id, state.cloud);
+    const q = sub==='primary' ? resQuery() : '';
+    const projects = allProjects.filter(r=>resourceMatches(r, q));
     const tags = assignedTagsFor(group.id, state.cloud);
     const bucketKey = sub==='tag' ? state.cloud+'-tag' : state.cloud;
     const rowsData = sub==='tag' ? tags : projects;
@@ -2464,7 +2889,12 @@ function resourcesTab(group){
     const someOn = selectedIds.length>0 && !allOn;
     const idsCsv = rowsData.map(r=>"'"+r.id+"'").join(',');
     let tableBlock;
-    if(!rowsData.length){
+    if(!rowsData.length && q){
+      /* 搜尋沒結果 ≠ 沒有資源，不能沿用 No Resources Yet（那會讓人以為指派被清空了） */
+      tableBlock = `<div class="empty-state"><div><span class="material-symbols-outlined">search_off</span>
+        <p class="empty-title">No Matching Resources</p>
+        <p class="empty-copy">No resources match “${esc(state.resSearch[state.cloud].trim())}”. Try a different name, ID, or ${esc(CLOUD_META[state.cloud].hierCol ? CLOUD_META[state.cloud].hierCol.toLowerCase() : 'parent')}.</p></div></div>`;
+    } else if(!rowsData.length){
       tableBlock = `<div class="empty-state"><div><span class="material-symbols-outlined">add_link</span>
         <p class="empty-title">No Resources Yet</p>
         <p class="empty-copy">No resources have been assigned to this group yet.
@@ -2483,19 +2913,51 @@ Please assign new resources or reach out to your administrator for help.</p></di
           <th>${canRemove?checkboxHtml(allOn, `toggleAllResources('${bucketKey}',[${idsCsv}])`, someOn):''}</th>
           ${sortHeader(terms.colKey,'resources','key')}${sortHeader(terms.colValue,'resources','value')}${sortHeader(terms.colParent,'resources','parent')}<th>Action</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     } else {
-      const resAccessors = {col1:r=>r.name.toLowerCase(), col2:r=>r.parentName.toLowerCase()};
+      /* Folder 欄只有 GCP 有。這不是 GCP 特例——這張表的欄位本來就隨雲不同
+       * （AWS 是 Management Account、Azure 是 Subscription），每朵雲照自己的階層命名。
+       * AWS 的 Organizational Unit / Azure 的 Management Group 是對應物，這輪沒有需求證據，不一起推。
+       * 沒有資料夾的專案顯示 No folder，沿用 .is-nocost 的斜體次要色（跟 No Cost Project 同一種處理）。 */
+      /* 階層欄三朵雲都有（2026-09-22）。三雲的結構同型、只是名稱與深度上限不同：
+       * GCP Folder 10 層／AWS Organizational Unit 5 層／Azure Management Group 6 層。
+       * 欄位槽固定成「資源 → 階層位置 → 付費歸屬」，名稱由 CLOUD_META.hierCol 決定，
+       * 路徑規則三朵雲共用同一組函式，之後加雲只要補一棵樹跟一個名稱。 */
+      const hasFolderCol = !!CLOUD_META[state.cloud].hierCol;
+      /* Organization 欄只在「GCP 且真的有多個 org」時出現，條件跟彈窗的區段標頭共用
+       * 同一個 isMultiOrg()。單一 org（今天所有客戶）整欄不 render，畫面像素級不變。
+       * 理由不是資訊完整性，是正確性：跨 org 撞名時最小可區分路徑補不出東西
+       * （第一層資料夾沒有祖先可爬，distinguishingSegments() 回傳 0），
+       * 彈窗靠 org 區段標頭擋住，平的表格沒有區段就沒人擋，
+       * Folder 欄會出現兩列一模一樣的字串指向不同資料夾。 */
+      const hasOrgCol = !!CLOUD_META[state.cloud].orgCol && isMultiOrg();
+      const noHierLabel = `No ${CLOUD_META[state.cloud].hierCol.toLowerCase()}`;
+      const folderText = r => r.folderNode ? folderColumnText(r.folderNode, state.cloud) : noHierLabel;
+      const resAccessors = {col1:r=>r.name.toLowerCase(), col2:r=>r.parentName.toLowerCase(),
+        folder:r=>r.folderNode ? folderSortKey(r.folderNode, state.cloud) : '\uffff', org:r=>(r.orgName||'').toLowerCase()};
       const rows = sortRows(projects, 'resources', resAccessors).map(r=>`<tr class="${selected[r.id]?'selected':''}">
           <td>${canRemove?checkboxHtml(!!selected[r.id], `toggleResource('${r.id}','${bucketKey}')`):''}</td>
-          <td class="cell-double"><div class="l1">${esc(r.name)}</div><div class="l2">${esc(r.subId)}</div></td>
-          <td class="cell-double"><div class="l1">${esc(r.parentName)}</div><div class="l2">${esc(r.parentId)}</div></td>
+          <td class="cell-double"><div class="l1">${hlq(r.name,q)}</div><div class="l2">${hlq(r.subId,q)}</div></td>
+          <td class="cell-double"><div class="l1">${hlq(r.parentName,q)}</div><div class="l2">${hlq(r.parentId,q)}</div></td>
+          ${hasOrgCol?`<td class="cell-double"><div class="l1">${hlq(r.orgName||'',q)}</div><div class="l2">${hlq(r.orgId||'',q)}</div></td>`:''}
+          ${hasFolderCol?`<td class="cell-ellipsis${r.folderNode?' has-fptip':' is-nofolder'}"${r.folderNode?` tabindex="0"${hasOrgCol&&r.orgName?` data-forg="${esc(r.orgName)}"`:''} data-fpath="${esc(folderColumnSegmentsFull(r.folderNode, state.cloud).join('\n'))}" aria-label="${esc(folderColumnFullPath(r.folderNode, state.cloud))}"`:''}>${r.folderNode?folderColumnHtml(r.folderNode, state.cloud, q):esc(noHierLabel)}</td>`:''}
           <td><button class="btn-icon ${r.canRemove&&canRemove?'danger':''}" ${!(r.canRemove&&canRemove)?'disabled':''} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'],'${bucketKey}')" title="Unlink Resource"><span class="material-symbols-outlined">link_off</span></button></td>
         </tr>`).join('');
-      tableBlock = `<div class="table-wrap"><table><colgroup><col style="width:48px"><col style="width:42%"><col><col style="width:80px"></colgroup><thead><tr>
+      /* 欄位順序（2026-09-24 第二次調整）：Project → Billing Account → (Organization) → Folder → Action。
+       * ①跟彈窗 Group by 切換器同一個順序（Billing account → Folder）
+       * ②production 既有的前兩欄（Project、Billing Account）位置不動，Folder 是新增的、接在後面
+       * ③長度不固定的路徑放最後，吃剩下的寬度；Organization 緊貼在它前面，先讀範圍再讀路徑
+       * 欄寬：Billing Account 固定 240px（真實 GCP BA ID 20 字元，22% 在 1024px 只剩 167px 放不下），
+       * 多 org 時欄位變多，表格最小寬度拉到 960px，窄螢幕改橫向捲動，不讓路徑被擠到剩幾個字。 */
+      const resCols = hasOrgCol
+        ? `<col style="width:48px"><col style="width:22%"><col style="width:240px"><col style="width:18%"><col><col style="width:80px">`
+        : hasFolderCol
+        ? `<col style="width:48px"><col style="width:22%"><col style="width:240px"><col><col style="width:80px">`
+        : `<col style="width:48px"><col style="width:42%"><col><col style="width:80px">`;
+      tableBlock = `<div class="table-wrap"><table${hasOrgCol?' style="min-width:960px"':''}><colgroup>${resCols}</colgroup><thead><tr>
           <th>${canRemove?checkboxHtml(allOn, `toggleAllResources('${bucketKey}',[${idsCsv}])`, someOn):''}</th>
-          ${sortHeader(CLOUD_META[state.cloud].col1,'resources','col1')}${sortHeader(CLOUD_META[state.cloud].col2,'resources','col2')}<th>Action</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+          ${sortHeader(CLOUD_META[state.cloud].col1,'resources','col1')}${sortHeader(CLOUD_META[state.cloud].col2,'resources','col2')}${hasOrgCol?sortHeader(CLOUD_META[state.cloud].orgCol,'resources','org'):''}${hasFolderCol?sortHeader(CLOUD_META[state.cloud].hierCol,'resources','folder'):''}<th>Action</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     }
     const seg = `<div class="seg" role="tablist">
-        <button class="seg-btn ${sub==='primary'?'active':''}" role="tab" aria-selected="${sub==='primary'}" onclick="setResSub('primary')">${CLOUD_META[state.cloud].col1}<span class="seg-cnt">${projects.length}</span></button>
+        <button class="seg-btn ${sub==='primary'?'active':''}" role="tab" aria-selected="${sub==='primary'}" onclick="setResSub('primary')">${CLOUD_META[state.cloud].col1}<span class="seg-cnt">${allProjects.length}</span></button>
         <button class="seg-btn ${sub==='tag'?'active':''}" role="tab" aria-selected="${sub==='tag'}" onclick="setResSub('tag')">${esc(terms.tab)}<span class="seg-cnt">${tags.length}</span></button>
       </div>`;
     /* #03-5：Unlink Resource 是藍色 outline（跟 Assign Resource 同一組主色），不是紅色。
@@ -2504,7 +2966,9 @@ Please assign new resources or reach out to your administrator for help.</p></di
     return pillTabs(true) + `
       <div class="res-toolbar">
         <div class="res-toolbar-left">${seg}
-          <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="Search resources" oninput="showToast('Filtering… (prototype does not filter mock data)')"></div>
+          <div class="search-box"><span class="material-symbols-outlined">search</span>${sub==='primary'
+            ? `<input id="res-search" placeholder="Search resources" value="${esc(state.resSearch[state.cloud]||'')}" oninput="onResSearch(this)">`
+            : `<input placeholder="Search resources" oninput="showToast('Filtering… (prototype does not filter mock data)')">`}</div>
         </div>
         <div class="res-toolbar-actions">
           ${(canRemove && selectedIds.length)?`<button class="btn btn-out" onclick="openUnlinkDialog('${group.id}','${state.cloud}',[${selectedIds.map(id=>"'"+id+"'").join(',')}],'${bucketKey}')"><span class="material-symbols-outlined">link_off</span>Unlink Resource</button>`:''}
@@ -2592,7 +3056,7 @@ const assign = {
    * tree      = 我原本做的樹狀版（左側箭頭、縮排引導線、巢狀 sticky）
    * 放兩套是為了讓 Kabin 實際感受「既有元件延伸到多層」會遇到什麼，
    * 而不是只讀我的文字分析。Demo FAB 可即時切換。 */
-  pickerStyle:'component-fix',   // 2026-09-10 Kabin 定案走這個版本
+  pickerStyle:'tree-tint-hover',   // 2026-09-24 Kabin 定案：樹狀＋資料夾底色，引導線照 VS Code 預設「游標進清單才顯示」。常駐版與 component 系列留作對照
   hasFolders:true,     // org 完全沒開資料夾時退回現行的 BA → Project 兩層
   /* false ＝ 切 Group by 就清掉已勾選（開發團隊 2026-09-10 立場，RD 出兩支
    * 獨立 API）。清掉時會在彈窗裡告知並給 Undo，不靜默。true ＝ 保留（UX
@@ -2601,14 +3065,14 @@ const assign = {
    * false ＝ 原本的線性縮排，留著對照「波動拳」長什麼樣。 */
   /* 是否授權了多個 GCP org。true 才長出 org 區段標頭，單一 org 畫面完全不變。 */
   multiOrg:false,
-  /* 深層樹的路徑策略，Kabin 2026-09-11 問「只有第五層後有路徑會不會很怪」而做的
-   * 三個可切換對照：
-   *   'deep'  = 現況。縮排封頂後才出現路徑
-   *   'all'   = 每一列都顯示緊鄰上層（語言一致，但淺層全是冗餘）
-   *   'micro' = 封頂後改用 4px 微縮排維持鏈狀感，路徑只留給同名／搜尋
-   * 真實客戶只有 2-3 層，三者在真實情境下畫面完全相同，差別只在第五層之後。 */
+  /* 深層樹的路徑策略：
+   *   'deep' = 預設。縮排封頂時才補路徑（C 案不封頂，所以實際只在搜尋／撞名時出現）
+   *   'all'  = 每一列都顯示緊鄰上層（語言一致，但淺層全是冗餘）
+   * 'micro'（封頂後改 8px 步進）與它的常駐引導線 2026-09-24 否決，程式碼已移除。 */
   pathMode:'deep',
-  indentCap:true,
+  /* 2026-09-24 Kabin 定案 C：整棵樹只有一種步距（16px，不封頂），平常不畫線，
+   * 滑鼠停在哪一列只亮它所屬的那一條。封頂（A）、micro＋常駐引導線（B）已否決、情境已移除 */
+  indentCap:false,
   keepSelection:false,
   clearedSelection:null,   // Undo 用，切視角清掉的那一份
   clearedCount:0,
@@ -2696,8 +3160,7 @@ function folderMatches(node){
   if(!assign.search) return false;
   const term = assign.search.toLowerCase();
   if(term.includes('/')){
-    if(!FOLDER_PATHS) buildFolderPathIndex();
-    const full = (FOLDER_PATHS.get(node.id) || []).concat(node.name).join('/').toLowerCase();
+    const full = (hierIndex(assign.cloud).paths.get(node.id) || []).concat(node.name).join('/').toLowerCase();
     /* 空白容錯：使用者可能照畫面打「platform / staging」 */
     return full.includes(term.replace(/\s*\/\s*/g, '/'));
   }
@@ -2767,6 +3230,15 @@ function toggleScope(projects){
  * 一個子資料夾、沒有東西可以判斷，那九下是純粹的操作稅。點一下看到整條路徑，
  * 使用者才能一眼判斷這個資料夾底下到底有什麼。收合對稱處理，否則收起來再
  * 打開會殘留上次的展開狀態。 */
+/* Demo 專用：把 corp 那條十層深鏈整條展開。四個「路徑」情境都停在同一個
+ * 展開位置，切換時畫面不跳，差別才比得出來。真實流程仍是預設收合。 */
+function expandDeepChain(){
+  const root = findFolder('deep-0');
+  if(!root) return;
+  assign.expanded['deep-0'] = true;
+  walkFolders(root.children, child=>{ assign.expanded[child.id] = true; });
+  renderAssign();
+}
 function toggleExpand(nodeId){
   const open = !assign.expanded[nodeId];
   assign.expanded[nodeId] = open;
@@ -2868,6 +3340,8 @@ const INDENT_STEP_TREE = 16;
 const INDENT_STEP_COMPONENT = 32;   // = GroupedMultiSelectOptionItem 的 pl:'32px'
 function isComponentStyle(){ return assign.pickerStyle.startsWith('component'); }
 function isComponentFixed(){ return assign.pickerStyle === 'component-fix'; }
+function isTinted(){ return assign.pickerStyle.startsWith('tree-tint'); }
+function railsOnHover(){ return assign.pickerStyle === 'tree-tint-hover'; }
 function indentStep(){
   return (isComponentStyle() && !isComponentFixed()) ? INDENT_STEP_COMPONENT : INDENT_STEP_TREE;
 }
@@ -2898,27 +3372,39 @@ function folderStickyTop(){
  * 深層的資訊密度是上升而不是下降。
  * 真實情境（客戶最多 2-3 層）完全碰不到這個上限，畫面跟原本一模一樣。 */
 const INDENT_CAP = 4;
-/* 封頂後的縮排步進。取 8px 而不是 4px：8px 在 Guideline 的格線上（4px 只准用於
- * icon 與文字之間的微間距），而且相鄰兩列 8px 的差是明確看得出來的。
- * 第 10 層總縮排 24 + 4×16 + 5×8 = 128px，比線性的 168px 少 40px，名稱欄多拿回
- * 那 40px；同時層級關係一路到底都還是「看」得出來的，不用讀文字去解。 */
-const MICRO_STEP = 8;
 function indentPx(depth){
   const steps = assign.indentCap ? Math.min(depth, INDENT_CAP) : depth;
-  const base = 24 + steps * indentStep();
-  /* micro 模式：封頂之後每層再疊 4px。相鄰兩列 4px 的差是看得出來的，
-   * 所以深層的鏈狀關係不會塌成「一排兄弟」；而 5 層 × 4px 只多 20px，
-   * 不會回到線性縮排那種 168px 的斜階梯。 */
-  if(assign.pathMode === 'micro' && assign.indentCap && depth > INDENT_CAP){
-    return base + (depth - INDENT_CAP) * MICRO_STEP;
-  }
-  return base;
+  return 24 + steps * indentStep();
 }
-function railsHtml(depth){
+const RAIL_CHEV_CENTER = 10;   // .tchev 是 20×20，中心在左緣 +10px
+/* 停留引導線（C 案，2026-09-24）。VS Code 的 active indent guide：游標在哪一列，
+ * 只亮出它所屬區塊的那一條線，其餘不畫，所以不會出現常駐引導線那排梳子。
+ * 做法刻意用「每列自帶祖先的線、靠一條 CSS 規則點亮」，不是巢狀 DOM 的 :has()——
+ * 因為 FE 的 GroupedMultiSelect 是 react-window 虛擬清單，列是 absolute 定位、沒有巢狀
+ * 容器；每列知道自己的祖先 id 就能畫，跟 FE 的實作條件一致（onMouseEnter 記下
+ * hoveredParentId，列渲染時對那個祖先畫一條線即可）。 */
+function hoverGuidesHtml(ancIds){
+  /* 只給定案的元件修正版：樹狀對照版本來就有常駐引導線；元件原版箭頭在右邊、線對不到箭頭 */
+  if(!ancIds || !ancIds.length || !isComponentFixed()) return '';
+  return ancIds.map((id, level)=>`<span class="hguide" data-for="${id}" style="left:${indentPx(level) + RAIL_CHEV_CENTER}px"></span>`).join('');
+}
+function setHoverGuide(parentId){
+  let tag = document.getElementById('hguide-style');
+  if(!tag){ tag = document.createElement('style'); tag.id = 'hguide-style'; document.head.appendChild(tag); }
+  tag.textContent = parentId
+    ? `.hguide[data-for="${parentId}"]{opacity:1}.rmodal-body.is-tinted .trail[data-for="${parentId}"]{background:var(--lt-grey-400)}`
+    : '';
+}
+document.addEventListener('mouseover', e=>{
+  const row = e.target.closest && e.target.closest('.rmodal-body .tnode');
+  setHoverGuide(row ? row.getAttribute('data-parent') : null);
+});
+function railsHtml(depth, ancIds = []){
   if(isComponentStyle()) return '';   // 既有元件沒有縮排引導線
   let out = '';
   const shown = assign.indentCap ? Math.min(depth, INDENT_CAP) : depth;
-  for(let level=0; level<shown; level++){ out += `<span class="trail" style="left:${32 + level*INDENT_STEP_TREE}px"></span>`; }
+  /* data-for＝這條線屬於哪個祖先，停留加深時靠它點名（跟 C 案 .hguide 同一個機制） */
+  for(let level=0; level<shown; level++){ out += `<span class="trail"${ancIds[level]?` data-for="${ancIds[level]}"`:''} style="left:${indentPx(level) + RAIL_CHEV_CENTER}px"></span>`; }
   return out;
 }
 /* 帳單帳戶視角沒有 org 分段（一個帳單帳戶可以付費給跨 org 的專案，所以 org
@@ -2928,7 +3414,7 @@ function orgChipHtml(project){
   if(!isMultiOrg() || showFolderView() || !project.orgName) return '';
   return `<span class="ba-chip is-org-chip">${esc(project.orgName)}</span>`;
 }
-function projectRow(project, depth){
+function projectRow(project, depth, ancIds = []){
   /* 元件版：GroupedMultiSelectOptionItem 是單行 `name (desc)`，desc 用 hint 色，
    * 所以資源 ID 走 desc 的位置、跟名稱同一行（元件的 row height 是固定 40px，
    * 容不下兩行）。樹狀版維持兩行 Name / ID，對齊 Resources 表格的既有慣例。 */
@@ -2936,7 +3422,7 @@ function projectRow(project, depth){
   const body = isComponentStyle()
     ? `${label}<span class="tdesc">(${hl(project.resId)})</span>`
     : `${label}<span class="tsub">${hl(project.resId)}</span>`;
-  return `<div class="tnode is-project" style="padding-left:${indentPx(depth)}px" onclick="toggleProject('${project.id}')">${railsHtml(depth)}
+  return `<div class="tnode is-project"${ancIds.length?` data-parent="${ancIds[ancIds.length-1]}"`:''} style="padding-left:${indentPx(depth)}px" onclick="toggleProject('${project.id}')">${railsHtml(depth, ancIds)}${hoverGuidesHtml(ancIds)}
     <span class="tchev ghost"></span>
     ${checkboxHtml(!!assign.selected[project.id], `toggleProject('${project.id}')`)}
     <span class="material-symbols-outlined ticon ghost">folder</span>
@@ -2957,25 +3443,37 @@ function projectRow(project, depth){
  *   3. 名稱重複 → 從右往左一段一段加，加到這條後綴在所有同名者之中唯一為止
  * 所以 platform 底下的 staging 顯示 `platform / staging`、deprecated 底下的顯示
  * `deprecated / staging`，兩個 staging 一眼分得出來。 */
-let FOLDER_PATHS = null;      // node.id → 祖先名稱陣列
-let FOLDER_NAME_COUNT = null; // 名稱 → 出現次數
-let FOLDER_SAME_NAME = null;  // 名稱 → 該名稱所有節點的祖先路徑陣列
-function buildFolderPathIndex(){
-  FOLDER_PATHS = new Map();
-  FOLDER_NAME_COUNT = new Map();
-  FOLDER_SAME_NAME = new Map();
-  walkFolders(cfg().folders(), (node, depth, path)=>{
-    FOLDER_PATHS.set(node.id, path);
-    FOLDER_NAME_COUNT.set(node.name, (FOLDER_NAME_COUNT.get(node.name)||0) + 1);
-    if(!FOLDER_SAME_NAME.has(node.name)) FOLDER_SAME_NAME.set(node.name, []);
-    FOLDER_SAME_NAME.get(node.name).push(path);
-  });
+const HIER_INDEX = {};        // cloud → {paths: node.id→祖先名稱陣列, count, same}
+/* 索引改成「每朵雲一份」（2026-09-22）。原本只有一份、從 cfg() 也就是
+ * **彈窗當下那朵雲**建出來，但外層表格看的是 state.cloud，兩者可以不同：
+ * 彈窗停在 GCP、表格切到 AWS 時，表格會拿 GCP 的索引去查 AWS 的節點。
+ * 三朵雲都有階層欄之後這個錯配就會真的發生，所以索引跟著雲走。 */
+function hierarchyTree(cloud){
+  if(cloud === 'aws')   return AWS_OU_TREE;
+  if(cloud === 'azure') return AZURE_MG_TREE;
+  return activeOrgs().flatMap(org=>org.folders);
 }
+function buildFolderPathIndex(cloud){
+  const tree = hierarchyTree(cloud);
+  const paths = new Map(), count = new Map(), same = new Map();
+  walkFolders(tree, (node, depth, path)=>{
+    paths.set(node.id, path);
+    count.set(node.name, (count.get(node.name)||0) + 1);
+    if(!same.has(node.name)) same.set(node.name, []);
+    same.get(node.name).push(path);
+  });
+  HIER_INDEX[cloud] = {paths, count, same};
+  return HIER_INDEX[cloud];
+}
+function hierIndex(cloud){ return HIER_INDEX[cloud] || buildFolderPathIndex(cloud); }
+/* GCP 的樹會隨 multiOrg 改變，切換時必須丟掉重建，不然第二個 org 的節點查不到 */
+function invalidateHierIndex(cloud){ if(cloud) delete HIER_INDEX[cloud]; else Object.keys(HIER_INDEX).forEach(k=>delete HIER_INDEX[k]); }
 /* 回傳「為了跟同名者區分開來，最少要顯示幾段祖先」。名稱唯一時回傳 0。 */
-function distinguishingSegments(node){
-  const mine = FOLDER_PATHS.get(node.id) || [];
-  if((FOLDER_NAME_COUNT.get(node.name)||0) <= 1) return 0;
-  const others = (FOLDER_SAME_NAME.get(node.name)||[]).filter(path=>path !== mine);
+function distinguishingSegments(node, cloud){
+  const idx = hierIndex(cloud);
+  const mine = idx.paths.get(node.id) || [];
+  if((idx.count.get(node.name)||0) <= 1) return 0;
+  const others = (idx.same.get(node.name)||[]).filter(path=>path !== mine);
   for(let take=1; take<=mine.length; take++){
     const suffix = mine.slice(mine.length - take).join('/');
     const clash = others.some(path=>path.slice(Math.max(0, path.length - take)).join('/') === suffix);
@@ -2993,12 +3491,11 @@ function distinguishingSegments(node){
  * `corp / platform-ops / infra / prod / eu-west / …` 讀不完，而使用者要的是
  * 「這是哪一個 staging」，不是背下整條路。 */
 function pathPrefix(depth, node){
-  if(!FOLDER_PATHS) buildFolderPathIndex();
-  const ancestors = FOLDER_PATHS.get(node.id) || [];
+  const ancestors = hierIndex(assign.cloud).paths.get(node.id) || [];
   if(!ancestors.length) return '';
   const flattened = !!assign.search;
   const capped = assign.indentCap && depth > INDENT_CAP;
-  const needed = distinguishingSegments(node) > 0;
+  const needed = distinguishingSegments(node, assign.cloud) > 0;
   /* `needed`（名稱跟別人衝突）是正確性問題，跟選哪個模式無關——三個模式都要顯示，
    * 不然使用者捲到 `platform > staging` 的專案列表，sticky 釘住的標頭只寫
    * `staging (7)`，完全看不出是哪個 staging（deprecated 底下也有一個）。
@@ -3009,7 +3506,6 @@ function pathPrefix(depth, node){
    * 何時顯示路徑：
    *   一律：搜尋中，或名稱跟別人衝突（不分模式，這是正確性底線）
    *   'all'   → 再加上每一列都顯示（除了第一層，它沒有祖先）
-   *   'micro' → 沒有額外情況，封頂後靠微縮排表達層級
    *   'deep'  → 再加上深度超過封頂線（現況：靠路徑補償縮排停止累加）
    */
   const show = flattened
@@ -3017,12 +3513,19 @@ function pathPrefix(depth, node){
     || (assign.pathMode === 'all')
     || (assign.pathMode === 'deep' && capped);
   if(!show) return '';
-  const take = Math.min(ancestors.length, Math.max(1, distinguishingSegments(node)));
+  /* 搜尋中樹被攤平，跟外層表格一樣沒有縮排脈絡，所以改用表格同一種寫法
+   * （保留最上層、命中的層換回來）——同一個資料夾在內外不會有兩種寫法（2026-09-24） */
+  if(flattened){
+    const q = assign.search.includes('/') ? '' : assign.search.trim().toLowerCase();
+    const {parts} = hierDisplayParts(node, assign.cloud, q);
+    return parts.length ? `<span class="tpath">${parts.join(' / ')} / </span>` : '';
+  }
+  const take = Math.min(ancestors.length, Math.max(1, distinguishingSegments(node, assign.cloud)));
   const shown = ancestors.slice(ancestors.length - take);
   const elided = ancestors.length > take ? '… / ' : '';
   return `<span class="tpath">${elided}${esc(shown.join(' / '))} / </span>`;
 }
-function folderRow(node, depth, ancestors = []){
+function folderRow(node, depth, ancestors = [], ancIds = []){
   /* 選單只列未指派的，所以計數也只能算未指派的，
    * 不然「platform (24)」底下只掛 3 列，數字跟看到的東西對不起來 */
   const unassigned = allProjectsOf(node).filter(project=>!project.assigned);
@@ -3038,14 +3541,14 @@ function folderRow(node, depth, ancestors = []){
     : `(${selectable.length} / ${unassigned.length})`;
   const expanded = !!assign.expanded[node.id] || !!assign.search;
   const kids = expanded ? (
-      node.children.filter(nodeHasVisible).map(child=>folderRow(child, depth+1, ancestors.concat(node.name))).join('') +
+      node.children.filter(nodeHasVisible).map(child=>folderRow(child, depth+1, ancestors.concat(node.name), ancIds.concat(node.id))).join('') +
       /* 資料夾自己命中搜尋時整批留著底下的專案，但「已指派的不進這個選單」這條
        * 規則不能跟著放掉——原本這裡只檢查帳單帳戶篩選，導致搜資料夾名稱時
        * 已指派的專案會冒出來，跟旁邊的計數對不起來。用 inFolderScope 一起擋掉。 */
-      node.projects.filter(project => folderMatches(node) ? inFolderScope(project) : projectVisible(project)).map(project=>projectRow(project, depth+1)).join('')
+      node.projects.filter(project => folderMatches(node) ? inFolderScope(project) : projectVisible(project)).map(project=>projectRow(project, depth+1, ancIds.concat(node.id))).join('')
     ) : '';
   return `<div class="tbranch">
-      <div class="tnode is-folder" data-depth="${depth}" style="padding-left:${indentPx(depth)}px;top:${folderStickyTop()}px;z-index:${30+depth}"${node.folderId?` title="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth)}
+      <div class="tnode is-folder" data-depth="${depth}"${ancIds.length?` data-parent="${ancIds[ancIds.length-1]}"`:''} style="padding-left:${indentPx(depth)}px;top:${folderStickyTop()}px;z-index:${30+depth}"${node.folderId?` title="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth, ancIds)}${hoverGuidesHtml(ancIds)}
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('${node.id}')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
         ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome)}
         <span class="material-symbols-outlined ticon">folder</span>
@@ -3156,7 +3659,8 @@ function selectAllRow(){
   const picked = selectedIn(scope);
   const isAll = picked===scope.length;
   const isSome = picked>0 && !isAll;
-  return `<div class="tnode is-selectall">
+  /* 左邊距跟第一層資料夾同一個 indentPx(0)：元件版沒有箭頭佔位，沒給的話 checkbox 會貼齊彈窗左緣 */
+  return `<div class="tnode is-selectall" style="padding-left:${indentPx(0)}px">
       <span class="tchev ghost"></span>
       ${checkboxHtml(isAll, `toggleSelectAll()`, isSome)}
       <span class="material-symbols-outlined ticon ghost">folder</span>
@@ -3219,7 +3723,7 @@ function toggleBa(baId){ toggleScope(baProjects(baId)); }
 
 /* 選單本體（工具列 + 提示條 + 清單 + 計數）跟外殼分開。modal 與 wizard 兩個宿主都吃這一份。 */
 function assignPickerParts(){
-  buildFolderPathIndex();   // 換雲、塞深樹都會改變樹，索引每次重建（成本可忽略）
+  invalidateHierIndex();    // 換雲、切 multiOrg、塞深樹都會改變樹，索引丟掉重建（成本可忽略）
   const assignable = everyUnassigned().length;
   const picked = Object.keys(assign.selected).length;
 
@@ -3281,7 +3785,7 @@ function assignPickerParts(){
           </div>
         </div>` : ''}
       </div>`;
-  const bodyCls = `rmodal-body ${isComponentStyle()?'is-component':'is-tree'}${isComponentFixed()?' is-component-fixed':''}`;
+  const bodyCls = `rmodal-body ${isComponentStyle()?'is-component':'is-tree'}${isComponentFixed()?' is-component-fixed':''}${isTinted()?' is-tinted':''}${railsOnHover()?' is-rails-onhover':''}`;
   const count = assignable ? `<b>${picked}</b> of ${assignable} unassigned ${assignable===1?cfg().noun:cfg().nounPlural} selected` : '';
   return {tools, notice:clearedNoticeHtml(), body, bodyCls, count, picked, assignable};
 }
@@ -3356,18 +3860,18 @@ const TAG_TERMS = {
          searchKeys:'Search label keys',                 // #56-1 原文
          searchValues:'Search label values',             // 設計端暫擬：#56-1 只畫了 Keys 的下拉，Values 的搜尋 placeholder 比照造句
          parentPrefix:'Billing Account', keyPrefix:'Label Key',
-         colKey:'Label Key', colValue:'Label Value', colParent:'Billing Account (Label belongs to)'},
+         colKey:'Label Key', colValue:'Label Value', colParent:'Billing Account'},
   aws:  {tab:'Tag', keys:'Tag Keys', values:'Tag Values', keyPh:'Select Tag Key', valuePh:'Select Tag Value',
          searchKeys:'Search Tag keys',                   // #57-1 原文（Tag 大寫、跟 GCP 的「Search label keys」大小寫不一致，照稿不改，已列入設計稿問題）
          searchValues:'Search Tag values',               // 設計端暫擬，比照 #57-1 的大小寫
          parentPrefix:'Management Account', keyPrefix:'Tag Key',
-         colKey:'Tag Key', colValue:'Tag Value', colParent:'Management Account (Tag belongs to)'},
+         colKey:'Tag Key', colValue:'Tag Value', colParent:'Management Account'},
   azure:{tab:'Tag', keys:'Tag Keys', values:'Tag Values', keyPh:'Select Tag Key', valuePh:'Select Tag Value',
          // 2026-09-11 Kabin 裁決：Azure 子分頁改叫 Tag（跟 AWS 同一個詞、符合 Azure 原生術語），
          // 但流程／版面仍照 GCP 既有結構（雙層下拉、key→value），只是換詞不是重新設計。
          searchKeys:'Search Tag keys', searchValues:'Search Tag values',
          parentPrefix:'Subscription', keyPrefix:'Tag Key',
-         colKey:'Tag Key', colValue:'Tag Value', colParent:'Subscription (Tag belongs to)'},
+         colKey:'Tag Key', colValue:'Tag Value', colParent:'Subscription'},
 };
 /* 上層（Billing Account / Management Account / Subscription）。GCP 沿用 Resources 表格
  * 既有的 GCP_BAS，另外兩朵雲補第二個上層，讓「上層 → key」的分組看得出來。 */
@@ -4164,7 +4668,8 @@ window.DEMO_CATEGORIES = [
   {id:'role',   label:'Role',      icon:'person',      hint:'按鈕顯示與否由後端回傳的 availableActions 決定，這裡是 5 組對應的布林值組合'},
   {id:'state',  label:'Page',      icon:'layers',      hint:'Group List 主畫面的資料狀態'},
   {id:'cloud',  label:'Resources', icon:'cloud',       hint:'Resources 分頁的雲端授權狀態'},
-  {id:'assign', label:'Assign',    icon:'account_tree',hint:'Assign Resource 的資料夾樹選單'},
+  {id:'list',   label:'List',      icon:'table_rows',  hint:'外層 Resources 表格（不開彈窗）：階層位置欄、org／tenant 欄、三朵雲對照'},
+  {id:'assign', label:'Assign',    icon:'account_tree',hint:'Assign Resource 彈窗裡的資料夾樹選單'},
   {id:'style',  label:'Picker',    icon:'style',       hint:'多層選單的兩種做法：延伸既有元件 vs 樹狀。同一份資料、同一套選取邏輯，只有呈現不同'},
   {id:'create', label:'Create',    icon:'group_add',   hint:'v3：Create Group 三步 wizard（#08 / #30 / #31 / #37）。第 3、4 步內嵌的是 v2 做好的資源選單，不是 canvas 上的舊版'},
   {id:'tag',    label:'Label/Tag', icon:'sell',        hint:'v3：Resources 的第二種指派維度（#03-3 / #03-4 / #56 / #57）。Project|Label、Account|Tag 子分頁，Assign 開 key → value 兩層下拉'},
@@ -4186,6 +4691,11 @@ window.DEMO_SCENARIOS = [
   {id:'cloud-all',      category:'cloud', label:'All clouds authorized', icon:'cloud_done'},
   {id:'cloud-gcp-only', category:'cloud', label:'Only GCP authorized',   icon:'lock', tip:'AWS / Azure 顯示授權引導，Admin 才有 CTA'},
 
+  {id:'org-multi',      category:'assign', label:'彈窗：多個 GCP Organization',      icon:'domain', tip:'同一租戶授權兩個 GCP org（acme-corp.com / beta-inc.com），兩邊都有第一層資料夾叫 platform。org 做成區段標頭不是樹的一層：位置本身就說了它是 org，所以最小可區分路徑完全不用改。帳單帳戶視角沒有 org 分段（一個 BA 可跨 org 付費），那裡才在專案列標 org chip'},
+  {id:'list-hier',      category:'list', label:'階層深度示意（第 1→10 層）', icon:'account_tree', tip:'外層 Resources 表格，策展過的列：第 1 層 / 第 2 層撞名 / 第 4 層中間層撞名 / 第 7 層 / 第 10 層 / 沒有歸屬，一次看完階層位置欄在各種深度長怎樣。切 AWS / Azure 分頁看同一套規則在那兩朵雲的樣子'},
+  {id:'list-single-org',category:'list', label:'單一 org／tenant（預設）', icon:'business_center', tip:'常態。org／tenant 欄整欄不 render，表格跟沒有這欄時逐格相同'},
+  {id:'org-multi-table',category:'list', label:'多個 org／tenant（三朵雲）', icon:'domain', tip:'同一個 multiOrg 旗標，但直接停在 Group Details 的 Resources 表格（不開彈窗）。Organization 欄只有在這個情境才會出現，單一 org 時整欄不 render。停在 Data Analytics 這組，它剛好同時指派到兩個 org 的 platform 資料夾：Folder 欄兩列都寫 platform、一模一樣，只有 Organization 欄分得出來。那就是這一欄存在的理由'},
+  {id:'org-single',     category:'assign', label:'彈窗：單一 Organization（預設）', icon:'business_center', tip:'常態。org 區段標頭整條不 render，畫面跟加 org 之前一模一樣，資料夾仍釘在 Select all 底下'},
   {id:'assign-ba',     category:'assign', label:'預設：Billing account 視角',   icon:'account_balance_wallet', tip:'既有客戶的現況，開啟選單的預設分組'},
   {id:'assign-folder', category:'assign', label:'切換到 Folder 視角', icon:'account_tree', tip:'10 個資料夾、2 層巢狀、88 個專案、10 個未分類，結構取自工程調查的實查結果'},
   {id:'assign-nofld',  category:'assign', label:'Org 沒有資料夾',               icon:'folder_off', tip:'報告沒涵蓋的 case。Folder 分頁仍然存在，點進去才看到「No folders in this organization」空狀態——跟雲端 pill tabs 的 not-authorized 是同一套語言，不預先把選項藏起來'},
@@ -4193,20 +4703,14 @@ window.DEMO_SCENARIOS = [
   {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:`全新群組，${DEMO_TOTAL} 個專案全部在選單裡（含 2 個沒有帳單帳戶的，以及深度情境那棵 10 層樹）`},
   {id:'assign-drift',  category:'assign', label:`回訪：只剩沒指派的 ${DEMO_DRIFT} 個`,     icon:'new_releases', tip:`指派過之後客戶又在 console 新增專案。依設計稿註記，選單只列尚未指派的，所以整個選單本身就是差異報告：${DEMO_TOTAL} → ${DEMO_DRIFT} 列，沒有未指派專案的資料夾整個不出現。用 API 既有的 projects[].assigned 過濾`},
   {id:'assign-synced', category:'assign', label:'全部都已指派（選單空的）',       icon:'done_all', tip:'沒有東西可以加了，走空狀態並指向表格的 Unlink Resource。刻意不用 No Data 語彙，這不是出錯'},
-  {id:'org-multi',      category:'assign', label:'多個 GCP Organization',      icon:'domain', tip:'同一租戶授權兩個 GCP org（acme-corp.com / beta-inc.com），兩邊都有第一層資料夾叫 platform。org 做成區段標頭不是樹的一層：位置本身就說了它是 org，所以最小可區分路徑完全不用改。帳單帳戶視角沒有 org 分段（一個 BA 可跨 org 付費），那裡才在專案列標 org chip'},
-  {id:'org-single',     category:'assign', label:'單一 GCP Organization（預設）', icon:'business_center', tip:'常態。org 區段標頭整條不 render，畫面跟加 org 之前一模一樣，資料夾仍釘在 Select all 底下'},
-  {id:'path-deep',      category:'style',  label:'路徑：封頂後才出現（預設）', icon:'subdirectory_arrow_right', tip:'現況。第 1-4 層純名稱＋縮排，第 5 層起縮排封頂、改用祖先路徑。真實情境 2-3 層完全碰不到，差別只在極端深度'},
-  {id:'path-all',       category:'style',  label:'路徑：每一列都顯示',       icon:'format_list_bulleted', tip:'語言一致、沒有第五層那個轉折，但淺層每一列都在重複正上方那一列的名字，而客戶真實情境就是淺層。名稱也被路徑往右推'},
-  {id:'path-micro',     category:'style',  label:'路徑：封頂後改 8px 縮排', icon:'compress', tip:'封頂後每層再疊 8px（在格線上），深層的鏈狀關係不會塌成一排兄弟，所以路徑只留給同名與搜尋。第 10 層總縮排 128px，線性是 168px'},
-  {id:'indent-cap',     category:'style',  label:'縮排封頂 + 路徑（預設）',   icon:'format_indent_decrease', tip:'縮排到第 4 層就停止累加，第 5 層以上改用祖先路徑文字表達層級。真實情境（2-3 層）完全碰不到上限、畫面不變；十層時不會出現斜階梯，而且原本空白的左半邊改放真的內容'},
-  {id:'indent-linear',  category:'style',  label:'線性縮排（對照組：波動拳）', icon:'format_indent_increase', tip:'每層都累加 16px，第 10 層縮排 168px。左半邊全空、名稱被擠掉、清單看起來是歪的。展開極端深度那棵樹就看得到'},
   {id:'sel-clear',     category:'assign', label:'切視角清掉勾選（開發現況）', icon:'layers_clear', tip:'RD 出兩支獨立 API，開發團隊目前想要切視角就清空。不保留可以，靜默清空不行——所以清掉時在彈窗裡講出來並給 Undo，成本只是把陣列留著。先在帳單帳戶視角勾幾個再切 Folder'},
   {id:'sel-keep',      category:'assign', label:'切視角保留勾選（UX 建議）',   icon:'checklist', tip:'勾選存的是專案 ID 集合、跟清單由哪支 API 給無關。已知代價：切過去之後那些勾選散在收合的資料夾裡，底部計數說 3 個但畫面上看不到，所以完整版該搭配一個「看目前選了什麼」的檢視'},
   {id:'assign-fail',   category:'assign', label:'Assign 失敗（toast）',           icon:'error', tip:'設計稿 #18-3 定義了成功與失敗兩種 toast，失敗也是關閉彈窗 + 左下角 toast。勾幾個再按 Assign 就會走失敗分支'},
 
+  {id:'style-tree-tint-hover', category:'style', label:'預設：游標進清單才顯示線（展開十層鏈）', icon:'visibility', tip:'跟預設一樣是樹狀＋資料夾底色，差別只在線：游標不在清單上時完全不畫，游標一進清單所有線一起淡入，所屬父層那條照樣加深。靜止時最乾淨，但線不是常駐結構'},
+  {id:'style-tree-tint', category:'style', label:'對照：線常駐＋停留加深', icon:'format_color_fill', tip:'樹狀版的常駐引導線保留，資料夾列加淺藍底；滑鼠停在哪一列，它所屬父層那條線加深一階（不是出現／消失），游標移動時畫面不跳。專案列 hover 改淺灰，避免跟資料夾同色'},
   {id:'style-component', category:'style', label:'延伸既有元件（GroupedMultiSelect）', icon:'widgets', tip:'完全照 Cost Dashboard 那顆 Tag/Label 下拉的語言：父層藍底 band + 粗體 + (count) + 右側箭頭、子項單行 name (id)、縮排 32px、沒有引導線也沒有資料夾 icon、父層不 sticky。搭配「極端深度」情境看 10 層會怎樣'},
-  {id:'style-component-fix', category:'style', label:'元件版 + 建議修正（縮排 16px、箭頭移左）', icon:'build', tip:'跟元件版只差兩個數字：GroupedMultiSelectOptionItem 的 pl 從 32 改 16、GroupHeader 的 Expand IconButton 從 label 後面移到前面。其餘視覺完全不動。10 層縮排從 344px 降到 184px、標籤可用寬從 150px 回到 256px'},
-  {id:'style-tree',      category:'style', label:'樹狀版（左側箭頭 + 引導線）',        icon:'account_tree', tip:'左側箭頭跟縮排同一欄、有垂直引導線、資料夾 icon、父層巢狀 sticky、縮排 16px、子項兩行 Name / ID。差別只有呈現，選取邏輯與資料完全共用'},
+  {id:'style-component-fix', category:'style', label:'元件修正版（C 案：停留才亮的線）', icon:'build', tip:'跟元件版只差兩個數字：GroupedMultiSelectOptionItem 的 pl 從 32 改 16、GroupHeader 的 Expand IconButton 從 label 後面移到前面。其餘視覺完全不動。10 層縮排從 344px 降到 184px、標籤可用寬從 150px 回到 256px'},
 
   {id:'wz-open',   category:'create', label:'開啟 Create Group wizard',        icon:'add_circle', tip:'#08：800×720、左側五步 stepper。Group Name 必填、Add Manager 非必填（PM 決策）。Skip Steps and Create Group 會先驗證格式再直接建立'},
   {id:'wz-format', category:'create', label:'Step 1 格式錯誤（即時）',          icon:'error_outline', tip:'#08-1：Group Name 空白 → 「Group name cannot be empty.」；email 格式錯或重複 → 「Some email addresses are invalid or duplicated.」，邊打邊檢查'},
@@ -4241,8 +4745,15 @@ window.DEMO_SCENARIOS = [
   {id:'load-list',     category:'p3', label:'Group List 讀取中（#32）',       icon:'hourglass_top',   tip:'標題計數照常顯示（註記：需讀取的數量可先按上圖呈現）、Create Group disabled、表頭灰條'},
   {id:'no-group',      category:'p3', label:'No Group（#01-2 / #02-2）',      icon:'list_alt',        tip:'清單 icon 淺藍、通用文案、空狀態內不再放第二顆 Create Group（右上那顆就是入口）'},
 ];
+/* List 分類共用：停在外層 Resources 表格，維持當下看的那朵雲（方便切雲對照） */
+function gotoResourcesTable(groupId){
+  state.view='detail'; state.tier=1; state.t1Id=groupId; state.t2Id=null;
+  state.tab='resources'; state.resSub[state.cloud]='primary'; render();
+}
 window.DEMO_DEFAULT = 'admin';
 window.DEMO_APPLY = function (id) {
+  /* 策展列是 List 分類專用，切到別的情境一律關掉，不然會黏在畫面上 */
+  if (id !== 'list-hier') state.hierShowcase = false;
   if (['admin','t1-manager','t1-member','t2-manager','t2-member'].includes(id)) {
     state.role = id; state.selectedResources = {}; render(); return;
   }
@@ -4255,17 +4766,17 @@ window.DEMO_APPLY = function (id) {
   if (id === 'assign-deep')    { showDeepTree(); return; }
   if (id === 'style-component'){ assign.pickerStyle='component'; if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
   if (id === 'style-component-fix'){ assign.pickerStyle='component-fix'; if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
-  if (id === 'style-tree')     { assign.pickerStyle='tree';      if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
+  if (id === 'style-tree-tint-hover'){ assign.pickerStyle='tree-tint-hover'; if(!assign.open){ openAssign('gcp'); } setGroupBy('folder'); expandDeepChain(); return; }
+  if (id === 'style-tree-tint'){ assign.pickerStyle='tree-tint'; if(!assign.open){ openAssign('gcp'); } setGroupBy('folder'); expandDeepChain(); return; }
   if (id === 'assign-first')   { setAssignedMode('none');  assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
   if (id === 'assign-drift')   { setAssignedMode('mixed'); assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
   if (id === 'assign-synced')  { setAssignedMode('all');   assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); return; }
   if (id === 'org-multi')       { assign.multiOrg = true;  assign.hasFolders = true; if(!assign.open){ openAssign('gcp'); } setGroupBy('folder'); return; }
+  /* List 分類：一律停在外層表格、不開彈窗，只切旗標，方便單一↔多 org 來回比對 */
+  if (id === 'list-hier')       { assign.multiOrg = false; state.hierShowcase = true;  closeAssign(); invalidateHierIndex(); gotoResourcesTable('engineering'); return; }
+  if (id === 'list-single-org') { assign.multiOrg = false; state.hierShowcase = false; closeAssign(); invalidateHierIndex(); gotoResourcesTable('data-analytics'); return; }
+  if (id === 'org-multi-table') { assign.multiOrg = true; assign.hasFolders = true; state.hierShowcase = false; closeAssign(); invalidateHierIndex(); gotoResourcesTable('data-analytics'); return; }
   if (id === 'org-single')      { assign.multiOrg = false; assign.hasFolders = true; if(!assign.open){ openAssign('gcp'); } setGroupBy('folder'); return; }
-  if (id === 'path-deep')      { assign.pathMode='deep';  assign.indentCap=true; if(!assign.open){ openAssign('gcp'); } setGroupBy('folder'); return; }
-  if (id === 'path-all')       { assign.pathMode='all';   assign.indentCap=true; if(!assign.open){ openAssign('gcp'); } setGroupBy('folder'); return; }
-  if (id === 'path-micro')     { assign.pathMode='micro'; assign.indentCap=true; if(!assign.open){ openAssign('gcp'); } setGroupBy('folder'); return; }
-  if (id === 'indent-cap')     { assign.indentCap = true;  if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
-  if (id === 'indent-linear')  { assign.indentCap = false; if(!assign.open){ openAssign('gcp'); setGroupBy('folder'); } else renderAssign(); return; }
   if (id === 'sel-clear')      { assign.keepSelection = false; if(!assign.open){ openAssign('gcp'); } else renderAssign(); showToast('切換 Group by 會清掉已勾選（開發團隊目前立場），清掉時會在彈窗裡告知並給 Undo'); return; }
   if (id === 'sel-keep')       { assign.keepSelection = true;  if(!assign.open){ openAssign('gcp'); } else renderAssign(); showToast('切換 Group by 保留已勾選（UX 建議），勾選是專案 ID 的集合、跟視角無關'); return; }
   if (id === 'assign-fail')    { setAssignedMode('mixed'); assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); assign.forceFail = true; return; }
@@ -4345,6 +4856,7 @@ window.DEMO_APPLY = function (id) {
  *     page:      string?,          // matches DEMO_PAGES[].id (alias: 'tab' for backwards compat)
  *     category:  string?,          // matches DEMO_CATEGORIES[].id
  *     isNoData:  boolean?,         // groups under "no data" sub-divider
+ *     group:     string?,          // 2026-09-30：同一頁內的分組小標（依第一次出現的順序排）。沒寫 group 的頁面行為完全不變
  *     disabled:  boolean?,         // shows "Soon" badge, not clickable
  *   }
  *
@@ -4442,6 +4954,9 @@ window.DEMO_APPLY = function (id) {
     '.demo-sub-sep{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;',
     'color:#9CAEC4;letter-spacing:.4px;text-transform:uppercase;margin:10px 0 6px}',
     '.demo-sub-sep::before,.demo-sub-sep::after{content:\'\';flex:1;height:1px;background:rgba(14,58,130,.1)}',
+    /* Group header（scenario.group，2026-09-30） */
+    '.demo-grp-sep{font-size:11px;font-weight:700;color:#676767;margin:12px 0 6px;letter-spacing:0}',
+    '.demo-grp-sep:first-child{margin-top:0}',
 
     /* Button group */
     '.demo-buttons{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}',
@@ -4474,7 +4989,7 @@ window.DEMO_APPLY = function (id) {
     '.demo-page-tab[data-tip]::after,.demo-cat-tab[data-tip]::after{display:none!important}',
 
     /* #gl-tip — body-level fixed tooltip (auto-injected) */
-    '#gl-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:12px;line-height:1.4;',
+    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:12px;line-height:1.4;',
     'padding:6px 10px;border-radius:4px;max-width:320px;white-space:normal;',
     'pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25);',
     'font-family:\'Noto Sans\',sans-serif}'
@@ -4546,7 +5061,17 @@ window.DEMO_APPLY = function (id) {
     }
     var normal = scenarios.filter(function (s) { return !s.isNoData; });
     var noData = scenarios.filter(function (s) { return s.isNoData; });
-    var html = _renderGroup(normal);
+    var html = '';
+    if (normal.some(function (s) { return !!s.group; })) {
+      var order = [];
+      normal.forEach(function (s) { var g = s.group || ''; if (order.indexOf(g) < 0) order.push(g); });
+      order.forEach(function (g) {
+        if (g) html += '<div class="demo-grp-sep">' + _esc(g) + '</div>';
+        html += _renderGroup(normal.filter(function (s) { return (s.group || '') === g; }));
+      });
+    } else {
+      html = _renderGroup(normal);
+    }
     if (noData.length) {
       html += '<div class="demo-sub-sep">no data</div>' + _renderGroup(noData);
     }
@@ -4718,24 +5243,37 @@ window.DEMO_APPLY = function (id) {
     tip.id = 'gl-tip';
     document.body.appendChild(tip);
     var cur = null;
-    document.addEventListener('mouseover', function (e) {
-      var el = e.target.closest('[data-tip]');
-      if (!el || el === cur) return;
-      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block';
-    });
-    document.addEventListener('mousemove', function (e) {
-      if (!cur) return;
-      var tw = tip.offsetWidth, th = tip.offsetHeight;
-      var x = e.clientX - tw / 2, y = e.clientY - th - 10;
-      if (x < 8) x = 8;
-      if (x + tw > window.innerWidth - 8) x = window.innerWidth - tw - 8;
-      if (y < 8) y = e.clientY + 16;
+    // 2026-10-09 Kabin 裁決：全站 tooltip 改成錨在元件上（Figma／MUI 行為），不再跟著游標跑。
+    // 規則照 Anomaly Detection #01-3 量到的：預設出現在元件上方 6px、水平靠元件左緣，
+    // 右邊放不下就改靠元件右緣 +2；上方放不下改到下方。
+    // 可選屬性：data-tip-pos="below"（固定放下方）、data-tip-dy（下方距離，預設 4）、
+    // data-tip-anchor（CSS 選擇器，錨在子元素上）、data-tip-align="content-right"（右緣對齊內容右緣 −16）。
+    function place() {
+      if (!cur || !cur.isConnected) { cur = null; tip.style.display = 'none'; return; }
+      var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
+      var r = a.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var x = r.left;
+      if (x + tw > vw - 8) x = Math.max(8, Math.min(r.right + 2, vw - 8) - tw);
+      if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
+      var below = cur.dataset.tipPos === 'below';
+      var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
+      var y = below ? r.bottom + dy : r.top - th - 6;
+      if (y < 8) y = r.bottom + 4;
+      if (y + th > vh - 8) y = Math.max(8, r.top - th - 6);
       tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    }
+    document.addEventListener('mouseover', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (!el || (el === cur && tip.style.display !== 'none')) return;
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place();
     });
     document.addEventListener('mouseout', function (e) {
-      var el = e.target.closest('[data-tip]');
-      if (el && el === cur) { cur = null; tip.style.display = 'none'; }
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && el === cur && !el.contains(e.relatedTarget)) { cur = null; tip.style.display = 'none'; }
     });
+    window.addEventListener('scroll', place, true);
+    window.addEventListener('resize', place);
   }
 
   // ===== PUBLIC API =====

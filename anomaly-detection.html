@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — User Menu v1 (Account Menu + AI Quota)</title>
+<title>Lumiture.ai — Anomaly Detection v1 (Figma-first Build)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 <style>
@@ -278,196 +277,290 @@
 
 </style>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; overscroll-behavior: none; }
-body {
-  font-family: var(--lt-font-sans);
-  font-size: var(--lt-fs-14); font-weight: 400; color: var(--lt-color-text-primary);
-  background: var(--lt-blue-10); letter-spacing: 0;
-  -webkit-font-smoothing: antialiased;
+/* ============================================================
+ * Anomaly Detection — route `/budget/anomaly`（本輪只做列表頁；詳情頁 `/budget/anomaly/[alertId]` 另一輪）
+ * 權威順序（Kabin 2026-09-11 裁決）：Figma 設計稿 > tokens.css > Guideline > FE 現況（FE 依據＝2026-08-11 快照，可能已過期）
+ * Figma file P3MZ4MmG1pjel2cSbXkUMW，正式 page「Anomaly Detection & Alert」4267:40553（不用 [Draft] 8034:86674、不用 Backup for V1）。數值皆由 REST 節點樹量得。
+ * 標記慣例：⚠ DEVIATION＝偏離 Figma 或 FE；⚠ 設計端暫擬＝Figma 沒畫、自己補的；⚠ 未確認＝稿上有但用途或規則不明
+ * ============================================================ */
+
+/* ---- 頁面層 token：Figma 量到、tokens.css 沒有或不同時補在這裡（待收錄）----
+ * ⚠ DEVIATION: 卡片陰影 0 0 20 .10（token 是 0 0 6 .2）／輸入框與按鈕圓角 5（token 4）／Modal 圓角 15（Figma #03-1 量到 r15；token 12。Customized Budget 量到 10，兩頁不一致，見設計稿問題清單）／輸入框邊框 #CCCCCC（token #DCE3EC）*/
+:root{
+  --ad-card-shadow: 0 0 20px rgba(0,0,0,.10);
+  --ad-radius-field: 5px;
+  --ad-radius-modal: 15px;
+  --ad-field-border: #CCCCCC;                 /* = --lt-grey-300 */
+  --ad-scroll-thumb: #D8D8D8;
+  --ad-toast-ok: #008F88;                     /* = --lt-color-success-dark（Figma Toast Allocated）*/
+  --ad-toast-err: #BF302E;                    /* tokens 無 error dark；Figma Toast 量到 */
+  --ad-badge-bg: #B3B3B3;                     /* Figma Badge / Text：子項計數膠囊（= --lt-grey-400）；FE 的 gray.borderDark，tokens 沒有對應語意 token */
 }
-button { font-family: inherit; font-size: inherit; cursor: pointer; border: none; background: none; color: inherit; letter-spacing: 0; }
-a { color: inherit; text-decoration: none; }
-.material-symbols-outlined {
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  font-size: 20px; line-height: 1; vertical-align: middle; user-select: none;
-}
 
-/* LAYOUT */
-.app { display: flex; min-height: 100vh; }
-#lt-sidebar { flex-shrink: 0; }
-.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.content { flex: 1; padding: 48px 32px; display: flex; align-items: flex-start; justify-content: center; }
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overscroll-behavior:none}
+body{font-family:var(--lt-font-sans);font-size:var(--lt-fs-14);line-height:var(--lt-leading-body);color:var(--lt-color-text-primary);background:var(--lt-color-primary-bg);letter-spacing:var(--lt-tracking-normal)}
+a{color:var(--lt-color-primary);text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:var(--lt-fs-14);letter-spacing:0;color:inherit}
+.material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;vertical-align:middle;user-select:none}
+.icon-outline{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20}
+[hidden]{display:none!important}
 
-/* Hint card */
-.hint { max-width: 560px; background: #fff; border-radius: var(--lt-radius-md); box-shadow: var(--lt-shadow-dialog);
-  padding: 32px; text-align: center; }
-.hint-arrow { display: inline-flex; align-items: center; gap: 6px; color: var(--lt-color-primary);
-  font-weight: 600; font-size: 13px; margin-bottom: 16px; }
-.hint-arrow .material-symbols-outlined { font-size: 18px; }
-.hint h1 { font-size: var(--lt-fs-20); font-weight: 700; margin-bottom: 10px; color: var(--lt-color-text-heading); }
-.hint p { font-size: 13.5px; line-height: 1.7; color: var(--lt-color-text-secondary); margin-bottom: 14px; }
-.hint ul { text-align: left; font-size: 12.5px; line-height: 1.8; color: var(--lt-color-text-secondary);
-  list-style: none; display: inline-block; }
-.hint li { display: flex; gap: 8px; align-items: flex-start; }
-.hint li .material-symbols-outlined { font-size: 16px; color: var(--lt-color-secondary); margin-top: 2px; }
+/* ===== App layout（Figma：內容區 padding 32、段落間距 20）===== */
+.app{display:flex;min-height:100vh}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.content{padding:var(--lt-space-32);flex:1;display:flex;flex-direction:column;gap:20px;min-width:0}
 
-/* FOOTER */
-.footer { display: flex; align-items: center; justify-content: space-between; padding: 14px 32px;
-  border-top: 1px solid var(--lt-color-border-default); background: #fff; font-size: 12px; color: var(--lt-color-text-secondary); }
-.footer-version { font-weight: 600; color: var(--lt-color-text-primary); display: inline-flex; align-items: center; gap: 8px; }
-.ver-tag { background: #34B5D9; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; }
-.footer-credit { color: #676767; }
+/* ===== Buttons（Figma Button/M：36h、圓角 5、14/700）===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--lt-space-4);min-width:80px;padding:0 var(--lt-button-padding-x);height:36px;border-radius:var(--ad-radius-field);font-weight:var(--lt-fw-bold);font-size:var(--lt-fs-14);line-height:1.5;white-space:nowrap;border:1px solid transparent;transition:background-color var(--lt-transition-fast),border-color var(--lt-transition-fast),color var(--lt-transition-fast)}
+.btn-p{background:var(--lt-color-primary);color:var(--lt-color-text-inverse)}
+.btn-p:hover{background:var(--lt-color-primary-hover)}
+.btn-p:active{background:var(--lt-color-primary-active)}
+.btn-o{background:var(--lt-color-bg-default);color:var(--lt-color-primary);border-color:var(--lt-color-primary)}
+.btn-o:hover{background:var(--lt-color-bg-subtle);color:var(--lt-color-primary-hover);border-color:var(--lt-color-primary-hover)}
+.btn-o:active{background:var(--lt-color-bg-emphasized);color:var(--lt-color-primary-active);border-color:var(--lt-color-primary-active)}
+.btn .material-symbols-outlined{font-size:16px}
+.btn .ic-add{font-variation-settings:'FILL' 0,'wght' 600,'GRAD' 0,'opsz' 20}
+.btn:disabled,.btn.is-disabled{background:var(--lt-grey-300)!important;color:#fff!important;border-color:transparent!important;cursor:not-allowed}
+.btn.btn-o:disabled,.btn.btn-o.is-disabled{background:#fff!important;color:var(--lt-grey-300)!important;border-color:var(--lt-grey-300)!important}
+
+/* ===== Page header（Figma #01：H4 20/700、說明 14/24.5 #676767）===== */
+.pg-hdr{display:flex;align-items:center;gap:var(--lt-space-16);min-height:30px}
+/* ⚠ DEVIATION: Overview v1 把標題放大成 Guideline H3 24px；這頁 Figma 量到 H4 20/700/30，照 Figma（同 Customized Budget）*/
+.pg-title{font-size:20px;font-weight:var(--lt-fw-bold);color:var(--lt-color-text-heading);line-height:30px}
+.pg-desc{font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-secondary)}
+.hdr-block{display:flex;flex-direction:column;gap:4px}
+
+/* ===== Card（Figma：白底 r8 內距 24 陰影 0 0 20 .10）===== */
+.card{background:var(--lt-card-bg);border-radius:var(--lt-card-radius);box-shadow:var(--ad-card-shadow);padding:var(--lt-card-padding);display:flex;flex-direction:column;gap:16px;min-width:0}
+.card.is-tall{min-height:504px}   /* Figma #01-4／#01-5／#01-8：卡片高 504（空狀態、No Auth）*/
+
+/* ===== 工具列（Figma #01：高 36、Alert List 18/700 靠左；右側 Alert Settings／狀態 chip／All|Pinned，gap 16）===== */
+.toolbar{display:flex;align-items:center;gap:16px;min-height:36px}
+.tb-title{font-size:var(--lt-fs-18);font-weight:var(--lt-fw-bold);line-height:27px;color:var(--lt-color-text-heading);margin-right:auto}
+.tb-title.none{margin-right:auto;min-width:1px}
+.toolbar.is-empty{min-height:30px}   /* 對稿修正（Figma #01-4）：空狀態沒有切換器，工具列高 30 不是 36 */
+.tb-r{display:flex;align-items:center;gap:16px;margin-left:auto}
+/* Alert Settings：Text Button（12/700、primary、文字底線、icon 永遠不畫底線）*/
+.lnk-btn{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 0;font-size:var(--lt-fs-12);font-weight:var(--lt-fw-bold);line-height:21px;color:var(--lt-color-primary)}
+.lnk-btn .material-symbols-outlined{font-size:16px}
+.lnk-btn .t{text-decoration:underline}
+.lnk-btn:hover{color:var(--lt-color-primary-hover)}
+.lnk-btn:disabled{color:var(--lt-grey-300);cursor:not-allowed}
+.lnk-btn:disabled:hover{color:var(--lt-grey-300)}
+/* 偵測狀態 chip（Figma Status Chips：高 24、r4、內距 2/8、燈 8×8、文字 12/18）*/
+.st-chip{display:inline-flex;align-items:center;gap:4px;height:24px;padding:2px 8px;border-radius:var(--lt-radius-sm);background:var(--lt-color-info-light);font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-primary)}
+.st-chip .dot{width:8px;height:8px;border-radius:50%;background:var(--lt-color-primary);flex-shrink:0}
+.st-chip .tx{white-space:pre}   /* Figma 文案 `Detection Enabled  (Sensitivity: High)` 中間是兩個空格，照稿保留 */
+.st-chip.off{background:var(--lt-grey-100)}
+.st-chip.off .dot{background:var(--lt-grey-400)}
+.st-chip.skel{width:224px;background:transparent;padding:0}
+.st-chip.skel .sk{background:var(--lt-grey-100);animation:none}   /* Figma #01-6：狀態 chip 的佔位是靜態 #F2F2F2 224×14 */
+/* All | Pinned Toggle Group（Figma：101×36、外框 #CCCCCC r6、All 48 寬／Pin 52 寬、選中底 #D1EEFF 字 #002663）*/
+.tg{display:inline-flex;height:36px;border:1px solid var(--lt-grey-300);border-radius:6px;overflow:hidden;background:#fff;flex-shrink:0}
+.tgb{display:inline-flex;align-items:center;justify-content:center;height:34px;color:var(--lt-grey-500);transition:background var(--lt-transition-fast)}
+.tgb.t-all{width:48px;font-size:var(--lt-fs-14);line-height:21px}
+.tgb.t-pin{width:52px}
+.tgb .material-symbols-outlined{font-size:20px}
+.tgb:hover{background:var(--lt-grey-50)}
+.tgb.on{background:var(--lt-blue-20);color:var(--lt-blue-90)}   /* ⚠ 設計端暫擬：Figma 只畫 All 選中；Pinned 選中的 icon 色沿用 All 選中字色 #002663 */
+.tgb.on:hover{background:var(--lt-blue-20)}
+.tg .sep{width:1px;background:var(--lt-grey-300);flex-shrink:0}
+.tg.is-disabled .tgb{color:var(--lt-grey-400);cursor:not-allowed;background:#fff}   /* Figma #01-6：讀取中不能操作的元件呈現 Disabled（字 #B3B3B3、icon #CCCCCC）*/
+.tg.is-disabled .tgb.t-pin .material-symbols-outlined{color:var(--lt-grey-300)}
+
+/* ===== Table（Figma：Header 50＋Row 50、header #F2FAFF、header 下緣 #B3B3B3、列分隔 #E6E6E6；最多 10.5 列→外框高 575）=====
+ * 用 grid 列模擬 table，欄寬 = 320／min175／min175／min240／80（Figma 1117 寬正好是最小寬；1346 寬時三個彈性欄各 273）*/
+.tbl-scroll{--cols:320px minmax(175px,1fr) minmax(175px,1fr) minmax(240px,1fr) 80px;--minw:990px;max-height:575px;overflow-y:scroll;overflow-x:auto;overscroll-behavior:contain;position:relative}
+/* T2 沒有 Assigned to 欄（#01-7 畫面）：稿在 1117 寬量到 Resource／Actual Cost／Anomaly Date 各 303、Action 80。
+ * Resource 欄照 #01-1「寬度固定」規則固定成 303（#01-7 的值，不是其他稿的 320），其餘兩欄平分；1117 寬時三欄都是 303，跟稿一致 */
+.tbl-scroll.no-assigned{--cols:303px minmax(175px,1fr) minmax(175px,1fr) 80px;--minw:733px}
+/* 垂直捲軸常駐（Figma 用 15px 軸＋10px thumb #D8D8D8 r2＋左右 1px #E6E6E6）；軸上方 50px 與表頭同色 */
+.tbl-scroll::-webkit-scrollbar{width:15px;height:15px}
+/* 對稿修正（Figma #01 取樣）：軌道從表頭下緣開始、表頭底色與下緣線延伸過捲軸那一欄；軌道左右 1px #E6E6E6、thumb 約 9 寬 #D8D8D8。
+ * 表頭那 50px 由 .tbl-scroll 自己的背景補（背景不隨內容捲動，剛好是固定在頂端的那一段）*/
+.tbl-scroll{background:linear-gradient(#F2FAFF 0,#F2FAFF 49px,#B3B3B3 49px,#B3B3B3 50px,#fff 50px)}
+.tbl-scroll::-webkit-scrollbar-track{background:#fff;box-shadow:inset 1px 0 #E6E6E6,inset -1px 0 #E6E6E6}
+.tbl-scroll::-webkit-scrollbar-track:vertical{margin-top:50px}
+.tbl-scroll::-webkit-scrollbar-track:horizontal{box-shadow:inset 0 1px #E6E6E6,inset 0 -1px #E6E6E6}
+.tbl-scroll::-webkit-scrollbar-thumb{background:var(--ad-scroll-thumb);border:solid transparent;border-width:0 2px 0 3px;background-clip:padding-box;border-radius:2px;box-shadow:inset 0 0 0 1px #E6E6E6}   /* Figma Scroll bar / Vertical：thumb 10 寬、距軌道左 3、#D8D8D8＋1px #E6E6E6、r2 */
+.tbl-scroll::-webkit-scrollbar-thumb:horizontal{border-width:3px 0 2px 0}
+.tbl-scroll::-webkit-scrollbar-corner{background:#fff}
+.tr{display:grid;grid-template-columns:var(--cols);min-width:var(--minw)}
+.td,.th{height:50px;padding:0 16px;display:flex;align-items:center;min-width:0;background:#fff;border-bottom:1px solid var(--lt-grey-200);font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-primary)}
+.th{background:var(--lt-color-primary-bg);font-weight:var(--lt-fw-bold);color:var(--lt-color-text-heading);border-bottom-color:var(--lt-grey-400);gap:4px}
+.th-row{position:sticky;top:0;z-index:5}
+.td .ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+/* 固定欄：Resource Name / ID（左）、Action（右）；固定欄接合處陰影 0 0 10 .1（#01 註記，一開始就有）*/
+.st-l{position:sticky;left:0;z-index:3}
+.st-r{position:sticky;right:0;z-index:3}
+.th.st-l,.th.st-r{z-index:6}
+.st-l::after,.st-r::before{content:'';position:absolute;top:0;bottom:-1px;width:10px;pointer-events:none}
+/* 對稿修正（Figma #01-1 取樣）：稿是 DROP 0.10 blur10 位移 2 被裁成一條，接合處實際只有約 6% 深、8px 內淡出；原本 10% 線性 10px 太重 */
+.st-l::after{right:-10px;background:linear-gradient(90deg,rgba(0,0,0,.063),rgba(0,0,0,.012) 7px,rgba(0,0,0,0) 8px)}
+.st-r::before{left:-10px;background:linear-gradient(270deg,rgba(0,0,0,.055),rgba(0,0,0,.012) 7px,rgba(0,0,0,0) 8px)}
+.tbody .tr:hover .td{background:var(--lt-grey-50)}
+/* 資源欄：[箭頭 10][Logo 24][兩行名稱/ID][計數膠囊]（Figma #01-1／#01-9）*/
+/* Figma #01-1／#01-9 量到：一般列 padding 左右 20、gap 10 → 箭頭 x20、logo x40、名稱 x74；展開中的主列 4px 前綴線＋左 18／右 10、gap 8（logo 仍在 x40、名稱 x72、計數膠囊右移到距右 10）；子列左 40（含前綴線）右 10 */
+.td.res{padding:0 20px;gap:10px;position:relative}
+.td.res.can{cursor:pointer}
+.tw{width:10px;height:10px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+.tw i{display:block;width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:6px solid var(--lt-grey-500)}
+.tw.open i{border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--lt-grey-500);border-bottom:0}
+.csp{width:24px;height:24px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+.csp svg,.csp img{width:24px;height:24px;display:block}
+.cell-2l{display:flex;flex-direction:column;justify-content:center;min-width:0;flex:1}
+.cell-2l .l1{font-size:var(--lt-fs-14);line-height:21px;color:var(--lt-color-text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell-2l .l2{font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-grey-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cnt{flex-shrink:0;min-width:20px;height:20px;padding:0 4px;border-radius:5px;background:var(--ad-badge-bg);color:#fff;font-size:var(--lt-fs-14);font-weight:var(--lt-fw-bold);line-height:20px;text-align:center;font-variant-numeric:tabular-nums}
+/* 展開：主列與子列左側 4px #9ED7FF 前綴線；子列底色 #F6F6F6（#01-9 註記：各種狀態定義請見 CMDS）*/
+.tr.is-open .td.res::before,.tr.is-child .td.res::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--lt-blue-30)}
+.tr.is-open .td.res{padding:0 10px 0 22px;gap:8px}
+.tr.is-child .td{background:var(--lt-grey-50)}
+.tr.is-child:hover .td{background:var(--lt-grey-100)}   /* ⚠ 設計端暫擬：子列底色本來就是 CMDS hover 色 #F6F6F6，hover 再深一階 #F2F2F2，否則沒有回饋（#01-9 只寫「各種狀態定義請見 CMDS」）*/
+.tr.is-child .td.res{padding:0 10px 0 40px;gap:10px}
+.tr.is-child .td.res .csp{margin-left:0}
+.td .dash{color:var(--lt-color-text-primary)}
+.td.asg{padding-right:8px}   /* 文案寬度容差：Figma 文字框 208 剛好放得下 Engineering Research Assistants，Chrome 字寬略大，右內距縮到 8 避免多截 */
+.td.act{padding:0 16px;gap:8px}
+.ib{width:20px;height:20px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--lt-grey-500);transition:background var(--lt-transition-fast),color var(--lt-transition-fast)}
+.ib .material-symbols-outlined{font-size:16px}
+/* 對稿修正（Figma #01-3 節點）：一般 icon button hover 圓底 #676767@24%；已釘選 pin hover #0B6DD7@12% */
+.ib:hover{background:rgba(103,103,103,.24)}
+/* Pin：Figma 兩態 icon 同形（FILL 1）、只換顏色：已釘＝primary、未釘＝#676767；hover 淡藍圓底。
+ * ⚠ DEVIATION: Guideline 規定 On/Off icon 要「on=FILL 1+primary、off=FILL 0+neutral」；Figma 與 FE 都只切顏色，Kabin 09-11 裁決「Figma 有畫就照 Figma」→ 照稿，不切 FILL。 */
+.ib.pin.on{color:var(--lt-color-primary)}
+.ib.pin.on:hover{background:rgba(11,109,215,.12)}
+.ib:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring)}
+.td.res:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(0,79,176,.35)}
+.th .info{font-size:16px;color:var(--lt-grey-500);cursor:help}
+
+/* ===== Skeleton（#01-6：表頭 #F2F2F2＋上緣 2px、四列、左欄與右四欄間 1px 分隔）===== */
+/* 對稿修正（Figma #01-6）：條的底色 #E6E6E6（稿上再疊一層動畫光），原本 #EBEBEB 偏淡 */
+.sk{background:linear-gradient(90deg,#E6E6E6 25%,#F2F2F2 50%,#E6E6E6 75%);background-size:200% 100%;animation:shimmer 1.5s infinite linear;border-radius:4px;height:14px}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.sk-tbl{display:grid;grid-template-columns:476fr 1px 528fr}
+.sk-tbl .sk-div{background:var(--lt-grey-200)}
+.sk-left,.sk-right{display:flex;flex-direction:column}
+.sk-hd{height:50px;background:var(--lt-grey-100);border-top:2px solid var(--lt-grey-200);border-bottom:1px solid var(--lt-grey-200);display:flex;align-items:center;padding:0 16px}
+.sk-row{height:50px;border-bottom:1px solid var(--lt-grey-200);display:flex;align-items:center;padding:0 16px;background:#fff}
+/* 對稿修正（Figma #01-6）：右半四欄等寬 132、每欄一條 50 寬的條置中（原本是 gap 25 靠左排）*/
+.sk-right .sk-hd,.sk-right .sk-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:0;justify-items:center}
+.sk-right .sk{width:50px}
+.sk-hd .sk{background:#E6E6E6;animation:none}
+
+/* ===== Empty / No-auth / Error（#01-4／#01-5／#01-8）===== */
+.es{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--lt-color-text-secondary);flex:1;min-height:300px;padding:16px 0}
+.es .es-ic{font-size:80px;color:var(--lt-blue-30);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;line-height:80px;width:80px;height:80px}
+.es .es-ic.is-outline{font-variation-settings:'FILL' 0,'wght' 700,'GRAD' 0,'opsz' 48}   /* 對稿修正（Fable §5 #1）：#01-4 的 table_view 格子是空心的，Material Symbols 的 FILL 0 就是這個字形 */
+.es svg{width:80px;height:80px;display:block}
+.es-title{font-size:var(--lt-fs-18);font-weight:var(--lt-fw-bold);line-height:27px;margin-top:16px}
+.es-desc{font-size:var(--lt-fs-14);white-space:pre-line;margin-top:8px;line-height:24.5px}
+.es .btn{margin-top:32px}
+.es.err{min-height:70vh}
+
+/* ===== Switch（Figma 30×16、r8、knob 12）／ 下拉（36h、8×6 實心三角 #676767）===== */
+.sw{position:relative;display:inline-block;width:30px;height:16px;border-radius:8px;border:1px solid var(--lt-color-primary);background:#fff;vertical-align:middle;cursor:pointer;transition:background var(--lt-transition-fast);flex-shrink:0}
+.sw::after{content:'';position:absolute;left:1px;top:1px;width:12px;height:12px;border-radius:50%;background:transparent;border:1px solid var(--lt-color-primary);transition:transform var(--lt-transition-fast),background var(--lt-transition-fast)}
+.sw.on{background:var(--lt-color-primary)}
+.sw.on::after{background:#fff;border-color:#fff;transform:translateX(14px)}
+.sw:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring)}
+.sw.is-disabled{cursor:not-allowed;background:#fff;border-color:var(--lt-grey-300)}
+.sw.is-disabled.on{background:var(--lt-grey-300)}   /* Figma #03-2：Disabled ON 軌 #CCCCCC、白點 */
+.sel{display:flex;align-items:center;justify-content:space-between;gap:10px;height:36px;padding:0 10px;background:#fff;border:1px solid var(--ad-field-border);border-radius:var(--ad-radius-field);font-size:var(--lt-fs-14);color:var(--lt-color-text-primary);cursor:pointer;text-align:left;width:100%;min-width:0;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}
+.sel:hover{border-color:var(--lt-grey-400)}
+.sel.open{border-color:var(--lt-color-border-focus);box-shadow:var(--lt-button-focus-ring)}
+.tri{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--lt-grey-500);flex-shrink:0}
+.sel.open .tri{transform:rotate(180deg)}
+.sel:disabled{background:var(--lt-grey-100);border-color:var(--lt-grey-200);color:var(--lt-grey-400);cursor:not-allowed}   /* Figma #03-2：底 #F2F2F2、框 #E6E6E6、字 #B3B3B3 */
+.sel:disabled .tri{border-top-color:var(--lt-grey-300)}
+.pop{position:fixed;z-index:calc(var(--lt-z-modal) + 1);background:#fff;border:1px solid var(--lt-grey-200);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.1);overscroll-behavior:contain;font-size:var(--lt-fs-14);max-height:320px;overflow-y:auto}
+/* ⚠ 設計端暫擬（Fable §5 #2）：Figma 沒畫 Sensitivity 下拉的展開態 → 照 Guideline「Dropdown / Select」的 List／Item：
+ * 容器 1px #E6E6E6、r8、上下 4、陰影 0 4 12 .08＋0 1 3 .1；項目 40 高、內距 0 12；Hover #F6F6F6、鍵盤焦點 #E6E6E6、
+ * Selected 底 #F2FAFF＋字 #004FB0＋右側勾、Selected+Hover #D1EEFF。
+ * （原本選中態用 class `sel`，會吃到下拉欄位 .sel 的框線與高度，一併改名 is-sel）*/
+.pop.menu{padding:4px 0}
+.mi{display:flex;align-items:center;justify-content:space-between;gap:8px;height:40px;padding:0 12px;cursor:pointer;color:var(--lt-color-text-primary);white-space:nowrap}
+.mi:hover{background:var(--lt-grey-50)}
+.mi.hl{background:var(--lt-grey-200)}
+.mi.is-sel{background:var(--lt-blue-10);color:var(--lt-color-primary)}
+.mi.is-sel:hover{background:var(--lt-blue-20)}
+.mi .ck{font-size:18px;color:var(--lt-color-primary);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20}
+
+/* ===== Modal（#03-1／#03-2：700 寬、r15、內距 24/32、gap 24、陰影 0 0 6 .2、標題 20/700；上下 Padding 24、左右 32 是 #03-1 紫色註記）===== */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:var(--lt-z-modal);display:flex;align-items:center;justify-content:center;padding:24px}
+.modal{width:700px;max-width:100%;max-height:calc(100vh - 48px);background:#fff;border-radius:var(--ad-radius-modal);box-shadow:var(--lt-shadow-dialog);padding:24px 32px;display:flex;flex-direction:column;gap:24px;min-height:0}
+.modal .m-hd{display:flex;align-items:center;gap:15px;flex-shrink:0}
+.modal .m-hd h2{flex:1;font-size:20px;line-height:30px;font-weight:var(--lt-fw-bold);color:var(--lt-color-text-heading)}
+.modal .m-x{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--lt-grey-500);flex-shrink:0}
+.modal .m-x:hover{background:var(--lt-grey-100)}
+.modal .m-x .material-symbols-outlined{font-size:24px;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24}
+.modal .m-desc{font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-primary);flex-shrink:0}
+.modal .m-scroll{flex:1 1 auto;min-height:0;overflow-y:scroll;overscroll-behavior:contain}
+/* 內容區右側固定一條 15px 捲軸（Figma 一直畫著，thumb #D8D8D8）*/
+.modal .m-scroll::-webkit-scrollbar{width:15px}
+.modal .m-scroll::-webkit-scrollbar-track{background:#fff;box-shadow:inset 1px 0 #E6E6E6,inset -1px 0 #E6E6E6}   /* 對稿修正：scrollbar 軌道的 border 不會畫，改 inset 陰影 */
+.modal .m-scroll::-webkit-scrollbar-thumb{background:var(--ad-scroll-thumb);border:solid transparent;border-width:0 2px 0 3px;background-clip:padding-box;border-radius:2px;box-shadow:inset 0 0 0 1px #E6E6E6}
+.m-inner{display:flex;flex-direction:column;gap:24px;padding-right:8px}
+.modal .m-ft{display:flex;justify-content:flex-end;gap:10px;flex-shrink:0}
+.modal .m-ft .btn{min-width:100px}
+.lbl{font-size:var(--lt-fs-12);font-weight:var(--lt-fw-bold);line-height:18px;color:var(--lt-color-primary)}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.swrow{display:inline-flex;align-items:center;gap:10px;height:36px;cursor:pointer;align-self:flex-start;font-size:var(--lt-fs-14);line-height:24.5px}
+.swrow.is-disabled{cursor:not-allowed;color:var(--lt-grey-300)}
+.help{font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-secondary)}
+.sens{display:flex;flex-direction:column;gap:8px}
+.sens .sel{width:240px;padding:0 10px 0 7px}   /* 對稿修正（Fable §5 #9，同 CB §5 #16）：Figma 文字距欄位左緣 8（外框畫在框內）→ 1px 框＋7 */
+.sens.is-disabled .lbl{color:var(--lt-color-primary)}   /* Figma #03-2：Detection Sensitivity 標籤維持藍色，欄位與說明變灰 */
+.sens.is-disabled .help{color:var(--lt-grey-400)}
+.nbox{border:1px solid var(--lt-grey-200);border-radius:8px;background:#fff;padding:23px;display:flex;flex-direction:column;gap:16px}
+.nbox h3{font-size:var(--lt-fs-16);font-weight:var(--lt-fw-bold);line-height:24px;color:var(--lt-color-text-heading)}
+.nbox .intro{display:flex;flex-direction:column;gap:8px}
+.nbox .role{display:flex;flex-direction:column;gap:8px}
+.nbox .role .rl{font-size:var(--lt-fs-12);font-weight:var(--lt-fw-bold);line-height:18px;color:var(--lt-color-text-primary)}
+.nbox .role .swrow{height:25px}
+.nbox hr{border:none;border-top:1px solid var(--lt-grey-200);margin:0 0 -1px}   /* 對稿修正（Figma #03-1）：Figma 外框畫在框內、分隔線高 0；padding 23＋分隔線不佔高，框高 483 與稿一致 */
+.nbox.is-disabled h3,.nbox.is-disabled .rl{color:var(--lt-grey-400)}
+.nbox.is-disabled .help{color:var(--lt-grey-400)}
+
+/* ===== Toast（Figma：左下、400×46、r4、陰影 0 0 6 .2；成功 #008F88、失敗 #BF302E；同時出現時失敗在上）===== */
+/* ⚠ DEVIATION: Figma toast 距左 24；Demo FAB 佔 18–66px，與其他 prototype 一致往右挪到 80 */
+.toast-wrap{position:fixed;bottom:24px;left:80px;z-index:var(--lt-z-toast);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:8px;min-height:46px;padding:8px 16px;background:var(--ad-toast-ok);color:#fff;border-radius:4px;box-shadow:var(--lt-shadow-dialog);font-size:var(--lt-fs-14);line-height:24.5px;width:400px;animation:toast-in .25s ease-out;pointer-events:auto}
+.toast.err{background:var(--ad-toast-err)}
+.toast.info{background:var(--lt-tooltip-bg)}
+.toast .material-symbols-outlined{font-size:20px;flex-shrink:0}
+@keyframes toast-in{0%{transform:translateY(20px);opacity:0}100%{transform:translateY(0);opacity:1}}
+
+/* Tooltip（Figma #01-3：深底白字、14/24.5、內距 8/16、max-width 400、r4、陰影 0 0 6 .2）。底色用 token --lt-tooltip-bg（#31383E，Kabin 10/09 裁決）；Figma 實際是 #000910@80%，疊白底約等於 */
+body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.5px;padding:8px 16px;border-radius:var(--lt-tooltip-radius);box-shadow:var(--lt-shadow-dialog);text-align:left}
+
+/* ===== Footer（CLAUDE.md 規定的 prototype footer；Figma 底部 Copyright 列是產品 footer，不是這個）===== */
+.footer{padding:var(--lt-space-16) var(--lt-space-32);background:var(--lt-color-primary-bg);border-top:1px solid var(--lt-color-border-default);display:flex;align-items:center;justify-content:space-between;font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);flex-wrap:wrap;gap:10px}
+.footer-version{font-weight:var(--lt-fw-medium);color:#262626}
+.footer-version .ver-tag{background:#34B5D9;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}
+.footer-credit{color:#676767;font-size:12px}
 </style>
 </head>
 <body>
 <div class="app">
-  <!-- SIDEBAR — rendered by shared/lumiture-sidebar.js -->
   <aside id="lt-sidebar"></aside>
-
   <div class="main">
-    <!-- Shared topbar + Account Menu — see shared/lumiture-topbar.js -->
     <header id="lt-topbar"></header>
-
-    <div class="content">
-      <div class="hint">
-        <div class="hint-arrow"><span class="material-symbols-outlined">north_east</span>點右上角頭像開啟 Account Menu</div>
-        <h1>User Menu + AI Quota</h1>
-        <p>這是 LT-3138 / LT-3140（v1.19.0）的共用 Account Menu。它掛在共用 topbar 上，所有 prototype 點開頭像都會看到同一版。用左下角的 <span class="material-symbols-outlined" style="font-size:16px; color:var(--lt-color-secondary); vertical-align:-3px;">science</span> Demo 切換情境：</p>
-        <ul>
-          <li><span class="material-symbols-outlined">layers</span>各方案（Essential / Starter / Standard / Premium）顯示哪些 quota 項目</li>
-          <li><span class="material-symbols-outlined">circle</span>Active（綠）/ Warning（琥珀）/ Depleted（紅）+ Loading / Error</li>
-          <li><span class="material-symbols-outlined">info</span>Warning / Depleted 項目 hover 顯示 tooltip 說明（無彈窗、無 Contact Sales）</li>
-        </ul>
-      </div>
-    </div>
-
+    <div class="content" id="content"></div>
     <div class="footer">
-      <span class="footer-version">User Menu Prototype<span class="ver-tag">v1</span></span>
+      <span class="footer-version">Anomaly Detection Prototype<span class="ver-tag">v1</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
     </div>
   </div>
 </div>
-
-<!-- Demo Scenarios — rendered by shared/demo-fab.js -->
+<div class="toast-wrap" id="toast-wrap" aria-live="polite"></div>
+<div id="modal-root"></div>
 
 <script>
-// =================================================================
-// DEMO SCENARIOS — 切換 Account Menu 各情境（數值對齊 specs §參考情境）
-// =================================================================
-window.DEMO_CATEGORIES = [
-  { id: 'plan',   label: 'Plan',    icon: 'layers',
-    hint: '不同方案決定 AI Quota box 顯示哪些項目。Standard=兩項（預設）；Essential=兩項（照 PRD）；Starter=只 analyses；Premium=兩項皆 Unlimited。' },
-  { id: 'state',  label: 'State',   icon: 'circle',
-    hint: '以 Standard（兩項）展示用量狀態與資料狀態：<80% 綠 / 80-99% 琥珀 / ≥100% 紅 / Loading / Error。數值取自 specs 參考情境表。' },
-  { id: 'special',label: 'Special', icon: 'tune',
-    hint: '混合狀態、加購後額度提升、角色 chip 變體、不可切換角色（隱藏 View as Another Role）。' },
-];
-
-window.DEMO_SCENARIOS = [
-  // === Plan ===
-  { id: 'plan-standard',  category: 'plan', label: 'Standard（預設・兩項）',  icon: 'workspace_premium',
-    tip: 'Standard plan：AI Quota box 顯示 AI Analyses + Rightsizing 兩項，皆綠色（32/80、410/1000）。三方資料皆一致，最適合設計稿參照。' },
-  { id: 'plan-essential', category: 'plan', label: 'Essential（兩項）', icon: 'eco',
-    tip: 'Essential plan：照 Notion PRD 顯示 AI Analyses + Rightsizing 兩項。⚠ specs ai-quota README 說只 rightsizing，與 PRD 衝突待 PM 對齊。' },
-  { id: 'plan-starter',   category: 'plan', label: 'Starter（只 analyses）',  icon: 'rocket_launch',
-    tip: 'Starter plan：只顯示 AI Analyses 項目（無 rightsizing）。' },
-  { id: 'plan-premium',   category: 'plan', label: 'Premium（Unlimited）',   icon: 'diamond',
-    tip: 'Premium plan：unlimited，兩項皆顯示 Unlimited ✨（cyan，不可點）。金色 plan banner。⚠ 偏離 PRD（PRD 說 Premium 不顯示 box），設計上更友善，待回推 PM。' },
-
-  // === State (Standard, 兩項) ===
-  { id: 'state-normal',   category: 'state', label: 'Normal（綠）',   icon: 'check_circle',
-    tip: 'Active：analyses 32/80、rightsizing 410/1000，皆 <80% 綠色、不可點。' },
-  { id: 'state-warning',  category: 'state', label: 'Warning（琥珀）', icon: 'warning',
-    tip: 'Warning：analyses 70/80 (87.5%)、rightsizing 850/1000 (85%)，皆 80-99% 琥珀色、純預警不可點。' },
-  { id: 'state-depleted', category: 'state', label: 'Depleted（紅）',  icon: 'error',
-    tip: 'Depleted：analyses 80/80、rightsizing 1000/1000，皆 ≥100% 紅色。hover 紅項顯示 tooltip 說明（取代原 Limit Reached 彈窗，無 Contact Sales）。' },
-  { id: 'state-loading',  category: 'state', label: 'Loading（載入中）', icon: 'hourglass_top',
-    tip: 'Quota 資料載入中：box 顯示 2 行 shimmer skeleton（避免 generic spinner）。menu 其他項照常。' },
-  { id: 'state-error',    category: 'state', label: 'Error（抓不到）',   icon: 'error',
-    tip: 'Quota 端點失敗：partial degrade — 只有 box 顯示「Couldn\'t load quota · Retry」，menu 其他項不受影響。' },
-
-  // === Special ===
-  { id: 'special-addon',  category: 'special', label: 'Add-on Active（加購 ×2）', icon: 'add_shopping_cart',
-    tip: '加購 2 包後 total 提升：analyses 92/160、rightsizing 1180/2000，皆回到綠色。（Billing 摘要為階段二，v1.19.0 僅反映在額度提升）' },
-  { id: 'special-mixed',  category: 'special', label: '混合狀態（琥珀+紅）',     icon: 'compare_arrows',
-    tip: 'analyses 琥珀 (72/80)、rightsizing 紅 (1000/1000)。驗證兩項獨立判斷、版面不跳動；hover 各自顯示對應 tooltip。' },
-  { id: 'special-manager',category: 'special', label: '角色 chip：Manager - Group', icon: 'badge',
-    tip: 'Manager 角色 chip 帶群組後綴「Manager - Cost Center」（Admin 以外才有後綴）。' },
-  { id: 'special-noswitch',category:'special', label: '不可切換角色',           icon: 'person_off',
-    tip: 'canSwitchRole=false → 隱藏「View as Another Role」（只有有其他角色可切換的帳號才顯示）。' },
-];
-
-window.DEMO_DEFAULT = 'plan-standard';
-window.DEMO_APPLY = applyScenario;
-
-// 共用 menu 動作佔位（Profile/Settings/Log out/View as Another Role）
-window.LUMITURE_MENU_ACTION = function (label) {
-  console.log('[user-menu demo] clicked:', label);
-};
-
-// 基礎 user
-function baseUser() {
-  return {
-    name: 'Isabella Izzy Rodriguez',
-    email: 'isabella.rc@tech-ventures.co',
-    role: 'Admin',
-    initials: 'IR',
-    canSwitchRole: true,
-    plan: 'Standard',
-    planDateRange: '2 Aug. 2025 ~ 2 Aug. 2035',
-    product: 'LumiTure.ai',
-    version: 'v1.19.0',
-    addonPacks: 0,
-    quota: {
-      refreshDate: '2 Apr. 2035',
-      analyses:    { used: 32,  total: 80 },
-      rightsizing: { used: 410, total: 1000 },
-    },
-  };
-}
-
-function applyScenario(id) {
-  var u = baseUser();
-
-  switch (id) {
-    // Plan
-    case 'plan-standard':  break;
-    case 'plan-essential': u.plan = 'Essential'; break;
-    case 'plan-starter':   u.plan = 'Starter';   break;
-    case 'plan-premium':   u.plan = 'Premium';   break;
-
-    // State
-    case 'state-normal':   break;
-    case 'state-warning':  u.quota.analyses = { used: 70, total: 80 };  u.quota.rightsizing = { used: 850, total: 1000 }; break;
-    case 'state-depleted': u.quota.analyses = { used: 80, total: 80 };  u.quota.rightsizing = { used: 1000, total: 1000 }; break;
-    case 'state-loading':  u.quota.state = 'loading'; break;
-    case 'state-error':    u.quota.state = 'error';   break;
-
-    // Special
-    case 'special-addon':  u.addonPacks = 2; u.quota.analyses = { used: 92, total: 160 }; u.quota.rightsizing = { used: 1180, total: 2000 }; break;
-    case 'special-mixed':  u.quota.analyses = { used: 72, total: 80 };  u.quota.rightsizing = { used: 1000, total: 1000 }; break;
-    case 'special-manager':u.role = 'Manager - Cost Center'; u.name = 'John Doue'; u.email = 'jdoe@email.com'; u.initials = 'JD'; break;
-    case 'special-noswitch': u.canSwitchRole = false; break;
-  }
-
-  window.LUMITURE_USER = u;
-  window.LumitureTopbar.rerender();
-  window.LumitureTopbar.openMenu();
-}
-
-// 初始載入即套預設情境並開啟 menu
-window.addEventListener('load', function () {
-  setTimeout(function () { applyScenario(window.DEMO_DEFAULT); }, 60);
-});
-
-// =================================================================
-// SIDEBAR NAV — definition in shared/lumiture-nav.js
-// =================================================================
-window.LUMITURE_ACTIVE = 'user-menu';
+  window.LUMITURE_ACTIVE = 'anomaly-detection';
+  window.LUMITURE_USER = { role: 'Admin', plan: 'Standard' };
 </script>
-
-<!-- SHARED MODULES — nav 必須在 sidebar 前載入 -->
 <script>
 /* === Inlined: shared/lumiture-nav.js === */
 /*!
@@ -1277,6 +1370,542 @@ window.LUMITURE_ACTIVE = 'user-menu';
 
 </script>
 <script>
+/* ============================================================
+ * 0. Constants — 文案逐字取自 Figma TEXT 節點（Kabin 規則：Figma 上有的文案不准自由發揮）
+ * ============================================================ */
+/* Figma #01 註記「Actual Cost 小數點後兩位，目前僅以美金呈現，不計算 credit」→ 固定 USD（Customized Budget 才是依客戶設定）*/
+const CURRENCY = 'USD';
+const MAX_BADGE = 99;            // #01 註記：若有超過一則告警則後綴告警總數，最大為 99，顯示為「99+」
+const MAX_TIP_GROUPS = 5;        // #01-3 註記：組數 > 5 筆時僅顯示前 5 筆名稱，並加上 ...+{n} more
+const PIN_OLD_DAYS = 30;
+
+const COPY = {
+  title: 'Anomaly Detection',
+  desc: 'Displaying resources with detected anomalies in the last 30 days within your group (organization) based on the alert settings configured by admins.',
+  listTitle: 'Alert List',
+  settingsBtn: 'Alert Settings',
+  assignedTip: "Displays the list of your subgroups.  When '--' is displayed, it indicates that the resource is assigned to your group but has not been assigned to a lower-level group.",
+  dashTip: 'The resource is assigned to your group but has not been assigned to a lower-level group.',
+  pinTip: 'This anomaly is from over 30 days ago. Unpinning this item will remove it from your view permanently.',
+  detailTip: 'Check Anomaly Details',
+  empty: { title: 'No Anomaly Alerts', desc: 'There are currently no anomaly alerts for your managed organization or group.' },
+  /* ⚠ 設計端暫擬：Figma 沒畫 Pinned 視角的空狀態（FE 也沒做，有異常但都沒釘會渲染空表格；FE 真 bug，要回報）。這裡補一個 */
+  pinnedEmpty: { title: 'No Pinned Alerts', desc: 'Pin an anomaly alert from the All view to keep track of it here.' },
+  noAuth: {
+    title: 'Unlock the Potential of Your Cloud Data Today',
+    admin: "Begin your cloud cost optimization journey by authorizing your cloud account.\nYou can monitor spending anomalies within your managed organization or groups, set anomaly detection criteria and notification settings as needed,\nand stay informed about your organization's cloud spending anytime, anywhere.",
+    nonAdmin: "To kickstart your cloud cost optimization journey,\nplease reach out to your organization's administrator for authorization.\nYou can monitor spending anomalies within your managed organization or groups,\nand stay informed about your organization's cloud spending anytime, anywhere.",
+    btn: 'Add Your Authorization'
+  },
+  /* ⚠ DEVIATION: FE 的列表沒有 error 分支（LABELS.error 定義了卻沒用到，失敗會落到空狀態）。這裡補正確的 error 狀態（沿用 Overview／Customized Budget 的文案），要回報 FE */
+  error: { title: 'Something Went Wrong', desc: 'Please ensure you have a stable internet connection\nand try refreshing the page.' },
+  settings: {
+    title: 'Anomaly Alert Settings',
+    desc: "Admin can set anomaly alerts to notify the Admin, group managers, and members via email when there’s any anomaly detected.",
+    detection: 'Detection',
+    sensitivity: 'Detection Sensitivity',
+    sensHelp: 'You can set the sensitivity to trigger the alert. A higher sensitivity level means the system is more vigilant and will react to even minor changes in spending patterns.',
+    notif: 'Notification Settings',
+    notifDesc: 'Each role will be able to receive alerts for spending anomalies at the configured threshold when its notifications are enabled.'
+  },
+  toast: { ok: 'Alert settings updated successfully.', fail: 'Unable to update alert. Please try again later.' },
+  /* ⚠ 設計端暫擬：詳情頁這輪不做，列表上的入口改成 toast 說明 */
+  detailLater: 'Anomaly Details page is built in a separate round. Coming soon.'
+};
+const SENS = ['Low', 'Medium', 'High'];
+/* Notification Settings：五個角色各一個總開關（#03-1 黃便條：原本是兩欄開關「自己的群組／下層群組」，因為後端 alert 不依群組層級分別發布，簡化成只做一個總開關）*/
+const NOTIF_ROLES = [['admin', 'Admin'], ['t1Manager', 'Tier 1 Manager'], ['t1Member', 'Tier 1 Member'], ['t2Manager', 'Tier 2 Manager'], ['t2Member', 'Tier 2 Member']];
+const NOTIF_DIVIDE_AFTER = ['admin', 't1Member'];   // Admin｜T1｜T2 三組之間的分隔線
+
+/* ---- 圖像：Overview／Customized Budget 同一張鎖頭插圖與錯誤圖示（FE public/images，色值 #9ED7FF）---- */
+const ILLUS_AUTH = '<svg viewBox="0 0 77 66" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.1402 1.9429C20.5363 2.31186 20.7878 2.82689 20.7978 3.40161L20.9116 8.83068C20.9357 9.98004 19.9949 10.9306 18.8102 10.9538C17.6255 10.9771 16.6456 10.0643 16.6215 8.91496L16.5077 3.4859C16.4836 2.33653 17.4244 1.38602 18.6091 1.36274C19.2035 1.35106 19.7442 1.57394 20.1402 1.9429ZM12.4441 9.56538L8.51429 5.90452C7.68294 5.13007 6.36831 5.14807 5.57984 5.94469C4.79137 6.74131 4.82617 8.01639 5.65751 8.79083L9.58734 12.4517C10.4187 13.2261 11.7333 13.2081 12.5218 12.4115C13.3103 11.6149 13.2755 10.3398 12.4441 9.56538ZM17.1208 53.1633C15.4006 52.7162 14.1168 51.7664 13.2692 50.3139C12.4201 48.8611 12.2209 47.3188 12.6715 45.6871L18.6172 24.16C19.0679 22.5283 20.0353 21.2893 21.5194 20.4429C23.002 19.5962 24.6034 19.3964 26.3235 19.8436L45.5314 24.8367L46.5147 21.2767C46.9756 19.6079 46.793 18.0795 45.967 16.6914C45.1421 15.3053 43.9078 14.3986 42.2641 13.9713C40.9262 13.6235 39.6889 13.689 38.5521 14.1677C37.4164 14.6484 36.4516 15.3618 35.6577 16.3081C35.1013 16.8391 34.5261 17.2158 33.9321 17.4382C33.3377 17.6621 32.7538 17.6995 32.1804 17.5504C31.1483 17.2822 30.4213 16.7251 29.9994 15.8793C29.5771 15.0351 29.6711 14.1755 30.2814 13.3008C31.6632 11.1162 33.5988 9.52236 36.0882 8.51922C38.5772 7.51756 41.1787 7.36948 43.8926 8.07497C47.2182 8.93946 49.7279 10.7938 51.4218 13.638C53.1138 16.4832 53.504 19.5561 52.5924 22.8566L51.6092 26.4166L53.0426 26.7892C54.7627 27.2364 56.0466 28.1862 56.8941 29.6386C57.7433 31.0915 57.9425 32.6338 57.4918 34.2655L51.5462 55.7926C51.0955 57.4243 50.1281 58.6633 48.644 59.5096C47.1614 60.3563 45.56 60.5561 43.8399 60.109L17.1208 53.1633ZM33.8603 44.3985C35.1217 44.7264 36.3222 44.5719 37.4617 43.9349C38.6001 43.296 39.3383 42.3646 39.6763 41.1409C40.0143 39.9171 39.855 38.7524 39.1984 37.6469C38.5398 36.5425 37.5799 35.8263 36.3184 35.4984C35.057 35.1705 33.8573 35.3253 32.7193 35.9627C31.5794 36.6012 30.8404 37.5323 30.5024 38.7561C30.1644 39.9798 30.3245 41.1447 30.9826 42.2506C31.6396 43.3546 32.5989 44.0706 33.8603 44.3985ZM10.6168 17.1102C11.0129 17.4791 11.2643 17.9942 11.2744 18.5689C11.2985 19.7183 10.3577 20.6688 9.17294 20.6921L3.57682 20.802C2.39209 20.8253 1.41224 19.9125 1.38815 18.7631C1.36405 17.6138 2.30484 16.6632 3.48957 16.64L9.08569 16.53C9.6781 16.5204 10.2207 16.7412 10.6168 17.1102ZM67.3699 59.7009L73.0217 65.1839C73.2149 65.3948 73.4443 65.5002 73.71 65.5002C73.9757 65.5002 74.2051 65.3948 74.3984 65.1839L76.1736 63.4617C76.391 63.2508 76.4997 63.0225 76.4997 62.777C76.4997 62.5305 76.391 62.3135 76.1736 62.126L70.5218 56.643L73.0941 55.7995C73.553 55.6355 73.7767 55.3252 73.7651 54.8688C73.7525 54.4114 73.5168 54.1124 73.0579 53.9718L62.7688 50.9843C62.4065 50.8906 62.0867 50.9782 61.8094 51.2472C61.5312 51.5171 61.4404 51.8278 61.537 52.1793L64.6165 62.1612C64.7614 62.6064 65.0696 62.8351 65.5411 62.8473C66.0116 62.8585 66.3313 62.6415 66.5004 62.1963L67.3699 59.7009Z" fill="#9ED7FF"/></svg>';
+const ILLUS_ERR = '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M31.9966 45.8756C32.8821 45.8756 33.6256 45.5761 34.227 44.977C34.8285 44.378 35.1292 43.6357 35.1292 42.7502C35.1292 41.8647 34.8297 41.1186 34.2307 40.5118C33.6317 39.9051 32.8894 39.6017 32.0039 39.6017C31.1183 39.6017 30.3749 39.9051 29.7734 40.5118C29.172 41.1186 28.8712 41.8647 28.8712 42.7502C28.8712 43.6357 29.1708 44.378 29.7698 44.977C30.3688 45.5761 31.1111 45.8756 31.9966 45.8756ZM32.0002 34.6988C32.8514 34.6988 33.5698 34.406 34.1553 33.8205C34.7408 33.235 35.0336 32.5166 35.0336 31.6654V21.3654C35.0336 20.5142 34.7408 19.7959 34.1553 19.2104C33.5698 18.6249 32.8514 18.3321 32.0002 18.3321C31.149 18.3321 30.4307 18.6249 29.8452 19.2104C29.2597 19.7959 28.9669 20.5142 28.9669 21.3654V31.6654C28.9669 32.5166 29.2597 33.235 29.8452 33.8205C30.4307 34.406 31.149 34.6988 32.0002 34.6988ZM32.0002 59.209C28.2263 59.209 24.6853 58.4952 21.3772 57.0678C18.0691 55.6403 15.1916 53.703 12.7445 51.256C10.2974 48.8089 8.36017 45.9313 6.9327 42.6232C5.50524 39.3151 4.7915 35.7741 4.7915 32.0002C4.7915 28.2263 5.50524 24.6853 6.9327 21.3772C8.36017 18.0691 10.2974 15.1916 12.7445 12.7445C15.1916 10.2974 18.0691 8.36017 21.3772 6.9327C24.6853 5.50524 28.2263 4.7915 32.0002 4.7915C35.7741 4.7915 39.3151 5.50524 42.6232 6.9327C45.9313 8.36017 48.8089 10.2974 51.256 12.7445C53.703 15.1916 55.6403 18.0691 57.0678 21.3772C58.4952 24.6853 59.209 28.2263 59.209 32.0002C59.209 35.7741 58.4952 39.3151 57.0678 42.6232C55.6403 45.9313 53.703 48.8089 51.256 51.256C48.8089 53.703 45.9313 55.6403 42.6232 57.0678C39.3151 58.4952 35.7741 59.209 32.0002 59.209ZM32.0002 53.1422C37.9133 53.1422 42.9152 51.0968 47.006 47.006C51.0968 42.9152 53.1422 37.9133 53.1422 32.0002C53.1422 26.0872 51.0968 21.0853 47.006 16.9944C42.9152 12.9036 37.9133 10.8582 32.0002 10.8582C26.0872 10.8582 21.0853 12.9036 16.9944 16.9944C12.9036 21.0853 10.8582 26.0872 10.8582 32.0002C10.8582 37.9133 12.9036 42.9152 16.9944 47.006C21.0853 51.0968 26.0872 53.1422 32.0002 53.1422Z" fill="#9ED7FF"/></svg>';
+
+/* CSP logo：官方 logo，SVG 取自 LumiTag v10（當初從 Figma 匯出），用 data URI 的 <img> 內嵌，避免 Azure 漸層 id 在同頁重複。
+ * 對稿時改（原本是簡化手繪版，AWS 字比稿小一號）*/
+const CSP = {
+  gcp:   { label: 'Google Cloud', third: 'Project',        thirdPl: 'projects',        logo: '<img src="data:image/svg+xml,%3Csvg width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E %3Cpath d=%22M7.30379 8.54541C6.02489 8.54644 4.77857 8.94003 3.74055 9.67069C2.70252 10.4013 1.92514 11.4322 1.51801 12.618C1.11087 13.8037 1.09451 15.0845 1.47123 16.2798C1.84796 17.4752 2.59876 18.5247 3.61781 19.2805L6.34005 16.6174C5.9931 16.465 5.68918 16.2325 5.4544 15.9399C5.21962 15.6473 5.06102 15.3032 4.99222 14.9374C4.92342 14.5716 4.94649 14.1949 5.05944 13.8397C5.17239 13.4845 5.37185 13.1615 5.64066 12.8983C5.90947 12.6352 6.2396 12.4399 6.60266 12.3291C6.96573 12.2183 7.35086 12.1955 7.72496 12.2624C8.09906 12.3294 8.45094 12.4842 8.75033 12.7136C9.04973 12.943 9.28769 13.2401 9.44376 13.5793L12.166 10.9149C11.5981 10.1791 10.8634 9.58212 10.0198 9.17098C9.17609 8.75983 8.2464 8.5457 7.30379 8.54541Z%22 fill=%22%23FBBC05%22/%3E %3Cpath d=%22M14.9433 8.18333L15.6354 8.19541L17.5154 6.35221L17.6057 5.57234C16.0623 4.2236 14.0647 3.47865 11.9949 3.47998C8.09575 3.47998 4.81137 6.07445 3.83789 9.58926C4.04325 9.44879 4.48255 9.5543 4.48255 9.5543L8.24001 8.94922C8.24001 8.94922 8.43497 8.63651 8.5305 8.65494C9.33492 7.78925 10.4478 7.25772 11.6404 7.16954C12.833 7.08136 14.0149 7.44322 14.9433 8.18079V8.18333Z%22 fill=%22%23EA4335%22/%3E %3Cpath d=%22M20.1626 9.59813C19.7306 8.04275 18.8442 6.64436 17.612 5.57422L14.9475 8.18013C15.4942 8.61011 15.9352 9.15449 16.2383 9.77321C16.5414 10.3919 16.6988 11.0692 16.6989 11.7553V12.2155C17.322 12.2155 17.9195 12.4576 18.3601 12.8884C18.8006 13.3193 19.0481 13.9038 19.0481 14.5131C19.0481 15.1225 18.8006 15.7069 18.3601 16.1378C17.9195 16.5687 17.322 16.8108 16.6989 16.8108H12.003L11.5332 17.2735V20.0313L12.003 20.4889H16.6983C18.0002 20.4875 19.2677 20.0793 20.3157 19.3239C21.3638 18.5684 22.1376 17.5052 22.5244 16.2893C22.9112 15.0734 22.8907 13.7684 22.4658 12.5648C22.0409 11.3611 21.234 10.3217 20.1626 9.59813Z%22 fill=%22%234285F4%22/%3E %3Cpath d=%22M7.30024 20.4925H11.9928V16.8156H7.30024C6.96683 16.8155 6.63732 16.7455 6.3339 16.6104L5.65675 16.8131L3.77672 18.6531L3.6123 19.2747C4.67173 20.0654 5.96762 20.4933 7.30024 20.4925Z%22 fill=%22%2334A853%22/%3E %3C/svg%3E" alt="">' },
+  aws:   { label: 'AWS',          third: 'Account',        thirdPl: 'accounts',        logo: '<img src="data:image/svg+xml,%3Csvg width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E %3Cpath d=%22M7.38084 10.3539C7.37413 10.5653 7.40123 10.7764 7.46111 10.9792C7.52284 11.1529 7.59916 11.3211 7.68927 11.482C7.71996 11.5301 7.73745 11.5855 7.73997 11.6425C7.73552 11.6853 7.72093 11.7264 7.69742 11.7624C7.6739 11.7984 7.64214 11.8283 7.60476 11.8496L7.18226 12.1453C7.12759 12.1837 7.06309 12.2057 6.99635 12.2087C6.95708 12.2073 6.91849 12.1979 6.88291 12.1812C6.84733 12.1645 6.8155 12.1408 6.78933 12.1115C6.69119 12.0144 6.60598 11.9051 6.53582 11.7862C6.4654 11.6679 6.39358 11.527 6.32034 11.3637C6.07289 11.6725 5.75807 11.9206 5.39997 12.0891C5.04186 12.2575 4.64997 12.3418 4.25428 12.3354C3.99875 12.3494 3.743 12.3122 3.5021 12.2258C3.2612 12.1395 3.04001 12.0058 2.85156 11.8327C2.67698 11.6551 2.54105 11.4433 2.45234 11.2106C2.36363 10.9779 2.32405 10.7294 2.3361 10.4806C2.3249 10.2103 2.3745 9.94088 2.48126 9.69226C2.58803 9.44364 2.74922 9.22215 2.95296 9.0441C3.44217 8.65885 4.05502 8.46508 4.67679 8.49907C4.92564 8.49979 5.17414 8.51815 5.4204 8.55399C5.67954 8.59061 5.94854 8.64131 6.22739 8.7061V8.19064C6.26842 7.78668 6.14848 7.38284 5.89361 7.06677C5.56753 6.81602 5.15783 6.69961 4.74861 6.74144C4.49375 6.74273 4.23992 6.77393 3.99233 6.83439C3.73466 6.896 3.48188 6.9765 3.23604 7.07522C3.15656 7.11174 3.07469 7.1428 2.99098 7.16817H2.88113C2.78255 7.16817 2.73325 7.09494 2.73325 6.94847V6.61468C2.72721 6.52989 2.74476 6.44507 2.78395 6.36963C2.83691 6.30468 2.90514 6.25388 2.98253 6.22175C3.2653 6.08629 3.56119 5.98011 3.86557 5.90487C4.22304 5.81309 4.59082 5.76765 4.95987 5.76967C5.62366 5.71084 6.28392 5.91575 6.79778 6.34006C7.00668 6.57375 7.16605 6.84737 7.26627 7.14438C7.36648 7.44138 7.40545 7.75562 7.38084 8.06811V10.3539ZM4.52891 11.4228C4.77668 11.4192 5.02218 11.375 5.25562 11.2918C5.51295 11.2027 5.7419 11.0467 5.91896 10.8398C6.02804 10.7181 6.10884 10.5738 6.15556 10.4173C6.20421 10.2182 6.22693 10.0137 6.22317 9.80884V9.51309C6.00998 9.462 5.79419 9.4225 5.57673 9.39478C5.35813 9.36682 5.13799 9.35271 4.91762 9.35253C4.54762 9.32479 4.17928 9.4247 3.87402 9.63561C3.76377 9.73288 3.6766 9.85352 3.61885 9.98874C3.56111 10.124 3.53426 10.2703 3.54024 10.4173C3.53025 10.5522 3.54796 10.6878 3.59228 10.8157C3.6366 10.9436 3.7066 11.061 3.79797 11.1609C3.89663 11.2504 4.01196 11.3196 4.13737 11.3646C4.26279 11.4095 4.39584 11.4293 4.52891 11.4228ZM10.1694 12.1833C10.0742 12.192 9.97887 12.1682 9.89898 12.1157C9.82418 12.0404 9.77282 11.945 9.7511 11.8411L8.10755 6.40766C8.07566 6.31603 8.0544 6.22105 8.04417 6.12458C8.04059 6.101 8.0426 6.07692 8.05004 6.05427C8.05748 6.03162 8.07014 6.01103 8.087 5.99417C8.10386 5.97731 8.12444 5.96465 8.14709 5.95721C8.16975 5.94978 8.19383 5.94777 8.2174 5.95135H8.90609C9.00268 5.94166 9.09966 5.96554 9.18072 6.01895C9.25063 6.09657 9.29874 6.19133 9.32015 6.29358L10.4989 10.9412L11.5932 6.29358C11.6101 6.19103 11.6589 6.09641 11.7327 6.02317C11.8174 5.97091 11.9166 5.94722 12.0157 5.95557H12.5819C12.6811 5.94722 12.7803 5.97091 12.865 6.02317C12.938 6.09811 12.9853 6.19426 13.0002 6.2978L14.1029 11.0045L15.3198 6.2978C15.3422 6.19505 15.3918 6.1002 15.4634 6.02317C15.5445 5.96976 15.6414 5.94589 15.738 5.95557H16.3887C16.4123 5.95199 16.4364 5.954 16.459 5.96144C16.4817 5.96888 16.5022 5.98154 16.5191 5.9984C16.536 6.01526 16.5486 6.03584 16.5561 6.05849C16.5635 6.08115 16.5655 6.10523 16.5619 6.1288C16.5654 6.16533 16.5654 6.20212 16.5619 6.23865C16.5484 6.29734 16.5315 6.35518 16.5112 6.41188L14.8212 11.8453C14.7995 11.9492 14.7481 12.0446 14.6733 12.12C14.5934 12.1724 14.4981 12.1963 14.4029 12.1876H13.786C13.6862 12.198 13.5858 12.1726 13.503 12.1157C13.4305 12.0371 13.3834 11.9385 13.3678 11.8327L12.2735 7.3076L11.1919 11.8284C11.1762 11.9342 11.1291 12.0329 11.0567 12.1115C10.9738 12.1683 10.8735 12.1938 10.7736 12.1833H10.1694ZM19.1941 12.3692C18.8301 12.3698 18.4672 12.3287 18.1125 12.2467C17.8304 12.1899 17.5575 12.0947 17.3013 11.9636C17.2243 11.931 17.1587 11.8763 17.1128 11.8063C17.0669 11.7363 17.0428 11.6544 17.0436 11.5707V11.2158C17.0436 11.0693 17.0971 10.9961 17.2041 10.9961C17.2489 10.9968 17.2933 11.0053 17.3351 11.0214L17.5126 11.0933C17.7606 11.203 18.0198 11.2852 18.2858 11.3383C18.5638 11.3954 18.8469 11.4237 19.1308 11.4228C19.4881 11.444 19.8441 11.3634 20.1575 11.1904C20.2718 11.1225 20.3659 11.0251 20.4298 10.9084C20.4937 10.7917 20.5251 10.6601 20.5208 10.5271C20.5232 10.4369 20.5077 10.3471 20.475 10.2629C20.4424 10.1788 20.3933 10.102 20.3307 10.037C20.1174 9.85827 19.8659 9.73105 19.5955 9.66519L18.5773 9.34408C18.1485 9.22495 17.7666 8.97721 17.483 8.63427C17.2565 8.34309 17.1332 7.98492 17.1323 7.61603C17.1264 7.34336 17.192 7.07389 17.3224 6.83439C17.4487 6.6091 17.6198 6.41209 17.8252 6.25555C18.0406 6.0918 18.284 5.96867 18.5435 5.8922C18.8305 5.80938 19.1278 5.76812 19.4265 5.76967C19.5847 5.76953 19.7428 5.77941 19.8997 5.79925C20.0603 5.81896 20.2124 5.84572 20.356 5.87952C20.4997 5.91332 20.6335 5.94994 20.7574 5.98937C20.8594 6.02137 20.9584 6.06238 21.0532 6.1119C21.1332 6.15504 21.2036 6.21397 21.2602 6.28513C21.3049 6.35416 21.327 6.43536 21.3236 6.51751V6.85129C21.3236 6.99776 21.2701 7.07099 21.163 7.07099C21.0683 7.06041 20.9765 7.03173 20.8926 6.98649C20.4663 6.80129 20.0054 6.70911 19.5406 6.71609C19.2173 6.69928 18.8953 6.76776 18.6069 6.91467C18.4988 6.97778 18.4104 7.06966 18.3514 7.18007C18.2925 7.29047 18.2654 7.41507 18.2731 7.53998C18.271 7.63291 18.2883 7.72526 18.324 7.81112C18.3596 7.89697 18.4128 7.97443 18.4801 8.03854C18.7079 8.2207 18.9712 8.35311 19.2533 8.42724L20.2504 8.72722C20.6727 8.83697 21.0514 9.07278 21.3363 9.40323C21.5596 9.69318 21.6761 10.0514 21.6658 10.4173C21.6695 10.7 21.6058 10.9795 21.4799 11.2327C21.3569 11.4746 21.1824 11.6865 20.9687 11.8538C20.7357 12.0337 20.4704 12.1671 20.187 12.2467C19.8637 12.3351 19.5293 12.3763 19.1941 12.3692Z%22 fill=%22%23252F3E%22/%3E %3Cpath fill-rule=%22evenodd%22 clip-rule=%22evenodd%22 d=%22M20.5331 15.7792C18.2219 17.4861 14.8672 18.3945 12.0026 18.3945C8.13772 18.42 4.40308 16.9988 1.53289 14.4103C1.31741 14.2159 1.50754 13.9497 1.7695 14.0976C4.95349 15.919 8.55845 16.8759 12.2266 16.8735C14.9659 16.8588 17.6753 16.3031 20.1993 15.2384C20.588 15.0736 20.9175 15.4961 20.5331 15.7792Z%22 fill=%22%23FF9900%22/%3E %3Cpath fill-rule=%22evenodd%22 clip-rule=%22evenodd%22 d=%22M21.497 14.6803C21.2012 14.3 19.5407 14.5028 18.7971 14.5916C18.5732 14.6169 18.5352 14.4226 18.738 14.2789C20.0604 13.3494 22.2321 13.6156 22.4814 13.9282C22.7307 14.2409 22.4138 16.4168 21.1759 17.4562C20.9857 17.6167 20.804 17.5322 20.8885 17.321C21.1674 16.6196 21.7927 15.0605 21.497 14.6803Z%22 fill=%22%23FF9900%22/%3E %3C/svg%3E" alt="">' },
+  azure: { label: 'Azure',        third: 'Resource Group', thirdPl: 'resource groups', logo: '<img src="data:image/svg+xml,%3Csvg width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E %3Cpath d=%22M8.58875 2.16067H14.6146L8.35913 20.7058C8.32714 20.8005 8.28059 20.8896 8.22115 20.97C8.16184 21.0505 8.09031 21.121 8.0091 21.1793C7.92789 21.2376 7.83829 21.2829 7.74308 21.3134C7.64787 21.344 7.54859 21.3598 7.4488 21.3598H2.75919C2.60696 21.3598 2.45677 21.3236 2.32134 21.2539C2.18577 21.1843 2.06874 21.0834 1.97997 20.9596C1.89114 20.8357 1.83303 20.6925 1.81043 20.5418C1.78777 20.3911 1.80152 20.2371 1.85014 20.0928L7.67816 2.81414C7.70998 2.71944 7.75657 2.63034 7.81614 2.5499C7.87545 2.46945 7.94724 2.39894 8.02819 2.34064C8.1094 2.28235 8.19901 2.23704 8.29421 2.20649C8.38942 2.17594 8.4887 2.16016 8.58849 2.16016V2.16041L8.58875 2.16067Z%22 fill=%22url(%23paint0_linear_0_6933)%22/%3E %3Cpath d=%22M19.6972 21.3596H14.2864C14.2261 21.3596 14.1657 21.354 14.1062 21.3425C14.0468 21.3313 13.9885 21.3145 13.9323 21.2924C13.876 21.2702 13.8221 21.2428 13.7709 21.2107C13.7198 21.1784 13.6718 21.1414 13.6276 21.1002L7.48745 15.3659C7.42251 15.3052 7.37728 15.2265 7.35762 15.1398C7.33798 15.0531 7.34489 14.9626 7.37745 14.8799C7.41 14.7972 7.46669 14.7262 7.54014 14.6762C7.61371 14.6263 7.70052 14.5996 7.78936 14.5996H17.3447L19.6967 21.3599L19.6972 21.3596Z%22 fill=%22%230078D4%22/%3E %3Cpath d=%22M14.6365 2.16066L10.4183 14.601L17.3104 14.5995L19.6746 21.3597H14.2841C14.2284 21.3592 14.1726 21.3541 14.1177 21.3442C14.0627 21.3343 14.0087 21.3198 13.9563 21.3004C13.8511 21.2621 13.7533 21.2061 13.6671 21.1347L9.52223 17.2663L8.36192 20.6882C8.33188 20.7737 8.29064 20.8549 8.23922 20.9295C8.13616 21.0796 7.99518 21.1996 7.83064 21.2775C7.74872 21.3163 7.662 21.3439 7.57277 21.3597H2.76224C2.60848 21.3603 2.45676 21.3236 2.32006 21.2528C2.18334 21.1821 2.06565 21.0795 1.97694 20.9537C1.88824 20.8279 1.83112 20.6826 1.81042 20.5301C1.7898 20.3775 1.80612 20.2222 1.85803 20.0772L7.67663 2.82711C7.70692 2.73063 7.75249 2.63975 7.81155 2.55778C7.87036 2.47581 7.94214 2.40351 8.0236 2.34394C8.10507 2.28438 8.19569 2.23804 8.29166 2.20699C8.38763 2.17593 8.48819 2.16015 8.58925 2.16066H14.6367H14.6365Z%22 fill=%22url(%23paint1_linear_0_6933)%22/%3E %3Cpath d=%22M22.1134 20.0928C22.162 20.2372 22.1757 20.3911 22.1534 20.5418C22.1307 20.6925 22.0727 20.8356 21.9841 20.9596C21.8953 21.0833 21.7783 21.1842 21.6428 21.2538C21.5073 21.3233 21.3572 21.3597 21.2049 21.3597H14.4889C14.6411 21.3597 14.7913 21.3233 14.927 21.2538C15.0624 21.1843 15.1795 21.0833 15.2684 20.9596C15.3572 20.8358 15.4153 20.6925 15.4379 20.5418C15.4606 20.3911 15.4468 20.2371 15.3982 20.0928L9.56993 2.81361C9.50577 2.62326 9.38353 2.45784 9.22041 2.34062C9.13946 2.28233 9.04985 2.23727 8.9549 2.20672C8.85995 2.17617 8.76067 2.16064 8.66113 2.16064H15.3768C15.4766 2.16064 15.5756 2.17617 15.6709 2.20672C15.7658 2.23727 15.8554 2.28258 15.9366 2.34062C16.0176 2.39892 16.0891 2.46943 16.1484 2.54962C16.2077 2.62981 16.2541 2.71891 16.2861 2.81361L22.1144 20.0928H22.1134Z%22 fill=%22url(%23paint2_linear_0_6933)%22/%3E %3Cdefs%3E %3ClinearGradient id=%22paint0_linear_0_6933%22 x1=%2210.7879%22 y1=%223.58369%22 x2=%224.52562%22 y2=%2222.083%22 gradientUnits=%22userSpaceOnUse%22%3E %3Cstop stop-color=%22%23114A8B%22/%3E %3Cstop offset=%221%22 stop-color=%22%230669BC%22/%3E %3C/linearGradient%3E %3ClinearGradient id=%22paint1_linear_0_6933%22 x1=%2212.7407%22 y1=%2212.2033%22 x2=%2211.2922%22 y2=%2212.6946%22 gradientUnits=%22userSpaceOnUse%22%3E %3Cstop stop-opacity=%220.3%22/%3E %3Cstop offset=%220.1%22 stop-opacity=%220.2%22/%3E %3Cstop offset=%220.3%22 stop-opacity=%220.1%22/%3E %3Cstop offset=%220.6%22 stop-opacity=%220.1%22/%3E %3Cstop offset=%221%22 stop-opacity=%220%22/%3E %3C/linearGradient%3E %3ClinearGradient id=%22paint2_linear_0_6933%22 x1=%2211.9412%22 y1=%223.04399%22 x2=%2218.8145%22 y2=%2221.3549%22 gradientUnits=%22userSpaceOnUse%22%3E %3Cstop stop-color=%22%233CCBF4%22/%3E %3Cstop offset=%221%22 stop-color=%22%232892DF%22/%3E %3C/linearGradient%3E %3C/defs%3E %3C/svg%3E" alt="">' },
+};
+
+/* ============================================================
+ * 1. Mock data
+ *    清單項目形狀（盤點 §3）：{ id, platform, name, rid, cost, off(幾天前), groups[], pin, children? }
+ *    樹狀兩層：父列＝資源最新一則告警，children＝同一資源更早的告警；badge ＝ children + 1（最大 99+）
+ * ============================================================ */
+const GROUPS = {
+  eng: 'Engineering Research Assistants', elec: 'Electrical Engineering Students', mech: 'Mechanical Engineering Students', mechT: 'Mechanical Engineering Technology Labs',
+  lab: 'Lab Technicians', capstone: 'Capstone Project Teams', civil: 'Civil Engineering Students', innov: 'Innovation and Design Labs', comp: 'Computer Engineering Students',
+  chem: 'Chemical Engineering Students', fac: 'Engineering Faculty Members', ops: 'Operations and Compliance', portal: 'Portal Development', steer: 'Steering Committee'
+};
+const G = GROUPS;
+/* 資源（Figma #01 原值：名稱、ID、金額、群組；日期換成相對今天的「幾天前」，因為頁面規則是「最近 30 天」，稿上的 2035/2036 是示意）*/
+const RES = [
+  { id: 'r1',  platform: 'gcp',   name: 'BigQueryAnalytics',     rid: 'bigquery-analytics',    off: 1,  cost: 2734.12, groups: [G.eng],             total: 3,   childPins: [1] },
+  { id: 'r2',  platform: 'aws',   name: 'qa-environment',        rid: '876543210987',          off: 2,  cost: 2322.65, groups: [],                  total: 1 },
+  { id: 'r3',  platform: 'aws',   name: 'marketing-campaign',    rid: '654321098765',          off: 4,  cost: 2005.23, groups: [G.elec],            total: 9,   pin: true },
+  { id: 'r4',  platform: 'aws',   name: 'gaming',                rid: '654321098765',          off: 5,  cost: 1649.95, groups: [G.mech, G.mechT],   total: 1 },
+  { id: 'r5',  platform: 'gcp',   name: 'MarketingCampaign',     rid: 'marketing-campaign',    off: 7,  cost: 2905.45, groups: [G.lab],             total: 1,   pin: true },
+  { id: 'r6',  platform: 'azure', name: 'ProductAlpha',          rid: 'product-alpha',         off: 9,  cost: 2516.78, groups: [G.capstone],        total: 1,   pin: true },
+  { id: 'r7',  platform: 'gcp',   name: 'IoTDeviceManagement',   rid: 'iot-device-management', off: 11, cost: 1878.36, groups: [G.civil],           total: 3 },
+  /* 7 組：給 #01-3 的「前 5 筆＋...+N more」示範（Figma 該列的 tooltip 範例）*/
+  { id: 'r8',  platform: 'gcp',   name: 'InternalTools',         rid: 'internal-tools',        off: 14, cost: 2144.80, groups: [G.chem, G.civil, G.comp, G.elec, G.innov, G.lab, G.mech], total: 8 },
+  { id: 'r9',  platform: 'aws',   name: 'marketing-campaign',    rid: '654321098765',          off: 17, cost: 1767.52, groups: [G.comp],            total: 19 },
+  { id: 'r10', platform: 'aws',   name: 'training',              rid: '210987654321',          off: 20, cost: 1533.08, groups: [G.comp],            total: 120 },   // → 99+
+  { id: 'r11', platform: 'azure', name: 'hr-system',             rid: 'hr-system',             off: 21, cost: 2516.78, groups: [G.fac],             total: 15 },
+  { id: 'r12', platform: 'gcp',   name: 'DataWarehouse',         rid: 'data-warehouse-prod',   off: 23, cost: 1402.19, groups: [G.ops, G.portal],   total: 1 },
+  { id: 'r13', platform: 'aws',   name: 'security-audit',        rid: '000039282716',          off: 25, cost: 1211.40, groups: [G.steer],           total: 2 },
+  { id: 'r14', platform: 'azure', name: 'rg-prod-eastasia',      rid: 'rg-prod-eastasia',      off: 27, cost: 1098.06, groups: [],                  total: 1 },
+  /* 已超過 30 天、但被釘選的告警：只會出現在 Pinned 視角（#01 註記：Pinned 顯示所有已被釘選的告警；pin tooltip 說明取消釘選後會永久從視角消失）*/
+  { id: 'r15', platform: 'gcp',   name: 'LegacyETL',             rid: 'legacy-etl-pipeline',   off: 38, cost: 3320.50, groups: [G.ops],             total: 1,   pin: true, old: true },
+  { id: 'r16', platform: 'aws',   name: 'batch-reports',         rid: '112233445566',          off: 52, cost: 2870.00, groups: [G.steer, G.ops],    total: 1,   pin: true, old: true }
+];
+function buildItems() {
+  return RES.map((r, ri) => {
+    const it = { id: r.id, platform: r.platform, name: r.name, rid: r.rid, cost: r.cost, off: r.off, groups: r.groups.slice(), pin: !!r.pin, old: !!r.old, idx: ri, children: [] };
+    const n = r.total - 1;
+    for (let k = 0; k < n; k++) {
+      const off = Math.min(29, r.off + 1 + Math.floor(k * (29 - r.off) / Math.max(n, 1)));
+      const cost = Math.round(r.cost * (0.35 + ((k * 37 + ri * 11) % 90) / 50) * 100) / 100;
+      /* 子列群組：輪流用父列的群組；k=1（BigQuery 第二筆）依 Figma 用 Lab Technicians；偶爾沒有子群組 → '--' */
+      const gs = r.id === 'r1' && k === 1 ? [G.lab] : r.groups.length ? [r.groups[k % r.groups.length]] : [];
+      it.children.push({ id: r.id + '-c' + k, platform: r.platform, name: r.name, rid: r.rid, cost, off, groups: gs, pin: (r.childPins || []).includes(k), old: false, idx: ri, children: [] });
+    }
+    return it;
+  });
+}
+
+/* ============================================================
+ * 2. State
+ * ============================================================ */
+const ROLES = {
+  admin: { label: 'Owner / Admin',  chip: 'Admin',                    canAddAuth: true,  settings: true,  tier: 0 },
+  t1m:   { label: 'T1 Manager',     chip: 'Manager - Cost Center',    canAddAuth: false, settings: false, tier: 1 },
+  t1mb:  { label: 'T1 Member',      chip: 'Member - Cost Center',     canAddAuth: false, settings: false, tier: 1 },
+  t2m:   { label: 'T2 Manager',     chip: 'Manager - Platform Team',  canAddAuth: false, settings: false, tier: 2 },
+  t2mb:  { label: 'T2 Member',      chip: 'Member - Platform Team',   canAddAuth: false, settings: false, tier: 2 }
+};
+const state = {
+  role: 'admin',
+  pageState: 'set',          // set | loading | empty | no-auth | error
+  view: 'all',               // all | pinned（All／Pinned 切換器）
+  items: buildItems(),
+  expanded: new Set(),
+  settings: { detection: true, sensitivity: 'High', notif: { admin: true, t1Manager: true, t1Member: true, t2Manager: true, t2Member: true } },
+  draft: null,               // Alert Settings 彈窗的暫存草稿（按 Save 前 live state 不動，同 Rate Optimization Data Sources 的做法）
+  failNext: false,           // Demo：下一次 Save 回失敗
+};
+const TODAY = new Date(); TODAY.setHours(0, 0, 0, 0);
+
+/* ============================================================
+ * 3. Helpers
+ * ============================================================ */
+const $ = (s, r) => (r || document).querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+const MON = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May.', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'];
+const fmtDMY = d => d.getDate() + ' ' + MON[d.getMonth()] + ' ' + d.getFullYear();   // Figma：4 Jan. 2036
+const fmtMoney = n => Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const dateOf = off => new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate() - off);
+const role = () => ROLES[state.role];
+
+/* Assigned to：字母升冪、逗號隔開；沒有子群組 → '--'。T2 整欄不顯示（見 hideAssigned()）*/
+function groupsOf(it) { return role().tier === 2 ? [] : it.groups.slice().sort((a, b) => a.localeCompare(b)); }
+function assignedTip(gs) {
+  if (!gs.length) return COPY.dashTip;
+  if (gs.length === 1) return gs[0];                                            // 只有 1 筆時不需顯示項目符號
+  const shown = gs.slice(0, MAX_TIP_GROUPS).map(g => '• ' + g);
+  if (gs.length > MAX_TIP_GROUPS) shown.push('...+' + (gs.length - MAX_TIP_GROUPS) + ' more, view full list in detail page.');
+  return shown.join('\n');
+}
+/* 非 Admin 只看得到自己有權限的資源告警（#01-7）。⚠ 設計端暫擬：Figma 沒定義 mock 範圍，T1 看前 11 組、T2 看前 7 組（含被釘選的過期項目要看得到者，保留 r15）*/
+function visibleParents() {
+  const t = role().tier, lim = t === 0 ? 99 : t === 1 ? 11 : 7;
+  return state.items.filter(it => it.idx < lim || it.old && t < 2);
+}
+function allVisible() { return visibleParents().filter(it => !it.old); }          // All 視角：最近 30 天
+function pinnedFlat() {                                                              // Pinned 視角：遞迴撈出所有已釘選、清空 children 攤平，依時間新→舊
+  const out = [];
+  visibleParents().forEach(it => { if (it.pin) out.push(it); it.children.forEach(c => { if (c.pin) out.push(c); }); });
+  return out.sort((a, b) => a.off - b.off);
+}
+function findItem(id) {
+  for (const it of state.items) { if (it.id === id) return it; for (const c of it.children) if (c.id === id) return c; }
+  return null;
+}
+
+/* ============================================================
+ * 4. List view（#01～#01-9）
+ * ============================================================ */
+const ACT = {};   // data-a 事件處理表（全站 click 委派）
+
+function headerHtml() { return `<div class="hdr-block"><div class="pg-hdr"><h1 class="pg-title">${COPY.title}</h1></div><div class="pg-desc">${esc(COPY.desc)}</div></div>`; }
+
+function chipHtml() {
+  const s = state.settings;
+  return s.detection
+    ? `<span class="st-chip"><span class="dot"></span><span class="tx">Detection Enabled  (Sensitivity: ${s.sensitivity})</span></span>`
+    : `<span class="st-chip off"><span class="dot"></span><span class="tx">Detection Disabled</span></span>`;
+}
+/* mode: full（標題＋設定＋chip＋切換器）／empty（#01-4：沒有標題與切換器）／loading（#01-6）*/
+function toolbarHtml(mode) {
+  const canSet = role().settings;
+  const loading = mode === 'loading';
+  const settingsBtn = canSet ? `<button class="lnk-btn" data-a="open-settings" ${loading ? 'disabled' : ''}><span class="material-symbols-outlined">settings</span><span class="t">${COPY.settingsBtn}</span></button>` : '';
+  const chip = loading ? '<span class="st-chip skel"><span class="sk" style="width:224px"></span></span>' : chipHtml();
+  const tg = mode === 'empty' ? '' : `<div class="tg ${loading ? 'is-disabled' : ''}" role="group" aria-label="Alert list view"><button class="tgb t-all ${state.view === 'all' ? 'on' : ''}" data-a="view" data-v="all" ${loading ? 'disabled' : ''}>All</button><i class="sep"></i><button class="tgb t-pin ${state.view === 'pinned' ? 'on' : ''}" data-a="view" data-v="pinned" aria-label="Pinned" ${loading ? 'disabled' : ''}><span class="material-symbols-outlined">keep</span></button></div>`;
+  return `<div class="toolbar ${mode === 'empty' ? 'is-empty' : ''}">${mode === 'empty' ? '<span class="tb-title none"></span>' : `<h2 class="tb-title">${COPY.listTitle}</h2>`}<div class="tb-r">${settingsBtn}${chip}${tg}</div></div>`;
+}
+
+/* ⚠ 未確認：pin tooltip 只在 Figma #01-3 已釘選那顆畫出，文案卻寫「超過 30 天」；FE 一律掛。這裡掛在所有已釘選的 pin 上 */
+function pinBtn(it) {
+  const on = it.pin;
+  return `<button class="ib pin ${on ? 'on' : ''}" data-a="pin" data-id="${esc(it.id)}" aria-pressed="${on}" aria-label="${on ? 'Unpin anomaly' : 'Pin anomaly'}" ${on ? `data-tip="${esc(COPY.pinTip)}"` : ''}><span class="material-symbols-outlined">keep</span></button>`;
+}
+/* kind：'p' 父列（可展開）／'c' 子列／'f' Pinned 視角攤平的單列 */
+function rowHtml(it, kind) {
+  const can = kind === 'p' && it.children.length > 0;
+  const open = can && state.expanded.has(it.id);
+  const total = it.children.length + 1;
+  const badge = can ? `<span class="cnt">${total > MAX_BADGE ? MAX_BADGE + '+' : total}</span>` : '';
+  const gs = groupsOf(it);
+  const txt = gs.length ? esc(gs.join(', ')) : '<span class="dash">--</span>';
+  const noAssigned = hideAssigned();
+  const cls = (kind === 'c' ? 'is-child ' : '') + (open ? 'is-open' : '');
+  const nameTip = `${it.name} (${it.rid})`;
+  const tw = kind === 'c' ? '' : `<span class="tw ${open ? 'open' : ''}">${can ? '<i></i>' : ''}</span>`;
+  return `<div class="tr ${cls}" role="row" data-rid="${esc(it.id)}">
+    <div class="td res st-l ${can ? 'can' : ''}" role="cell" ${can ? `data-a="toggle" data-id="${esc(it.id)}" tabindex="0" aria-expanded="${open}"` : ''} data-tip="${esc(nameTip)}" data-tip-pos="below" data-tip-anchor=".cell-2l">${tw}<span class="csp">${CSP[it.platform].logo}</span><div class="cell-2l"><div class="l1">${esc(it.name)}</div><div class="l2">${esc(it.rid)}</div></div>${badge}</div>
+    <div class="td" role="cell"><span class="ell">${CURRENCY} ${fmtMoney(it.cost)}</span></div>
+    <div class="td" role="cell"><span class="ell">${fmtDMY(dateOf(it.off))}</span></div>
+    ${noAssigned ? '' : `<div class="td asg" role="cell" data-tip="${esc(assignedTip(gs))}" data-tip-pos="below" data-tip-dy="-2" data-tip-align="content-right"><span class="ell">${txt}</span></div>`}
+    <div class="td act st-r" role="cell">${pinBtn(it)}<button class="ib" data-a="detail" data-id="${esc(it.id)}" aria-label="Check anomaly details" data-tip="${esc(COPY.detailTip)}"><span class="material-symbols-outlined">description</span></button></div>
+  </div>`;
+}
+/* ⚠ DEVIATION（偏離 FE 與 #01-7 紫便條，照設計稿畫面）：T2 整欄藏起 Assigned to。
+ * #01-7 紫便條寫「因會動到後端資料流，約定暫時維持顯示、內容為 --」，FE 也是這樣做；Kabin 2026-10-09 驗收裁決照畫面（設計定義）藏起來——
+ * 紫便條代表開發現實跟設計的差異，她偏好保留設計定義。藏欄後也不會出現「--」懸停說明對 T2 不成立的問題（對稿紀錄 §5 #4）*/
+function hideAssigned() { return role().tier === 2; }
+function tableHtml(rows) {
+  const na = hideAssigned();
+  return `<div class="tbl-scroll ${na ? 'no-assigned' : ''}" id="tbl-scroll" role="table" aria-label="Anomaly alerts">
+    <div class="tr th-row" role="row">
+      <div class="th st-l" role="columnheader" style="padding-left:16px">Resource Name / ID</div>
+      <div class="th" role="columnheader">Actual Cost</div>
+      <div class="th" role="columnheader">Anomaly Date</div>
+      ${na ? '' : `<div class="th" role="columnheader">Assigned to<span class="material-symbols-outlined info" id="assigned-info" data-tip="${esc(COPY.assignedTip)}">info</span></div>`}
+      <div class="th st-r" role="columnheader">Action</div>
+    </div>
+    <div class="tbody" role="rowgroup">${rows}</div></div>`;
+}
+function bodyRows() {
+  if (state.view === 'pinned') return pinnedFlat().map(it => rowHtml(it, 'f')).join('');
+  return allVisible().map(it => rowHtml(it, 'p') + (state.expanded.has(it.id) ? it.children.map(c => rowHtml(c, 'c')).join('') : '')).join('');
+}
+function skelCard() {
+  const na = hideAssigned();
+  const row = () => `<div class="sk-row"><div class="sk" style="width:100%"></div></div>`;
+  const rrow = () => `<div class="sk-row"><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>`;
+  return `<div class="card" role="status" aria-label="Loading">${toolbarHtml('loading')}
+    <div class="sk-tbl"><div class="sk-left"><div class="sk-hd"><div class="sk" style="width:100px"></div></div>${row() + row() + row() + row()}</div><div class="sk-div"></div>
+    <div class="sk-right"><div class="sk-hd"><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>${rrow() + rrow() + rrow() + rrow()}</div></div></div>`;
+}
+function esCard(inner, tall) { return `<div class="card ${tall ? 'is-tall' : ''}"><div class="es">${inner}</div></div>`; }
+const ILLUS_TABLE = '<span class="material-symbols-outlined es-ic is-outline">table_view</span>';
+
+function renderList() {
+  const root = $('#content');
+  const sc0 = $('#tbl-scroll');
+  const keep = sc0 ? { t: sc0.scrollTop, l: sc0.scrollLeft } : null;
+  const ps = state.pageState;
+  let body;
+  const list = allVisible();
+  if (ps === 'loading') body = skelCard();
+  else if (ps === 'empty' || (ps === 'set' && !list.length && !pinnedFlat().length)) {
+    /* #01-4：時間範圍內沒有任何異常偵測告警 → 空狀態；仍可進行告警設定（Alert Settings 與 chip 還在，Alert List 標題與切換器消失）*/
+    body = `<div class="card is-tall">${toolbarHtml('empty')}<div class="es">${ILLUS_TABLE}<div class="es-title">${COPY.empty.title}</div><div class="es-desc">${esc(COPY.empty.desc)}</div></div></div>`;
+  } else if (ps === 'no-auth') {
+    const admin = role().canAddAuth;
+    body = esCard(`${ILLUS_AUTH}<div class="es-title">${COPY.noAuth.title}</div><div class="es-desc">${esc(admin ? COPY.noAuth.admin : COPY.noAuth.nonAdmin)}</div>${admin ? `<a class="btn btn-p" href="./organization-settings.html"><span class="material-symbols-outlined ic-add">add</span>${COPY.noAuth.btn}</a>` : ''}`, true);
+  } else if (ps === 'error') body = esCard(`${ILLUS_ERR}<div class="es-title">${COPY.error.title}</div><div class="es-desc">${esc(COPY.error.desc)}</div>`, true);
+  else {
+    const pinnedEmpty = state.view === 'pinned' && !pinnedFlat().length;
+    if (pinnedEmpty) body = `<div class="card is-tall">${toolbarHtml('full')}<div class="es"><span class="material-symbols-outlined es-ic">keep</span><div class="es-title">${COPY.pinnedEmpty.title}</div><div class="es-desc">${esc(COPY.pinnedEmpty.desc)}</div></div></div>`;
+    else body = `<div class="card">${toolbarHtml('full')}${tableHtml(bodyRows())}</div>`;
+  }
+  root.innerHTML = headerHtml() + body;
+  const sc = $('#tbl-scroll');
+  if (sc && keep) { sc.scrollTop = keep.t; sc.scrollLeft = keep.l; }
+}
+
+Object.assign(ACT, {
+  'view': el => { if (state.view === el.dataset.v) return; state.view = el.dataset.v; renderList(); },
+  'toggle': el => { const id = el.dataset.id; state.expanded.has(id) ? state.expanded.delete(id) : state.expanded.add(id); renderList(); },
+  /* Pin：optimistic update（先改再送 API，失敗回滾；prototype 只做前半）。Pinned 視角取消釘選後該列直接消失；超過 30 天的告警取消釘選後永久消失（pin tooltip 的說明）*/
+  'pin': (el, e) => {
+    e.stopPropagation();
+    const it = findItem(el.dataset.id); if (!it) return;
+    it.pin = !it.pin;
+    if (!it.pin && it.old) state.items = state.items.filter(x => x.id !== it.id);
+    const tip = $('#gl-tip'); if (tip) tip.style.display = 'none';
+    renderList();
+  },
+  /* ⚠ 設計端暫擬：詳情頁（#02 系列）另一輪製作，入口先以 toast 說明 */
+  'detail': (el, e) => { e.stopPropagation(); toast('info', COPY.detailLater); },
+  'open-settings': () => openSettings()
+});
+document.addEventListener('keydown', e => {
+  if ((e.key === ' ' || e.key === 'Enter') && e.target.matches && e.target.matches('.td.res.can')) { e.preventDefault(); e.target.click(); }
+  if ((e.key === ' ' || e.key === 'Enter') && e.target.matches && e.target.matches('.sw[data-a]')) { e.preventDefault(); e.target.click(); }
+});
+
+/* ============================================================
+ * 5. Alert Settings 彈窗（#03-1／#03-2）— 只有 Admin 進得來
+ * ============================================================ */
+function openSettings(draft) {
+  state.draft = draft || { detection: state.settings.detection, sensitivity: state.settings.sensitivity, notif: Object.assign({}, state.settings.notif) };
+  renderSettings();
+}
+function swRow(on, act, key, disabled, label) {
+  return `<span class="swrow ${disabled ? 'is-disabled' : ''}" ${disabled ? '' : `data-a="${act}" data-k="${key || ''}"`}><span class="sw ${on ? 'on' : ''} ${disabled ? 'is-disabled' : ''}" role="switch" aria-checked="${on}" ${disabled ? 'aria-disabled="true"' : `tabindex="0" data-a="${act}" data-k="${key || ''}"`} aria-label="${esc(label)}"></span><span>${on ? 'ON' : 'OFF'}</span></span>`;
+}
+function renderSettings() {
+  const d = state.draft; if (!d) return;
+  const off = !d.detection;
+  const keepScroll = ($('#modal-root .m-scroll') || {}).scrollTop || 0;
+  const roles = NOTIF_ROLES.map(([k, l]) => `<div class="role"><div class="rl">${l}</div>${swRow(d.notif[k], 'sm-notif', k, off, l)}</div>${NOTIF_DIVIDE_AFTER.includes(k) ? '<hr>' : ''}`).join('');
+  $('#modal-root').innerHTML = `<div class="mask"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="sm-t">
+    <div class="m-hd"><h2 id="sm-t">${COPY.settings.title}</h2><button class="m-x" data-a="m-close" aria-label="Close"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="m-desc">${esc(COPY.settings.desc)}</div>
+    <div class="m-scroll"><div class="m-inner">
+      <div class="fld"><div class="lbl">${COPY.settings.detection}</div>${swRow(d.detection, 'sm-det', '', false, 'Detection')}</div>
+      <div class="sens ${off ? 'is-disabled' : ''}"><div class="fld"><div class="lbl">${COPY.settings.sensitivity}</div><button class="sel" id="sm-sel" data-a="sm-sens" ${off ? 'disabled' : ''} aria-haspopup="listbox"><span>${d.sensitivity}</span><span class="tri"></span></button></div><div class="help">${esc(COPY.settings.sensHelp)}</div></div>
+      <div class="nbox ${off ? 'is-disabled' : ''}"><div class="intro"><h3>${COPY.settings.notif}</h3><div class="help">${esc(COPY.settings.notifDesc)}</div></div>${roles.replace(/<hr>$/, '')}</div>
+    </div></div>
+    <div class="m-ft"><button class="btn btn-o" data-a="m-close">Cancel</button><button class="btn btn-p" data-a="sm-save">Save</button></div></div></div>`;
+  const sc = $('#modal-root .m-scroll'); if (sc) sc.scrollTop = keepScroll;
+  const b = $('#modal-root .btn-p'); if (b && !document.activeElement.closest('#modal-root')) b.focus({ preventScroll: true });
+}
+function closeModal() { closePop(); $('#modal-root').innerHTML = ''; state.draft = null; }
+Object.assign(ACT, {
+  'm-close': () => closeModal(),
+  /* Detection 關閉時：下半部（敏感度、通知）呈現 Disabled，但仍維持原設定（#03-2 紫便條）*/
+  'sm-det': () => { state.draft.detection = !state.draft.detection; closePop(); renderSettings(); },
+  'sm-notif': el => { const k = el.dataset.k; state.draft.notif[k] = !state.draft.notif[k]; renderSettings(); },
+  'sm-sens': el => openSensMenu(el),
+  'sm-pick': el => { state.draft.sensitivity = el.dataset.v; closePop(); renderSettings(); },
+  'sm-save': () => {
+    const d = state.draft; closeModal();
+    if (state.failNext) { state.failNext = false; toast('error', COPY.toast.fail); return; }   // #Toast：因連線等其他不可避原因導致失敗者，關閉彈窗並顯示 Toast 於左下角
+    state.settings = { detection: d.detection, sensitivity: d.sensitivity, notif: Object.assign({}, d.notif) };
+    renderList(); toast('ok', COPY.toast.ok);
+  }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (POP) closePop(); else if ($('#modal-root').firstChild) closeModal(); } });
+
+/* ---- 單選下拉（Detection Sensitivity）----*/
+let POP = null;
+function openSensMenu(el) {
+  if (POP) { closePop(); return; }
+  const r = el.getBoundingClientRect();
+  const pop = document.createElement('div');
+  pop.className = 'pop menu'; pop.setAttribute('role', 'listbox'); pop.style.minWidth = Math.max(r.width, 240) + 'px';
+  pop.innerHTML = SENS.map(s => { const on = state.draft.sensitivity === s; return `<div class="mi ${on ? 'is-sel' : ''}" role="option" aria-selected="${on}" data-a="sm-pick" data-v="${s}"><span>${s}</span>${on ? '<span class="material-symbols-outlined ck">check</span>' : ''}</div>`; }).join('');
+  document.body.appendChild(pop);
+  pop.style.left = r.left + 'px';
+  const h = pop.offsetHeight;
+  pop.style.top = (r.bottom + 4 + h > window.innerHeight ? Math.max(8, r.top - h - 4) : r.bottom + 4) + 'px';
+  el.classList.add('open'); POP = { pop, anchor: el };
+}
+function closePop() { if (!POP) return; POP.pop.remove(); POP.anchor.classList && POP.anchor.classList.remove('open'); POP = null; }
+document.addEventListener('mousedown', e => { if (POP && !e.target.closest('.pop') && !e.target.closest('#sm-sel')) closePop(); });
+window.addEventListener('resize', () => closePop());
+document.addEventListener('scroll', e => { if (POP && !(e.target.closest && e.target.closest('.pop'))) closePop(); }, true);
+
+/* ============================================================
+ * 6. Toast
+ * ============================================================ */
+function toast(kind, msg) {
+  const wrap = $('#toast-wrap'), el = document.createElement('div');
+  el.className = 'toast ' + (kind === 'error' ? 'err' : kind === 'info' ? 'info' : '');
+  el.innerHTML = `<span class="material-symbols-outlined">${kind === 'error' ? 'error' : kind === 'info' ? 'info' : 'check_circle'}</span><span>${esc(msg)}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => { el.style.transition = 'opacity .25s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 260); }, 4200);
+}
+
+/* ============================================================
+ * 7. 事件委派
+ * ============================================================ */
+document.addEventListener('click', e => {
+  const el = e.target.closest && e.target.closest('[data-a]');
+  if (!el) return;
+  if (el.disabled) return;
+  const fn = ACT[el.dataset.a]; if (fn) fn(el, e);
+});
+/* 彈窗點遮罩空白處不關閉（Figma 註記只有 Save／Cancel 兩種結束方式，加上右上 X）*/
+</script>
+<script>
+/* ============================================================
+ * 8. Demo FAB（每張列表頁 Figma 畫面＋必備狀態；情境標籤附 Figma 編號）
+ * ============================================================ */
+window.DEMO_PAGES = [
+  { id: 'role',     label: 'Role',     icon: 'person' },
+  { id: 'state',    label: 'State',    icon: 'layers' },
+  { id: 'view',     label: 'View',     icon: 'web' },
+  { id: 'settings', label: 'Settings', icon: 'settings' }
+];
+window.DEMO_SCENARIOS = [
+  { id: 'admin', page: 'role', label: 'Owner / Admin', icon: 'admin_panel_settings', tip: '看得到 Alert Settings 按鈕。No-auth 有「Add Your Authorization」按鈕（#01-5）。' },
+  { id: 't1m',   page: 'role', label: 'T1 Manager',    icon: 'supervisor_account',   tip: '#01-7：隱藏 Alert Settings 按鈕，只看得到自己有權限的資源告警。No-auth 是請聯絡管理員版（#01-8）。' },
+  { id: 't1mb',  page: 'role', label: 'T1 Member',     icon: 'badge',                tip: '同 T1 Manager。這頁沒有 Manager / Member 差異。' },
+  { id: 't2m',   page: 'role', label: 'T2 Manager',    icon: 'person',               tip: '#01-7：沒有 Assigned to 欄位（Kabin 10/09 裁決照設計稿畫面）。' },
+  { id: 't2mb',  page: 'role', label: 'T2 Member',     icon: 'person_outline',       tip: '同 T2 Manager。' },
+
+  { id: 'set',      page: 'state', group: 'List 狀態', label: 'With data (#01)',             icon: 'check_circle', tip: '預設：14 組資源、最近 30 天，依偵測時間新→舊。第一次進頁會先跑一次 skeleton。' },
+  { id: 'loading',  page: 'state', group: 'List 狀態', label: 'Loading skeleton (#01-6)',    icon: 'hourglass_top', tip: 'Alert Settings、All/Pinned 切換器 Disabled，chip 與表格換成 skeleton。' },
+  { id: 'empty',    page: 'state', group: 'List 狀態', label: 'No anomaly alerts (#01-4)',   icon: 'monitoring', tip: '沒有 Alert List 標題與切換器；仍可進行告警設定（Admin）。' },
+  { id: 'no-auth',  page: 'state', group: 'List 狀態', label: 'No authorization：Admin (#01-5)', icon: 'lock_open', tip: '提示 Admin 前往授權；角色切到非 Admin 就是 #01-8 文案、無按鈕。' },
+  { id: 'no-auth-na', page: 'state', group: 'List 狀態', label: 'No authorization：非 Admin (#01-8)', icon: 'lock', tip: '請聯絡 organization 管理員授權，無 CTA。' },
+  { id: 'error',    page: 'state', group: 'List 狀態', label: 'Error（補的，Figma 沒畫）',  icon: 'cloud_off', tip: '⚠ DEVIATION：FE 的列表沒有 error 分支（失敗會落到空狀態），這裡補正確的 error 狀態。' },
+  { id: 'det-off',  page: 'state', group: '偵測設定', label: 'Detection OFF (#01-2)',  icon: 'notifications_off', tip: '設定列 chip 變成灰燈 Detection Disabled；清單內容不變。' },
+  { id: 'det-on',   page: 'state', group: '偵測設定', label: 'Detection ON（Sensitivity: High）', icon: 'notifications_active', tip: '預設。' },
+
+  { id: 'v-all',      page: 'view', group: '瀏覽', label: 'All (#01)',    icon: 'list_alt' },
+  { id: 'v-pinned',   page: 'view', group: '瀏覽', label: 'Pinned (#01 註記)', icon: 'keep', tip: '顯示所有已被釘選的告警，每則以「單則」顯示不收納；含超過 30 天的告警。在該畫面取消釘選，該則告警直接消失。' },
+  { id: 'v-pinned-empty', page: 'view', group: '瀏覽', label: 'Pinned 沒有任何釘選（補的）', icon: 'push_pin', tip: '⚠ 設計端暫擬：Figma 與 FE 都沒有這個空狀態（FE 會渲染空表格）。' },
+  { id: 'v-expand',   page: 'view', group: '展開 (#01-9)', label: '展開一組 (#01-9)', icon: 'expand_circle_down', tip: '主列與子列左側 4px #9ED7FF 前綴線，子列底色 #F6F6F6。' },
+  { id: 'v-expand-many', page: 'view', group: '展開 (#01-9)', label: '同時展開多組 (#01-9)', icon: 'unfold_more', tip: '一次可展開不只一組。' },
+  { id: 'v-t2',       page: 'view', group: '角色畫面', label: 'T2：沒有 Assigned to 欄位 (#01-7)', icon: 'visibility_off', tip: 'T2 角色一律藏起 Assigned to 整欄（Kabin 10/09 裁決照設計稿畫面，不照紫便條的「暫時顯示 --」）。Resource 欄 303。' },
+  { id: 'h-assigned-info', page: 'view', group: 'Hover (#01-3)', label: 'Assigned to 標題說明', icon: 'info', tip: '模擬滑鼠移到欄位標題 info icon。Tooltip max width 400。' },
+  { id: 'h-assigned-list', page: 'view', group: 'Hover (#01-3)', label: 'Assigned to 內容：超過 5 組', icon: 'format_list_bulleted', tip: '前 5 筆（字母升冪）＋ ...+2 more, view full list in detail page.' },
+  { id: 'h-assigned-dash', page: 'view', group: 'Hover (#01-3)', label: 'Assigned to：-- 說明', icon: 'help' },
+  { id: 'h-pin',      page: 'view', group: 'Hover (#01-3)', label: 'Pin 提示（已釘選）', icon: 'push_pin', tip: '⚠ 未確認：Figma 只在已釘選那顆畫出提示，文案又說「超過 30 天」；FE 一律掛。' },
+  { id: 'h-name',     page: 'view', group: 'Hover (#01-3)', label: 'Resource 名稱＋ID', icon: 'badge', tip: '一律顯示 “Name (ID)”。' },
+  { id: 'h-detail',   page: 'view', group: 'Hover (#01-3)', label: 'Check Anomaly Details', icon: 'description' },
+  { id: 'd-detail',   page: 'view', group: '詳情入口', label: '點詳情 icon → toast', icon: 'info', tip: '⚠ 設計端暫擬：詳情頁另一輪製作，先以 toast 說明。' },
+
+  { id: 's-on',   page: 'settings', group: 'Alert Settings 彈窗', label: 'Settings：Detection ON (#03-1)', icon: 'tune', tip: '700 寬，Sensitivity 預設 Medium。' },
+  { id: 's-off',  page: 'settings', group: 'Alert Settings 彈窗', label: 'Settings：Detection OFF (#03-2)', icon: 'toggle_off', tip: '下半部 Disabled，仍維持原設定（Medium、五個通知皆 ON）。' },
+  { id: 's-sens', page: 'settings', group: 'Alert Settings 彈窗', label: 'Sensitivity 下拉展開', icon: 'arrow_drop_down_circle' },
+  { id: 's-fail', page: 'settings', group: '送出結果', label: '下一次 Save 失敗（切換）', icon: 'report', tip: '關閉彈窗並跳紅色 toast，設定不變。' },
+  { id: 't-ok',   page: 'settings', group: '送出結果', label: 'Toast：updated successfully (#Toast)', icon: 'check_circle' },
+  { id: 't-fail', page: 'settings', group: '送出結果', label: 'Toast：failed (#Toast)', icon: 'error' },
+  { id: 't-both', page: 'settings', group: '送出結果', label: 'Toast：兩種同時（Figma 示意）', icon: 'layers', tip: '失敗在上、成功在下。' }
+];
+window.DEMO_DEFAULT = 'set';
+
+function setRole(id) { state.role = id; if (window.LumitureTopbar) LumitureTopbar.setRole(ROLES[id].chip); }
+let _listShown = false;
+function showList(opts) {
+  closeModal(); opts = opts || {};
+  const first = !_listShown; _listShown = true;
+  if (first && state.pageState === 'set' && !opts.noSkel) {   // Kabin 偏好：切進「有資料」畫面前故意跑一次 skeleton
+    state.pageState = 'loading'; renderList();
+    setTimeout(() => { if (state.pageState === 'loading') { state.pageState = 'set'; renderList(); } }, 650);
+  } else renderList();
+  window.scrollTo(0, 0);
+}
+function setPageState(id) { state.pageState = id; _listShown = true; showList(); }
+function resetData() { state.items = buildItems(); state.expanded = new Set(); state.view = 'all'; }
+/* 用合成 mouse 事件觸發 #gl-tip（Demo 用，讓靜態畫面也看得到懸停態）*/
+function simHover(sel) {
+  const el = document.querySelector(sel); if (!el) return;
+  el.scrollIntoView({ block: 'center', inline: 'nearest' });
+  const r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+  const init = { bubbles: true, clientX: x, clientY: y };
+  el.dispatchEvent(new MouseEvent('mouseover', init)); el.dispatchEvent(new MouseEvent('mousemove', init));
+}
+const later = fn => setTimeout(fn, 80);
+
+window.DEMO_APPLY = function (id) {
+  closePop(); closeModal();
+  const tip = document.getElementById('gl-tip'); if (tip) tip.style.display = 'none';
+  if (ROLES[id]) { setRole(id); if (state.pageState === 'set') state.pageState = 'set'; renderList(); return; }
+  if (['set', 'loading', 'empty', 'no-auth', 'error'].includes(id)) { if (id === 'set') { resetData(); state.settings.detection = true; } setPageState(id); return; }
+  if (id === 'no-auth-na') { setRole('t1m'); setPageState('no-auth'); return; }
+  if (id === 'det-off') { state.pageState = 'set'; state.settings.detection = false; showList({ noSkel: true }); return; }
+  if (id === 'det-on') { state.pageState = 'set'; state.settings.detection = true; state.settings.sensitivity = 'High'; showList({ noSkel: true }); return; }
+
+  /* ---- View ---- */
+  state.pageState = 'set'; _listShown = true;
+  if (id === 'v-all') { resetData(); showList({ noSkel: true }); return; }
+  if (id === 'v-pinned') { resetData(); state.view = 'pinned'; showList({ noSkel: true }); return; }
+  if (id === 'v-pinned-empty') { resetData(); state.items.forEach(it => { it.pin = false; it.children.forEach(c => { c.pin = false; }); }); state.items = state.items.filter(it => !it.old); state.view = 'pinned'; showList({ noSkel: true }); return; }
+  if (id === 'v-expand') { resetData(); state.expanded.add('r1'); showList({ noSkel: true }); return; }
+  if (id === 'v-expand-many') { resetData(); ['r1', 'r3', 'r7'].forEach(x => state.expanded.add(x)); showList({ noSkel: true }); return; }
+  if (id === 'v-t2') { resetData(); setRole('t2m'); showList({ noSkel: true }); return; }
+  if (id === 'h-assigned-info') { resetData(); showList({ noSkel: true }); later(() => simHover('#assigned-info')); return; }
+  if (id === 'h-assigned-list') { resetData(); showList({ noSkel: true }); later(() => simHover('.tr[data-rid="r8"] .td[data-tip]:not(.res)')); return; }
+  if (id === 'h-assigned-dash') { resetData(); showList({ noSkel: true }); later(() => simHover('.tr[data-rid="r2"] .td[data-tip]:not(.res)')); return; }
+  if (id === 'h-pin') { resetData(); showList({ noSkel: true }); later(() => simHover('.tr[data-rid="r3"] .ib.pin')); return; }
+  if (id === 'h-name') { resetData(); showList({ noSkel: true }); later(() => simHover('.tr[data-rid="r7"] .td.res')); return; }
+  if (id === 'h-detail') { resetData(); showList({ noSkel: true }); later(() => simHover('.tr[data-rid="r2"] .ib[data-a="detail"]')); return; }
+  if (id === 'd-detail') { resetData(); showList({ noSkel: true }); later(() => { const b = document.querySelector('.ib[data-a="detail"]'); b && b.click(); }); return; }
+
+  /* ---- Settings ---- */
+  if (id === 's-fail') { state.failNext = !state.failNext; toast('info', state.failNext ? 'The next Save will fail.' : 'Save will succeed again.'); return; }
+  if (id === 't-ok') return toast('ok', COPY.toast.ok);
+  if (id === 't-fail') return toast('error', COPY.toast.fail);
+  if (id === 't-both') { toast('ok', COPY.toast.ok); toast('error', COPY.toast.fail); return; }
+  if (['s-on', 's-off', 's-sens'].includes(id)) {
+    setRole('admin'); state.pageState = 'set'; showList({ noSkel: true });
+    openSettings({ detection: id !== 's-off', sensitivity: 'Medium', notif: { admin: true, t1Manager: true, t1Member: true, t2Manager: true, t2Member: true } });
+    if (id === 's-sens') later(() => { const s = document.getElementById('sm-sel'); s && s.click(); });
+    return;
+  }
+};
+
+/* ============================================================
+ * 9. Boot（#loading／#empty／#no-auth／#error／#pinned／#expand／#det-off／#settings／#settings-off 等 hash 直接開到該狀態）
+ * ============================================================ */
+(function boot() {
+  setRole('admin');
+  const h = (location.hash || '').replace('#', '');
+  const map = { loading: 'loading', empty: 'empty', 'no-auth': 'no-auth', 'no-auth-na': 'no-auth-na', error: 'error', pinned: 'v-pinned', 'pinned-empty': 'v-pinned-empty', expand: 'v-expand', 't2': 'v-t2', 'det-off': 'det-off', settings: 's-on', 'settings-off': 's-off', t1m: 't1m', t2mb: 't2mb' };
+  if (h === 't1m' || h === 't2mb') { setRole(h); setPageState('no-auth'); return; }
+  if (map[h]) { _listShown = true; DEMO_APPLY(map[h]); return; }
+  showList();
+})();
+</script>
+<script>
+/* ============================================================
+ * 10. Tooltip（#gl-tip）：頁面自己提供，shared demo-fab.js 看到已存在就不注入它「跟著游標跑」的版本（Fable §5 #3）
+ *   做法比照 All Resource List v1（兩頁行為一致）：tooltip 錨在元件上，游標在元件裡移動不會漂。
+ *   位置依 Figma #01-3 六個 tooltip 量到的：
+ *   - Resource 名稱、Assigned to 儲存格：出現在下方（名稱靠文字起點、下緣＋4；Assigned to 貼列底線上 2）
+ *   - 表頭 info、Pin、Details：出現在上方 6px
+ *   - 水平先靠元件左緣，右邊放不下就改靠元件右緣＋2（Details、Pin、info）；Assigned to 一律對齊內容右緣（r.right−16）
+ *   shared 的全站版本要不要也改成錨定，列在對稿紀錄 §8 待 Kabin。
+ * ============================================================ */
+(function () {
+  const tip = document.createElement('div'); tip.id = 'gl-tip'; tip.style.display = 'none'; document.body.appendChild(tip);
+  let cur = null;
+  function place() {
+    if (!cur || !cur.isConnected) { cur = null; tip.style.display = 'none'; return; }
+    const a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
+    const r = a.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight, vw = innerWidth, vh = innerHeight;
+    let x = r.left; if (x + tw > vw - 8) x = Math.max(8, Math.min(r.right + 2, vw - 8) - tw);
+    /* Fable §7 #3：#01-3 兩個 Assigned to tooltip 右緣都對齊儲存格文字右緣（1200），不是靠左；靠左會蓋到右邊 Pin */
+    if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
+    const below = cur.dataset.tipPos === 'below', dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
+    let y = below ? r.bottom + dy : r.top - th - 6;
+    if (y < 8) y = r.bottom + 4; if (y + th > vh - 8) y = Math.max(8, r.top - th - 6);
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  }
+  document.addEventListener('mouseover', e => {
+    const el = e.target.closest && e.target.closest('[data-tip]');
+    if (!el || (el === cur && tip.style.display !== 'none')) return;
+    cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place();
+  });
+  document.addEventListener('mouseout', e => {
+    const el = e.target.closest && e.target.closest('[data-tip]');
+    if (el && el === cur && !el.contains(e.relatedTarget)) { cur = null; tip.style.display = 'none'; }
+  });
+  window.addEventListener('scroll', place, true);
+  window.addEventListener('resize', place);
+})();
+</script>
+<script>
 /* === Inlined: shared/demo-fab.js === */
 /*!
  * demo-fab.js — Lumiture Designer Demo Scenarios (Shared Module v2)
@@ -1826,6 +2455,5 @@ window.LUMITURE_ACTIVE = 'user-menu';
 })();
 
 </script>
-
 </body>
 </html>

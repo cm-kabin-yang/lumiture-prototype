@@ -353,7 +353,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 @keyframes sIn{from{transform:translateX(-110%);opacity:0}to{transform:translateX(0);opacity:1}}
 
 /* ==== Tooltip ==== */
-.rs-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:12px;line-height:1.6;padding:8px 11px;border-radius:6px;max-width:340px;z-index:400;pointer-events:none;opacity:0;transition:opacity .12s;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.rs-tip{position:fixed;background:#31383E;color:#fff;font-size:12px;line-height:1.6;padding:8px 11px;border-radius:6px;max-width:340px;z-index:400;pointer-events:none;opacity:0;transition:opacity .12s;box-shadow:0 4px 12px rgba(0,0,0,.25)}
 .rs-tip.show{opacity:1}
 .rs-tip b{font-weight:700}
 
@@ -1106,10 +1106,26 @@ function renderCards(){
 /* ============================================================
    RENDER — tabs + actions
 ============================================================ */
+/* Tab 小計跟著篩選＋搜尋走（2026-10-06 Kabin 定案，比照 GitLab MR 列表）：
+   篩選沒讓這個分頁變少 → 沿用設計稿上的總數（#01 的 999+ / 8 / 2，假資料筆數比較少）；
+   有變少 → 顯示篩選後的實際筆數，最多 999+。Archived 照舊不顯示數量。 */
+function tabVisibleRows(id){
+  var rows = applyFilters(DATA[id].slice());
+  var q = state.searchQ;
+  if(q){ rows = rows.filter(function(r){ return rowHaystack(r).indexOf(q)>=0; }); }
+  return rows;
+}
+function tabBadge(t){
+  if(t.badge==='' || state.pageState!=='set') return t.badge;
+  var n = tabVisibleRows(t.id).length;
+  if(n===DATA[t.id].length) return t.badge;
+  return n>999 ? '999+' : String(n);
+}
 function renderTabs(){
   $('#rs-tabs').innerHTML = TABS.map(function(t){
     var active = t.id===state.tab?' active':'';
-    var badge = t.badge!==''?'<span class="tab-badge">'+t.badge+'</span>':'';
+    var b = tabBadge(t);
+    var badge = b!==''?'<span class="tab-badge">'+b+'</span>':'';
     return '<button class="tab'+active+'" onclick="setTab(\''+t.id+'\')">'+t.label+badge+'</button>';
   }).join('');
 }
@@ -1311,6 +1327,7 @@ function saveEot(){
 
 function renderTable(){
   var area = $('#rs-tablearea');
+  renderTabs();   // 篩選、搜尋、切換狀態都會走到這裡，順便刷新 Tab 小計
 
   if(state.pageState==='loading'){ area.innerHTML = skeletonTable(); return; }
   if(state.pageState==='empty' || state.pageState==='nodata'){
@@ -1319,9 +1336,8 @@ function renderTable(){
     return;
   }
 
-  var rows = applyFilters(DATA[state.tab].slice());
+  var rows = tabVisibleRows(state.tab);
   var q = state.searchQ;
-  if(q){ rows = rows.filter(function(r){ return rowHaystack(r).indexOf(q)>=0; }); }
   _visibleRows = rows;
   if(state.sort.key){
     var k = state.sort.key, d = state.sort.dir;
@@ -1479,12 +1495,12 @@ function usageMetricVal(key, r){
     'Max. CPU Utilization (P95)':         (cpu*1.42).toFixed(2)+'%',
     'Avg. Memory Utilization (P95)':      mem.toFixed(2)+'%',
     'Max. Memory Utilization (P95)':      (mem*1.31).toFixed(2)+'%',
-    'Avg. Disk Total Ops Count (P95)':    Math.round(cpu*128).toLocaleString()+' IOPS',
-    'Max. Disk Total Ops Count (P95)':    Math.round(cpu*412).toLocaleString()+' IOPS',
-    'Avg. Network Total Ops Count (P95)': Math.round(cpu*96).toLocaleString()+' pps',
-    'Max. Network Total Ops Count (P95)': Math.round(cpu*318).toLocaleString()+' pps',
+    'Avg. Disk Total Ops Count (P95)':    Math.round(cpu*128).toLocaleString()+' ops/s',    /* 2026-09-22 單位修正：原寫 IOPS，FE 確認 API key DiskTotalOpsCount 的單位是 ops/s */
+    'Max. Disk Total Ops Count (P95)':    Math.round(cpu*412).toLocaleString()+' ops/s',
+    'Avg. Network Total Ops Count (P95)': Math.round(cpu*96).toLocaleString()+' ops/s',      /* 2026-09-22 單位修正：原寫 pps（封包/秒），FE 確認 API key NetworkTotalOpsCount 的單位是 ops/s（操作次數/秒），非封包計數 */
+    'Max. Network Total Ops Count (P95)': Math.round(cpu*318).toLocaleString()+' ops/s',
     'Peak Hours':                         '16:00 ~ 16:05',   /* ticket 原文示例 */
-    'Weekday / Weekend Ratio':            '68%',             /* ⚠ 設計端暫擬：ticket 只寫範圍 0%~100%，沒給示例值 */
+    'Weekday / Weekend Ratio':            'weekend heavy 68%', /* 2026-09-22 值格式對齊 Figma master（同步改成「描述詞 + 百分比」，不再是裸百分比）；⚠ 名稱與數字仍是設計端暫擬，ticket 只寫範圍 0%~100%，沒給示例值 */
     'Data Completeness':                  'High'             /* 附錄：完整度 < 50% 會被標成 Insufficient Data 而不產生推薦，所以推薦裡看不到最低階 */
   };
   return map[key] || '--';
@@ -1509,6 +1525,10 @@ function buildInstCards(hours){
    - Cost Calculator 不做輸入框，直接用該 bucket 觀測到的量算；卡片改各層級
 ============================================================ */
 var STORAGE_USAGE_METRICS = [
+  /* 2026-09-22 三個顯示名一度誤改成 Storage Total Bytes / Read API Request Count / Write API Request Count
+     （對齊 FE 的 API key 對照表），但查回 LT-2586 PRD 本文才發現三個名字是 PM 定案的顯示名、附有 UX 理由
+     （Current Stored Bytes 是「使用者去 console 核對會看到的數字」），API key 名稱只是後端資料來源，
+     不是畫面顯示名的依據，已改回 PRD 原字。權威順序：ticket > PRD > Figma > code，這次是沒有先查 PRD 就動手 */
   { k:'Current Stored Bytes', f:function(r){ return r.storedBytes; } },
   { k:'Object Count',         f:function(r){ return r.objectCount; } },
   { k:'Read Ratio',           f:function(r){ return r.readRatio; },
@@ -2188,14 +2208,14 @@ bindTips();
 
     { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
       { id: 'general-budget',    label: 'General Budget',    icon: 'savings',              href: './general-budget.html' },
-      { id: 'customized-budget', label: 'Customized Budget', icon: 'tune',                 disabled: true },
-      { id: 'anomaly-detection', label: 'Anomaly Detection', icon: 'notifications_active', disabled: true },
+      { id: 'customized-budget', label: 'Customized Budget', icon: 'tune',                 href: './customized-budget.html' },
+      { id: 'anomaly-detection', label: 'Anomaly Detection', icon: 'notifications_active', href: './anomaly-detection.html' },
     ]},
 
     { type: 'group', id: 'org', label: 'Organization Settings', items: [
-      { id: 'lumitag',            label: 'LumiTag',            icon: 'sell',            href: './lumitag.html' },
       { id: 'group-list',         label: 'Group List',         icon: 'groups',          href: './group-list.html' },
-      { id: 'all-resource-list',  label: 'All Resource List',  icon: 'inventory_2',     disabled: true },
+      { id: 'lumitag',            label: 'LumiTag',            icon: 'sell',            href: './lumitag.html' },
+      { id: 'all-resource-list',  label: 'All Resource List',  icon: 'folder_data',     href: './all-resource-list.html' },
       { id: 'authorization-list', label: 'Authorization List', icon: 'link',            href: './organization-settings.html' },
       { id: 'admin-list',         label: 'Admin List',         icon: 'manage_accounts', href: './group-list.html#admin' },
     ]},
@@ -2250,67 +2270,85 @@ bindTips();
     '.lt-sidebar{width:var(--lt-sb-w);min-width:0;background:var(--lt-sb-bg);color:#fff;',
     'position:sticky;top:0;height:100vh;z-index:100;overflow:hidden;',
     'flex-shrink:0;',
-    'display:flex;flex-direction:column;transition:width .2s ease;scrollbar-width:none}',
+    'display:flex;flex-direction:column;transition:width .2s ease;scrollbar-width:none;',
+    /* 2026-10-02 對 Figma LumiTag #01：Side Navbar 三層陰影 */
+    'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12)}',
     '.lt-sidebar::-webkit-scrollbar{display:none}',
     '.lt-sidebar.lt-collapsed{width:64px}',
 
     /* Logo block */
-    '.lt-sb-logo{padding:16px 20px;display:flex;align-items:center;gap:10px;',
-    'font-size:18px;font-weight:700;color:#fff;border-bottom:1px solid var(--lt-sb-border);',
-    'min-height:68px;box-sizing:border-box;white-space:nowrap;overflow:hidden;flex-shrink:0}',
-    '.lt-sb-logo-wrap{position:relative;width:32px;height:32px;flex-shrink:0}',
-    '.lt-sb-logo-wrap svg{width:32px;height:32px;display:block}',
-    /* PROTOTYPE tag — cyan caps below the icon */
-    '.lt-sb-proto{position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);',
-    'background:var(--lt-sb-bg);color:#34B5D9;font-size:6px;font-weight:700;',
-    'padding:1px 3px;border-radius:2px;text-transform:uppercase;letter-spacing:.3px;',
-    'line-height:1.2;white-space:nowrap}',
-    '.lt-sb-logo-text{transition:opacity .2s}',
-    '.lt-sidebar.lt-collapsed .lt-sb-logo-text{opacity:0;width:0;overflow:hidden}',
-    '.lt-sidebar.lt-collapsed .lt-sb-proto{display:none}',
-    '.lt-sidebar.lt-collapsed .lt-sb-logo{padding:16px;justify-content:center;gap:0}',
+    '.lt-sb-logo{position:relative;padding:0 24px;display:flex;align-items:center;gap:6px;',
+    'font-size:18px;font-weight:700;color:#fff;border-bottom:none;',
+    'height:64px;box-sizing:border-box;white-space:nowrap;overflow:hidden;flex-shrink:0}',
+    '.lt-sb-logo-wrap{width:39px;height:28px;flex-shrink:0}',
+    '.lt-sb-logo-wrap svg{width:39px;height:28px;display:block;overflow:visible}',
+    /* hover 變形（2026-10-05 Kabin 試做）：圓環白→青、短條青→白 0.18s，腳 scaleY 0→1 從圓環裡長出來 0.22s；只有連結狀態才有 */
+    'a.lt-sb-logo{text-decoration:none;cursor:pointer}',
+    'a.lt-sb-logo:focus-visible{outline:2px solid #4ADFFF;outline-offset:-6px;border-radius:8px}',
+    '.lt-i-ring{fill:#FFF;transition:fill .18s ease}',
+    '.lt-i-short{fill:#4ADFFF;transition:fill .18s ease}',
+    '.lt-i-leg{fill:#4ADFFF;transform:scaleY(0);transform-box:fill-box;transform-origin:50% 0;transition:transform .22s cubic-bezier(.2,.8,.2,1) .04s}',
+    'a.lt-sb-logo:hover .lt-i-ring,a.lt-sb-logo:focus-visible .lt-i-ring{fill:#4ADFFF}',
+    'a.lt-sb-logo:hover .lt-i-short,a.lt-sb-logo:focus-visible .lt-i-short{fill:#FFF}',
+    'a.lt-sb-logo:hover .lt-i-leg,a.lt-sb-logo:focus-visible .lt-i-leg{transform:scaleY(1)}',
+    '@media (prefers-reduced-motion:reduce){.lt-i-ring,.lt-i-short,.lt-i-leg,.lt-sb-proto-x{transition:none}}',
+    '.lt-sb-logo-text{transition:opacity .2s;color:#fff;font-size:18px;line-height:1}',
+    /* 2026-10-05 Kabin 選 C1：正式 logo 不動，產品名後面接線框膠囊標示 prototype。完整的 PROTOTYPE 塞不下（sidebar 250px，膠囊只剩約 53px），所以寫 PROTO；
+       9px、青色 #4ADFFF（對比 9.12:1），右緣實測 228.6px，在 nav 項目右緣 234px 以內。原本的 P 標誌存成 shared/prototype-p-mark.svg */
+    '.lt-sb-proto{flex-shrink:0;padding:0 4px;border:1px solid #4ADFFF;border-radius:999px;color:#4ADFFF;',
+    'font-size:9px;font-weight:700;letter-spacing:.02em;line-height:14px;transition:opacity .2s;display:inline-flex}',
+    /* hover 時 PROTO 展開成 PROTOTYPE：TYPE 用 max-width 0→30px 推出來。完整字要 63px，所以平常的膠囊也收緊成字距 .02em、內距 4（右緣 243.8px，離 sidebar 邊 6px） */
+    '.lt-sb-proto-x{display:inline-block;max-width:0;overflow:hidden;vertical-align:top;transition:max-width .22s cubic-bezier(.2,.8,.2,1) .04s}',
+    'a.lt-sb-logo:hover .lt-sb-proto-x,a.lt-sb-logo:focus-visible .lt-sb-proto-x{max-width:30px}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo-text,.lt-sidebar.lt-collapsed .lt-sb-proto{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo{padding:0;justify-content:center;gap:0}',
+    /* 收合時膠囊放不下，改顯示 prototype 專用 P 標誌（shared/prototype-p-mark.svg），收合後也看得出是 prototype（2026-10-05 Kabin） */
+    '.lt-sb-logo-p{display:none;width:36.8px;height:32px;flex-shrink:0}',
+    '.lt-sb-logo-p svg{width:36.8px;height:32px;display:block;overflow:visible}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo-wrap{display:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-logo-p{display:block}',
 
     /* Nav scroll area — 內部捲動，sidebar 外層不捲（寬敞 padding 對齊原始設計） */
-    '.lt-sb-nav{flex:1;padding:8px 12px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}',
+    '.lt-sb-nav{flex:1;padding:16px 16px 8px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}',
     '.lt-sb-nav::-webkit-scrollbar{width:6px}',
     '.lt-sb-nav::-webkit-scrollbar-track{background:transparent}',
     '.lt-sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}',
     '.lt-sb-nav::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.25)}',
 
     /* Top-level item (no group) — 寬敞 padding，font-size 14px */
-    '.lt-sb-item{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;',
-    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
-    'text-decoration:none;white-space:nowrap;overflow:hidden;margin-bottom:2px}',
+    '.lt-sb-item{display:flex;align-items:center;gap:8px;padding:8px;min-height:40px;box-sizing:border-box;cursor:pointer;',
+    'font-size:14px;font-weight:400;line-height:24px;color:#fff;border-radius:4px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden;margin-bottom:8px}',
     '.lt-sb-item:hover{background:var(--lt-sb-hov);color:#fff}',
-    '.lt-sb-item.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-item.lt-active{background:var(--lt-sb-active);color:#fff}',
     '.lt-sb-item.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
-    '.lt-sb-item .material-symbols-outlined{font-size:20px;opacity:.9;flex-shrink:0}',
+    '.lt-sb-item .material-symbols-outlined{font-size:24px;flex-shrink:0}',
 
     /* Group section */
-    '.lt-sb-group{margin-bottom:4px}',
+    '.lt-sb-group{margin-bottom:0}',
     '.lt-sb-group-hdr{display:flex;align-items:center;justify-content:space-between;',
-    'padding:18px 14px 10px;font-size:14px;font-weight:700;color:#fff;',
-    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:.2px}',
+    'padding:8px;min-height:40px;box-sizing:border-box;margin-bottom:8px;font-size:14px;font-weight:500;line-height:24px;color:#fff;border-radius:4px;',
+    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0}',
     '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
     '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
-    '.lt-sb-group-arrow{font-size:18px;transition:transform .18s;opacity:.85;flex-shrink:0}',
+    '.lt-sb-group-arrow{font-size:24px;transition:transform .18s;flex-shrink:0}',
     '.lt-sb-group.lt-collapsed .lt-sb-group-arrow{transform:rotate(180deg)}',
     '.lt-sb-group.lt-collapsed .lt-sb-group-children{display:none}',
 
     /* Sub-item (inside group) — 一致 14px font，11px 垂直 padding */
-    '.lt-sb-subitem{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;',
-    'font-size:14px;color:rgba(255,255,255,.92);border-radius:6px;transition:background .15s;',
-    'text-decoration:none;white-space:nowrap;overflow:hidden}',
+    '.lt-sb-subitem{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 24px;min-height:40px;box-sizing:border-box;cursor:pointer;',
+    'font-size:14px;font-weight:400;line-height:24px;color:#fff;border-radius:4px;transition:background .15s;',
+    'text-decoration:none;white-space:nowrap;overflow:hidden;margin-bottom:8px}',
     '.lt-sb-subitem:hover{background:var(--lt-sb-hov);color:#fff}',
-    '.lt-sb-subitem.lt-active{background:var(--lt-sb-active);color:#fff;font-weight:500}',
+    '.lt-sb-subitem.lt-active{background:var(--lt-sb-active);color:#fff}',
     '.lt-sb-subitem.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
-    '.lt-sb-subitem .material-symbols-outlined{font-size:18px;opacity:.9;flex-shrink:0}',
+    '.lt-sb-subitem .material-symbols-outlined{font-size:24px;flex-shrink:0}',
 
     /* Collapsed state — hide labels, center icons */
     '.lt-sidebar.lt-collapsed .lt-sb-item span:not(.material-symbols-outlined),',
     '.lt-sidebar.lt-collapsed .lt-sb-subitem span:not(.material-symbols-outlined){display:none}',
     '.lt-sidebar.lt-collapsed .lt-sb-item,',
-    '.lt-sidebar.lt-collapsed .lt-sb-subitem{padding:10px 0;justify-content:center;border-radius:0}',
+    '.lt-sidebar.lt-collapsed .lt-sb-subitem{padding:8px 0;justify-content:center;border-radius:0}',
     '.lt-sidebar.lt-collapsed .lt-sb-group-hdr > span:first-child{display:none}',
     '.lt-sidebar.lt-collapsed .lt-sb-group-arrow{display:none}',
     '.lt-sidebar.lt-collapsed .lt-sb-group-hdr{padding:8px 0;justify-content:center}',
@@ -2337,19 +2375,29 @@ bindTips();
     document.head.appendChild(s);
   }
 
-  // ===== Canonical Logo (concentric circles + PROTOTYPE tag + LumiTure.ai) =====
-  var LOGO_HTML =
-    '<div class="lt-sb-logo">' +
-      '<div class="lt-sb-logo-wrap">' +
-        '<svg viewBox="0 0 32 32" fill="none" aria-hidden="true">' +
-          '<circle cx="16" cy="16" r="13" stroke="#FFF" stroke-width="2" fill="none"/>' +
-          '<circle cx="16" cy="16" r="7" stroke="#FFF" stroke-width="2" fill="none"/>' +
-          '<circle cx="16" cy="16" r="3" fill="#FFF"/>' +
-        '</svg>' +
-        '<span class="lt-sb-proto">PROTOTYPE</span>' +
-      '</div>' +
+  // ===== Logo：正式 Lumiture logo＋LumiTure.ai＋PROTO 膠囊 =====
+  // ===== Prototype 專用 P 標誌（收合狀態＋favicon 用；正本 shared/prototype-p-mark.svg） =====
+  var P_MARK_INNER = '<defs><mask id="ltPring" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#000"/><circle cx="25.0413" cy="14" r="14.1" fill="#fff"/></mask><mask id="ltPbars" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#fff"/><circle cx="25.0413" cy="14" r="14" fill="#000"/></mask><mask id="ltPmask" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#fff"/><circle cx="25.0413" cy="14" r="11.2" fill="#000"/></mask></defs><path d="M25.0413 0C32.7731 0.00012318 39.0413 6.26809 39.0413 14C39.0413 21.7319 32.7731 27.9999 25.0413 28C21.8903 28 18.983 26.9582 16.6434 25.2014C16.582 25.1553 16.5075 25.1299 16.4307 25.1299H10.5422C10.2772 25.1299 10.0349 24.9801 9.91625 24.7432L8.61254 22.1367C8.49619 21.904 8.66584 21.6299 8.92602 21.6299H12.6564C12.9342 21.6299 13.103 21.3205 12.9622 21.081C12.5841 20.4379 12.2558 19.7621 11.983 19.0586C11.93 18.9218 11.7992 18.8301 11.6525 18.8301H1.96704C1.70205 18.8301 1.45971 18.6803 1.34106 18.4434L0.0373491 15.8369C-0.0790086 15.6042 0.090642 15.3301 0.350826 15.3301H10.7202C10.9265 15.3301 11.0876 15.1526 11.0737 14.9468C11.0524 14.6339 11.0413 14.3182 11.0413 14C11.0413 13.6356 11.0551 13.2745 11.0825 12.9171C11.0983 12.71 10.9367 12.5303 10.729 12.5303H0.52563C0.265515 12.5303 0.0959761 12.2561 0.212154 12.0234L1.51586 9.41699C1.63443 9.17986 1.87673 9.0303 2.14184 9.03027H11.708C11.8534 9.03027 11.9832 8.94026 12.0372 8.8053C12.3188 8.10088 12.6561 7.4248 13.0436 6.7823C13.188 6.54274 13.0195 6.22949 12.7398 6.22949H5.07544C4.81536 6.22938 4.64663 5.95629 4.76294 5.72363L6.06567 3.11719C6.1842 2.88012 6.42661 2.72959 6.69165 2.72949H16.6204C16.6952 2.72949 16.768 2.70541 16.8285 2.66148C19.1355 0.987609 21.973 0 25.0413 0ZM25.0413 2.7998C18.8557 2.7998 13.8411 7.81441 13.8411 14C13.8411 20.1856 18.8557 25.2002 25.0413 25.2002C31.2267 25.2001 36.2415 20.1855 36.2415 14C36.2415 7.81449 31.2267 2.79993 25.0413 2.7998Z" fill="#FFF" mask="url(#ltPbars)"/><path d="M25.0413 0C32.7731 0.00012318 39.0413 6.26809 39.0413 14C39.0413 21.7319 32.7731 27.9999 25.0413 28C21.8903 28 18.983 26.9582 16.6434 25.2014C16.582 25.1553 16.5075 25.1299 16.4307 25.1299H10.5422C10.2772 25.1299 10.0349 24.9801 9.91625 24.7432L8.61254 22.1367C8.49619 21.904 8.66584 21.6299 8.92602 21.6299H12.6564C12.9342 21.6299 13.103 21.3205 12.9622 21.081C12.5841 20.4379 12.2558 19.7621 11.983 19.0586C11.93 18.9218 11.7992 18.8301 11.6525 18.8301H1.96704C1.70205 18.8301 1.45971 18.6803 1.34106 18.4434L0.0373491 15.8369C-0.0790086 15.6042 0.090642 15.3301 0.350826 15.3301H10.7202C10.9265 15.3301 11.0876 15.1526 11.0737 14.9468C11.0524 14.6339 11.0413 14.3182 11.0413 14C11.0413 13.6356 11.0551 13.2745 11.0825 12.9171C11.0983 12.71 10.9367 12.5303 10.729 12.5303H0.52563C0.265515 12.5303 0.0959761 12.2561 0.212154 12.0234L1.51586 9.41699C1.63443 9.17986 1.87673 9.0303 2.14184 9.03027H11.708C11.8534 9.03027 11.9832 8.94026 12.0372 8.8053C12.3188 8.10088 12.6561 7.4248 13.0436 6.7823C13.188 6.54274 13.0195 6.22949 12.7398 6.22949H5.07544C4.81536 6.22938 4.64663 5.95629 4.76294 5.72363L6.06567 3.11719C6.1842 2.88012 6.42661 2.72959 6.69165 2.72949H16.6204C16.6952 2.72949 16.768 2.70541 16.8285 2.66148C19.1355 0.987609 21.973 0 25.0413 0ZM25.0413 2.7998C18.8557 2.7998 13.8411 7.81441 13.8411 14C13.8411 20.1856 18.8557 25.2002 25.0413 25.2002C31.2267 25.2001 36.2415 20.1855 36.2415 14C36.2415 7.81449 31.2267 2.79993 25.0413 2.7998Z" fill="#4ADFFF" mask="url(#ltPring)"/><path d="M13.094 21.298L15.227 19.995L15.45 14L24.480 33.503A0.35 0.35 0 0 1 24.162 34.000L21.246 34.000A0.7 0.7 0 0 1 20.648 33.665Z" fill="#4ADFFF" mask="url(#ltPmask)"/><path d="M6.45275 22.0168C6.33418 21.7797 6.09179 21.6299 5.82665 21.6299H3.32559C3.06541 21.6299 2.89618 21.9037 3.01254 22.1364L4.3158 24.7429C4.43438 24.9801 4.67676 25.1299 4.9419 25.1299H7.44297C7.70315 25.1299 7.87237 24.8561 7.75601 24.6234L6.45275 22.0168Z" fill="#FFF"/><path d="M25.0413 5.59998C29.6803 5.60019 33.4407 9.3613 33.4407 14.0004C33.4405 18.6392 29.6801 22.3996 25.0413 22.3998C20.4022 22.3998 16.6411 18.6394 16.6409 14.0004C16.6409 9.36117 20.4021 5.59998 25.0413 5.59998ZM25.0403 8.39978C24.0472 8.39988 23.1146 8.65916 22.3059 9.11267C23.4354 9.14717 24.3409 10.0716 24.3411 11.2094C24.3411 12.3691 23.4003 13.3099 22.2405 13.3099C21.105 13.3097 20.1818 12.4079 20.1438 11.2816C19.6961 12.0864 19.4408 13.0131 19.4407 13.9994C19.4407 17.092 21.9478 19.5997 25.0403 19.6C28.1331 19.6 30.6409 17.0922 30.6409 13.9994C30.6406 10.9069 28.1329 8.39978 25.0403 8.39978Z" fill="#FFF"/>';
+  // favicon：深藍圓角底，白色速度條在淺色分頁列上才看得到
+  var FAVICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#002663"/>' +
+    '<g transform="translate(8.55 11.6) scale(1.2)">' + P_MARK_INNER + '</g></svg>';
+
+  // 正式 logo 的圖形拆成五層（同一條原版 path 用 mask 分出速度條／圓環），hover 時圓環轉青、P 的腳從圓環長出來、左下短條轉白＝收合狀態那個 P 標誌
+  var LOGO_ICON = '<svg viewBox="0 0 40 28" fill="none" aria-hidden="true"><defs><mask id="ltHring" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#000"/><circle cx="25.0413" cy="14" r="14.1" fill="#fff"/></mask><mask id="ltHbars" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#fff"/><circle cx="25.0413" cy="14" r="14" fill="#000"/></mask><mask id="ltHleg" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#fff"/><circle cx="25.0413" cy="14" r="11.2" fill="#000"/></mask></defs><path d="M25.0413 0C32.7731 0.00012318 39.0413 6.26809 39.0413 14C39.0413 21.7319 32.7731 27.9999 25.0413 28C21.8903 28 18.983 26.9582 16.6434 25.2014C16.582 25.1553 16.5075 25.1299 16.4307 25.1299H10.5422C10.2772 25.1299 10.0349 24.9801 9.91625 24.7432L8.61254 22.1367C8.49619 21.904 8.66584 21.6299 8.92602 21.6299H12.6564C12.9342 21.6299 13.103 21.3205 12.9622 21.081C12.5841 20.4379 12.2558 19.7621 11.983 19.0586C11.93 18.9218 11.7992 18.8301 11.6525 18.8301H1.96704C1.70205 18.8301 1.45971 18.6803 1.34106 18.4434L0.0373491 15.8369C-0.0790086 15.6042 0.090642 15.3301 0.350826 15.3301H10.7202C10.9265 15.3301 11.0876 15.1526 11.0737 14.9468C11.0524 14.6339 11.0413 14.3182 11.0413 14C11.0413 13.6356 11.0551 13.2745 11.0825 12.9171C11.0983 12.71 10.9367 12.5303 10.729 12.5303H0.52563C0.265515 12.5303 0.0959761 12.2561 0.212154 12.0234L1.51586 9.41699C1.63443 9.17986 1.87673 9.0303 2.14184 9.03027H11.708C11.8534 9.03027 11.9832 8.94026 12.0372 8.8053C12.3188 8.10088 12.6561 7.4248 13.0436 6.7823C13.188 6.54274 13.0195 6.22949 12.7398 6.22949H5.07544C4.81536 6.22938 4.64663 5.95629 4.76294 5.72363L6.06567 3.11719C6.1842 2.88012 6.42661 2.72959 6.69165 2.72949H16.6204C16.6952 2.72949 16.768 2.70541 16.8285 2.66148C19.1355 0.987609 21.973 0 25.0413 0ZM25.0413 2.7998C18.8557 2.7998 13.8411 7.81441 13.8411 14C13.8411 20.1856 18.8557 25.2002 25.0413 25.2002C31.2267 25.2001 36.2415 20.1855 36.2415 14C36.2415 7.81449 31.2267 2.79993 25.0413 2.7998Z" fill="#FFF" mask="url(#ltHbars)"/><path class="lt-i-ring" d="M25.0413 0C32.7731 0.00012318 39.0413 6.26809 39.0413 14C39.0413 21.7319 32.7731 27.9999 25.0413 28C21.8903 28 18.983 26.9582 16.6434 25.2014C16.582 25.1553 16.5075 25.1299 16.4307 25.1299H10.5422C10.2772 25.1299 10.0349 24.9801 9.91625 24.7432L8.61254 22.1367C8.49619 21.904 8.66584 21.6299 8.92602 21.6299H12.6564C12.9342 21.6299 13.103 21.3205 12.9622 21.081C12.5841 20.4379 12.2558 19.7621 11.983 19.0586C11.93 18.9218 11.7992 18.8301 11.6525 18.8301H1.96704C1.70205 18.8301 1.45971 18.6803 1.34106 18.4434L0.0373491 15.8369C-0.0790086 15.6042 0.090642 15.3301 0.350826 15.3301H10.7202C10.9265 15.3301 11.0876 15.1526 11.0737 14.9468C11.0524 14.6339 11.0413 14.3182 11.0413 14C11.0413 13.6356 11.0551 13.2745 11.0825 12.9171C11.0983 12.71 10.9367 12.5303 10.729 12.5303H0.52563C0.265515 12.5303 0.0959761 12.2561 0.212154 12.0234L1.51586 9.41699C1.63443 9.17986 1.87673 9.0303 2.14184 9.03027H11.708C11.8534 9.03027 11.9832 8.94026 12.0372 8.8053C12.3188 8.10088 12.6561 7.4248 13.0436 6.7823C13.188 6.54274 13.0195 6.22949 12.7398 6.22949H5.07544C4.81536 6.22938 4.64663 5.95629 4.76294 5.72363L6.06567 3.11719C6.1842 2.88012 6.42661 2.72959 6.69165 2.72949H16.6204C16.6952 2.72949 16.768 2.70541 16.8285 2.66148C19.1355 0.987609 21.973 0 25.0413 0ZM25.0413 2.7998C18.8557 2.7998 13.8411 7.81441 13.8411 14C13.8411 20.1856 18.8557 25.2002 25.0413 25.2002C31.2267 25.2001 36.2415 20.1855 36.2415 14C36.2415 7.81449 31.2267 2.79993 25.0413 2.7998Z" mask="url(#ltHring)"/><g mask="url(#ltHleg)"><path class="lt-i-leg" d="M13.094 21.298L15.227 19.995L15.45 14L24.480 33.503A0.35 0.35 0 0 1 24.162 34.000L21.246 34.000A0.7 0.7 0 0 1 20.648 33.665Z"/></g><path class="lt-i-short" d="M6.45275 22.0168C6.33418 21.7797 6.09179 21.6299 5.82665 21.6299H3.32559C3.06541 21.6299 2.89618 21.9037 3.01254 22.1364L4.3158 24.7429C4.43438 24.9801 4.67676 25.1299 4.9419 25.1299H7.44297C7.70315 25.1299 7.87237 24.8561 7.75601 24.6234L6.45275 22.0168Z"/><path d="M25.0413 5.59998C29.6803 5.60019 33.4407 9.3613 33.4407 14.0004C33.4405 18.6392 29.6801 22.3996 25.0413 22.3998C20.4022 22.3998 16.6411 18.6394 16.6409 14.0004C16.6409 9.36117 20.4021 5.59998 25.0413 5.59998ZM25.0403 8.39978C24.0472 8.39988 23.1146 8.65916 22.3059 9.11267C23.4354 9.14717 24.3409 10.0716 24.3411 11.2094C24.3411 12.3691 23.4003 13.3099 22.2405 13.3099C21.105 13.3097 20.1818 12.4079 20.1438 11.2816C19.6961 12.0864 19.4408 13.0131 19.4407 13.9994C19.4407 17.092 21.9478 19.5997 25.0403 19.6C28.1331 19.6 30.6409 17.0922 30.6409 13.9994C30.6406 10.9069 28.1329 8.39978 25.0403 8.39978Z" fill="#FFF"/></svg>';
+
+  // logo 連到 Overview（從 LUMITURE_NAV 拿 href）；在 Overview 頁本身不連自己，也就沒有 hover 變形
+  function _renderLogo() {
+    var nav = window.LUMITURE_NAV || [];
+    var home = nav.filter(function (e) { return e.type === 'item' && e.id === 'overview'; })[0];
+    var linked = home && home.href && !home.disabled && window.LUMITURE_ACTIVE !== 'overview';
+    var open = linked ? '<a class="lt-sb-logo is-link" href="' + _esc(home.href) + '" title="Go to Overview">' : '<div class="lt-sb-logo">';
+    return open +
+      '<div class="lt-sb-logo-wrap">' + LOGO_ICON + '</div>' +
       '<span class="lt-sb-logo-text">LumiTure.ai</span>' +
-    '</div>';
+      '<span class="lt-sb-proto" title="Prototype">PROTO<span class="lt-sb-proto-x">TYPE</span></span>' +
+      '<div class="lt-sb-logo-p" aria-hidden="true"><svg viewBox="0 0 39.10 34.00" fill="none">' + P_MARK_INNER + '</svg></div>' +
+    (linked ? '</a>' : '</div>');
+  }
 
   // ===== Helpers =====
   function _esc(s) {
@@ -2417,7 +2465,7 @@ bindTips();
     }
     // If mount is not already a sidebar, wrap it
     mount.classList.add('lt-sidebar');
-    mount.innerHTML = LOGO_HTML + _renderNav() + _renderCollapseBtn();
+    mount.innerHTML = _renderLogo() + _renderNav() + _renderCollapseBtn();
 
     // Group toggle
     mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
@@ -2460,9 +2508,19 @@ bindTips();
     rerender: _render,
   };
 
+  // 頁面自己沒設 favicon 才補，分頁列一眼分得出 prototype 跟正式站
+  function _injectFavicon() {
+    if (document.querySelector('link[rel~="icon"]')) return;
+    var l = document.createElement('link');
+    l.rel = 'icon'; l.type = 'image/svg+xml';
+    l.href = 'data:image/svg+xml,' + encodeURIComponent(FAVICON_SVG);
+    document.head.appendChild(l);
+  }
+
   // ===== INIT =====
   function _init() {
     _injectCSS();
+    _injectFavicon();
     _render();
     // Dispatch resize so chart libraries (ECharts 等) 重新測量容器
     // —— 避免 inline script 已先 init chart 後，shared CSS 才 inject 導致 layout shift
@@ -2581,14 +2639,15 @@ bindTips();
   // ===== CSS =====
   var CSS = [
     /* ---------- Topbar 容器 ---------- */
-    '.lt-topbar{background:#002663;padding:14px 32px;display:flex;align-items:center;justify-content:flex-end;gap:16px;',
-    'position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px;box-sizing:border-box}',
+    /* 2026-10-02 照 Figma LumiTag #01：高 64、左右內距 24、無底線；帳號區與紅點是刻意的，不動 */
+    '.lt-topbar{background:#002663;padding:14px 24px;display:flex;align-items:center;justify-content:flex-end;gap:16px;',
+    'position:sticky;top:0;z-index:50;border-bottom:none;min-height:64px;box-sizing:border-box}',
 
     /* Icon button */
     '.lt-tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;',
-    'cursor:pointer;color:rgba(255,255,255,.7);background:none;border:none;padding:0;position:relative;font-family:inherit;transition:background .15s,color .15s}',
+    'cursor:pointer;color:#fff;background:none;border:none;padding:0;position:relative;font-family:inherit;transition:background .15s,color .15s}',
     '.lt-tb-ic:hover{background:rgba(255,255,255,.08);color:#fff}',
-    '.lt-tb-ic .material-symbols-outlined{font-size:22px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 22}',
+    '.lt-tb-ic .material-symbols-outlined{font-size:30px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 30}',
     '.lt-tb-ic .lt-tb-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:#FF403D;',
     'border:2px solid #002663;border-radius:50%}',
 
@@ -2637,8 +2696,8 @@ bindTips();
     '.lt-q-label{font-size:12.5px;color:rgba(255,255,255,.9);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
     '.lt-q-val{font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:3px}',
     '.lt-q-val .material-symbols-outlined{font-size:13px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 13}',
-    /* hover tooltip（Lumiture 非圖表 tooltip 規範：#3C3C3C 深底白字） */
-    '.lt-q-tip{position:absolute;top:calc(100% + 2px);left:8px;right:8px;z-index:5;background:#3C3C3C;color:#fff;',
+    /* hover tooltip（Lumiture 非圖表 tooltip 規範：#31383E 深底白字） */
+    '.lt-q-tip{position:absolute;top:calc(100% + 2px);left:8px;right:8px;z-index:5;background:#31383E;color:#fff;',
     'font-size:11.5px;font-weight:400;line-height:1.45;padding:8px 10px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.3);',
     'opacity:0;visibility:hidden;transform:translateY(-2px);transition:opacity .12s,transform .12s;pointer-events:none}',
     '.lt-q-item.has-tip:hover .lt-q-tip,.lt-q-item.has-tip:focus-within .lt-q-tip{opacity:1;visibility:visible;transform:none}',
@@ -2947,6 +3006,7 @@ bindTips();
  *     page:      string?,          // matches DEMO_PAGES[].id (alias: 'tab' for backwards compat)
  *     category:  string?,          // matches DEMO_CATEGORIES[].id
  *     isNoData:  boolean?,         // groups under "no data" sub-divider
+ *     group:     string?,          // 2026-09-30：同一頁內的分組小標（依第一次出現的順序排）。沒寫 group 的頁面行為完全不變
  *     disabled:  boolean?,         // shows "Soon" badge, not clickable
  *   }
  *
@@ -3044,6 +3104,9 @@ bindTips();
     '.demo-sub-sep{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;',
     'color:#9CAEC4;letter-spacing:.4px;text-transform:uppercase;margin:10px 0 6px}',
     '.demo-sub-sep::before,.demo-sub-sep::after{content:\'\';flex:1;height:1px;background:rgba(14,58,130,.1)}',
+    /* Group header（scenario.group，2026-09-30） */
+    '.demo-grp-sep{font-size:11px;font-weight:700;color:#676767;margin:12px 0 6px;letter-spacing:0}',
+    '.demo-grp-sep:first-child{margin-top:0}',
 
     /* Button group */
     '.demo-buttons{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}',
@@ -3076,7 +3139,7 @@ bindTips();
     '.demo-page-tab[data-tip]::after,.demo-cat-tab[data-tip]::after{display:none!important}',
 
     /* #gl-tip — body-level fixed tooltip (auto-injected) */
-    '#gl-tip{position:fixed;background:#3C3C3C;color:#fff;font-size:12px;line-height:1.4;',
+    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:12px;line-height:1.4;',
     'padding:6px 10px;border-radius:4px;max-width:320px;white-space:normal;',
     'pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25);',
     'font-family:\'Noto Sans\',sans-serif}'
@@ -3148,7 +3211,17 @@ bindTips();
     }
     var normal = scenarios.filter(function (s) { return !s.isNoData; });
     var noData = scenarios.filter(function (s) { return s.isNoData; });
-    var html = _renderGroup(normal);
+    var html = '';
+    if (normal.some(function (s) { return !!s.group; })) {
+      var order = [];
+      normal.forEach(function (s) { var g = s.group || ''; if (order.indexOf(g) < 0) order.push(g); });
+      order.forEach(function (g) {
+        if (g) html += '<div class="demo-grp-sep">' + _esc(g) + '</div>';
+        html += _renderGroup(normal.filter(function (s) { return (s.group || '') === g; }));
+      });
+    } else {
+      html = _renderGroup(normal);
+    }
     if (noData.length) {
       html += '<div class="demo-sub-sep">no data</div>' + _renderGroup(noData);
     }
@@ -3320,24 +3393,37 @@ bindTips();
     tip.id = 'gl-tip';
     document.body.appendChild(tip);
     var cur = null;
-    document.addEventListener('mouseover', function (e) {
-      var el = e.target.closest('[data-tip]');
-      if (!el || el === cur) return;
-      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block';
-    });
-    document.addEventListener('mousemove', function (e) {
-      if (!cur) return;
-      var tw = tip.offsetWidth, th = tip.offsetHeight;
-      var x = e.clientX - tw / 2, y = e.clientY - th - 10;
-      if (x < 8) x = 8;
-      if (x + tw > window.innerWidth - 8) x = window.innerWidth - tw - 8;
-      if (y < 8) y = e.clientY + 16;
+    // 2026-10-09 Kabin 裁決：全站 tooltip 改成錨在元件上（Figma／MUI 行為），不再跟著游標跑。
+    // 規則照 Anomaly Detection #01-3 量到的：預設出現在元件上方 6px、水平靠元件左緣，
+    // 右邊放不下就改靠元件右緣 +2；上方放不下改到下方。
+    // 可選屬性：data-tip-pos="below"（固定放下方）、data-tip-dy（下方距離，預設 4）、
+    // data-tip-anchor（CSS 選擇器，錨在子元素上）、data-tip-align="content-right"（右緣對齊內容右緣 −16）。
+    function place() {
+      if (!cur || !cur.isConnected) { cur = null; tip.style.display = 'none'; return; }
+      var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
+      var r = a.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var x = r.left;
+      if (x + tw > vw - 8) x = Math.max(8, Math.min(r.right + 2, vw - 8) - tw);
+      if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
+      var below = cur.dataset.tipPos === 'below';
+      var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
+      var y = below ? r.bottom + dy : r.top - th - 6;
+      if (y < 8) y = r.bottom + 4;
+      if (y + th > vh - 8) y = Math.max(8, r.top - th - 6);
       tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    }
+    document.addEventListener('mouseover', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (!el || (el === cur && tip.style.display !== 'none')) return;
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place();
     });
     document.addEventListener('mouseout', function (e) {
-      var el = e.target.closest('[data-tip]');
-      if (el && el === cur) { cur = null; tip.style.display = 'none'; }
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && el === cur && !el.contains(e.relatedTarget)) { cur = null; tip.style.display = 'none'; }
     });
+    window.addEventListener('scroll', place, true);
+    window.addEventListener('resize', place);
   }
 
   // ===== PUBLIC API =====
