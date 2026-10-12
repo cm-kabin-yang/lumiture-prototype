@@ -687,6 +687,16 @@
 .v10-s2 #ed-vals>.vc:not(.ac),.v10-s2 #cr-vals>.vc:not(.ac){display:none}
 .v10-s2 .v9-zone-h,.v10-s2 .v9-zone-d{display:none}
 .v10-s2 .v10-keycard,.v10-s2 .tag-rules-info,.v10-s2 .vals-empty-box,.v10-s2 .vals-err{display:none!important}
+.v10-s2 .v9-zone-empty{display:none!important}
+.v10-split{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;border:1px solid var(--g200);border-radius:var(--r-md);background:var(--wh);padding:14px 16px;margin-bottom:16px;cursor:pointer;font-family:inherit;color:var(--g900)}
+.v10-split:hover{border-color:var(--g400)}
+.v10-split.is-on{border-color:var(--pri);background:#F5FAFF}
+.v10-split .checkbox{margin-top:3px}
+.v10-split-t{font-size:14px;font-weight:700;line-height:1.6}
+.v10-split-opt{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:4px;background:var(--g100);color:var(--g600);font-size:12px;font-weight:400;margin-left:8px;vertical-align:1px}
+.v10-split-d{font-size:12px;color:var(--g600);margin-top:2px;line-height:1.6}
+.v10-done{display:flex;align-items:flex-start;gap:8px;border:1px dashed var(--g300);border-radius:var(--r-md);padding:14px 16px;margin-bottom:16px;font-size:14px;color:var(--g700)}
+.v10-done .material-symbols-outlined{color:var(--ok);font-variation-settings:'FILL' 1;font-size:20px}
 .v10-direct{background:var(--g50);border-radius:var(--r-md);padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--g700)}
 .v10-direct-h{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:600;color:var(--g800);font-size:14px}
 .v10-direct-h .material-symbols-outlined{font-size:18px;color:var(--g500)}
@@ -1769,7 +1779,7 @@ if(S._previewLoading){
   el.innerHTML=`<div class="pg-hdr"><a class="back-btn" href="#" onclick="showLeaveConfirm('list');return false"><span class="material-symbols-outlined">arrow_circle_left</span>LumiTag List</a><div class="pg-hdr-row"><div class="pg-title">Coverage Preview</div></div></div>
 <div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span class="skeleton" style="display:inline-block;width:240px;height:16px;border-radius:4px"></span><span class="skeleton" style="display:inline-block;width:200px;height:14px;border-radius:4px"></span></div>${skBar}${skLeg}</div>
 <div class="card" style="margin-bottom:24px"><div class="st" style="margin-bottom:16px">Spend Breakdown</div><div class="pt-wrap"><table class="pt" style="table-layout:fixed">${skColW}<thead><tr><th>Tag Value</th><th style="text-align:right">30 Days Spend</th><th>Share of Spend</th></tr></thead><tbody>${Array(5).fill(skRow).join('')}</tbody></table></div></div>
-<div class="sbtm"><button class="btn btn-o" onclick="${S._isNew?`go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_circle_left</span>Back to Edit</button><div class="ssp"></div><button class="btn btn-o" disabled style="opacity:.45;cursor:not-allowed">Save as Inactive Tag</button><button class="btn btn-p" disabled style="opacity:.45;cursor:not-allowed">Apply LumiTag</button></div>`;
+<div class="sbtm"><button class="btn btn-o" onclick="${S._isNew?`S._v10Restore=true;go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_circle_left</span>Back to Edit</button><div class="ssp"></div><button class="btn btn-o" disabled style="opacity:.45;cursor:not-allowed">Save as Inactive Tag</button><button class="btn btn-p" disabled style="opacity:.45;cursor:not-allowed">Apply LumiTag</button></div>`;
   return;
 }
 
@@ -1812,7 +1822,7 @@ const draftBtn=`<button class="btn btn-o" onclick="showSaveDraftModal('${t.id}',
 el.innerHTML=`<div class="pg-hdr"><a class="back-btn" href="#" onclick="showLeaveConfirm('list');return false"><span class="material-symbols-outlined">arrow_circle_left</span>LumiTag List</a><div class="pg-hdr-row"><div class="pg-title">Coverage Preview</div></div></div>
 <div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div class="st">Coverage for LumiTag: ${t.name}</div><span style="font-size:12px;font-weight:500;color:var(--g500)">Total 30 Days Spend: <strong style="font-weight:500">${fmtFull(t.totalCost)}</strong></span></div>${bar}${leg}</div>
 <div class="card" style="margin-bottom:24px"><div class="st" style="margin-bottom:16px">Spend Breakdown</div><div class="pt-wrap"><table class="pt" style="table-layout:fixed">${colW}<thead><tr><th>Tag Value</th><th style="text-align:right">30 Days Spend</th><th>Share of Spend</th></tr></thead><tbody>${trows}</tbody></table></div>${untaggedFooter}</div>
-<div class="sbtm"><button class="btn btn-o" onclick="${S._isNew?`go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_circle_left</span>Back to Edit</button><div class="ssp"></div>${draftBtn}<button class="btn btn-p" onclick="showApplyModal('${t.id}',${ar},${ur},'${pct(ar,t.totalRes)}','${pct(ur,t.totalRes)}')">Apply LumiTag</button></div>`;
+<div class="sbtm"><button class="btn btn-o" onclick="${S._isNew?`S._v10Restore=true;go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_circle_left</span>Back to Edit</button><div class="ssp"></div>${draftBtn}<button class="btn btn-p" onclick="showApplyModal('${t.id}',${ar},${ur},'${pct(ar,t.totalRes)}','${pct(ur,t.totalRes)}')">Apply LumiTag</button></div>`;
 setTimeout(()=>{document.querySelectorAll('#v-preview .aseg').forEach(s=>{if(s.offsetWidth<44){const sp=s.querySelector('.seg-pct');if(sp)sp.style.visibility='hidden';}});},50);}
 
 function saveDraft(id){if(S._tmp){const origTag=S.tags.find(x=>x.id===id);const wa=origTag?.wasActive||S._tmp.wasActive||false;if(S._isNew)S.tags.push({...S._tmp,status:'inactive',wasActive:wa});else{const i=S.tags.findIndex(x=>x.id===id);if(i>=0)S.tags[i]={...S._tmp,status:'inactive',wasActive:wa}}S._tmp=null;S._isNew=false}go('list');toast('Tag saved as inactive successfully.')}
@@ -2926,7 +2936,7 @@ function v9RenderPreview(t,el){
 ${acHtml}
 <div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div class="st">Spend Breakdown</div>${canToggle?`<span style="flex:1"></span>${v9ParkedBadge('proposal')}<div class="v9-seg" role="tablist"><button type="button" class="${before?'':'on'}" onclick="S._pvMode='after';go('preview','${t.id}')">After allocation</button><button type="button" class="${before?'on':''}" onclick="S._pvMode='before';go('preview','${t.id}')">Before allocation</button></div>`:''}</div><div class="pt-wrap"><table class="pt" style="table-layout:fixed">${colW}<thead><tr><th>Tag Value</th>${twoCol?`<th style="text-align:right">Direct <span class="info-tip" tabindex="0" data-tip="Cost that value cards assign to this value."><span class="material-symbols-outlined">info</span></span></th><th style="text-align:right">Allocated <span class="info-tip" tabindex="0" data-tip="Shared cost that allocation cards split to this value. It's an estimate from your rules, not measured cost."><span class="material-symbols-outlined">info</span></span></th>`:''}<th style="text-align:right">30 Days Spend</th><th>Share of Spend</th><th>Resources <span class="info-tip" tabindex="0" data-tip="After shared cost is split, one resource can count toward several values, so these numbers don't add up."><span class="material-symbols-outlined">info</span></span></th></tr></thead><tbody>${trows}</tbody></table></div>${untaggedFooter}${kubeLine}</div>
 ${kubeHtml}${conflictHtml}
-<div class="sbtm"><button class="btn btn-o" onclick="${S._isNew?`go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_circle_left</span>Back to Edit</button><div class="ssp"></div><button class="btn btn-o" onclick="showSaveDraftModal('${t.id}',${!!S.tags.find(x=>x.id===t.id&&x.status==='active')})">Save as Inactive Tag</button><button class="btn btn-p" onclick="v9ShowApply('${t.id}',${cover},${uc},${valCount},${acAll.reduce((s,x)=>s+(x.info.allocated||0),0)})">Apply LumiTag</button></div>`;
+<div class="sbtm"><button class="btn btn-o" onclick="${S._isNew?`S._v10Restore=true;go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_circle_left</span>Back to Edit</button><div class="ssp"></div><button class="btn btn-o" onclick="showSaveDraftModal('${t.id}',${!!S.tags.find(x=>x.id===t.id&&x.status==='active')})">Save as Inactive Tag</button><button class="btn btn-p" onclick="v9ShowApply('${t.id}',${cover},${uc},${valCount},${acAll.reduce((s,x)=>s+(x.info.allocated||0),0)})">Apply LumiTag</button></div>`;
   setTimeout(()=>{el.querySelectorAll('.aseg').forEach(s=>{if(s.offsetWidth<44){const sp=s.querySelector('.seg-pct');if(sp)sp.style.visibility='hidden'}})},50);
 }
 
@@ -3071,11 +3081,13 @@ function v10Apply(prefix){
   hdr.querySelector('span').textContent=S._step===1?'Value Cards':'Shared Cost Allocation';
   if(addBtn){if(!addBtn._v9Html)addBtn._v9Html=addBtn.innerHTML;
     addBtn.innerHTML=`<span class="material-symbols-outlined">add</span>${S._step===1?'Add Value Card':'Add Allocation Card'}`;
-    addBtn.onclick=S._step===1?function(){tryAddVC(cid);v9Sched(cid)}:function(){v9TryAddAC(cid)}}
+    addBtn.onclick=S._step===1?function(){tryAddVC(cid);v9Sched(cid)}:function(){v9TryAddAC(cid)};
+    /* 2026-10-12 會議：Phase 1 只有一張 allocation card → 第 2 步不放 Add 按鈕，改用下方的勾選 */
+    addBtn.style.display=S._step===2?'none':''}
   const d=document.createElement('div');d.className='v10-desc';
   d.innerHTML=S._step===1
     ?'Value cards assign direct cost: each card gives the cost it matches to one value. Cards are checked from top to bottom, and the first match wins.'
-    :"Optional. Allocation cards split cost that no value card has taken, by each value's direct cost from step 1. They always run after all value cards.";
+    :"Optional. Split cost that no value card has taken across your values, by each value's direct cost from step 1.";
   hdr.after(d);
   if(S._step===2){const sm=document.createElement('div');sm.className='v10-direct';d.after(sm)}
   // 底部按鈕：第 1 步 Next；第 2 步 Back＋Coverage Preview
@@ -3119,6 +3131,31 @@ function v10UpdDirect(cid){
   box.innerHTML=`<div class="v10-direct-h"><span class="material-symbols-outlined">sell</span>Direct cost from value cards<span class="v10-direct-sub">Last 30 days</span><a href="#" onclick="event.preventDefault();v10Go('${v10Pfx(cid)}',1)">Edit value cards</a></div>
 <div class="v10-direct-list">${names.map(n=>`<span class="v10-direct-item">${n} <strong>${v9fmt(R.direct[n]||0)}</strong></span>`).join('')||'<span class="ac-muted">No value has direct cost yet.</span>'}<span class="v10-direct-rest">Not taken by any value card <strong>${v9fmt(Math.max(0,total-direct))}</strong></span></div>`;
   const ze=ctn.querySelector('.v9-zone-empty');if(ze)ze.innerHTML='No shared cost to split? Continue to <strong>Coverage Preview</strong>. To split shared cost across values, use <strong>Add Allocation Card</strong>.';
+  /* 2026-10-12：只有一張 allocation card → 用勾選代替 Add 按鈕。
+   * 勾選是「主動選擇」：加了 allocation card，這個 tag 就會對 Manager、Member 隱藏，不能預設幫使用者打開。
+   * 依 Guideline，要按套用才生效的選項用 checkbox（switch 是即時生效）。 */
+  const rest=Math.max(0,total-direct);const hasAC=cards.some(c=>c.type==='alloc');
+  box.parentNode.querySelectorAll(':scope>.v10-split,:scope>.v10-done').forEach(x=>x.remove());
+  let html;
+  if(rest<=0&&!hasAC){
+    html=`<div class="v10-done"><span class="material-symbols-outlined">check_circle</span><span>All cost in this tag is already assigned by value cards, so there's nothing left to split. Continue to <strong>Coverage Preview</strong>.</span></div>`;
+  }else{
+    html=`<button type="button" class="v10-split${hasAC?' is-on':''}" role="checkbox" aria-checked="${hasAC}" onclick="v10ToggleSplit('${cid}',${!hasAC})">${LumiCheckbox.html({checked:hasAC})}<span><span class="v10-split-t">Split the remaining ${v9fmt(rest)} across values<span class="v10-split-opt">Optional</span></span><span class="v10-split-d" style="display:block">Splits this cost by each value's direct cost from step 1. Managers and Members won't see this tag in Cost Dashboard.</span></span></button>`;
+  }
+  box.insertAdjacentHTML('afterend',html);
+}
+/* 勾選 → 加入唯一的 allocation card（value 自動帶入）；取消 → 移除，設定先暫存，再勾回來時還原 */
+function v10ToggleSplit(cid,on){
+  const ctn=document.getElementById(cid);if(!ctn)return;S._acStash=S._acStash||{};
+  if(on){
+    if(ctn.querySelector('.vc.ac'))return;
+    const st=S._acStash[cid];
+    if(st){const card=addAC(cid,st);renum(cid);v9Sched(cid);card.scrollIntoView({behavior:'smooth',block:'nearest'})}
+    else v9TryAddAC(cid);
+  }else{
+    const acs=[...ctn.querySelectorAll('.vc.ac')];if(!acs.length)return;
+    S._acStash[cid]=v9CollectAC(acs[0]);acs.forEach(c=>c.remove());S._isDirty=true;renum(cid);v9Sched(cid);
+  }
 }
 const _v10UpdAll=v9UpdAll;v9UpdAll=function(cid){_v10UpdAll(cid);if(v10On()&&S._step===2)v10UpdDirect(cid)};
 const _v10RE=renderEdit;renderEdit=function(id){_v10RE(id);v10Apply('ed');
@@ -3132,7 +3169,15 @@ const _v10RE=renderEdit;renderEdit=function(id){_v10RE(id);v10Apply('ed');
     tip.style.left=Math.max(8,Math.min(r.left,window.innerWidth-tip.offsetWidth-8))+'px';tip.style.top=(r.bottom+8)+'px'});
   document.addEventListener('focusout',e=>{const el=e.target.closest&&e.target.closest('[data-tip]');const tip=document.getElementById('gl-tip');if(el&&tip)tip.style.display='none'});
 })();
-const _v10RC=renderCreate;renderCreate=function(){_v10RC();v10Apply('cr')};
+/* 2026-10-12 修：新建的 tag 從 Preview 按 Back to Edit，建立頁會整個重來、卡片全部不見。
+ * 改成從 S._tmp 把 tag key、value card、allocation card 還原回來（Edit 頁本來就是這樣做） */
+const _v10RC=renderCreate;renderCreate=function(){_v10RC();
+  if(S._v10Restore&&S._isNew&&S._tmp){const t=S._tmp;S._v10Restore=false;
+    const nm=document.getElementById('cr-name');if(nm)nm.value=t.name||'';
+    const eb=document.getElementById('cr-vals-empty');if(eb)eb.style.display='none';
+    (t.values||[]).forEach(v=>v.type==='alloc'?addAC('cr-vals',v):addVC('cr-vals',v.name,v.cspBlocks,v.res,v.cost));
+    renum('cr-vals');v9Sched('cr-vals');}
+  v10Apply('cr')};
 /* 從 List 進 Edit／Create 一律從第 1 步開始；Preview 的 Back to Edit 回到原本那一步 */
 const _v10Go=go;go=function(n,p){const from=document.querySelector('.view.active')?.id;if((n==='edit'||n==='create')&&from==='v-list'&&!S._v10Hold)S._step=1;return _v10Go(n,p)};
 const _v10Demo=window.DEMO_APPLY;window.DEMO_APPLY=function(name,btn){S._v10Hold=true;try{return _v10Demo(name,btn)}finally{S._v10Hold=false}};
@@ -3140,6 +3185,54 @@ const _v10Demo=window.DEMO_APPLY;window.DEMO_APPLY=function(name,btn){S._v10Hold
 const _v10CFA=v9CreateForAC;v9CreateForAC=function(acid,cid){if(v10On()&&S._step!==1){S._step=1;v10Apply(v10Pfx(cid))}_v10CFA(acid,cid)};
 const _v10BTA=v9BackToAC;v9BackToAC=function(acid){const ac=document.querySelector(`[data-acid=${acid}]`);const cid=ac?.closest('[id]')?.id;if(v10On()&&S._step!==2&&cid){S._step=2;v10Apply(v10Pfx(cid))}setTimeout(()=>_v10BTA(acid),60)};
 const _v10Kube=v9KubeCreate;v9KubeCreate=function(id){S._step=1;_v10Kube(id)};
+
+/* ---------- v10：原生下拉換成自製選單（2026-10-12 Kabin：分享螢幕時看不到原生 select 的選單） ----------
+ * 做法：把每個 <select> 藏起來，旁邊放一顆外觀相同的按鈕；選單選了之後寫回原本的 select 並觸發 change，
+ * 所以原本讀 select.value、onchange 的邏輯都不用改。之後動態長出來的 select 由 MutationObserver 自動接管。 */
+(function(){
+  const st=document.createElement('style');st.textContent=`
+.nsel-btn{display:inline-flex;align-items:center;justify-content:space-between!important;gap:6px;box-sizing:border-box;cursor:pointer;text-align:left;font-family:inherit;white-space:nowrap;overflow:hidden}
+.nsel-btn .nsel-t{flex:1 1 auto;min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis}
+.nsel-off{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;overflow:hidden!important;margin:0!important;padding:0!important;border:0!important}
+.nsel-btn .material-symbols-outlined{font-size:20px;color:var(--g500);flex-shrink:0}
+.nsel-btn:disabled{cursor:not-allowed;opacity:.6}
+.nsel-menu{position:fixed;z-index:3000;min-width:160px;max-height:300px;overflow:auto;overscroll-behavior:contain;background:#fff;border-radius:6px;box-shadow:0 0 6px rgba(0,0,0,.2);padding:4px 0}
+.nsel-menu button{display:block;width:100%;text-align:left;border:none;background:none;padding:0 12px;height:40px;font-size:14px;font-family:inherit;color:var(--g900);cursor:pointer;white-space:nowrap}
+.nsel-menu button:hover{background:#F6F6F6}
+.nsel-menu button.on{background:#D1EEFF;color:#002663}
+.nsel-menu button:disabled{color:var(--g400);cursor:default;background:none}`;
+  document.head.appendChild(st);
+  let menu=null,cur=null;
+  const label=sel=>{const o=sel.options[sel.selectedIndex];return o?o.text:''};
+  function close(){if(menu){menu.remove();menu=null;cur=null}}
+  function open(sel,btn){close();cur=sel;menu=document.createElement('div');menu.className='nsel-menu';
+    [...sel.options].forEach((o,i)=>{if(o.hidden)return;const b=document.createElement('button');b.type='button';b.textContent=o.text;if(i===sel.selectedIndex)b.className='on';if(o.disabled)b.disabled=true;
+      b.onclick=e=>{e.stopPropagation();sel.selectedIndex=i;sync(sel);close();sel.dispatchEvent(new Event('input',{bubbles:true}));sel.dispatchEvent(new Event('change',{bubbles:true}))};menu.appendChild(b)});
+    document.body.appendChild(menu);const r=btn.getBoundingClientRect();menu.style.minWidth=r.width+'px';
+    const below=window.innerHeight-r.bottom;menu.style.left=Math.min(r.left,window.innerWidth-menu.offsetWidth-8)+'px';
+    menu.style.top=(below<menu.offsetHeight+8&&r.top>menu.offsetHeight+8?r.top-menu.offsetHeight-4:r.bottom+4)+'px';
+    const on=menu.querySelector('.on');if(on)on.scrollIntoView({block:'nearest'})}
+  function sync(sel){const b=sel._nselBtn;if(!b)return;const t=b.querySelector('.nsel-t');const l=label(sel);if(t.textContent!==l)t.textContent=l;b.disabled=sel.disabled;
+    const hiddenByCode=sel.hidden||sel.style.display==='none'||getComputedStyle(sel).display==='none';
+    if(hiddenByCode){b.style.display='none';return}
+    b.style.display='';
+    if(!b._styled){if(sel.offsetParent!==null)copyStyle(sel,b);b.style.visibility=b._styled?'':'hidden'}}
+  function copyStyle(sel,b){const cs=getComputedStyle(sel);if(!cs.width||cs.display==='none')return;
+    ['width','minWidth','maxWidth','height','paddingLeft','paddingRight','borderTopWidth','borderRightWidth','borderBottomWidth','borderLeftWidth','borderTopStyle','borderRightStyle','borderBottomStyle','borderLeftStyle','borderTopColor','borderRightColor','borderBottomColor','borderLeftColor','borderRadius','fontSize','fontWeight','color','backgroundColor','flex','flexGrow','flexShrink','flexBasis','marginLeft','marginRight','marginTop','marginBottom'].forEach(k=>b.style[k]=cs[k]);
+    b.style.paddingRight='10px';/* 原生 select 右側留給自己箭頭的空間不要照搬，不然箭頭不會靠右 */
+    b._styled=true;sel.classList.add('nsel-off');b.style.visibility=''}
+  function enhance(sel){if(sel._nselBtn||sel.multiple||sel.closest('.nsel-skip'))return;
+    const b=document.createElement('button');b.type='button';b.className='nsel-btn';b.innerHTML='<span class="nsel-t"></span><span class="material-symbols-outlined">expand_more</span>';
+    b.onclick=e=>{e.stopPropagation();if(b.disabled)return;cur===sel?close():open(sel,b)};
+    sel._nselBtn=b;b._sel=sel;sel.after(b);sync(sel);requestAnimationFrame(()=>sync(sel))}
+  function scan(root){(root.querySelectorAll?root.querySelectorAll('select'):[]).forEach(enhance);if(root.tagName==='SELECT')enhance(root)}
+  new MutationObserver(ms=>ms.forEach(m=>{m.removedNodes.forEach(n=>{if(n.nodeType!==1)return;(n.tagName==='SELECT'?[n]:[...(n.querySelectorAll?n.querySelectorAll('select'):[])]).forEach(x=>{if(x._nselBtn&&!x.isConnected){x._nselBtn.remove();x._nselBtn=null}})});m.addedNodes.forEach(n=>{if(n.nodeType===1)scan(n)})})).observe(document.body,{childList:true,subtree:true});
+  scan(document.body);
+  setInterval(()=>{document.querySelectorAll('.nsel-btn').forEach(b=>{if(!b._sel||!b._sel.isConnected||b._sel._nselBtn!==b)b.remove()});document.querySelectorAll('select').forEach(sel=>{if(sel._nselBtn){if(!sel._nselBtn.isConnected){sel._nselBtn=null;enhance(sel)}else sync(sel)}})},250);
+  document.addEventListener('click',e=>{if(menu&&!menu.contains(e.target))close()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+  window.addEventListener('scroll',e=>{if(menu&&menu.contains(e.target))return;close()},true);window.addEventListener('resize',close);
+})();
 
 /* ---------- v10：Workload 值選單改成「輸入後搜尋」（RD 2026-10-02） ---------- */
 const _v10BMW=buildMsWrap;
