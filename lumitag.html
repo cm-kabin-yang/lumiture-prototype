@@ -688,6 +688,11 @@
 .v10-s2 .v9-zone-h,.v10-s2 .v9-zone-d{display:none}
 .v10-s2 .v10-keycard,.v10-s2 .tag-rules-info,.v10-s2 .vals-empty-box,.v10-s2 .vals-err{display:none!important}
 .v10-s2 .v9-zone-empty{display:none!important}
+/* 2026-10-12：Phase 1 只有一張 allocation card → 拖曳、序號、垃圾桶都拿掉，移除只用第 2 步的勾選 */
+.v10-s1 .vc.ac .dh,.v10-s2 .vc.ac .dh,.v10-s1 .vc.ac .rv,.v10-s2 .vc.ac .rv{display:none!important}
+.v10-leg-key{margin-left:auto;gap:6px;color:var(--g600)}
+.v10-leg-sw{display:inline-block;width:14px;height:10px;border-radius:2px;background:var(--g500)}
+.v10-leg-sw.is-alloc{margin-left:10px;background:repeating-linear-gradient(45deg,rgba(255,255,255,.55) 0 3px,transparent 3px 6px),color-mix(in srgb,var(--g500) 55%,#fff)}
 .v10-split{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;border:1px solid var(--g200);border-radius:var(--r-md);background:var(--wh);padding:14px 16px;margin-bottom:16px;cursor:pointer;font-family:inherit;color:var(--g900)}
 .v10-split:hover{border-color:var(--g400)}
 .v10-split.is-on{border-color:var(--pri);background:#F5FAFF}
@@ -1660,7 +1665,7 @@ function renum(cid){
   /* 2026-10-06 Kabin：分兩步之後 allocation card 一定排在所有 value card 後面，不需要用藍色序號強調順序
      → value card 照舊 1、2、3；allocation card 不顯示序號，改在標籤上寫「Allocation card 1」（自己一組重新數），Preview 用同一個名字 */
   const el=document.getElementById(cid);if(!el)return;
-  if(typeof v10On==='function'&&v10On()){let v=0,a=0;el.querySelectorAll('.vc').forEach(c=>{if(c.classList.contains('ac')){a++;const t=c.querySelector('.ac-badge-t');if(t)t.textContent='Allocation card '+a}else{v++;const n=c.querySelector('.pn');if(n)n.textContent=v}});return}
+  if(typeof v10On==='function'&&v10On()){let v=0,a=0;el.querySelectorAll('.vc').forEach(c=>{if(c.classList.contains('ac')){a++;const t=c.querySelector('.ac-badge-t');if(t)t.textContent='Allocation card'}else{v++;const n=c.querySelector('.pn');if(n)n.textContent=v}});return}
   el.querySelectorAll('.vc').forEach((c,i)=>{const n=c.querySelector('.pn');if(n)n.textContent=i+1;const t=c.querySelector('.ac-badge-t');if(t)t.textContent='Allocation card'})}
 
 function simMatch(el){const card=el.closest('.vc');if(!card)return;const vm=card.querySelector('[data-vmatch]');if(!vm)return;const nameInput=card.querySelector('.vni');const conds=card.querySelectorAll('.cr');const name=nameInput?.value.trim();
@@ -2617,7 +2622,7 @@ function addAC(cid,cfg){
 <span class="ac-meta" data-tip="${v9Basis().metaTip}"><span class="ac-meta-item">${v9Basis().meta}</span></span>
 <span style="flex:1"></span><span class="material-symbols-outlined rv" data-tip="Remove this Value" onclick="S._isDirty=true;this.closest('.vc').remove();renum('${cid}');updCPV('${cid}')">delete</span></div>
 <div class="ac-body">
-<div class="ac-sec"><span class="ac-sec-t">Shared cost to split</span><span class="ac-sec-d">Cost that matches these conditions and hasn't been taken by a value card or an earlier allocation card.</span></div>
+<div class="ac-sec"><span class="ac-sec-t">Shared cost to split</span><span class="ac-sec-d">Cost that matches these conditions and hasn't been taken by a value card.</span></div>
 <div class="csp-blocks-area"></div><div class="add-csp-wrap"><button class="add-csp-btn" onclick="showCspPicker(this)"><span class="material-symbols-outlined">add</span>Add Data Source</button><div class="csp-picker"></div></div>
 <div class="ac-match" data-acmatch></div>
 <div class="ac-sec" style="margin-top:16px"><span class="ac-sec-t">Split across</span><span class="ac-sec-d">${v9Basis().splitDesc}</span></div>
@@ -2867,7 +2872,13 @@ function v9RenderPreview(t,el){
   const T=R.total;const uc=before?R.untagged-acAll.reduce((s,x)=>s+x.info.unallocated,0):R.untagged;const up=T?uc/T*100:0;
   // Chart
   let bar='<div class="abar">';let leg='<div class="aleg">';
-  vals.forEach((v,i)=>{const p=T?v.total/T*100:0;if(p>0){bar+=`<div class="aseg" style="width:${p}%;background:${COLORS[i%9]}" onmouseenter="showSegTip(event,'${v.name.replace(/'/g,'&apos;')}','${COLORS[i%9]}','${v9fmt(v.total)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${p.toFixed(2)}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${COLORS[i%9]}"></div>${v.name}</div>`}});
+  /* 2026-10-12：每個 value 的色塊分兩段，實心＝Direct、淺色斜線＝Allocated（估算），一眼看出覆蓋率裡哪些是分攤來的 */
+  const anyAlloc=vals.some(v=>v.alloc>0);
+  vals.forEach((v,i)=>{const p=T?v.total/T*100:0;if(p>0){const c=COLORS[i%9];const dp=v.total?v.direct/v.total*100:100;
+    const bg=v.alloc>0?`linear-gradient(90deg,${c} 0 ${dp}%,transparent ${dp}%),repeating-linear-gradient(45deg,rgba(255,255,255,.55) 0 3px,transparent 3px 6px),color-mix(in srgb,${c} 55%,#fff)`:c;
+    const tipv=v.alloc>0?`${v9fmt(v.total)} (Direct ${v9fmt(v.direct)} + Allocated ${v9fmt(v.alloc)})`:v9fmt(v.total);
+    bar+=`<div class="aseg" style="width:${p}%;background:${bg}" onmouseenter="showSegTip(event,'${v.name.replace(/'/g,'&apos;')}','${c}','${tipv}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${p.toFixed(2)}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${COLORS[i%9]}"></div>${v.name}</div>`}});
+  if(anyAlloc)leg+=`<div class="li v10-leg-key"><span class="v10-leg-sw"></span>Direct<span class="v10-leg-sw is-alloc"></span>Allocated (estimated)</div>`;
   pools.forEach(pl=>{const p=T?pl.total/T*100:0;bar+=`<div class="aseg v9-pool-seg" style="width:${p}%" onmouseenter="showSegTip(event,'${pl.name}','#9AA7B8','${v9fmt(pl.total)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${p.toFixed(2)}%</span></div>`;leg+=`<div class="li"><div class="ld v9-pool-seg"></div>${pl.name}</div>`});
   if(up>0){bar+=`<div class="aseg" style="width:${up}%;background:${CLR_UNTAGGED}" onmouseenter="showSegTip(event,'Untagged','${CLR_UNTAGGED}','${v9fmt(uc)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${up.toFixed(2)}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${CLR_UNTAGGED}"></div>Untagged</div>`}
   bar+='</div>';leg+='</div>';
@@ -2912,7 +2923,7 @@ function v9RenderPreview(t,el){
     const takenLinks=[...info.takenBy].map(n=>`<a href="#" class="v10-taken-link" data-tip="Edit this value card" onclick="v10EditCardFromPreview('${String(n).replace(/'/g,"\\'")}');return false">${n}</a>`).join(', ');
     const takenHtml=info.takenAbove?`<div class="v10-taken"><span class="material-symbols-outlined">info</span><span>These conditions also match ${v9fmt(info.takenAbove)} that ${takenLinks} already own${info.takenBy.size>1?'':'s'}. That part isn't split again${info.matched?`, only the remaining ${v9fmt(info.matched)} is`:''}.</span></div>`:'';
     const acNo=acList.findIndex(x=>x.i===i)+1;
-    return `<div class="v9-ac-line">${(typeof v10On==='function'&&v10On())?`<span class="ac-badge"><span class="material-symbols-outlined">call_split</span>Allocation card ${acNo}</span>`:`<span class="pn">${i+1}</span>`}<div>${line}${zeroHtml}${takenHtml}</div></div>`}).join('')}</div>`:'';
+    return `<div class="v9-ac-line">${(typeof v10On==='function'&&v10On())?`<span class="ac-badge"><span class="material-symbols-outlined">call_split</span>${acList.length>1?`Allocation card ${acNo}`:'Allocation card'}</span>`:`<span class="pn">${i+1}</span>`}<div>${line}${zeroHtml}${takenHtml}</div></div>`}).join('')}</div>`:'';
   // ⏸ PARKED：Rule Conflicts（Figma #05 / #05-1 的隱藏元件，註記「暫不實作」）
   const conflictHtml=(S._showParked&&R.multi.length)?(()=>{
     const cspName={GCP:'Google Cloud',AWS:'AWS',Azure:'Azure',FOCUS:'FOCUS'};
@@ -3065,7 +3076,7 @@ function v10Apply(prefix){
   const cid=prefix+'-vals';const ctn=document.getElementById(cid);if(!ctn)return;
   const valsCard=ctn.closest('.card');const hdr=valsCard.firstElementChild;
   view.querySelector('.v10-stepper')?.remove();view.querySelectorAll('.v10-btn').forEach(b=>b.remove());
-  valsCard.querySelector('.v10-desc')?.remove();valsCard.querySelector('.v10-direct')?.remove();
+  valsCard.querySelector('.v10-desc')?.remove();valsCard.querySelector('.v10-direct')?.remove();valsCard.querySelectorAll('.v10-split,.v10-done').forEach(x=>x.remove());
   const bar=view.querySelector('.sbtm');const btns=[...bar.querySelectorAll('button')];
   const cancel=btns.find(b=>b.textContent.trim()==='Cancel');const preview=btns.find(b=>b.textContent.includes('Coverage Preview'));
   const addBtn=document.getElementById(prefix+'-add-val-btn');
@@ -3087,7 +3098,7 @@ function v10Apply(prefix){
   const d=document.createElement('div');d.className='v10-desc';
   d.innerHTML=S._step===1
     ?'Value cards assign direct cost: each card gives the cost it matches to one value. Cards are checked from top to bottom, and the first match wins.'
-    :"Optional. Split cost that no value card has taken across your values, by each value's direct cost from step 1.";
+    :"Split cost that no value card has taken across your values, by each value's direct cost from step 1.";
   hdr.after(d);
   if(S._step===2){const sm=document.createElement('div');sm.className='v10-direct';d.after(sm)}
   // 底部按鈕：第 1 步 Next；第 2 步 Back＋Coverage Preview
@@ -3140,7 +3151,7 @@ function v10UpdDirect(cid){
   if(rest<=0&&!hasAC){
     html=`<div class="v10-done"><span class="material-symbols-outlined">check_circle</span><span>All cost in this tag is already assigned by value cards, so there's nothing left to split. Continue to <strong>Coverage Preview</strong>.</span></div>`;
   }else{
-    html=`<button type="button" class="v10-split${hasAC?' is-on':''}" role="checkbox" aria-checked="${hasAC}" onclick="v10ToggleSplit('${cid}',${!hasAC})">${LumiCheckbox.html({checked:hasAC})}<span><span class="v10-split-t">Split the remaining ${v9fmt(rest)} across values<span class="v10-split-opt">Optional</span></span><span class="v10-split-d" style="display:block">Splits this cost by each value's direct cost from step 1. Managers and Members won't see this tag in Cost Dashboard.</span></span></button>`;
+    html=`<button type="button" class="v10-split${hasAC?' is-on':''}" role="checkbox" aria-checked="${hasAC}" onclick="v10ToggleSplit('${cid}',${!hasAC})">${LumiCheckbox.html({checked:hasAC})}<span><span class="v10-split-t">Split shared cost across values<span class="v10-split-opt">Optional</span></span><span class="v10-split-d" style="display:block">Choose which shared cost to split and it's divided by each value's direct cost from step 1. Managers and Members won't see this tag in Cost Dashboard.</span></span></button>`;
   }
   box.insertAdjacentHTML('afterend',html);
 }
