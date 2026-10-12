@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — Anomaly Detection v1 (Figma-first Build)</title>
+<title>Lumiture.ai — Anomaly Detection v2 (Anomaly Details)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
@@ -276,9 +276,10 @@
  * ============================================================ */
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 <style>
 /* ============================================================
- * Anomaly Detection — route `/budget/anomaly`（本輪只做列表頁；詳情頁 `/budget/anomaly/[alertId]` 另一輪）
+ * Anomaly Detection — route `/budget/anomaly`（列表頁＋Alert Settings 彈窗，v1）＋ `/budget/anomaly/[alertId]`（Anomaly Details 詳情頁，v2；hash `#detail/<alertId>`）
  * 權威順序（Kabin 2026-09-11 裁決）：Figma 設計稿 > tokens.css > Guideline > FE 現況（FE 依據＝2026-08-11 快照，可能已過期）
  * Figma file P3MZ4MmG1pjel2cSbXkUMW，正式 page「Anomaly Detection & Alert」4267:40553（不用 [Draft] 8034:86674、不用 Backup for V1）。數值皆由 REST 節點樹量得。
  * 標記慣例：⚠ DEVIATION＝偏離 Figma 或 FE；⚠ 設計端暫擬＝Figma 沒畫、自己補的；⚠ 未確認＝稿上有但用途或規則不明
@@ -540,6 +541,218 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
 .footer-version{font-weight:var(--lt-fw-medium);color:#262626}
 .footer-version .ver-tag{background:#34B5D9;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}
 .footer-credit{color:#676767;font-size:12px}
+
+/* ============================================================
+ * v2：Anomaly Details（`/budget/anomaly/[alertId]`）
+ * Figma section「Anomaly Details」4520:186300：#02／#02-1／#02-2／#02-3／#04／#05／#06／#07／#08（數值皆由 REST 節點樹量得）
+ * ============================================================ */
+:root{
+  --ad-tip-bg: #31383E;
+  --ad-chart-tip-shadow: 0 0 6px rgba(0,0,0,.2);
+}
+
+/* ---- 頂端 GoBack（Figma：16/700 #004FB0、icon arrow_circle_left 16；Text Button hover 底線只套文字）---- */
+.gb{display:inline-flex;align-items:center;gap:4px;height:25px;align-self:flex-start;font-size:16px;font-weight:var(--lt-fw-bold);line-height:24px;color:var(--lt-color-primary);cursor:pointer}
+.gb .material-symbols-outlined{font-size:16px}
+/* 對稿修正（#02 Arrow_Circle/Left、Right）：稿是 Material Icons 版（箭頭較長、圓較滿），Material Symbols 的 arrow_circle_* 箭頭只剩一小截；改用稿匯出的 16px 向量，顏色跟文字（currentColor）*/
+.ico16{width:16px;height:16px;flex-shrink:0;display:block}
+.gb:hover{color:var(--lt-color-primary-hover)}
+.gb:hover .t{text-decoration:underline}
+.gb:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring);border-radius:5px}
+
+/* ---- 報表卡（Figma：白底 r8 內距 24、區塊間距 32）---- */
+.rpt{gap:32px}
+.rpt-hd{display:flex;align-items:center;gap:10px;min-height:30px}
+.rpt-hd h1{font-size:20px;font-weight:var(--lt-fw-bold);line-height:30px;color:var(--lt-color-text-heading);margin-right:auto}
+.rpt-act{display:flex;align-items:center;gap:8px}
+/* View 1-Month Cost Trend：12/700、文字底線、icon 永遠不畫底線 */
+.tx-link{display:inline-flex;align-items:center;gap:4px;height:30px;font-size:12px;font-weight:var(--lt-fw-bold);line-height:21px;color:var(--lt-color-primary)}
+.tx-link .material-symbols-outlined{font-size:16px}
+.tx-link .t{text-decoration:underline}
+.tx-link:hover{color:var(--lt-color-primary-hover)}
+.tx-link:disabled{color:var(--lt-grey-300);cursor:not-allowed}
+/* 對稿修正（#02／#02-2 Icon button / light）：按鈕 24×24、圖示 18（稿的 Screenshot 是自訂圖示：視窗＋相機，用稿匯出的向量）、hover 圓底 24 #0B6DD7@12% */
+.ib30{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--lt-color-primary);transition:background var(--lt-transition-fast)}
+.ib30 .material-symbols-outlined{font-size:18px}
+.ib30 svg{width:18px;height:18px;display:block}
+.ib30:hover{background:rgba(11,109,215,.12)}
+.ib30:disabled{color:var(--lt-grey-300);cursor:not-allowed;background:none}
+.ib30:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring)}
+
+/* 上半：左資訊、右 AI Analysis（兩欄等寬，AI 隱藏時左欄寬度不變）*/
+.rpt-top{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.rpt-info{display:flex;flex-direction:column;gap:16px;min-width:0}
+.l12{font-size:12px;font-weight:var(--lt-fw-bold);line-height:18px;color:var(--lt-color-text-secondary)}
+.blk{display:flex;flex-direction:column;gap:4px;min-width:0}
+.rn{display:flex;align-items:center;gap:8px;height:30px;min-width:0}
+.rn .csp{flex-shrink:0}
+.rn .nm{font-size:20px;font-weight:var(--lt-fw-bold);line-height:30px;color:var(--lt-color-text-heading);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
+.rn .id{font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:0 0 auto;max-width:45%}
+/* Fable §5 #2：資源名稱過長（AWS account name 上限 50、Azure RG 上限 90）時名稱先截斷、ID 保留（最多佔一行的 45%），兩者都掛 tooltip（#02-2 註記「內容過長的項目 Hover 皆以 Tooltips 顯示全內容」）*/
+.cost-v{display:flex;align-items:flex-end;gap:8px;height:54px}
+.cost-v .v{font-size:36px;font-weight:var(--lt-fw-bold);line-height:54px;color:var(--lt-color-text-heading);font-variant-numeric:tabular-nums}
+.cost-v .u{font-size:12px;font-weight:var(--lt-fw-bold);line-height:18px;color:#0D2037;padding-bottom:8px}
+.adate{font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-secondary)}
+
+/* AI Analysis（⏸ PARKED：純示意，PM 尚未確定功能方向，暫不開發）*/
+.ai{background:var(--lt-color-primary-bg);border:1px solid var(--lt-blue-20);border-radius:10px;padding:15px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.ai.is-parked{border:1px dashed var(--lt-grey-300);background:repeating-linear-gradient(-45deg,var(--lt-color-primary-bg) 0 12px,#E4F3FC 12px 13px)}
+.ai-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:24px}
+.ai-t{display:inline-flex;align-items:center;gap:4px;font-size:16px;font-weight:var(--lt-fw-bold);line-height:24px}
+.ai-t .material-symbols-outlined,.ai-t .tx{background:linear-gradient(180deg,#004FB0,#4ADFFF);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.ai-t .material-symbols-outlined{font-size:16px}
+/* 對稿修正（#02 AI Analysis 標題圖示）：稿是一大一小兩顆星（Material Symbols 的 auto_awesome 是三顆），改用稿匯出的向量當遮罩、底色同一組漸層 */
+.ai-ic{width:16px;height:16px;flex-shrink:0;background:linear-gradient(180deg,#004FB0,#4ADFFF);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5.74796 10.6865C5.86066 10.7661 5.98965 10.8196 6.12558 10.8432C6.26151 10.8667 6.40099 10.8598 6.53391 10.8228C6.66682 10.7858 6.78985 10.7198 6.89408 10.6294C6.99831 10.539 7.08112 10.4265 7.13654 10.3002L7.57654 8.96305C7.68367 8.64141 7.86418 8.34911 8.1038 8.1093C8.34342 7.86948 8.63556 7.68873 8.95711 7.58133L10.236 7.1659C10.4175 7.10232 10.5746 6.98341 10.6851 6.8259C10.7702 6.70628 10.8256 6.56814 10.8468 6.42288C10.868 6.27762 10.8543 6.12941 10.8069 5.99047C10.7595 5.85153 10.6798 5.72586 10.5742 5.62382C10.4687 5.52178 10.3404 5.4463 10.2 5.40362L8.93425 4.99219C8.61246 4.88544 8.31996 4.70521 8.07992 4.46577C7.83989 4.22634 7.65894 3.93428 7.55139 3.61276L7.13596 2.33447C7.07202 2.1534 6.95342 1.99665 6.79654 1.8859C6.63867 1.77704 6.45144 1.71875 6.25968 1.71875C6.06792 1.71875 5.88069 1.77704 5.72282 1.8859C5.56338 1.99851 5.44343 2.15845 5.37996 2.34304L4.95939 3.63733C4.85222 3.95057 4.67514 4.2353 4.44159 4.46994C4.20803 4.70459 3.92413 4.88298 3.61139 4.99162L2.33139 5.40647C2.14925 5.47086 1.99171 5.59041 1.88069 5.7485C1.76966 5.9066 1.71068 6.09536 1.71193 6.28854C1.71319 6.48172 1.77463 6.6697 1.8877 6.82634C2.00078 6.98297 2.15986 7.10047 2.34282 7.16247L3.60911 7.5739C4.01971 7.71156 4.38065 7.96715 4.64682 8.30876C4.79882 8.50476 4.91596 8.72476 4.99311 8.96019L5.40911 10.2368C5.47311 10.4185 5.59196 10.5756 5.74911 10.6865M11.3171 14.1608C11.4334 14.2429 11.5724 14.2869 11.7148 14.2865C11.8563 14.2869 11.9944 14.2436 12.1102 14.1625C12.2293 14.078 12.3185 13.9579 12.3651 13.8196L12.5777 13.1665C12.6226 13.0308 12.6985 12.9076 12.7994 12.8064C12.9003 12.7052 13.0233 12.6289 13.1588 12.5836L13.8251 12.3676C13.9593 12.3197 14.0755 12.2315 14.1578 12.1151C14.2402 11.9988 14.2846 11.8599 14.2851 11.7173C14.2851 11.571 14.2383 11.4285 14.1515 11.3107C14.0648 11.1929 13.9426 11.1059 13.8028 11.0625L13.1491 10.851C13.0134 10.8061 12.8901 10.7301 12.7889 10.6291C12.6877 10.5281 12.6115 10.4049 12.5662 10.2693L12.3491 9.60476C12.3023 9.46912 12.2141 9.35159 12.0969 9.26873C11.9798 9.18586 11.8396 9.14183 11.6961 9.14284C11.5526 9.14385 11.4131 9.18985 11.2971 9.27436C11.1811 9.35886 11.0946 9.47762 11.0497 9.6139L10.836 10.2688C10.7922 10.4026 10.7182 10.5246 10.6199 10.6253C10.5215 10.7261 10.4013 10.8029 10.2685 10.8499L9.60225 11.0659C9.46771 11.1137 9.35121 11.2019 9.26867 11.3183C9.18613 11.4348 9.14158 11.574 9.14111 11.7168C9.14126 11.8608 9.18677 12.0012 9.27118 12.1179C9.3556 12.2346 9.47463 12.3218 9.61139 12.367L10.2651 12.5796C10.4012 12.6248 10.5248 12.7012 10.626 12.8027C10.7272 12.9042 10.8032 13.028 10.848 13.1642L11.0645 13.8288C11.1118 13.963 11.1997 14.0793 11.316 14.1613'/%3E%3C/svg%3E") center/16px 16px no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5.74796 10.6865C5.86066 10.7661 5.98965 10.8196 6.12558 10.8432C6.26151 10.8667 6.40099 10.8598 6.53391 10.8228C6.66682 10.7858 6.78985 10.7198 6.89408 10.6294C6.99831 10.539 7.08112 10.4265 7.13654 10.3002L7.57654 8.96305C7.68367 8.64141 7.86418 8.34911 8.1038 8.1093C8.34342 7.86948 8.63556 7.68873 8.95711 7.58133L10.236 7.1659C10.4175 7.10232 10.5746 6.98341 10.6851 6.8259C10.7702 6.70628 10.8256 6.56814 10.8468 6.42288C10.868 6.27762 10.8543 6.12941 10.8069 5.99047C10.7595 5.85153 10.6798 5.72586 10.5742 5.62382C10.4687 5.52178 10.3404 5.4463 10.2 5.40362L8.93425 4.99219C8.61246 4.88544 8.31996 4.70521 8.07992 4.46577C7.83989 4.22634 7.65894 3.93428 7.55139 3.61276L7.13596 2.33447C7.07202 2.1534 6.95342 1.99665 6.79654 1.8859C6.63867 1.77704 6.45144 1.71875 6.25968 1.71875C6.06792 1.71875 5.88069 1.77704 5.72282 1.8859C5.56338 1.99851 5.44343 2.15845 5.37996 2.34304L4.95939 3.63733C4.85222 3.95057 4.67514 4.2353 4.44159 4.46994C4.20803 4.70459 3.92413 4.88298 3.61139 4.99162L2.33139 5.40647C2.14925 5.47086 1.99171 5.59041 1.88069 5.7485C1.76966 5.9066 1.71068 6.09536 1.71193 6.28854C1.71319 6.48172 1.77463 6.6697 1.8877 6.82634C2.00078 6.98297 2.15986 7.10047 2.34282 7.16247L3.60911 7.5739C4.01971 7.71156 4.38065 7.96715 4.64682 8.30876C4.79882 8.50476 4.91596 8.72476 4.99311 8.96019L5.40911 10.2368C5.47311 10.4185 5.59196 10.5756 5.74911 10.6865M11.3171 14.1608C11.4334 14.2429 11.5724 14.2869 11.7148 14.2865C11.8563 14.2869 11.9944 14.2436 12.1102 14.1625C12.2293 14.078 12.3185 13.9579 12.3651 13.8196L12.5777 13.1665C12.6226 13.0308 12.6985 12.9076 12.7994 12.8064C12.9003 12.7052 13.0233 12.6289 13.1588 12.5836L13.8251 12.3676C13.9593 12.3197 14.0755 12.2315 14.1578 12.1151C14.2402 11.9988 14.2846 11.8599 14.2851 11.7173C14.2851 11.571 14.2383 11.4285 14.1515 11.3107C14.0648 11.1929 13.9426 11.1059 13.8028 11.0625L13.1491 10.851C13.0134 10.8061 12.8901 10.7301 12.7889 10.6291C12.6877 10.5281 12.6115 10.4049 12.5662 10.2693L12.3491 9.60476C12.3023 9.46912 12.2141 9.35159 12.0969 9.26873C11.9798 9.18586 11.8396 9.14183 11.6961 9.14284C11.5526 9.14385 11.4131 9.18985 11.2971 9.27436C11.1811 9.35886 11.0946 9.47762 11.0497 9.6139L10.836 10.2688C10.7922 10.4026 10.7182 10.5246 10.6199 10.6253C10.5215 10.7261 10.4013 10.8029 10.2685 10.8499L9.60225 11.0659C9.46771 11.1137 9.35121 11.2019 9.26867 11.3183C9.18613 11.4348 9.14158 11.574 9.14111 11.7168C9.14126 11.8608 9.18677 12.0012 9.27118 12.1179C9.3556 12.2346 9.47463 12.3218 9.61139 12.367L10.2651 12.5796C10.4012 12.6248 10.5248 12.7012 10.626 12.8027C10.7272 12.9042 10.8032 13.028 10.848 13.1642L11.0645 13.8288C11.1118 13.963 11.1997 14.0793 11.316 14.1613'/%3E%3C/svg%3E") center/16px 16px no-repeat}
+.ai-b{font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-primary)}
+.ai-b b{font-weight:var(--lt-fw-bold)}
+/* ⏸ PARKED badge：樣式複製自 LumiTag v10 的 .v9-parked-badge（不動 shared，第二個 prototype 使用，抽 shared 的條件已達成，見 specs/parked-designs.md）*/
+.pk-badge{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:12px;background:var(--lt-grey-100);color:var(--lt-color-text-primary);font-size:12px;font-weight:600;cursor:help;flex-shrink:0;white-space:nowrap}
+.pk-badge .material-symbols-outlined{font-size:16px}
+
+/* Assigned to（#02／#02-3／#06）*/
+.rpt .asg{display:flex;flex-direction:column;gap:16px}   /* 對稿修正（回歸）：原本寫 .asg，會吃到列表 Assigned to 儲存格（.td.asg），儲存格文字被排成直向、往上跑 */
+.rpt>.asg{margin-top:-16px}   /* 對稿修正（#02 Frame 5719）：上半資訊與 Assigned to 同一組、間距 16（不是報表卡各區塊的 32）*/
+.gt{padding:0 8px;min-width:0}
+.gt-n{position:relative;min-width:0}
+.gt-kids{margin-top:8px;min-width:0}
+.gt-n+.gt-n{margin-top:8px}
+.gt-row{display:flex;align-items:center;gap:8px;height:21px;min-width:0}
+.gt-row.can{cursor:pointer}
+.gt-row.can:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring);border-radius:4px}
+.gt-row .tw{margin:0}
+.chip{display:inline-flex;align-items:center;justify-content:center;height:20px;padding:0 7px;border-radius:4px;background:var(--lt-grey-100);border:1px solid var(--lt-grey-400);color:#7C7C7C;font-size:12px;line-height:18px;flex-shrink:0;white-space:nowrap}
+.gt-tx{font-size:var(--lt-fs-14);line-height:21px;color:var(--lt-color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+/* 階層連線：L 型（#02 左側便條：Meta／Jira 留言串的 L 型連結線）。垂直線與子列左緣在父列 chip 中心，水平腳 20、圓角 8 */
+.gt-n.ch{padding-left:0}
+.gt-n.ch>.gt-row{padding-left:22px}
+.gt-n.ch.d2>.gt-row{padding-left:21px}
+.gt-n.ch::after{content:'';position:absolute;left:0;top:-7px;width:20px;height:17.5px;border-left:1px solid var(--lt-grey-300);border-bottom:1px solid var(--lt-grey-300);border-bottom-left-radius:8px;pointer-events:none}
+.gt-n.ch:not(:last-child)::before{content:'';position:absolute;left:0;top:10px;bottom:-8px;border-left:1px solid var(--lt-grey-300);pointer-events:none}
+.gt-n.ch+.gt-n.ch::after{top:-8px;height:18.5px}
+.gt-kids.k1{margin-left:43.5px}   /* Admin chip 中心（chip 51 寬，前面有 18 的箭頭＋間距）*/
+.gt-kids.k2{margin-left:46px}      /* Tier-1 chip 中心 */
+.gt.no-arrow .gt-kids.k1{margin-left:25.5px}
+/* Fable §7 #1 尾巴：T1 視角根節點是 Tier-1 chip（47 寬，比 Admin 窄 4），連線要對到它的中心，否則偏右約 2px */
+.gt-kids.k1.p-tier{margin-left:41.5px}
+.gt.no-arrow .gt-kids.k1.p-tier{margin-left:23.5px}
+
+/* 圖表區 */
+.sec{display:flex;flex-direction:column;gap:16px;min-width:0}
+.sec-t{display:flex;align-items:center;gap:8px;font-size:var(--lt-fs-18);font-weight:var(--lt-fw-bold);line-height:27px;color:var(--lt-color-text-heading)}
+.sec-t .info{font-size:16px;color:var(--lt-grey-400);cursor:help}
+.c-unit{font-size:12px;font-weight:500;line-height:18px;color:var(--lt-grey-400)}
+.chart{width:100%;height:270px}
+.cwrap{display:flex;flex-direction:column;gap:16px}
+.lgd{display:flex;flex-wrap:wrap;justify-content:center;column-gap:8px;row-gap:4px;padding:0 68px}
+.lg-i{display:inline-flex;align-items:center;gap:4px;height:18px;padding:0;font-size:12px;line-height:18px;color:var(--lt-color-text-secondary);cursor:pointer;white-space:nowrap}
+.lg-i i{width:8px;height:8px;background:var(--c);display:block;flex-shrink:0}
+.lg-i.off{color:var(--lt-grey-400)}
+.lg-i.off i{background:var(--lt-grey-200)}
+.lg-i:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring);border-radius:2px}
+.lgd.is-static .lg-i{cursor:default;pointer-events:none}
+
+/* chart tooltip（Figma #02-2：白底、r5、內距 8、陰影 0 0 6 .2；行：8 圓點＋名稱＋右對齊 $ 金額；Others 固定最後）*/
+.ct{min-width:264px;font-family:var(--lt-font-sans);font-size:12px;line-height:18px;color:#262626}
+.ct .ct-t{padding-bottom:7px;margin-bottom:8px;border-bottom:1px solid var(--lt-grey-300);font-weight:500}   /* 對稿修正（#02-2 Chart / Tooltip）：標題 12/500、分隔線 #CCCCCC */
+.ct .ct-r{display:flex;align-items:center;gap:4px;margin-top:4px}
+.ct .ct-r:first-of-type{margin-top:0}
+.ct .ct-r i{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:block}
+.ct .ct-r .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ct .ct-r .v{flex-shrink:0;font-variant-numeric:tabular-nums;font-weight:700;margin-left:4px}   /* 金額 12/700；圖例與金額間距 8 */
+
+/* 36 小時明細表（9 欄；前三欄固定、滾動時才出陰影；欄位不可點、列 hover 無效果）*/
+.tb-top{display:flex;flex-direction:column;gap:4px}
+.tb-row{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:30px}
+.tb-d{font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-secondary)}
+.dtbl .tbody .tr:hover .td{background:#fff}
+.dtbl .td{cursor:default}
+.dtbl .th{white-space:nowrap;gap:10px}   /* 對稿修正：標題與排序箭頭間距 10（Header / M gap）*/
+/* 對稿修正（#02 Table）：稿的 575＝表頭＋10.5 列，橫向捲軸另外 16 高接在下面；原生捲軸算在 max-height 裡會少看到 0.3 列 */
+.dtbl .tbl-scroll{max-height:590px}
+/* 對稿修正（#02 Button / S）：Download CSV 用小號按鈕 30 高、左 10 右 12 */
+.btn.btn-s{height:30px;padding:0 12px 0 10px;min-width:0}
+.dtbl .th.r,.dtbl .td.r{justify-content:flex-end;text-align:right}
+.dtbl .th.sortable{cursor:pointer;user-select:none}
+.dtbl .th.sortable:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(0,79,176,.35)}
+.dtbl .si{font-size:20px;color:var(--lt-grey-300);font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20;flex-shrink:0}
+.dtbl .th.on .si{color:var(--lt-color-primary)}
+.dtbl .sl{position:sticky;z-index:3}
+.dtbl .th.sl{z-index:6}
+.dtbl .sl3::after{content:'';position:absolute;top:0;bottom:-1px;right:-10px;width:10px;pointer-events:none;opacity:0;transition:opacity var(--lt-transition-fast);background:linear-gradient(90deg,rgba(0,0,0,.063),rgba(0,0,0,.012) 7px,rgba(0,0,0,0) 8px)}
+.dtbl .tbl-scroll.is-scrolled .sl3::after{opacity:1}
+.dtbl .td .ell{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+
+/* Skeleton（#04）：標籤保留、內容換成灰條；讀取中不能操作的按鈕 Disabled */
+.skl{background:var(--lt-grey-100)}
+.sk-b{height:14px;border-radius:4px}
+.sk-s{background:linear-gradient(90deg,#E6E6E6 25%,#F2F2F2 50%,#E6E6E6 75%);background-size:200% 100%;animation:shimmer 1.5s infinite linear;border-radius:4px}
+.dsk-chart{position:relative;height:360px}   /* 對稿修正（#04 Skeleton/Line Chart，1005×360）：以下座標都是稿的值（相對圖表區左上）*/
+.dsk-grid{position:absolute;left:35px;right:4px;top:38px;height:250px}
+.dsk-h{position:absolute;left:0;right:0;height:1px;background:repeating-linear-gradient(90deg,#E6E6E6 0 5px,transparent 5px 10px)}
+.dsk-h.solid{background:#E6E6E6}
+.dsk-vs{position:absolute;inset:0;display:flex;justify-content:space-between;padding:0 10px}
+.dsk-vs i{width:1px;height:100%;background:repeating-linear-gradient(180deg,#E6E6E6 0 5px,transparent 5px 10px)}
+.dsk-wave{position:absolute;left:35px;right:4px;top:37px;height:174px}
+.dsk-wave svg{width:100%;height:100%;display:block}
+.dsk-yl{position:absolute;left:4px;width:25px;height:12px}
+.dsk-xl{position:absolute;left:4px;right:4px;top:300px;display:flex;justify-content:space-between;padding:0 30px}
+.dsk-xl .sk-s{width:49px;height:12px}
+.dsk-lg{position:absolute;left:32px;right:32px;top:326px;display:flex;flex-direction:column;gap:6px}
+.dsk-lg>div{display:flex;gap:10px}
+.dsk-lg .sk-s{height:12px;flex-basis:0}
+/* 明細表 skeleton（#04 Skeleton/Customized Table）：左 476／右四欄 132，表頭 #F2F2F2＋上緣 2px／下緣 1px #E6E6E6、列高 50 */
+.dsk-tbl{display:flex}
+.dsk-tbl .l{flex:476 1 0;min-width:0}
+.dsk-tbl .dv{width:1px;background:var(--lt-grey-200);margin-right:1px}
+.dsk-tbl .r{flex:528 1 0;min-width:0}
+.dsk-tbl .hd,.dsk-tbl .rw{height:50px;display:flex;align-items:center;border-bottom:1px solid var(--lt-grey-200)}
+.dsk-tbl .hd{background:var(--lt-grey-100);border-top:2px solid var(--lt-grey-200);height:50px}
+.dsk-tbl .l .hd,.dsk-tbl .l .rw{padding:0 16px}
+.dsk-tbl .r .hd,.dsk-tbl .r .rw{display:grid;grid-template-columns:repeat(4,1fr);justify-items:center}
+/* AI Analysis 讀取中：灰條是 #676767@12%（疊在淡藍底上）*/
+.sk-a{background:linear-gradient(90deg,rgba(103,103,103,.12) 25%,rgba(103,103,103,.06) 50%,rgba(103,103,103,.12) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite linear;border-radius:4px;height:14px;margin:5.25px 0;flex-shrink:0}
+.es .es-ic.is-err{font-size:80px}
+.card.is-dtall{min-height:538px}   /* Figma #05：卡片高 538（141→679）*/
+/* 對稿修正（#05 Empty state 1053×538 蓋滿整張卡）：圖示＋文字以整張卡置中，不是扣掉標題列後置中（差 30px）*/
+.card.is-dtall{position:relative}
+.card.is-dtall>.es{position:absolute;inset:0}
+
+/* ---- Screenshot 預覽（#08；⚠ 設計端暫擬：真產品下載 PNG LumiTure_anomaly_report，prototype 用預覽＋window.print()）---- */
+#shot-root{display:none}
+#shot-root.on{display:flex;flex-direction:column;position:fixed;inset:0;z-index:calc(var(--lt-z-modal) + 5);background:#3a3f45}
+.shot-bar{display:flex;align-items:center;gap:12px;padding:10px 20px;background:#262626;color:#fff;font-size:13px;flex-shrink:0}
+.shot-bar .sp{flex:1}
+.shot-bar .btn{height:32px;min-width:0;padding:0 14px}
+.shot-bar .btn-o{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
+.shot-bar .btn-o:hover{background:rgba(255,255,255,.12);color:#fff;border-color:#fff}
+.shot-scroll{flex:1;overflow:auto;overscroll-behavior:contain}
+.shot-canvas{width:2026px;background:var(--lt-color-primary-bg);display:flex;flex-direction:column;gap:32px;transform-origin:0 0}
+.shot-hd,.shot-ft{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;background:linear-gradient(90deg,#4ADFFF,#004FB0);color:#fff}
+.shot-hd{height:88px}
+.shot-ft{height:129px;gap:4px}
+.shot-ft .cp{font-size:var(--lt-fs-14);line-height:24.5px;color:#fff}
+.shot-logo{display:flex;align-items:center;gap:10px;height:40px;color:#fff}
+.shot-logo svg{height:40px;width:238px;display:block}
+.shot-logo .wm{font-size:32px;font-weight:500;line-height:40px;letter-spacing:0}
+.shot-main{padding:0 157px}
+.shot-main .card{box-shadow:var(--ad-card-shadow)}
+.shot-main .lgd{padding:0}
+.shot-main .tbl-scroll{max-height:none;overflow:visible;background:none}
+.shot-main .tbl-scroll .th-row{position:static}
+.shot-main .tbl-scroll .st-l,.shot-main .tbl-scroll .sl{position:static}
+.shot-main .tbl-scroll .sl3::after{display:none}
+.shot-main .tbl-scroll .th{background:var(--lt-color-primary-bg)}
+.shot-main .th:not(.on) .si{display:none}
+.shot-disc{text-align:center;font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-secondary);padding:0 93px}
+.shot-disc b{font-weight:var(--lt-fw-bold)}
+@media print{
+  @page{size:2026px 3300px;margin:0}
+  html,body{background:#fff}
+  .app,.toast-wrap,#modal-root,.demo-fab,.demo-popover,#gl-tip,.shot-bar{display:none!important}
+  #shot-root.on{position:static;display:block;background:none}
+  .shot-scroll{overflow:visible}
+  .shot-canvas{zoom:1!important;transform:none!important}
+}
 </style>
 </head>
 <body>
@@ -549,13 +762,14 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     <header id="lt-topbar"></header>
     <div class="content" id="content"></div>
     <div class="footer">
-      <span class="footer-version">Anomaly Detection Prototype<span class="ver-tag">v1</span></span>
+      <span class="footer-version">Anomaly Detection Prototype<span class="ver-tag">v2 · Anomaly Details</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
     </div>
   </div>
 </div>
 <div class="toast-wrap" id="toast-wrap" aria-live="polite"></div>
 <div id="modal-root"></div>
+<div id="shot-root"></div>
 
 <script>
   window.LUMITURE_ACTIVE = 'anomaly-detection';
@@ -1408,9 +1622,7 @@ const COPY = {
     notif: 'Notification Settings',
     notifDesc: 'Each role will be able to receive alerts for spending anomalies at the configured threshold when its notifications are enabled.'
   },
-  toast: { ok: 'Alert settings updated successfully.', fail: 'Unable to update alert. Please try again later.' },
-  /* ⚠ 設計端暫擬：詳情頁這輪不做，列表上的入口改成 toast 說明 */
-  detailLater: 'Anomaly Details page is built in a separate round. Coming soon.'
+  toast: { ok: 'Alert settings updated successfully.', fail: 'Unable to update alert. Please try again later.' }
 };
 const SENS = ['Low', 'Medium', 'High'];
 /* Notification Settings：五個角色各一個總開關（#03-1 黃便條：原本是兩欄開關「自己的群組／下層群組」，因為後端 alert 不依群組層級分別發布，簡化成只做一個總開關）*/
@@ -1650,8 +1862,6 @@ Object.assign(ACT, {
     const tip = $('#gl-tip'); if (tip) tip.style.display = 'none';
     renderList();
   },
-  /* ⚠ 設計端暫擬：詳情頁（#02 系列）另一輪製作，入口先以 toast 說明 */
-  'detail': (el, e) => { e.stopPropagation(); toast('info', COPY.detailLater); },
   'open-settings': () => openSettings()
 });
 document.addEventListener('keydown', e => {
@@ -1743,6 +1953,449 @@ document.addEventListener('click', e => {
   const fn = ACT[el.dataset.a]; if (fn) fn(el, e);
 });
 /* 彈窗點遮罩空白處不關閉（Figma 註記只有 Save／Cancel 兩種結束方式，加上右上 X）*/
+
+/* ============================================================
+ * 11. Anomaly Details（v2，route `/budget/anomaly/[alertId]`；hash `#detail/<alertId>`、`#screenshot[/<alertId>]`）
+ *     對照 Figma：#02／#02-1／#02-2／#02-3（GCP）、#04 Loading、#05 Error、#06 AWS、#07 Azure、#08 Screenshot
+ * ============================================================ */
+Object.assign(state, { route: 'list', detailId: 'r1', dPage: 'set', dSort: { k: 'time', dir: -1 }, dTree: false, dHidden: new Set(), showParked: true });
+
+const DCOPY = {
+  back: 'Anomaly Alert List',
+  title: 'Anomaly Detection Report',
+  trend: 'View 1-Month Cost Trend',
+  shotTip: 'Take Screenshot',
+  ai: 'AI Analysis',
+  aiParkedTip: '這個設計已經完成，但 PM 還沒確定功能方向、尚未安排開發（Figma #02 紫便條：純示意、暫不開發）。先保留在 prototype，之後可以直接拿來用。Demo FAB 可以隱藏這個區塊看上線版。',
+  asg: 'Assigned to',
+  chartTitle: 'Cost by Top Spending 10 Services',
+  chartTip: 'Visualizes the cost trends of the top 10 highest-spending services leading up to the anomaly date, with all remaining services grouped as "Others." Hourly cost breakdown for the 3-day period ending on the anomaly date.',
+  chartUnit: 'Cost (USD)',
+  tblTitle: 'Top 10 Services: 36-Hour Cost Breakdown',
+  tblDesc: 'We recommend logging into your console to verify the accurate status and fees. The cost information here is for reference.',
+  csv: 'Download CSV',
+  err: { title: 'Anomaly Details Unavailable', desc: 'Unable to display anomaly data. Please ensure you have the necessary permissions and try again.' },
+  /* ⚠ 設計端暫擬：詳情頁的空狀態 Figma 沒畫（FE 有定義，文案同列表）。後端回饋「拿不到 cost date／resource name 不會發生」，所以這個狀態實際很少見 */
+  empty: { title: 'No Anomaly Alerts', desc: 'There are currently no anomaly alerts for your managed organization or group.' },
+  trendToast: 'In production this opens Cost Dashboard in a new tab with: one month before the anomaly date, Group by SKU, and the Filter set to this resource. The prototype opens the page without these parameters.',
+  shotToast: 'In production this downloads LumiTure_anomaly_report.png. The prototype shows the output layout instead.',
+  disc: 'Note: This screenshot displays a summary of <b>the first 20 records from the "Top 10 Services: 36-Hour Cost Breakdown."</b><br>To access the full dataset and utilize interactive analysis tools, please visit LumiTure.ai.'
+};
+
+/* ---------- 資源名稱標籤依平台換（#02／#06／#07）---------- */
+/* 稿匯出的圖示（Figma REST images?format=svg）：Arrow_Circle/Left、Arrow_Circle/Right、Screenshot。填色改 currentColor */
+const SVG_BACK = '<svg class="ico16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8.00026 14.9336C6.62898 14.9336 5.28849 14.527 4.14831 13.7651C3.00813 13.0033 2.11947 11.9204 1.5947 10.6535C1.06993 9.38663 0.932628 7.99257 1.20015 6.64764C1.46768 5.3027 2.12801 4.0673 3.09766 3.09766C4.0673 2.12801 5.3027 1.46768 6.64764 1.20015C7.99257 0.932628 9.38663 1.06993 10.6535 1.5947C11.9204 2.11947 13.0033 3.00813 13.7651 4.14831C14.527 5.28849 14.9336 6.62898 14.9336 8.00026C14.9336 9.8391 14.2031 11.6026 12.9029 12.9029C11.6026 14.2031 9.8391 14.9336 8.00026 14.9336ZM8.80915 10.9192L6.69795 8.89466H11.802C12.1703 8.89466 12.4734 8.59156 12.4734 8.22328V7.77608C12.4734 7.4078 12.1703 7.10471 11.802 7.10471H6.6968L8.80915 5.08133C9.07646 4.82566 9.08191 4.38407 8.82071 4.12222L8.51333 3.81715C8.25424 3.55639 7.82486 3.55639 7.56577 3.81715L3.85644 7.52417C3.59568 7.78326 3.59568 8.21264 3.85644 8.47173L7.56577 12.1845C7.82486 12.4452 8.25424 12.4452 8.51333 12.1845L8.82071 11.8795C9.0819 11.6127 9.07763 11.1788 8.80915 10.9192Z"/></svg>', SVG_TREND = '<svg class="ico16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M7.99974 1.06641C9.37102 1.06641 10.7115 1.47304 11.8517 2.23488C12.9919 2.99673 13.8805 4.07957 14.4053 5.34647C14.9301 6.61337 15.0674 8.00743 14.7998 9.35236C14.5323 10.6973 13.872 11.9327 12.9023 12.9023C11.9327 13.872 10.6973 14.5323 9.35236 14.7998C8.00743 15.0674 6.61337 14.9301 5.34647 14.4053C4.07957 13.8805 2.99673 12.9919 2.23488 11.8517C1.47304 10.7115 1.06641 9.37102 1.06641 7.99974C1.06641 6.1609 1.79688 4.39738 3.09713 3.09713C4.39738 1.79688 6.1609 1.06641 7.99974 1.06641ZM7.19085 5.08081L9.30205 7.10534H4.19796C3.82968 7.10534 3.52658 7.40844 3.52658 7.77672V8.22392C3.52658 8.5922 3.82968 8.89529 4.19796 8.89529H9.3032L7.19085 10.9187C6.92354 11.1743 6.91809 11.6159 7.17929 11.8778L7.48667 12.1828C7.74576 12.4436 8.17514 12.4436 8.43423 12.1828L12.1436 8.47583C12.4043 8.21674 12.4043 7.78736 12.1436 7.52827L8.43423 3.81547C8.17514 3.55471 7.74576 3.55471 7.48667 3.81547L7.17929 4.12054C6.9181 4.38726 6.92237 4.82122 7.19085 5.08081Z"/></svg>', SVG_SHOT = '<svg viewBox="0 0 18 18" aria-hidden="true"><path fill="currentColor" d="M12.5732 7.73535C12.9387 7.73545 13.2874 7.89451 13.5312 8.17188L14.1924 8.92773C14.2554 9.01018 14.311 9.03711 14.3682 9.03711H14.917C15.6242 9.03711 16.2002 9.62177 16.2002 10.3398V13.874C16.2002 14.5921 15.6242 15.1768 14.917 15.1768H8.6875C7.98051 15.1765 7.40527 14.5919 7.40527 13.874V10.3398C7.40527 9.62192 7.98051 9.03735 8.6875 9.03711H9.2373C9.29444 9.03711 9.3493 9.0089 9.38379 8.96289L10.0742 8.17188C10.3181 7.89452 10.6667 7.7354 11.0322 7.73535H12.5732ZM11.8027 10.1533C10.7929 10.1533 9.9709 10.9885 9.9707 12.0137C9.9707 13.0391 10.7928 13.874 11.8027 13.874C12.8126 13.874 13.6348 13.0391 13.6348 12.0137C13.6346 10.9885 12.8125 10.1534 11.8027 10.1533ZM11.374 3C12.4786 3 13.374 3.89543 13.374 5V6.11133H11.5742V5.57227H3.59961V10.002C3.59961 10.1124 3.68937 10.2021 3.7998 10.2021H5.78906V12.002H3.7998L3.5957 11.9922C2.58701 11.8899 1.7998 11.0376 1.7998 10.002V5C1.7998 3.89545 2.69526 3.00003 3.7998 3H11.374Z"/></svg>';
+const RES_LABEL = { gcp: 'Project Name / ID', aws: 'Account Name / ID', azure: 'Resource Group Name / ID' };
+
+/* ---------- 圖表色序：CMDS General Behavior 順序（同 Cost Dashboard）；Others 固定灰（#02 註記）----------
+ * ⚠ DEVIATION: 第 1 色 Figma 與 Cost Dashboard 都是 #86CBFC（GCP 品牌藍），tokens.css 的 --lt-chart-2 是 #9ED7FF（2026-05-21 修正）。這頁照 Figma，其餘 9 色與 tokens 一致 */
+const PAL = ['#86CBFC', 'var(--lt-chart-5)', 'var(--lt-chart-6)', 'var(--lt-chart-9)', 'var(--lt-chart-3)', 'var(--lt-chart-4)', 'var(--lt-chart-7)', 'var(--lt-chart-10)', 'var(--lt-chart-8)', 'var(--lt-chart-1)'];
+let _palRes = null;
+function palette() {
+  if (_palRes) return _palRes;
+  const cs = getComputedStyle(document.documentElement);
+  _palRes = PAL.map(c => c.startsWith('var(') ? (cs.getPropertyValue(c.slice(4, -1)).trim() || '#999') : c);
+  _palRes.push('#B3B3B3');
+  return _palRes;
+}
+
+/* ---------- Mock：每朵雲的服務、SKU、地點。w＝基準權重、f＝異常日尾端的飆升倍率、p＝單價 ---------- */
+const SVC = {
+  gcp: [
+    { n: 'Cloud SQL', w: 1.0, f: 2.0, p: 14.04, un: 'Instance', ty: 'On-Demand', sk: ['Core running in Americas', 'RAM running in Americas', 'Storage SSD capacity'] },
+    { n: 'Cloud Storage', w: .72, f: 2.7, p: .06, un: 'GB', ty: 'On-Demand', sk: ['Standard Storage (Multi-regional)', 'Nearline Storage Iowa', 'Network Egress Premium'] },
+    { n: 'Developer Tools', w: .62, f: 2.4, p: 12.21, un: 'Node', ty: 'Subscription', sk: ['Cloud Build Slot', 'Artifact Registry Storage'] },
+    { n: 'Cloud Spanner', w: .42, f: 3.6, p: 12.08, un: 'Node', ty: 'On-Demand', sk: ['Spanner Node', 'Spanner Storage SSD'] },
+    { n: 'Management Tools', w: .36, f: 1.1, p: .64, un: 'Resource', ty: 'Committed Use Discount (1-Year)', sk: ['Cloud Deployment Manager', 'Cloud Monitoring Ingestion'] },
+    { n: 'Cloud Logging', w: .3, f: 2.3, p: .53, un: 'GB', ty: 'On-Demand', sk: ['Log Volume', 'Log Storage Retention'] },
+    { n: 'Security', w: .24, f: 1.4, p: .01, un: 'Project', ty: 'Committed Use Discount (1-Year)', sk: ['Security Command Center Premium', 'Cloud Armor Policy'] },
+    { n: 'API Management', w: .18, f: 1.2, p: .02, un: 'API Call', ty: 'Subscription', sk: ['Apigee API Calls', 'Apigee Environment'] },
+    { n: 'Google Kubernetes Engine', w: .13, f: 1.3, p: .03, un: 'Cluster', ty: 'On-Demand', sk: ['Autopilot Pod mCPU Requests', 'Regional Cluster Management Fee'] },
+    { n: 'Internet of Things (IoT)', w: .09, f: 1.0, p: .1, un: 'MB', ty: 'Committed Use Discount (1-Year)', sk: ['Monitoring Time Series Data', 'IoT Core Data Plane'], gap: [20, 25] }
+  ],
+  aws: [
+    { n: 'Amazon S3', w: 1.0, f: 2.0, p: .023, un: 'GB-Mo', sk: ['TimedStorage-ByteHrs', 'Requests-Tier1'] },
+    { n: 'AWS Lambda', w: .62, f: 2.7, p: .0000167, un: 'GB-Second', sk: ['Lambda-GB-Second', 'Request'] },
+    { n: 'Amazon CloudFront', w: .5, f: 2.4, p: .085, un: 'GB', sk: ['DataTransfer-Out-Bytes', 'Requests-Tier2-HTTPS'] },
+    { n: 'Amazon RDS', w: .3, f: 3.6, p: .171, un: 'Hrs', sk: ['InstanceUsage:db.m5.large', 'RDS:GP2-Storage'] },
+    { n: 'Amazon EC2', w: .13, f: 1.5, p: .1664, un: 'Hrs', sk: ['BoxUsage:t3.xlarge', 'EBS:VolumeUsage.gp3'] }
+  ],
+  azure: [
+    { n: 'Azure SQL Database', w: 1.0, f: 2.2, p: .27, un: '1 Hour', sk: ['vCore Hours', 'Data Stored'], from: 52 },
+    { n: 'Azure Blob Storage', w: .6, f: 2.6, p: .018, un: '1 GB/Month', sk: ['Data Stored (LRS)', 'Write Operations'], from: 44 },
+    { n: 'Virtual Machines', w: .45, f: 2.4, p: .192, un: '1 Hour', sk: ['D4s v3 Compute Hours', 'P10 Disks'], from: 44 }
+  ]
+};
+const LOCS = {
+  gcp: ['Singapore (asia-southeast1)', 'Oregon (us-west1)', 'Iowa (us-central1)', 'Taiwan (asia-east1)', 'Tokyo (asia-northeast1)', 'Belgium (europe-west1)', 'South Carolina (us-east1)', 'Seoul (asia-northeast3)'],
+  aws: ['Singapore (ap-southeast-1)', 'Oregon (us-west-2)', 'N. Virginia (us-east-1)', 'Tokyo (ap-northeast-1)', 'Ireland (eu-west-1)'],
+  azure: ['Southeast Asia (southeastasia)', 'West US 2 (westus2)', 'Japan East (japaneast)', 'East US (eastus)', 'North Europe (northeurope)']
+};
+const AWS_PO = ['On-Demand', 'On-Demand', 'Savings Plans', 'On-Demand', 'Reserved', 'Spot'];
+/* ⚠ 設計端暫擬：Azure 的 Frequency 欄值 Figma 沒示範，用 Azure 成本匯出常見的三種 */
+const AZ_FREQ = ['UsageBased', 'UsageBased', 'OneTime', 'Recurring'];
+
+/* 表格欄位：Figma #02-1／#06／#07 逐欄（標題三雲各一套）。w＝最小寬（前三欄固定）、s＝可排序（稿上有箭頭的欄）、r＝靠右 */
+const DCOLS = {
+  gcp:   [['time', 'Cost Time', 148, 1], ['svc', 'Service', 240], ['sku', 'SKU', 240], ['cost', 'Cost', 144, 1, 1], ['price', 'Pricing', 120, 1, 1], ['loc', 'Location', 240], ['ty', 'Cost Type', 200], ['amt', 'Usage Amount', 180, 0, 1], ['unit', 'Unit', 120]],
+  aws:   [['time', 'Cost Time', 148, 1], ['svc', 'Service', 240], ['sku', 'Usage Type', 240], ['cost', 'Unblended Cost', 168, 1, 1], ['price', 'Public On-Demand Cost', 219, 1, 1], ['loc', 'Region', 240], ['ty', 'Purchase Option', 200], ['amt', 'Usage Quantity', 180, 0, 1], ['unit', 'Unit', 120]],
+  azure: [['time', 'Cost Time', 148, 1], ['svc', 'Meter Category', 240], ['sku', 'Meter', 240], ['cost', 'All Cost in USD', 190, 1, 1], ['price', 'PAYGPrice', 130, 1, 1], ['loc', 'Location', 240], ['ty', 'Frequency', 200], ['amt', 'Quantity', 180, 0, 1], ['unit', 'Unit of Measure', 139]]
+};
+
+/* ---------- 偽隨機（同一則告警每次看到的曲線一樣）---------- */
+function hstr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const pad2 = n => String(n).padStart(2, '0');
+const fmtDMYs = d => pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear();              // Figma：01/01/2036
+const fmtCT = d => fmtDMYs(d) + ' ' + pad2(d.getHours()) + ':00';                                              // 01/01/2036 20:00
+const fmtAx = d => d.getDate() + ' ' + MON[d.getMonth()] + '\n' + pad2(d.getHours()) + ':00';                  // 30 Dec.⏎00:00
+const fmtTip = d => d.getDate() + ' ' + MON[d.getMonth()] + ' ' + d.getFullYear() + ' ' + pad2(d.getHours()) + ':00';   // 31 Dec. 2035 15:00
+const MONL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const fmtLong = d => d.getDate() + ' ' + MONL[d.getMonth()] + ', ' + d.getFullYear();                           // 1 January, 2036
+const usd = n => 'USD ' + fmtMoney(n);
+
+/* ---------- 產生一則告警的詳情資料 ----------
+ * 圖：異常當天往前 3 天（含當天；每小時一點，共 73 點，最後一點是隔天 00:00）。
+ * 表：異常當天＋往前 12 小時＝36 小時、不含 Others。金額與列表的 Actual Cost 對得起來（異常當天各服務加總＝Cost）。*/
+const DCACHE = {};
+function genDetail(it) {
+  if (DCACHE[it.id]) return DCACHE[it.id];
+  const cloud = it.platform, defs = SVC[cloud], R = mulberry(hstr(it.id)), TN = 73;
+  const day = dateOf(it.off), y = day.getFullYear(), m = day.getMonth(), dd = day.getDate();
+  const times = Array.from({ length: TN }, (_, t) => new Date(y, m, dd - 2, t));
+  const vals = defs.map(s => {
+    let x = 0; const ph = R() * 6, ss = 54 + Math.floor(R() * 14), arr = [];
+    for (let t = 0; t < TN; t++) {
+      x = x * .72 + (R() * 2 - 1) * .28;
+      let v = s.w * (1 + .16 * x + .07 * Math.sin(t / 4 + ph));
+      if (t >= ss) { const g = Math.min(1, (t - ss + 1) / 4); v *= 1 + (s.f - 1) * g * (1 + .15 * (R() * 2 - 1)); }
+      arr.push(v);
+    }
+    if (s.gap) for (let t = s.gap[0]; t <= s.gap[1]; t++) arr[t] = null;       // 偶爾沒有花費的小時（折線斷開）
+    if (s.from != null) for (let t = 0; t < s.from; t++) arr[t] = null;       // 資源較晚才有花費
+    return arr;
+  });
+  let others = null;
+  if (cloud === 'gcp') { let x = 0; others = Array.from({ length: TN }, () => { x = x * .7 + (R() * 2 - 1) * .3; return .07 * (1 + .22 * x); }); }
+  /* 縮放：異常當天（t 48–71）所有服務加總 ＝ 列表的 Actual Cost */
+  let tot = 0;
+  for (let t = 48; t < 72; t++) { vals.forEach(a => { if (a[t] != null) tot += a[t]; }); if (others) tot += others[t]; }
+  const k = it.cost / tot, r2 = v => v == null ? null : Math.round(v * k * 100) / 100;
+  const series = defs.map((s, i) => ({ name: s.n, data: vals[i].map(r2) }));
+  if (others) series.push({ name: 'Others', data: others.map(r2) });
+  /* 「有花費但四捨五入後仍是 0.00」的列（#02 註記）：最後一個服務在 t=58 放 0.003 */
+  /* Fable §5 #8：原本只把第 58 小時改成 0.003，折線在那一點掉到 0 再彈回、像資料壞掉。改成前後各一小時沒有花費（null：表格不出列、折線斷開，同 #02 註記「不顯示沒有花費的項目」），
+   * 中間那一小時 0.003 → 表格出現一列 USD 0.00、折線只是一小段缺口，跟 IoT 稿上本來就會斷的樣子一致 */
+  if (others) { const ti = series.length - 2; if (series[ti].data[58] != null) { series[ti].data[57] = null; series[ti].data[58] = .003; series[ti].data[59] = null; } }   // 只放在 GCP（最小的服務）；其他雲的最後一個服務金額不小，會在圖上掉到 0 像 bug
+  const col = palette();
+  series.forEach((s, i) => { s.color = s.name === 'Others' ? col[10] : col[i]; });
+  let max = 0; series.forEach(s => s.data.forEach(v => { if (v != null && v > max) max = v; }));
+  /* 明細列（t=71→36，新→舊）*/
+  const rows = [];
+  for (let t = 71; t >= 36; t--) defs.forEach((s, i) => {
+    const c = series[i].data[t]; if (c == null) return;
+    const sj = (t + i) % s.sk.length, loc = LOCS[cloud][(i + Math.floor(t / 5)) % LOCS[cloud].length];
+    let ty = s.ty, price = s.p * (1 + .25 * sj), pub = c;
+    if (cloud === 'aws') { ty = AWS_PO[(i * 3 + t) % AWS_PO.length]; pub = ty === 'On-Demand' ? c : c * 1.3; price = s.p; }
+    if (cloud === 'azure') ty = AZ_FREQ[(i + t) % AZ_FREQ.length];
+    const base = cloud === 'aws' ? pub : c;
+    rows.push({ ts: times[t], svc: s.n, sku: s.sk[sj], cost: c, price: cloud === 'aws' ? pub : price, loc, ty, amt: base / price, unit: s.un, si: i, t });
+  });
+  const dayTotals = defs.map((s, i) => { let a = 0; for (let t = 48; t < 72; t++) a += series[i].data[t] || 0; return a; });
+  const dayAll = dayTotals.reduce((a, b) => a + b, 0) + (others ? series[series.length - 1].data.slice(48, 72).reduce((a, b) => a + (b || 0), 0) : 0);
+  return (DCACHE[it.id] = { cloud, defs, times, series, max, rows, dayTotals, dayAll });
+}
+/* Y 軸刻度：取「好讀的數字」（1／1.5／2／2.5／3／4／5／6／8／10 × 10^n），5 格；稿上的 13,650 是示意（實際資料會長不一樣）*/
+function niceStep(x) { if (!(x > 0)) return 1; const p = Math.pow(10, Math.floor(Math.log10(x))); const m = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10].find(v => v * p >= x - 1e-9); return Number((m * p).toPrecision(6)); }
+/* Y 軸數字縮寫（Guideline／Overview 規則：超過十萬才用 K/M/B、兩位小數，未達門檻顯示千分位）*/
+function fmtAxis(v, step) {
+  const a = Math.abs(v);
+  if (a >= 1e9) return (v / 1e9).toFixed(2) + 'B'; if (a >= 1e6) return (v / 1e6).toFixed(2) + 'M'; if (a >= 1e5) return (v / 1e3).toFixed(2) + 'K';
+  return Number(v).toLocaleString('en-US', { maximumFractionDigits: step < 1 ? 2 : 0 });
+}
+
+/* ---------- 資源名稱＋階層（Assigned to）---------- */
+/* 同層級字母升冪（#02-3 註記）。⚠ 稿上 Tier-1 順序 Innovation→Cloud Financial→Resource 不是升冪（設計稿本身的問題），這裡照註記的規則排 */
+const TREE_OVERRIDE = {
+  r1: { name: G.eng, t1: [
+    { name: 'Innovation and Design Labs', t2: [] },
+    { name: 'Cloud Financial Operations Resource Optimization and Cost Governance Strategy Implementation Oversight Group for Cross-Departmental Cloud Spend Analysis and Budgetary Control Initiatives', t2: [] },
+    { name: 'Resource Optimization Group', t2: ['Application Maintenance Group'] }] }
+};
+/* Kabin 2026-10-12 裁決：Assigned to 的根節點＝組織層（Admin）。資源的群組全部是 Tier-1（原本被當根的第一個群組降回 Tier-1，跟其他 Tier-1 並列），各自底下的 Tier-2 不變。
+ * 組織名稱沿用 Group List v3 的 mock（ORG_NAME = 'CloudMile'，對應 FE 頁首寫死的組織名）*/
+const ORG_NAME = 'CloudMile';
+function baseTree(it) {
+  const o = TREE_OVERRIDE[it.id];
+  const t1 = o ? [{ name: o.name, t2: [] }].concat(o.t1) : it.groups.map(n => ({ name: n, t2: [] }));
+  return { name: ORG_NAME, t1: t1.slice().sort((a, b) => a.name.localeCompare(b.name)).map(x => ({ name: x.name, t2: x.t2.slice().sort((a, b) => a.localeCompare(b)) })) };
+}
+/* ⚠ DEVIATION（Kabin 2026-10-12 裁決）：#02 畫面的根節點是 `Admin` chip＋一個 Tier-1 群組名（Civil Engineering Students）；改成 `Admin` chip＋組織名，所有群組都是 Tier-1 */
+/* 依檢視者層級：Admin 看 Admin→T1→T2；T1 從自己的 T1 往下；T2 只呈現自己。⚠ 設計端暫擬：#02-3 只畫了 Admin 視角，稿註記只說「T2 目前也按此（只呈現自己）」 */
+function viewTree(it) {
+  const b = baseTree(it), t = role().tier;
+  if (t === 0) return { chip: 'Admin', name: b.name, kids: b.t1.map(x => ({ chip: 'Tier-1', name: x.name, kids: x.t2.map(n => ({ chip: 'Tier-2', name: n, kids: [] })) })) };
+  /* Fable §5 #1：T1 檢視者落在有 Tier-2 的群組（否則 T1 視角永遠演不出 Tier-1→Tier-2 那一層）；mock 裡 T1 Manager 就是 Resource Optimization Group 的主管 */
+  if (t === 1) { const f = b.t1.find(x => x.t2.length) || b.t1[0]; return { chip: 'Tier-1', name: f ? f.name : '--', kids: f ? f.t2.map(n => ({ chip: 'Tier-2', name: n, kids: [] })) : [] }; }
+  const f2 = b.t1.find(x => x.t2.length); return { chip: 'Tier-2', name: f2 ? f2.t2[0] : (b.t1[0] ? b.t1[0].name : '--'), kids: [] };
+}
+function treeSentence(t) {
+  let n1 = 0, n2 = 0; t.kids.forEach(k => { if (k.chip === 'Tier-1') { n1++; n2 += k.kids.length; } else n2++; });
+  const parts = []; if (n1) parts.push(n1 + ' Tier-1 subgroup' + (n1 > 1 ? 's' : '')); if (n2) parts.push(n2 + ' Tier-2 subgroup' + (n2 > 1 ? 's' : ''));
+  /* ⚠ DEVIATION: 稿上句型註記寫 `…, and {N} Tier-2 subgroup(s).`（and 前有逗號），但 #02 畫面是「3 Tier-1 subgroups and 1 Tier-2 subgroup」無逗號。畫面與註記衝突時照畫面 */
+  return parts.length ? t.name + ', including ' + parts.join(' and ') + '.' : t.name;
+}
+function treeNode(n, depth, interactive) {
+  const tx = depth === 0 ? treeSentence(n) : n.name;
+  const kids = n.kids.length ? `<div class="gt-kids k${depth + 1}${depth === 0 && n.chip !== 'Admin' ? ' p-tier' : ''}">${n.kids.map(k => treeNode(k, depth + 1, interactive)).join('')}</div>` : '';
+  const can = depth === 0 && n.kids.length > 0;
+  const open = can && state.dTree && interactive;
+  const arrow = depth === 0 && can ? `<span class="tw ${open ? 'open' : ''}"><i></i></span>` : '';
+  return `<div class="gt-n ${depth ? 'ch d' + depth : ''}"><div class="gt-row ${can && interactive ? 'can' : ''}" ${can && interactive ? `data-a="d-tree" tabindex="0" role="button" aria-expanded="${open}" aria-label="Show subgroups"` : ''}>${arrow}<span class="chip">${n.chip}</span><span class="gt-tx" data-tip="${esc(tx)}" data-tip-align="right" data-tip-gap="4" data-tip-trunc>${esc(tx)}</span></div>${depth === 0 ? (open ? kids : '') : kids}</div>`;
+}
+function assignedHtml(it, interactive) {
+  /* ⚠ 設計端暫擬（對稿時補）：資源沒有指派給任何群組（屬於 org 層級，#02 黃便條「後端將 Assigned Group 全部移除 → 只有 Admin 看得到」）稿沒畫。
+   * 原本畫成「Admin chip＋--」，chip 會被讀成「指派給 Admin 群組」；改成只顯示 --，跟列表 Assigned to 欄一致 */
+  if (!it.groups.length && !TREE_OVERRIDE[it.id]) return `<div class="asg"><div class="l12">${DCOPY.asg}</div><div class="gt no-arrow"><div class="gt-row"><span class="gt-tx">--</span></div></div></div>`;
+  const t = viewTree(it), can = t.kids.length > 0;
+  return `<div class="asg"><div class="l12">${DCOPY.asg}</div><div class="gt ${can ? '' : 'no-arrow'}">${treeNode(t, 0, interactive)}</div></div>`;
+}
+
+/* ---------- AI Analysis（⏸ PARKED）文案模板取自 #02／#06／#07，數字由當筆資料算出 ---------- */
+function aiHtml(it, D, shot) {
+  const order = D.defs.map((s, i) => ({ n: s.n, v: D.dayTotals[i] })).sort((a, b) => b.v - a.v), a = order[0], b = order[1] || order[0];
+  const pct = v => (v / D.dayAll * 100).toFixed(1) + '%';
+  const head = `The cost anomaly detected on <b>${fmtLong(dateOf(it.off))}</b>, for ${esc(it.name)} is primarily driven by <b>${esc(a.n)}</b> (${pct(a.v)}, ${usd(a.v)}) and <b>${esc(b.n)}</b> (${pct(b.v)}, ${usd(b.v)}).`;
+  const tail = {
+    gcp: ' Since 100% of these costs are attributed to standard pay-as-you-go rates, there are significant savings opportunities through <b>Committed Use Discounts (CUDs)</b>. We recommend reviewing resource utilization and refining automated budget alerts to proactively mitigate future anomalies.',
+    aws: ' Since 100% of these costs are attributed to standard On-Demand rates, there are significant savings opportunities through <b>Savings Plans or Reserved Instances (RIs)</b>. We recommend reviewing resource utilization and refining AWS Budgets alerts to proactively mitigate future anomalies.',
+    azure: ' Since 100% of these costs are attributed to standard <b>Pay-As-You-Go</b> rates, there are significant savings opportunities through <b>Azure Reservations</b> or <b>Azure Savings Plans</b>. We recommend reviewing resource utilization and refining Azure Budgets alerts to proactively mitigate future anomalies.'
+  }[D.cloud];
+  /* Fable §5 #9：截圖輸出（真產品是給客戶的 PNG）不帶暫緩標記，照 #08 畫成一般實線框（⚠ 設計端暫擬）。頁面上照樣標 PARKED */
+  const parked = state.showParked && !shot;
+  const badge = parked ? `<span class="pk-badge" data-tip="${esc(DCOPY.aiParkedTip)}"><span class="material-symbols-outlined">pause_circle</span>已設計・PM 尚未安排開發</span>` : '';
+  /* ⏸ PARKED：AI Analysis（Figma #02 紫便條「純示意。PM 尚未確定功能方向，暫不開發」）。登記在 specs/parked-designs.md；Demo FAB「隱藏暫緩的設計」看上線版 */
+  return `<div class="ai ${parked ? 'is-parked' : ''}"><div class="ai-hd"><span class="ai-t"><span class="ai-ic" aria-hidden="true"></span><span class="tx">${DCOPY.ai}</span></span>${badge}</div><div class="ai-b">${head}${tail}</div></div>`;
+}
+
+/* ---------- 明細表 ---------- */
+function sortRows(D) {
+  const { k, dir } = state.dSort, key = k === 'time' ? 'ts' : k;
+  return D.rows.slice().sort((a, b) => { const av = key === 'ts' ? +a.ts : a[key], bv = key === 'ts' ? +b.ts : b[key]; return (av - bv) * dir || (+b.ts - +a.ts) || a.si - b.si; });
+}
+function dCell(c, r) {
+  switch (c) {
+    case 'time': return fmtCT(r.ts);
+    case 'cost': case 'price': return usd(r[c]);
+    case 'amt': return fmtMoney(r.amt);
+    default: return r[c];
+  }
+}
+function dTableHtml(D, shot) {
+  const cols = DCOLS[D.cloud], rows = sortRows(D).slice(0, shot ? 20 : 999);
+  /* Fable §5 #3：照 #02-1 紫註記「[Cost Time] 欄固定寬度；其餘欄位設 min-width，瀏覽器有更多寬度時平均分配」。
+   * Service／SKU 也是固定欄（sticky），它們變寬後 SKU 的 left 要跟著變 → 用 --l3（Service 右緣），繪製後與 resize 時量一次（syncStickyLeft）*/
+  const tpl = cols.map(c => c[0] === 'time' ? c[2] + 'px' : `minmax(${c[2]}px,1fr)`).join(' ');
+  const minw = cols.reduce((a, c) => a + c[2], 0);
+  const sticky = { time: '0px', svc: '148px', sku: 'var(--l3,388px)' };
+  const th = cols.map(c => {
+    const on = state.dSort.k === c[0], sl = c[0] in sticky;
+    const si = c[3] ? `<span class="material-symbols-outlined si">${on && state.dSort.dir > 0 ? 'arrow_upward' : 'arrow_downward'}</span>` : '';
+    return `<div class="th ${c[4] ? 'r' : ''} ${c[3] ? 'sortable' : ''} ${on ? 'on' : ''} ${sl ? 'sl' + (c[0] === 'sku' ? ' sl3' : '') : ''}" role="columnheader" ${sl ? `style="left:${sticky[c[0]]}"` : ''} ${c[3] && !shot ? `data-a="d-sort" data-k="${c[0]}" tabindex="0" aria-sort="${on ? (state.dSort.dir > 0 ? 'ascending' : 'descending') : 'none'}"` : ''}>${c[1]}${si}</div>`;
+  }).join('');
+  /* 「欄位無法點擊，因此 Hover 無效果；字串內容大於可顯示範圍時以 … 替代，Hovering 顯示完整內容」＋ #02-2：Hover 不論內容長短一律顯示 Tooltips（與前端約定）*/
+  const body = rows.map(r => `<div class="tr" role="row">${cols.map(c => { const v = dCell(c[0], r), sl = c[0] in sticky; return `<div class="td ${c[4] ? 'r' : ''} ${sl ? 'sl' + (c[0] === 'sku' ? ' sl3' : '') : ''}" role="cell" ${sl ? `style="left:${sticky[c[0]]}"` : ''} data-tip="${esc(v)}" data-tip-anchor=".ell" data-tip-gap="4"><span class="ell">${esc(v)}</span></div>`; }).join('')}</div>`).join('');
+  return `<div class="tbl-scroll c-${D.cloud}" id="${shot ? 'shot-tbl' : 'd-tbl'}" role="table" aria-label="Top 10 services 36-hour cost breakdown" style="--cols:${tpl};--minw:${minw}px"><div class="tr th-row" role="row">${th}</div><div class="tbody" role="rowgroup">${body}</div></div>`;
+}
+
+/* ---------- 報表卡內容（頁面與 Screenshot 共用；shot＝true 時隱藏按鈕、圖例全顯、表格 20 列全欄位）---------- */
+function reportHtml(it, D, shot) {
+  const logo = CSP[it.platform].logo;
+  const lg = D.series.map(s => `<button class="lg-i ${!shot && state.dHidden.has(s.name) ? 'off' : ''}" style="--c:${s.color}" data-a="d-lg" data-n="${esc(s.name)}" aria-pressed="${!(!shot && state.dHidden.has(s.name))}"><i></i>${esc(s.name)}</button>`).join('');
+  const act = shot ? '' : `<div class="rpt-act"><button class="tx-link" data-a="d-trend">${SVG_TREND}<span class="t">${DCOPY.trend}</span></button><button class="ib30" data-a="d-shot" aria-label="${DCOPY.shotTip}" data-tip="${DCOPY.shotTip}" data-tip-align="right" data-tip-gap="4">${SVG_SHOT}</button></div>`;
+  return `<div class="rpt-hd"><h1>${DCOPY.title}</h1>${act}</div>
+    <div class="rpt-top"><div class="rpt-info">
+      <div class="blk"><div class="l12">${RES_LABEL[it.platform]}</div><div class="rn"><span class="csp">${logo}</span><span class="nm" data-tip="${esc(it.name)}" data-tip-gap="4" data-tip-trunc>${esc(it.name)}</span><span class="id" data-tip="(${esc(it.rid)})" data-tip-gap="4" data-tip-trunc>(${esc(it.rid)})</span></div></div>
+      <div class="blk"><div class="l12">Cost</div><div class="cost-v"><span class="v">${fmtMoney(it.cost)}</span><span class="u">${CURRENCY}</span></div></div>
+      <div class="blk"><div class="l12">Anomaly Date</div><div class="adate">${fmtDMYs(dateOf(it.off))}</div></div>
+    </div>${state.showParked ? aiHtml(it, D, shot) : ''}</div>
+    ${assignedHtml(it, !shot)}
+    <div class="sec"><div class="sec-t">${DCOPY.chartTitle}<span class="material-symbols-outlined info" data-tip="${esc(DCOPY.chartTip)}" data-tip-gap="4">info</span></div>
+      <div class="cwrap"><div class="c-unit">${DCOPY.chartUnit}</div><div class="chart js-chart" data-shot="${shot ? 1 : 0}"></div></div>
+      <div class="lgd ${shot ? 'is-static' : ''}">${lg}</div></div>
+    <div class="dtbl"><div class="tb-top"><div class="tb-row"><div class="sec-t">${DCOPY.tblTitle}</div>${shot ? '' : `<button class="btn btn-o btn-s" data-a="d-csv"><span class="material-symbols-outlined">download</span>${DCOPY.csv}</button>`}</div><div class="tb-d">${DCOPY.tblDesc}</div></div><div style="height:16px"></div>${dTableHtml(D, shot)}</div>`;
+}
+
+/* ---------- ECharts ---------- */
+let CHARTS = [];
+function disposeCharts() { CHARTS.forEach(c => { try { c.ro.disconnect(); c.ch.dispose(); } catch (e) { } }); CHARTS = []; }
+/* Fable §5 #4：Y 軸上限依「目前看得到的系列」算（點掉圖例後重算，同 ECharts／Dashboard 預設行為）*/
+function yStep(D, shot) { let m = 0; D.series.forEach(s => { if (shot || !state.dHidden.has(s.name)) s.data.forEach(v => { if (v != null && v > m) m = v; }); }); return niceStep((m || D.max) / 5); }
+function mkChart(el, D, shot) {
+  if (typeof echarts === 'undefined') { el.innerHTML = '<div class="es"><div class="es-desc">ECharts failed to load.</div></div>'; return; }
+  const ch = echarts.init(el), step = yStep(D, shot), labels = D.times.map(fmtAx);
+  const sel = {}; D.series.forEach(s => { sel[s.name] = shot || !state.dHidden.has(s.name); });
+  ch.setOption({
+    animation: false,
+    grid: { left: 68, right: 30, top: 17, bottom: 45 },   /* ⚠ DEVIATION: 稿上折線畫到卡片右緣、X 軸標籤自己平均分布（第一個在軸右 38、最後一個離右緣 34，跟資料點對不上）。實作讓標籤對準資料點（boundaryGap false），最後一個標籤（2 Jan. 00:00）置中在最後一點，右側留 30 才不會被裁掉。
+     對稿修正：折線起點貼齊 Y 軸（boundaryGap false）、0 軸實線 #B3B3B3、折線圓滑（稿的 path 帶 r20 轉角）*/
+    legend: { show: false, data: D.series.map(s => s.name), selected: sel },
+    tooltip: shot ? { show: false } : {
+      trigger: 'axis', axisPointer: { type: 'line', lineStyle: { color: '#CCCCCC', width: 1, type: 'solid' } },
+      backgroundColor: '#FFFFFF', borderColor: '#FFFFFF', borderWidth: 1, padding: 8, confine: false,
+      textStyle: { color: '#262626', fontFamily: 'Noto Sans', fontSize: 12 },
+      extraCssText: 'box-shadow:0 0 6px rgba(0,0,0,.2);border-radius:5px;max-width:600px;',
+      /* 對稿修正（#02-2）：tooltip 在指示線右側 8、上緣固定在圖表頂端上方 9（不跟著游標上下跑）；右邊放不下才翻到左側 */
+      position: (pt, p, dom, rect, size) => { let x = pt[0] + 8; if (x + size.contentSize[0] > size.viewSize[0]) x = pt[0] - size.contentSize[0] - 8; return [x, -9]; },
+      formatter: ps => {
+        const items = ps.filter(p => p.value != null && p.value !== '-').sort((a, b) => (a.seriesName === 'Others') - (b.seriesName === 'Others') || b.value - a.value);
+        const i = ps[0].dataIndex;
+        return `<div class="ct"><div class="ct-t">${fmtTip(D.times[i])}</div>${items.map(p => `<div class="ct-r"><i style="background:${p.color}"></i><span class="n">${esc(p.seriesName)}</span><span class="v">$${fmtMoney(p.value)}</span></div>`).join('')}</div>`;
+      }
+    },
+    xAxis: { type: 'category', data: labels, boundaryGap: false, axisLine: { lineStyle: { color: '#B3B3B3' } }, axisTick: { show: false }, axisLabel: { interval: 7, color: '#262626', fontSize: 12, lineHeight: 18, margin: 9, fontFamily: 'Noto Sans', hideOverlap: false } },
+    yAxis: { type: 'value', min: 0, max: step * 5, interval: step, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#262626', fontSize: 12, fontFamily: 'Noto Sans', margin: 8, formatter: v => fmtAxis(v, step) }, splitLine: { lineStyle: { color: '#CCCCCC', type: [5, 5] } } },
+    series: D.series.map(s => ({ name: s.name, type: 'line', data: s.data, connectNulls: false, showSymbol: false, smooth: 0.3, smoothMonotone: 'x', symbol: 'circle', symbolSize: 8, lineStyle: { width: 1.5, color: s.color }, itemStyle: { color: s.color, borderColor: '#FFFFFF', borderWidth: 2 },   /* #02-2 Marker：8 圓點＋白框 2 */ emphasis: { focus: 'series', lineStyle: { width: 1.5 } }, blur: { lineStyle: { opacity: .25 } } }))
+  });
+  const ro = new ResizeObserver(() => ch.resize()); ro.observe(el);
+  CHARTS.push({ ch, ro, el, shot });
+}
+function initCharts(it) {
+  const D = genDetail(it);
+  document.querySelectorAll('.js-chart').forEach(el => mkChart(el, D, el.dataset.shot === '1'));
+}
+function liveChart() { const c = CHARTS.find(x => !x.shot); return c && c.ch; }
+
+/* ---------- Loading（#04）：標籤保留、內容換灰條；讀取中不能操作的按鈕 Disabled。
+ * Figma #04 的標籤寫「Anomaly Time」，#02／#06／#07 與 FE 都是「Anomaly Date」→ ⚠ DEVIATION 用 Anomaly Date（資源標題「Project Name / ID」前端回饋：從 List 點入就知道 CSP，不用讀取）*/
+function dSkelHtml(it) {
+  /* 對稿修正（#04）：各灰條的尺寸與上下內距照稿（Project 320×20 上 5、Cost 200×36 上下 9、Date 200×14 上 5、Assigned 200×12 上 3）*/
+  const sk = (w, h, m) => `<div class="sk-s" style="width:${w};height:${h}px;${m ? 'margin:' + m : ''}"></div>`;
+  const WAVE = '<svg viewBox="0 0 966 174" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="dskw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E6E6E6"/><stop offset="1" stop-color="#E6E6E6" stop-opacity="0"/></linearGradient></defs><path d="M0 33 L45 25 L75 36 L110 36 L140 25 L175 36 L205 36 L235 24 L265 28 L300 36 L333 25 L363 34 L395 6 L427 36 L455 37 L490 63 L525 35 L555 25 L585 36 L615 36 L645 30 L680 36 L745 36 L773 53 L805 35 L837 25 L870 35 L897 28 L930 56 L955 44 L966 46 L966 174 L0 174Z" transform="translate(0 40)" fill="url(#dskw)"/><path d="M0 33 L45 25 L75 36 L110 36 L140 25 L175 36 L205 36 L235 24 L265 28 L300 36 L333 25 L363 34 L395 6 L427 36 L455 37 L490 63 L525 35 L555 25 L585 36 L615 36 L645 30 L680 36 L745 36 L773 53 L805 35 L837 25 L870 35 L897 28 L930 56 L955 44 L966 46" transform="translate(0 40)" fill="none" stroke="#E6E6E6" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>';
+  const lgRow = ws => `<div>${ws.map(w => `<div class="sk-s" style="flex-grow:${w}"></div>`).join('')}</div>`;
+  const rRow = cls => `<div class="${cls}">${'<div class="sk-s" style="width:50px;height:14px"></div>'.repeat(4)}</div>`;
+  return `<div class="rpt-hd"><h1>${DCOPY.title}</h1><div class="rpt-act"><button class="tx-link" disabled>${SVG_TREND}<span class="t">${DCOPY.trend}</span></button><button class="ib30" disabled aria-label="${DCOPY.shotTip}">${SVG_SHOT}</button></div></div>
+  <div class="rpt-top"><div class="rpt-info">
+    <div class="blk"><div class="l12">${RES_LABEL[it.platform]}</div>${sk('320px', 20, '5px 0')}</div>
+    <div class="blk"><div class="l12">Cost</div>${sk('200px', 36, '9px 0')}</div>
+    <div class="blk"><div class="l12">Anomaly Date</div>${sk('200px', 14, '5px 0')}</div>
+  </div>${state.showParked ? `<div class="ai is-parked"><div class="ai-hd"><span class="ai-t"><span class="ai-ic" aria-hidden="true"></span><span class="tx">${DCOPY.ai}</span></span><span class="pk-badge"><span class="material-symbols-outlined">pause_circle</span>已設計・PM 尚未安排開發</span></div><div style="display:flex;flex-direction:column">${'<div class="sk-a"></div>'.repeat(5)}</div></div>` : ''}</div>
+  <div class="asg"><div class="l12">${DCOPY.asg}</div><div>${sk('200px', 12, '3px 0 6px')}</div></div>
+  <div class="sec"><div class="sec-t">${DCOPY.chartTitle}<span class="material-symbols-outlined info">info</span></div>
+    <div class="dsk-chart">${sk('80px', 12, '2px 0 0 4px')}
+      ${[70, 158, 244].map(t => `<div class="sk-s dsk-yl" style="top:${t}px"></div>`).join('')}
+      <div class="dsk-grid"><div class="dsk-h" style="top:0"></div><div class="dsk-h" style="top:126px"></div><div class="dsk-h solid" style="top:250px"></div><div class="dsk-vs">${'<i></i>'.repeat(16)}</div></div>
+      <div class="dsk-wave">${WAVE}</div>
+      <div class="dsk-xl">${'<div class="sk-s"></div>'.repeat(16)}</div>
+      <div class="dsk-lg">${lgRow([247, 80, 247, 80, 247])}${lgRow([80, 330, 80, 330, 80])}</div></div></div>
+  <div class="dtbl dtbl-sk"><div class="tb-top"><div class="tb-row"><div class="sec-t">${DCOPY.tblTitle}</div><button class="btn btn-o btn-s" disabled><span class="material-symbols-outlined">download</span>${DCOPY.csv}</button></div><div class="tb-d">${DCOPY.tblDesc}</div></div><div style="height:15px"></div>
+    <div class="dsk-tbl"><div class="l"><div class="hd">${sk('100px', 14)}</div>${`<div class="rw">${sk('100%', 14)}</div>`.repeat(3)}</div><div class="dv"></div><div class="r">${rRow('hd')}${rRow('rw').repeat(3)}</div></div></div>`;
+}
+
+/* ---------- 路由與繪製 ---------- */
+function goBackHtml() { return `<a class="gb" role="link" tabindex="0" data-a="d-back">${SVG_BACK}<span class="t">${DCOPY.back}</span></a>`; }
+function renderDetail() {
+  disposeCharts();
+  const root = $('#content'), it = findItem(state.detailId);
+  let ps = state.dPage;
+  if (ps !== 'loading' && state.pageState === 'no-auth') ps = 'no-auth';        // 沿用列表的規則：沒有授權資源就是 No Authorization
+  if (!it && ps !== 'loading') ps = 'error';                                       // 網址 id 無效（#05 可能情境）
+  let card;
+  if (ps === 'loading' && it) card = `<div class="card rpt" role="status" aria-label="Loading">${dSkelHtml(it)}</div>`;
+  else if (ps === 'error') card = `<div class="card rpt is-dtall"><div class="rpt-hd"><h1>${DCOPY.title}</h1></div><div class="es"><span class="material-symbols-outlined es-ic is-err">error</span><div class="es-title">${DCOPY.err.title}</div><div class="es-desc">${esc(DCOPY.err.desc)}</div></div></div>`;
+  else if (ps === 'empty') card = `<div class="card rpt is-dtall"><div class="rpt-hd"><h1>${DCOPY.title}</h1></div><div class="es">${ILLUS_TABLE}<div class="es-title">${DCOPY.empty.title}</div><div class="es-desc">${esc(DCOPY.empty.desc)}</div></div></div>`;
+  else if (ps === 'no-auth') {
+    const admin = role().canAddAuth;
+    card = esCard(`${ILLUS_AUTH}<div class="es-title">${COPY.noAuth.title}</div><div class="es-desc">${esc(admin ? COPY.noAuth.admin : COPY.noAuth.nonAdmin)}</div>${admin ? `<a class="btn btn-p" href="./organization-settings.html"><span class="material-symbols-outlined ic-add">add</span>${COPY.noAuth.btn}</a>` : ''}`, true);
+  } else card = `<div class="card rpt">${reportHtml(it, genDetail(it), false)}</div>`;
+  root.innerHTML = goBackHtml() + card;
+  if (ps === 'set') { initCharts(it); const sc = $('#d-tbl'); if (sc) { sc.addEventListener('scroll', () => sc.classList.toggle('is-scrolled', sc.scrollLeft > 0), { passive: true }); syncStickyLeft(sc); } }
+}
+/* SKU 欄的 sticky left＝Service 欄右緣（Service 會隨可用寬度變寬）*/
+let _stickyRO = null;
+function syncStickyLeft(sc) {
+  const set = () => { const th = sc.querySelectorAll('.th-row .th'); if (th.length > 2) sc.style.setProperty('--l3', (th[0].getBoundingClientRect().width + th[1].getBoundingClientRect().width) + 'px'); };
+  set(); if (_stickyRO) _stickyRO.disconnect(); _stickyRO = new ResizeObserver(set); _stickyRO.observe(sc);
+}
+function renderShot() {
+  const r = $('#shot-root'), it = findItem(state.detailId);
+  if (state.route !== 'screenshot' || !it) { r.className = ''; r.innerHTML = ''; return; }
+  const D = genDetail(it);
+  r.className = 'on';
+  r.innerHTML = `<div class="shot-bar"><span class="material-symbols-outlined">screenshot_monitor</span><span>Screenshot output preview · LumiTure_anomaly_report.png　<span style="opacity:.7">⚠ 設計端暫擬：真產品下載 PNG，prototype 用預覽＋列印</span></span><span class="sp"></span><button class="btn btn-o" data-a="shot-print"><span class="material-symbols-outlined">print</span>Print / Save as PDF</button><button class="btn btn-p" data-a="shot-close">Close</button></div>
+  <div class="shot-scroll"><div class="shot-canvas" id="shot-canvas"><div class="shot-hd">${logoLockup()}</div><div class="shot-main"><div class="card rpt">${reportHtml(it, D, true)}</div></div><div class="shot-disc">${DCOPY.disc}</div><div class="shot-ft">${logoLockup()}<div class="cp">Copyright © 2026 LumiTure.ai, Inc. All rights reserved.</div></div></div></div>`;
+  fitShot();
+  r.querySelectorAll('.js-chart').forEach(el => mkChart(el, D, true));
+}
+/* 對稿修正（#08 Logo_LumiTure.ai 238×40）：原本用圖形標＋文字代替字標，改用稿匯出的官方 Logo 向量（Figma REST images?format=svg）*/
+function logoLockup() {
+  return `<div class="shot-logo"><svg viewBox="0 0 238 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="LumiTure.ai" role="img"><path d="M35.7729 0C46.8186 0 55.7729 8.9543 55.7729 20C55.7729 31.0457 46.8186 40 35.7729 40C31.2718 40 27.1189 38.5119 23.7768 36.0025C23.6891 35.9366 23.5826 35.9004 23.4728 35.9004H15.06C14.6812 35.9004 14.3348 35.6855 14.1654 35.3467L12.3031 31.623C12.1375 31.2908 12.3792 30.9007 12.7504 30.9004H18.08C18.4769 30.9004 18.718 30.4584 18.5169 30.1162C17.9771 29.1975 17.5084 28.2318 17.1188 27.2268C17.043 27.0314 16.8562 26.9004 16.6466 26.9004H2.80996C2.43119 26.9004 2.08482 26.6855 1.91543 26.3467L0.0531277 22.623C-0.112484 22.2908 0.129151 21.9007 0.500393 21.9004H15.3143C15.609 21.9004 15.8392 21.6469 15.8192 21.3529C15.7889 20.9058 15.7729 20.4547 15.7729 20C15.7729 19.4794 15.793 18.9635 15.8322 18.453C15.8549 18.1572 15.624 17.9004 15.3274 17.9004H0.750393C0.379151 17.9001 0.137516 17.509 0.303128 17.1768L2.16543 13.4531C2.33482 13.1143 2.68119 12.9004 3.05996 12.9004H16.7267C16.9344 12.9004 17.1199 12.7718 17.1969 12.579C17.599 11.5732 18.0799 10.6077 18.6327 9.69016C18.8389 9.34787 18.5982 8.90039 18.1986 8.90039H7.25039C6.87915 8.90009 6.63752 8.50896 6.80313 8.17676L8.66543 4.45312C8.83482 4.11434 9.18119 3.90039 9.55996 3.90039H23.7421C23.849 3.90039 23.9529 3.86598 24.0394 3.8032C27.3353 1.41136 31.389 0 35.7729 0ZM35.7729 4C26.9363 4 19.7729 11.1634 19.7729 20C19.7729 28.8366 26.9363 36 35.7729 36C44.6094 36 51.7729 28.8366 51.7729 20C51.7729 11.1634 44.6094 4 35.7729 4Z" fill="white"/><path d="M9.2178 31.4527C9.04841 31.1139 8.70214 30.8999 8.32337 30.8999H4.75042C4.37873 30.8999 4.13698 31.2911 4.30321 31.6235L6.16501 35.3471C6.3344 35.6859 6.68067 35.8999 7.05944 35.8999H10.6324C11.0041 35.8999 11.2458 35.5087 11.0796 35.1763L9.2178 31.4527Z" fill="#4ADFFF"/><path d="M35.7734 8C42.4009 8 47.7734 13.3726 47.7734 20C47.7734 26.6274 42.4009 32 35.7734 32C29.146 32 23.7734 26.6274 23.7734 20C23.7734 13.3726 29.146 8 35.7734 8ZM35.7734 12C34.3566 12 33.0264 12.3695 31.8721 13.0156C33.4832 13.0677 34.7733 14.39 34.7734 16.0137C34.7734 17.6705 33.4303 19.0137 31.7734 19.0137C30.1528 19.0137 28.8323 17.7288 28.7754 16.1221C28.1374 17.2709 27.7734 18.5928 27.7734 20C27.7734 24.4183 31.3552 28 35.7734 28C40.1917 28 43.7734 24.4183 43.7734 20C43.7734 15.5817 40.1917 12 35.7734 12Z" fill="white"/><path fill-rule="evenodd" clip-rule="evenodd" d="M219.977 32.8643C222.502 32.8643 224.618 31.6083 226.324 29.0961V19.1618C225.679 18.0199 224.772 17.093 223.604 16.381C222.435 15.669 221.199 15.313 219.896 15.313C217.787 15.313 215.946 16.1862 214.375 17.9326C212.816 19.6656 212.037 21.6941 212.037 24.0181C212.037 26.4765 212.81 28.5655 214.354 30.285C215.913 32.0046 217.787 32.8643 219.977 32.8643ZM217.026 27.9572C216.05 26.9318 215.534 25.7028 215.534 24.0636C215.534 22.6174 216.016 21.4306 217.05 20.3464L217.05 20.3479C217.05 20.347 217.051 20.3462 217.051 20.3453C218.096 19.2517 219.076 18.8954 220.128 18.8954L220.153 18.8955L220.178 18.8954C221.229 18.8954 222.21 19.2517 223.254 20.3453L223.28 27.9572C222.718 28.5403 222.151 28.9176 221.547 29.1346C221.099 29.3074 220.655 29.3716 220.213 29.3716C220.193 29.3716 220.173 29.3715 220.153 29.3712C220.133 29.3715 220.113 29.3716 220.093 29.3716C219.65 29.3716 219.206 29.3074 218.758 29.1346C218.154 28.9176 217.588 28.5403 217.026 27.9572ZM224.771 24.0636C224.771 25.7028 224.255 26.9318 223.28 27.9572L223.255 20.3464C224.29 21.4306 224.771 22.6174 224.771 24.0636Z" fill="white"/><path d="M199.398 24.0718C199.414 24.4546 199.1 24.7637 198.717 24.7637H185.223C185.532 26.4698 186.23 27.7192 187.319 28.5118C188.42 29.2909 189.616 29.6805 190.905 29.6805C192.714 29.6805 194.608 28.7133 196.125 27.3879C196.384 27.1614 196.768 27.1362 197.042 27.3438L198.532 28.4698C198.853 28.7126 198.904 29.1776 198.625 29.4676C196.462 31.7114 193.733 32.8643 190.744 32.8643C188.272 32.8643 186.204 32.018 184.538 30.3253C182.872 28.6327 182.039 26.5303 182.039 24.0181C182.039 21.6672 182.879 19.632 184.558 17.9124C186.251 16.1795 188.313 15.313 190.744 15.313C193.135 15.313 195.184 16.1929 196.89 17.9527C198.453 19.5527 199.289 21.5924 199.398 24.0718ZM185.586 21.9628H195.742C194.613 19.679 192.947 18.5371 190.744 18.5371C188.34 18.5371 186.62 19.679 185.586 21.9628Z" fill="white"/><path d="M151.061 16.6784C151.061 16.2927 151.373 15.98 151.759 15.98H153.868C154.254 15.98 154.567 16.2927 154.567 16.6784V25.3501C154.567 28.2384 155.836 29.6825 158.375 29.6825C159.504 29.6825 160.397 29.2997 161.055 28.5339C161.714 27.7548 162.043 26.6935 162.043 25.3501V16.6784C162.043 16.2927 162.355 15.98 162.741 15.98H164.81C165.196 15.98 165.509 16.2927 165.509 16.6784V25.9143C165.509 27.9966 164.83 29.7094 163.473 31.0528C162.117 32.3962 160.384 33.0679 158.275 33.0679C156.125 33.0679 154.385 32.3962 153.055 31.0528C151.726 29.7094 151.061 27.9563 151.061 25.7934V16.6784Z" fill="white"/><path d="M133.992 7.63054C133.992 7.24482 134.305 6.93213 134.691 6.93213H148.991C149.377 6.93213 149.69 7.24482 149.69 7.63054V9.73996C149.69 10.1257 149.377 10.4384 148.991 10.4384H143.564V31.9058C143.564 32.2916 143.251 32.6043 142.865 32.6043H140.796C140.411 32.6043 140.098 32.2916 140.098 31.9058V10.4384H134.691C134.305 10.4384 133.992 10.1257 133.992 9.73996V7.63054Z" fill="white"/><path d="M126.496 16.675C126.496 16.2893 126.809 15.9766 127.195 15.9766H129.264C129.649 15.9766 129.962 16.2893 129.962 16.675V31.9003C129.962 32.286 129.649 32.5987 129.264 32.5987H127.195C126.809 32.5987 126.496 32.286 126.496 31.9003V16.675Z" fill="white"/><path d="M99.0031 32.604C98.6174 32.604 98.3047 32.2913 98.3047 31.9056V16.678C98.3047 16.2923 98.6174 15.9796 99.0031 15.9796H101.072C101.458 15.9796 101.771 16.2923 101.771 16.678V18.5387C102.59 17.4909 103.369 16.7252 104.108 16.2415C104.86 15.7579 105.72 15.5161 106.687 15.5161C107.95 15.5161 108.938 15.7915 109.65 16.3423C110.375 16.8931 110.986 17.773 111.483 18.9821C112.357 17.773 113.196 16.8931 114.002 16.3423C114.822 15.7915 115.769 15.5161 116.843 15.5161C118.16 15.5161 119.295 16.0132 120.249 17.0073C121.203 17.9879 121.68 19.1567 121.68 20.5135V31.9056C121.68 32.2913 121.367 32.604 120.981 32.604H118.892C118.506 32.604 118.194 32.2913 118.194 31.9056V21.4203C118.194 19.5799 117.287 18.6596 115.473 18.6596C114.439 18.6596 113.559 19.1298 112.833 20.0702C112.121 21.0106 111.765 22.1726 111.765 23.5563V31.9056C111.765 32.2913 111.453 32.604 111.067 32.604H108.958C108.572 32.604 108.259 32.2913 108.259 31.9056V21.8838C108.259 19.7075 107.366 18.6193 105.579 18.6193C104.518 18.6193 103.618 19.0627 102.879 19.9493C102.14 20.8359 101.771 21.9308 101.771 23.2339V31.9056C101.771 32.2913 101.458 32.604 101.072 32.604H99.0031Z" fill="white"/><path d="M79.9277 16.6779C79.9277 16.2922 80.2404 15.9795 80.6261 15.9795H82.7356C83.1213 15.9795 83.434 16.2922 83.434 16.6779V25.3496C83.434 28.2379 84.7035 29.682 87.2425 29.682C88.3709 29.682 89.2643 29.2992 89.9225 28.5334C90.5808 27.7543 90.9099 26.693 90.9099 25.3496V16.6779C90.9099 16.2922 91.2226 15.9795 91.6083 15.9795H93.6775C94.0632 15.9795 94.3759 16.2922 94.3759 16.6779V25.9138C94.3759 27.9961 93.6975 29.7089 92.3406 31.0523C90.9838 32.3957 89.2508 33.0674 87.1417 33.0674C84.9923 33.0674 83.2526 32.3957 81.9227 31.0523C80.5927 29.7089 79.9277 27.9558 79.9277 25.7929V16.6779Z" fill="white"/><path d="M65.5 7.63054C65.5 7.24482 65.8127 6.93213 66.1984 6.93213H68.2675C68.6532 6.93213 68.9659 7.24482 68.9659 7.63054V28.4399C68.9659 28.8256 69.2786 29.1383 69.6643 29.1383H76.6301C77.0158 29.1383 77.3285 29.451 77.3285 29.8367V31.9058C77.3285 32.2916 77.0158 32.6043 76.6301 32.6043H66.1984C65.8127 32.6043 65.5 32.2916 65.5 31.9058V7.63054Z" fill="white"/><path d="M128.755 7.55279C128.586 7.214 128.239 7 127.86 7H124.288C123.916 7 123.674 7.39116 123.84 7.72361L125.702 11.4472C125.872 11.786 126.218 12 126.597 12H130.169C130.541 12 130.783 11.6088 130.617 11.2764L128.755 7.55279Z" fill="white"/><path d="M233.805 16.675C233.805 16.2893 234.117 15.9766 234.503 15.9766H236.572C236.958 15.9766 237.271 16.2893 237.271 16.675V31.9003C237.271 32.286 236.958 32.5987 236.572 32.5987H234.503C234.117 32.5987 233.805 32.286 233.805 31.9003V16.675Z" fill="white"/><path d="M225.312 16.675C225.312 16.2893 225.625 15.9766 226.011 15.9766H228.106C228.492 15.9766 228.805 16.2893 228.805 16.675V31.9003C228.805 32.286 228.492 32.5987 228.106 32.5987H226.011C225.625 32.5987 225.312 32.286 225.312 31.9003V16.675Z" fill="white"/><path d="M235.755 7.55279C235.586 7.214 235.239 7 234.86 7H231.288C230.916 7 230.674 7.39116 230.84 7.72361L232.702 11.4472C232.872 11.786 233.218 12 233.597 12H237.169C237.541 12 237.783 11.6088 237.617 11.2764L235.755 7.55279Z" fill="white"/><path d="M208.017 28.4527C207.847 28.1139 207.501 27.8999 207.122 27.8999H203.549C203.178 27.8999 202.936 28.2911 203.102 28.6235L204.964 32.3471C205.133 32.6859 205.479 32.8999 205.858 32.8999H209.431C209.803 32.8999 210.045 32.5087 209.878 32.1763L208.017 28.4527Z" fill="white"/><path d="M172.866 16.0704C173.252 16.0704 173.564 16.3831 173.564 16.7688V19.496C174.343 18.1258 175.102 17.1384 175.841 16.5339C176.594 15.9159 177.568 15.6069 178.763 15.6069C178.959 15.6069 179.205 15.6343 179.501 15.689C179.892 15.7614 180.117 16.1671 180.001 16.5481L179.331 18.7495C179.226 19.0931 178.878 19.2988 178.524 19.2385C178.192 19.1818 177.956 19.1535 177.816 19.1535C176.634 19.1535 175.64 19.5699 174.834 20.4028C174.041 21.2223 173.645 22.25 173.645 23.4859V31.9964C173.645 32.3821 173.332 32.6948 172.947 32.6948H170.837C170.451 32.6948 170.139 32.3821 170.139 31.9964V16.7688C170.139 16.3831 170.451 16.0704 170.837 16.0704H172.866Z" fill="white"/></svg></div>`;
+}
+function fitShot() { const cv = $('#shot-canvas'); if (!cv) return; const z = Math.min(1, ($('.shot-scroll').clientWidth) / 2026); cv.style.zoom = z; }
+window.addEventListener('resize', fitShot);
+
+function renderRoute() { if (state.route === 'list') renderList(); else { renderDetail(); renderShot(); } }
+function setHash(h) { if (location.hash !== h) history.replaceState(null, '', location.pathname + location.search + h); }
+function enterDetail(id, opts) {
+  opts = opts || {};
+  closeModal();
+  if (state.detailId !== id) { state.dTree = false; state.dHidden = new Set(); state.dSort = { k: 'time', dir: -1 }; }
+  state.detailId = id; state.route = opts.shot ? 'screenshot' : 'detail'; _listShown = true;
+  if (opts.dPage) state.dPage = opts.dPage;
+  if (!opts.noSkel && (state.dPage === 'set' || !opts.dPage) && findItem(id)) {          // 進頁固定跑一次 skeleton（全站慣例，650ms）
+    state.dPage = 'loading'; renderRoute();
+    setTimeout(() => { if (state.dPage === 'loading' && state.detailId === id) { state.dPage = 'set'; renderRoute(); if (opts.after) opts.after(); } }, 650);
+  } else { if (!opts.dPage) state.dPage = 'set'; renderRoute(); if (opts.after) setTimeout(opts.after, 60); }
+  window.scrollTo(0, 0);
+}
+function routeFromHash() {
+  const h = (location.hash || '').replace('#', '');
+  let m;
+  if ((m = h.match(/^detail\/(.+)$/))) {
+    const id = decodeURIComponent(m[1]);
+    if (state.route === 'screenshot' && state.detailId === id) { state.route = 'detail'; renderShot(); return true; }   // 從 Screenshot 預覽關閉：回到同一頁，不重跑 skeleton
+    enterDetail(id); return true;
+  }
+  if ((m = h.match(/^screenshot(?:\/(.+))?$/))) { enterDetail(m[1] ? decodeURIComponent(m[1]) : state.detailId, { shot: true, dPage: 'set', noSkel: true }); return true; }
+  return false;
+}
+window.addEventListener('hashchange', () => { if (!routeFromHash() && state.route !== 'list') showList({ noSkel: true }); });
+
+function downloadCsv() {
+  const it = findItem(state.detailId); if (!it) return;
+  const D = genDetail(it), cols = DCOLS[D.cloud], q = v => { const t = String(v == null ? '' : v); return /[",\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+  const head = cols.map(c => c[1]);
+  const body = sortRows(D).map(r => cols.map(c => c[0] === 'time' ? fmtCT(r.ts) : (['cost', 'price', 'amt'].includes(c[0]) ? r[c[0]].toFixed(2) : r[c[0]])).map(q).join(','));
+  const csv = '﻿' + [head.map(q).join(',')].concat(body).join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+  a.download = 'anomaly-' + it.rid + '-' + fmtDMYs(dateOf(it.off)).replace(/\//g, '-') + '.csv'; document.body.appendChild(a); a.click(); a.remove();
+}
+
+Object.assign(ACT, {
+  'detail': (el, e) => { e.stopPropagation(); location.hash = '#detail/' + encodeURIComponent(el.dataset.id); },
+  'd-back': () => { location.hash = ''; },
+  'd-tree': () => { state.dTree = !state.dTree; renderDetail(); const r = $('.gt-row.can'); r && r.focus(); },
+  'd-sort': el => { const k = el.dataset.k, s = state.dSort; state.dSort = s.k === k ? { k, dir: -s.dir } : { k, dir: 1 }; const sc = $('#d-tbl'), sl = sc ? sc.scrollLeft : 0; renderDetail(); const n = $('#d-tbl'); if (n) { n.scrollLeft = sl; n.classList.toggle('is-scrolled', sl > 0); } const f = document.querySelector('.th[data-k="' + k + '"]'); f && f.focus(); },
+  'd-lg': el => {
+    const n = el.dataset.n, ch = liveChart(); state.dHidden.has(n) ? state.dHidden.delete(n) : state.dHidden.add(n);
+    el.classList.toggle('off', state.dHidden.has(n)); el.setAttribute('aria-pressed', String(!state.dHidden.has(n)));
+    ch && ch.dispatchAction({ type: 'legendToggleSelect', name: n });
+    if (ch) { const st = yStep(genDetail(findItem(state.detailId)), false); ch.setOption({ yAxis: { max: st * 5, interval: st, axisLabel: { formatter: v => fmtAxis(v, st) } } }); }
+  },
+  'd-csv': () => downloadCsv(),
+  /* ⚠ 設計端暫擬：View 1-Month Cost Trend 真產品帶參數（Anomaly 前一個月、Group by SKU、Filter 該 Project／Account）；Cost Dashboard prototype 沒有接這些參數，所以開頁＋toast 說明 */
+  'd-trend': () => { toast('info', DCOPY.trendToast); window.open('./cost-dashboard.html', '_blank', 'noopener'); },
+  'd-shot': () => { toast('info', DCOPY.shotToast); location.hash = '#screenshot/' + encodeURIComponent(state.detailId); },
+  'shot-close': () => { location.hash = '#detail/' + encodeURIComponent(state.detailId); },
+  'shot-print': () => window.print()
+});
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.gb,.gt-row.can,.th.sortable')) { e.preventDefault(); e.target.click(); }
+  if (e.key === 'Escape' && state.route === 'screenshot') ACT['shot-close']();
+});
+/* 圖例 hover：對應 series 強化、其他變淡（Guideline「Legend 行為」）*/
+document.addEventListener('mouseover', e => { const el = e.target.closest && e.target.closest('.lg-i'); const ch = liveChart(); if (el && ch && !el.closest('.is-static') && !el.classList.contains('off')) ch.dispatchAction({ type: 'highlight', seriesName: el.dataset.n }); });
+document.addEventListener('mouseout', e => { const el = e.target.closest && e.target.closest('.lg-i'); const ch = liveChart(); if (el && ch && !el.closest('.is-static')) ch.dispatchAction({ type: 'downplay', seriesName: el.dataset.n }); });
 </script>
 <script>
 /* ============================================================
@@ -1752,7 +2405,8 @@ window.DEMO_PAGES = [
   { id: 'role',     label: 'Role',     icon: 'person' },
   { id: 'state',    label: 'State',    icon: 'layers' },
   { id: 'view',     label: 'View',     icon: 'web' },
-  { id: 'settings', label: 'Settings', icon: 'settings' }
+  { id: 'settings', label: 'Settings', icon: 'settings' },
+  { id: 'detail',   label: 'Detail',   icon: 'description' }
 ];
 window.DEMO_SCENARIOS = [
   { id: 'admin', page: 'role', label: 'Owner / Admin', icon: 'admin_panel_settings', tip: '看得到 Alert Settings 按鈕。No-auth 有「Add Your Authorization」按鈕（#01-5）。' },
@@ -1782,7 +2436,7 @@ window.DEMO_SCENARIOS = [
   { id: 'h-pin',      page: 'view', group: 'Hover (#01-3)', label: 'Pin 提示（已釘選）', icon: 'push_pin', tip: '⚠ 未確認：Figma 只在已釘選那顆畫出提示，文案又說「超過 30 天」；FE 一律掛。' },
   { id: 'h-name',     page: 'view', group: 'Hover (#01-3)', label: 'Resource 名稱＋ID', icon: 'badge', tip: '一律顯示 “Name (ID)”。' },
   { id: 'h-detail',   page: 'view', group: 'Hover (#01-3)', label: 'Check Anomaly Details', icon: 'description' },
-  { id: 'd-detail',   page: 'view', group: '詳情入口', label: '點詳情 icon → toast', icon: 'info', tip: '⚠ 設計端暫擬：詳情頁另一輪製作，先以 toast 說明。' },
+  { id: 'd-detail',   page: 'view', group: '詳情入口', label: '點詳情 icon → 進詳情頁', icon: 'description', tip: '列表 Action 欄的 description icon 進詳情頁（hash #detail/<alertId>，進頁先跑 650ms skeleton）。Row 本身不可點。' },
 
   { id: 's-on',   page: 'settings', group: 'Alert Settings 彈窗', label: 'Settings：Detection ON (#03-1)', icon: 'tune', tip: '700 寬，Sensitivity 預設 Medium。' },
   { id: 's-off',  page: 'settings', group: 'Alert Settings 彈窗', label: 'Settings：Detection OFF (#03-2)', icon: 'toggle_off', tip: '下半部 Disabled，仍維持原設定（Medium、五個通知皆 ON）。' },
@@ -1790,7 +2444,31 @@ window.DEMO_SCENARIOS = [
   { id: 's-fail', page: 'settings', group: '送出結果', label: '下一次 Save 失敗（切換）', icon: 'report', tip: '關閉彈窗並跳紅色 toast，設定不變。' },
   { id: 't-ok',   page: 'settings', group: '送出結果', label: 'Toast：updated successfully (#Toast)', icon: 'check_circle' },
   { id: 't-fail', page: 'settings', group: '送出結果', label: 'Toast：failed (#Toast)', icon: 'error' },
-  { id: 't-both', page: 'settings', group: '送出結果', label: 'Toast：兩種同時（Figma 示意）', icon: 'layers', tip: '失敗在上、成功在下。' }
+  { id: 't-both', page: 'settings', group: '送出結果', label: 'Toast：兩種同時（Figma 示意）', icon: 'layers', tip: '失敗在上、成功在下。' },
+
+  { id: 'dt-gcp',      page: 'detail', group: '主畫面（Admin）', label: 'GCP (#02)',                          icon: 'cloud', tip: 'Project Name / ID、Cost、Anomaly Date、Assigned to（預設收合）、Cost by Top Spending 10 Services、36 小時明細。' },
+  { id: 'dt-collapsed',page: 'detail', group: '主畫面（Admin）', label: 'GCP：Sidebar 收合 (#02-1)',         icon: 'left_panel_close', tip: '收合 Sidebar 時內容區變寬，表格欄位寬度與固定前三欄行為不變。' },
+  { id: 'dt-expand',   page: 'detail', group: '主畫面（Admin）', label: 'GCP：展開 Assigned to (#02-3)',      icon: 'account_tree', tip: 'Admin→Tier-1→Tier-2 的 L 型階層，同層字母升冪；長名稱以 … 截斷、懸停看全文（max 400）。' },
+  { id: 'dt-aws',      page: 'detail', group: '主畫面（Admin）', label: 'AWS (#06)',                          icon: 'cloud_queue', tip: 'Account Name / ID；欄位 Usage Type／Unblended Cost／Public On-Demand Cost／Region／Purchase Option／Usage Quantity。該資源沒有分配給下層群組：不顯示箭頭與後綴字串。' },
+  { id: 'dt-azure',    page: 'detail', group: '主畫面（Admin）', label: 'Azure (#07)',                        icon: 'cloud_done', tip: 'Resource Group Name / ID；欄位 Meter Category／Meter／All Cost in USD／PAYGPrice／Location／Frequency／Quantity／Unit of Measure。該資源較晚才有花費，部分折線從中段開始。' },
+  { id: 'dt-org',      page: 'detail', group: '主畫面（Admin）', label: '資源沒有指派給任何群組（補的）',     icon: 'domain', tip: '⚠ 設計端暫擬：資源屬於 org 層級（後端把 Assigned Group 全部移除，只有 Admin 看得到，#02 黃便條）。稿沒畫，Assigned to 只顯示 --，跟列表一致。' },
+  { id: 'dt-sort-cost',page: 'detail', group: '主畫面（Admin）', label: '明細表：依 Cost 排序',              icon: 'sort', tip: '可排序的欄位只有稿上畫箭頭的 Cost Time／Cost／Pricing。Cost Time 預設新→舊。⚠ 設計端暫擬：點新欄位一律從升冪開始。' },
+  { id: 'dt-h-shot',   page: 'detail', group: 'Hover (#02-2)',   label: 'Take Screenshot',                    icon: 'screenshot_monitor' },
+  { id: 'dt-h-info',   page: 'detail', group: 'Hover (#02-2)',   label: '圖表標題說明',                       icon: 'info' },
+  { id: 'dt-h-chart',  page: 'detail', group: 'Hover (#02-2)',   label: '圖表 tooltip（11 項、Others 固定最後）', icon: 'show_chart', tip: '白底 chart tooltip，依金額高到低，Others 固定在最後。' },
+  { id: 'dt-h-cell',   page: 'detail', group: 'Hover (#02-2)',   label: '表格儲存格被 … 截斷的全文',          icon: 'more_horiz', tip: '「Hover 不論內容長短統一顯示 Tooltips」（2024/11 與前端約定）。' },
+  { id: 'dt-loading',  page: 'detail', group: '必備狀態',        label: 'Loading skeleton (#04)',             icon: 'hourglass_top', tip: '標籤保留、內容換灰條；View 1-Month Cost Trend／截圖／Download CSV Disabled。' },
+  { id: 'dt-empty',    page: 'detail', group: '必備狀態',        label: 'No Anomaly Alerts（補的，Figma 沒畫）', icon: 'monitoring', tip: '⚠ 設計端暫擬：Figma 沒畫，文案取自 FE。後端回饋這個情況實際不會發生。' },
+  { id: 'dt-error',    page: 'detail', group: '必備狀態',        label: 'Error page (#05)',                   icon: 'cloud_off', tip: '通用錯誤頁：Anomaly Details Unavailable。可能原因：複製到無效的網頁 id、蓄意改 id、網路問題。直接開 #detail/xxx 也會看到。' },
+  { id: 'dt-noauth',   page: 'detail', group: '必備狀態',        label: 'No authorization（沿用列表）',       icon: 'lock', tip: '沿用列表的規則：沒有授權資源就顯示 No Authorization。' },
+  { id: 'dt-role-t1',  page: 'detail', group: '角色 (⚠ 設計端暫擬)', label: 'T1：Assigned to 從 Tier-1 起',   icon: 'supervisor_account', tip: '#02-3 只畫了 Admin 視角。T1 從自己的 Tier-1 往下、T2 只呈現自己（#06 註記）。' },
+  { id: 'dt-role-t2',  page: 'detail', group: '角色 (⚠ 設計端暫擬)', label: 'T2：只呈現自己',                 icon: 'person' },
+  { id: 'dt-shot',     page: 'detail', group: 'Screenshot (#08)', label: '截圖輸出版面 (#08)',                icon: 'screenshot_monitor', tip: '上下 Logo、圖例全顯示、表格 20 列全欄位、只留目前排序箭頭、底部 Disclaimer、隱藏 View 1-Month／Download CSV。hash #screenshot。' },
+  { id: 'dt-shot-aws', page: 'detail', group: 'Screenshot (#08)', label: '截圖輸出版面：AWS',                 icon: 'cloud_queue' },
+  { id: 'dt-parked-on', page: 'detail', group: '暫緩的設計',     label: '顯示 AI Analysis（預設）',           icon: 'pause_circle', tip: '⏸ PARKED：Figma #02 紫便條「純示意。PM 尚未確定功能方向，暫不開發」。虛線外框＋斜紋底＋badge。' },
+  { id: 'dt-parked-off', page: 'detail', group: '暫緩的設計',    label: '隱藏暫緩的設計（看上線版）',         icon: 'hide_source', tip: '拿掉 AI Analysis 區塊，左欄寬度不變。' },
+  { id: 'dt-csv',      page: 'detail', group: '動作',            label: 'Download CSV',                       icon: 'download', tip: '真的下載 CSV（BOM、依目前排序、36 小時全部列）。' },
+  { id: 'dt-trend',    page: 'detail', group: '動作',            label: 'View 1-Month Cost Trend：toast 說明', icon: 'arrow_circle_right', tip: '⚠ 設計端暫擬：真產品新分頁開 Cost Dashboard 並帶參數；這裡只出 toast（點頁面上的連結才會開新分頁）。' }
 ];
 window.DEMO_DEFAULT = 'set';
 
@@ -1798,6 +2476,7 @@ function setRole(id) { state.role = id; if (window.LumitureTopbar) LumitureTopba
 let _listShown = false;
 function showList(opts) {
   closeModal(); opts = opts || {};
+  if (state.route !== 'list') { state.route = 'list'; disposeCharts(); renderShot(); if (/^#(detail|screenshot)/.test(location.hash)) setHash(''); }
   const first = !_listShown; _listShown = true;
   if (first && state.pageState === 'set' && !opts.noSkel) {   // Kabin 偏好：切進「有資料」畫面前故意跑一次 skeleton
     state.pageState = 'loading'; renderList();
@@ -1817,14 +2496,48 @@ function simHover(sel) {
 }
 const later = fn => setTimeout(fn, 80);
 
+/* ---- Detail 情境（v2）---- */
+function setSidebarCollapsed(on) { const s = document.querySelector('.lt-sidebar'); if (s && s.classList.contains('lt-collapsed') !== on && window.LumitureSidebar) LumitureSidebar.toggleCollapse(); }
+function applyDetail(id) {
+  /* Fable §5 #1（🔴）：原本 dt-role-* 只是「不重設成 admin」，從來沒切到 T1／T2，畫面還是 Admin 的樹 */
+  setRole(id === 'dt-role-t1' ? 't1m' : id === 'dt-role-t2' ? 't2m' : 'admin');
+  state.pageState = id === 'dt-noauth' ? 'no-auth' : 'set';
+  setSidebarCollapsed(id === 'dt-collapsed');
+  if (id !== 'dt-parked-off') state.showParked = true;
+  const go = (rid, o) => { enterDetail(rid, Object.assign({ noSkel: true, dPage: 'set' }, o || {})); if (!(o && o.shot)) setHash('#detail/' + rid); else setHash('#screenshot/' + rid); };
+  const R1 = 'r1';
+  if (id === 'dt-gcp' || id === 'dt-collapsed') return go(R1);
+  if (id === 'dt-expand') { state.dTree = true; return go(R1, { after: () => simHover('.gt-kids .gt-n.ch:first-child .gt-tx') }); }
+  if (id === 'dt-aws') return go('r13');
+  if (id === 'dt-azure') return go('r6');   // 對稿修正：#07 有 Assigned to 群組（r14 是沒有群組的 org 層級資源，見 dt-org）
+  if (id === 'dt-org') return go('r14');
+  if (id === 'dt-sort-cost') { state.detailId = R1; state.dSort = { k: 'cost', dir: -1 }; enterDetail(R1, { noSkel: true, dPage: 'set' }); state.dSort = { k: 'cost', dir: -1 }; renderRoute(); setHash('#detail/' + R1); return; }
+  if (id === 'dt-h-shot') return go(R1, { after: () => simHover('[data-a="d-shot"]') });
+  if (id === 'dt-h-info') return go(R1, { after: () => simHover('.sec-t .info') });
+  if (id === 'dt-h-chart') return go(R1, { after: () => setTimeout(() => { const ch = liveChart(); ch && ch.dispatchAction({ type: 'showTip', seriesIndex: 0, dataIndex: 39 }); }, 150) });
+  if (id === 'dt-h-cell') return go(R1, { after: () => simHover('.td[data-tip^="Security Command"]') });
+  if (id === 'dt-loading') return go(R1, { dPage: 'loading' });
+  if (id === 'dt-empty') return go(R1, { dPage: 'empty' });
+  if (id === 'dt-error') return go(R1, { dPage: 'error' });
+  if (id === 'dt-noauth') return go(R1);
+  if (id === 'dt-role-t1' || id === 'dt-role-t2') { state.dTree = true; return go(R1); }
+  if (id === 'dt-shot') return go(R1, { shot: true });
+  if (id === 'dt-shot-aws') return go('r13', { shot: true });
+  if (id === 'dt-parked-on' || id === 'dt-parked-off') { state.showParked = id === 'dt-parked-on'; return go(state.route === 'list' ? R1 : state.detailId, { dPage: 'set' }); }
+  if (id === 'dt-csv') { go(R1); setTimeout(() => downloadCsv(), 120); return; }
+  if (id === 'dt-trend') { go(R1); toast('info', DCOPY.trendToast); return; }
+}
+
 window.DEMO_APPLY = function (id) {
   closePop(); closeModal();
   const tip = document.getElementById('gl-tip'); if (tip) tip.style.display = 'none';
-  if (ROLES[id]) { setRole(id); if (state.pageState === 'set') state.pageState = 'set'; renderList(); return; }
+  if (ROLES[id]) { setRole(id); if (state.pageState === 'set') state.pageState = 'set'; renderRoute(); return; }
   if (['set', 'loading', 'empty', 'no-auth', 'error'].includes(id)) { if (id === 'set') { resetData(); state.settings.detection = true; } setPageState(id); return; }
   if (id === 'no-auth-na') { setRole('t1m'); setPageState('no-auth'); return; }
   if (id === 'det-off') { state.pageState = 'set'; state.settings.detection = false; showList({ noSkel: true }); return; }
   if (id === 'det-on') { state.pageState = 'set'; state.settings.detection = true; state.settings.sensitivity = 'High'; showList({ noSkel: true }); return; }
+
+  if (id.startsWith('dt-')) return applyDetail(id);
 
   /* ---- View ---- */
   state.pageState = 'set'; _listShown = true;
@@ -1860,6 +2573,7 @@ window.DEMO_APPLY = function (id) {
  * ============================================================ */
 (function boot() {
   setRole('admin');
+  if (routeFromHash()) return;
   const h = (location.hash || '').replace('#', '');
   const map = { loading: 'loading', empty: 'empty', 'no-auth': 'no-auth', 'no-auth-na': 'no-auth-na', error: 'error', pinned: 'v-pinned', 'pinned-empty': 'v-pinned-empty', expand: 'v-expand', 't2': 'v-t2', 'det-off': 'det-off', settings: 's-on', 'settings-off': 's-off', t1m: 't1m', t2mb: 't2mb' };
   if (h === 't1m' || h === 't2mb') { setRole(h); setPageState('no-auth'); return; }
@@ -1887,14 +2601,19 @@ window.DEMO_APPLY = function (id) {
     let x = r.left; if (x + tw > vw - 8) x = Math.max(8, Math.min(r.right + 2, vw - 8) - tw);
     /* Fable §7 #3：#01-3 兩個 Assigned to tooltip 右緣都對齊儲存格文字右緣（1200），不是靠左；靠左會蓋到右邊 Pin */
     if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
+    /* v2 詳情頁（#02-2／#02-3）：截圖按鈕與 Assigned to 長名稱的 tooltip 右緣對齊元件右緣；上方間距 4（data-tip-gap）*/
+    if (cur.dataset.tipAlign === 'right') x = Math.max(8, r.right - tw);
     const below = cur.dataset.tipPos === 'below', dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
-    let y = below ? r.bottom + dy : r.top - th - 6;
+    const gapA = cur.dataset.tipGap != null ? +cur.dataset.tipGap : 6;
+    let y = below ? r.bottom + dy : r.top - th - gapA;
     if (y < 8) y = r.bottom + 4; if (y + th > vh - 8) y = Math.max(8, r.top - th - 6);
     tip.style.left = x + 'px'; tip.style.top = y + 'px';
   }
   document.addEventListener('mouseover', e => {
     const el = e.target.closest && e.target.closest('[data-tip]');
     if (!el || (el === cur && tip.style.display !== 'none')) return;
+    /* Fable §5 #5：data-tip-trunc 的元件只在文字被截斷時才顯示（#02-3「超過呈現 …，懸停可查看完整內容」）；表格儲存格維持「不論長短統一顯示」 */
+    if (el.dataset.tipTrunc != null && el.scrollWidth <= el.clientWidth) return;
     cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place();
   });
   document.addEventListener('mouseout', e => {
