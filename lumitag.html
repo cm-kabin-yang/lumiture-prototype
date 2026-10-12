@@ -674,10 +674,10 @@
 /* 2026-10-06 Kabin：stepper 的數字圓圈跟 value card 序號同一種樣式，使用者會搞混 → 改成「進度條＋Step N 文字」，不用圓圈數字 */
 .v10-stepper{display:flex;align-items:center;gap:10px;background:var(--wh);border-radius:8px;box-shadow:0 0 20px rgba(0,0,0,.10);padding:16px 24px;margin-bottom:20px;flex-wrap:wrap}
 .v10-step{display:inline-flex;align-items:center;gap:10px;border:none;background:none;cursor:pointer;font-family:inherit;padding:2px 0;font-size:14px;font-weight:700;line-height:21px;color:#B3B3B3;border-radius:4px}
-.v10-step-ic{width:20px;height:20px;border-radius:50%;border:2px solid #B3B3B3;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--wh)}
-.v10-step-ic .material-symbols-outlined{font-size:14px;color:var(--wh);font-variation-settings:'FILL' 1,'wght' 700}
+.v10-step-ic{width:24px;height:24px;border-radius:50%;border:2px solid #B3B3B3;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--wh);font-size:12px;font-weight:700;line-height:1;color:#B3B3B3}
+.v10-step-ic .material-symbols-outlined{font-size:16px;color:var(--wh);font-variation-settings:'FILL' 1,'wght' 700}
 .v10-step.is-cur,.v10-step.is-done{color:var(--pri)}
-.v10-step.is-cur .v10-step-ic{border-color:var(--pri)}
+.v10-step.is-cur .v10-step-ic{border-color:var(--pri);background:var(--pri);color:var(--wh)}
 .v10-step.is-done .v10-step-ic{border-color:var(--pri);background:var(--pri)}
 .v10-step:hover .v10-step-t{text-decoration:underline}.v10-step:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
 .v10-step-line{width:40px;height:2px;background:#B3B3B3;flex-shrink:0}.v10-step-line.is-done{background:var(--pri)}
@@ -884,15 +884,18 @@ tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g20
 .v9-conf-rule.is-win .material-symbols-outlined{color:#00B5A6}
 /* allocation card 的 Add Value：跟最後一列拉開，間距同 Add Condition（條件列 margin-bottom 20px） */
 .ac-addrow{margin-top:20px}
-.v9-kube-line{display:flex;align-items:flex-start;gap:8px;margin-top:16px;padding:12px 16px;background:var(--pri-lt10);border-radius:var(--r-sm);font-size:14px;color:var(--g900);line-height:1.6}
-.v9-kube-line>.material-symbols-outlined{font-size:20px;color:var(--pri);font-variation-settings:'FILL' 1;flex-shrink:0}
-.v9-kube-line>.v9-parked-badge{margin-left:auto;flex-shrink:0}
-.v9-kube-body{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
-.v9-kube-line code{font-size:12px;background:var(--wh);border:1px solid var(--g200);padding:0 4px;border-radius:4px}
+/* 2026-10-12：kube 提示與 View Details 分攤說明改用 CMDS「Toast」ststes=info, Bg=White 的外框（白底、陰影、左 4px 色條），
+   Kabin：icon 改灰（藍 icon 旁邊接 text button 看起來像兩顆按鈕）、按鈕改成接在句尾的 text button ⚠ DEVIATION（CMDS info icon 是藍、按鈕在右側） */
+.notice.lt-info.v10-note{align-items:flex-start;margin:16px 0 0;font-size:14px;line-height:1.75}
+.notice.lt-info.v10-note::before{background:var(--pri)}
+.notice.lt-info.v10-note>.material-symbols-outlined{color:var(--g500);font-variation-settings:'FILL' 1;margin-top:3px}
+.v10-note-txt{flex:1;min-width:0;color:var(--g900)}
+.v10-note-txt code{font-size:12px;background:var(--g100);padding:1px 4px;border-radius:4px}
+.v10-note>.v9-parked-badge{margin-left:8px;flex-shrink:0;margin-top:2px}
+.v10-tbtn{border:none;background:none;padding:0;font:inherit;font-weight:700;color:var(--pri);cursor:pointer}
+.v10-tbtn:hover{text-decoration:underline}.v10-tbtn:focus-visible{outline:2px solid var(--pri);outline-offset:2px;border-radius:2px}
+.mh+.v10-note,.mb>.v10-note:first-child{margin:0 0 16px}
 .ac-rm{margin-left:0}
-.v10-rm-alloc{display:flex;gap:8px;align-items:flex-start;margin:0 0 16px;padding:12px 16px;background:var(--pri-lt10);border-radius:var(--r-sm);font-size:14px;line-height:1.6;color:var(--g900)}
-.v10-rm-alloc>.material-symbols-outlined{font-size:20px;color:var(--pri);font-variation-settings:'FILL' 1;flex-shrink:0}
-.v10-rm-alloc a{color:var(--pri);font-weight:500}
 .v9-kube{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--g800);line-height:1.6}
 .v9-kube>.material-symbols-outlined{color:var(--warn);font-variation-settings:'FILL' 1}
 .v9-kube code{font-size:12px;background:var(--g100);padding:1px 4px;border-radius:4px}
@@ -2006,7 +2009,7 @@ function _openResModal(type,valueName,count,totalCost,allocated){
   const isUntagged=type==='untagged';
   const title=isUntagged?'Untagged Resources':`Resources Matched To: ${valueName}`;
   // Show modal with skeleton first, then render real data after 800ms
-  showModal(`<div class="mh"><span class="mt">${title}</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div>${allocated>0?`<div class="v10-rm-alloc"><span class="material-symbols-outlined">info</span><div>${valueName} also gets <strong>${v9fmt(allocated)}</strong> split from shared cost (estimated). It isn't tied to specific resources, so the list below only shows the ${v9fmt(totalCost)} direct cost. <a href="#" onclick="closeModal();document.getElementById('v10-ac-sec')?.scrollIntoView({behavior:'smooth',block:'start'});return false">See Shared Cost Allocation</a></div></div>`:''}<div id="res-modal-inner">${_renderSkeleton('billing')}</div><p style="margin-top:12px;font-size:12px;color:var(--g400);font-style:italic">*Note: Costs are estimated based on synchronized data and may differ from final billing.</p><div class="mf"><button class="btn btn-p" onclick="closeModal()">Got it</button></div>`,'lg tall');
+  showModal(`<div class="mh"><span class="mt">${title}</span><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div>${allocated>0?`<div class="notice lt-info v10-note"><span class="material-symbols-outlined">info</span><div class="v10-note-txt">${valueName} also gets <strong>${v9fmt(allocated)}</strong> split from shared cost (estimated). That amount isn't tied to specific resources, so this list only shows the ${v9fmt(totalCost)} direct cost. To see how it's split, check Shared Cost Allocation at the bottom of Coverage Preview.</div></div>`:''}<div id="res-modal-inner">${_renderSkeleton('billing')}</div><p style="margin-top:12px;font-size:12px;color:var(--g400);font-style:italic">*Note: Costs are estimated based on synchronized data and may differ from final billing.</p><div class="mf"><button class="btn btn-p" onclick="closeModal()">Got it</button></div>`,'lg tall');
   setTimeout(()=>{const el=document.getElementById('res-modal-inner');if(el)el.innerHTML=_renderResModalBody();},800);
 }
 
@@ -2607,9 +2610,9 @@ function v9TryAddAC(cid){
 const V9_BASIS_COPY={
   spend:{
     meta:'Split by Spend',
-    metaTip:"Shared cost is split by each value's spend. More ways to split are coming later.",
+    metaTip:"Shared cost is split by each value's direct cost from value cards.",
     splitDesc:"Each value's share follows its direct cost from value cards.",
-    shareTip:"Shared cost is split day by day, using each day's spend. This share adds up the last 30 days, so it can differ from each value's spend ratio for the whole period.",
+    shareTip:"Calculated day by day, then added up for the last 30 days, so it can differ slightly from the 30-day spend ratio.",
     noShareHere:n=>`${n} has no direct cost in this cluster, so it receives nothing. Add a ${S._k8sNorm?'Namespace':'k8s-namespace'} condition to the ${n} value card if ${n} runs in this cluster.`,
     noShareAny:n=>`${n} has no direct cost from value cards, so it receives nothing.`,
     noWeight:(amt,where)=>`${amt} can't be split because none of these values has direct cost in ${where} this period. It stays Untagged.`,
@@ -2626,7 +2629,7 @@ function addAC(cid,cfg){
 <span class="ac-meta" data-tip="${v9Basis().metaTip}"><span class="ac-meta-item">${v9Basis().meta}</span></span>
 <span style="flex:1"></span><span class="material-symbols-outlined rv" data-tip="Remove this Value" onclick="S._isDirty=true;this.closest('.vc').remove();renum('${cid}');updCPV('${cid}')">delete</span></div>
 <div class="ac-body">
-<div class="ac-sec"><span class="ac-sec-t">Shared cost to split</span><span class="ac-sec-d">Cost that matches these conditions and hasn't been taken by a value card.</span></div>
+<div class="ac-sec"><span class="ac-sec-t">Shared cost to split</span><span class="ac-sec-d">Cost that matches these conditions and isn't assigned by a value card.</span></div>
 <div class="csp-blocks-area"></div><div class="add-csp-wrap"><button class="add-csp-btn" onclick="showCspPicker(this)"><span class="material-symbols-outlined">add</span>Add Data Source</button><div class="csp-picker"></div></div>
 <div class="ac-match" data-acmatch></div>
 <div class="ac-sec" style="margin-top:16px"><span class="ac-sec-t">Split across</span><span class="ac-sec-d">${v9Basis().splitDesc}</span></div>
@@ -2894,11 +2897,11 @@ function v9RenderPreview(t,el){
   vals.forEach((v,i)=>{
     const color=COLORS[i%9];const dp=v.total?v.direct/v.total*100:0;const esc=v.name.replace(/'/g,'&apos;');
     // 一列維持 50px（Guideline 表格規範）：拆分用一條細的堆疊條＋Estimated，金額細節放 tooltip
-    const tip=`Direct ${v9fmt(v.direct)} + Allocated ${v9fmt(v.alloc)}. Allocated amounts are estimates calculated from your rules, not measured cost.`;
+    const tip=`Direct ${v9fmt(v.direct)} + Allocated ${v9fmt(v.alloc)}. Allocated amounts are estimates based on your allocation rules.`;
     const split=v.alloc?`<span class="v9-split-bar" data-tip="${tip}"><span style="width:${dp}%;background:${color}"></span><span class="is-alloc" style="width:${100-dp}%;background:${color}"></span></span>`:'';
     const est=v.alloc?`<span class="v9-est" data-tip="${tip}">Estimated</span>`:'';
     const resCell=`<td><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="color:var(--g600);white-space:nowrap">${v.res} resource${v.res>1?'s':''}</span><a href="#" onclick="event.preventDefault();showMatchedModal('${esc}',${v.res},${Math.round(v.direct)},${Math.round(v.alloc)})" style="color:var(--pri);font-size:14px;font-weight:500;white-space:nowrap">View Details</a></div></td>`;
-    if(v.total>0&&twoCol){trows+=`<tr><td><div class="li"><div class="ld" style="background:${color}"></div>${v.name}</div></td><td style="text-align:right">${v9fmt(v.direct)}</td><td style="text-align:right">${v.alloc?`<div class="v9-amt-cell"><span>${v9fmt(v.alloc)}</span><span class="v9-est" data-tip="Split from shared cost by your allocation cards. It's an estimate calculated from your rules, not measured cost.">Estimated</span></div>`:'<span style="color:var(--g400)">—</span>'}</td><td style="text-align:right;font-weight:700">${v9fmt(v.total)}</td><td>${v9pct(v.total,T)}</td>${resCell}</tr>`;return}
+    if(v.total>0&&twoCol){trows+=`<tr><td><div class="li"><div class="ld" style="background:${color}"></div>${v.name}</div></td><td style="text-align:right">${v9fmt(v.direct)}</td><td style="text-align:right">${v.alloc?`<div class="v9-amt-cell"><span>${v9fmt(v.alloc)}</span><span class="v9-est" data-tip="Split from shared cost by your allocation card. It's an estimate based on your allocation rules.">Estimated</span></div>`:'<span style="color:var(--g400)">—</span>'}</td><td style="text-align:right;font-weight:700">${v9fmt(v.total)}</td><td>${v9pct(v.total,T)}</td>${resCell}</tr>`;return}
     if(v.total>0)trows+=`<tr><td><div class="li"><div class="ld" style="background:${color}"></div>${v.name}</div></td><td style="text-align:right"><div class="v9-amt-cell">${split}<span>${v9fmt(v.total)}</span>${est}</div></td><td>${v9pct(v.total,T)}</td><td><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="color:var(--g600);white-space:nowrap">${v.res} resource${v.res>1?'s':''}</span><a href="#" onclick="event.preventDefault();showMatchedModal('${esc}',${v.res},${Math.round(v.total)})" style="color:var(--pri);font-size:14px;font-weight:500;white-space:nowrap">View Details</a></div></td></tr>`;
     else if(twoCol)trows+=`<tr class="nm"><td><div class="li"><div class="ld" style="background:var(--g200)"></div>${v.name}</div></td><td style="text-align:right;color:var(--g400)">${S._currency} 0</td><td style="text-align:right;color:var(--g400)">—</td><td style="text-align:right;color:var(--g400)">${S._currency} 0</td><td style="color:var(--g400)">0%</td><td><span style="font-size:12px;color:var(--g400)">No resources matched</span></td></tr>`;
     else trows+=`<tr class="nm"><td><div class="li"><div class="ld" style="background:var(--g200)"></div>${v.name}</div></td><td style="text-align:right;color:var(--g400)">${S._currency} 0</td><td style="color:var(--g400)">0%</td><td><span style="font-size:12px;color:var(--g400)">No resources matched</span></td></tr>`;
@@ -2911,7 +2914,7 @@ function v9RenderPreview(t,el){
     :(()=>{const splitAmt=acAll.reduce((s,x)=>s+x.info.allocated,0);
       // 有分攤時不說「全部標記成功」：分出去的是依規則估算的金額（PRD 計算規則「結果性質：估算值，非量測值」）
       return splitAmt>0
-        ?`<div class="lt-ok-row">All cost is assigned to a value. ${v9fmt(splitAmt)} of it is split from shared cost, so it's an estimate.</div>`
+        ?`<div class="lt-ok-row">All cost is assigned to a value. ${v9fmt(splitAmt)} of it is split from shared cost and is an estimate.</div>`
         :`<div class="lt-ok-row">100% Coverage Achieved! All resources are successfully tagged and accounted for.</div>`})();
   // 分攤狀態（PRD：未攤分標示，兩種原因）⚠ ASSUMPTION 文案
   const acList=cards.map((c,i)=>({c,i,info:R.cards[i]})).filter(x=>x.c.type==='alloc');
@@ -2925,7 +2928,7 @@ function v9RenderPreview(t,el){
     const zeroHtml=zeroNames.length&&info.reason!=='no-match'?`<div class="v9-warn-t" style="margin-top:4px">${zeroNames.map(n=>v9Basis().noShareHere(n)).join(' ')}</div>`:'';
     /* 2026-10-05：回應「最後才看到、想改 value 要多走幾步」→ 名字可以點，直接回第 1 步、捲到那張 value card */
     const takenLinks=[...info.takenBy].map(n=>`<a href="#" class="v10-taken-link" data-tip="Edit this value card" onclick="v10EditCardFromPreview('${String(n).replace(/'/g,"\\'")}');return false">${n}</a>`).join(', ');
-    const takenHtml=info.takenAbove?`<div class="v10-taken"><span class="material-symbols-outlined">info</span><span>These conditions also match ${v9fmt(info.takenAbove)} that ${takenLinks} already own${info.takenBy.size>1?'':'s'}. That part isn't split again${info.matched?`, only the remaining ${v9fmt(info.matched)} is`:''}.</span></div>`:'';
+    const takenHtml=info.takenAbove?`<div class="v10-taken"><span class="material-symbols-outlined">info</span><span>${v9fmt(info.takenAbove)} of the cost matching these conditions is already assigned by ${takenLinks}, so ${info.matched?`only the remaining ${v9fmt(info.matched)} is split`:`nothing is left to split`}.</span></div>`:'';
     const acNo=acList.findIndex(x=>x.i===i)+1;
     return `<div class="v9-ac-line">${(typeof v10On==='function'&&v10On())?`<span class="ac-badge"><span class="material-symbols-outlined">call_split</span>${acList.length>1?`Allocation card ${acNo}`:'Allocation card'}</span>`:`<span class="pn">${i+1}</span>`}<div>${line}${zeroHtml}${takenHtml}</div></div>`}).join('')}</div>`:'';
   // ⏸ PARKED：Rule Conflicts（Figma #05 / #05-1 的隱藏元件，註記「暫不實作」）
@@ -2944,11 +2947,11 @@ function v9RenderPreview(t,el){
   // UX 提案（Q-H）：Untagged 裡有 kube:* 成本時，Untagged 列下面加一行說明＋建議；2026-10-01 加回一鍵建立（做法 3），按下回 Edit、卡片建好、名稱留空讓使用者選
   const kubeCond=S._k8sNorm?'Namespace starts with kube:':'k8s-namespace starts with kube:';
   const kubeHtml='';
-  const kubeLine=(S._showParked&&kubeUntagged>0&&!before)?`<div class="v9-kube-line"><span class="material-symbols-outlined">info</span><div class="v9-kube-body"><div><strong>${v9fmt(kubeUntagged)}</strong> of Untagged is unused cluster capacity (<code>kube:*</code>). Most teams assign it to their infrastructure team with a value card where <code>${kubeCond}</code>.</div><button class="bac" type="button" onclick="v9KubeCreate('${t.id}')"><span class="material-symbols-outlined">add_circle</span>Create value card</button></div>${v9ParkedBadge('deferred')}</div>`:'';
+  const kubeLine=(S._showParked&&kubeUntagged>0&&!before)?`<div class="notice lt-info v10-note v9-kube-line"><span class="material-symbols-outlined">info</span><div class="v10-note-txt"><strong>${v9fmt(kubeUntagged)}</strong> of Untagged is unused cluster capacity (<code>kube:*</code>). Most teams assign it to their infrastructure team with a value card where <code>${kubeCond}</code>. <button class="v10-tbtn" type="button" onclick="v9KubeCreate('${t.id}')">Create value card</button></div>${v9ParkedBadge('deferred')}</div>`:'';
   const cover=T-uc;const valCount=vals.filter(v=>v.total>0).length;
   el.innerHTML=`<div class="pg-hdr"><a class="back-btn" href="#" onclick="showLeaveConfirm('list');return false"><span class="material-symbols-outlined">arrow_circle_left</span>LumiTag List</a><div class="pg-hdr-row"><div class="pg-title">Coverage Preview</div></div></div>
 <div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div class="st">Coverage for LumiTag: ${t.name}</div><span style="font-size:12px;font-weight:500;color:var(--g500)">Total 30 Days Spend: <strong style="font-weight:500">${fmtFull(T)}</strong></span></div>${bar}${leg}</div>
-<div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div class="st">Spend Breakdown</div>${canToggle?`<span style="flex:1"></span>${v9ParkedBadge('proposal')}<div class="v9-seg" role="tablist"><button type="button" class="${before?'':'on'}" onclick="S._pvMode='after';go('preview','${t.id}')">After allocation</button><button type="button" class="${before?'on':''}" onclick="S._pvMode='before';go('preview','${t.id}')">Before allocation</button></div>`:''}</div><div class="pt-wrap"><table class="pt" style="table-layout:fixed">${colW}<thead><tr><th>Tag Value</th>${twoCol?`<th style="text-align:right">Direct <span class="info-tip" tabindex="0" data-tip="Cost that value cards assign to this value."><span class="material-symbols-outlined">info</span></span></th><th style="text-align:right">Allocated <span class="info-tip" tabindex="0" data-tip="Shared cost that allocation cards split to this value. It's an estimate from your rules, not measured cost."><span class="material-symbols-outlined">info</span></span></th>`:''}<th style="text-align:right">30 Days Spend</th><th>Share of Spend</th><th>Resources <span class="info-tip" tabindex="0" data-tip="After shared cost is split, one resource can count toward several values, so these numbers don't add up."><span class="material-symbols-outlined">info</span></span></th></tr></thead><tbody>${trows}</tbody></table></div>${untaggedFooter}${kubeLine}</div>
+<div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div class="st">Spend Breakdown</div>${canToggle?`<span style="flex:1"></span>${v9ParkedBadge('proposal')}<div class="v9-seg" role="tablist"><button type="button" class="${before?'':'on'}" onclick="S._pvMode='after';go('preview','${t.id}')">After allocation</button><button type="button" class="${before?'on':''}" onclick="S._pvMode='before';go('preview','${t.id}')">Before allocation</button></div>`:''}</div><div class="pt-wrap"><table class="pt" style="table-layout:fixed">${colW}<thead><tr><th>Tag Value</th>${twoCol?`<th style="text-align:right">Direct <span class="info-tip" tabindex="0" data-tip="Cost that value cards assign to this value."><span class="material-symbols-outlined">info</span></span></th><th style="text-align:right">Allocated <span class="info-tip" tabindex="0" data-tip="Shared cost split to this value by your allocation card. It's an estimate based on your allocation rules. See Shared Cost Allocation below for how it's split."><span class="material-symbols-outlined">info</span></span></th>`:''}<th style="text-align:right">30 Days Spend</th><th>Share of Spend</th><th>Resources <span class="info-tip" tabindex="0" data-tip="After shared cost is split, one resource can count toward several values, so these numbers don't add up."><span class="material-symbols-outlined">info</span></span></th></tr></thead><tbody>${trows}</tbody></table></div>${untaggedFooter}${kubeLine}</div>
 ${acHtml}${kubeHtml}${conflictHtml}
 <div class="sbtm"><button class="btn btn-o" onclick="${S._isNew?`S._v10Restore=true;go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_circle_left</span>Back to Edit</button><div class="ssp"></div><button class="btn btn-o" onclick="showSaveDraftModal('${t.id}',${!!S.tags.find(x=>x.id===t.id&&x.status==='active')})">Save as Inactive Tag</button><button class="btn btn-p" onclick="v9ShowApply('${t.id}',${cover},${uc},${valCount},${acAll.reduce((s,x)=>s+(x.info.allocated||0),0)})">Apply LumiTag</button></div>`;
   setTimeout(()=>{el.querySelectorAll('.aseg').forEach(s=>{if(s.offsetWidth<44){const sp=s.querySelector('.seg-pct');if(sp)sp.style.visibility='hidden'}})},50);
@@ -3070,11 +3073,11 @@ v9ZonesOn=function(){return S._layout==='steps'||_v9ZonesOnOrig()};
 function v10On(){return S._layout==='steps'}
 function v10Pfx(cid){return cid.slice(0,2)}
 function v10Stepper(prefix){
-  // 2026-10-12 Kabin：改用 CMDS「Stepper / Horizontal」Type=check sign（Element：check_text_bold），不顯示數字；
-  // 做完＝實心勾、目前＝空心藍圈、還沒到＝灰圈；可點（CMDS 沒畫 hover，FE 用 MUI StepButton＋nonLinear）
+  // 2026-10-12 Kabin：用 CMDS「Stepper / Horizontal」Type=basic（數字），做完的步驟換成 check 元素的實心勾（同 MUI Stepper 預設）；
+  // 做完＝實心藍勾、目前＝實心藍底白數字、還沒到＝灰框灰數字；可點（CMDS 沒畫 hover，FE 用 MUI StepButton＋nonLinear）
   const st=['Value Cards','Shared Cost Allocation (Optional)','Coverage Preview'];
   return `<div class="v10-stepper" role="list">${st.map((t,i)=>{const n=i+1;const cls=n===S._step?'is-cur':(n<S._step?'is-done':'');
-    return `${i?`<span class="v10-step-line${n<=S._step?' is-done':''}"></span>`:''}<button type="button" role="listitem" class="v10-step ${cls}" onclick="v10Go('${prefix}',${n})"${n===S._step?' aria-current="step"':''}><span class="v10-step-ic">${n<S._step?'<span class="material-symbols-outlined">check</span>':''}</span><span class="v10-step-t">${t}</span></button>`}).join('')}</div>`;
+    return `${i?`<span class="v10-step-line${n<=S._step?' is-done':''}"></span>`:''}<button type="button" role="listitem" class="v10-step ${cls}" onclick="v10Go('${prefix}',${n})"${n===S._step?' aria-current="step"':''}><span class="v10-step-ic">${n<S._step?'<span class="material-symbols-outlined">check</span>':n}</span><span class="v10-step-t">${t}</span></button>`}).join('')}</div>`;
 }
 function v10Apply(prefix){
   const view=document.getElementById(prefix==='ed'?'v-edit':'v-create');if(!view)return;
@@ -3103,7 +3106,7 @@ function v10Apply(prefix){
   const d=document.createElement('div');d.className='v10-desc';
   d.innerHTML=S._step===1
     ?'Value cards assign direct cost: each card gives the cost it matches to one value. Cards are checked from top to bottom, and the first match wins.'
-    :"Split cost that no value card has taken across your values, by each value's direct cost from step 1.";
+    :"Split cost not assigned by value cards across your values, based on each value's direct cost from step 1.";
   hdr.after(d);
   if(S._step===2){const sm=document.createElement('div');sm.className='v10-direct';d.after(sm)}
   // 底部按鈕：第 1 步 Next；第 2 步 Back＋Coverage Preview
@@ -3145,7 +3148,7 @@ function v10UpdDirect(cid){
   const names=[];cards.forEach(c=>{if(c.type!=='alloc'&&c.name&&!names.includes(c.name))names.push(c.name)});
   const total=rows.reduce((a,r)=>a+r.cost,0);const direct=names.reduce((a,n)=>a+(R.direct[n]||0),0);
   box.innerHTML=`<div class="v10-direct-h"><span class="material-symbols-outlined">sell</span>Direct cost from value cards<span class="v10-direct-sub">Last 30 days</span><a href="#" onclick="event.preventDefault();v10Go('${v10Pfx(cid)}',1)">Edit value cards</a></div>
-<div class="v10-direct-list">${names.map(n=>`<span class="v10-direct-item">${n} <strong>${v9fmt(R.direct[n]||0)}</strong></span>`).join('')||'<span class="ac-muted">No value has direct cost yet.</span>'}<span class="v10-direct-rest">Not taken by any value card <strong>${v9fmt(Math.max(0,total-direct))}</strong></span></div>`;
+<div class="v10-direct-list">${names.map(n=>`<span class="v10-direct-item">${n} <strong>${v9fmt(R.direct[n]||0)}</strong></span>`).join('')||'<span class="ac-muted">No value has direct cost yet.</span>'}<span class="v10-direct-rest">Not assigned by value cards <strong>${v9fmt(Math.max(0,total-direct))}</strong></span></div>`;
   const ze=ctn.querySelector('.v9-zone-empty');if(ze)ze.innerHTML='No shared cost to split? Continue to <strong>Coverage Preview</strong>. To split shared cost across values, use <strong>Add Allocation Card</strong>.';
   /* 2026-10-12：只有一張 allocation card → 用勾選代替 Add 按鈕。
    * 勾選是「主動選擇」：加了 allocation card，這個 tag 就會對 Manager、Member 隱藏，不能預設幫使用者打開。
@@ -3156,7 +3159,7 @@ function v10UpdDirect(cid){
   if(rest<=0&&!hasAC){
     html=`<div class="v10-done"><span class="material-symbols-outlined">check_circle</span><span>All cost in this tag is already assigned by value cards, so there's nothing left to split. Continue to <strong>Coverage Preview</strong>.</span></div>`;
   }else{
-    html=`<button type="button" class="v10-split${hasAC?' is-on':''}" role="checkbox" aria-checked="${hasAC}" onclick="v10ToggleSplit('${cid}',${!hasAC})">${LumiCheckbox.html({checked:hasAC})}<span><span class="v10-split-t">Split shared cost across values<span class="v10-split-opt">Optional</span></span><span class="v10-split-d" style="display:block">Choose which shared cost to split and it's divided by each value's direct cost from step 1. Managers and Members won't see this tag in Cost Dashboard.</span></span></button>`;
+    html=`<button type="button" class="v10-split${hasAC?' is-on':''}" role="checkbox" aria-checked="${hasAC}" onclick="v10ToggleSplit('${cid}',${!hasAC})">${LumiCheckbox.html({checked:hasAC})}<span><span class="v10-split-t">Split shared cost across values<span class="v10-split-opt">Optional</span></span><span class="v10-split-d" style="display:block">Choose which shared cost to split. It's divided by each value's direct cost from step 1. Once applied, Managers and Members won't see this tag in Cost Dashboard.</span></span></button>`;
   }
   box.insertAdjacentHTML('afterend',html);
 }
