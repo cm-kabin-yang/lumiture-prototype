@@ -680,6 +680,8 @@
 .v10-step.is-cur .v10-step-ic{border-color:var(--pri);background:var(--pri)}
 .v10-step.is-done .v10-step-ic{border-color:var(--pri);background:var(--pri)}
 .v10-step:hover .v10-step-t{text-decoration:underline}.v10-step:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+.v10-step-txt{display:flex;flex-direction:column;align-items:flex-start;text-align:left}
+.v10-step-opt{font-size:12px;font-weight:400;line-height:18px;color:var(--g500)}
 .v10-step-line{flex:1 1 auto;min-width:50px;height:2px;border-radius:2px;background:#B3B3B3}.v10-step-line.is-done{background:var(--pri)}
 .v10-desc{font-size:12px;line-height:18px;color:var(--g500);margin:-8px 0 16px}
 .v10-s1 #ed-vals>.vc.ac,.v10-s1 #cr-vals>.vc.ac,.v10-s1 .v9-zone{display:none}
@@ -3079,9 +3081,10 @@ function v10Stepper(prefix,cur){
   // 還沒到＝灰框灰字（Selection=False, Finished=false）。目前這步＝最後一個藍勾；往回走時後面的步驟變回灰色。
   // 連接線撐滿剩下的寬度（同 FE MuiStepConnector：width 100%、min 50px）；可點（CMDS 沒畫 hover，FE 用 MUI StepButton＋nonLinear）
   // 2026-10-12 Kabin：每步文字前加「Step N:」，開會好溝通；只換 CMDS instance 的文字，不動元件
-  const st=['Step 1: Value Cards','Step 2: Shared Cost Allocation (Optional)','Step 3: Coverage Preview'];
-  return `<div class="v10-stepper" role="list">${st.map((t,i)=>{const n=i+1;const cls=n===cur?'is-cur':(n<cur?'is-done':'');
-    return `${i?`<span class="v10-step-line${n<=cur?' is-done':''}"></span>`:''}<button type="button" role="listitem" class="v10-step ${cls}" onclick="${inPv?`v10FromPreview(${n})`:`v10Go('${prefix}',${n})`}"${n===cur?' aria-current="step"':''}><span class="v10-step-ic">${n<=cur?'<span class="material-symbols-outlined">check</span>':''}</span><span class="v10-step-t">${t}</span></button>`}).join('')}</div>`;
+  // 「Optional」照 MUI StepLabel 的 optional 屬性放在標題下方一行灰色小字（Kabin 10/12 選 B：接在標題後面不明顯）
+  const st=[['Step 1: Value Cards',''],['Step 2: Shared Cost Allocation','Optional'],['Step 3: Coverage Preview','']];
+  return `<div class="v10-stepper" role="list">${st.map(([t,o],i)=>{const n=i+1;const cls=n===cur?'is-cur':(n<cur?'is-done':'');
+    return `${i?`<span class="v10-step-line${n<=cur?' is-done':''}"></span>`:''}<button type="button" role="listitem" class="v10-step ${cls}" onclick="${inPv?`v10FromPreview(${n})`:`v10Go('${prefix}',${n})`}"${n===cur?' aria-current="step"':''}><span class="v10-step-ic">${n<=cur?'<span class="material-symbols-outlined">check</span>':''}</span><span class="v10-step-txt"><span class="v10-step-t">${t}</span>${o?`<span class="v10-step-opt">${o}</span>`:''}</span></button>`}).join('')}</div>`;
 }
 function v10Apply(prefix){
   const view=document.getElementById(prefix==='ed'?'v-edit':'v-create');if(!view)return;
