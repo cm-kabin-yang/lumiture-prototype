@@ -3072,13 +3072,15 @@ const _v9ZonesOnOrig=v9ZonesOn;
 v9ZonesOn=function(){return S._layout==='steps'||_v9ZonesOnOrig()};
 function v10On(){return S._layout==='steps'}
 function v10Pfx(cid){return cid.slice(0,2)}
-function v10Stepper(prefix){
+function v10Stepper(prefix,cur){
+  cur=cur||S._step;const inPv=cur===3;
   // 2026-10-12 Kabin：用 CMDS Step groups 的 check 系列，不用數字（跟 value card 序號太像）、不用空心藍圈（太微妙）
   // 目前＝實心藍勾＋粗體（check_text_bold, Selection=True, Finished=true）；做完＝實心藍勾＋一般字重（check, Selection=True, Finished=true）；
   // 還沒到＝灰框（check, Selection=False, Finished=false）；可點（CMDS 沒畫 hover，FE 用 MUI StepButton＋nonLinear）
-  const st=['Value Cards','Shared Cost Allocation (Optional)','Coverage Preview'];
-  return `<div class="v10-stepper" role="list">${st.map((t,i)=>{const n=i+1;const cls=n===S._step?'is-cur':(n<S._step?'is-done':'');
-    return `${i?`<span class="v10-step-line${n<=S._step?' is-done':''}"></span>`:''}<button type="button" role="listitem" class="v10-step ${cls}" onclick="v10Go('${prefix}',${n})"${n===S._step?' aria-current="step"':''}><span class="v10-step-ic">${n<=S._step?'<span class="material-symbols-outlined">check</span>':''}</span><span class="v10-step-t">${t}</span></button>`}).join('')}</div>`;
+  // 2026-10-12 Kabin：每步文字前加「Step N:」，開會好溝通；只換 CMDS instance 的文字，不動元件
+  const st=['Step 1: Value Cards','Step 2: Shared Cost Allocation (Optional)','Step 3: Coverage Preview'];
+  return `<div class="v10-stepper" role="list">${st.map((t,i)=>{const n=i+1;const cls=n===cur?'is-cur':(n<cur?'is-done':'');
+    return `${i?`<span class="v10-step-line${n<=cur?' is-done':''}"></span>`:''}<button type="button" role="listitem" class="v10-step ${cls}" onclick="${inPv?`v10FromPreview(${n})`:`v10Go('${prefix}',${n})`}"${n===cur?' aria-current="step"':''}><span class="v10-step-ic">${n<=cur?'<span class="material-symbols-outlined">check</span>':''}</span><span class="v10-step-t">${t}</span></button>`}).join('')}</div>`;
 }
 function v10Apply(prefix){
   const view=document.getElementById(prefix==='ed'?'v-edit':'v-create');if(!view)return;
@@ -3135,9 +3137,20 @@ function v10Go(prefix,n){
   if(n===S._step)return;
   S._step=n;v10Apply(prefix);window.scrollTo({top:0,behavior:'smooth'});
 }
+/* 2026-10-12 Kabin：Preview 是第 3 步，不該像跳到另一頁。頁首沿用第 1、2 步（Edit LumiTag: {key}＋狀態／Create LumiTag），
+   加上 stepper（第 3 步為目前），底部「Back to Edit」改「Back」回到原本那一步。用後處理包住所有 Preview 版本（含 loading、舊版 tag） */
+const _v10RP=renderPreview;renderPreview=function(id){_v10RP(id);if(!v10On())return;
+  const el=document.getElementById('v-preview');const hdr=el&&el.querySelector('.pg-hdr');if(!hdr)return;
+  const src=document.querySelector(S._isNew?'#v-create .pg-hdr':'#v-edit .pg-hdr');
+  if(src){const c=src.cloneNode(true);c.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));hdr.replaceWith(c)}
+  el.querySelector('.v10-stepper')?.remove();el.querySelector('.pg-hdr').insertAdjacentHTML('afterend',v10Stepper(S._isNew?'cr':'ed',3));
+  const back=[...el.querySelectorAll('.sbtm button')].find(b=>b.textContent.includes('Back to Edit'));
+  if(back){back.dataset.v10back='1';back.innerHTML='<span class="material-symbols-outlined">arrow_back</span>Back'}
+};
+function v10FromPreview(n){if(n===3)return;const back=document.querySelector('#v-preview .sbtm button[data-v10back]');if(!back)return;S._step=n;back.click()}
 /* Preview → 第 1 步的指定 value card：沿用 Back to Edit 的返回邏輯，只是先把步驟設成 1，回來後捲到那張卡並閃一下 */
 function v10EditCardFromPreview(name){
-  const back=[...document.querySelectorAll('#v-preview .sbtm button')].find(b=>b.textContent.includes('Back to Edit'));if(!back)return;
+  const back=[...document.querySelectorAll('#v-preview .sbtm button')].find(b=>b.dataset.v10back||b.textContent.includes('Back to Edit'));if(!back)return;
   S._step=1;back.click();
   setTimeout(()=>{const card=[...document.querySelectorAll('#ed-vals>.vc:not(.ac),#cr-vals>.vc:not(.ac)')].find(c=>(c.querySelector('.vni')?.value||'').trim()===name);
     if(!card)return;card.scrollIntoView({behavior:'smooth',block:'center'});card.classList.remove('vc-new');void card.offsetWidth;card.classList.add('vc-new')},80);
