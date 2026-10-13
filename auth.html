@@ -1235,13 +1235,21 @@ function runSso(id) {
   if (o === 'nomatch-uninvited') { state.dlg = { type: 'onelast', kind: 'team' }; show('login', { keep: true }); history.replaceState(null, '', '#sso-uninvited'); return; }
   if (o === 'nomatch-choice') { state.dlg = { type: 'almost' }; show('login', { keep: true }); history.replaceState(null, '', '#sso-almost'); return; }
   if (o === 'ok-linked-multi-pick') { state.fromSso = true; openRoleDialog();   /* Fable #7：預設角色不在了 → 預選首次指派（排序後第一個），不可能預選到已消失的那個 */ history.replaceState(null, '', '#sso-role'); return; }
-  goHome({ ssoToast: true });
+  enterApp({ ssoToast: true });
 }
 function closeAllUi() { state.dlg = null; renderDialog(); clearToasts(); state.pending = false; }
 function goHome(opt = {}) {
   closeAllUi(); state.view = 'home'; $('#app').innerHTML = homeView(); history.replaceState(null, '', '#home');
   if (opt.roleToast) toast('ok', COPY.role.ok);
   if (opt.ssoToast) toast('ok', COPY.sso.ok);
+}
+/* 真實流程的終點（2026-10-14 Kabin）：登入／SSO／選角色成功 → 直接進 Overview prototype，成功 toast 交給落地頁的 shared topbar 顯示一次。
+   Demo FAB 的「登入後首頁（示意）」與 #home 仍走 goHome() 的說明卡，方便單獨看 toast 設計。部署時 NAV_REWRITE 把路徑換成 ./overview.html */
+const OVERVIEW_URL = './overview.html';
+function enterApp(opt = {}) {
+  const msgs = [opt.roleToast && COPY.role.ok, opt.ssoToast && COPY.sso.ok].filter(Boolean);   /* 跟 goHome() 同一組 toast */
+  try { if (msgs.length) sessionStorage.setItem('lt-pending-toast', JSON.stringify({ msgs })); } catch (e) {}
+  window.location.href = OVERVIEW_URL;
 }
 function openRoleDialog(selectedId, list) {
   state.roles = { list: list || MOCK_ROLES, selected: selectedId || sortedRoles(list || MOCK_ROLES)[0].id, loading: false, open: false };
@@ -1274,7 +1282,7 @@ function finish(view) {
        位置照 FE（密碼欄下方）；文案是 API 回傳的 message，內容未知 → ⚠ 設計端暫擬：先用通用句 */
     if (res === 'fail') { setErr('login', 'password', COPY.failGeneric); return; }
     if (res === 'multi') { state.fromSso = false; openRoleDialog(); return; }   /* Fable #7：FE 只在 session 沒有預設群組時開 #08，預選 defaultGroupId || 第一個 → 首次指派 */
-    return goHome();
+    return enterApp();
   }
   if (view === 'forgot') {
     if (res === 'nf') return setErr('forgot', 'email', COPY.forgot.notFound);
@@ -1369,7 +1377,7 @@ document.addEventListener('click', e => {
   const rsel = t.closest('#role-sel'); if (rsel) { if (pop) closePop(); else openRolePop(); return; }
   if (pop && !t.closest('.pop')) closePop();
   /* 彈窗按鈕 */
-  const rc = t.closest('[data-role="continue"]'); if (rc) { if (state.roles.loading) return; state.roles.loading = true; renderDialog(); later(() => { const fromSso = state.fromSso; state.roles.loading = false; goHome({ roleToast: true, ssoToast: fromSso }); }, 800); return; }
+  const rc = t.closest('[data-role="continue"]'); if (rc) { if (state.roles.loading) return; state.roles.loading = true; renderDialog(); later(() => { const fromSso = state.fromSso; state.roles.loading = false; enterApp({ roleToast: true, ssoToast: fromSso }); }, 800); return; }
   const al = t.closest('[data-almost]'); if (al) { if (al.dataset.almost === 'join') { state.dlg = { type: 'onelast', kind: 'group' }; renderDialog(); history.replaceState(null, '', '#sso-join'); } else { state.dlg = null; renderDialog(); go('signup'); } return; }
   const ol = t.closest('[data-onelast]'); if (ol) { state.dlg = null; renderDialog(); history.replaceState(null, '', '#login'); return; }
   const lg = t.closest('[data-legal]'); if (lg) { const back = state.view === 'signup' ? 'signup' : 'activate'; state.dlg = null; renderDialog(); history.replaceState(null, '', '#' + back); return; }

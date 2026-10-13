@@ -2060,7 +2060,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
              '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Settings\')">' +
                '<span class="material-symbols-outlined">settings</span>Settings</button>' +
              '<div class="lt-am-div"></div>' +
-             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Log out\')">' +
+             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar.logout()">' +
                '<span class="material-symbols-outlined">logout</span>Log out</button>' +
            '</div>';
   }
@@ -2138,13 +2138,45 @@ Please try again in a few moments. If the problem persists, contact support.</di
     closeMenu: _closeMenu,
     toggleMenu: _toggleMenu,
     rerender: function () { _render(); if (_menuOpen) _openMenu(); },
+    /* Log out → Auth prototype 的 Login 頁（2026-10-14 Kabin：登出 → 登入 → 回 Overview 一整圈走得通）。
+       部署打包時 NAV_REWRITE 會把這個相對路徑換成 ./auth.html */
+    logout: function () {
+      _closeMenu();
+      window.location.href = './auth.html#login';
+    },
     _noop: function (label) { /* 展示用：Profile/Settings/Log out/View as Another Role 點擊佔位 */
       if (typeof window.LUMITURE_MENU_ACTION === 'function') window.LUMITURE_MENU_ACTION(label);
     },
   };
 
   // ===== INIT =====
-  function _init() { _injectCSS(); _render(); }
+  /* 登入後的一次性 toast：Auth prototype 登入成功導回 Overview 前寫進 sessionStorage，
+     落地頁（任何用 shared topbar 的頁）讀到就顯示一次再清掉。樣式照 FE Toaster（bottom-left、成功 #008F88、5 秒） */
+  function _showPendingToast() {
+    var raw = null;
+    try { raw = sessionStorage.getItem('lt-pending-toast'); sessionStorage.removeItem('lt-pending-toast'); } catch (e) { return; }
+    if (!raw) return;
+    var msgs = []; try { msgs = JSON.parse(raw).msgs || []; } catch (e) { return; }
+    if (!msgs.length) return;
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;left:80px;bottom:24px;z-index:var(--lt-z-toast,1400);display:flex;flex-direction:column-reverse;gap:16px';
+    msgs.forEach(function (msg) {
+      var el = document.createElement('div');
+      el.setAttribute('role', 'status');
+      el.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 16px;width:400px;max-width:calc(100vw - 96px);' +
+        'background:#008F88;color:#fff;border-radius:4px;' +
+        'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);' +
+        'font-family:inherit;font-size:14px;line-height:24.5px;cursor:pointer';
+      el.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">check_circle</span><span></span>';
+      el.lastChild.textContent = msg;
+      el.addEventListener('click', function () { if (el.parentNode) el.parentNode.removeChild(el); });
+      wrap.appendChild(el);
+      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 5000);
+    });
+    document.body.appendChild(wrap);
+  }
+
+  function _init() { _injectCSS(); _render(); _showPendingToast(); }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _init);
   } else { _init(); }
