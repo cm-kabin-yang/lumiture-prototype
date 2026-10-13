@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — Overview v1 (Cloud Cost Overview 現況翻譯)</title>
+<title>Lumiture.ai — Overview v2 (Spending Rankings)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
@@ -279,10 +279,11 @@
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 <style>
 /* ============================================================
- * Overview (Cloud Cost Overview) — route `/`
- * Source of truth: LumiTure-FE apps/lumiture-ai/src/app/(main)/page.tsx + components/*
- * 這頁已在真實產品上線；本檔是「翻譯 + 依 CMDS token 提升一致性」，不是重新設計。
- * 所有偏離 FE 現況的地方都用「⚠ DEVIATION」註記，方便回頭對照。
+ * Overview (Cloud Cost Overview) — route `/`，v2 加上子頁 Full Group Spending Ranking — route `/overview/spending-rankings`（hash `#rankings`）
+ * 主頁：Source of truth = LumiTure-FE apps/lumiture-ai/src/app/(main)/page.tsx + components/*（v1，已上線頁面的翻譯）
+ * 子頁（v2）：權威順序 Figma（🧞‍♂️ Main Feature `LjnJtk5GbzPJazWzsdQmAm` #08 `5690:37299`、Layout Components `5690:37908`／`5698:33896`）
+ *            > tokens.css > Guideline > FE（spending-rankings/*）。FE 只在設計稿不定義的層面（行為、資料形狀、邊界值）當依據。
+ * 偏離標「⚠ DEVIATION」、設計端自補標「⚠ 設計端暫擬」、不確定標「⚠ 未確認」；`grep -n "⚠"` 一次列出。
  * ============================================================ */
 
 /* ---- Component-level tokens this page needs but tokens.css 尚未定義 ----
@@ -469,6 +470,70 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 /* ===== Tooltip（非圖表：#31383E 深底白字；demo-fab.js 注入的 #gl-tip 在這頁放寬到 600px + 保留換行） ===== */
 body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5;padding:8px 12px;border-radius:var(--lt-tooltip-radius)}
 
+/* ============================================================
+ * Spending Rankings 子頁（v2）— Figma #08 `5690:37299`／Layout Components `5698:33896`
+ * 版面數字全部量自稿（1367 寬）：Main Area 內距 32、Back 列 30 高、卡片內距 24 / r8、標題 20/30 Bold、
+ * 說明 12/18、Display Frequency S 號 30 高、圖例 16×12、Y 軸標籤欄 200 + 10、列高 36（兩條 15px 柱）+ 間距 30、X 軸列 26
+ * ============================================================ */
+:root{
+  /* ⚠ DEVIATION: 稿上這張卡的陰影是 0 0 20px rgba(0,0,0,.10)（與 FE 相同），不是 token --lt-card-shadow（0 0 6px .2）。權威順序 Figma > tokens，照稿；主頁卡片維持 token（v1 裁決） */
+  --ov-rk-card-shadow: 0 0 20px rgba(0,0,0,.10);
+  --ov-rk-dash: #CCCCCC;     /* 稿：垂直格線 #CCCCCC dashed 5/5；Y 軸線 #B3B3B3 solid */
+}
+.content.is-rk{padding-top:var(--lt-space-32)}   /* 稿：Main Area 內距 32/32/80/32 */
+.rk-top{display:flex;align-items:center;justify-content:space-between;min-height:30px;margin-bottom:var(--lt-space-16)}
+/* 稿：Back to Overview 是 12px Bold #004FB0 底線文字 + 16px 填滿圓形箭頭（secondary/link/borderless），預設就帶底線 */
+.rk-back{display:inline-flex;align-items:center;gap:var(--lt-space-4);height:30px;padding:0;border-radius:var(--lt-radius-sm);font-size:var(--lt-fs-12);font-weight:var(--lt-fw-bold);line-height:21px;color:var(--lt-color-primary)}
+/* 對稿修正：稿的底線只在文字（Content 節點 textDecoration UNDERLINE），圖示不帶底線；圖示改用稿匯出的 Arrow_Circle/Left 16px 向量（Material Symbols 的 arrow_circle_left 箭頭只剩一小截，同 Anomaly Detection 詳情頁 §2 #7） */
+.rk-back .t{text-decoration:underline}
+.rk-ico16{width:16px;height:16px;flex-shrink:0;display:block}
+.rk-back:hover{color:var(--lt-color-primary-hover)}
+.rk-card{background:var(--lt-card-bg);border-radius:8px;box-shadow:var(--ov-rk-card-shadow);padding:24px;display:flex;flex-direction:column;min-width:0}
+.rk-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--lt-space-16);min-height:30px}   /* 對稿修正：稿的 Title 列是頂端對齊（Update 24 高貼齊上緣），置中會讓更新時間與截圖鈕低 3px */
+.rk-title{font-size:var(--lt-fs-20);font-weight:var(--lt-fw-bold);line-height:30px;color:var(--lt-color-text-heading);margin:0}
+.rk-upd{display:flex;align-items:center;height:24px;gap:var(--lt-space-8);font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-secondary);white-space:nowrap}
+.rk-upd-times{display:flex;gap:20px;font-variant-numeric:tabular-nums}
+.rk-upd-times b{font-weight:var(--lt-fw-medium);margin-right:4px}
+.rk-upd .ic-info{font-size:16px;color:var(--lt-color-text-secondary);cursor:help}
+/* 稿：截圖鈕 24×24、圖示 18、#004FB0。⚠ 未確認：與主頁那顆（36×36、灰色）不一致，這頁照稿 */
+.rk-shot{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;color:var(--lt-color-primary);border-radius:var(--lt-radius-circle)}
+.rk-shot svg{width:18px;height:18px;fill:currentColor}
+.rk-shot:hover{background:var(--lt-color-bg-emphasized)}
+.rk-shot:disabled{color:var(--lt-color-text-disabled);cursor:not-allowed;background:none}
+.rk-note{margin-top:var(--lt-space-8);font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-secondary)}
+.rk-freq{margin-top:var(--lt-space-8);display:flex;justify-content:flex-end}
+/* Dropdown S 號（稿 132×30；箭頭是實心小三角，非主頁 v1 的 chevron）。⚠ 未確認：同一個 Display Frequency 元件，主頁（v1，CMDS M 36px + chevron）與子頁（稿 S 30px + 三角）長得不一樣，稿面是設計稿本身的不一致，這頁照稿 */
+.dd.sm .dd-trig{height:30px;min-width:132px;padding:0 8px 0 7px;border-color:#CCCCCC;border-radius:5px}   /* 對稿修正：稿 Dropdown / Field S 外框 #CCCCCC、r5（tokens 沒有 5px 圓角與這個框色，頁面層 literal）；文字距左 8（含框線）、三角距右 9 */
+.dd.sm .dd-label{font-size:var(--lt-fs-12)}
+.dd.sm .dd-list{min-width:132px}   /* Fable #3：Guideline Dropdown List「Min Width 與 Trigger 同寬」；S trigger 132。項高不改：Guideline 沒有 S 號 item 規格（Plain 40），維持與主頁同一組 36 */
+.rk-tri{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--lt-color-text-secondary);flex-shrink:0}
+.rk-leg-row{margin-top:var(--lt-space-16);display:flex;align-items:center;justify-content:space-between;gap:var(--lt-space-16);min-height:30px}
+.rk-leg{display:flex;align-items:center;gap:var(--lt-space-8);flex-wrap:wrap}
+.rk-leg-item{display:inline-flex;align-items:center;gap:var(--lt-space-4);font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-secondary)}
+.rk-leg-sw{width:16px;height:12px;flex-shrink:0}
+.rk-period{font-size:var(--lt-fs-14);font-weight:var(--lt-fw-medium);font-style:italic;line-height:24.5px;color:var(--lt-grey-400);white-space:nowrap}
+.rk-wrap{margin-top:var(--lt-space-16);min-width:0}
+.rk-plot{position:relative}
+.rk-chart{width:100%}
+/* X 軸列：PRD 寫「使用者在滾動圖表時，能夠隨時查看到 X 軸以對照」→ 預設貼在視窗底部（sticky），捲到圖表尾端自然落回原位。
+ * Kabin 2026-10-13 裁決：貼視窗底（含貼住時的 1px 上線）。綠便利貼的另外兩種（不黏、限制最大高度）留在 Demo FAB「已不採用（留著對照）」 */
+.rk-axis{position:sticky;bottom:0;z-index:3;background:var(--lt-card-bg);height:33px;padding-top:7px;box-sizing:border-box}   /* 對稿修正：稿是 plot 下 gap 7 + x axis 26 高，原本 26 少了 7，卡片短 7px */
+.rk-axis-lbl{position:absolute;left:0;top:7px;width:calc(var(--rk-left,210px) - 20px);text-align:right;font-size:var(--lt-fs-12);font-weight:var(--lt-fw-bold);line-height:18px;color:var(--lt-grey-400);white-space:nowrap}
+.rk-axis-ticks{position:absolute;left:var(--rk-left,210px);right:12px;top:7px;height:18px}
+.rk-tick{position:absolute;top:0;transform:translateX(-50%);font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-primary);white-space:nowrap}
+.rk-wrap.is-sticky .rk-axis.is-stuck{box-shadow:0 -1px 0 var(--lt-grey-200)}   /* ⚠ 設計端暫擬（Fable #4）：只在真的貼住視窗底（圖表還沒捲完）時才畫 1px 上線，讓「浮在內容上」講得出來；捲到圖表尾端落回原位時不畫，跟稿的靜態 X 軸一樣 */
+.rk-sentinel{height:1px;margin-top:-1px}
+.rk-wrap.is-static .rk-axis{position:relative}
+.rk-wrap.is-maxh .rk-scroll{max-height:560px;overflow-y:auto;overscroll-behavior:contain}
+.rk-wrap.is-maxh .rk-axis{position:relative;padding-right:var(--rk-sbw,0px)}
+.rk-wrap.is-maxh .rk-axis-ticks{right:calc(12px + var(--rk-sbw,0px))}
+.rk-sk-lbl{width:calc(var(--rk-left,210px) - 10px)!important}
+.rk-sk-row{display:flex;align-items:center;gap:10px;height:66px}
+.rk-sk-lbl{width:200px;flex-shrink:0}
+.rk-sk-bars{flex:1;display:flex;flex-direction:column;gap:3px;padding-right:12px}
+.rk-state{min-height:400px;display:flex;flex-direction:column;justify-content:center}
+@media(max-width:900px){.rk-hdr{flex-wrap:wrap}.rk-upd{flex-wrap:wrap;white-space:normal}.rk-leg-row{flex-wrap:wrap}}
+
 /* ===== Footer ===== */
 .footer{padding:var(--lt-space-16) var(--lt-space-32);background:var(--lt-color-primary-bg);border-top:1px solid var(--lt-color-border-default);display:flex;align-items:center;justify-content:space-between;font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);flex-wrap:wrap;gap:10px}
 .footer-version{font-weight:var(--lt-fw-medium);color:#262626}
@@ -486,7 +551,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
     <div class="content" id="content"></div>
 
     <div class="footer">
-      <span class="footer-version">Overview Prototype<span class="ver-tag">v1</span></span>
+      <span class="footer-version">Overview Prototype<span class="ver-tag">v2 · Spending Rankings</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
     </div>
   </div>
@@ -1888,6 +1953,17 @@ const COPY = {
     addAuth: 'Add Your Authorization',
   },
   focusNoCompare: 'There is not enough data to compare to the previous period.',
+  /* ---- v2 子頁 Full Group Spending Ranking（文案逐字取自 Figma #08） ---- */
+  rank: {
+    /* ⚠ DEVIATION: FE 標題是 `Full Team Spending Rankings`；Figma 是 `Full Group Spending Ranking`（與稿內 Top 10 Highest Spending Groups 的 Group 用詞一致），照稿 */
+    title: 'Full Group Spending Ranking',
+    back: 'Back to Overview',
+    note: 'Please note that this chart is displayed on a group basis.\nThe total amount in this chart may not match the organization’s total amount due to the duplication of resources assigned to multiple groups.',
+    cost: 'Cost',
+    /* ⚠ 設計端暫擬：稿與 FE 都沒有「沒權限進這頁」的畫面。照 All Resource List v1 的 no-access 模式（T2 後端不回傳 viewSpendingRanking，直接輸入網址進來時） */
+    noAccessTitle: 'You do not have access to this page',
+    noAccessDesc: 'Please contact your organization’s administrator if you believe this is a mistake.',
+  },
 };
 
 /* FE public/images 的空狀態插圖（inline 進來，維持單檔 prototype；色值 #9ED7FF = Primary Light 30，與 CMDS Empty State icon 規則一致） */
@@ -1941,7 +2017,9 @@ const DATA_VARIANTS = {
   'no-compare':  { budget: 1200000, warning: 0.8, alert: 1.0, compare: false },
 };
 
-/* Top 10 Highest Spending Groups — SpendingGroup[]（本月）；This Year 用 ×(當月序) 加抖動 */
+/* Full Group Spending Ranking — SpendingGroup[]（本月）；This Year 用 ×(當月序) 加抖動。
+ * v2：完整排名 15 個團隊（Figma #08 也是 15 個）；Top 10 Highest Spending Groups（主頁）就是這份依總花費排序後的前 10 名，
+ * 兩邊吃同一份資料，所以團隊與金額一定對得起來。後五個刻意比前十小，月視角不會擠進前十。 */
 const GROUPS_MONTH = [
   { groupName: 'Platform Engineering',  gcpCost: 18240.5, awsCost: 9120.2,  azureCost: null,   budget: 30000 },
   { groupName: 'Data Science',          gcpCost: 12880.1, awsCost: 4450.0,  azureCost: 2020.4, budget: 16000 },
@@ -1953,8 +2031,16 @@ const GROUPS_MONTH = [
   { groupName: 'Analytics BI',          gcpCost: 4210.6,  awsCost: null,    azureCost: null,   budget: 4000 },
   { groupName: 'QA Automation',         gcpCost: 1910.2,  awsCost: 1380.9,  azureCost: null,   budget: 4000 },
   { groupName: 'Internal IT',           gcpCost: 1180.4,  awsCost: 710.1,   azureCost: 580.6,  budget: null },
+  /* ---- 以下 5 個只出現在完整排名（名次 11–15） ---- */
+  { groupName: 'Business Intelligence Guild', gcpCost: 1010.2, awsCost: 640.3, azureCost: 280.1, budget: 3500 },
+  { groupName: 'Training, Networking and Communication', gcpCost: 880.4, awsCost: 760.6, azureCost: null, budget: 2500 },   // 兩行（稿上也有這個名字）
+  { groupName: 'Developer Experience',  gcpCost: 640.5,  awsCost: 590.2,  azureCost: 190.4,  budget: null },
+  { groupName: 'Regional Customer Success, Onboarding and Enablement Programs for Strategic Accounts', gcpCost: 520.0, awsCost: 380.7, azureCost: null, budget: 1500 },   // 超過兩行 → 以 … 取代（稿：Y 軸最大 200px、最多兩行）
+  { groupName: 'Sandbox Experiments',   gcpCost: 290.6,  awsCost: 120.2,  azureCost: null,   budget: 800 },
 ];
-const YEAR_JITTER = [1.02, 1.28, 0.94, 1.05, 0.98, 1.1, 0.9, 1.3, 1.0, 0.97];
+const YEAR_JITTER = [1.02, 1.28, 0.94, 1.05, 0.98, 1.1, 0.9, 1.3, 1.0, 0.97, 1.0, 1.04, 0.96, 1.12, 0.9];
+/* Demo「大量團隊」：再加 25 個很小的團隊（總花費都 < 名次 15），驗證 X 軸黏底；不影響前十名 */
+const MANY_EXTRA = Array.from({ length: 25 }, (_, i) => ({ groupName: `Team ${String(i + 16).padStart(2, '0')} · Shared Services`, gcpCost: 250 - i * 8, awsCost: 120 - i * 3.5, azureCost: i % 3 === 0 ? 40 - i : null, budget: i % 4 === 0 ? null : 600 }));
 
 /* Cost by Cloud — costByCloud[platform] = {cost, budget}。
  * 本月三雲合計 = Monthly Total Cost（96,412.37）；本年合計 = Spend by This Year（Jan–Sep 加總 913,859.63），數字卡與圖表對得上 */
@@ -1998,8 +2084,13 @@ const state = {
   /* ⚠ DEVIATION（有意）：FE 用 `session.user.group.depth !== T2` 在前端藏 Top 10；FE 自己註記這該由後端回 availableActions。
    * prototype 照 group-list 的慣例改成資料驅動：角色只是換這組布林值，畫面不寫任何 role 字串判斷 */
   availableActions: { viewSpendingRanking: true },
+  /* ---- v2 子頁 ---- */
+  route: 'main',          // main | rankings（hash `#rankings?freq=&period=`，與 FE 的 query 參數同形）
+  rkLoading: false,       // 進頁（650ms）／切 Display Frequency（500ms）的 skeleton
+  manyGroups: false,      // Demo：40 個團隊（驗證 X 軸黏底）
+  rkAxis: 'sticky',       // sticky | static | maxh（便利貼「X 軸是否難以參照」：Kabin 2026-10-13 裁決 sticky；static／maxh 留在 Demo FAB「已不採用」對照）
 };
-let charts = { tc: null, top10: null, byCloud: null };
+let charts = { tc: null, top10: null, byCloud: null, rk: null };
 let _mainShown = false;   // 第一次切進「有資料」畫面才跑一次 skeleton 轉場
 
 /* ============================================================
@@ -2080,16 +2171,22 @@ function overviewOrg() {
     currentYear:  { cost: ytd,          comparisonRate: cmp(isCurrentYear() ? 0.127 : 0) },
   };
 }
+const groupTotal = (g) => (g.gcpCost || 0) + (g.awsCost || 0) + (g.azureCost || 0);
+/* 完整排名（依總花費由高到低，FE generateSortedSeries 的結果）。主頁 Top 10 = 這份的前 10 名 */
 function groupsForFreq() {
-  if (state.freq === 'month') return GROUPS_MONTH;
+  const base = state.manyGroups ? GROUPS_MONTH.concat(MANY_EXTRA) : GROUPS_MONTH;
   const k = CUR_MONTH_IDX + 1;
-  return GROUPS_MONTH.map((g, i) => ({
-    groupName: g.groupName,
-    gcpCost: g.gcpCost === null ? null : g.gcpCost * k * YEAR_JITTER[i],
-    awsCost: g.awsCost === null ? null : g.awsCost * k * YEAR_JITTER[i],
-    azureCost: g.azureCost === null ? null : g.azureCost * k * YEAR_JITTER[i],
-    budget: g.budget === null ? null : g.budget * 12,
-  }));
+  const list = state.freq === 'month' ? base : base.map((g, i) => {
+    const j = YEAR_JITTER[i] || 1;
+    return {
+      groupName: g.groupName,
+      gcpCost: g.gcpCost === null ? null : g.gcpCost * k * j,
+      awsCost: g.awsCost === null ? null : g.awsCost * k * j,
+      azureCost: g.azureCost === null ? null : g.azureCost * k * j,
+      budget: g.budget === null ? null : g.budget * 12,
+    };
+  });
+  return list.slice().sort((a, b) => groupTotal(b) - groupTotal(a));
 }
 function focusForFreq() {
   if (state.freq === 'month') return FOCUS_MONTH;
@@ -2104,6 +2201,8 @@ function renderAll() {
   closeAllPopovers();
   const root = document.getElementById('content');
   disposeCharts();
+  root.classList.toggle('is-rk', state.route === 'rankings');
+  if (state.route === 'rankings') { root.innerHTML = rankingsHtml(); mountRankings(); return; }
   if (state.pageState === 'loading') { root.innerHTML = pageLoadingHtml(); return; }
   if (state.pageState === 'no-auth') { root.innerHTML = noAuthHtml(); _mainShown = false; return; }
 
@@ -2133,10 +2232,10 @@ function pageLoadingHtml() {
   return `<div class="page-loading" role="status" aria-live="polite" aria-label="Loading"><div class="spinner"></div></div>`;
 }
 
-function noAuthHtml() {
+function noAuthHtml(withTitle = true) {
   const admin = ROLES[state.role].canAddAuth;
   return `
-    <div class="pg-hdr"><h1 class="pg-title">${COPY.title}</h1></div>
+    ${withTitle ? `<div class="pg-hdr"><h1 class="pg-title">${COPY.title}</h1></div>` : ''}
     <div class="card noauth-card">
       <div class="es">
         ${ILLUS.auth}
@@ -2381,55 +2480,94 @@ function optimizeHtml() {
   return `<div class="sections">${cards.join('')}</div>`;
 }
 
-/* ---- Top 10 chart：三雲堆疊 cost + Total Budget 並排；依總花費排序（FE generateSortedSeries） ---- */
+/* ---- 排名圖共用：series、tooltip、Hovering 灰底（Top 10 與子頁 Full Group Spending Ranking 完全相同；稿：「定義與操作與 Overview 中的 Top 10 完全相同（包含 Hovering）」）
+ * Kabin 2026-10-13 裁決：主頁 Top 10 也照子頁的稿（tooltip、灰底、堆疊順序、關進場動畫），兩邊共用下面這組函式。
+ * ⚠ DEVIATION（主頁 Top 10）：FE 是 MUI 風 tooltip（列高 24、灰框 r8）、ECharts shadow 蓋滿整個 category、堆疊 GCP 貼軸、有進場動畫；這裡照稿註記「與子頁完全相同」 ---- */
+/* 對稿裁決（2026-10-13）：堆疊順序照稿，Azure 貼軸（子頁最左、主頁最下）→ AWS → GCP；圖例與 tooltip 照稿維持 GCP → AWS → Azure（RANK_ORDER） */
+const RANK_ORDER = ['gcp', 'aws', 'azure'];
+const RANK_STACK = ['azure', 'aws', 'gcp'];
+/* 對稿修正：Hovering 時柱子維持原色（稿 Bar 4 只在柱子後面墊灰底）；ECharts 預設 emphasis 會把滑到的那列柱子提亮（實測 Azure #308CE3→#349AF9），兩個 series 都關掉 */
+function rankSeries(sorted) {
+  const series = [];
+  RANK_STACK.forEach(k => {
+    const costs = sorted.map(g => g[`${k}Cost`]);
+    if (!costs.some(v => typeof v === 'number')) return;
+    series.push({ name: PLATFORM[k].label, type: 'bar', stack: 'cost', itemStyle: { color: PLATFORM[k].color }, emphasis: { disabled: true },
+      data: sorted.map(g => ({ value: cx(g[`${k}Cost`] ?? 0), isOverrun: typeof g.budget === 'number' && groupTotal(g) > g.budget })) });
+  });
+  if (sorted.some(g => typeof g.budget === 'number')) {
+    series.push({ name: 'Total Budget', type: 'bar', stack: 'budget', itemStyle: { color: CHART.totalBudget }, emphasis: { disabled: true }, data: sorted.map(g => cx(g.budget)) });
+  }
+  return series;
+}
+/* 圖例順序（照稿 GCP → AWS → Azure → Total Budget），跟堆疊順序分開 */
+const rankLegendNames = (series) => RANK_ORDER.map(k => PLATFORM[k].label).filter(n => series.some(x => x.name === n)).concat(series.some(x => x.name === 'Total Budget') ? ['Total Budget'] : []);
+/* Tooltip 照稿 Chart / Tooltip（#08）：r5、陰影 0 0 6 .2、無灰框；列高 18、列距 4；分隔線 #CCCCCC；
+ * Total Budget／Remaining Budget 標籤 500；Remaining Budget 與色塊列同一條左緣（前面留 8+4 空位）。
+ * Fable #2：min 240／max 580（比照 chartTip），標籤與金額都不准縮（IDR 年視角 Rp1,278,549,588.00 原本把 Remaining Budget 擠成 Remaining Budg）。
+ * Fable #1 ⚠ 設計端暫擬：子頁 Y 軸照註記截成 …、主頁 X 軸截成 80px，tooltip 標題是讀得到全名的地方，所以標題不截、整段換行；
+ * 標題用 width:0＋min-width:100% 不參與寬度計算，長名稱只會變高、不會把 tooltip 撐到 580。稿的 Title 是 224×18 單行（只畫了短名字）
+ * ⚠ 未確認：稿的 tooltip 範例是「各雲各自對自己的預算變紅」（GCP 黑、AWS／Azure 紅），FE 也是逐雲預算；mock 只有團隊層級預算，團隊總花費 > 總預算時三雲一起變紅 */
+function rankTip(title, rows, footer) {
+  const row = (r, i) => `<div style="display:flex;align-items:center;gap:8px;height:18px;${i ? 'margin-top:4px;' : ''}"><span style="flex:1 0 auto;display:flex;align-items:center;white-space:nowrap;${r.lblStyle || ''}">${r.sw === undefined ? '' : `<span style="display:inline-block;width:8px;height:8px;margin-right:4px;flex-shrink:0;background:${r.sw}"></span>`}${r.label}</span><strong style="flex-shrink:0;font-weight:700;${r.valueStyle || ''}">${r.value}</strong></div>`;
+  const hr = '<div style="height:1px;background:#CCCCCC;margin:8px 0 7px"></div>';
+  return `<div style="min-width:240px;max-width:580px;box-sizing:border-box;padding:8px;background:#fff;border-radius:5px;box-shadow:0 0 6px rgba(0,0,0,.2);font-family:'Noto Sans',sans-serif;font-size:12px;line-height:18px;color:#262626">
+    <div style="width:0;min-width:100%;font-weight:500;white-space:normal;overflow-wrap:anywhere">${esc(title)}</div>${hr}
+    ${rows.map(row).join('')}${footer ? hr + footer.map(row).join('') : ''}</div>`;
+}
+function rankTooltip() {
+  return { trigger: 'axis', appendToBody: true, confine: true, borderWidth: 0, backgroundColor: 'transparent', padding: 0, extraCssText: 'box-shadow:none',
+    axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(0,0,0,0)' } },   // 灰底改由 attachRankBand() 用 graphic 畫（稿 Bar 4 是 48，ECharts 的 shadow 只能蓋滿整個 category）
+    formatter: (params) => {
+      const val = (p) => typeof p.value === 'number' ? p.value : (p.data && p.data.value) || 0;
+      const clouds = params.filter(p => p.seriesName !== 'Total Budget')
+        .sort((a, b) => RANK_ORDER.findIndex(k => PLATFORM[k].label === a.seriesName) - RANK_ORDER.findIndex(k => PLATFORM[k].label === b.seriesName));
+      const total = params.find(p => p.seriesName === 'Total Budget');
+      const totalCost = clouds.reduce((s, p) => s + val(p), 0), red = `color:${CHART.alert.main}`;
+      const rows = clouds.map(p => ({ sw: p.color, label: p.seriesName, value: cur().symbol + fmtNum(val(p), 2), valueStyle: p.data && p.data.isOverrun ? red : '' }));
+      let footer;
+      if (total && typeof total.value === 'number' && total.value) {
+        const left = total.value - totalCost;
+        footer = [{ sw: total.color, label: 'Total Budget', lblStyle: 'font-weight:500', value: cur().symbol + fmtNum(total.value, 2) },
+                  { sw: 'transparent', label: 'Remaining Budget', lblStyle: 'font-weight:500', value: (left < 0 ? '-' : '') + cur().symbol + fmtNum(Math.abs(left), 2), valueStyle: left < 0 ? red : '' }];
+      } else footer = [{ label: 'Total Cost', lblStyle: 'font-weight:500', value: cur().symbol + fmtNum(totalCost, 2) }];
+      return rankTip(params[0].axisValue, rows, footer);
+    } };
+}
+/* Hovering 灰底照稿 Bar 4：#7C7C7C@10%，沿數值軸蓋滿繪圖區，沿類別軸只蓋「兩條柱＋前 7 後 8」（子頁 15+3+15 → 48），不是整個 category 帶。
+ * 主頁 Top 10 是直條（柱 16、間隔 4）→ 寬 51（⚠ 設計端暫擬：主頁沒有自己的 Hovering 稿，照子頁的規則換算） */
+function attachRankBand(chart, catAxis, groupPx) {
+  const id = 'rank-band', hide = () => chart.setOption({ graphic: [{ id, type: 'rect', invisible: true, shape: { x: 0, y: 0, width: 0, height: 0 } }] });
+  const show = (idx) => {
+    const grid = chart.getModel().getComponent('grid').coordinateSystem.getRect();
+    const c = Math.round(chart.convertToPixel(catAxis === 'y' ? { yAxisIndex: 0 } : { xAxisIndex: 0 }, idx)), t = groupPx + 15;
+    const lo = c - Math.ceil(t / 2), shape = catAxis === 'y' ? { x: grid.x, y: lo, width: grid.width, height: t } : { x: lo, y: grid.y, width: t, height: grid.height };
+    chart.setOption({ graphic: [{ id, type: 'rect', z: -1, silent: true, invisible: false, shape, style: { fill: CHART.shadow } }] });
+  };
+  chart.on('updateAxisPointer', (e) => { const a = (e.axesInfo || []).find(x => x.axisDim === catAxis); a ? show(a.value) : hide(); });
+  chart.on('globalout', hide);
+}
+
+/* ---- Top 10 chart：三雲堆疊 cost + Total Budget 並排；取完整排名的前 10 名（FE generateSortedSeries） ---- */
 function mountTop10Chart() {
   const el = document.getElementById('top10-chart');
   if (!el) return;
-  const groups = groupsForFreq();
-  const totals = groups.map((g, i) => ({ i, sum: (g.gcpCost || 0) + (g.awsCost || 0) + (g.azureCost || 0) }));
-  totals.sort((a, b) => b.sum - a.sum);
-  const sorted = totals.map(t => groups[t.i]);
+  const sorted = groupsForFreq().slice(0, 10);
   const names = sorted.map(g => g.groupName);
-  const series = [];
-  ['gcp', 'aws', 'azure'].forEach(k => {
-    const costs = sorted.map(g => g[`${k}Cost`]);
-    if (!costs.some(v => typeof v === 'number')) return;
-    series.push({ name: PLATFORM[k].label, type: 'bar', stack: 'cost', itemStyle: { color: PLATFORM[k].color },
-      data: sorted.map(g => ({ value: cx(g[`${k}Cost`] ?? 0), isOverrun: typeof g.budget === 'number' && ((g.gcpCost || 0) + (g.awsCost || 0) + (g.azureCost || 0)) > g.budget })) });
-  });
-  if (sorted.some(g => typeof g.budget === 'number')) {
-    series.push({ name: 'Total Budget', type: 'bar', stack: 'budget', itemStyle: { color: CHART.totalBudget }, data: sorted.map(g => cx(g.budget)) });
-  }
+  const series = rankSeries(sorted);
   charts.top10 = echarts.init(el);
   charts.top10.setOption({
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow', shadowStyle: { color: CHART.shadow } }, borderWidth: 0, backgroundColor: 'transparent', padding: 0, extraCssText: 'box-shadow:none',
-      formatter: (params) => {
-        const clouds = params.filter(p => p.seriesName !== 'Total Budget');
-        const total = params.find(p => p.seriesName === 'Total Budget');
-        const totalCost = clouds.reduce((s, p) => s + (typeof p.value === 'number' ? p.value : (p.data && p.data.value) || 0), 0);
-        const rows = clouds.map(p => {
-          const over = p.data && p.data.isOverrun;
-          return { html: `<span style="display:inline-block;width:8px;height:8px;margin-right:4px;background:${p.color}"></span>${p.seriesName}`, value: cur().symbol + fmtNum(p.data.value, 2), valueStyle: over ? `color:${CHART.alert.main}` : '' };
-        });
-        let footer;
-        if (total && typeof total.value === 'number' && total.value) {
-          const left = total.value - totalCost;
-          footer = `<div style="height:1px;background:#E6E6E6;margin:8px 0"></div>
-            <div style="display:flex;align-items:center;gap:4px;height:24px"><span style="display:inline-block;width:8px;height:8px;margin-right:4px;background:${total.color}"></span><span style="flex:1">Total Budget</span><strong>${cur().symbol + fmtNum(total.value, 2)}</strong></div>
-            <div style="display:flex;align-items:center;gap:4px;height:24px;padding-left:14px"><span style="flex:1">Remaining Budget</span><strong style="${left < 0 ? `color:${CHART.alert.main}` : ''}">${(left < 0 ? '-' : '') + cur().symbol + fmtNum(left, 2)}</strong></div>`;
-        } else {
-          footer = `<div style="height:1px;background:#E6E6E6;margin:8px 0"></div><div style="display:flex;align-items:center;gap:4px;height:24px"><span style="flex:1">Total Cost</span><strong>${cur().symbol + fmtNum(totalCost, 2)}</strong></div>`;
-        }
-        return chartTip(params[0].axisValue, rows, footer);
-      } },
-    legend: { selectedMode: false, top: 'bottom', icon: 'rect', itemWidth: 16, itemHeight: 12, textStyle: { fontFamily: 'Noto Sans', fontSize: 12, color: '#262626' } },
+    animation: false,          // ⚠ DEVIATION：FE 有進場動畫；Kabin 2026-10-13 裁決主頁 Top 10 與子頁完全相同（子頁關掉，見 mountRankings）
+    tooltip: rankTooltip(),    // ⚠ DEVIATION：照子頁的稿（rankTip），不是 FE 的 MUI 風 tooltip
+    legend: { data: rankLegendNames(series), selectedMode: false, top: 'bottom', icon: 'rect', itemWidth: 16, itemHeight: 12, textStyle: { fontFamily: 'Noto Sans', fontSize: 12, color: '#262626' } },
     grid: { left: 20, right: 0, bottom: 20, top: 20, containLabel: true },
     xAxis: { type: 'category', boundaryGap: true, data: names, axisTick: { show: false },
              axisLabel: { interval: 0, color: CHART.axisText, width: 80, overflow: 'truncate', fontFamily: 'Noto Sans' }, axisLine: { lineStyle: { color: CHART.axisLine } } },
     yAxis: { type: 'value', axisLabel: { color: CHART.axisText, fontFamily: 'Noto Sans', formatter: (v) => axisLabel(v) }, splitLine: { lineStyle: { type: 'dashed', color: CHART.splitLine } } },
     barWidth: 16, barCategoryGap: '20%', barGap: '25%',
-    series,
+    series,                    // ⚠ DEVIATION：堆疊 Azure 貼軸（照稿），FE 是 GCP 貼軸
   });
+  attachRankBand(charts.top10, 'x', 16 + 4 + 16);   // ⚠ DEVIATION：灰底照子頁 Bar 4 的規則，FE 是 ECharts shadow 蓋滿整個 category
 }
 
 /* ---- Cost by Cloud：cost 蓋在 budget 上（barGap -100%）、超出部分疊紅 + 警示 markPoint ---- */
@@ -2508,6 +2646,7 @@ function mountCharts() {
   mountFocus();
 }
 window.addEventListener('resize', () => {
+  if (state.route === 'rankings' && document.getElementById('rk-wrap') && parseInt(document.getElementById('rk-wrap').style.getPropertyValue('--rk-left')) !== rkLeft()) { renderAll(); return; }   // 窄螢幕 Y 軸欄換寬度要整張重畫
   Object.values(charts).forEach(c => c && c.resize());
   if (window.LumitureFocusTreemap) LumitureFocusTreemap.resizeAll();
 });
@@ -2531,6 +2670,9 @@ function toggleFreq(e) { e.stopPropagation(); const dd = document.getElementById
 function setFreq(v) {
   if (v === state.freq) { closeAllPopovers(); return; }
   state.freq = v;
+  if (state.route === 'rankings') {   // FE：freq 進 URL query → 重新抓排名（Display Frequency 在載入中 disabled）
+    syncRkHash(); rkReload(500); return;
+  }
   reloadSections(['sec-optimize', 'sec-focus']);
 }
 /* 資料參數改變 → 受影響區塊先 skeleton 再重繪（切進有資料畫面前故意跑 skeleton） */
@@ -2601,9 +2743,11 @@ function mpApply() {
   if (changed) reloadSections(['sec-overview', 'sec-optimize', 'sec-focus']);
 }
 
-/* 頁面上不在本 prototype 範圍內的動作，用 toast 說明去向 */
-function goSpendingRankings() { toast('info', 'Navigates to Overview › Spending Rankings (/overview/spending-rankings) with the current period and frequency. That page is outside this prototype.'); }
-function takeScreenshot() { toast('info', 'In production this exports the page as LumiTure_overview.png via a hidden screenshot layout. The export mechanism is not reproduced here.'); }
+/* 截圖：本 prototype 不重現匯出機制，用 toast 說明 */
+function takeScreenshot() {
+  const f = state.route === 'rankings' ? 'LumiTure_spending_rankings.png' : 'LumiTure_overview.png';
+  toast('info', `In production this exports the page as ${f} via a hidden screenshot layout. The export mechanism is not reproduced here.`);   // ⚠ 未確認：#08 沒畫截圖版面（FE 有，另帶 ScreenshotNotes 四行說明），這輪只出 toast
+}
 
 function toast(kind, msg) {
   const wrap = document.getElementById('toast-wrap');
@@ -2612,6 +2756,190 @@ function toast(kind, msg) {
   el.innerHTML = `<span class="material-symbols-outlined">${kind === 'error' ? 'error' : kind === 'info' ? 'info' : 'check_circle'}</span><span>${esc(msg)}</span>`;
   wrap.appendChild(el);
   setTimeout(() => { el.style.transition = 'opacity .25s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 260); }, 4200);
+}
+
+/* ============================================================
+ * 8b. Spending Rankings 子頁（v2）— hash `#rankings?freq=month&period=YYYY-MM-01`
+ *   FE route `/overview/spending-rankings`，freq／period 用 URL query 從主頁帶過來（useOverviewParamChange）。
+ *   Figma #08（`5690:37299`）一張主稿 + 下方註記；沒有畫 empty／error／loading／no-access，那幾個都標 ⚠ 設計端暫擬。
+ * ============================================================ */
+const pad2 = (n) => String(n).padStart(2, '0');
+const rkLeft = () => { const c = document.getElementById('content'); return (c ? c.clientWidth : 1100) < 700 ? 120 : 210; };   // 稿：Y 軸欄 200 + 間距 10；窄螢幕縮成 120
+function rkHash() { const p = state.period; return `#rankings?freq=${state.freq}&period=${p.year}-${pad2(p.month)}-01`; }
+function setHash(h) { if (location.hash !== h) history.replaceState(null, '', location.pathname + location.search + h); }
+function syncRkHash() { if (state.route === 'rankings') setHash(rkHash()); }
+function goSpendingRankings() { location.hash = rkHash(); }          // 觸發 hashchange → enterRankings（瀏覽器上一頁可回主頁）
+function goOverview() { location.hash = ''; }                       // FE：回 /?freq=&period=（目前的 freq／period 一併帶回）
+
+let _rkTimer = null;
+function enterRankings(opts) {
+  opts = opts || {};
+  state.route = 'rankings';
+  clearTimeout(_rkTimer);
+  state.rkLoading = !opts.noSkel;                                    // 進頁固定跑一次 skeleton（全站慣例 650ms）
+  renderAll();
+  window.scrollTo(0, 0);
+  if (state.rkLoading) _rkTimer = setTimeout(() => { state.rkLoading = false; if (state.route === 'rankings') renderAll(); }, 650);
+}
+function rkReload(ms) {
+  clearTimeout(_rkTimer);
+  state.rkLoading = true; renderAll();
+  _rkTimer = setTimeout(() => { state.rkLoading = false; if (state.route === 'rankings') renderAll(); }, ms);
+}
+function showMain() {
+  clearTimeout(_rkTimer); state.rkLoading = false;
+  state.route = 'main'; renderAll(); window.scrollTo(0, 0);
+}
+function routeFromHash() {
+  const m = (location.hash || '').replace(/^#/, '').match(/^rankings(?:\?(.*))?$/);
+  if (!m) return false;
+  const q = new URLSearchParams(m[1] || '');
+  if (['month', 'year'].includes(q.get('freq'))) state.freq = q.get('freq');
+  const pm = (q.get('period') || '').match(/^(\d{4})-(\d{2})/);
+  if (pm) { const y = +pm[1], mo = +pm[2]; if (!mpIsDisabled(y, mo) && mo >= 1 && mo <= 12) state.period = { year: y, month: mo }; }
+  enterRankings(); return true;
+}
+window.addEventListener('hashchange', () => { if (!routeFromHash() && state.route !== 'main') showMain(); });
+
+/* FE UpdateAt 只列時間；稿上子頁多了日期與 (UTC+0)。⚠ 未確認：主頁維持 FE 的「只有時間」，兩頁不一致，等 Kabin 決定哪邊為準 */
+function rkUpdateTimes() {
+  const pts = [];
+  for (let d = -1; d <= 1; d++) [3, 9, 15, 21].forEach(h => pts.push(new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate() + d, h, 0)));
+  const prev = pts.filter(t => t <= NOW).pop(), next = pts.find(t => t > NOW);
+  const f = (t) => `${pad2(t.getDate())}/${pad2(t.getMonth() + 1)}/${t.getFullYear()} ${pad2(t.getHours())}:00`;
+  return { prev: f(prev), next: f(next) };
+}
+/* X 軸刻度：稿是 0–50K、每 5K 一格（10 格）。取「好讀的間距」讓最大值落在 10 格左右；main chart 與 X 軸列共用同一組數字才會對齊 */
+function rkScale(groups) {
+  let m = 0;
+  groups.forEach(g => { m = Math.max(m, cx(groupTotal(g)), cx(g.budget || 0)); });
+  if (!(m > 0)) return { max: 1, step: 1 };
+  const raw = m / 10, pow = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(x => x * pow).find(x => x >= raw - 1e-9);
+  return { max: Math.ceil(m / step - 1e-9) * step, step };
+}
+/* Y 軸標籤：最大寬 200px、最多兩行、超過以「…」取代（稿 #08 註記）。ECharts 的 lineOverflow 在 5.4 對 category 軸不生效（實測會排出三行），所以自己量字寬斷行 */
+const _rkCtx = document.createElement('canvas').getContext('2d');
+function rkWrapLabel(text, maxW) {
+  _rkCtx.font = '400 12px "Noto Sans", sans-serif';
+  const w = (t) => _rkCtx.measureText(t).width;
+  const lines = []; let cur = '';
+  text.split(' ').forEach(word => {
+    const t = cur ? cur + ' ' + word : word;
+    if (w(t) <= maxW) { cur = t; return; }
+    if (cur) lines.push(cur);
+    cur = word;
+    while (w(cur) > maxW) { let i = cur.length; while (i > 1 && w(cur.slice(0, i)) > maxW) i--; lines.push(cur.slice(0, i)); cur = cur.slice(i); }   // 單一長字也要切
+  });
+  if (cur) lines.push(cur);
+  if (lines.length <= 2) return lines.join('\n');
+  let rest = lines.slice(1).join(' ');
+  while (rest.length > 1 && w(rest + '…') > maxW) rest = rest.slice(0, -1);
+  return lines[0] + '\n' + rest.trimEnd() + '…';
+}
+const rkRows = (n) => Math.max(120, n * 66 - 14);     // 稿：每個團隊 36（兩條 15px 柱）+ 間距 30，上下各 8
+
+/* 對稿修正：稿匯出的圖示（Figma REST images?format=svg，與 Anomaly Detection 詳情頁同一組）：Arrow_Circle/Left 16、Screenshot 18。填色 currentColor */
+const RK_BACK_SVG = '<svg class="rk-ico16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8.00026 14.9336C6.62898 14.9336 5.28849 14.527 4.14831 13.7651C3.00813 13.0033 2.11947 11.9204 1.5947 10.6535C1.06993 9.38663 0.932628 7.99257 1.20015 6.64764C1.46768 5.3027 2.12801 4.0673 3.09766 3.09766C4.0673 2.12801 5.3027 1.46768 6.64764 1.20015C7.99257 0.932628 9.38663 1.06993 10.6535 1.5947C11.9204 2.11947 13.0033 3.00813 13.7651 4.14831C14.527 5.28849 14.9336 6.62898 14.9336 8.00026C14.9336 9.8391 14.2031 11.6026 12.9029 12.9029C11.6026 14.2031 9.8391 14.9336 8.00026 14.9336ZM8.80915 10.9192L6.69795 8.89466H11.802C12.1703 8.89466 12.4734 8.59156 12.4734 8.22328V7.77608C12.4734 7.4078 12.1703 7.10471 11.802 7.10471H6.6968L8.80915 5.08133C9.07646 4.82566 9.08191 4.38407 8.82071 4.12222L8.51333 3.81715C8.25424 3.55639 7.82486 3.55639 7.56577 3.81715L3.85644 7.52417C3.59568 7.78326 3.59568 8.21264 3.85644 8.47173L7.56577 12.1845C7.82486 12.4452 8.25424 12.4452 8.51333 12.1845L8.82071 11.8795C9.0819 11.6127 9.07763 11.1788 8.80915 10.9192Z"/></svg>';
+const RK_SHOT_SVG = '<svg viewBox="0 0 18 18" aria-hidden="true"><path fill="currentColor" d="M12.5732 7.73535C12.9387 7.73545 13.2874 7.89451 13.5312 8.17188L14.1924 8.92773C14.2554 9.01018 14.311 9.03711 14.3682 9.03711H14.917C15.6242 9.03711 16.2002 9.62177 16.2002 10.3398V13.874C16.2002 14.5921 15.6242 15.1768 14.917 15.1768H8.6875C7.98051 15.1765 7.40527 14.5919 7.40527 13.874V10.3398C7.40527 9.62192 7.98051 9.03735 8.6875 9.03711H9.2373C9.29444 9.03711 9.3493 9.0089 9.38379 8.96289L10.0742 8.17188C10.3181 7.89452 10.6667 7.7354 11.0322 7.73535H12.5732ZM11.8027 10.1533C10.7929 10.1533 9.9709 10.9885 9.9707 12.0137C9.9707 13.0391 10.7928 13.874 11.8027 13.874C12.8126 13.874 13.6348 13.0391 13.6348 12.0137C13.6346 10.9885 12.8125 10.1534 11.8027 10.1533ZM11.374 3C12.4786 3 13.374 3.89543 13.374 5V6.11133H11.5742V5.57227H3.59961V10.002C3.59961 10.1124 3.68937 10.2021 3.7998 10.2021H5.78906V12.002H3.7998L3.5957 11.9922C2.58701 11.8899 1.7998 11.0376 1.7998 10.002V5C1.7998 3.89545 2.69526 3.00003 3.7998 3H11.374Z"/></svg>';
+function rkBackHtml() { return `<button class="rk-back" onclick="goOverview()">${RK_BACK_SVG}<span class="t">${COPY.rank.back}</span></button>`; }
+function rkTopHtml(withCurrency) {
+  const c = window.CurrencyPicker ? CurrencyPicker.CURRENCIES.find(x => x.code === state.currency) : null;
+  return `<div class="rk-top">${rkBackHtml()}${withCurrency ? `<button class="curr-btn" onclick="CurrencyPicker.open(this, state.currency, setCurrency)" title="Change currency"><span class="curr-flag">${c ? c.flag : ''}</span><span class="curr-code">${state.currency}</span><span class="material-symbols-outlined">expand_more</span></button>` : ''}</div>`;
+}
+function rkFreqHtml(disabled) {
+  const opt = COPY.freq.options.find(o => o.v === state.freq);
+  return `<div class="dd sm" id="freq-dd">
+    <span class="dd-label">${COPY.freq.label}</span>
+    <button class="dd-trig" onclick="toggleFreq(event)" aria-haspopup="listbox" ${disabled ? 'disabled' : ''}><span>${opt.label}</span><span class="rk-tri"></span></button>
+    <div class="dd-list" role="listbox">${COPY.freq.options.map(o => `<div class="dd-item${o.v === state.freq ? ' sel' : ''}" role="option" aria-selected="${o.v === state.freq}" onclick="setFreq('${o.v}')">${o.label}</div>`).join('')}</div>
+  </div>`;
+}
+function rkSkeletonHtml(left) {
+  const rows = Array.from({ length: 10 }, (_, i) => `<div class="rk-sk-row"><div class="sk sk-text rk-sk-lbl" style="width:${150 - (i % 3) * 22}px"></div><div class="rk-sk-bars"><div class="sk" style="height:15px;width:${92 - i * 7}%"></div><div class="sk" style="height:15px;width:${68 - (i % 4) * 4}%"></div></div></div>`).join('');
+  return `<div class="rk-wrap" style="--rk-left:${left}px" role="status" aria-live="polite" aria-label="Loading">${rows}</div>`;
+}
+function rankingsHtml() {
+  /* 角色權限資料驅動：T2 後端不回傳 viewSpendingRanking → 主頁沒有 Top 10 入口，直接輸入網址進來也要擋（⚠ 設計端暫擬，稿與 FE 都沒有這個畫面） */
+  if (!state.availableActions.viewSpendingRanking) {
+    return `${rkTopHtml(false)}<div class="rk-card"><div class="es" style="min-height:520px"><span class="material-symbols-outlined" style="font-size:64px;color:var(--lt-blue-30)">lock</span><div class="es-title">${COPY.rank.noAccessTitle}</div><div class="es-desc">${COPY.rank.noAccessDesc}</div><button class="btn btn-p" onclick="goOverview()">${COPY.rank.back}</button></div></div>`;
+  }
+  /* ⚠ 設計端暫擬：沒有授權任何雲的 org（hasAssignedResources=false）。主頁 no-auth 時沒有排名入口；直接進子頁就沿用主頁的 no-auth 畫面（FE 子頁沒有 gate，只會抓到空資料） */
+  if (state.pageState === 'no-auth') return `${rkTopHtml(false)}${noAuthHtml(false)}`;
+
+  const st = state.pageState, left = rkLeft();
+  const sk = state.rkLoading || st === 'loading' || st === 'sec-loading', err = st === 'error', emp = st === 'empty';
+  const groups = (sk || err || emp) ? [] : groupsForFreq();
+  const chart = groups.length > 0;
+  const { prev, next } = rkUpdateTimes();
+  const series = chart ? rankSeries(groups) : [];
+  const skLegend = sk ? [60, 40, 44, 64].map(w => `<span class="sk sk-text" style="width:${w + 28}px;height:12px"></span>`).join('') : '';
+  const legend = skLegend || rankLegendNames(series).map(n => series.find(x => x.name === n)).map(x => `<span class="rk-leg-item"><span class="rk-leg-sw" style="background:${x.itemStyle.color}"></span>${x.name}</span>`).join('');   // 圖例照稿 GCP → AWS → Azure（堆疊順序另外是 Azure 貼軸）
+  let body;
+  if (sk) body = rkSkeletonHtml(left);
+  else if (err) body = emptyStateHtml('error', COPY.empty.error);          // ⚠ 設計端暫擬：FE 子頁 error 與 empty 都落到 emptyChart；這裡分開（與主頁 Top 10 一致）
+  else if (!chart) body = emptyStateHtml('chart', COPY.empty.chart);
+  else {
+    const sc = rkScale(groups), n = Math.round(sc.max / sc.step);
+    const ticks = Array.from({ length: n + 1 }, (_, i) => `<span class="rk-tick" style="left:${(i / n) * 100}%">${axisLabel(i * sc.step)}</span>`).join('');
+    body = `<div class="rk-wrap is-${state.rkAxis}" id="rk-wrap" style="--rk-left:${left}px">
+      <div class="rk-scroll" id="rk-scroll"><div class="rk-plot"><div class="rk-chart" id="rk-chart" style="height:${rkRows(groups.length)}px"></div></div></div>
+      <div class="rk-axis"><span class="rk-axis-lbl">${COPY.rank.cost} (${state.currency})</span><div class="rk-axis-ticks">${ticks}</div></div>
+      <div class="rk-sentinel" id="rk-sentinel"></div>
+    </div>`;
+  }
+  return `${rkTopHtml(true)}
+  <div class="rk-card">
+    <div class="rk-hdr">
+      <h1 class="rk-title">${COPY.rank.title}</h1>
+      <div class="rk-upd">
+        <div class="rk-upd-times"><span><b>Last Updated</b>${prev}</span><span><b>Next Update</b>${next} (UTC+0)</span></div>
+        <span class="material-symbols-outlined ic-info" data-tip="${esc(COPY.updateAtTip)}">info</span>
+        <button class="rk-shot" data-tip="${COPY.screenshotTip}" aria-label="${COPY.screenshotTip}" onclick="takeScreenshot()" ${sk ? 'disabled' : ''}>${RK_SHOT_SVG}</button>
+      </div>
+    </div>
+    <p class="rk-note">${esc(COPY.rank.note).replace('\n', '<br>')}</p>
+    <div class="rk-freq">${rkFreqHtml(sk)}</div>
+    <div class="rk-leg-row"><div class="rk-leg">${legend}</div><div class="rk-period">${COPY.periodPrefix}: ${periodCaption()}</div></div>
+    ${body}
+  </div>`;
+}
+let _rkStuckIO = null;
+function mountRankings() {
+  const el = document.getElementById('rk-chart');
+  if (!el) return;
+  const groups = groupsForFreq(), names = groups.map(g => g.groupName), left = rkLeft(), sc = rkScale(groups);
+  const h = rkRows(groups.length), band = h / groups.length;
+  const labelMap = {}; names.forEach(n => { labelMap[n] = rkWrapLabel(n, left - 10 - 2); });
+  charts.rk = echarts.init(el);
+  charts.rk.setOption({
+    /* ⚠ DEVIATION（Fable #5）：FE SpendingRankingsChart 有進場動畫（animation: !isScreenshotMode）。子頁每次畫圖前都先跑 650／500ms skeleton，
+       再接 ECharts 約 1 秒的進場動畫等於等兩段，堆疊段在動畫中還會浮在半空；關掉。Kabin 2026-10-13 裁決主頁 Top 10 一起關 */
+    animation: false,
+    tooltip: rankTooltip(),
+    legend: { show: false },
+    /* 對稿修正：稿是每列 36 + 間距 30、上下各留 8（第一列中心在 26，列距 66）。grid 上下各外推 7，category 帶寬才會剛好 66、第一列中心落在 26；
+       原本 grid 0/0 帶寬 65.07、第一列中心 32.5，頭尾各差 6.5px */
+    grid: { left, right: 12, top: -7, bottom: -7, containLabel: false },
+    /* 稿：垂直格線 #CCCCCC dashed 5/5、Y 軸線 #B3B3B3 solid；X 軸刻度另外畫在 .rk-axis（才能黏底），這裡只留格線 */
+    xAxis: { type: 'value', min: 0, max: sc.max, interval: sc.step, axisLabel: { show: false }, axisLine: { show: false }, axisTick: { show: false },
+             splitLine: { show: true, lineStyle: { type: [5, 5], color: '#CCCCCC', width: 1 } } },
+    /* 稿：Y 軸標籤最大寬 200px、最多兩行、超過以「…」取代；排名由高到低往下（category 軸 inverse） */
+    yAxis: { type: 'category', inverse: true, data: names, axisTick: { show: false }, axisLine: { show: true, lineStyle: { color: '#B3B3B3' } },
+             axisLabel: { interval: 0, color: CHART.axisText, fontFamily: 'Noto Sans', fontSize: 12, lineHeight: 18, align: 'left', margin: left, formatter: (v) => labelMap[v] } },
+    barWidth: 15, barCategoryGap: Math.max(6, band - 33), barGap: '20%',   // 兩條 15px 柱（cost／budget）間隔 3px，上下各留 (band−33)/2
+    series: rankSeries(groups),
+  });
+  attachRankBand(charts.rk, 'y', 15 + 3 + 15);   // 對稿修正：Hovering 灰底照稿 Bar 4（48 高、從 Y 軸到繪圖區右緣）
+  const wrap = document.getElementById('rk-wrap'), sc2 = document.getElementById('rk-scroll');
+  /* X 軸貼底時的上線：圖表尾端的 sentinel 還在視窗下方 → 軸列正貼著視窗底 */
+  const sen = document.getElementById('rk-sentinel'), axis = wrap && wrap.querySelector('.rk-axis');
+  if (_rkStuckIO) { _rkStuckIO.disconnect(); _rkStuckIO = null; }
+  if (sen && axis && state.rkAxis === 'sticky' && 'IntersectionObserver' in window) {
+    _rkStuckIO = new IntersectionObserver(([en]) => axis.classList.toggle('is-stuck', !en.isIntersecting && en.boundingClientRect.top > 0));
+    _rkStuckIO.observe(sen);
+  }
+  if (wrap && sc2 && state.rkAxis === 'maxh') wrap.style.setProperty('--rk-sbw', (sc2.offsetWidth - sc2.clientWidth) + 'px');   // 捲軸寬度，X 軸列右緣要扣掉才對得齊
 }
 
 /* ============================================================
@@ -2631,6 +2959,7 @@ window.DEMO_PAGES = [
   { id: 'role',  label: 'Role',  icon: 'person' },
   { id: 'state', label: 'State', icon: 'layers' },
   { id: 'data',  label: 'Data',  icon: 'dataset' },
+  { id: 'rankings', label: 'Rankings', icon: 'leaderboard' },
 ];
 window.DEMO_SCENARIOS = [
   { id: 'admin', page: 'role', label: 'Owner / Admin', icon: 'admin_panel_settings', tip: 'No-auth 畫面有「Add Your Authorization」按鈕；看得到 Top 10 Highest Spending Groups。' },
@@ -2651,9 +2980,56 @@ window.DEMO_SCENARIOS = [
   { id: 'budget-over', page: 'data', label: 'Budget exceeded (alert)',  icon: 'error',         tip: 'YTD 已超過預算：數字轉紅（error.dark）；Total Cost 圖上 Sep 起是 Overspend、後續是 Overspend Forecast。' },
   { id: 'no-budget',   page: 'data', label: 'No budget set',            icon: 'money_off',     tip: 'totalCost.budget = null：沒有 Your Budget 線、沒有 Overspend 狀態、數字卡不變色（threshold 預設 1 / 1）。' },
   { id: 'no-compare',  page: 'data', label: 'No comparison data',       icon: 'trending_flat', tip: 'comparisonRate = null：四張卡右下改成「There is not enough data to compare to the previous period.」，無趨勢 icon。' },
+
+  /* ---- v2 子頁 Full Group Spending Ranking（Figma #08 `5690:37299`）。標籤附稿上編號；上面三個頁籤的情境在子頁路由下同樣生效（Role／State／Data 切換不會跳回主頁） ---- */
+  { id: 'rk-enter',   page: 'rankings', group: '#08 主流程', label: '從主頁點 See Full Rankings 進頁',        icon: 'ads_click', tip: '回到主頁後點「See Full Rankings」：hash 變 #rankings?freq=&period=，進頁先跑 650ms skeleton。freq／period 沿用主頁目前的選擇。' },
+  { id: 'rk-set',     page: 'rankings', group: '#08 主流程', label: '#08 完整排名（15 個團隊，預設）',        icon: 'leaderboard', tip: 'Figma #08：Back to Overview + 幣別、卡片（標題／更新時間／說明／Display Frequency／圖例／Period）、橫向堆疊 bar（雲端三色 + Total Budget 綠條）。團隊與金額跟主頁 Top 10 同一份資料，前 10 名一致。' },
+  { id: 'rk-hover',   page: 'rankings', group: '#08 主流程', label: '#08 Hovering：第 2 名那列',               icon: 'mouse', tip: 'Figma #08 Hovering：整列灰色陰影（#7C7C7C @10%）+ 白底 tooltip（團隊名、三雲金額、Total Budget、Remaining Budget；超支紅字）。灰底 48 高、tooltip 照稿（r5、列高 18）；稿註記說與主頁 Top 10 相同，但主頁是 FE 翻譯，兩邊目前不同（待 Kabin，見對稿紀錄 §8）。' },
+  { id: 'rk-year',    page: 'rankings', group: '#08 主流程', label: 'Display Frequency：This Year',            icon: 'calendar_view_month', tip: '切到 This Year：Period 變 Jan. – 當月，金額變年累計，排名重排；freq 同步寫回 hash。' },
+  { id: 'rk-twd',     page: 'rankings', group: '#08 主流程', label: '幣別：TWD',                               icon: 'currency_exchange', tip: '稿：可在此頁切換幣別（預設同 #01）。軸刻度與 tooltip 金額一起換算。' },
+  { id: 'rk-h-info',  page: 'rankings', group: '#08 主流程', label: 'Hovering：更新時間 info icon',            icon: 'info', tip: '錨定 tooltip（#31383E），文案與主頁 UpdateAt 相同。' },
+  { id: 'rk-long',    page: 'rankings', group: '#08 Y 軸與 X 軸', label: '#08 Y 軸：兩行與 … 省略',            icon: 'wrap_text', tip: '稿：Y 軸最大寬度 200px、最多兩行、超過以「…」取代。預設資料已含一個兩行名字與一個超過兩行的名字（排名 11–15）；這個情境把畫面捲到那一段。' },
+  { id: 'rk-many',    page: 'rankings', group: '#08 Y 軸與 X 軸', label: '大量團隊（40 個）',                   icon: 'format_list_numbered', tip: '圖表很高時 X 軸在最下面，往下捲到底才看得到金額。預設 X 軸列貼在視窗底部。' },
+  { id: 'rk-axis-sticky', page: 'rankings', group: '便利貼：X 軸是否難以參照？', label: 'X 軸貼底（Kabin 10/13 裁決）', icon: 'vertical_align_bottom', tip: 'PRD 方向：「使用者在滾動圖表時，能夠隨時查看到 X 軸以對照」→ X 軸列 position:sticky 貼視窗底部。綠便利貼說「待了解」，所以另外兩種做法也留著對照。' },
+  { id: 'rk-axis-static', page: 'rankings', group: '已不採用（留著對照）', label: 'X 軸不黏（稿的原樣）', icon: 'vertical_align_center', tip: '稿上 X 軸只畫在圖表最下面。40 個團隊時使用者要捲到底才看得到刻度（綠便利貼擔心的情況）。' },
+  { id: 'rk-axis-maxh', page: 'rankings', group: '已不採用（留著對照）', label: '限制圖表高度（內捲動）', icon: 'height', tip: '綠便利貼的另一個選項「定義顯示範圍的最大高度」：圖表區最高 560px、內部捲動，X 軸列固定在圖表區下緣。' },
+  { id: 'rk-loading', page: 'rankings', group: '必備狀態', label: 'Loading（skeleton，不結束）',              icon: 'hourglass_empty', isNoData: true, tip: '⚠ 設計端暫擬：稿沒畫。標題／說明／圖例列留著，Display Frequency 與截圖鈕 disabled，圖表區換 shimmer 列。FE 現況是 CircularProgress。' },
+  { id: 'rk-empty',   page: 'rankings', group: '必備狀態', label: 'Empty：No Data Available',                icon: 'monitoring', isNoData: true, tip: '⚠ 設計端暫擬：稿沒畫。圖表區換 EmptyState（emptyChart）；標題列、Display Frequency 與 Period 保留。' },
+  { id: 'rk-error',   page: 'rankings', group: '必備狀態', label: 'Error：Something Went Wrong',             icon: 'cloud_off', isNoData: true, tip: '⚠ 設計端暫擬：FE 子頁把 error 與 empty 都畫成 emptyChart；這裡分開，跟主頁 Top 10 的 error 一致。' },
+  { id: 'rk-noauth',  page: 'rankings', group: '必備狀態', label: 'No authorization（沒授權任何雲）',        icon: 'lock', isNoData: true, tip: '⚠ 設計端暫擬：沿用主頁 no-auth 畫面（只留 Back to Overview）。' },
+  { id: 'rk-t1',      page: 'rankings', group: '角色', label: 'T1 Manager：看得到這頁',                     icon: 'supervisor_account', tip: '⚠ 未確認：稿註記「各權限看到的資料內容詳見 PRD」，PRD 範圍沒有模型化，T1 看到的資料與 Admin 相同。' },
+  { id: 'rk-t2',      page: 'rankings', group: '角色', label: 'T2 Manager：沒有存取權',                     icon: 'person', tip: '⚠ 設計端暫擬：主頁 T2 看不到 Top 10（availableActions.viewSpendingRanking = false），直接輸入網址進子頁也一樣擋。畫面照 All Resource List 的 no-access 模式。' },
 ];
 window.DEMO_DEFAULT = 'set';
+/* 用合成 mouse 事件觸發 #gl-tip（Demo 用，讓靜態畫面也看得到懸停態） */
+function simHover(sel) {
+  const el = document.querySelector(sel); if (!el) return;
+  el.scrollIntoView({ block: 'center', inline: 'nearest' });
+  const r = el.getBoundingClientRect(), init = { bubbles: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 };
+  el.dispatchEvent(new MouseEvent('mouseover', init)); el.dispatchEvent(new MouseEvent('mousemove', init));
+}
+function applyRankings(id) {
+  /* 每個子頁情境都從乾淨狀態開始（admin、有資料、USD、本月、X 軸貼底），再套自己那一項 */
+  setRole(id === 'rk-t1' ? 't1m' : id === 'rk-t2' ? 't2m' : 'admin');
+  state.pageState = ({ 'rk-loading': 'sec-loading', 'rk-empty': 'empty', 'rk-error': 'error', 'rk-noauth': 'no-auth' })[id] || 'set';
+  state.currency = id === 'rk-twd' ? 'TWD' : 'USD';
+  state.freq = id === 'rk-year' ? 'year' : 'month';
+  state.manyGroups = id === 'rk-many';
+  state.rkAxis = id === 'rk-axis-static' ? 'static' : id === 'rk-axis-maxh' ? 'maxh' : 'sticky';
+  _mainShown = true;
+  if (id === 'rk-enter') { clearTimeout(_rkTimer); state.route = 'main'; state.rkLoading = false; setHash(''); renderAll(); window.scrollTo(0, 0); setTimeout(goSpendingRankings, 700); return; }
+  clearTimeout(_rkTimer); state.rkLoading = false; state.route = 'rankings';
+  setHash(rkHash()); renderAll(); window.scrollTo(0, 0);
+  const later = (fn, ms) => setTimeout(fn, ms || 200);
+  /* 對稿修正：游標放在稿上的位置（第 2 列灰底內、tooltip 左上角落在稿的 1046,439），截圖才能跟 #08 疊；真實使用時 tooltip 跟著游標 */
+  if (id === 'rk-hover') later(() => { if (charts.rk) charts.rk.dispatchAction({ type: 'showTip', x: 720, y: 79 }); });
+  if (id === 'rk-h-info') later(() => simHover('.rk-upd .ic-info'));
+  if (id === 'rk-long') later(() => { const c = document.getElementById('rk-chart'); if (c) window.scrollTo(0, c.getBoundingClientRect().top + window.scrollY + 8 * 66 - 120); });
+  if (id === 'rk-many') later(() => window.scrollTo(0, 300));
+}
 window.DEMO_APPLY = function (id) {
+  const tip = document.getElementById('gl-tip'); if (tip) tip.style.display = 'none';
+  if (id.startsWith('rk-')) { applyRankings(id); return; }
   if (ROLES[id]) { setRole(id); renderAll(); return; }
   if (DATA_VARIANTS[id]) {
     state.data = id;
@@ -2673,6 +3049,9 @@ window.DEMO_APPLY = function (id) {
   if (['loading', 'sec-loading', 'no-auth', 'empty', 'error'].includes(h)) state.pageState = h;
   if (ROLES[h]) setRole(h);
   setRole(state.role);
+  /* Y 軸標籤是自己量字寬斷行的：字型載入後（Noto Sans 寬度與 fallback 不同）重畫一次圖 */
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (state.route === 'rankings' && charts.rk) { charts.rk.dispose(); charts.rk = null; mountRankings(); } });
+  if (routeFromHash()) { _mainShown = true; return; }       // #rankings（可帶 ?freq=&period=）直接開子頁
   renderAll();
 })();
 </script>
