@@ -2875,6 +2875,7 @@ window.DEMO_SCENARIOS = [
   { id: 'h-pin',      page: 'view', group: 'Hover (#01-3)', label: 'Pin 提示（已釘選）', icon: 'push_pin', tip: '⚠ 未確認：Figma 只在已釘選那顆畫出提示，文案又說「超過 30 天」；FE 一律掛。' },
   { id: 'h-name',     page: 'view', group: 'Hover (#01-3)', label: 'Resource 名稱＋ID', icon: 'badge', tip: '一律顯示 “Name (ID)”。' },
   { id: 'h-detail',   page: 'view', group: 'Hover (#01-3)', label: 'Check Anomaly Details', icon: 'description' },
+  { id: 'view-email', page: 'view', group: '通知信', label: '看通知信（Notification Emails）', icon: 'mail', tip: 'Anomaly Detection 的告警信（Figma Email Notification）。開新分頁，信裡的 View Details／See All 會連回這支 prototype 的詳情頁與列表。' },
   { id: 'd-detail',   page: 'view', group: '詳情入口', label: '點詳情 icon → 進詳情頁', icon: 'description', tip: '列表 Action 欄的 description icon 進詳情頁（hash #detail/<alertId>，進頁先跑 650ms skeleton）。Row 本身不可點。' },
 
   { id: 's-on',   page: 'settings', group: 'Alert Settings 彈窗', label: 'Settings：Detection ON (#03-1)', icon: 'tune', tip: '700 寬，Sensitivity 預設 Medium。' },
@@ -2967,9 +2968,12 @@ function applyDetail(id) {
   if (id === 'dt-trend') { go(R1); toast('info', DCOPY.trendToast); return; }
 }
 
+/* 看通知信（Notification Emails 接回流程）：用 <a target=_blank> 開新分頁到對應信件（不取代目前頁面，Demo 狀態不會丟；也避免自動掃情境時被導走）。路徑與 hash 見 notification-emails-prototype-v1.html */
+function openNotificationEmail(hash) { const a = document.createElement('a'); a.href = './notification-emails.html' + hash; a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); }
 window.DEMO_APPLY = function (id) {
   closePop(); closeModal();
   const tip = document.getElementById('gl-tip'); if (tip) tip.style.display = 'none';
+  if (id === 'view-email') return openNotificationEmail('#anomaly');
   if (ROLES[id]) { setRole(id); if (state.pageState === 'set') state.pageState = 'set'; renderRoute(); return; }
   if (['set', 'loading', 'empty', 'no-auth', 'error'].includes(id)) { if (id === 'set') { resetData(); state.settings.detection = true; } setPageState(id); return; }
   if (id === 'no-auth-na') { setRole('t1m'); setPageState('no-auth'); return; }

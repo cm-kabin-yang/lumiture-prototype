@@ -543,6 +543,13 @@ body.rule-figma .rules li:not(.met) .ck{font-variation-settings:'FILL' 0,'wght' 
 .toast.info{background:var(--au-toast-info)}
 .toast .material-symbols-outlined{font-size:20px;flex-shrink:0}
 .toast .tx{white-space:pre-line}
+/* 展示入口（Notification Emails 接回流程，2026-10-14）：Demo FAB 同色系的深藍底＋黃色虛線框，讀得出「這不是產品 UI」；Demo FAB「展示入口」可隱藏。
+   ⚠ 設計端暫擬：Kabin 要求 Forgot／Sign Up 寄出成功後有路徑看到那封信，正式產品沒有這顆 */
+.toast .demo-entry{pointer-events:auto;display:inline-flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px;height:22px;padding:0 8px;border-radius:11px;background:#0D1B3E;color:#fff;border:1px dashed #D9CC4A;font-size:12px;line-height:18px;font-weight:700;white-space:nowrap;text-decoration:none}
+.toast .demo-entry:hover{background:#0E3A82}
+.toast .demo-entry:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.toast .demo-entry .material-symbols-outlined{font-size:14px}
+body.demo-entries-off .demo-entry{display:none}
 @keyframes toast-in{0%{transform:translateY(20px);opacity:0}100%{transform:translateY(0);opacity:1}}
 
 /* ============================================================
@@ -800,11 +807,14 @@ function later(fn, ms) { const t = setTimeout(fn, ms); state.timers.push(t); ret
 /* ============================================================
  * 3. Toast
  * ============================================================ */
+/* 展示入口的去向：Notification Emails 展示頁（部署時路徑轉換一併處理） */
+const EMAIL_RESET = './notification-emails.html#reset-password', EMAIL_ACTIVATE = './notification-emails.html#activate';
 function toast(kind, msg, opt = {}) {
   const wrap = $('#toast-wrap'), el = document.createElement('div');
   el.className = 'toast ' + (kind === 'error' ? 'err' : kind === 'info' ? 'info' : '');
   /* FE Toaster icons：success=check_circle、info／error=info、warning=warning。error 也是 i 圖示；Figma #11 的失敗 toast 畫驚嘆號圓圈，Kabin 10/13 裁決 toast 照 FE，列為設計稿差異 */
-  el.innerHTML = `<span class="material-symbols-outlined">${kind === 'ok' ? 'check_circle' : 'info'}</span><span class="tx">${esc(msg)}</span>`;
+  el.innerHTML = `<span class="material-symbols-outlined">${kind === 'ok' ? 'check_circle' : 'info'}</span><span class="tx">${esc(msg)}</span>` +
+    (opt.demoLink ? `<a class="demo-entry" href="${opt.demoLink}" title="Prototype 展示入口，不是產品 UI"><span class="material-symbols-outlined">mail</span>Open this email (prototype)</a>` : '');
   const kill = () => { el.remove(); };
   el.addEventListener('click', kill);
   wrap.appendChild(el);
@@ -1287,7 +1297,7 @@ function finish(view) {
   if (view === 'forgot') {
     if (res === 'nf') return setErr('forgot', 'email', COPY.forgot.notFound);
     if (res === 'fail') return failGeneric();
-    toast('ok', COPY.forgot.ok, { dur: 10000 }); return go('login', { silent: false });
+    toast('ok', COPY.forgot.ok, { dur: 10000, demoLink: EMAIL_RESET }); return go('login', { silent: false });
   }
   if (view === 'reset' || view === 'activate') {
     if (COMMON_PWDS.includes(f.password.toLowerCase()) || res === 'common') return setErr(view, 'passwordConfirm', COPY.common);   /* ⚠ 設計端暫擬：Figma #05-1 把 7 則密碼錯誤統一寫在 Confirm Password 下方；FE 的 API 錯誤是 toast，這裡跟 Figma 放 Confirm 下方 */
@@ -1297,7 +1307,7 @@ function finish(view) {
   if (view === 'signup') {
     if (res === 'dup') return setErr('signup', 'email', COPY.signup.dup);
     if (res === 'fail') return failGeneric();
-    toast('ok', COPY.signup.ok, { dur: 10000 }); return go('login');
+    toast('ok', COPY.signup.ok, { dur: 10000, demoLink: EMAIL_ACTIVATE }); return go('login');
   }
 }
 
@@ -1436,6 +1446,8 @@ window.DEMO_SCENARIOS = [
   S('lg-ok-single', 'login', '成功', '登入成功（單一角色）→ 首頁', 'check_circle', '不跳 toast（FE 密碼登入成功沒有 toast）。首頁是示意頁。'),
   S('lg-ok-multi', 'login', '成功', '登入成功（多角色、沒有預設角色）→ #08', 'groups', '有別的角色可切「且」預設角色不存在才開 #08（Figma 登入流程圖；FE 條件是 session 沒有預設群組）；有預設角色直接進首頁。預選首次指派的角色（排序後第一個）。'),
   S('lg-lbl-fe', 'login', '樣式切換', '欄位標籤：FE（標籤在上，Kabin 10/13 裁決）', 'label', '定案。FE theme 把 InputLabel 設成 position:relative（粗體、Primary 色、在輸入框上方）；Activate 與 Country / Region 是 size small，標籤 12px。'),
+  S('lg-demo-entries-on', 'login', '展示入口', 'Open this email：顯示（預設）', 'mail', 'Forgot／Sign Up 寄出成功的 toast 旁，有一顆深藍底黃虛線框的展示入口，連到 Notification Emails 的對應信件。不是產品 UI。'),
+  S('lg-demo-entries-off', 'login', '展示入口', 'Open this email：隱藏', 'mail_off', '把展示入口整批藏起來（看產品 UI 本身時用）。'),
   S('lg-lbl-figma', 'login', '已不採用（留著對照）', '欄位標籤：Figma（notch）', 'label_outline', 'Kabin 10/13 裁決不採用。Figma #01～#05 畫的是 MUI 預設的 notch 標籤，輸入框左內距 12。僅供對照。'),
   /* ---- Forgot ---- */
   S('fg-02', 'forgot', '畫面', '#02 Forgot Password', 'mail_lock', '預設畫面。'),
@@ -1533,6 +1545,8 @@ window.DEMO_APPLY = function (id) {
   const I = id.split('-')[0];
   /* ---- Login ---- */
   if (id === 'lg-01') return open('login');
+  if (id === 'lg-demo-entries-on') { document.body.classList.remove('demo-entries-off'); return open('login'); }
+  if (id === 'lg-demo-entries-off') { document.body.classList.add('demo-entries-off'); return open('login'); }
   if (id === 'lg-lbl-fe') { document.body.classList.remove('lbl-figma'); return open('login'); }
   if (id === 'lg-lbl-figma') { document.body.classList.add('lbl-figma'); return open('login'); }
   if (id === 'lg-filled') { fillValid('login'); return open('login'); }
@@ -1552,7 +1566,7 @@ window.DEMO_APPLY = function (id) {
   if (id === 'fg-fail') { fillValid('forgot'); state.next.forgot = 'fail'; open('forgot'); return submit('forgot'); }
   if (id === 'fg-loading') { fillValid('forgot'); state.pending = true; return open('forgot'); }
   if (id === 'fg-ok') { fillValid('forgot'); open('forgot'); return submit('forgot'); }
-  if (id === 'fg-toast') { open('login'); toast('ok', COPY.forgot.ok, { persist: true }); return; }
+  if (id === 'fg-toast') { open('login'); toast('ok', COPY.forgot.ok, { persist: true, demoLink: EMAIL_RESET }); return; }
   /* ---- Reset ---- */
   if (id === 'rs-03') { state.verifyAuto = true; show('reset', { keep: false }); history.replaceState(null, '', '#reset'); return; }
   if (id === 'rs-fmt') { state.forms.reset.password = 'abc'; validateNow('reset', ['password']); open('reset'); return refreshRules('reset'); }
@@ -1564,7 +1578,7 @@ window.DEMO_APPLY = function (id) {
   if (id === 'rs-verify') { state.verify = 'loading'; return open('reset'); }
   if (id === 'rs-loading') { fillValid('reset'); state.pending = true; open('reset'); return refreshRules('reset'); }
   if (id === 'rs-toast') { open('login'); toast('ok', COPY.reset.ok, { persist: true }); return; }
-  if (id === 'su-toast') { open('login'); toast('ok', COPY.signup.ok, { persist: true }); return; }
+  if (id === 'su-toast') { open('login'); toast('ok', COPY.signup.ok, { persist: true, demoLink: EMAIL_ACTIVATE }); return; }
   if (id === 'ac-toast') { open('login'); toast('ok', COPY.activate.ok, { persist: true }); return; }
   if (id === 'rs-ok') { fillValid('reset'); open('reset'); refreshRules('reset'); return submit('reset'); }
   if (id === 'rs-rule-fe') { document.body.classList.remove('rule-figma'); open('reset'); return refreshRules('reset'); }

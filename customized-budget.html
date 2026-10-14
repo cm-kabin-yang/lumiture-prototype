@@ -3226,6 +3226,7 @@ window.DEMO_SCENARIOS = [
   { id: 'org-1',   page: 'state', group: '授權平台', label: 'Org：只有 Google Cloud', icon: 'cloud_done', tip: 'Add Rule 只有 Google Cloud；Batch create by 沒有 AWS Accounts。' },
   { id: 'fail-next', page: 'state', group: '送出結果', label: '下一次送出失敗（toast）', icon: 'report', tip: '切換：下一次 Create / Save / Confirm and Create 回失敗，留在原地並跳紅色 toast（#6、#19）。' },
 
+  { id: 'view-email', page: 'view', group: '通知信', label: '看通知信（Notification Emails）', icon: 'mail', tip: 'Customized Budget 的告警信（Figma Email Notification）。開新分頁，信裡的 View Details 連回這支 prototype 的列表。' },
   { id: 'v-list',   page: 'view', group: '瀏覽', label: 'Budget List', icon: 'list_alt' },
   { id: 'v-create', page: 'view', group: '建立', label: 'Create (#05)', icon: 'add_box', tip: '單筆建立。網址 #create。' },
   { id: 'v-batch',  page: 'view', group: '建立', label: 'Batch Create (#08)', icon: 'library_add', tip: '預設 Repeats Daily、無 Budget Scope 卡。網址 #batch。' },
@@ -3287,8 +3288,11 @@ function fullRules() {
     mkRule('aws', [{ type: 'group', values: ['Capstone Project Teams', 'Computer Engineering Students'] }, { type: 'service', values: ['DynamoDB', 'Amazon S3'] }, { type: 'third', values: optionsFor('third', 'aws').slice(0, 11) }])
   ];
 }
+/* 看通知信（Notification Emails 接回流程）：用 <a target=_blank> 開新分頁到對應信件（不取代目前頁面，Demo 狀態不會丟；也避免自動掃情境時被導走）。路徑與 hash 見 notification-emails-prototype-v1.html */
+function openNotificationEmail(hash) { const a = document.createElement('a'); a.href = './notification-emails.html' + hash; a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); }
 window.DEMO_APPLY = function (id) {
   closePop(true); closeModal();
+  if (id === 'view-email') return openNotificationEmail('#customized-alert');
   if (ROLES[id]) { setRole(id); if (state.view === 'list') renderList(); return; }
   if (['set', 'loading', 'empty', 'no-auth', 'error'].includes(id)) { if (id === 'set') { state.budgets = state.budgets.length ? state.budgets : initialBudgets(); } setPageState(id); return; }
   /* ⚠ 設計端暫擬：Add Rule 的平台選單 Figma 只畫了 Google Cloud／AWS（#07-2），Azure 由 Demo 的「+ Azure」情境開啟；第三個條件叫 Resource Group */
