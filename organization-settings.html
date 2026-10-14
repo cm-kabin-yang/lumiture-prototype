@@ -451,6 +451,7 @@
  *   window.LumitureSidebar.toggleGroup(groupId)
  *   window.LumitureSidebar.toggleCollapse()    — collapse the whole sidebar (icon-only)
  *   window.LumitureSidebar.setActive(itemId)
+ *   window.LumitureSidebar.setLoading(true|false) — Figma General Behavior #01-5 Sidebar Loading：nav 換成 5 條 200×24 skeleton（預設不顯示）
  */
 (function () {
   'use strict';
@@ -553,6 +554,19 @@
     '.lt-sidebar.lt-collapsed .lt-sb-group.lt-collapsed .lt-sb-group-children{display:block}',
     '.lt-sidebar.lt-collapsed .lt-sb-nav{padding:8px 4px}',
 
+    /* Sidebar Loading（Figma General Behavior #01-5；FE MainSidebarSkeleton）
+       5 條 200×24、圓角 4、顏色 CMDS Opacity Color Lighten 50（#FFFFFF 50%）、MUI wave 動畫；稿量到第一條離 logo 區底 24、間距 48（條與條之間 24）、水平置中。
+       logo 與底部收合鈕維持原樣不動（FE 骨架只有 nav 區）；收合狀態稿沒畫，⚠ 設計端暫擬：條寬縮成 32。預設完全不顯示，沒呼叫 setLoading 不影響任何既有頁面 */
+    '.lt-sb-skel{display:none;flex-direction:column;align-items:center;gap:24px;padding:8px 0 0}',
+    '.lt-sidebar.lt-loading .lt-sb-nav>*:not(.lt-sb-skel){display:none}',
+    '.lt-sidebar.lt-loading .lt-sb-skel{display:flex}',
+    '.lt-sidebar.lt-loading .lt-sb-collapse-btn button{visibility:hidden}',
+    '.lt-sb-skel-bar{position:relative;display:block;width:200px;max-width:100%;height:24px;border-radius:4px;background:rgba(255,255,255,.5);overflow:hidden}',
+    '.lt-sb-skel-bar::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:lt-sb-wave 1.6s linear .5s infinite}',
+    '@keyframes lt-sb-wave{0%{transform:translateX(-100%)}50%,100%{transform:translateX(100%)}}',
+    '.lt-sidebar.lt-collapsed .lt-sb-skel-bar{width:32px}',
+    '@media (prefers-reduced-motion:reduce){.lt-sb-skel-bar::after{animation:none}}',
+
     /* Collapse toggle button at bottom */
     '.lt-sb-collapse-btn{padding:12px;display:flex;justify-content:flex-end;',
     'border-top:1px solid var(--lt-sb-border);flex-shrink:0}',
@@ -641,6 +655,7 @@
         html += _renderItem(entry, false);
       }
     });
+    html += '<div class="lt-sb-skel" aria-hidden="true">' + '<span class="lt-sb-skel-bar"></span>'.repeat(5) + '</div>';
     html += '</div>';
     return html;
   }
@@ -653,6 +668,15 @@
            '</div>';
   }
 
+  // ===== Loading（#01-5）=====
+  var _loading = false;
+  function _applyLoading(mount) {
+    mount = mount || document.getElementById('lt-sidebar');
+    if (!mount) return;
+    mount.classList.toggle('lt-loading', _loading);
+    if (_loading) mount.setAttribute('aria-busy', 'true'); else mount.removeAttribute('aria-busy');
+  }
+
   // ===== Mount =====
   function _render() {
     var mount = document.getElementById('lt-sidebar');
@@ -663,6 +687,7 @@
     // If mount is not already a sidebar, wrap it
     mount.classList.add('lt-sidebar');
     mount.innerHTML = _renderLogo() + _renderNav() + _renderCollapseBtn();
+    _applyLoading(mount);
 
     // Group toggle
     mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
@@ -702,6 +727,8 @@
         el.classList.toggle('lt-active', el.dataset.navId === itemId);
       });
     },
+    setLoading: function (on) { _loading = !!on; _applyLoading(); },
+    isLoading: function () { return _loading; },
     rerender: _render,
   };
 
@@ -778,6 +805,9 @@
  *   window.LumitureTopbar.setQuota({analyses:{...}, rightsizing:{...}, refreshDate, addonPacks})
  *   window.LumitureTopbar.openMenu() / closeMenu() / toggleMenu()
  *   window.LumitureTopbar.rerender()
+ *   window.LumitureTopbar.openRoleDialog() / closeRoleDialog()   — View as Another Role 彈窗（#01-5；頁面掛勾見下方 role 區塊註解）
+ *   window.LumitureTopbar.setQuotaState('loading'|'error'|null)   — AI Quota 區塊狀態（#01-7）
+ *   window.LumitureTopbar.showPageLoading() / hidePageLoading()   — 角色切換時的「原頁面 Loading」遮罩
  */
 (function () {
   'use strict';
@@ -807,13 +837,13 @@
 
   // plan → 顯示哪些 quota 項目
   //   Essential = 兩項（照 Notion PRD，2026-06-22 Kabin 拍板）；Starter = 只 analyses；
-  //   Standard = 兩項；Premium/none = 不顯示 box
+  //   Standard = 兩項；Premium = 兩項（2026-10-14 Kabin 裁決照稿 #01-4：Unlimited 是 PRD 誤植、稿已劃掉，Premium 也顯示 `{remaining}/{total} left`，sub 只寫 Org-wide）；none = 不顯示 box
   //   ⚠ specs ai-quota README 說 Essential 只 rightsizing，與 PRD 衝突、待 PM 對齊；此處照 PRD
   var PLAN_QUOTA_ITEMS = {
     Essential: ['analyses', 'rightsizing'],
     Starter:   ['analyses'],
     Standard:  ['analyses', 'rightsizing'],
-    Premium:   [],
+    Premium:   ['analyses', 'rightsizing'],
     none:      [],
   };
 
@@ -823,13 +853,13 @@
     rightsizing: { label: 'Rightsizing Scans',   dialogLabel: 'Usage Optimization', unit: 'Rightsizing scans' },
   };
 
-  // plan banner 配色（對齊 Figma #01-4：Essential 灰 / Starter 藍 / Standard 深藍 / Premium 金）
+  // plan banner 配色（2026-10-14 逐格取樣 Figma #01-4／#01-6：Essential #5D93AD / Starter #308CE3 / Standard #004FB0 / Premium 金漸層 #D3B241→#AA8E2E；舊值是 06-22 的目視估計）
   var PLAN_BANNER = {
-    Essential: 'background:#5B6B7F',
-    Starter:   'background:#2E6DB4',
-    Standard:  'background:#16407C',
-    Premium:   'background:linear-gradient(90deg,#B8901F 0%,#E3BC55 100%)',
-    none:      'background:#5B6B7F',
+    Essential: 'background:#5D93AD',
+    Starter:   'background:#308CE3',
+    Standard:  'background:#004FB0',
+    Premium:   'background:linear-gradient(90deg,#D3B241 0%,#AA8E2E 100%)',
+    none:      'background:#5D93AD',
   };
 
   // ===== CSS =====
@@ -858,76 +888,89 @@
     '.lt-tb-chev{color:rgba(255,255,255,.6);font-size:20px;transition:transform .18s}',
     '.lt-tb-user.is-open .lt-tb-chev{transform:rotate(180deg)}',
 
-    /* ---------- Account Menu popover ---------- */
+    /* ---------- Account Menu popover ----------
+       2026-10-14 逐格對 Figma #01-6（hover）／#01-7（loading & error）：左右內距 24、方案列 37 高、姓名 16/700、角色 chip 藍 #004FB0 方角、
+       AI Quota 每列 24 高、狀態色 #00DCC2／#F4A938／#FF403D、功能列 40 高（外包 8／16）、陰影 0 0 6px .2。舊值（內距 16、狀態色提亮）是 06-22 的目視估計 */
     '.lt-am-backdrop{position:fixed;inset:0;z-index:1000;background:transparent}',
-    '.lt-am{position:fixed;top:62px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
-    'box-shadow:0 4px 16px rgba(0,0,0,.28);overflow:hidden;font-family:\'Noto Sans\',sans-serif;color:#fff;',
-    'animation:lt-am-in .14s ease;transform-origin:top right}',
+    '.lt-am{position:fixed;top:64px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
+    'box-shadow:0 0 6px rgba(0,0,0,.2);font-family:\'Noto Sans\',sans-serif;color:#fff;',
+    'animation:lt-am-in .14s ease;transform-origin:top right}',   /* 不設 overflow:hidden：hover tooltip（寬 400）要能伸出選單左邊，圓角改由第一／最後一個子區塊自己帶 */
     '@keyframes lt-am-in{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}',
     '.lt-am-hidden{display:none!important}',
 
     /* Plan banner */
-    '.lt-am-plan{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;color:#fff}',
-    '.lt-am-plan-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.lt-am-plan-date{font-size:11px;font-weight:500;opacity:.85;white-space:nowrap;letter-spacing:.2px;text-transform:uppercase}',
+    '.lt-am-plan{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 24px;color:#fff;border-radius:8px 8px 0 0}',
+    '.lt-am-plan-name{font-size:14px;font-weight:700;line-height:21px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-plan-date{font-size:12px;font-weight:400;line-height:18px;white-space:nowrap;text-transform:uppercase}',
 
     /* User identity */
-    '.lt-am-id{padding:14px 16px 12px}',
-    '.lt-am-id-name{font-size:15px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.lt-am-id-email{font-size:12px;color:rgba(255,255,255,.62);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.lt-am-chip{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:3px 10px 3px 8px;',
-    'background:#1E5FA8;border-radius:9999px;font-size:11px;font-weight:600;color:#fff}',
-    '.lt-am-chip .material-symbols-outlined{font-size:14px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 14}',
+    '.lt-am-id{padding:16px 24px;display:flex;flex-direction:column;gap:8px}',
+    '.lt-am-id-name{font-size:16px;font-weight:400;line-height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',   /* 稿的節點寫 700，但稿圖渲染是 regular（逐像素量 name 筆畫占比 0.17 vs 粗體 0.30），照稿圖 */
+    '.lt-am-id-email{font-size:12px;line-height:18px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-am-id-top{display:flex;flex-direction:column}',
+    '.lt-am-chip{align-self:flex-start;display:inline-flex;align-items:center;gap:4px;height:20px;padding:1px 8px;box-sizing:border-box;',
+    'background:#004FB0;border-radius:4px;font-size:12px;font-weight:400;line-height:18px;color:#fff;max-width:100%}',
+    '.lt-am-chip .material-symbols-outlined{font-size:16px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20}',
 
-    /* ---------- AI Quota box (navy 內嵌，彩色圓點 + 提亮狀態色，對齊設計稿) ---------- */
-    '.lt-q{padding:12px 16px}',
-    '.lt-q-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}',
-    '.lt-q-title{font-size:13px;font-weight:700;color:#fff}',
-    '.lt-q-sub{font-size:11px;color:rgba(255,255,255,.5);white-space:nowrap;letter-spacing:.1px}',
-    /* quota item — 高度固定（per spec：切狀態版面不跳動）；warning/depleted 有 hover tooltip */
-    '.lt-q-item{display:flex;align-items:center;gap:9px;padding:5px 8px;margin:0 -8px;border-radius:6px;position:relative;transition:background .12s}',
+    /* ---------- AI Quota box（navy 內嵌，彩色圓點；#01-6／#01-7） ---------- */
+    '.lt-q{padding:16px 24px}',
+    '.lt-q-head{display:flex;align-items:center;justify-content:space-between;gap:8px;height:25px;margin-bottom:4px}',
+    '.lt-q-title{font-size:14px;font-weight:700;line-height:25px;color:#fff}',
+    '.lt-q-sub{font-size:12px;line-height:18px;color:#B3B3B3;white-space:nowrap}',
+    /* quota item：24 高（切狀態版面不跳動）；左內距 8（Status Chips）、右緣貼內容邊；warning/depleted 有 hover tooltip */
+    '.lt-q-item{display:flex;align-items:center;gap:8px;height:24px;padding:0 0 0 8px;border-radius:4px;position:relative;transition:background .12s}',
+    '.lt-q-item+.lt-q-item{margin-top:4px}',
     '.lt-q-item.has-tip{cursor:help}',
-    '.lt-q-item.has-tip:hover{background:rgba(255,255,255,.07)}',
+    '.lt-q-item.has-tip:hover{background:rgba(255,255,255,.07)}',   /* ⚠ 設計端暫擬：稿 #01-6 hover 列沒有底色；這裡補一層讓「可以 hover」看得出來 */
+    '.lt-q-item.has-tip:focus-visible{outline:2px solid #4ADFFF;outline-offset:-2px}',
     '.lt-q-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}',
-    '.lt-q-label{font-size:12.5px;color:rgba(255,255,255,.9);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.lt-q-val{font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:3px}',
+    '.lt-q-label{font-size:12px;line-height:18px;color:#fff;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-q-val{font-size:12px;line-height:18px;font-weight:700;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:3px}',
     '.lt-q-val .material-symbols-outlined{font-size:13px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 13}',
-    /* hover tooltip（Lumiture 非圖表 tooltip 規範：#31383E 深底白字） */
-    '.lt-q-tip{position:absolute;top:calc(100% + 2px);left:8px;right:8px;z-index:5;background:#31383E;color:#fff;',
-    'font-size:11.5px;font-weight:400;line-height:1.45;padding:8px 10px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.3);',
-    'opacity:0;visibility:hidden;transform:translateY(-2px);transition:opacity .12s,transform .12s;pointer-events:none}',
-    '.lt-q-item.has-tip:hover .lt-q-tip,.lt-q-item.has-tip:focus-within .lt-q-tip{opacity:1;visibility:visible;transform:none}',
-    /* 狀態色（提亮一階給 navy 深底，dot + value 同色） */
-    '.lt-q-item.is-active    .lt-q-dot{background:#2DD4BF}', '.lt-q-item.is-active    .lt-q-val{color:#2DD4BF}',
-    '.lt-q-item.is-warning   .lt-q-dot{background:#FBBF24}', '.lt-q-item.is-warning   .lt-q-val{color:#FBBF24}',
-    '.lt-q-item.is-depleted  .lt-q-dot{background:#FF6B68}', '.lt-q-item.is-depleted  .lt-q-val{color:#FF6B68}',
-    '.lt-q-item.is-unlimited .lt-q-dot{background:#4ADFFF}', '.lt-q-item.is-unlimited .lt-q-val{color:#4ADFFF}',
-    /* add-on 行 */
-    '.lt-q-addon{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;color:#4ADFFF;font-weight:500}',
-    '.lt-q-addon .material-symbols-outlined{font-size:14px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 14}',
-    /* loading / error */
-    '.lt-q-skel{height:13px;border-radius:4px;margin:9px 0;background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.16),rgba(255,255,255,.08));background-size:200% 100%;animation:lt-q-shimmer 1.3s infinite}',
-    '.lt-q-skel-sub{width:120px;height:11px;margin:0;display:inline-block}',
+    /* hover tooltip（#01-6：寬 400、padding 8 16、14/24.5、右緣縮進 24、貼在該列正下方，會伸出選單左邊；底色 #31383E 近乎不透明） */
+    '.lt-q-tip{position:absolute;top:100%;right:0;z-index:5;width:400px;max-width:600px;box-sizing:border-box;background:rgba(49,56,62,.98);color:#fff;',
+    'font-size:14px;font-weight:400;line-height:24.5px;padding:8px 16px;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.3);',
+    'opacity:0;visibility:hidden;transform:translateY(-2px);transition:opacity .12s,transform .12s;pointer-events:none;text-align:left}',
+    '.lt-q-item.has-tip:hover .lt-q-tip,.lt-q-item.has-tip:focus-within .lt-q-tip,.lt-q-item.has-tip.is-tip-open .lt-q-tip{opacity:1;visibility:visible;transform:none}',   /* is-tip-open：展示頁 Demo 把 hover 說明固定打開用 */
+    /* 狀態色（#01-6 取樣：#00DCC2／#F4A938／#FF403D；dot + value 同色） */
+    '.lt-q-item.is-active    .lt-q-dot{background:#00DCC2}', '.lt-q-item.is-active    .lt-q-val{color:#00DCC2}',
+    '.lt-q-item.is-warning   .lt-q-dot{background:#F4A938}', '.lt-q-item.is-warning   .lt-q-val{color:#F4A938}',
+    '.lt-q-item.is-depleted  .lt-q-dot{background:#FF403D}', '.lt-q-item.is-depleted  .lt-q-val{color:#FF403D}',
+    /* add-on 行：靠右（#01-4 Standard 方案示意） */
+    '.lt-q-addon{display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:8px;height:18px;font-size:12px;line-height:18px;color:#4ADFFF;font-weight:500}',
+    '.lt-q-addon .material-symbols-outlined{font-size:16px;font-variation-settings:\'FILL\' 1,\'wght\' 500,\'GRAD\' 0,\'opsz\' 16}',
+    /* loading（#01-7）：整塊固定 113 高（跟有資料時同高，不跳版）；右上一條 80×12、下面兩條滿寬 12 高、間距 26 */
+    '.lt-q.is-loading{min-height:113px;box-sizing:border-box}',
+    '.lt-q-skel{display:block;height:12px;border-radius:6px;background:linear-gradient(90deg,rgba(255,255,255,.10),rgba(255,255,255,.18),rgba(255,255,255,.10));background-size:200% 100%;animation:lt-q-shimmer 1.3s infinite}',
+    '.lt-q-skel-sub{width:80px}',
+    '.lt-q-skel-row{margin-top:6px}',
+    '.lt-q-skel-row+.lt-q-skel-row{margin-top:14px}',
     '@keyframes lt-q-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}',
-    '.lt-q-err{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.75);padding:4px 0}',
+    '@media (prefers-reduced-motion:reduce){.lt-q-skel{animation:none}}',
+    /* error（#01-7）：只有這塊壞（partial degrade），整塊 85 高；help icon＋文字＋右側 Retry（青、粗、底線） */
+    '.lt-q-err{display:flex;align-items:center;gap:8px;height:24px;padding-left:8px;font-size:12px;line-height:18px;color:#CCCCCC}',
     '.lt-q-err-msg{flex:1;min-width:0}',
-    '.lt-q-err .material-symbols-outlined{font-size:16px;color:rgba(255,255,255,.55);font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 16}',
-    '.lt-q-err a{color:#4ADFFF;font-weight:600;cursor:pointer;flex-shrink:0}',
+    '.lt-q-err .material-symbols-outlined{font-size:16px;color:#CCCCCC;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20}',
+    '.lt-q-err a{color:#4ADFFF;font-weight:700;text-decoration:underline;cursor:pointer;flex-shrink:0;border-radius:2px}',
+    '.lt-q-err a:focus-visible{outline:2px solid #4ADFFF;outline-offset:2px}',
 
-    /* ---------- Menu action items ---------- */
-    '.lt-am-div{height:1px;background:rgba(255,255,255,.1)}',
-    '.lt-am-item{display:flex;align-items:center;gap:12px;padding:12px 16px;color:#fff;cursor:pointer;',
-    'background:none;border:none;width:100%;font-family:inherit;font-size:13.5px;text-align:left;transition:background .12s}',
+    /* ---------- Menu action items（外包 8／16、項目 40 高、icon 24、14/400） ---------- */
+    '.lt-am-div{height:1px;background:rgba(255,255,255,.2)}',   /* 稿 vertical instance opacity .2，FE AccountMenuItemWrap borderColor alpha(white,.2)（Fable #3） */
+    '.lt-am-grp{padding:8px 16px}',
+    '.lt-am-grp:last-child{border-radius:0 0 8px 8px}',
+    '.lt-am-item{display:flex;align-items:center;gap:8px;height:40px;padding:8px;box-sizing:border-box;color:#fff;cursor:pointer;border-radius:4px;',
+    'background:none;border:none;width:100%;font-family:inherit;font-size:14px;font-weight:400;line-height:24px;text-align:left;transition:background .12s}',
     '.lt-am-item:hover{background:rgba(255,255,255,.07)}',
-    '.lt-am-item .material-symbols-outlined{font-size:20px;color:rgba(255,255,255,.85);',
-    'font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20}',
+    '.lt-am-item:focus-visible{outline:2px solid #4ADFFF;outline-offset:-2px}',
+    '.lt-am-item .material-symbols-outlined{font-size:24px;color:#fff;',
+    'font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 24}',
   ].join('');
 
   function _injectCSS() {
     if (document.getElementById('lt-topbar-css')) return;
     var s = document.createElement('style');
     s.id = 'lt-topbar-css';
-    s.textContent = CSS;
+    s.textContent = CSS + ROLE_CSS;
     document.head.appendChild(s);
   }
 
@@ -975,17 +1018,8 @@
            '</button>';
   }
 
-  function _renderQuotaItem(key, q, opts) {
-    opts = opts || {};
+  function _renderQuotaItem(key, q) {
     var meta = QUOTA_META[key];
-    // Premium：unlimited（無 used/total，cyan + sparkle，不可點）
-    if (opts.unlimited) {
-      return '<div class="lt-q-item is-unlimited">' +
-               '<span class="lt-q-dot"></span>' +
-               '<span class="lt-q-label">' + _esc(meta.label) + '</span>' +
-               '<span class="lt-q-val">Unlimited<span class="material-symbols-outlined">auto_awesome</span></span>' +
-             '</div>';
-    }
     var used = q.used || 0, total = q.total || 0;
     var remaining = Math.max(0, total - used);
     var st = _status(used, total);
@@ -1001,7 +1035,7 @@
       tip = '<span class="lt-q-tip">' + _esc(tipText) + '</span>';
     }
     var hasTip = tip !== '';
-    return '<div class="lt-q-item is-' + st + (hasTip ? ' has-tip' : '') + '"' + (hasTip ? ' tabindex="0"' : '') + '>' +
+    return '<div class="lt-q-item is-' + st + (hasTip ? ' has-tip' : '') + '"' + (hasTip ? ' tabindex="0" role="menuitem" aria-disabled="true"' : '') + '>' +
              '<span class="lt-q-dot"></span>' +
              '<span class="lt-q-label">' + _esc(meta.label) + '</span>' +
              '<span class="lt-q-val">' + remaining.toLocaleString() + ' / ' + total.toLocaleString() + ' left</span>' +
@@ -1012,33 +1046,31 @@
   function _renderQuotaBox(u) {
     var isPremium = u.plan === 'Premium';
     var items = _planItems(u.plan);
-    if (!items.length && !isPremium) return '';   // 無有效 plan：不顯示（理論上不會發生）
-    // Premium（unlimited）不重置 → header 只顯示 Org-wide，不接 refresh 日
+    if (!items.length) return '';   // 無有效 plan：不顯示（理論上不會發生）
+    // Premium（稿 #01-4）：header 只寫 Org-wide，不接 refresh 日；數字照一般方案
     var sub = isPremium ? 'Org-wide' : 'Org-wide, refresh on ' + _esc(u.quota.refreshDate);
     var head = '<div class="lt-q-head">' +
                  '<span class="lt-q-title">AI Quota</span>' +
                  '<span class="lt-q-sub">' + sub + '</span>' +
                '</div>';
-    // loading（refresh 日也尚未載入 → sub 一併 skeleton）
+    // loading（#01-7）：refresh 日也尚未載入 → 右上一條 skeleton；下面兩條滿寬；整塊 min-height 113（跟有資料時同高）
     if (u.quota.state === 'loading') {
-      return '<div class="lt-q">' +
+      return '<div class="lt-q is-loading" aria-busy="true" aria-label="Loading AI Quota">' +
                '<div class="lt-q-head"><span class="lt-q-title">AI Quota</span>' +
                  '<span class="lt-q-skel lt-q-skel-sub"></span></div>' +
-               '<div class="lt-q-skel" style="width:78%"></div><div class="lt-q-skel" style="width:62%"></div>' +
+               '<div class="lt-q-skel lt-q-skel-row"></div><div class="lt-q-skel lt-q-skel-row"></div>' +
              '</div>';
     }
-    // error（partial degrade：只有這塊壞，menu 其他項照常）；refresh 日未載入 → sub 只顯示 Org-wide；Retry 右對齊
+    // error（#01-7 partial degrade：只有這塊壞，menu 其他項照常）；refresh 日未載入 → sub 只顯示 Org-wide；Retry 右對齊、青色粗體底線
     if (u.quota.state === 'error') {
       var headErr = '<div class="lt-q-head"><span class="lt-q-title">AI Quota</span><span class="lt-q-sub">Org-wide</span></div>';
       return '<div class="lt-q">' + headErr +
                '<div class="lt-q-err"><span class="material-symbols-outlined">help</span>' +
                '<span class="lt-q-err-msg">Couldn\'t load quota</span>' +
-               '<a onclick="window.LumitureTopbar.rerender()">Retry</a></div>' +
+               '<a role="menuitem" tabindex="0" onclick="window.LumitureTopbar._retryQuota()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.LumitureTopbar._retryQuota()}">Retry</a></div>' +
              '</div>';
     }
-    var rows = isPremium
-      ? ['analyses', 'rightsizing'].map(function (k) { return _renderQuotaItem(k, {}, { unlimited: true }); }).join('')
-      : items.map(function (k) { return _renderQuotaItem(k, u.quota[k] || {}); }).join('');
+    var rows = items.map(function (k) { return _renderQuotaItem(k, u.quota[k] || {}); }).join('');
     // add-on 行（packs>0，Premium 不適用）；naming 對齊 PRD：單數 "AI Quota Add-on × N"
     var addon = (!isPremium && (u.addonPacks || 0) > 0)
       ? '<div class="lt-q-addon"><span class="material-symbols-outlined">auto_awesome</span>' +
@@ -1051,14 +1083,12 @@
     var planName = _esc(u.plan) + ' Plan';
     var bannerStyle = PLAN_BANNER[u.plan] || PLAN_BANNER.Standard;
     var viewAs = u.canSwitchRole
-      ? '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'View as Another Role\')">' +
-          '<span class="material-symbols-outlined">sync_alt</span>View as Another Role</button>' +
+      ? '<div class="lt-am-grp">' +
+          '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar.openRoleDialog()">' +
+            '<span class="material-symbols-outlined">sync_alt</span>View as Another Role</button></div>' +
         '<div class="lt-am-div"></div>'
       : '';
     var box = _renderQuotaBox(u);
-    var quotaSection = box
-      ? '<div class="lt-am-div"></div>' + box + '<div class="lt-am-div"></div>'
-      : '<div class="lt-am-div"></div>';
     return '<div class="lt-am-backdrop" id="lt-am-backdrop" onclick="window.LumitureTopbar.closeMenu()"></div>' +
            '<div class="lt-am" id="lt-am" role="menu">' +
              '<div class="lt-am-plan" style="' + bannerStyle + '">' +
@@ -1066,19 +1096,26 @@
                '<span class="lt-am-plan-date">' + _esc(u.planDateRange) + '</span>' +
              '</div>' +
              '<div class="lt-am-id">' +
-               '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
-               '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
+               '<div class="lt-am-id-top">' +
+                 '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
+                 '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
+               '</div>' +
                '<span class="lt-am-chip"><span class="material-symbols-outlined">account_circle</span>' + _esc(u.role) + '</span>' +
              '</div>' +
-             quotaSection +
-             viewAs +
-             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Profile\')">' +
-               '<span class="material-symbols-outlined">person</span>Profile</button>' +
-             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Settings\')">' +
-               '<span class="material-symbols-outlined">settings</span>Settings</button>' +
              '<div class="lt-am-div"></div>' +
-             '<button type="button" class="lt-am-item" onclick="window.LumitureTopbar.logout()">' +
-               '<span class="material-symbols-outlined">logout</span>Log out</button>' +
+             (box ? box + '<div class="lt-am-div"></div>' : '') +
+             viewAs +
+             '<div class="lt-am-grp">' +
+               '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Profile\')">' +
+                 '<span class="material-symbols-outlined">manage_accounts</span>Profile</button>' +
+               '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Settings\')">' +
+                 '<span class="material-symbols-outlined">settings</span>Settings</button>' +
+             '</div>' +
+             '<div class="lt-am-div"></div>' +
+             '<div class="lt-am-grp">' +
+               '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar.logout()">' +
+                 '<span class="material-symbols-outlined">logout</span>Log out</button>' +
+             '</div>' +
            '</div>';
   }
 
@@ -1107,25 +1144,351 @@
     return host;
   }
 
+  /* 鍵盤（Fable #5）：開啟時焦點進第一項；↑↓／Home／End 移動；Esc 關閉並回到 user chip；Tab 離開選單時關閉並回到 chip；項目有 role="menuitem" */
+  function _menuItems() {
+    var m = document.getElementById('lt-am');
+    return m ? Array.prototype.slice.call(m.querySelectorAll('.lt-am-item,.lt-q-err a,.lt-q-item.has-tip')) : [];
+  }
   function _openMenu() {
+    var wasOpen = _menuOpen, items0 = wasOpen ? _menuItems() : [], idx = items0.indexOf(document.activeElement);
     var u = _user();
     _menuHost().innerHTML = _renderMenu(u);
     _menuOpen = true;
     var chip = document.getElementById('lt-tb-user');
     if (chip) { chip.classList.add('is-open'); chip.setAttribute('aria-expanded', 'true'); }
+    var items = _menuItems(), t = null;
+    if (!wasOpen) t = document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
+    else if (idx > -1 && items.length) t = items[Math.min(idx, items.length - 1)];            // 重繪（Retry、切 plan…）：焦點留在原位
+    if (t) t.focus({ preventScroll: true });
   }
-  function _closeMenu() {
+  function _closeMenu(refocus) {
+    var had = _menuOpen;
     _menuHost().innerHTML = '';
     _menuOpen = false;
     var chip = document.getElementById('lt-tb-user');
-    if (chip) { chip.classList.remove('is-open'); chip.setAttribute('aria-expanded', 'false'); }
+    if (chip) { chip.classList.remove('is-open'); chip.setAttribute('aria-expanded', 'false'); if (refocus && had) chip.focus({ preventScroll: true }); }
   }
   function _toggleMenu() { _menuOpen ? _closeMenu() : _openMenu(); }
 
-  // Esc 關閉 menu
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && _menuOpen) _closeMenu();
+    if (!_menuOpen) return;
+    var m = document.getElementById('lt-am'), a = document.activeElement, inside = !!(m && a && m.contains(a));
+    if (e.key === 'Escape') { e.preventDefault(); _closeMenu(true); return; }
+    if (e.key === 'Tab' && inside) { e.preventDefault(); _closeMenu(true); return; }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End') {
+      var items = _menuItems(); if (!items.length) return;
+      if (!inside && a && a.id !== 'lt-tb-user') return;
+      e.preventDefault();
+      var i = items.indexOf(a), n = items.length;
+      if (e.key === 'Home') i = 0; else if (e.key === 'End') i = n - 1;
+      else if (e.key === 'ArrowDown') i = i < 0 ? 0 : (i + 1) % n; else i = i < 0 ? n - 1 : (i - 1 + n) % n;
+      items[i].focus({ preventScroll: true });
+    }
   });
+
+  // ===== View as Another Role（Figma General Behavior #01-5 Popup: Select Your Role）=====
+  /* 視覺與互動沿用 Auth prototype 的 #08 Select Your Role（FE SelectUserRoleDialog）：寬 600、padding 24/32、圖示 75、
+     標題 20/700、下拉＝FE SingleSelect（搜尋 Group Name、Admin 置頂其餘字母排序、尾端角色 chip、清單最高 260）。
+     #01-5 與 #08 的差別（稿的註記）：多一顆 Keep Current Role（outlined、不切換直接關閉）；選到目前角色時 Continue disabled；
+     Continue 後「原頁面 Loading → 新角色視角的該頁面；沒權限看就跳回 Overview」。
+     頁面掛勾（都是選用，沒定義就只換 topbar 的角色 chip）。角色鍵 key 沿用各頁 ROLES 的 id：
+       'admin'（Owner／Admin）／'t1m'（T1 Manager）／'t1mb'（T1 Member）／'t2m'（T2 Manager）／'t2mb'（T2 Member）；由群組的 tier（0＝org 層／1／2）＋ role 算出
+       window.LUMITURE_ROLES         = [{id,name,role:'Admin'|'Manager'|'Member',tier:0|1|2}]   角色清單 mock；沒給用下面 DEFAULT_ROLES
+       window.LUMITURE_ROLE_CHANGE   = function (key, group) {}                      切換成功後呼叫（讓頁面套用那個角色的畫面）。
+                                                                                     頁面自己的 setRole 會把 chip 寫成頁面慣用寫法，要換回使用者選的群組請接著呼叫 LumitureTopbar.setRole(LumitureTopbar.roleLabel(group))
+       window.LUMITURE_ALLOWED_ROLES = ['admin','t1m']                               這頁哪些角色看得到；新角色不在裡面 → 導向 Overview
+       window.LUMITURE_HOME_HREF     = './overview.html'      導向的位置（預設值如左）。已經在這個檔名的頁面就不導向 */
+  var HOME_DEFAULT = './overview.html';   // 導回 Overview 的預設位置（打包時由 NAV_REWRITE 換成 ./overview.html）
+  var ROLE_PARTNER_SVG = "<svg width=\"75\" height=\"75\" viewBox=\"0 0 76 75\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<mask id=\"ltRdMask\" style=\"mask-type:alpha\" maskUnits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"76\" height=\"75\">\n<rect x=\"0.5\" width=\"75\" height=\"75\" fill=\"white\"/>\n</mask>\n<g mask=\"url(#ltRdMask)\">\n<path d=\"M35.5137 25.7133L29.1941 19.4123C28.4819 18.7002 28.1258 17.8651 28.1258 16.9073C28.1258 15.9494 28.4819 15.1144 29.1941 14.4022L35.5137 8.10124C36.2259 7.38905 37.0578 7.03296 38.0094 7.03296C38.9611 7.03296 39.793 7.38905 40.5052 8.10124L46.8248 14.4022C47.537 15.1144 47.893 15.9494 47.893 16.9073C47.893 17.8651 47.537 18.7002 46.8248 19.4123L40.5052 25.7133C39.793 26.4255 38.9611 26.7816 38.0094 26.7816C37.0578 26.7816 36.2259 26.4255 35.5137 25.7133ZM6.45117 63.733C5.45367 63.733 4.61185 63.39 3.9257 62.7038C3.23956 62.0177 2.89648 61.1759 2.89648 60.1784V50.8033C2.89648 48.9204 3.55206 47.3364 4.8632 46.0513C6.17435 44.7662 7.74534 44.1237 9.57617 44.1237H19.9227C21.0017 44.1237 21.9881 44.3654 22.882 44.8488C23.7759 45.3323 24.4969 45.9981 25.0449 46.8461C26.5802 48.9396 28.4796 50.5718 30.743 51.7425C33.0063 52.9133 35.4253 53.4987 38.0001 53.4987C40.6144 53.4987 43.0564 52.9133 45.326 51.7425C47.5956 50.5718 49.4782 48.9396 50.9739 46.8461C51.6012 45.9981 52.3519 45.3323 53.2259 44.8488C54.1 44.3654 55.0506 44.1237 56.0775 44.1237H66.4427C68.3256 44.1237 69.9096 44.7662 71.1947 46.0513C72.4798 47.3364 73.1223 48.9204 73.1223 50.8033V60.1784C73.1223 61.1759 72.7793 62.0177 72.0931 62.7038C71.407 63.39 70.5652 63.733 69.5677 63.733H53.9427C52.9452 63.733 52.1033 63.39 51.4172 62.7038C50.731 62.0177 50.388 61.1759 50.388 60.1784V56.4555C48.565 57.6829 46.6083 58.6195 44.5176 59.2655C42.4269 59.9114 40.2544 60.2344 38.0001 60.2344C35.7978 60.2344 33.6415 59.9015 31.531 59.2358C29.4205 58.57 27.4538 57.6234 25.6309 56.3961V60.1784C25.6309 61.1759 25.2878 62.0177 24.6016 62.7038C23.9155 63.39 23.0737 63.733 22.0762 63.733H6.45117ZM13.0001 40.2513C10.3461 40.2513 8.08893 39.3212 6.22867 37.4609C4.36841 35.6006 3.43828 33.3435 3.43828 30.6895C3.43828 27.9959 4.36841 25.7289 6.22867 23.8884C8.08893 22.048 10.3461 21.1277 13.0001 21.1277C15.6937 21.1277 17.9607 22.048 19.8012 23.8884C21.6416 25.7289 22.5619 27.9959 22.5619 30.6895C22.5619 33.3435 21.6416 35.6006 19.8012 37.4609C17.9607 39.3212 15.6937 40.2513 13.0001 40.2513ZM63.0001 40.2513C60.3461 40.2513 58.0889 39.3212 56.2287 37.4609C54.3684 35.6006 53.4383 33.3435 53.4383 30.6895C53.4383 27.9959 54.3684 25.7289 56.2287 23.8884C58.0889 22.048 60.3461 21.1277 63.0001 21.1277C65.6937 21.1277 67.9607 22.048 69.8012 23.8884C71.6416 25.7289 72.5619 27.9959 72.5619 30.6895C72.5619 33.3435 71.6416 35.6006 69.8012 37.4609C67.9607 39.3212 65.6937 40.2513 63.0001 40.2513Z\" fill=\"#004FB0\"/>\n</g>\n</svg>";
+  var DEFAULT_ROLES = [
+    { id: 'g-admin', name: 'Admin', role: 'Admin', tier: 0 }, { id: 'g-cc', name: 'Cost Center', role: 'Manager', tier: 1 },
+    { id: 'g-fin', name: 'Finance-APAC', role: 'Member', tier: 1 }, { id: 'g-dm', name: 'Data-Migration', role: 'Member', tier: 1 },
+    { id: 'g-azB', name: 'Availability-Zone-B', role: 'Manager', tier: 2 }, { id: 'g-plat', name: 'Platform Team', role: 'Member', tier: 2 },
+    { id: 'g-rep', name: 'Reporting', role: 'Member', tier: 2 },
+  ];
+  var ROLE_COPY = {
+    title: 'Select Your Role',
+    desc: ['Please choose the role you\'d like to use for this session.',
+           'We\'ll remember your selection and use it as the default for future logins.',
+           'You can always switch roles later by clicking your profile in the Header.'],
+    keep: 'Keep Current Role', cont: 'Continue', search: 'Search Group Name',
+  };
+  var ROLE_CSS = [
+    '.lt-rd-back{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:990;display:flex;align-items:center;justify-content:center;padding:32px;animation:lt-rd-fade .15s ease-out;font-family:\'Noto Sans\',sans-serif}',
+    '@keyframes lt-rd-fade{from{opacity:0}to{opacity:1}}',
+    '.lt-rd{background:#fff;border-radius:10px;box-shadow:0 0 20px rgba(0,0,0,.1);width:600px;max-width:100%;max-height:100%;overflow:auto;padding:24px 32px;display:flex;flex-direction:column;color:#262626}',
+    '.lt-rd:focus{outline:none}',
+    '.lt-rd-hd{display:flex;flex-direction:column;align-items:center;text-align:center}',
+    '.lt-rd-ic{margin-bottom:15px;line-height:0}',
+    '.lt-rd-hd h4{margin:0;font-size:20px;font-weight:700;line-height:30px;letter-spacing:0}',
+    '.lt-rd-hd p{margin:0;font-size:14px;line-height:24.5px;color:#262626}',
+    '.lt-rd-desc{margin-top:15px}',
+    '.lt-rd-body{margin:40px 0 64px}',
+    '.lt-rd-act{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}',
+    '.lt-rd-btn{display:inline-flex;align-items:center;justify-content:center;height:36px;min-width:80px;padding:0 16px;border-radius:5px;border:1px solid transparent;',
+    'font-family:inherit;font-size:14px;line-height:14px;font-weight:700;white-space:nowrap;cursor:pointer;transition:background .15s,border-color .15s}',
+    '.lt-rd-btn.pri{background:#004FB0;color:#fff;border-color:#004FB0;min-width:160px}',
+    '.lt-rd-btn.pri:hover{background:#0B6DD7;border-color:#0B6DD7}',
+    '.lt-rd-btn.out{background:#fff;color:#004FB0;border-color:#004FB0}',
+    '.lt-rd-btn.out:hover{background:#F2FAFF}',
+    '.lt-rd-btn[disabled]{background:#CCCCCC;border-color:#CCCCCC;color:#fff;cursor:not-allowed}',
+    '.lt-rd-btn:focus-visible,.lt-rd-sel:focus-visible{outline:2px solid #004FB0;outline-offset:2px}',
+    '.lt-rd-spin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:lt-rd-spin .8s linear infinite}',
+    '@keyframes lt-rd-spin{to{transform:rotate(360deg)}}',
+    /* 下拉觸發欄（FE SingleSelect／SelectButton） */
+    '.lt-rd-sel{display:flex;align-items:center;gap:4px;width:100%;height:36px;padding:8px;box-sizing:border-box;background:#fff;border:1px solid #CCCCCC;border-radius:5px;font-size:14px;cursor:pointer;user-select:none}',
+    '.lt-rd-sel:hover{border-color:transparent;outline:2px solid #CCCCCC;outline-offset:-2px}',
+    '.lt-rd-v{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#262626}',
+    '.lt-rd-arr{color:rgba(0,0,0,.54);font-size:24px;flex:none}',
+    '.lt-rd-chip{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:5px;background:#004FB0;color:#fff;font-size:12px;line-height:18px;flex:none}',
+    '.lt-rd-pop{position:fixed;z-index:995;background:#fff;border-radius:6px;box-shadow:0 0 6px rgba(0,0,0,.2);overflow:hidden;font-family:\'Noto Sans\',sans-serif;color:#262626}',
+    '.lt-rd-pop-in{padding:10px;display:flex;flex-direction:column}',
+    '.lt-rd-search{display:flex;align-items:center;height:36px;border:1px solid #CCCCCC;border-radius:5px;padding:8px;margin-bottom:10px;gap:8px}',
+    '.lt-rd-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;font-family:inherit;font-size:14px;color:#000910}',
+    '.lt-rd-search input::placeholder{color:#7C7C7C}',
+    '.lt-rd-search .material-symbols-outlined{color:#7C7C7C;font-size:24px}',
+    '.lt-rd-pop hr{border:0;border-top:1px solid rgba(0,0,0,.12);margin:0}',
+    '.lt-rd-list{max-height:260px;overflow:auto;overscroll-behavior:contain;padding-top:4px}',
+    '.lt-rd-opt{display:flex;align-items:center;justify-content:space-between;gap:8px;height:40px;padding:0 8px;margin:0 2px;border-radius:4px;cursor:pointer;font-size:14px}',
+    '.lt-rd-opt:hover{background:rgba(0,0,0,.04)}',
+    '.lt-rd-opt.on{background:rgba(0,0,0,.08)}',
+    '.lt-rd-opt.kb{background:rgba(0,0,0,.04);box-shadow:inset 0 0 0 1px #CCCCCC}',
+    '.lt-rd-opt.on.kb{background:rgba(0,0,0,.08)}',
+    '.lt-rd-nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.lt-rd-empty{padding:12px 8px;color:#7C7C7C;font-size:14px}',
+    /* 切換角色時的「原頁面 Loading」遮罩（⚠ 設計端暫擬：Figma 只寫「在原頁面上 Loading」；FE 實際是 window.location.reload()） */
+    '.lt-rd-load{position:fixed;z-index:60;background:#F2FAFF;display:flex;flex-direction:column;gap:24px;padding:32px;overflow:hidden;animation:lt-rd-fade .12s ease-out}',
+    '.lt-rd-sk{display:block;border-radius:8px;background:linear-gradient(90deg,#E9EEF3,#F6F9FC,#E9EEF3);background-size:200% 100%;animation:lt-q-shimmer 1.3s infinite}',
+    '.lt-rd-sk-row{display:flex;gap:24px}',
+    '@media (prefers-reduced-motion:reduce){.lt-rd-sk,.lt-rd-spin{animation:none}}',
+  ].join('');
+
+  var _rd = null;   // { selected, loading, ddOpen, active, q, ret, list }
+  function _baseRoles() { return (window.LUMITURE_ROLES && window.LUMITURE_ROLES.length) ? window.LUMITURE_ROLES : DEFAULT_ROLES; }
+  /* 目前 chip 的群組不在清單裡時（各頁 Demo FAB 用頁面慣用的群組名，例如 'Manager - Platform Team'），把它補進清單，
+     彈窗才會預選「目前角色」本身，不會預選到同等級的另一個群組（主 session 10/14 驗收時發現） */
+  function _roles() {
+    var list = _baseRoles(), lab = (_user() || {}).role || '', i;
+    var m = /^(Manager|Member)\s*-\s*(.+)$/.exec(lab); if (!m) return list;
+    for (i = 0; i < list.length; i++) if (_roleLabel(list[i]) === lab) return list;
+    var tier = 1;
+    for (i = 0; i < list.length; i++) if (list[i].name === m[2]) { tier = list[i].tier === 2 ? 2 : 1; break; }
+    return list.concat([{ id: 'g-cur', name: m[2], role: m[1], tier: tier }]);
+  }
+  function _isAdminRole(r) { return r.role === 'Admin' || r.role === 'Owner'; }   // FE Role enum 另有 OWNER，UserRoleChip 把 Owner 也顯示成 Admin
+  function _roleKey(r) { return _isAdminRole(r) ? 'admin' : 't' + (r.tier === 2 ? 2 : 1) + (r.role === 'Manager' ? 'm' : 'mb'); }
+  function _roleLabel(r) { return _isAdminRole(r) ? 'Admin' : r.role + ' - ' + r.name; }   // topbar chip／menu chip 的寫法（Admin 無群組後綴）
+  function _sortedRoles(list) {   // #08-1：Admin 置頂，其餘依字母排序
+    return list.slice().sort(function (a, b) {
+      return ((a.role === 'Admin' ? 0 : 1) - (b.role === 'Admin' ? 0 : 1)) || a.name.localeCompare(b.name);
+    });
+  }
+  /* chip 字串 → 角色鍵。各頁 Demo FAB 的角色情境用的是頁面慣用寫法（'Manager - Platform Team'），不一定剛好是清單裡有的群組（Platform Team 在清單是 Member），
+     所以比對不到時退回用角色鍵找：群組名在清單裡找得到就用它的 tier，找不到當 T1（Fable #1） */
+  function _keyOfLabel(label) {
+    if (!label) return null;
+    if (label.indexOf(' - ') < 0) return /^(Admin|Owner)$/.test(label) ? 'admin' : null;
+    var m = /^(Manager|Member)\s*-\s*(.+)$/.exec(label); if (!m) return null;
+    var list = _baseRoles(), tier = 1;
+    for (var i = 0; i < list.length; i++) if (list[i].name === m[2]) { tier = list[i].tier === 2 ? 2 : 1; break; }
+    return 't' + tier + (m[1] === 'Manager' ? 'm' : 'mb');
+  }
+  function _currentRoleId() {
+    var u = _user(), list = _roles(), i;
+    for (i = 0; i < list.length; i++) if (_roleLabel(list[i]) === u.role) return list[i].id;      // 1. chip 字串剛好對得上某個群組
+    var key = _keyOfLabel(u.role); if (!key) return null;
+    for (i = 0; i < list.length; i++) if (_roleKey(list[i]) === key) return list[i].id;           // 2. 退回同角色鍵的第一個群組
+    return null;
+  }
+  function _roleById(id) { var l = _roles(); for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i]; return null; }
+
+  var ROLE_INERT_SKIP = '.demo-fab,.demo-popover,#gl-tip,#lt-rd-host,#lt-rd-pop,#lt-rd-load,script,style,link,noscript';
+  function _roleInert(on) {
+    Array.prototype.slice.call(document.body.children).forEach(function (el) {
+      if (on) { if (!el.matches(ROLE_INERT_SKIP) && !el.inert) { el.inert = true; el.setAttribute('data-lt-rd-inert', ''); } }
+      else if (el.hasAttribute('data-lt-rd-inert')) { el.inert = false; el.removeAttribute('data-lt-rd-inert'); }
+    });
+  }
+  function _rdHost() {
+    var h = document.getElementById('lt-rd-host');
+    if (!h) { h = document.createElement('div'); h.id = 'lt-rd-host'; document.body.appendChild(h); }
+    return h;
+  }
+  function _rdPopHost() {
+    var h = document.getElementById('lt-rd-pop');
+    if (!h) { h = document.createElement('div'); h.id = 'lt-rd-pop'; document.body.appendChild(h); }
+    return h;
+  }
+  function _rdDialogHtml() {
+    var r = _rd, sel = _roleById(r.selected) || _sortedRoles(r.list)[0];
+    var disabled = !!r.loading || (r.current && r.selected === r.current);
+    return '<div class="lt-rd-back" id="lt-rd-back"><div class="lt-rd" id="lt-rd" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="lt-rd-t">' +
+      '<div class="lt-rd-hd"><div class="lt-rd-ic">' + ROLE_PARTNER_SVG + '</div><h4 id="lt-rd-t">' + ROLE_COPY.title + '</h4>' +
+        '<div class="lt-rd-desc">' + ROLE_COPY.desc.map(function (l) { return '<p>' + _esc(l) + '</p>'; }).join('') + '</div></div>' +
+      '<div class="lt-rd-body"><div class="lt-rd-sel" id="lt-rd-sel" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="' + (r.ddOpen ? 'true' : 'false') +
+        '" aria-controls="lt-rd-list" aria-labelledby="lt-rd-t"><span class="lt-rd-v">' + _esc(sel.name) + '</span><span class="lt-rd-chip">' + _esc(sel.role) +
+        '</span><span class="material-symbols-outlined lt-rd-arr">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
+      '<div class="lt-rd-act"><button type="button" class="lt-rd-btn out" id="lt-rd-keep"' + (r.loading ? ' disabled' : '') + '>' + ROLE_COPY.keep + '</button>' +
+        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') + '>' +
+        (r.loading ? '<span class="lt-rd-spin" role="status" aria-label="Loading"></span>' : ROLE_COPY.cont) + '</button></div>' +
+    '</div></div>';
+  }
+  function _rdRender(keepFocusId) {
+    var host = _rdHost(), before = keepFocusId || (document.activeElement && document.activeElement.id);
+    host.innerHTML = _rdDialogHtml();
+    var again = before && document.getElementById(before);
+    var t = again && !again.disabled ? again : document.getElementById('lt-rd');
+    if (t) t.focus({ preventScroll: true });
+  }
+  function _rdFocusables() {
+    var d = document.getElementById('lt-rd');
+    return d ? Array.prototype.slice.call(d.querySelectorAll('button:not([disabled]),[tabindex]:not([tabindex="-1"])')) : [];
+  }
+  function _rdOptsHtml(q) {
+    var r = _rd, ql = (q || '').toLowerCase();
+    var items = _sortedRoles(r.list).filter(function (x) { return x.name.toLowerCase().indexOf(ql) > -1; });
+    return items.length ? items.map(function (x) {
+      return '<div class="lt-rd-opt' + (x.id === r.selected ? ' on' : '') + '" id="lt-rd-o-' + _esc(x.id) + '" role="option" data-rid="' + _esc(x.id) + '"><span class="lt-rd-nm">' +
+             _esc(x.name) + '</span><span class="lt-rd-chip">' + _esc(x.role) + '</span></div>';
+    }).join('') : '<div class="lt-rd-empty">No options</div>';
+  }
+  function _rdOpts() { return Array.prototype.slice.call(document.querySelectorAll('#lt-rd-pop .lt-rd-opt')); }
+  function _rdActivate(i) {
+    var items = _rdOpts(), q = document.getElementById('lt-rd-q');
+    if (!items.length) { _rd.active = -1; if (q) q.removeAttribute('aria-activedescendant'); return; }
+    i = Math.max(0, Math.min(items.length - 1, i)); _rd.active = i;
+    items.forEach(function (o, k) { o.classList.toggle('kb', k === i); o.setAttribute('aria-selected', o.classList.contains('on') ? 'true' : 'false'); });
+    if (q) q.setAttribute('aria-activedescendant', items[i].id);
+    var list = items[i].parentNode;
+    if (items[i].offsetTop < list.scrollTop) list.scrollTop = items[i].offsetTop;
+    else if (items[i].offsetTop + items[i].offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = items[i].offsetTop + items[i].offsetHeight - list.clientHeight;
+  }
+  function _rdClosePop(refocus) {
+    if (!_rd || !_rd.ddOpen) return;
+    _rd.ddOpen = false; _rdPopHost().innerHTML = '';
+    var s = document.getElementById('lt-rd-sel');
+    if (s) { s.setAttribute('aria-expanded', 'false'); var a = s.querySelector('.lt-rd-arr'); if (a) a.textContent = 'arrow_drop_down'; if (refocus) s.focus({ preventScroll: true }); }
+  }
+  function _rdOpenPop() {
+    var s = document.getElementById('lt-rd-sel'); if (!s || !_rd || _rd.loading) return;
+    _rd.ddOpen = true; s.setAttribute('aria-expanded', 'true'); s.querySelector('.lt-rd-arr').textContent = 'arrow_drop_up';
+    var host = _rdPopHost();
+    host.innerHTML = '<div class="lt-rd-pop" id="lt-rd-popbox"><div class="lt-rd-pop-in"><div class="lt-rd-search"><input id="lt-rd-q" placeholder="' + ROLE_COPY.search +
+      '" autocomplete="off" role="combobox" aria-label="' + ROLE_COPY.search + '" aria-controls="lt-rd-list" aria-expanded="true" aria-autocomplete="list"><span class="material-symbols-outlined">search</span></div><hr>' +
+      '<div class="lt-rd-list" id="lt-rd-list" role="listbox" aria-label="Roles">' + _rdOptsHtml('') + '</div></div></div>';
+    var el = document.getElementById('lt-rd-popbox'), rc = s.getBoundingClientRect();
+    el.style.width = rc.width + 'px'; el.style.left = rc.left + 'px';
+    var top = rc.bottom + 6; el.style.top = top + 'px';
+    var h = el.offsetHeight; if (top + h > innerHeight - 8) el.style.top = Math.max(8, rc.top - h - 6) + 'px';
+    var q = document.getElementById('lt-rd-q');
+    q.addEventListener('input', function () { document.getElementById('lt-rd-list').innerHTML = _rdOptsHtml(q.value); _rdActivate(0); });
+    var on = _rdOpts().map(function (o) { return o.classList.contains('on'); }).indexOf(true);
+    _rdActivate(on < 0 ? 0 : on);
+    q.focus({ preventScroll: true });
+  }
+  function _rdChoose(id) { _rd.selected = id; _rdClosePop(false); _rdRender('lt-rd-sel'); }
+  function _openRoleDialog() {
+    if (_rd) return;
+    _closeMenu();
+    var list = _roles(), cur = _currentRoleId();
+    _rd = { list: list, current: cur, selected: cur || _sortedRoles(list)[0].id, loading: false, ddOpen: false, active: -1, ret: document.getElementById('lt-tb-user') };
+    _roleInert(true); _rdRender();
+  }
+  function _closeRoleDialog() {
+    if (!_rd) return;
+    _rdClosePop(false);
+    var ret = _rd.ret; _rd = null;
+    _rdHost().innerHTML = ''; _roleInert(false);
+    if (ret && ret.isConnected) ret.focus({ preventScroll: true });
+  }
+  function _rdContinue() {
+    if (!_rd || _rd.loading || (_rd.current && _rd.selected === _rd.current)) return;
+    _rd.loading = true; _rdClosePop(false); _rdRender('lt-rd-go');
+    var r = _roleById(_rd.selected);
+    setTimeout(function () {   // FE usePatchDefaultUserGroup pending（⚠ 設計端暫擬 600ms）
+      if (!_rd) return;
+      _closeRoleDialog();
+      _showPageLoading();
+      setTimeout(function () { _commitRole(r); }, 800);   // ⚠ 設計端暫擬：Figma「在原頁面上 Loading」沒寫時長
+    }, 600);
+  }
+  /* 原頁面 Loading 遮罩：除了擋視覺也要擋鍵盤（Fable #2）——遮罩期間背景 inert、焦點移到遮罩（aria-busy），結束後焦點回 user chip */
+  function _showPageLoading() {
+    _hidePageLoading(true);
+    var tb = document.getElementById('lt-topbar'), sb = document.getElementById('lt-sidebar');
+    var top = tb ? Math.round(tb.getBoundingClientRect().bottom) : 64, left = sb ? Math.round(sb.getBoundingClientRect().right) : 0;
+    var el = document.createElement('div');
+    el.id = 'lt-rd-load'; el.className = 'lt-rd-load'; el.setAttribute('role', 'status'); el.setAttribute('aria-busy', 'true'); el.setAttribute('aria-label', 'Loading'); el.tabIndex = -1;
+    el.style.cssText = 'top:' + Math.max(0, top) + 'px;left:' + left + 'px;right:0;bottom:0;outline:none';
+    el.innerHTML = '<span class="lt-rd-sk" style="width:260px;height:32px"></span>' +
+      '<div class="lt-rd-sk-row"><span class="lt-rd-sk" style="flex:1;height:120px"></span><span class="lt-rd-sk" style="flex:1;height:120px"></span><span class="lt-rd-sk" style="flex:1;height:120px"></span></div>' +
+      '<span class="lt-rd-sk" style="flex:1;min-height:200px"></span>';
+    document.body.appendChild(el);
+    _roleInert(true);
+    el.focus({ preventScroll: true });
+  }
+  function _hidePageLoading(silent) {
+    var el = document.getElementById('lt-rd-load'); if (!el) return;
+    el.parentNode.removeChild(el);
+    if (silent === true || _rd) return;
+    _roleInert(false);
+    var chip = document.getElementById('lt-tb-user'); if (chip) chip.focus({ preventScroll: true });
+  }
+  function _commitRole(r) {
+    try { sessionStorage.setItem('lt-role-id', r.id); } catch (e) {}
+    window.LumitureTopbar.setRole(_roleLabel(r));
+    var allowed = window.LUMITURE_ALLOWED_ROLES, key = _roleKey(r);
+    var home = window.LUMITURE_HOME_HREF || HOME_DEFAULT;
+    /* 已經在 Overview 就不導向。比對「導向目標的檔名」而不是寫死 overview-prototype：部署版打包時 NAV_REWRITE 會把 HOME_DEFAULT 換成 ./overview.html，這裡跟著換（Fable #8） */
+    var homeFile = home.split('#')[0].split('/').pop(), onHome = !!homeFile && location.pathname.split('/').pop() === homeFile;
+    if (Array.isArray(allowed) && allowed.indexOf(key) === -1 && !onHome) {
+      // 沒有權限看這一頁 → 跳回 Overview（Figma #01-5 註記）。遮罩留著直到頁面換掉
+      location.href = home;
+      return;
+    }
+    _hidePageLoading();
+    if (typeof window.LUMITURE_ROLE_CHANGE === 'function') { try { window.LUMITURE_ROLE_CHANGE(key, r); } catch (e) { console.error(e); } }
+  }
+  // 登入後換頁（導回 Overview）時，新頁要帶著剛切的角色（同一個瀏覽分頁內）
+  function _applyStoredRole() {
+    var id = null; try { id = sessionStorage.getItem('lt-role-id'); } catch (e) {}
+    var r = id && _roleById(id);
+    if (r) window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, { role: _roleLabel(r) });
+  }
+
+  document.addEventListener('click', function (e) {
+    if (!_rd) return;
+    var t = e.target;
+    var opt = t.closest && t.closest('#lt-rd-pop .lt-rd-opt'); if (opt) { _rdChoose(opt.getAttribute('data-rid')); return; }
+    if (t.closest && t.closest('#lt-rd-sel')) { _rd.ddOpen ? _rdClosePop(true) : _rdOpenPop(); return; }
+    if (_rd.ddOpen && !(t.closest && t.closest('#lt-rd-pop'))) _rdClosePop(false);
+    if (t.closest && t.closest('#lt-rd-keep')) { if (!_rd.loading) _closeRoleDialog(); return; }
+    if (t.closest && t.closest('#lt-rd-go')) { _rdContinue(); return; }
+    /* 點背景不關閉（FE：reason === 'backdropClick' 直接 return） */
+  });
+  document.addEventListener('keydown', function (e) {
+    if (!_rd) return;
+    var t = e.target;
+    if (_rd.ddOpen) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); _rdActivate(_rd.active + (e.key === 'ArrowDown' ? 1 : -1)); return; }
+      if (e.key === 'Enter') { e.preventDefault(); var it = _rdOpens(); return; }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); _rdClosePop(true); return; }
+      if (e.key === 'Tab') { e.preventDefault(); _rdClosePop(true); return; }
+      return;
+    }
+    if ((e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') && t && t.id === 'lt-rd-sel') { e.preventDefault(); _rdOpenPop(); return; }
+    if (e.key === 'Tab') {   // Tab 只在彈窗內循環
+      var list = _rdFocusables(); if (!list.length) { e.preventDefault(); return; }
+      var first = list[0], last = list[list.length - 1], a = document.activeElement, inside = a && a.closest && a.closest('#lt-rd');
+      if (!inside || a.id === 'lt-rd') { e.preventDefault(); (e.shiftKey ? last : first).focus(); }
+      else if (e.shiftKey && a === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && a === last) { e.preventDefault(); first.focus(); }
+    }
+    /* Esc 不關彈窗（FE：disableEscapeKeyDown，要離開按 Keep Current Role） */
+  }, true);
+  function _rdOpens() { var items = _rdOpts(), it = items[_rd.active]; if (it) _rdChoose(it.getAttribute('data-rid')); }
+  window.addEventListener('resize', function () { if (_rd && _rd.ddOpen) _rdClosePop(false); });
+  window.addEventListener('scroll', function (e) { if (_rd && _rd.ddOpen && !(e.target instanceof Node && document.getElementById('lt-rd-pop').contains(e.target))) _rdClosePop(false); }, true);
 
   // ===== Public API =====
   window.LumitureTopbar = {
@@ -1155,10 +1518,42 @@
     closeMenu: _closeMenu,
     toggleMenu: _toggleMenu,
     rerender: function () { _render(); if (_menuOpen) _openMenu(); },
+    roleLabel: _roleLabel,
+    roleKey: _roleKey,
+    /* 這個瀏覽分頁裡用 View as Another Role 切過的角色（chip 寫法）；沒切過回 null。頁面的預設情境用它避免把切過的角色洗掉 */
+    storedRoleLabel: function () {
+      var id = null; try { id = sessionStorage.getItem('lt-role-id'); } catch (e) {}
+      var r = id && _roleById(id); return r ? _roleLabel(r) : null;
+    },
+    /* View as Another Role（#01-5）：openRoleDialog() 等同點 Account Menu 的 View as Another Role */
+    openRoleDialog: _openRoleDialog,
+    closeRoleDialog: _closeRoleDialog,
+    /* 切換角色時「原頁面 Loading」遮罩，展示頁 Demo FAB 單獨看狀態用 */
+    showPageLoading: _showPageLoading,
+    hidePageLoading: _hidePageLoading,
+    /* AI Quota 區塊狀態：'loading' | 'error' | null（正常）。#01-7 */
+    setQuotaState: function (st) {
+      var cur = (window.LUMITURE_USER || {});
+      var q = Object.assign({}, DEFAULT_USER.quota, cur.quota || {});
+      if (st) q.state = st; else delete q.state;
+      window.LUMITURE_USER = Object.assign({}, cur, { quota: q });
+      if (_menuOpen) _openMenu();
+    },
+    /* Retry：先轉成 loading，約 800ms 後恢復正常（⚠ 設計端暫擬：稿只畫了 Retry 文字連結，沒畫點下去之後）。
+       頁面若定義 window.LUMITURE_QUOTA_RETRY(done)，改由頁面決定結果（done('error') 可再走一次失敗） */
+    _retryQuota: function () {
+      var self = window.LumitureTopbar;
+      self.setQuotaState('loading');
+      setTimeout(function () {
+        if (typeof window.LUMITURE_QUOTA_RETRY === 'function') window.LUMITURE_QUOTA_RETRY(function (st) { self.setQuotaState(st || null); });
+        else self.setQuotaState(null);
+      }, 800);
+    },
     /* Log out → Auth prototype 的 Login 頁（2026-10-14 Kabin：登出 → 登入 → 回 Overview 一整圈走得通）。
        部署打包時 NAV_REWRITE 會把這個相對路徑換成 ./auth.html */
     logout: function () {
       _closeMenu();
+      try { sessionStorage.removeItem('lt-role-id'); } catch (e) {}
       window.location.href = './auth.html#login';
     },
     _noop: function (label) { /* 展示用：Profile/Settings/Log out/View as Another Role 點擊佔位 */
@@ -1193,7 +1588,18 @@
     document.body.appendChild(wrap);
   }
 
-  function _init() { _injectCSS(); _render(); _showPendingToast(); }
+  /* 換頁後（導回 Overview、或之後點 sidebar 去別頁）讓頁面套用剛切的角色：頁面有定義 LUMITURE_ROLE_CHANGE 才呼叫。
+     放到 load 之後再跑，才不會被頁面自己的初始化或 Demo FAB 預設情境蓋回 Admin */
+  function _applyStoredRoleToPage() {
+    var id = null; try { id = sessionStorage.getItem('lt-role-id'); } catch (e) {}
+    var r = id && _roleById(id);
+    if (!r) return;
+    var go = function () { setTimeout(function () {
+      if (typeof window.LUMITURE_ROLE_CHANGE === 'function') { try { window.LUMITURE_ROLE_CHANGE(_roleKey(r), r); } catch (e) { console.error(e); } }
+    }, 0); };
+    if (document.readyState === 'complete') go(); else window.addEventListener('load', go);
+  }
+  function _init() { _injectCSS(); _applyStoredRole(); _render(); _showPendingToast(); _applyStoredRoleToPage(); }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _init);
   } else { _init(); }
@@ -2076,6 +2482,23 @@
   }
 })();
 
+</script>
+<script>
+/* ============================================================
+ * General Behavior：角色切換（2026-10-14，Figma General Behavior #01-5 Popup: Select Your Role）
+ * Account Menu → View as Another Role 選好角色按 Continue 後，shared/lumiture-topbar.js 先做「原頁面 Loading」，
+ * 再呼叫下面的 LUMITURE_ROLE_CHANGE 讓這一頁變成那個角色看到的樣子；角色不在 LUMITURE_ALLOWED_ROLES 裡就跳回 Overview。
+ * 套用角色走 _demoFabApply（跟 Demo FAB 按鈕同一條路），FAB 的 active 情境會跟著亮；沒有 FAB 時退回 DEMO_APPLY
+ * 角色鍵：admin／t1m／t1mb／t2m／t2mb（對照表見 specs/2026-10-14-general-behavior-v1-figma-compare.md §6）
+ * ============================================================ */
+(function () {
+  /* 依據：頁面 Demo FAB 的 'no-access'（標籤「No Access (non Owner/Admin)」）。頁面沒有角色狀態，只有「Admin 看得到／不是 Owner/Admin 就整頁無權限」 */
+  window.LUMITURE_ALLOWED_ROLES = ['admin'];
+  window.LUMITURE_ROLE_CHANGE = function (key, group) {
+    (window._demoFabApply || window.DEMO_APPLY)(key === 'admin' ? 'default' : 'no-access');   /* 載入時套用用；非 admin 會顯示頁面自己的 No Access */
+    if (window.LumitureTopbar) LumitureTopbar.setRole(LumitureTopbar.roleLabel(group));
+  };
+})();
 </script>
 </body>
 </html>
