@@ -452,7 +452,7 @@ body.state-settings.role-admin .savebar{display:flex}
 .fsm-form .fsm-lbl{font-size:13px;font-weight:600;color:var(--g700);margin-bottom:6px}
 
 /* ===== Toast ===== */
-.toast-wrap{position:fixed;bottom:20px;left:20px;z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast-wrap{position:fixed;bottom:20px;left:var(--lt-toast-left, 274px);z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none}
 .toast{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--ok);color:#fff;border-radius:var(--r-md);box-shadow:0 4px 12px rgba(0,0,0,.15);font-size:13px;font-weight:500;min-width:280px;animation:toast-in .25s ease-out;pointer-events:auto}
 .toast.err{background:var(--err)}
 .toast.warn{background:var(--warn);color:#fff}
@@ -1431,7 +1431,12 @@ Please try again in a few moments. If the problem persists, contact support.</di
  *
  * API:
  *   window.LumitureSidebar.toggleGroup(groupId)
- *   window.LumitureSidebar.toggleCollapse()    — collapse the whole sidebar (icon-only)
+ *   window.LumitureSidebar.toggleCollapse(opts) / setCollapsed(bool, opts) / isCollapsed()
+ *       — 2026-10-14 照 Figma General Behavior #01-1／#01-2：收合＝21px 深藍細條（沒有 icon），logo 移到 topbar 左側，
+ *         細條底部（跨在右緣）一顆 30px 圓形展開鈕；展開時按鈕預設隱藏、hover／鍵盤 focus 到 sidebar 才出現。
+ *         opts.persist=true 才把狀態記進 localStorage 'lt-sidebar-collapsed'（使用者按按鈕時帶；Demo 情境程式呼叫不帶，免得污染前次設定）
+ *   window.LumitureSidebar.restoreStored()  — 回到 localStorage 記的前次狀態（Demo 情境重設用）
+ *   window.LumitureSidebar.mountTopbarLogo(host)  — 由 lumiture-topbar.js 呼叫，把收合時才出現的 logo 放進 topbar 左側
  *   window.LumitureSidebar.setActive(itemId)
  *   window.LumitureSidebar.setLoading(true|false) — Figma General Behavior #01-5 Sidebar Loading：nav 換成 5 條 200×24 skeleton（預設不顯示）
  */
@@ -1441,21 +1446,23 @@ Please try again in a few moments. If the problem persists, contact support.</di
   // ===== CSS =====
   var CSS = [
     /* CSS variables — sidebar 用 Primary Dark #002663（per Lumiture-Guideline.md，2026-05-08 設計師確認） */
-    ':root{--lt-sb-w:250px;--lt-sb-bg:#002663;--lt-sb-hov:rgba(255,255,255,.06);',
+    ':root{--lt-sb-w:250px;--lt-sb-w-open:250px;--lt-sb-bg:#002663;--lt-sb-hov:rgba(255,255,255,.06);',
     '--lt-sb-active:#004FB0;--lt-sb-text:rgba(255,255,255,.85);--lt-sb-text-muted:rgba(255,255,255,.5);',
     '--lt-sb-border:rgba(255,255,255,.1)}',
 
     /* Sidebar container — 採 sticky positioning：父層 .app 用 flex 或 grid 都能適應
-       min-width:0 是必要的：flex 子元素預設 min-width:auto 會被內容 min-content size 撐住，導致 collapse 失效 */
+       min-width:0 是必要的：flex 子元素預設 min-width:auto 會被內容 min-content size 撐住，導致 collapse 失效
+       2026-10-14：overflow 改 visible（展開／收合鈕要跨出右緣），內容改放 .lt-sb-clip（absolute、overflow hidden）裡的 .lt-sb-inner（固定 250 寬，收合時是被裁掉而不是重排） */
     '.lt-sidebar{width:var(--lt-sb-w);min-width:0;background:var(--lt-sb-bg);color:#fff;',
-    'position:sticky;top:0;height:100vh;z-index:100;overflow:hidden;',
-    'flex-shrink:0;',
-    'display:flex;flex-direction:column;transition:width .2s ease;scrollbar-width:none;',
+    'position:sticky;top:0;height:100vh;z-index:100;',
+    'flex-shrink:0;transition:width .2s ease;',
     /* 2026-10-02 對 Figma LumiTag #01：Side Navbar 三層陰影 */
     'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12)}',
-    '.lt-sidebar::-webkit-scrollbar{display:none}',
-    '.lt-sidebar.lt-collapsed{width:64px}',
-
+    '.lt-sidebar.lt-collapsed{width:21px}',   /* Figma #01-2：Frame 3973 寬 21 */
+    '.lt-sb-clip{position:absolute;inset:0;overflow:hidden;visibility:visible;transition:visibility 0s}',
+    '.lt-sidebar.lt-collapsed .lt-sb-clip{visibility:hidden;transition:visibility 0s linear .2s}',   /* 寬度縮完才隱藏，內容不會在 21px 裡露出一截；同時退出 tab 順序 */
+    '.lt-sb-inner{width:var(--lt-sb-w-open);height:100%;display:flex;flex-direction:column;scrollbar-width:none}',
+    '.lt-html-noanim,.lt-html-noanim *{transition:none!important}',   /* 載入時直接套上記住的狀態，不要看到 250→21 的動畫 */
     /* Logo block */
     '.lt-sb-logo{position:relative;padding:0 24px;display:flex;align-items:center;gap:6px;',
     'font-size:18px;font-weight:700;color:#fff;border-bottom:none;',
@@ -1463,14 +1470,15 @@ Please try again in a few moments. If the problem persists, contact support.</di
     '.lt-sb-logo-wrap{width:39px;height:28px;flex-shrink:0}',
     '.lt-sb-logo-wrap svg{width:39px;height:28px;display:block;overflow:visible}',
     /* hover 變形（2026-10-05 Kabin 試做）：圓環白→青、短條青→白 0.18s，腳 scaleY 0→1 從圓環裡長出來 0.22s；只有連結狀態才有 */
-    'a.lt-sb-logo{text-decoration:none;cursor:pointer}',
+    'a.lt-sb-logo,a.lt-tb-logo{text-decoration:none;cursor:pointer}',
     'a.lt-sb-logo:focus-visible{outline:2px solid #4ADFFF;outline-offset:-6px;border-radius:8px}',
+    'a.lt-tb-logo:focus-visible{outline:2px solid #4ADFFF;outline-offset:4px;border-radius:4px}',
     '.lt-i-ring{fill:#FFF;transition:fill .18s ease}',
     '.lt-i-short{fill:#4ADFFF;transition:fill .18s ease}',
     '.lt-i-leg{fill:#4ADFFF;transform:scaleY(0);transform-box:fill-box;transform-origin:50% 0;transition:transform .22s cubic-bezier(.2,.8,.2,1) .04s}',
-    'a.lt-sb-logo:hover .lt-i-ring,a.lt-sb-logo:focus-visible .lt-i-ring{fill:#4ADFFF}',
-    'a.lt-sb-logo:hover .lt-i-short,a.lt-sb-logo:focus-visible .lt-i-short{fill:#FFF}',
-    'a.lt-sb-logo:hover .lt-i-leg,a.lt-sb-logo:focus-visible .lt-i-leg{transform:scaleY(1)}',
+    'a.lt-sb-logo:hover .lt-i-ring,a.lt-sb-logo:focus-visible .lt-i-ring,a.lt-tb-logo:hover .lt-i-ring,a.lt-tb-logo:focus-visible .lt-i-ring{fill:#4ADFFF}',
+    'a.lt-sb-logo:hover .lt-i-short,a.lt-sb-logo:focus-visible .lt-i-short,a.lt-tb-logo:hover .lt-i-short,a.lt-tb-logo:focus-visible .lt-i-short{fill:#FFF}',
+    'a.lt-sb-logo:hover .lt-i-leg,a.lt-sb-logo:focus-visible .lt-i-leg,a.lt-tb-logo:hover .lt-i-leg,a.lt-tb-logo:focus-visible .lt-i-leg{transform:scaleY(1)}',
     '@media (prefers-reduced-motion:reduce){.lt-i-ring,.lt-i-short,.lt-i-leg,.lt-sb-proto-x{transition:none}}',
     '.lt-sb-logo-text{transition:opacity .2s;color:#fff;font-size:18px;line-height:1}',
     /* 2026-10-05 Kabin 選 C1：正式 logo 不動，產品名後面接線框膠囊標示 prototype。完整的 PROTOTYPE 塞不下（sidebar 250px，膠囊只剩約 53px），所以寫 PROTO；
@@ -1479,14 +1487,14 @@ Please try again in a few moments. If the problem persists, contact support.</di
     'font-size:9px;font-weight:700;letter-spacing:.02em;line-height:14px;transition:opacity .2s;display:inline-flex}',
     /* hover 時 PROTO 展開成 PROTOTYPE：TYPE 用 max-width 0→30px 推出來。完整字要 63px，所以平常的膠囊也收緊成字距 .02em、內距 4（右緣 243.8px，離 sidebar 邊 6px） */
     '.lt-sb-proto-x{display:inline-block;max-width:0;overflow:hidden;vertical-align:top;transition:max-width .22s cubic-bezier(.2,.8,.2,1) .04s}',
-    'a.lt-sb-logo:hover .lt-sb-proto-x,a.lt-sb-logo:focus-visible .lt-sb-proto-x{max-width:30px}',
-    '.lt-sidebar.lt-collapsed .lt-sb-logo-text,.lt-sidebar.lt-collapsed .lt-sb-proto{display:none}',
-    '.lt-sidebar.lt-collapsed .lt-sb-logo{padding:0;justify-content:center;gap:0}',
-    /* 收合時膠囊放不下，改顯示 prototype 專用 P 標誌（shared/prototype-p-mark.svg），收合後也看得出是 prototype（2026-10-05 Kabin） */
-    '.lt-sb-logo-p{display:none;width:36.8px;height:32px;flex-shrink:0}',
-    '.lt-sb-logo-p svg{width:36.8px;height:32px;display:block;overflow:visible}',
-    '.lt-sidebar.lt-collapsed .lt-sb-logo-wrap{display:none}',
-    '.lt-sidebar.lt-collapsed .lt-sb-logo-p{display:block}',
+    'a.lt-sb-logo:hover .lt-sb-proto-x,a.lt-sb-logo:focus-visible .lt-sb-proto-x,a.lt-tb-logo:hover .lt-sb-proto-x,a.lt-tb-logo:focus-visible .lt-sb-proto-x{max-width:30px}',
+    /* 收合時 logo 移到 topbar 左側（Kabin 2026-10-14）：Figma #01-2 的 logo 左緣離畫面左 24，topbar 左緣已被 21px 細條推開，所以往左補 -21（= -var(--lt-sb-w)）。
+       展開時 visibility:hidden（保留位置不跳版、不進 tab 順序），收合時淡入；每份 SVG 自帶 mask id（ltT*），不依賴別處的 defs */
+    '.lt-tb-logo{display:flex;align-items:center;gap:6px;margin-right:auto;margin-left:calc(-1 * var(--lt-sb-w));height:28px;flex-shrink:0;',
+    'font-size:18px;font-weight:700;color:#fff;white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .15s ease,visibility 0s linear .15s}',
+    'html.lt-sb-collapsed .lt-tb-logo{opacity:1;visibility:visible;transition:opacity .18s ease .12s,visibility 0s}',
+    '.lt-tb-logo .lt-sb-logo-wrap{width:39px;height:28px}',
+    '@media (prefers-reduced-motion:reduce){.lt-tb-logo,html.lt-sb-collapsed .lt-tb-logo{transition:none}}',
 
     /* Nav scroll area — 內部捲動，sidebar 外層不捲（寬敞 padding 對齊原始設計） */
     '.lt-sb-nav{flex:1;padding:16px 16px 8px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent}',
@@ -1524,40 +1532,41 @@ Please try again in a few moments. If the problem persists, contact support.</di
     '.lt-sb-subitem.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
     '.lt-sb-subitem .material-symbols-outlined{font-size:24px;flex-shrink:0}',
 
-    /* Collapsed state — hide labels, center icons */
-    '.lt-sidebar.lt-collapsed .lt-sb-item span:not(.material-symbols-outlined),',
-    '.lt-sidebar.lt-collapsed .lt-sb-subitem span:not(.material-symbols-outlined){display:none}',
-    '.lt-sidebar.lt-collapsed .lt-sb-item,',
-    '.lt-sidebar.lt-collapsed .lt-sb-subitem{padding:8px 0;justify-content:center;border-radius:0}',
-    '.lt-sidebar.lt-collapsed .lt-sb-group-hdr > span:first-child{display:none}',
-    '.lt-sidebar.lt-collapsed .lt-sb-group-arrow{display:none}',
-    '.lt-sidebar.lt-collapsed .lt-sb-group-hdr{padding:8px 0;justify-content:center}',
-    /* In collapsed mode, always show children */
-    '.lt-sidebar.lt-collapsed .lt-sb-group.lt-collapsed .lt-sb-group-children{display:block}',
-    '.lt-sidebar.lt-collapsed .lt-sb-nav{padding:8px 4px}',
-
     /* Sidebar Loading（Figma General Behavior #01-5；FE MainSidebarSkeleton）
        5 條 200×24、圓角 4、顏色 CMDS Opacity Color Lighten 50（#FFFFFF 50%）、MUI wave 動畫；稿量到第一條離 logo 區底 24、間距 48（條與條之間 24）、水平置中。
-       logo 與底部收合鈕維持原樣不動（FE 骨架只有 nav 區）；收合狀態稿沒畫，⚠ 設計端暫擬：條寬縮成 32。預設完全不顯示，沒呼叫 setLoading 不影響任何既有頁面 */
+       logo 與底部收合鈕維持原樣不動（FE 骨架只有 nav 區）；收合狀態（21px 細條）整條內容都隱藏，所以不顯示 skeleton（2026-10-14），展開後照舊。預設完全不顯示，沒呼叫 setLoading 不影響任何既有頁面 */
     '.lt-sb-skel{display:none;flex-direction:column;align-items:center;gap:24px;padding:8px 0 0}',
     '.lt-sidebar.lt-loading .lt-sb-nav>*:not(.lt-sb-skel){display:none}',
     '.lt-sidebar.lt-loading .lt-sb-skel{display:flex}',
-    '.lt-sidebar.lt-loading .lt-sb-collapse-btn button{visibility:hidden}',
+    '.lt-sidebar.lt-loading:not(.lt-collapsed) .lt-sb-toggle{visibility:hidden}',
     '.lt-sb-skel-bar{position:relative;display:block;width:200px;max-width:100%;height:24px;border-radius:4px;background:rgba(255,255,255,.5);overflow:hidden}',
     '.lt-sb-skel-bar::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:lt-sb-wave 1.6s linear .5s infinite}',
     '@keyframes lt-sb-wave{0%{transform:translateX(-100%)}50%,100%{transform:translateX(100%)}}',
-    '.lt-sidebar.lt-collapsed .lt-sb-skel-bar{width:32px}',
     '@media (prefers-reduced-motion:reduce){.lt-sb-skel-bar::after{animation:none}}',
 
-    /* Collapse toggle button at bottom */
-    '.lt-sb-collapse-btn{padding:12px;display:flex;justify-content:flex-end;',
-    'border-top:1px solid var(--lt-sb-border);flex-shrink:0}',
-    '.lt-sb-collapse-btn button{color:var(--lt-sb-text-muted);background:none;border:0;cursor:pointer;',
-    'display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:4px;',
-    'transition:all .15s}',
-    '.lt-sb-collapse-btn button:hover{background:var(--lt-sb-hov);color:#fff}',
-    '.lt-sidebar.lt-collapsed .lt-sb-collapse-btn{justify-content:center}',
-    '.lt-sidebar.lt-collapsed .lt-sb-collapse-btn .material-symbols-outlined{transform:rotate(180deg)}'
+    /* 收合／展開鈕（Figma #01-1／#01-2 量到：30×30 圓、#004FB0、icon 24 白、陰影 0 2px 14px rgba(137,174,255,.2)、
+       底緣離畫面底 20、圓心＝sidebar 右緣：展開 x=250、收合 x=22（細條右緣 21＋1））。
+       展開時預設不顯示，hover 整片 sidebar 或鍵盤 focus 到 sidebar 內任何元素才出現；收合時常駐。
+       按鈕是 aside 的子孫，所以滑到它凸出 sidebar 的那 15px 也算 hover 在 sidebar 上，不會閃掉。隱藏時 pointer-events:none（不留看不見的點擊區），但仍可被 Tab 聚焦 */
+    '.lt-sb-toggle{position:absolute;bottom:20px;left:calc(100% - 15px);width:30px;height:30px;padding:0;border:0;border-radius:50%;box-sizing:border-box;',
+    'background:#004FB0;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit;',
+    'box-shadow:0 2px 14px rgba(137,174,255,.2);opacity:0;pointer-events:none;z-index:2;transition:opacity .15s ease,left .2s ease,background .15s}',
+    '.lt-sb-toggle .material-symbols-outlined{font-size:24px;line-height:24px;font-variation-settings:\'FILL\' 0,\'wght\' 400,\'GRAD\' 0,\'opsz\' 24;pointer-events:none}',
+    '.lt-sidebar.lt-collapsed .lt-sb-toggle{left:7px}',
+    '.lt-sidebar:hover .lt-sb-toggle,.lt-sidebar:has(:focus-visible) .lt-sb-toggle,.lt-sb-toggle:focus-visible,.lt-sidebar.lt-collapsed .lt-sb-toggle{opacity:1;pointer-events:auto}',
+    '.lt-sb-toggle:hover{background:#0B6DD7}',   /* ⚠ 設計端暫擬：稿沒畫按鈕 hover，用 Primary Hover */
+    '.lt-sb-toggle:focus-visible{outline:none;box-shadow:0 0 0 2px #002663,0 0 0 4px #fff}',   /* 圓的一半壓在深藍、一半壓在淺藍，所以用深藍＋白雙環 */
+    '@media (hover:none){.lt-sb-toggle{opacity:1;pointer-events:auto}}',
+    '@media (prefers-reduced-motion:reduce){.lt-sidebar,.lt-sb-toggle,.lt-sb-clip{transition:none}}',
+    /* 收合時 Demo FAB（左下 18px 的圓）會壓到展開鈕（x 7–37、離底 20–50），往右挪開；FAB 是各頁共用的 demo 工具，不是產品 UI */
+    'html.lt-sb-collapsed .demo-fab{left:54px}',
+    'html.lt-sb-collapsed .demo-popover{left:54px}',
+    '.demo-fab,.demo-popover{transition:left .2s ease}',
+    /* Toast 起點（Kabin 2026-10-14）：從內容區左下角起算，不再蓋住展開鈕。展開 274、收合 45。
+       @property 註冊成 <length> 才能跟 sidebar 寬度轉場一起動（沒註冊的自訂屬性不會被插值）。各頁 toast 容器的 left 寫 var(--lt-toast-left) */
+    '@property --lt-toast-left{syntax:"<length>";inherits:true;initial-value:274px}',
+    ':root{--lt-toast-left:calc(var(--lt-sb-w,250px) + 24px);transition:--lt-toast-left .2s ease}',
+    '@media (prefers-reduced-motion:reduce){:root{transition:none}}'
   ].join('');
 
   function _injectCSS() {
@@ -1579,17 +1588,35 @@ Please try again in a few moments. If the problem persists, contact support.</di
   var LOGO_ICON = '<svg viewBox="0 0 40 28" fill="none" aria-hidden="true"><defs><mask id="ltHring" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#000"/><circle cx="25.0413" cy="14" r="14.1" fill="#fff"/></mask><mask id="ltHbars" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#fff"/><circle cx="25.0413" cy="14" r="14" fill="#000"/></mask><mask id="ltHleg" maskUnits="userSpaceOnUse" x="0" y="0" width="60" height="60"><rect width="60" height="60" fill="#fff"/><circle cx="25.0413" cy="14" r="11.2" fill="#000"/></mask></defs><path d="M25.0413 0C32.7731 0.00012318 39.0413 6.26809 39.0413 14C39.0413 21.7319 32.7731 27.9999 25.0413 28C21.8903 28 18.983 26.9582 16.6434 25.2014C16.582 25.1553 16.5075 25.1299 16.4307 25.1299H10.5422C10.2772 25.1299 10.0349 24.9801 9.91625 24.7432L8.61254 22.1367C8.49619 21.904 8.66584 21.6299 8.92602 21.6299H12.6564C12.9342 21.6299 13.103 21.3205 12.9622 21.081C12.5841 20.4379 12.2558 19.7621 11.983 19.0586C11.93 18.9218 11.7992 18.8301 11.6525 18.8301H1.96704C1.70205 18.8301 1.45971 18.6803 1.34106 18.4434L0.0373491 15.8369C-0.0790086 15.6042 0.090642 15.3301 0.350826 15.3301H10.7202C10.9265 15.3301 11.0876 15.1526 11.0737 14.9468C11.0524 14.6339 11.0413 14.3182 11.0413 14C11.0413 13.6356 11.0551 13.2745 11.0825 12.9171C11.0983 12.71 10.9367 12.5303 10.729 12.5303H0.52563C0.265515 12.5303 0.0959761 12.2561 0.212154 12.0234L1.51586 9.41699C1.63443 9.17986 1.87673 9.0303 2.14184 9.03027H11.708C11.8534 9.03027 11.9832 8.94026 12.0372 8.8053C12.3188 8.10088 12.6561 7.4248 13.0436 6.7823C13.188 6.54274 13.0195 6.22949 12.7398 6.22949H5.07544C4.81536 6.22938 4.64663 5.95629 4.76294 5.72363L6.06567 3.11719C6.1842 2.88012 6.42661 2.72959 6.69165 2.72949H16.6204C16.6952 2.72949 16.768 2.70541 16.8285 2.66148C19.1355 0.987609 21.973 0 25.0413 0ZM25.0413 2.7998C18.8557 2.7998 13.8411 7.81441 13.8411 14C13.8411 20.1856 18.8557 25.2002 25.0413 25.2002C31.2267 25.2001 36.2415 20.1855 36.2415 14C36.2415 7.81449 31.2267 2.79993 25.0413 2.7998Z" fill="#FFF" mask="url(#ltHbars)"/><path class="lt-i-ring" d="M25.0413 0C32.7731 0.00012318 39.0413 6.26809 39.0413 14C39.0413 21.7319 32.7731 27.9999 25.0413 28C21.8903 28 18.983 26.9582 16.6434 25.2014C16.582 25.1553 16.5075 25.1299 16.4307 25.1299H10.5422C10.2772 25.1299 10.0349 24.9801 9.91625 24.7432L8.61254 22.1367C8.49619 21.904 8.66584 21.6299 8.92602 21.6299H12.6564C12.9342 21.6299 13.103 21.3205 12.9622 21.081C12.5841 20.4379 12.2558 19.7621 11.983 19.0586C11.93 18.9218 11.7992 18.8301 11.6525 18.8301H1.96704C1.70205 18.8301 1.45971 18.6803 1.34106 18.4434L0.0373491 15.8369C-0.0790086 15.6042 0.090642 15.3301 0.350826 15.3301H10.7202C10.9265 15.3301 11.0876 15.1526 11.0737 14.9468C11.0524 14.6339 11.0413 14.3182 11.0413 14C11.0413 13.6356 11.0551 13.2745 11.0825 12.9171C11.0983 12.71 10.9367 12.5303 10.729 12.5303H0.52563C0.265515 12.5303 0.0959761 12.2561 0.212154 12.0234L1.51586 9.41699C1.63443 9.17986 1.87673 9.0303 2.14184 9.03027H11.708C11.8534 9.03027 11.9832 8.94026 12.0372 8.8053C12.3188 8.10088 12.6561 7.4248 13.0436 6.7823C13.188 6.54274 13.0195 6.22949 12.7398 6.22949H5.07544C4.81536 6.22938 4.64663 5.95629 4.76294 5.72363L6.06567 3.11719C6.1842 2.88012 6.42661 2.72959 6.69165 2.72949H16.6204C16.6952 2.72949 16.768 2.70541 16.8285 2.66148C19.1355 0.987609 21.973 0 25.0413 0ZM25.0413 2.7998C18.8557 2.7998 13.8411 7.81441 13.8411 14C13.8411 20.1856 18.8557 25.2002 25.0413 25.2002C31.2267 25.2001 36.2415 20.1855 36.2415 14C36.2415 7.81449 31.2267 2.79993 25.0413 2.7998Z" mask="url(#ltHring)"/><g mask="url(#ltHleg)"><path class="lt-i-leg" d="M13.094 21.298L15.227 19.995L15.45 14L24.480 33.503A0.35 0.35 0 0 1 24.162 34.000L21.246 34.000A0.7 0.7 0 0 1 20.648 33.665Z"/></g><path class="lt-i-short" d="M6.45275 22.0168C6.33418 21.7797 6.09179 21.6299 5.82665 21.6299H3.32559C3.06541 21.6299 2.89618 21.9037 3.01254 22.1364L4.3158 24.7429C4.43438 24.9801 4.67676 25.1299 4.9419 25.1299H7.44297C7.70315 25.1299 7.87237 24.8561 7.75601 24.6234L6.45275 22.0168Z"/><path d="M25.0413 5.59998C29.6803 5.60019 33.4407 9.3613 33.4407 14.0004C33.4405 18.6392 29.6801 22.3996 25.0413 22.3998C20.4022 22.3998 16.6411 18.6394 16.6409 14.0004C16.6409 9.36117 20.4021 5.59998 25.0413 5.59998ZM25.0403 8.39978C24.0472 8.39988 23.1146 8.65916 22.3059 9.11267C23.4354 9.14717 24.3409 10.0716 24.3411 11.2094C24.3411 12.3691 23.4003 13.3099 22.2405 13.3099C21.105 13.3097 20.1818 12.4079 20.1438 11.2816C19.6961 12.0864 19.4408 13.0131 19.4407 13.9994C19.4407 17.092 21.9478 19.5997 25.0403 19.6C28.1331 19.6 30.6409 17.0922 30.6409 13.9994C30.6406 10.9069 28.1329 8.39978 25.0403 8.39978Z" fill="#FFF"/></svg>';
 
   // logo 連到 Overview（從 LUMITURE_NAV 拿 href）；在 Overview 頁本身不連自己，也就沒有 hover 變形
-  function _renderLogo() {
+  function _homeHref() {
     var nav = window.LUMITURE_NAV || [];
     var home = nav.filter(function (e) { return e.type === 'item' && e.id === 'overview'; })[0];
-    var linked = home && home.href && !home.disabled && window.LUMITURE_ACTIVE !== 'overview';
-    var open = linked ? '<a class="lt-sb-logo is-link" href="' + _esc(home.href) + '" title="Go to Overview">' : '<div class="lt-sb-logo">';
-    return open +
-      '<div class="lt-sb-logo-wrap">' + LOGO_ICON + '</div>' +
+    return home && home.href && !home.disabled && window.LUMITURE_ACTIVE !== 'overview' ? home.href : null;
+  }
+  function _logoBody(icon) {
+    return '<div class="lt-sb-logo-wrap">' + icon + '</div>' +
       '<span class="lt-sb-logo-text">LumiTure.ai</span>' +
-      '<span class="lt-sb-proto" title="Prototype">PROTO<span class="lt-sb-proto-x">TYPE</span></span>' +
-      '<div class="lt-sb-logo-p" aria-hidden="true"><svg viewBox="0 0 39.10 34.00" fill="none">' + P_MARK_INNER + '</svg></div>' +
-    (linked ? '</a>' : '</div>');
+      '<span class="lt-sb-proto" title="Prototype">PROTO<span class="lt-sb-proto-x">TYPE</span></span>';
+  }
+  function _renderLogo() {
+    var href = _homeHref();
+    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" title="Go to Overview">' : '<div class="lt-sb-logo">';
+    return open + _logoBody(LOGO_ICON) + (href ? '</a>' : '</div>');
+  }
+  // 收合時顯示在 topbar 左側的 logo（同一組圖形，mask id 改 ltT* 避免跟 sidebar 那份撞 id）
+  function _renderTopbarLogo() {
+    var href = _homeHref();
+    var icon = LOGO_ICON.replace(/ltH(ring|bars|leg)/g, 'ltT$1');
+    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" title="Go to Overview">' : '<div class="lt-tb-logo">';
+    return open + _logoBody(icon) + (href ? '</a>' : '</div>');
+  }
+  function _mountTopbarLogo(host) {
+    host = host || document.getElementById('lt-topbar');
+    if (!host) return;
+    _injectCSS();
+    var old = host.querySelector('.lt-tb-logo');
+    if (old) old.parentNode.removeChild(old);
+    host.insertAdjacentHTML('afterbegin', _renderTopbarLogo());
   }
 
   // ===== Helpers =====
@@ -1642,12 +1669,67 @@ Please try again in a few moments. If the problem persists, contact support.</di
     return html;
   }
 
-  function _renderCollapseBtn() {
-    return '<div class="lt-sb-collapse-btn">' +
-             '<button type="button" data-action="toggle-collapse" title="Collapse sidebar">' +
-               '<span class="material-symbols-outlined">chevron_left</span>' +
-             '</button>' +
-           '</div>';
+  function _renderToggleBtn() {
+    return '<button type="button" class="lt-sb-toggle" data-action="toggle-collapse">' +
+             '<span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>' +
+           '</button>';
+  }
+
+  // ===== 收合狀態（記住使用者前次設定）=====
+  var STORE_KEY = 'lt-sidebar-collapsed', COLLAPSED_W = '21px';
+  function _readStored() { try { return window.localStorage.getItem(STORE_KEY) === '1'; } catch (e) { return false; } }
+  function _writeStored(on) { try { window.localStorage.setItem(STORE_KEY, on ? '1' : '0'); } catch (e) {} }
+  var _collapsed = _readStored();
+
+  // 套用到 <html>（class＋CSS 變數，給各頁的固定列／內容區位移用）與 sidebar 本身（class、inert、按鈕文字）
+  function _applyCollapsed() {
+    var root = document.documentElement;
+    root.classList.toggle('lt-sb-collapsed', _collapsed);
+    if (_collapsed) {
+      root.style.setProperty('--lt-sb-w', COLLAPSED_W);
+      root.style.setProperty('--sw', COLLAPSED_W);   // 舊頁面寫的 left:var(--sw)（固定底列）跟著動
+    } else {
+      root.style.removeProperty('--lt-sb-w');        // 還原成各頁／tokens 原本的展開值，展開狀態完全不變
+      root.style.removeProperty('--sw');
+    }
+    var sb = document.getElementById('lt-sidebar');
+    if (!sb) return;
+    sb.classList.toggle('lt-collapsed', _collapsed);
+    var clip = sb.querySelector('.lt-sb-clip');
+    if (clip) { if (_collapsed) clip.setAttribute('inert', ''); else clip.removeAttribute('inert'); }
+    var btn = sb.querySelector('.lt-sb-toggle');
+    if (btn) {
+      var label = _collapsed ? 'Expand sidebar' : 'Collapse sidebar';
+      btn.setAttribute('aria-label', label); btn.removeAttribute('title');   // title 與 aria-label 同字會被部分輔助工具唸兩次
+      btn.setAttribute('aria-controls', 'lt-sidebar');
+      btn.setAttribute('aria-expanded', _collapsed ? 'false' : 'true');
+      var ic = btn.querySelector('.material-symbols-outlined'); if (ic) ic.textContent = _collapsed ? 'chevron_right' : 'chevron_left';
+    }
+  }
+  var _resizeTimer = null;
+  function _setCollapsed(on, opts) {
+    on = !!on;
+    var changed = on !== _collapsed;
+    _collapsed = on;
+    if (opts && opts.persist) _writeStored(on);
+    // 程式收合時若焦點在 nav 內，inert 會把焦點丟到 body；先移到收合後唯一可達的 sidebar 控制（Fable §12 #5）
+    if (on && changed) {
+      var sbEl = document.getElementById('lt-sidebar'), clipEl = sbEl && sbEl.querySelector('.lt-sb-clip'), tgl = sbEl && sbEl.querySelector('.lt-sb-toggle');
+      if (clipEl && tgl && clipEl.contains(document.activeElement)) tgl.focus({ preventScroll: true });
+    }
+    _applyCollapsed();
+    if (!changed) return;
+    document.dispatchEvent(new CustomEvent('lt-sidebar-toggle', { detail: { collapsed: _collapsed } }));
+    // 寬度轉場跑完後通知圖表重新量容器（ECharts 等）
+    clearTimeout(_resizeTimer);
+    _resizeTimer = setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 230);
+  }
+  // 載入時先把記住的狀態套到 <html>（不等 DOM 建好），並在套用的那一刻關掉轉場，免得每換一頁都看到 250→21 的動畫
+  function _bootCollapsed() {
+    var root = document.documentElement;
+    root.classList.add('lt-html-noanim');
+    _applyCollapsed();
+    requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.remove('lt-html-noanim'); }); });
   }
 
   // ===== Loading（#01-5）=====
@@ -1668,8 +1750,10 @@ Please try again in a few moments. If the problem persists, contact support.</di
     }
     // If mount is not already a sidebar, wrap it
     mount.classList.add('lt-sidebar');
-    mount.innerHTML = _renderLogo() + _renderNav() + _renderCollapseBtn();
+    mount.innerHTML = '<div class="lt-sb-clip"><div class="lt-sb-inner">' + _renderLogo() + _renderNav() + '</div></div>' + _renderToggleBtn();
     _applyLoading(mount);
+    _applyCollapsed();
+    _mountTopbarLogo();
 
     // Group toggle
     mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
@@ -1682,7 +1766,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
     var btn = mount.querySelector('[data-action="toggle-collapse"]');
     if (btn) {
       btn.addEventListener('click', function () {
-        window.LumitureSidebar.toggleCollapse();
+        _setCollapsed(!_collapsed, { persist: true });   // 使用者自己按才記住
       });
     }
   }
@@ -1693,16 +1777,11 @@ Please try again in a few moments. If the problem persists, contact support.</di
       var grp = document.querySelector('[data-group-id="' + groupId + '"]');
       if (grp) grp.classList.toggle('lt-collapsed');
     },
-    toggleCollapse: function () {
-      var sb = document.getElementById('lt-sidebar');
-      var main = document.querySelector('.lt-main, .main, main');
-      if (sb) sb.classList.toggle('lt-collapsed');
-      if (main) main.classList.toggle('lt-sidebar-collapsed');
-      // Sync legacy CSS vars (--sw) for prototypes that reference them in topbar / footer
-      var w = sb && sb.classList.contains('lt-collapsed') ? '64px' : '250px';
-      document.documentElement.style.setProperty('--sw', w);
-      document.documentElement.style.setProperty('--lt-sb-w', w);
-    },
+    toggleCollapse: function (opts) { _setCollapsed(!_collapsed, opts); },
+    setCollapsed: function (on, opts) { _setCollapsed(on, opts); },
+    isCollapsed: function () { return _collapsed; },
+    restoreStored: function () { _setCollapsed(_readStored()); },   // Demo 情境重設用：回到「使用者前次設定」
+    mountTopbarLogo: _mountTopbarLogo,
     setActive: function (itemId) {
       window.LUMITURE_ACTIVE = itemId;
       document.querySelectorAll('.lt-sb-item, .lt-sb-subitem').forEach(function (el) {
@@ -1734,6 +1813,9 @@ Please try again in a few moments. If the problem persists, contact support.</di
       window.dispatchEvent(new Event('resize'));
     });
   }
+
+  _injectCSS();      // 載入當下就先套上記住的收合狀態（<html> class＋變數），第一次繪製就是對的寬度
+  _bootCollapsed();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _init);
@@ -2112,6 +2194,8 @@ Please try again in a few moments. If the problem persists, contact support.</di
     var icons = window.LUMITURE_TOPBAR_ICONS || DEFAULT_ICONS;
     mount.classList.add('lt-topbar');
     mount.innerHTML = icons.map(_renderIcon).join('') + _renderUserChip(u);
+    // sidebar 收合時 logo 會移到 topbar 左側（Figma #01-2）；logo 由 lumiture-sidebar.js 提供，沒載入就不放
+    if (window.LumitureSidebar && window.LumitureSidebar.mountTopbarLogo) window.LumitureSidebar.mountTopbarLogo(mount);
     var chip = document.getElementById('lt-tb-user');
     if (chip) chip.addEventListener('click', function (e) { e.stopPropagation(); _toggleMenu(); });
     _menuOpen = false;
@@ -2554,7 +2638,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
     var msgs = []; try { msgs = JSON.parse(raw).msgs || []; } catch (e) { return; }
     if (!msgs.length) return;
     var wrap = document.createElement('div');
-    wrap.style.cssText = 'position:fixed;left:80px;bottom:24px;z-index:var(--lt-z-toast,1400);display:flex;flex-direction:column-reverse;gap:16px';
+    wrap.style.cssText = 'position:fixed;left:var(--lt-toast-left,274px);bottom:24px;z-index:var(--lt-z-toast,1400);display:flex;flex-direction:column-reverse;gap:16px';
     msgs.forEach(function (msg) {
       var el = document.createElement('div');
       el.setAttribute('role', 'status');
