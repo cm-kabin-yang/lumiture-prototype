@@ -717,7 +717,21 @@
 .v10-split-empty .btn{margin-top:8px}
 .v10-ac-rm{margin-left:auto;display:inline-flex;align-items:center;gap:4px;background:none;border:0;padding:0;cursor:pointer;color:var(--pri);font:inherit;font-size:14px;font-weight:700}
 .v10-ac-rm .material-symbols-outlined{font-size:20px;font-variation-settings:'FILL' 1}
-.v10-ac-rm:hover .v10-ac-rm-t{text-decoration:underline}
+/* 2026-10-15 Kabin（Figma #12-8）：每次進第 2 步都先跑一段讀取。skeleton 靜態不動畫（A-18），讀取中不能按的元件 disabled */
+.v10-loading .v10-direct strong{color:transparent;background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;display:inline-block;min-width:56px;height:12px;vertical-align:middle;overflow:hidden}
+.v10-loading .v10-direct a,.v10-loading .v10-ac-rm,.v10-loading .vc.ac .ac-addrow,.v10-loading .vc.ac .ac-rm,.v10-loading .v10-back-link{color:var(--g300)!important;pointer-events:none}
+.v10-loading .vc.ac .add-csp-btn,.v10-loading .v10-split-empty .btn{color:var(--g300)!important;border-color:var(--g200)!important;pointer-events:none}
+.v10-loading .vc.ac .csp-blocks-area{background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:8px;min-height:86px}.v10-loading .vc.ac .csp-blocks-area *{visibility:hidden!important}
+.v10-loading .ac-match>*{display:none}.v10-loading .ac-match::before{content:'receipt_long';font-family:'Material Symbols Outlined';font-size:18px;color:var(--g300)}.v10-loading .ac-match::after{content:'Calculating…';color:var(--g400)}
+.v10-loading .ac-w,.v10-loading .ac-amt{color:transparent!important;background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;height:12px;width:56px;justify-self:end;align-self:center;overflow:hidden}
+.v10-loading .ac-row-basis,.v10-loading .ac-row-hint{display:none}
+.v10-loading .sbtm .btn{background:var(--wh)!important;color:var(--g300)!important;border-color:var(--g200)!important;pointer-events:none}.v10-loading .sbtm .btn-p{background:var(--lt-button-disabled-bg,#CCCCCC)!important;border-color:var(--lt-button-disabled-bg,#CCCCCC)!important;color:#fff!important}
+/* 2026-10-15 Kabin（Figma #08-1／#08-2）：Apply 彈窗提醒框＝白底、左側 4px 色條、陰影 0 0 6 .2、圓角 4、字 14；跟按鈕距離 72 */
+.v10-apply-notice{display:flex;align-items:flex-start;gap:10px;margin:20px 0 42px;padding:8px 16px;background:var(--wh);border-radius:4px;box-shadow:0 0 6px rgba(0,0,0,.2);border-left:4px solid var(--v10n,#FC9A0F);font-size:14px;line-height:24.5px;color:var(--g900)}
+.v10-apply-notice .material-symbols-outlined{font-size:20px;line-height:24.5px;color:var(--v10n,#FC9A0F);font-variation-settings:'FILL' 1;flex-shrink:0}
+.v10-apply-notice.is-warn{--v10n:#FC9A0F}.v10-apply-notice.is-info{--v10n:var(--pri)}
+.v10-reveal .card{animation:v10reveal .3s ease-out}@keyframes v10reveal{from{opacity:.35}to{opacity:1}}
+.v10-ac-rm:hover{color:var(--pri-lt)} /* 2026-10-15 Kabin：CMDS text button hover 是變色，不加底線（Figma #12-5） */
 .v10-step2-opt{margin-left:8px;margin-right:auto;vertical-align:middle}
 .v10-leg-key{margin-left:auto;gap:6px;color:var(--g600)}
 .v10-leg-sw{display:inline-block;width:14px;height:10px;border-radius:2px;background:var(--g500)}
@@ -782,7 +796,10 @@ tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g20
 @keyframes sk-shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
 .skeleton{background:linear-gradient(90deg,var(--g100) 25%,var(--g200) 37%,var(--g100) 63%);background-size:1200px 100%;animation:sk-shimmer 1.4s ease infinite;border-radius:4px;display:inline-block}
 .sk-row td{padding:10px 16px;border-bottom:1px solid var(--g100)}
-.seg-tip{display:none;position:fixed;background:var(--wh);border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 12px rgba(0,0,0,.14);z-index:500;pointer-events:none;overflow:hidden;min-width:180px}.seg-tip-title{font-size:13px;font-weight:700;color:var(--g900);padding:10px 14px 8px;border-bottom:1px solid var(--g100)}.seg-tip-row{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:13px;color:var(--g700)}.seg-tip-amt{margin-left:auto;font-weight:700;color:var(--g900)}
+.seg-tip{display:none;position:fixed;background:var(--wh);border-radius:5px;box-shadow:0 0 6px rgba(0,0,0,.2);z-index:500;pointer-events:none;padding:8px;width:240px;box-sizing:border-box} /* 2026-10-15 Kabin：照 CMDS Chart / Tooltip（Figma #05-6） */
+.seg-tip-title{font-size:12px;line-height:18px;font-weight:500;color:var(--g900)}.seg-tip-div{height:1px;background:var(--g200);margin:7px 0 8px}
+.seg-tip-row{display:flex;align-items:center;gap:6px;font-size:12px;line-height:18px;color:var(--g900)}.seg-tip-row+.seg-tip-row{margin-top:4px}.seg-tip-row.is-total{font-weight:500}
+.seg-tip-sw{width:8px;height:8px;flex-shrink:0}.seg-tip-sw.is-alloc{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.75) 0 1.5px,transparent 1.5px 3px)}.seg-tip-amt{margin-left:auto;font-weight:700}
 /* ===== SIDEBAR v2 — 對齊 Cost Dashboard ===== */
 .sb-logo{min-height:68px;box-sizing:border-box}
 .topbar{border-bottom:1px solid rgba(255,255,255,.1)}
@@ -981,7 +998,7 @@ select:not([multiple]){-webkit-appearance:none;appearance:none;background-image:
 </div>
 <div class="mo" id="mo"><div class="modal" id="mc"></div></div>
 <div class="tc" id="tc"></div>
-<div class="seg-tip" id="seg-tip"><div class="seg-tip-title" id="seg-tip-title"></div><div class="seg-tip-row" id="seg-tip-row"></div></div>
+<div class="seg-tip" id="seg-tip"></div>
 <script>
 // CMDS Color Kit — Main tier, chart usage order (ref: Lumiture-Guideline.md)
 const COLORS=['#86CBFC','#94F29D','#F3BE68','#FE89C1','#9CF3FF','#00DCC2','#F4B581','#C096FF','#FFA4A9','#7A8BA9'];
@@ -1493,7 +1510,9 @@ function v9NumberBlocks(vcEl){
     const prevSame=grp&&blocks[i-1]&&blocks[i-1].dataset.csp===c,nextSame=grp&&blocks[i+1]&&blocks[i+1].dataset.csp===c;
     b.classList.toggle('is-subgroup',!!prevSame);b.classList.toggle('has-next',!!nextSame);
     if(cnt[c]>1){if(!tag){tag=document.createElement('span');tag.className='csp-grp-n';b.querySelector('.csp-sw-name').after(tag)}tag.textContent=`Group ${seen[c]}`}else if(tag)tag.remove();
-    if(prevSame){const h=document.createElement('div');h.className='csp-sub-hdr';h.innerHTML=`<span class="csp-or">OR</span><span class="csp-grp-n">Group ${seen[c]}</span><span class="csp-hdr-txt">resources matching ALL conditions below:</span><button class="csp-block-rm" type="button" onclick="removeCspBlock(this)" data-tip="Remove this group"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>`;b.prepend(h)}
+    // 2026-10-15 Kabin 選 A：× 的文案照實際刪除範圍。同一朵雲有兩組以上時，第一組標頭的 × 只刪 Group 1，所以也叫 Group
+    const hdrRm=b.querySelector('.csp-block-hdr .csp-block-rm');if(hdrRm)hdrRm.dataset.tip=cnt[c]>1?'Remove this Group':'Remove this Data Source';
+    if(prevSame){const h=document.createElement('div');h.className='csp-sub-hdr';h.innerHTML=`<span class="csp-or">OR</span><span class="csp-grp-n">Group ${seen[c]}</span><span class="csp-hdr-txt">resources matching ALL conditions below:</span><button class="csp-block-rm" type="button" onclick="removeCspBlock(this)" data-tip="Remove this Group"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>`;b.prepend(h)}
     if(grp&&!nextSame){const ca=b.querySelector('.ca'),bac=ca&&ca.querySelector('.bac');if(bac){const g=document.createElement('button');g.type='button';g.className='bac v9-bac-grp';g.innerHTML='<span class="material-symbols-outlined">add_circle</span>Add OR group';g.onclick=function(){v9AddGroup(this)};bac.after(g)}}
   });
 }
@@ -1852,9 +1871,9 @@ const topVals=sortedForBar.slice(0,BAR_LIMIT);
 const otherVals=sortedForBar.slice(BAR_LIMIT);
 const otherCost=otherVals.reduce((s,v)=>s+v.cost,0);
 let bar='<div class="abar">';let leg='<div class="aleg">';
-topVals.forEach((v,i)=>{const p=pct(v.cost,t.totalCost);if(parseFloat(p)>0){const esc=v.name.replace(/'/g,'&apos;');bar+=`<div class="aseg" style="width:${p}%;background:${COLORS[i]}" onmouseenter="showSegTip(event,'${esc}','${COLORS[i]}','${fmtK(v.cost)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${p}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${COLORS[i]}"></div>${v.name}</div>`;}});
-if(otherVals.length>0){const op=pct(otherCost,t.totalCost);if(parseFloat(op)>0)bar+=`<div class="aseg" style="width:${op}%;background:${CLR_OTHER}" onmouseenter="showSegTip(event,'Other Values','${CLR_OTHER}','${fmtK(otherCost)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${op}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${CLR_OTHER}"></div>Other Values (${otherVals.length} more)</div>`;}
-if(parseFloat(up)>0){bar+=`<div class="aseg" style="width:${up}%;background:${CLR_UNTAGGED}" onmouseenter="showSegTip(event,'Untagged','${CLR_UNTAGGED}','${fmtK(uc)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${up}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${CLR_UNTAGGED}"></div>Untagged</div>`;}
+topVals.forEach((v,i)=>{const p=pct(v.cost,t.totalCost);if(parseFloat(p)>0){const esc=v.name.replace(/'/g,'&apos;');bar+=`<div class="aseg" style="width:${p}%;background:${COLORS[i]}" onmouseenter="showSegTip(event,'${esc}','${COLORS[i]}','${tipAmt(v.cost)}','${p}%')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${p}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${COLORS[i]}"></div>${v.name}</div>`;}});
+if(otherVals.length>0){const op=pct(otherCost,t.totalCost);if(parseFloat(op)>0)bar+=`<div class="aseg" style="width:${op}%;background:${CLR_OTHER}" onmouseenter="showSegTip(event,'Other Values (${otherVals.length} more)','${CLR_OTHER}','${tipAmt(otherCost)}','${op}%')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${op}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${CLR_OTHER}"></div>Other Values (${otherVals.length} more)</div>`;}
+if(parseFloat(up)>0){bar+=`<div class="aseg" style="width:${up}%;background:${CLR_UNTAGGED}" onmouseenter="showSegTip(event,'Untagged','${CLR_UNTAGGED}','${tipAmt(uc)}','${up}%')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${up}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${CLR_UNTAGGED}"></div>Untagged</div>`;}
 bar+='</div>';leg+='</div>';
 
 // === TABLE: sorted by cost, Untagged fixed at bottom (outside scroll) ===
@@ -2098,7 +2117,13 @@ function toast(msg,err){const c=document.getElementById('tc');const t=document.c
 
 function toggleSbGroup(id){document.getElementById(id).classList.toggle('collapsed')}
 function toggleSidebar(){const sb=document.querySelector('.sidebar');const mn=document.querySelector('.main');const ic=document.getElementById('sb-toggle-icon');sb.classList.toggle('collapsed');mn.classList.toggle('sb-collapsed');ic.textContent=sb.classList.contains('collapsed')?'chevron_right':'chevron_left';document.documentElement.style.setProperty('--sw',sb.classList.contains('collapsed')?'64px':'264px')}
-function showSegTip(e,name,color,costStr){const tip=document.getElementById('seg-tip');document.getElementById('seg-tip-title').textContent=name;document.getElementById('seg-tip-row').innerHTML=`<span style="width:10px;height:10px;border-radius:2px;background:${color};flex-shrink:0;display:inline-block"></span><span>${name}</span><span class="seg-tip-amt">${costStr}</span>`;tip.style.display='block';posSegTip(e);}
+/* 2026-10-15 Kabin：tooltip 金額照全站（FE nFormatter＋TooltipItem）：幣別符號＋完整數字＋兩位小數，不套十萬縮寫 */
+function tipAmt(n){return '$'+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+/* 2026-10-15 Kabin（Figma #05-6）：CMDS Chart / Tooltip。標題＝value 名稱；沒分攤時一列「比例＋金額」；有分攤時列 Direct、Allocated，分隔線下是 Total */
+function showSegTip(e,name,color,costStr,pctStr,direct,alloc){const tip=document.getElementById('seg-tip');const sw=(c,a)=>`<span class="seg-tip-sw${a?' is-alloc':''}" style="background-color:${c}"></span>`;
+  const row=(l,v,c,a,cls)=>`<div class="seg-tip-row${cls?' '+cls:''}">${c?sw(c,a):''}<span>${l}</span><span class="seg-tip-amt">${v}</span></div>`;
+  tip.innerHTML=`<div class="seg-tip-title">${name}</div><div class="seg-tip-div"></div>`+(alloc?row('Direct',direct,color)+row('Allocated',alloc,color,1)+'<div class="seg-tip-div"></div>'+row('Total',costStr,'',0,'is-total'):row(pctStr||'',costStr,color));
+  tip.style.display='block';posSegTip(e);}
 function posSegTip(e){const tip=document.getElementById('seg-tip');const w=tip.offsetWidth||180;const h=tip.offsetHeight||56;let x=e.clientX+14;let y=e.clientY-h-10;if(x+w>window.innerWidth-8)x=e.clientX-w-14;if(y<8)y=e.clientY+14;tip.style.left=x+'px';tip.style.top=y+'px';}
 function hideSegTip(){document.getElementById('seg-tip').style.display='none';}
 document.addEventListener('click',e=>{
@@ -2632,7 +2657,7 @@ function v9OpenRecipMenu(btn,cid){
   const m=document.createElement('div');m.className='v9-add-menu';
   m.innerHTML=(avail.length?avail.map(n=>`<button type="button" onclick="v9CloseAddMenu();${pick(n)}"><span class="material-symbols-outlined">sell</span><span><strong>${n}</strong></span></button>`).join('')
       :`<div class="v9-add-menu-empty">${S._autoRecip?'All values are already in this list.':'Every value with a value card is already in this list.'}</div>`)
-    +`<button type="button" onclick="v9CloseAddMenu();v9CreateForAC('${acid}','${cid}')"><span class="material-symbols-outlined">add</span><span><strong>Create value card…</strong><em>Set up the value first, then it joins this split.</em></span></button>`;
+    +`<button type="button" onclick="v9CloseAddMenu();v9CreateForAC('${acid}','${cid}')"><span class="material-symbols-outlined">add</span><span><strong>Create Value Card</strong></span></button>`;
   document.body.appendChild(m);
   const r=btn.getBoundingClientRect();m.style.top=(r.bottom+window.scrollY+4)+'px';m.style.left=(r.left+window.scrollX)+'px';
   setTimeout(()=>document.addEventListener('click',v9CloseAddMenu,{once:true}),0);
@@ -2983,11 +3008,11 @@ function v9RenderPreview(t,el){
   const anyAlloc=vals.some(v=>v.alloc>0);
   vals.forEach((v,i)=>{const p=T?v.total/T*100:0;if(p>0){const c=COLORS[i%9];const dp=v.total?v.direct/v.total*100:100;
     const bg=v.alloc>0?`linear-gradient(90deg,${c} 0 ${dp}%,transparent ${dp}%),repeating-linear-gradient(45deg,rgba(255,255,255,.55) 0 3px,transparent 3px 6px),color-mix(in srgb,${c} 55%,#fff)`:c;
-    const tipv=v.alloc>0?`${v9fmt(v.total)} (Direct ${v9fmt(v.direct)} + Allocated ${v9fmt(v.alloc)})`:v9fmt(v.total);
-    bar+=`<div class="aseg" style="width:${p}%;background:${bg}" onmouseenter="showSegTip(event,'${v.name.replace(/'/g,'&apos;')}','${c}','${tipv}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${p.toFixed(2)}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${COLORS[i%9]}"></div>${v.name}</div>`}});
+    const tipx=v.alloc>0?`,'${tipAmt(v.direct)}','${tipAmt(v.alloc)}'`:'';
+    bar+=`<div class="aseg" style="width:${p}%;background:${bg}" onmouseenter="showSegTip(event,'${v.name.replace(/'/g,'&apos;')}','${c}','${tipAmt(v.total)}','${p.toFixed(2)}%'${tipx})" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${p.toFixed(2)}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${COLORS[i%9]}"></div>${v.name}</div>`}});
   if(anyAlloc)leg+=`<div class="li v10-leg-key"><span class="v10-leg-sw"></span>Direct<span class="v10-leg-sw is-alloc"></span>Allocated</div>`;
-  pools.forEach(pl=>{const p=T?pl.total/T*100:0;bar+=`<div class="aseg v9-pool-seg" style="width:${p}%" onmouseenter="showSegTip(event,'${pl.name}','#9AA7B8','${v9fmt(pl.total)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${p.toFixed(2)}%</span></div>`;leg+=`<div class="li"><div class="ld v9-pool-seg"></div>${pl.name}</div>`});
-  if(up>0){bar+=`<div class="aseg" style="width:${up}%;background:${CLR_UNTAGGED}" onmouseenter="showSegTip(event,'Untagged','${CLR_UNTAGGED}','${v9fmt(uc)}')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${up.toFixed(2)}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${CLR_UNTAGGED}"></div>Untagged</div>`}
+  pools.forEach(pl=>{const p=T?pl.total/T*100:0;bar+=`<div class="aseg v9-pool-seg" style="width:${p}%" onmouseenter="showSegTip(event,'${pl.name}','#9AA7B8','${tipAmt(pl.total)}','${p.toFixed(2)}%')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${p.toFixed(2)}%</span></div>`;leg+=`<div class="li"><div class="ld v9-pool-seg"></div>${pl.name}</div>`});
+  if(up>0){bar+=`<div class="aseg" style="width:${up}%;background:${CLR_UNTAGGED}" onmouseenter="showSegTip(event,'Untagged','${CLR_UNTAGGED}','${tipAmt(uc)}','${up.toFixed(2)}%')" onmousemove="posSegTip(event)" onmouseleave="hideSegTip()"><span class="seg-pct">${up.toFixed(2)}%</span></div>`;leg+=`<div class="li"><div class="ld" style="background:${CLR_UNTAGGED}"></div>Untagged</div>`}
   bar+='</div>';leg+='</div>';
   // Table：每個 value 拆直接／分攤（Q-9 的 UX 建議）⚠ ASSUMPTION
   /* 2026-10-06：有分攤時表格多兩欄 Direct／Allocated，一眼看到每個 value 的錢從哪來（取代「分攤前／分攤後」切換，切換移到 Demo FAB 已不採用） */
@@ -3067,14 +3092,14 @@ function v9ShowApply(id,cover,uc,valCount,splitAmt){
   const thumb=`<span class="material-symbols-outlined" style="font-size:18px;color:var(--ok);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20">thumb_up</span>`; // 同 v8／Figma #08 的 100% / USD 0 特殊呈現
   // 2026-10-01 PM 定調：刪掉最後一張 allocation card 之後，key 恢復讓 Manager／Member 看到 ⚠ ASSUMPTION：提醒文案
   const lastAllocGone=!v9HasAlloc(t)&&orig&&orig!==t&&orig.status==='active'&&v9HasAlloc(orig);
-  const notice=lastAllocGone?`<div class="notice n-info" style="margin-bottom:20px;align-items:flex-start"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">visibility</span><div>This tag no longer splits shared cost. After you apply it, <strong>Managers and Members will see ${t.name}</strong> in Cost Dashboard again.</div></div>`:firstAlloc?`<div class="notice n-warn" style="margin-bottom:20px;align-items:flex-start"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">visibility_off</span><div>This tag splits shared cost. After you apply it, <strong>Managers and Members won't see ${t.name}</strong> in Cost Dashboard, because split amounts can reveal costs outside their access.</div></div>`:'';
+  const notice=lastAllocGone?`<div class="v10-apply-notice is-info"><span class="material-symbols-outlined">visibility</span><div>This tag no longer splits shared cost. After you apply it, <strong>Managers and Members will see ${t.name}</strong> in Cost Dashboard again.</div></div>`:firstAlloc?`<div class="v10-apply-notice is-warn"><span class="material-symbols-outlined">visibility_off</span><div>This tag splits shared cost. After you apply it, <strong>Managers and Members won't see ${t.name}</strong> in Cost Dashboard, because split amounts can reveal costs outside their access.</div></div>`:'';
   showModal(`<div class="mh"><div><span class="material-symbols-outlined mh-ic" style="color:var(--g500)">warning</span><span class="mt">Apply LumiTag</span></div><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div>
 <p style="margin-bottom:30px;color:var(--g900);line-height:1.75">LumiTag <strong>${t.name}</strong> will be integrated as a primary dimension in all reports and dashboards. <br>Please confirm the summary below:</p>
-<p style="margin-bottom:8px;color:var(--g900)">Applying this tag will cover <strong style="color:var(--pri)">${v9fmt(cover)}</strong> of your total spend.${splitAmt>0?`<br><span style="font-size:12px;color:var(--g600)">Includes ${v9fmt(splitAmt)} split from shared cost (estimated).</span>`:''}</p>${notice}
+<p style="margin-bottom:8px;color:var(--g900)">Applying this tag will cover <strong style="color:var(--pri)">${v9fmt(cover)}</strong> of your total spend.${splitAmt>0?`<br><span style="font-size:12px;color:var(--g600)">Includes ${v9fmt(splitAmt)} split from shared cost (estimated).</span>`:''}</p>
 <div style="background:var(--pri-lt10);border:1px solid var(--pri-lt20);border-radius:var(--r-md);padding:16px;margin-bottom:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
 <div><div class="lt-mlabel">Tag Values</div><div style="font-weight:700;font-size:14px;color:var(--g900)">${valCount}</div></div>
 <div><div class="lt-mlabel">Coverage Rate</div><div style="display:flex;align-items:center;gap:6px;font-weight:${uc<=0?700:500};font-size:14px;color:${uc<=0?'var(--ok)':'var(--g900)'}">${uc<=0?thumb:''}${uc<=0?'100':cr}%</div></div>
-<div><div class="lt-mlabel">Untagged Spend</div><div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;color:${uc<=0?'var(--ok)':'#BF302E'}">${uc<=0?thumb+S._currency+' 0':v9fmt(uc)}</div></div></div>
+<div><div class="lt-mlabel">Untagged Spend</div><div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;color:${uc<=0?'var(--ok)':'#BF302E'}">${uc<=0?thumb+S._currency+' 0':v9fmt(uc)}</div></div></div>${notice} <!-- 2026-10-15 Kabin（Figma #08-1／#08-2）：提醒框移到摘要表下方 -->
 <div class="mf"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="confirmApply('${id}')">Apply LumiTag</button></div>`,'wide');
 }
 
@@ -3239,6 +3264,7 @@ function v10Apply(prefix){
     bk.innerHTML='<span class="material-symbols-outlined">arrow_circle_left</span>Previous';bk.onclick=()=>v10Go(prefix,1);bar.prepend(bk);
   }
   v9Sched(cid);
+  if(S._step===2&&S._v10NeedLoad){S._v10NeedLoad=false;v10RunLoading(prefix)}else if(S._step!==2){clearTimeout(view._v10LoadT);view.classList.remove('v10-loading')}
 }
 function v10Go(prefix,n){
   const cid=prefix+'-vals';const ctn=document.getElementById(cid);if(!ctn)return;
@@ -3247,11 +3273,16 @@ function v10Go(prefix,n){
     if(p)p.click();return}
   if(n===2&&!ctn.querySelector('.vc:not(.ac)')){toast('Add at least one value card first.',1);return}
   if(n===S._step)return;
-  S._step=n;v10Apply(prefix);window.scrollTo({top:0,behavior:'smooth'});
+  S._step=n;if(n===2)S._v10NeedLoad=true;v10Apply(prefix);window.scrollTo({top:0,behavior:'smooth'});
 }
+/* 2026-10-15 Kabin（Figma #12-8）：每次進第 2 步都故意跑一段 skeleton，讀完再淡入內容 */
+const V10_LOAD_MS=900;
+function v10RunLoading(prefix){const view=document.getElementById(prefix==='ed'?'v-edit':'v-create');if(!view)return;
+  clearTimeout(view._v10LoadT);view.classList.remove('v10-reveal');view.classList.add('v10-loading');
+  view._v10LoadT=setTimeout(()=>{view.classList.remove('v10-loading');view.classList.add('v10-reveal');setTimeout(()=>view.classList.remove('v10-reveal'),350)},V10_LOAD_MS)}
 /* 2026-10-12 Kabin：Preview 是第 3 步，不該像跳到另一頁。頁首沿用第 1、2 步（Edit LumiTag: {key}＋狀態／Create LumiTag），
    加上 stepper（第 3 步為目前），底部「Back to Edit」改「Back」回到原本那一步。用後處理包住所有 Preview 版本（含 loading、舊版 tag） */
-const _v10RP=renderPreview;renderPreview=function(id){_v10RP(id);if(!v10On())return;
+const _v10RP=renderPreview;renderPreview=function(id){_v10RP(id);S._v10NeedLoad=true;if(!v10On())return;
   const el=document.getElementById('v-preview');const hdr=el&&el.querySelector('.pg-hdr');if(!hdr)return;
   const src=document.querySelector(S._isNew?'#v-create .pg-hdr':'#v-edit .pg-hdr');
   if(src){const c=src.cloneNode(true);c.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));hdr.replaceWith(c)}
