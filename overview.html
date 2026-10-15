@@ -101,8 +101,11 @@
   --lt-radius-none:   0;
   --lt-radius-xs:     3px;      /* chips / badges / 薄狀指示器 (源自 lumi-tag v7 5 處用法) */
   --lt-radius-sm:     4px;
+  --lt-radius-btn:    5px;      /* 2026-10-15 B-8：按鈕／輸入框／下拉觸發欄（FE muiButton、Figma CMDS 都是 5） */
   --lt-radius-md:     8px;
   --lt-radius-lg:     12px;
+  --lt-radius-modal-sm: 10px;   /* 2026-10-15 B-4：確認類彈窗（Remove／Discard／Select Role） */
+  --lt-radius-modal:  15px;     /* 2026-10-15 B-4：表單類彈窗（稿量到 15） */
   --lt-radius-xl:     16px;
   --lt-radius-pill:   9999px;   /* pill button / chip — 矩形元素的最大圓角 */
   --lt-radius-circle: 50%;      /* 圓形 icon / avatar / toggle dot — 形狀無關 */
@@ -189,9 +192,10 @@
   --lt-color-text-primary:   var(--lt-grey-700);   /* 內文預設 */
   --lt-color-text-secondary: var(--lt-grey-500);   /* 次要文字 */
   --lt-color-text-tertiary:  var(--lt-grey-400);   /* hint / placeholder */
-  --lt-color-text-disabled:  var(--lt-grey-400);
+  --lt-color-text-disabled:  var(--lt-grey-400);   /* 白底上的停用文字／icon；停用「按鈕」的字用 --lt-button-disabled-text（白） */
   --lt-color-text-inverse:   var(--lt-white);
-  --lt-color-text-link:      var(--lt-blue-60);
+  --lt-color-text-link:      var(--lt-blue-70);    /* 2026-10-15 B-14：#0B6DD7 → #004FB0，連結一律加底線（稿 cell、FE ResourceButton） */
+  --lt-color-text-link-hover: var(--lt-blue-60);   /* hover 淺一階 #0B6DD7，底線保留 */
   --lt-color-text-heading:   var(--lt-grey-800);   /* 為未來 heading 獨立換色預留 */
   --lt-color-text-icon:      var(--lt-grey-600);   /* 為未來 icon 獨立換色預留 */
 
@@ -199,7 +203,8 @@
   --lt-color-bg-default:    var(--lt-white);
   --lt-color-bg-subtle:     var(--lt-grey-50);
   --lt-color-bg-emphasized: var(--lt-grey-100);
-  --lt-color-bg-disabled:   var(--lt-grey-100);
+  --lt-color-bg-disabled:   var(--lt-grey-100);   /* 停用的「欄位」底（輸入框／下拉，FE SelectButton gray.disableLight）。2026-10-15 B-1：停用「按鈕」改用 FE 版 #CCCCCC 底白字，見 --lt-button-disabled-bg／-text；這顆維持 #F2F2F2，不然舊頁 `.btn:disabled` 用它當底又用 #CCCCCC 當字會變灰壓灰 */
+  --lt-color-text-on-disabled: var(--lt-white);   /* 停用按鈕上的字（= --lt-button-disabled-text） */
   --lt-color-bg-inverse:    var(--lt-blue-90);
   --lt-color-bg-overlay:    rgba(0, 0, 0, 0.5);
   --lt-color-bg-skeleton:   var(--lt-grey-200);   /* 骨架屏；2026-09-24 定，對應前端 gray.skeleton → gray.10；用途命名，日後可單獨換色 */
@@ -208,7 +213,8 @@
   --lt-color-border-default: var(--lt-grey-200);
   --lt-color-border-strong:  var(--lt-grey-300);
   --lt-color-border-focus:   var(--lt-color-primary);
-  --lt-color-border-input:   #DCE3EC;   /* prototype --tf-border；略不同於 grey-200 */
+  --lt-color-border-input:   var(--lt-grey-300);   /* 2026-10-15 B-7：#DCE3EC → #CCCCCC（FE、X-6 稿、RS／RO 稿一致） */
+  --lt-color-border-input-hover: var(--lt-grey-400); /* 下拉／輸入 hover 框 #B3B3B3（Guideline Dropdown 已是這個） */
   --lt-color-border-error:   var(--lt-color-error-base);
 
 
@@ -232,11 +238,15 @@
   /* --- Card --- */
   --lt-card-bg:      var(--lt-color-bg-default);
   --lt-card-radius:  var(--lt-radius-md);
-  --lt-card-shadow:  var(--lt-shadow-dialog);    /* CMDS 明確規範 Card 用 Dialog shadow */
+  --lt-card-shadow:  0 0 20px 0 rgba(0, 0, 0, 0.10);   /* 2026-10-15 B-3：Figma 對稿量到的卡片陰影（CB／AD／LumiTag 10/02）；原 var(--lt-shadow-dialog) 0 0 6px .2 */
   --lt-card-padding: var(--lt-space-24);
 
   /* --- Button --- */
-  --lt-button-radius:     var(--lt-radius-sm);
+  --lt-button-radius:     var(--lt-radius-btn);   /* 2026-10-15 B-8：4 → 5 */
+  --lt-button-font-weight: var(--lt-fw-bold);     /* 2026-10-15 A-2：稿（CMDS Button Bold 1）與 FE muiButton 都是 700 */
+  --lt-button-height:     36px;
+  --lt-button-disabled-bg:   var(--lt-grey-300);  /* 2026-10-15 B-1：FE 版 */
+  --lt-button-disabled-text: var(--lt-white);
   --lt-button-padding-x:  var(--lt-space-16);
   --lt-button-padding-y:  var(--lt-space-8);
   --lt-button-focus-ring: 0 0 0 3px rgba(0, 79, 176, 0.10);
@@ -244,13 +254,15 @@
   /* --- Input / Text Field --- */
   --lt-input-bg:        var(--lt-color-bg-default);
   --lt-input-border:    var(--lt-color-border-input);
-  --lt-input-radius:    var(--lt-radius-sm);
+  --lt-input-radius:    var(--lt-radius-btn);   /* 2026-10-15：36h r5（Figma 輸入與下拉） */
+  --lt-input-height:    36px;
   --lt-input-padding-x: var(--lt-space-16);
   --lt-input-padding-y: var(--lt-space-8);
 
   /* --- Modal --- */
-  --lt-modal-radius:   var(--lt-radius-lg);
-  --lt-modal-shadow:   var(--lt-shadow-dialog);  /* CMDS Dialog shadow（Modal = Dialog 同類）*/
+  --lt-modal-radius:   var(--lt-radius-modal);     /* 2026-10-15 B-4：表單類 15（原 12） */
+  --lt-modal-radius-sm: var(--lt-radius-modal-sm); /* 確認類 10 */
+  --lt-modal-shadow:   0 0 6px 0 rgba(0, 0, 0, 0.2);  /* 全站彈窗統一（B-4）；等同 --lt-shadow-dialog，寫死以免 dialog 陰影日後獨立換值時彈窗跟著動 */
   --lt-modal-padding:  var(--lt-space-24);
   --lt-modal-backdrop: rgba(0, 0, 0, 0.5);
 
@@ -259,6 +271,16 @@
   --lt-tooltip-text:    var(--lt-white);
   --lt-tooltip-radius:  var(--lt-radius-sm);
   --lt-tooltip-padding: var(--lt-space-8);
+
+  /* --- Page title / Toast（2026-10-15 修正輪新增） --- */
+  --lt-page-title-size:   var(--lt-fs-24);   /* B-2：頁標題 24／700 */
+  --lt-page-title-weight: var(--lt-fw-bold);
+  --lt-toast-success-bg:  #008F88;           /* 照 FE toast.css；CLAUDE.md 10/13 */
+  --lt-toast-error-bg:    #BF302E;
+  --lt-toast-info-bg:     #0B6DD7;           /* FE toast.css --infoMain */
+  --lt-toast-warning-bg:  #EC6F09;           /* FE toast.css --warningMain */
+  --lt-toast-radius:      4px;
+  --lt-toast-width:       400px;
 }
 
 
@@ -274,6 +296,76 @@
  *
  * Shadow 結構待 Figma audit：v7/v8 用單層、tokens.css 主階用雙層；Overlay 已用單層作折衷
  * ============================================================ */
+
+</style>
+<style>
+/* === Inlined: shared/lumiture-ui.css === */
+/* ============================================================
+ * lumiture-ui.css — 共用小元件樣式（2026-10-15 修正輪 S 組）
+ * 引用：<link rel="stylesheet" href="../shared/lumiture-ui.css?v=2026-10-15">（tokens.css 之後；沒載 tokens.css 的頁面也能用，var 都有備用值）
+ *
+ *   .lt-select   下拉／輸入觸發欄（A-11）
+ *   .lt-skeleton 骨架屏（A-18）
+ *   .lt-link     文字連結（B-14）
+ *   .lt-btn-icon 表格 Action icon button（B-6，CB 版）
+ *   空狀態／無權限見 lumiture-empty.js；Toast 見 lumiture-toast.js
+ * ============================================================ */
+
+/* ---------- .lt-select ----------
+ * 結構：
+ *   <button type="button" class="lt-select" aria-haspopup="listbox" aria-expanded="false">
+ *     <span class="lt-select__v">All Types</span>                       ← 沒選時加 .is-placeholder 在 .lt-select 上，字變 #B3B3B3
+ *     <span class="material-symbols-outlined lt-select__arrow">arrow_drop_down</span>   ← MUI 實心 ▾，不要用 expand_more／chevron
+ *   </button>
+ * 狀態 class：.is-open（框 primary＋focus ring，箭頭轉 180）、.is-error、.is-disabled 或 :disabled、.is-placeholder
+ * 高 36、圓角 5、字 14／400、框 #CCCCCC、hover 框 #B3B3B3（Guideline Dropdown；舊的 hover 框變藍底 #F2FAFF 已廢）。寬度由頁面給（width／min-width）。 */
+.lt-select{display:inline-flex;align-items:center;justify-content:space-between;gap:8px;box-sizing:border-box;height:var(--lt-input-height,36px);padding:0 4px 0 12px;
+  background:var(--lt-color-bg-default,#fff);border:1px solid var(--lt-color-border-input,#CCCCCC);border-radius:var(--lt-input-radius,5px);
+  font-family:inherit;font-size:14px;font-weight:400;line-height:1.5;color:var(--lt-color-text-primary,#262626);text-align:left;cursor:pointer;
+  transition:border-color .15s ease,box-shadow .15s ease}
+.lt-select:hover{border-color:var(--lt-color-border-input-hover,#B3B3B3)}
+.lt-select:focus-visible,.lt-select.is-open{outline:none;border-color:var(--lt-color-border-focus,#004FB0);box-shadow:var(--lt-button-focus-ring,0 0 0 3px rgba(0,79,176,.1))}
+.lt-select__v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lt-select.is-placeholder .lt-select__v{color:var(--lt-grey-400,#B3B3B3)}
+.lt-select__arrow{flex-shrink:0;font-size:24px;line-height:1;color:var(--lt-grey-500,#676767);transition:transform .2s ease;
+  font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+.lt-select.is-open .lt-select__arrow{transform:rotate(180deg)}
+.lt-select.is-error{border-color:var(--lt-color-error,#FF403D)}
+.lt-select.is-error:focus-visible,.lt-select.is-error.is-open{box-shadow:0 0 0 3px rgba(255,64,61,.1)}
+.lt-select:disabled,.lt-select.is-disabled{background:var(--lt-grey-100,#F2F2F2);border-color:var(--lt-grey-300,#CCCCCC);color:var(--lt-grey-300,#CCCCCC);cursor:not-allowed;box-shadow:none}
+.lt-select:disabled .lt-select__arrow,.lt-select.is-disabled .lt-select__arrow{color:var(--lt-grey-300,#CCCCCC)}
+
+/* ---------- .lt-skeleton ----------
+ * 骨架屏統一用 --lt-color-bg-skeleton（#E6E6E6）。**靜態**不跑 shimmer（X-6 現況，Guideline 已回改）；要 shimmer 才加 .lt-skeleton--shimmer。
+ * 用法：<div class="lt-skeleton" style="width:120px;height:16px"></div>；表格列慣例見各頁稿 #01-6（表頭文字照常、只有儲存格內容換成灰條；卡片標題照常、按鈕 disabled）。
+ * 變體：.lt-skeleton--line（高 14、r4）、.lt-skeleton--title（高 24、r4）、.lt-skeleton--circle（圓）、.lt-skeleton--block（r8，大塊如圖表區） */
+.lt-skeleton{display:block;background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;min-height:8px}
+.lt-skeleton--line{height:14px}
+.lt-skeleton--title{height:24px}
+.lt-skeleton--circle{border-radius:50%}
+.lt-skeleton--block{border-radius:8px}
+.lt-skeleton--shimmer{background:linear-gradient(90deg,var(--lt-color-bg-skeleton,#E6E6E6) 0%,#F2F2F2 50%,var(--lt-color-bg-skeleton,#E6E6E6) 100%);background-size:200% 100%;animation:lt-skeleton-shimmer 1.3s ease-in-out infinite}
+@keyframes lt-skeleton-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.lt-skeleton--shimmer{animation:none}}
+
+/* ---------- .lt-link ----------
+ * 文字連結（B-14）：#004FB0＋底線；hover 淺一階 #0B6DD7（底線保留）。字級繼承；稿 cell 連結 14／500，連結鈕（Learn More 等）12／700 請頁面自己給 font-size／weight。
+ * icon 不畫底線（CMDS Text Button 慣例）：有 icon 時文字包在 .lt-link__t。 */
+.lt-link{color:var(--lt-color-text-link,#004FB0);text-decoration:underline;cursor:pointer;background:none;border:none;padding:0;font:inherit}
+.lt-link:hover{color:var(--lt-color-text-link-hover,#0B6DD7)}
+.lt-link:focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:2px;border-radius:2px}
+.lt-link.has-icon{text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.lt-link.has-icon .lt-link__t{text-decoration:underline}
+
+/* ---------- .lt-btn-icon（表格 Action icon button，B-6 取 CB 版）----------
+ * 20×20 box、icon 16、FILL 1、primary 色、圓形；hover 底 #D1EEFF。disabled 色 #B3B3B3。
+ * <button type="button" class="lt-btn-icon" data-tip="Edit"><span class="material-symbols-outlined">edit</span></button> */
+.lt-btn-icon{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:20px;height:20px;padding:0;border:none;border-radius:50%;
+  background:none;color:var(--lt-color-primary,#004FB0);cursor:pointer;flex-shrink:0;transition:background .15s ease}
+.lt-btn-icon .material-symbols-outlined{font-size:16px;line-height:1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
+.lt-btn-icon:hover{background:var(--lt-blue-20,#D1EEFF)}
+.lt-btn-icon:focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:1px}
+.lt-btn-icon:disabled{color:var(--lt-grey-400,#B3B3B3);cursor:not-allowed;background:none}
 
 </style>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
@@ -316,8 +408,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 .pg-title{font-size:var(--lt-fs-24);font-weight:var(--lt-fw-bold);color:var(--lt-color-text-heading);line-height:1.4}
 .upd{display:flex;align-items:center;gap:var(--lt-space-4);margin-left:auto;font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary)}
 .upd-times{display:flex;gap:20px;font-variant-numeric:tabular-nums}
+/* A-4／A-18（稿 #11）：進頁讀取中頁首只有更新時間換成 skeleton、按鈕 disabled；讀完要恢復（endHeaderLoading） */
+.pg-hdr:not(.is-loading) .upd-sk{display:none}
+.pg-hdr.is-loading .upd-real{display:none}
 .upd .ic-info{font-size:16px;color:var(--lt-color-text-secondary);cursor:help}
-.icon-btn{width:36px;height:36px;border-radius:var(--lt-radius-circle);display:inline-flex;align-items:center;justify-content:center;color:var(--lt-color-text-icon);margin-left:var(--lt-space-8);transition:background var(--lt-transition-fast)}
+.icon-btn{width:36px;height:36px;border-radius:var(--lt-radius-circle);display:inline-flex;align-items:center;justify-content:center;color:var(--lt-color-primary);margin-left:var(--lt-space-8);transition:background var(--lt-transition-fast)}
 .icon-btn:hover{background:var(--lt-color-bg-emphasized)}
 .icon-btn:disabled{color:var(--lt-color-text-disabled);cursor:not-allowed;background:none}
 .icon-btn svg{width:24px;height:24px;fill:currentColor}
@@ -329,7 +424,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 .pg-sub-r{display:flex;align-items:center;gap:var(--lt-space-8)}
 
 /* ===== Buttons (CMDS) ===== */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--lt-space-4);min-width:80px;padding:0 var(--lt-button-padding-x);height:36px;border-radius:var(--lt-button-radius);font-weight:var(--lt-fw-medium);font-size:var(--lt-fs-14);line-height:1.5;white-space:nowrap;border:1px solid transparent;transition:background-color var(--lt-transition-fast),border-color var(--lt-transition-fast),color var(--lt-transition-fast)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--lt-space-4);min-width:80px;padding:0 var(--lt-button-padding-x);height:36px;border-radius:var(--lt-button-radius);font-weight:var(--lt-button-font-weight,700);font-size:var(--lt-fs-14);line-height:1.5;white-space:nowrap;border:1px solid transparent;transition:background-color var(--lt-transition-fast),border-color var(--lt-transition-fast),color var(--lt-transition-fast)}
 .btn-p{background:var(--lt-color-primary);color:var(--lt-color-text-inverse)}
 .btn-p:hover{background:var(--lt-color-primary-hover)}
 .btn-p:active{background:var(--lt-color-primary-active)}
@@ -341,17 +436,18 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 .btn-b:hover .btn-text{text-decoration:underline}   /* Text Button：底線只套文字，icon 不畫 */
 .btn-sm{height:30px;padding:0 12px}
 .btn .material-symbols-outlined{font-size:18px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 18}
-.btn:disabled{background:var(--lt-color-bg-disabled)!important;color:var(--lt-grey-300)!important;border-color:transparent!important;cursor:not-allowed}
+.btn:disabled{background:var(--lt-button-disabled-bg)!important;color:var(--lt-button-disabled-text)!important;border-color:transparent!important;cursor:not-allowed}
+/* B-1：停用的「按鈕」用 FE 版（底 #CCCCCC 白字）；Outlined 沒有實心底，照 skeleton 稿（#11）畫成白底灰框灰字 */
+.btn-o:disabled{background:var(--lt-color-bg-default)!important;color:var(--lt-color-text-disabled)!important;border-color:var(--lt-grey-300)!important}
+.curr-btn:disabled{opacity:.5;cursor:not-allowed;pointer-events:none}
 
 /* ===== Dropdown Field (CMDS M 36px) — Display Frequency ===== */
 .dd{position:relative;display:inline-flex;align-items:center;gap:var(--lt-space-8)}
 .dd-label{font-size:var(--lt-fs-12);font-weight:var(--lt-fw-bold);color:var(--lt-color-primary);white-space:nowrap}
-.dd-trig{height:36px;min-width:130px;padding:0 12px;border:1px solid var(--lt-input-border);border-radius:var(--lt-input-radius);background:var(--lt-input-bg);display:inline-flex;align-items:center;justify-content:space-between;gap:var(--lt-space-8);font-size:var(--lt-fs-14);color:var(--lt-color-text-primary);transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}
-.dd-trig:hover{border-color:var(--lt-color-border-strong)}
+/* A-11：觸發欄樣式（高 36、r5、框 #CCCCCC、hover 框 #B3B3B3、實心 ▾）由 shared .lt-select 提供，這裡只留這頁的寬度 */
+.dd-trig{min-width:130px}
 .dd.open .dd-trig{border-color:var(--lt-color-border-focus);box-shadow:var(--ov-focus-ring)}
-.dd-trig .material-symbols-outlined{font-size:18px;color:var(--lt-color-text-icon);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 18;transition:transform .2s ease;flex-shrink:0}
-.dd.open .dd-trig .material-symbols-outlined{transform:rotate(180deg)}
-.dd-trig:disabled{background:var(--lt-color-bg-disabled);color:var(--lt-color-text-disabled);border-color:var(--lt-grey-300);cursor:not-allowed}
+.dd.open .dd-trig .lt-select__arrow{transform:rotate(180deg)}
 .dd-list{position:absolute;top:calc(100% + 4px);right:0;min-width:130px;background:var(--lt-color-bg-default);border-radius:var(--lt-radius-sm);box-shadow:var(--lt-shadow-dialog);padding:var(--lt-space-4) 0;z-index:var(--lt-z-dropdown);display:none;overscroll-behavior:contain}
 .dd.open .dd-list{display:block}
 .dd-item{height:36px;padding:0 12px;display:flex;align-items:center;font-size:var(--lt-fs-14);color:var(--lt-color-text-primary);cursor:pointer;white-space:nowrap}
@@ -361,12 +457,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 /* ===== Month Picker — 翻譯 @lumiture-ui MonthPicker（react-datepicker + Reset/Cancel/Apply footer）
  * 版面沿用 executive-insights v2 既有 .mp-* 作法（同一個元件在兩支 prototype 長一樣） ===== */
 .mp-wrap{position:relative;display:inline-block}
-.mp-trig{height:36px;padding:0 12px;border:1px solid var(--lt-input-border);border-radius:var(--lt-input-radius);background:var(--lt-input-bg);display:inline-flex;align-items:center;gap:var(--lt-space-8);font-size:var(--lt-fs-14);color:var(--lt-color-text-primary);min-width:150px;justify-content:space-between;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}
-.mp-trig:hover{border-color:var(--lt-color-border-strong)}
+.mp-trig{min-width:150px}   /* 外觀由 .lt-select 提供（A-11） */
 .mp-wrap.open .mp-trig{border-color:var(--lt-color-border-focus);box-shadow:var(--ov-focus-ring)}
-.mp-trig .material-symbols-outlined{font-size:18px;color:var(--lt-color-text-icon);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 18}
-.mp-trig .mp-cal{color:var(--lt-color-text-secondary)}
-.mp-trig:disabled{background:var(--lt-color-bg-disabled);color:var(--lt-color-text-disabled);border-color:var(--lt-grey-300);cursor:not-allowed}
+.mp-wrap.open .mp-trig .lt-select__arrow{transform:rotate(180deg)}
+.mp-trig .mp-cal{font-size:18px;color:var(--lt-color-text-secondary);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 18}
 .mp-pop{position:absolute;top:calc(100% + 4px);right:0;width:320px;background:var(--lt-color-bg-default);border-radius:var(--lt-radius-md);box-shadow:var(--lt-shadow-dialog);z-index:var(--lt-z-dropdown);overscroll-behavior:contain;display:none;padding:20px}
 .mp-wrap.open .mp-pop{display:block}
 .mp-pop-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--lt-space-8)}
@@ -387,7 +481,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 
 /* ===== Card ===== */
 .card{background:var(--lt-card-bg);border-radius:var(--lt-card-radius);box-shadow:var(--lt-card-shadow);padding:var(--lt-card-padding)}
-/* ⚠ DEVIATION: FE CostSummaryCard 寫死 0 0 20px rgba(0,0,0,.10)；這裡統一用 --lt-card-shadow（CMDS Dialog shadow） */
+/* B-3（2026-10-15 裁決）：卡片陰影 --lt-card-shadow = 0 0 20px rgba(0,0,0,.10)，與稿、FE 相同，不再是 DEVIATION */
 
 /* ===== Cost Overview grid ===== */
 .ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--lt-space-16);margin-top:var(--lt-space-32)}
@@ -434,6 +528,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 .leg{display:flex;justify-content:center;gap:var(--lt-space-8);margin-top:12px;flex-wrap:wrap}
 .leg-item{display:inline-flex;align-items:center;gap:var(--lt-space-4);font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary)}
 .leg-sw{width:16px;height:12px;flex-shrink:0}
+.leg-btn{cursor:pointer;padding:0;border:none;background:none;font-family:inherit}
+.leg-btn.off{opacity:.4}
+.tc-leg{margin-top:0}
 
 /* ===== Empty State（翻譯 FE EmptyState medium：插圖 80 + H5 + body pre-line；CMDS：icon 淡藍 #9ED7FF） ===== */
 .es{flex:1;min-height:400px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--lt-color-text-secondary);padding:var(--lt-space-24)}
@@ -454,18 +551,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 @keyframes spin{to{transform:rotate(360deg)}}
 /* ⚠ DEVIATION: FE 區塊級載入用 CircularProgress（CostByFOCUS 甚至整張卡消失）；
  * 這裡卡片外框留著、只有內容換 CMDS Skeleton（shimmer），版面不跳位 */
-.sk{background:linear-gradient(90deg,var(--lt-grey-100) 25%,#FAFAFA 50%,var(--lt-grey-100) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite linear;border-radius:var(--lt-radius-sm)}
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-.sk-text{height:14px}
-.sk-block{border-radius:var(--lt-radius-md)}
+/* A-18：骨架屏吃 shared .lt-skeleton（--lt-color-bg-skeleton，靜態不跑 shimmer；X-6 現況） */
 
-/* ===== Toast（左下角；避開 Demo FAB 往右挪） ===== */
-.toast-wrap{position:fixed;bottom:20px;left:var(--lt-toast-left, 274px);z-index:var(--lt-z-toast);display:flex;flex-direction:column;gap:var(--lt-space-8);pointer-events:none}
-.toast{display:flex;align-items:center;gap:10px;padding:12px 18px;background:var(--lt-color-success);color:#fff;border-radius:var(--lt-radius-md);box-shadow:var(--lt-shadow-overlay-strong);font-size:var(--lt-fs-14);font-weight:var(--lt-fw-medium);min-width:280px;max-width:480px;animation:toast-in .25s ease-out;pointer-events:auto}
-.toast.err{background:var(--lt-color-error)}
-.toast.info{background:var(--lt-tooltip-bg)}
-.toast .material-symbols-outlined{font-size:20px;flex-shrink:0}
-@keyframes toast-in{0%{transform:translateY(20px);opacity:0}100%{transform:translateY(0);opacity:1}}
+/* Toast 改用 shared/lumiture-toast.js（A-1）：成功 #008F88／錯誤 #BF302E／r4／寬 400，左緣吃 --lt-toast-left */
 
 /* ===== Tooltip（非圖表：#31383E 深底白字；demo-fab.js 注入的 #gl-tip 在這頁放寬到 600px + 保留換行） ===== */
 body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5;padding:8px 12px;border-radius:var(--lt-tooltip-radius)}
@@ -476,8 +564,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
  * 說明 12/18、Display Frequency S 號 30 高、圖例 16×12、Y 軸標籤欄 200 + 10、列高 36（兩條 15px 柱）+ 間距 30、X 軸列 26
  * ============================================================ */
 :root{
-  /* ⚠ DEVIATION: 稿上這張卡的陰影是 0 0 20px rgba(0,0,0,.10)（與 FE 相同），不是 token --lt-card-shadow（0 0 6px .2）。權威順序 Figma > tokens，照稿；主頁卡片維持 token（v1 裁決） */
-  --ov-rk-card-shadow: 0 0 20px rgba(0,0,0,.10);
+  --ov-rk-card-shadow: var(--lt-card-shadow);   /* B-3 裁決後 token 就是稿的 0 0 20px .10 */
   --ov-rk-dash: #CCCCCC;     /* 稿：垂直格線 #CCCCCC dashed 5/5；Y 軸線 #B3B3B3 solid */
 }
 .content.is-rk{padding-top:var(--lt-space-32)}   /* 稿：Main Area 內距 32/32/80/32 */
@@ -503,10 +590,9 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
 .rk-note{margin-top:var(--lt-space-8);font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-secondary)}
 .rk-freq{margin-top:var(--lt-space-8);display:flex;justify-content:flex-end}
 /* Dropdown S 號（稿 132×30；箭頭是實心小三角，非主頁 v1 的 chevron）。⚠ 未確認：同一個 Display Frequency 元件，主頁（v1，CMDS M 36px + chevron）與子頁（稿 S 30px + 三角）長得不一樣，稿面是設計稿本身的不一致，這頁照稿 */
-.dd.sm .dd-trig{height:30px;min-width:132px;padding:0 8px 0 7px;border-color:#CCCCCC;border-radius:5px}   /* 對稿修正：稿 Dropdown / Field S 外框 #CCCCCC、r5（tokens 沒有 5px 圓角與這個框色，頁面層 literal）；文字距左 8（含框線）、三角距右 9 */
+.dd.sm .dd-trig{height:30px;min-width:132px;padding:0 0 0 7px}   /* 稿 Dropdown / Field S：高 30、寬 132；框色 r5 吃 .lt-select（A-11） */   /* 對稿修正：稿 Dropdown / Field S 外框 #CCCCCC、r5（tokens 沒有 5px 圓角與這個框色，頁面層 literal）；文字距左 8（含框線）、三角距右 9 */
 .dd.sm .dd-label{font-size:var(--lt-fs-12)}
 .dd.sm .dd-list{min-width:132px}   /* Fable #3：Guideline Dropdown List「Min Width 與 Trigger 同寬」；S trigger 132。項高不改：Guideline 沒有 S 號 item 規格（Plain 40），維持與主頁同一組 36 */
-.rk-tri{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--lt-color-text-secondary);flex-shrink:0}
 .rk-leg-row{margin-top:var(--lt-space-16);display:flex;align-items:center;justify-content:space-between;gap:var(--lt-space-16);min-height:30px}
 .rk-leg{display:flex;align-items:center;gap:var(--lt-space-8);flex-wrap:wrap}
 .rk-leg-item{display:inline-flex;align-items:center;gap:var(--lt-space-4);font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-secondary)}
@@ -557,8 +643,6 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
   </div>
 </div>
 
-<div class="toast-wrap" id="toast-wrap"></div>
-
 <!-- ===== Shared modules ===== -->
 <script>
   window.LUMITURE_ACTIVE = 'overview';
@@ -602,8 +686,8 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
     ]},
 
     { type: 'group', id: 'optimization', label: 'Optimization', items: [
-      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', href: './rightsizing.html' },
-      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'percent', href: './rate-optimization.html' },
+      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'arrows_input', href: './rightsizing.html' },
+      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'percent_discount', href: './rate-optimization.html' },
     ]},
 
     { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
@@ -818,18 +902,18 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
   function _logoBody(icon) {
     return '<div class="lt-sb-logo-wrap">' + icon + '</div>' +
       '<span class="lt-sb-logo-text">LumiTure.ai</span>' +
-      '<span class="lt-sb-proto" title="Prototype">PROTO<span class="lt-sb-proto-x">TYPE</span></span>';
+      '<span class="lt-sb-proto" data-tip="Prototype" data-tip-pos="below">PROTO<span class="lt-sb-proto-x">TYPE</span></span>';
   }
   function _renderLogo() {
     var href = _homeHref();
-    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" title="Go to Overview">' : '<div class="lt-sb-logo">';
+    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-sb-logo">';
     return open + _logoBody(LOGO_ICON) + (href ? '</a>' : '</div>');
   }
   // 收合時顯示在 topbar 左側的 logo（同一組圖形，mask id 改 ltT* 避免跟 sidebar 那份撞 id）
   function _renderTopbarLogo() {
     var href = _homeHref();
     var icon = LOGO_ICON.replace(/ltH(ring|bars|leg)/g, 'ltT$1');
-    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" title="Go to Overview">' : '<div class="lt-tb-logo">';
+    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-tb-logo">';
     return open + _logoBody(icon) + (href ? '</a>' : '</div>');
   }
   function _mountTopbarLogo(host) {
@@ -1079,7 +1163,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
  *     version:     'v1.19.0',               // Software version 列
  *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
  *     quota: {                              // AI Quota box 數據；total 已含 add-on
- *       refreshDate: 'Jul 1, 2026',         // 下次重置日（= 自然月下月 1 號）
+ *       refreshDate: '2 Nov. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）
  *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
  *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
  *     },
@@ -1112,7 +1196,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
     version: 'v1.19.0',
     addonPacks: 0,
     quota: {
-      refreshDate: '2 Jul. 2026',
+      refreshDate: '2 Nov. 2026',          // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期（原 2 Jul. 2026 已過期）
       analyses:    { used: 32,  total: 80 },
       rightsizing: { used: 410, total: 1000 },
     },
@@ -1125,7 +1209,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
   // plan → 顯示哪些 quota 項目
   //   Essential = 兩項（照 Notion PRD，2026-06-22 Kabin 拍板）；Starter = 只 analyses；
   //   Standard = 兩項；Premium = 兩項（2026-10-14 Kabin 裁決照稿 #01-4：Unlimited 是 PRD 誤植、稿已劃掉，Premium 也顯示 `{remaining}/{total} left`，sub 只寫 Org-wide）；none = 不顯示 box
-  //   ⚠ specs ai-quota README 說 Essential 只 rightsizing，與 PRD 衝突、待 PM 對齊；此處照 PRD
+  //   Essential 兩項：PRD 已更新（Essential 衝突解除，2026-06-22 起照 Notion PRD；specs repo 的 ai-quota README 寫「只 rightsizing」是落後、待 PM sync）
   var PLAN_QUOTA_ITEMS = {
     Essential: ['analyses', 'rightsizing'],
     Starter:   ['analyses'],
@@ -1165,7 +1249,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
     'border:2px solid #002663;border-radius:50%}',
 
     /* User chip — avatar + name + role + chevron */
-    '.lt-tb-user{display:flex;align-items:center;gap:10px;padding-left:16px;margin-left:0;',
+    '.lt-tb-user{display:flex;align-items:center;gap:10px;padding:0 0 0 16px;margin-left:0;font-family:inherit;',   /* A-20②（2026-10-15）：padding 寫全，頁面沒 reset button 時不會吃到瀏覽器預設 1px 6px 而變 162×36 */
     'border-left:1px solid rgba(255,255,255,.1);color:#fff;cursor:pointer;transition:opacity .15s;background:none;border-top:none;border-right:none;border-bottom:none}',
     '.lt-tb-user:hover{opacity:.92}',
     '.lt-tb-avatar-ic{font-size:34px;color:#fff;flex-shrink:0;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 34}',
@@ -1235,7 +1319,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
     '@keyframes lt-q-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}',
     '@media (prefers-reduced-motion:reduce){.lt-q-skel{animation:none}}',
     /* error（#01-7）：只有這塊壞（partial degrade），整塊 85 高；help icon＋文字＋右側 Retry（青、粗、底線） */
-    '.lt-q-err{display:flex;align-items:center;gap:8px;height:24px;padding-left:8px;font-size:12px;line-height:18px;color:#CCCCCC}',
+    '.lt-q-err{display:flex;align-items:center;gap:8px;height:24px;padding-left:0;font-size:12px;line-height:18px;color:#CCCCCC}',
     '.lt-q-err-msg{flex:1;min-width:0}',
     '.lt-q-err .material-symbols-outlined{font-size:16px;color:#CCCCCC;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20}',
     '.lt-q-err a{color:#4ADFFF;font-weight:700;text-decoration:underline;cursor:pointer;flex-shrink:0;border-radius:2px}',
@@ -1262,6 +1346,14 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
   }
 
   // ===== Helpers =====
+  /* 角色 chip icon（A-3；稿 #01-4／#01-7、FE UserRoleChip ROLE_ICON_MAP）：Member account_circle、Manager supervised_user_circle、Admin／Owner admin_panel_settings。
+     role 字串寫法：'Admin'／'Owner'／'Manager - Cost Center'／'Member - Finance-APAC'。topbar 上的頭像是使用者頭像（稿 #01 就是人像圓），不是角色 chip，不跟著換 */
+  function _roleIcon(role) {
+    var r = String(role || '');
+    if (/^Member\b/i.test(r)) return 'account_circle';
+    if (/^Manager\b/i.test(r)) return 'supervised_user_circle';
+    return 'admin_panel_settings';
+  }
   function _esc(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   }
@@ -1286,7 +1378,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
 
   // ===== Renderers =====
   function _renderIcon(item) {
-    var attrs = ' class="lt-tb-ic" title="' + _esc(item.title || '') + '"';
+    var attrs = ' class="lt-tb-ic" data-tip="' + _esc(item.title || '') + '" data-tip-pos="below" aria-label="' + _esc(item.title || '') + '"';   /* 原生 title 改 data-tip（#gl-tip） */
     if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
     var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
     return '<button type="button"' + attrs + '>' +
@@ -1387,7 +1479,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
                  '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
                  '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
                '</div>' +
-               '<span class="lt-am-chip"><span class="material-symbols-outlined">account_circle</span>' + _esc(u.role) + '</span>' +
+               '<span class="lt-am-chip"><span class="material-symbols-outlined">' + _roleIcon(u.role) + '</span>' + _esc(u.role) + '</span>' +
              '</div>' +
              '<div class="lt-am-div"></div>' +
              (box ? box + '<div class="lt-am-div"></div>' : '') +
@@ -1505,7 +1597,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
   var ROLE_CSS = [
     '.lt-rd-back{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:990;display:flex;align-items:center;justify-content:center;padding:32px;animation:lt-rd-fade .15s ease-out;font-family:\'Noto Sans\',sans-serif}',
     '@keyframes lt-rd-fade{from{opacity:0}to{opacity:1}}',
-    '.lt-rd{background:#fff;border-radius:10px;box-shadow:0 0 20px rgba(0,0,0,.1);width:600px;max-width:100%;max-height:100%;overflow:auto;padding:24px 32px;display:flex;flex-direction:column;color:#262626}',
+    '.lt-rd{background:#fff;border-radius:var(--lt-modal-radius-sm,10px);box-shadow:var(--lt-shadow-dialog,0 0 6px rgba(0,0,0,.2));width:600px;max-width:100%;max-height:100%;overflow:auto;padding:24px 32px;display:flex;flex-direction:column;color:#262626}',
     '.lt-rd:focus{outline:none}',
     '.lt-rd-hd{display:flex;flex-direction:column;align-items:center;text-align:center}',
     '.lt-rd-ic{margin-bottom:15px;line-height:0}',
@@ -1852,29 +1944,23 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
 
   // ===== INIT =====
   /* 登入後的一次性 toast：Auth prototype 登入成功導回 Overview 前寫進 sessionStorage，
-     落地頁（任何用 shared topbar 的頁）讀到就顯示一次再清掉。樣式照 FE Toaster（bottom-left、成功 #008F88、5 秒） */
+     落地頁（任何用 shared topbar 的頁）讀到就顯示一次再清掉。樣式與行為見 shared/lumiture-toast.js */
+  var _TB_SRC = (document.currentScript && document.currentScript.src) || '';
+  function _withToast(cb) {   // 頁面沒引 lumiture-toast.js 時，從 topbar 同資料夾補載一次
+    if (window.LumitureToast) { cb(window.LumitureToast); return; }
+    if (!_TB_SRC) return;
+    var sc = document.createElement('script');
+    sc.src = _TB_SRC.replace(/lumiture-topbar\.js.*$/, 'lumiture-toast.js');
+    sc.onload = function () { if (window.LumitureToast) cb(window.LumitureToast); };
+    document.head.appendChild(sc);
+  }
   function _showPendingToast() {
     var raw = null;
     try { raw = sessionStorage.getItem('lt-pending-toast'); sessionStorage.removeItem('lt-pending-toast'); } catch (e) { return; }
     if (!raw) return;
     var msgs = []; try { msgs = JSON.parse(raw).msgs || []; } catch (e) { return; }
     if (!msgs.length) return;
-    var wrap = document.createElement('div');
-    wrap.style.cssText = 'position:fixed;left:var(--lt-toast-left,274px);bottom:24px;z-index:var(--lt-z-toast,1400);display:flex;flex-direction:column-reverse;gap:16px';
-    msgs.forEach(function (msg) {
-      var el = document.createElement('div');
-      el.setAttribute('role', 'status');
-      el.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 16px;width:400px;max-width:calc(100vw - 96px);' +
-        'background:#008F88;color:#fff;border-radius:4px;' +
-        'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);' +
-        'font-family:inherit;font-size:14px;line-height:24.5px;cursor:pointer';
-      el.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">check_circle</span><span></span>';
-      el.lastChild.textContent = msg;
-      el.addEventListener('click', function () { if (el.parentNode) el.parentNode.removeChild(el); });
-      wrap.appendChild(el);
-      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 5000);
-    });
-    document.body.appendChild(wrap);
+    _withToast(function (T) { msgs.forEach(function (msg) { T.show({ kind: 'success', message: msg }); }); });   // 2026-10-15 A-1：改用共用 LumitureToast
   }
 
   /* 換頁後（導回 Overview、或之後點 sidebar 去別頁）讓頁面套用剛切的角色：頁面有定義 LUMITURE_ROLE_CHANGE 才呼叫。
@@ -1892,6 +1978,112 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _init);
   } else { _init(); }
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-toast.js === */
+/*!
+ * lumiture-toast.js — 全站共用 Toast（2026-10-15 修正輪 A-1）
+ *
+ * 規格（FE libs/lumiture-ui/src/Toaster/toast.css＋Toaster.tsx，Figma GB #02-3／GL #18-3／EI #08／RS #06／RO #06 逐值一致）：
+ *   成功 #008F88、錯誤 #BF302E、info #0B6DD7、warning #EC6F09｜圓角 4｜寬 400｜最小高 46｜內距 8／16｜icon 20（check_circle／info／warning）
+ *   位置：左下，left = var(--lt-toast-left)（sidebar 展開 274／收合 45；沒有 sidebar 的頁面自動改 24），bottom 24｜z-index 4000（高於彈窗 2000、Demo FAB 999）
+ *   5 秒自動消失，點一下立即關閉｜可堆疊（新的在最下面，column-reverse，gap 16）｜字 14／400／行高 24.5
+ *
+ * 用法（頁面把自己的 toast() 換成這個，不要再各寫一套 CSS）：
+ *   <script src="../shared/lumiture-toast.js?v=2026-10-15"><\/script>        // 在 tokens.css／sidebar 之後、頁面 script 之前
+ *   LumitureToast.show({ kind: 'success', message: 'Budget saved successfully.' });
+ *   LumitureToast.success('…') / .error('…') / .info('…') / .warning('…')   // 簡寫
+ *   選項：duration（毫秒，預設 5000，0＝不自動關）、action:{label,onClick}（右側底線文字鈕，例如 Undo）、
+ *        extra:HTMLElement（第二行額外節點，2026-10-15 R1 加：toast 本體仍是一行文字，extra 另起一行、靠左對齊訊息文字；
+ *        給 prototype 專用的展示入口用，例如 Auth 的「Open this email (prototype)」，不是產品 UI，不要拿來放正式功能）
+ *   LumitureToast.clear()                                                    // 全部清掉（Demo 切情境時用）
+ *   回傳該 toast 元素；文案一律 textContent，不吃 HTML。
+ *
+ * 文案寫法：照稿原句。不要用 em dash。
+ */
+(function () {
+  'use strict';
+  if (window.LumitureToast) return;
+
+  var ICON = { success: 'check_circle', error: 'info', info: 'info', warning: 'warning' };   /* FE：error 也是 info icon */
+  var BG   = { success: '#008F88', error: '#BF302E', info: '#0B6DD7', warning: '#EC6F09' };
+
+  function _css() {
+    if (document.getElementById('lt-toast-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-toast-css';
+    s.textContent = [
+      '.lt-toast-wrap{position:fixed;left:var(--lt-toast-left,274px);bottom:24px;z-index:var(--lt-z-toast,4000);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif)}',
+      '.lt-toast{pointer-events:auto;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:var(--lt-toast-width,400px);max-width:calc(100vw - 96px);min-height:46px;padding:8px 16px;',
+      'border-radius:var(--lt-toast-radius,4px);color:#fff;cursor:pointer;',
+      'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);',   /* MUI shadows[1]，FE Toaster 的 inline style */
+      'animation:lt-toast-in .2s ease}',
+      '.lt-toast.is-success{background:var(--lt-toast-success-bg,#008F88)}',
+      '.lt-toast.is-error{background:var(--lt-toast-error-bg,#BF302E)}',
+      '.lt-toast.is-info{background:var(--lt-toast-info-bg,#0B6DD7)}',
+      '.lt-toast.is-warning{background:var(--lt-toast-warning-bg,#EC6F09)}',
+      '.lt-toast-ic{font-size:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;',
+      'font-family:\'Material Symbols Outlined\';font-weight:400;font-style:normal;line-height:1;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20;letter-spacing:normal;text-transform:none;white-space:nowrap;-webkit-font-feature-settings:\'liga\';font-feature-settings:\'liga\'}',
+      '.lt-toast-msg{flex:1;min-width:0;font-size:14px;font-weight:400;line-height:24.5px;color:#fff;overflow-wrap:anywhere}',
+      '.lt-toast-extra{flex:0 0 100%;display:flex;align-items:center;padding-left:28px;margin-top:-2px;padding-bottom:2px}',
+      '.lt-toast-act{flex-shrink:0;background:none;border:none;color:#fff;font:inherit;font-size:14px;font-weight:700;text-decoration:underline;cursor:pointer;padding:0 0 0 8px}',
+      '@keyframes lt-toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}',
+      '@media (prefers-reduced-motion:reduce){.lt-toast{animation:none}}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+
+  var _wrap = null;
+  function _getWrap() {
+    if (_wrap && _wrap.parentNode) return _wrap;
+    _css();
+    _wrap = document.createElement('div');
+    _wrap.className = 'lt-toast-wrap';
+    _wrap.setAttribute('aria-live', 'polite');
+    // 沒有 sidebar 的頁面（Auth、通知信展示頁）沒有 --lt-toast-left，改貼視窗左下 24（FE Toaster 預設位置）
+    try { if (!getComputedStyle(document.documentElement).getPropertyValue('--lt-toast-left').trim()) _wrap.style.left = '24px'; } catch (e) {}
+    (document.body || document.documentElement).appendChild(_wrap);
+    return _wrap;
+  }
+
+  function show(opts) {
+    if (typeof opts === 'string') opts = { message: opts };
+    opts = opts || {};
+    var kind = BG[opts.kind] ? opts.kind : 'success';
+    var el = document.createElement('div');
+    el.className = 'lt-toast is-' + kind;
+    el.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+    var ic = document.createElement('span'); ic.className = 'lt-toast-ic material-symbols-outlined'; ic.textContent = ICON[kind]; ic.setAttribute('aria-hidden', 'true');
+    var msg = document.createElement('span'); msg.className = 'lt-toast-msg'; msg.textContent = opts.message == null ? '' : String(opts.message);
+    el.appendChild(ic); el.appendChild(msg);
+    function close() { if (el.parentNode) el.parentNode.removeChild(el); }
+    if (opts.action && opts.action.label) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'lt-toast-act'; b.textContent = opts.action.label;
+      b.addEventListener('click', function (e) { e.stopPropagation(); try { if (opts.action.onClick) opts.action.onClick(); } finally { close(); } });
+      el.appendChild(b);
+    }
+    if (opts.extra && opts.extra.nodeType === 1) {
+      var row = document.createElement('div'); row.className = 'lt-toast-extra';
+      row.addEventListener('click', function (e) { e.stopPropagation(); });   // 點額外節點不要順便關掉 toast（例如連結要能點）
+      row.appendChild(opts.extra); el.appendChild(row);
+    }
+    el.addEventListener('click', close);
+    _getWrap().appendChild(el);
+    var d = opts.duration == null ? 5000 : opts.duration;
+    if (d > 0) setTimeout(close, d);
+    return el;
+  }
+
+  window.LumitureToast = {
+    show: show,
+    success: function (m, o) { return show(Object.assign({}, o, { kind: 'success', message: m })); },
+    error:   function (m, o) { return show(Object.assign({}, o, { kind: 'error',   message: m })); },
+    info:    function (m, o) { return show(Object.assign({}, o, { kind: 'info',    message: m })); },
+    warning: function (m, o) { return show(Object.assign({}, o, { kind: 'warning', message: m })); },
+    clear: function () { if (_wrap) _wrap.innerHTML = ''; }
+  };
 })();
 
 </script>
@@ -1971,6 +2163,8 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
     /* Arrow icon */
     '.curr-btn .material-symbols-outlined{font-size:16px;',
     'color:#676767;flex-shrink:0;transition:transform .15s}',
+    /* 2026-10-15 R1（A-11）：下拉箭頭統一實心 ▾（arrow_drop_down 24）。markup 加 class="curr-arrow" 才套用（舊頁面仍是 expand_more 16 的 chevron） */
+    '.curr-btn .curr-arrow{font-size:24px;margin:0 -4px 0 -2px}',
     '.curr-btn.cp-open .material-symbols-outlined{transform:rotate(180deg)}',
 
     /* Dropdown container — 4px gap per CMDS spec */
@@ -2363,7 +2557,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:13px;line-height:1.5
       var share = (d.share != null) ? (d.share * 100).toFixed(2) + '%' : '--';
       return '<tr>' +
                '<td class="col-rank">' + _esc(rankStr) + '</td>' +
-               '<td class="col-name" title="' + _esc(d.name) + '">' + _esc(d.name) + '</td>' +
+               '<td class="col-name" data-tip="' + _esc(d.name) + '">' + _esc(d.name) + '</td>' +
                '<td class="col-spend tx-right">' + _esc(spending) + '</td>' +
                '<td class="col-share tx-right">' + _esc(share) + '</td>' +
                (showChange ? changeCell(d) : '') +
@@ -2739,7 +2933,13 @@ function renderAll() {
   }
   mountSections();
 }
+/* A-4：skeleton 轉場結束後恢復頁首（以前只重畫三個 section，頁首的 disabled 沒拿掉，Month Picker 與截圖鈕一直灰） */
+function endHeaderLoading() {
+  const h = document.getElementById('ov-hdr'); if (h) h.classList.remove('is-loading');
+  document.querySelectorAll('#ov-hdr .icon-btn, #mp-trigger, #content .curr-btn').forEach(b => { b.disabled = false; });
+}
 function mountSections() {
+  endHeaderLoading();
   document.getElementById('sec-overview').innerHTML = overviewBodyHtml();
   document.getElementById('sec-optimize').innerHTML = optimizeHtml();
   document.getElementById('sec-focus').innerHTML = focusHtml();
@@ -2776,10 +2976,11 @@ function mainHtml(skeleton) {
   return `
   <div class="sections">
     <section>
-      <div class="pg-hdr">
+      <div class="pg-hdr${skeleton ? ' is-loading' : ''}" id="ov-hdr">
         <h1 class="pg-title">${COPY.title}</h1>
         <div class="upd">
-          <div class="upd-times"><span>Last Updated ${prev}</span><span>Next Update ${next}</span></div>
+          <span class="lt-skeleton lt-skeleton--line upd-sk" style="width:160px"></span>
+          <div class="upd-times upd-real"><span>Last Updated ${prev}</span><span>Next Update ${next}</span></div>
           <span class="material-symbols-outlined ic-info" data-tip="${esc(COPY.updateAtTip)}">info</span>
         </div>
         <button class="icon-btn" data-tip="${COPY.screenshotTip}" aria-label="${COPY.screenshotTip}" onclick="takeScreenshot()" ${disabled}>${SCREENSHOT_SVG}</button>
@@ -2787,15 +2988,15 @@ function mainHtml(skeleton) {
       <div class="pg-sub">
         <p class="disclaimer">Please note that LumiTure.ai values may slightly differ from your console<br>due to variations in cloud provider time zones, currency settings, and the <strong>EXCLUSION OF CREDITS</strong> on this page. (<span class="lm" data-tip="${esc(COPY.learnMore)}">Learn More</span>)</p>
         <div class="pg-sub-r">
-          <button class="curr-btn" onclick="CurrencyPicker.open(this, state.currency, setCurrency)" title="Change currency">
+          <button class="curr-btn" onclick="CurrencyPicker.open(this, state.currency, setCurrency)" data-tip="Change currency" aria-label="Change currency" ${disabled}>
             <span class="curr-flag">${c ? c.flag : ''}</span>
             <span class="curr-code">${state.currency}</span>
-            <span class="material-symbols-outlined">expand_more</span>
+            <span class="material-symbols-outlined curr-arrow">arrow_drop_down</span>
           </button>
           <div class="mp-wrap" id="mp-wrap">
-            <button class="mp-trig" id="mp-trigger" onclick="toggleMonthPicker(event)" data-tip="${esc(COPY.monthPickerTip)}" aria-haspopup="dialog" aria-expanded="false" ${disabled}>
-              <span style="display:inline-flex;align-items:center;gap:8px"><span class="material-symbols-outlined mp-cal">calendar_month</span><span id="mp-val">${monthLabel(state.period.year, state.period.month)}</span></span>
-              <span class="material-symbols-outlined">expand_more</span>
+            <button class="mp-trig lt-select" id="mp-trigger" onclick="toggleMonthPicker(event)" data-tip="${esc(COPY.monthPickerTip)}" aria-haspopup="dialog" aria-expanded="false" ${disabled}>
+              <span class="lt-select__v" style="display:inline-flex;align-items:center;gap:8px"><span class="material-symbols-outlined mp-cal">calendar_month</span><span id="mp-val">${monthLabel(state.period.year, state.period.month)}</span></span>
+              <span class="material-symbols-outlined lt-select__arrow">arrow_drop_down</span>
             </button>
             <div class="mp-pop" id="mp-pop" role="dialog" aria-label="Select month"></div>
           </div>
@@ -2808,24 +3009,50 @@ function mainHtml(skeleton) {
   </div>`;
 }
 
-/* ---- Skeletons（卡片外框留著，內容 shimmer；對齊每張卡真實高度） ---- */
+/* ---- Skeletons（稿 #11 `8789:36229`）：卡片外框與標題照常、按鈕／下拉 disabled、內容換成圖表形狀的 skeleton；
+ * 與實際讀出的內容數量無關，是固定的讀取畫面。靜態、色 --lt-color-bg-skeleton（shared .lt-skeleton） ---- */
+const skb = (w, h, st = '') => `<span class="lt-skeleton" style="display:block;width:${w};height:${h}px;${st}"></span>`;
+function skBars(heights, h) {   // 柱狀 skeleton：左邊 Y 軸刻度、中間柱、底下 X 軸刻度
+  const ys = [0, 1, 2, 3, 4].map(() => skb('24px', 10)).join('');
+  const bars = heights.map(p => `<span class="lt-skeleton" style="flex:1;height:${p}%;border-radius:2px 2px 0 0"></span>`).join('');
+  return `<div style="display:flex;gap:16px;height:${h}px"><div style="display:flex;flex-direction:column;justify-content:space-between;padding:6px 0 26px">${ys}</div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px"><div style="flex:1;display:flex;align-items:flex-end;gap:24px;padding:0 12px;border-left:1px solid var(--lt-grey-200);border-bottom:1px solid var(--lt-grey-200)">${bars}</div>
+    <div style="display:flex;gap:24px;padding:0 12px;height:10px">${heights.map(() => `<span style="flex:1">${skb('70%', 8, 'margin:0 auto')}</span>`).join('')}</div></div></div>`;
+}
+const SK_H = [38, 44, 55, 56, 66, 68, 67, 92, 70, 85, 96, 80];
 function overviewSkeletonHtml() {
-  const kpi = () => `<div class="card kpi"><div class="sk sk-text" style="width:45%;margin-bottom:24px"></div><div class="sk" style="height:36px;width:70%;margin-bottom:16px"></div><div class="sk sk-text" style="width:55%;margin-left:auto"></div></div>`;
+  const kpi = (c) => `<div class="card kpi"><div class="kpi-lbl">${c.title}</div>${skb('100%', 36, 'margin-bottom:16px')}${skb('100%', 10, 'margin-bottom:12px')}${skb('45%', 10, 'margin-left:auto')}</div>`;
+  const area = `<div style="flex:1;min-height:0;display:flex;gap:16px"><div style="display:flex;flex-direction:column;justify-content:space-between;padding:6px 0 26px">${[0, 1, 2].map(() => skb('24px', 10)).join('')}</div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px"><span class="lt-skeleton" style="flex:1;border-radius:0;clip-path:polygon(0 52%,10% 44%,20% 50%,30% 38%,40% 46%,50% 30%,58% 56%,70% 40%,80% 48%,100% 42%,100% 100%,0 100%)"></span>
+    <div style="display:flex;gap:12px;height:10px">${Array.from({ length: 12 }, () => skb('100%', 8, 'flex:1')).join('')}</div></div></div>`;
   return `<div class="ov-grid">
-    <div class="card tc"><div class="tc-hdr"><div class="sk sk-text" style="width:120px;height:18px"></div><div class="sk sk-text" style="width:160px"></div></div><div class="sk sk-text" style="width:80px"></div><div class="sk sk-block" style="flex:1"></div></div>
-    <div class="kpi-grid">${kpi()}${kpi()}${kpi()}${kpi()}</div>
+    <div class="card tc"><div class="tc-hdr"><div class="card-title">${COPY.totalCost.title}</div>${skb('160px', 14)}</div>${skb('80px', 12)}${area}</div>
+    <div class="kpi-grid">${COPY.cards.map(kpi).join('')}</div>
   </div>`;
 }
-function ccSkeletonHtml(bodyH, minH) {
-  return `<div class="card cc" style="min-height:${minH}px">
-    <div class="cc-hdr"><div class="sk sk-text" style="width:240px;height:18px"></div><div class="sk" style="width:180px;height:36px;margin-left:auto"></div></div>
-    <div class="cc-meta"><div class="sk sk-text" style="width:80px"></div><div class="sk sk-text" style="width:150px"></div></div>
-    <div class="sk sk-block" style="height:${bodyH}px"></div></div>`;
+function ccSkeletonHtml(o) {   // o: { title, tip, btn, minH, body }
+  return `<div class="card cc" style="min-height:${o.minH}px">
+    <div class="cc-hdr"><div class="card-title">${o.title}${o.tip ? `<span class="material-symbols-outlined ic-info">info</span>` : ''}</div>
+      ${o.btn ? `<div class="cc-actions"><button class="btn btn-o" disabled><span class="material-symbols-outlined" style="transform:rotate(90deg)">bar_chart</span>${COPY.top10.btn}</button></div>` : ''}
+      ${freqSelectorHtml(true)}</div>
+    <div class="cc-meta">${skb('40px', 12)}${skb('150px', 14)}</div>
+    <div class="cc-body">${o.body}</div></div>`;
 }
 function optimizeSkeletonHtml() {
-  return `<div class="sections">${state.availableActions.viewSpendingRanking ? ccSkeletonHtml(400, 540) : ''}${ccSkeletonHtml(140, 320)}</div>`;
+  const top = state.availableActions.viewSpendingRanking ? ccSkeletonHtml({ title: COPY.top10.title, btn: true, minH: 540,
+    body: skBars(SK_H, 400) + `<div style="margin:24px auto 0;display:flex;flex-direction:column;align-items:center;gap:6px">${skb('140px', 14)}${skb('480px', 8)}${skb('420px', 8)}</div>` }) : '';
+  const cloud = ccSkeletonHtml({ title: COPY.byCloud.title, minH: 320, body: skBars(SK_H, 140) + `<div style="margin:12px auto 0">${skb('240px', 12)}</div>` });
+  return `<div class="sections">${top}${cloud}</div>`;
 }
-function focusSkeletonHtml() { return ccSkeletonHtml(388, 280); }
+function focusSkeletonHtml() {
+  const rows = Array.from({ length: 10 }, () => `<div style="display:flex;gap:12px;padding:6px 12px">${skb('100%', 10, 'flex:3')}${skb('100%', 10, 'flex:1')}${skb('100%', 10, 'flex:1')}${skb('100%', 10, 'flex:1')}</div>`).join('');
+  const tm = `<div style="display:grid;grid-template-columns:2.2fr 1.7fr .8fr;grid-template-rows:1fr 1fr 1fr 1fr;gap:3px;height:388px;border-radius:4px;overflow:hidden">
+    <span class="lt-skeleton" style="grid-column:1;grid-row:1/5;border-radius:0"></span><span class="lt-skeleton" style="grid-column:2;grid-row:1/3;border-radius:0"></span><span class="lt-skeleton" style="grid-column:3;grid-row:1/3;border-radius:0"></span>
+    <span class="lt-skeleton" style="grid-column:2;grid-row:3/5;border-radius:0"></span><span class="lt-skeleton" style="grid-column:3;grid-row:3;border-radius:0"></span><span class="lt-skeleton" style="grid-column:3;grid-row:4;border-radius:0"></span></div>`;
+  return ccSkeletonHtml({ title: COPY.focus.title, tip: true, minH: 280,
+    body: `<div style="display:grid;grid-template-columns:1fr 452px;gap:24px"><div style="display:flex;flex-direction:column;gap:12px">${tm}<div style="margin:0 auto">${skb('200px', 10)}</div></div>
+    <div style="border:1px solid var(--lt-grey-200);border-radius:8px;padding:12px 0;height:388px;overflow:hidden">${skb('calc(100% - 24px)', 18, 'margin:0 12px 8px')}${rows}</div></div>` });
+}
 
 /* ============================================================
  * 5. Cost Overview section（TotalCost + 4 KPI）
@@ -2842,7 +3069,7 @@ function totalCostCardHtml(d, isErr, isEmpty) {
   let body;
   if (isErr) body = emptyStateHtml('error', COPY.empty.error, true);
   else if (isEmpty) body = emptyStateHtml('chart', COPY.empty.chart, true);
-  else body = `<div class="tc-chart chart-box" id="tc-chart"></div>`;
+  else body = `<div class="tc-chart chart-box" id="tc-chart"></div><div class="leg tc-leg" id="tc-leg"></div>`;
   return `<div class="card tc">
     <div class="tc-hdr">
       <div class="card-title">${COPY.totalCost.title}</div>
@@ -2908,6 +3135,7 @@ function mountTotalCostChart(d) {
   };
   const maxAcc = Math.max(...acc, 0);
   const yMax = (budget !== null && budgetC > maxAcc) ? budgetC : undefined;
+  mountTotalCostLegend(cfg, budget !== null);   // 先放圖例再 init：圖例佔高度，chart 容器才會是縮小後的尺寸
   charts.tc = echarts.init(el);
   charts.tc.setOption({
     animation: true,
@@ -2922,9 +3150,8 @@ function mountTotalCostChart(d) {
         ]);
       },
     },
-    legend: { icon: 'rect', itemWidth: 16, itemHeight: 12, bottom: '5%', align: 'left', textStyle: { fontFamily: 'Noto Sans', fontSize: 12, color: '#262626' },
-              data: [COPY.status.ytd, COPY.status.actual, COPY.status.over, COPY.status.forecast, COPY.status.overForecast] },
-    grid: { left: '0%', right: '3%', top: '8%', bottom: '25%', containLabel: true },
+    legend: { show: false, data: [COPY.status.ytd, COPY.status.actual, COPY.status.over, COPY.status.forecast, COPY.status.overForecast] },   // A-43：圖例改成下方 HTML（每行置中），這裡只留元件讓 legendToggleSelect 有效
+    grid: { left: '0%', right: '3%', top: '8%', bottom: '3%', containLabel: true },
     xAxis: { type: 'category', data: MONTH_LABELS, axisLabel: { color: CHART.axisText, fontFamily: 'Noto Sans' }, axisLine: { lineStyle: { color: CHART.splitLine } }, axisTick: { show: false } },
     yAxis: { type: 'value', ...(yMax !== undefined && { max: yMax }), splitNumber: 3,
              axisLabel: { color: CHART.axisText, fontFamily: 'Noto Sans', formatter: (v) => axisLabel(v) },
@@ -2941,6 +3168,24 @@ function mountTotalCostChart(d) {
   });
 }
 
+/* A-43：Total Cost 圖例。ECharts 內建圖例換行時第一行置中、最後一項單獨靠左（像漏排），改成 HTML flex 置中、可點擊開關（稿 #01：五項一行，放不下就整體置中換行）。
+ * 稿註記：沒設預算就不顯示跟預算相關的圖例（Overspend／Overspend Forecast） */
+function mountTotalCostLegend(cfg, hasBudget) {
+  const el = document.getElementById('tc-leg'); if (!el) return;
+  const ytd = { name: COPY.status.ytd, sw: `background:linear-gradient(180deg,${CHART.ytd.top},${CHART.ytd.bottom})` };
+  const sw = (k) => { const c = cfg[k].itemStyle; return `background:${c.color};${c.borderColor ? `border:1px dashed ${c.borderColor}` : ''}`; };
+  const items = [ytd, { name: cfg.actual.name, sw: sw('actual') }];
+  if (hasBudget) items.push({ name: cfg.over.name, sw: sw('over') });
+  items.push({ name: cfg.forecast.name, sw: sw('forecast') });
+  if (hasBudget) items.push({ name: cfg.overForecast.name, sw: sw('overForecast') });
+  el.innerHTML = items.map(it => `<button type="button" class="leg-item leg-btn" data-n="${esc(it.name)}" aria-pressed="true"><span class="leg-sw" style="${it.sw}"></span>${esc(it.name)}</button>`).join('');
+  el.querySelectorAll('.leg-btn').forEach(b => b.addEventListener('click', () => {
+    if (!charts.tc) return;
+    charts.tc.dispatchAction({ type: 'legendToggleSelect', name: b.dataset.n });
+    const off = b.classList.toggle('off'); b.setAttribute('aria-pressed', off ? 'false' : 'true');
+  }));
+}
+
 /* 白底 chart tooltip（Guideline Chart Tooltip：白底 + 1px #E6E6E6 + radius 8 + shadow；FE 也是白底 min-width 240） */
 function chartTip(title, rows, footer) {
   return `<div style="min-width:240px;max-width:580px;padding:8px;background:#fff;border:1px solid #E6E6E6;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.08);font-family:'Noto Sans',sans-serif;font-size:12px;color:#262626;line-height:1.5">
@@ -2953,12 +3198,12 @@ function chartTip(title, rows, footer) {
 /* ============================================================
  * 6. Optimize Cloud Spend（Top 10 + Cost by Cloud）
  * ============================================================ */
-function freqSelectorHtml() {
-  const disabled = state.pageState === 'sec-loading';
+function freqSelectorHtml(forceDisabled) {
+  const disabled = forceDisabled || state.pageState === 'sec-loading';
   const opt = COPY.freq.options.find(o => o.v === state.freq);
   return `<div class="dd" id="freq-dd">
     <span class="dd-label">${COPY.freq.label}</span>
-    <button class="dd-trig" onclick="toggleFreq(event)" aria-haspopup="listbox" ${disabled ? 'disabled' : ''}><span>${opt.label}</span><span class="material-symbols-outlined">expand_more</span></button>
+    <button class="dd-trig lt-select" onclick="toggleFreq(event)" aria-haspopup="listbox" ${disabled ? 'disabled' : ''}><span class="lt-select__v">${opt.label}</span><span class="material-symbols-outlined lt-select__arrow">arrow_drop_down</span></button>
     <div class="dd-list" role="listbox">${COPY.freq.options.map(o => `<div class="dd-item${o.v === state.freq ? ' sel' : ''}" role="option" aria-selected="${o.v === state.freq}" onclick="setFreq('${o.v}')">${o.label}</div>`).join('')}</div>
   </div>`;
 }
@@ -2982,25 +3227,38 @@ function optimizeHtml() {
   const cards = [];
   if (state.availableActions.viewSpendingRanking) {
     let body, buttons = '';
-    if (isErr) body = emptyStateHtml('error', COPY.empty.error);
-    else if (isEmpty) body = emptyStateHtml('chart', COPY.empty.chart);
+    if (isErr) body = emptyStateHtml('error', COPY.empty.error, true);
+    else if (isEmpty) body = emptyStateHtml('chart', COPY.empty.chart, true);
     else {
       body = `<div class="chart-box" id="top10-chart" style="height:400px"></div><div class="chart-note">${esc(COPY.top10.note)}</div>`;
       buttons = `<button class="btn btn-o" data-tip="${COPY.top10.btnTip}" onclick="goSpendingRankings()"><span class="material-symbols-outlined" style="transform:rotate(90deg)">bar_chart</span>${COPY.top10.btn}</button>`;
     }
-    cards.push(cardContainerHtml({ title: COPY.top10.title, minHeight: 540, showCurrency: !isErr && !isEmpty, buttons, body }));
+    cards.push(cardContainerHtml({ title: COPY.top10.title, minHeight: (isErr || isEmpty) ? 320 : 540, showCurrency: !isErr && !isEmpty, buttons, body }));
   }
   let body2;
-  if (isErr) body2 = emptyStateHtml('error', COPY.empty.error);
-  else if (isEmpty) body2 = emptyStateHtml('chart', COPY.empty.chart);
+  if (isErr) body2 = emptyStateHtml('error', COPY.empty.error, true);   // A-39②：稿 #03／#05 兩張卡跟 Total Cost 差不多高（約 320），不保留圖表高度
+  else if (isEmpty) body2 = emptyStateHtml('chart', COPY.empty.chart, true);
   else body2 = `<div class="chart-box" id="bycloud-chart" style="height:140px"></div>
-      <div class="leg">
-        <span class="leg-item"><span class="leg-sw" style="background:${CHART.legendGray}"></span>${COPY.byCloud.legend[0]}</span>
-        <span class="leg-item"><span class="leg-sw" style="background:${CHART.legendGrayBg};border:1px dashed ${CHART.legendGray}"></span>${COPY.byCloud.legend[1]}</span>
-        <span class="leg-item"><span class="leg-sw" style="background:${CHART.alert.main}"></span>${COPY.byCloud.legend[2]}</span>
-      </div>`;
+${byCloudLegendHtml()}`;
   cards.push(cardContainerHtml({ title: COPY.byCloud.title, minHeight: 320, showCurrency: !isErr && !isEmpty, body: body2 }));
   return `<div class="sections">${cards.join('')}</div>`;
+}
+
+/* A-39①（稿 #01 註記＋Legend 元件 `9502:43239`）：圖例分雲「Actual Cost (Google Cloud)」「Remaining Budget (Google Cloud)」…，
+ * 只列「有出現的內容」：有預算才有 Remaining Budget、有超標才有 Budget Overrun 紅色項。X 軸與 tooltip 標題寫 Google Cloud／AWS／Azure。 */
+function byCloudLegendHtml() {
+  const src = BY_CLOUD[state.freq];
+  const sw = (bg, bd) => `<span class="leg-sw" style="background:${bg};${bd ? `border:1px dashed ${bd}` : ''}"></span>`;
+  const items = [];
+  let over = false;
+  Object.keys(src).forEach(k => {
+    const d = src[k], p = PLATFORM[k];
+    if (typeof d.cost === 'number') items.push(`<span class="leg-item">${sw(p.color)}Actual Cost (${p.label})</span>`);
+    if (typeof d.budget === 'number') items.push(`<span class="leg-item">${sw(p.budget.color, p.budget.border)}Remaining Budget (${p.label})</span>`);
+    if (typeof d.cost === 'number' && typeof d.budget === 'number' && d.cost > d.budget) over = true;
+  });
+  if (over) items.push(`<span class="leg-item">${sw(CHART.alert.main)}${COPY.byCloud.legend[2]}</span>`);
+  return `<div class="leg">${items.join('')}</div>`;
 }
 
 /* ---- 排名圖共用：series、tooltip、Hovering 灰底（Top 10 與子頁 Full Group Spending Ranking 完全相同；稿：「定義與操作與 Overview 中的 Top 10 完全相同（包含 Hovering）」）
@@ -3118,11 +3376,11 @@ function mountByCloudChart() {
         ];
         const diff = d.cost - d.budget;
         if (diff > 0) rows.push({ html: `<span style="${sw(CHART.alert.main)}"></span>Budget Overrun`, value: money(diff), valueStyle: `color:${CHART.alert.main}` });
-        return chartTip(PLATFORM[k].abbr, rows);
+        return chartTip(PLATFORM[k].label, rows);
       } },
     legend: { show: false },
     grid: { left: 20, right: 0, bottom: 0, top: 20, containLabel: true },
-    xAxis: { type: 'category', boundaryGap: true, data: clouds.map(k => PLATFORM[k].abbr), axisTick: { show: false },
+    xAxis: { type: 'category', boundaryGap: true, data: clouds.map(k => PLATFORM[k].label), axisTick: { show: false },
              axisLabel: { interval: 0, color: CHART.axisText, width: 80, overflow: 'truncate', fontFamily: 'Noto Sans' }, axisLine: { lineStyle: { color: CHART.axisLine } } },
     yAxis: { type: 'value', max: maxValue ? maxValue * 1.1 : undefined, interval: maxValue ? (maxValue * 1.1) / 2 : undefined,
              axisLabel: { color: CHART.axisText, fontFamily: 'Noto Sans', formatter: (v) => axisLabel(v) }, splitLine: { lineStyle: { type: 'dashed', color: CHART.splitLine } } },
@@ -3273,12 +3531,7 @@ function takeScreenshot() {
 }
 
 function toast(kind, msg) {
-  const wrap = document.getElementById('toast-wrap');
-  const el = document.createElement('div');
-  el.className = `toast ${kind === 'error' ? 'err' : kind === 'info' ? 'info' : ''}`;
-  el.innerHTML = `<span class="material-symbols-outlined">${kind === 'error' ? 'error' : kind === 'info' ? 'info' : 'check_circle'}</span><span>${esc(msg)}</span>`;
-  wrap.appendChild(el);
-  setTimeout(() => { el.style.transition = 'opacity .25s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 260); }, 4200);
+  LumitureToast.show({ kind: kind === 'error' ? 'error' : kind === 'info' ? 'info' : 'success', message: msg });
 }
 
 /* ============================================================
@@ -3368,18 +3621,18 @@ const RK_SHOT_SVG = '<svg viewBox="0 0 18 18" aria-hidden="true"><path fill="cur
 function rkBackHtml() { return `<button class="rk-back" onclick="goOverview()">${RK_BACK_SVG}<span class="t">${COPY.rank.back}</span></button>`; }
 function rkTopHtml(withCurrency) {
   const c = window.CurrencyPicker ? CurrencyPicker.CURRENCIES.find(x => x.code === state.currency) : null;
-  return `<div class="rk-top">${rkBackHtml()}${withCurrency ? `<button class="curr-btn" onclick="CurrencyPicker.open(this, state.currency, setCurrency)" title="Change currency"><span class="curr-flag">${c ? c.flag : ''}</span><span class="curr-code">${state.currency}</span><span class="material-symbols-outlined">expand_more</span></button>` : ''}</div>`;
+  return `<div class="rk-top">${rkBackHtml()}${withCurrency ? `<button class="curr-btn" onclick="CurrencyPicker.open(this, state.currency, setCurrency)" data-tip="Change currency" aria-label="Change currency"><span class="curr-flag">${c ? c.flag : ''}</span><span class="curr-code">${state.currency}</span><span class="material-symbols-outlined curr-arrow">arrow_drop_down</span></button>` : ''}</div>`;
 }
 function rkFreqHtml(disabled) {
   const opt = COPY.freq.options.find(o => o.v === state.freq);
   return `<div class="dd sm" id="freq-dd">
     <span class="dd-label">${COPY.freq.label}</span>
-    <button class="dd-trig" onclick="toggleFreq(event)" aria-haspopup="listbox" ${disabled ? 'disabled' : ''}><span>${opt.label}</span><span class="rk-tri"></span></button>
+    <button class="dd-trig lt-select" onclick="toggleFreq(event)" aria-haspopup="listbox" ${disabled ? 'disabled' : ''}><span class="lt-select__v">${opt.label}</span><span class="material-symbols-outlined lt-select__arrow">arrow_drop_down</span></button>
     <div class="dd-list" role="listbox">${COPY.freq.options.map(o => `<div class="dd-item${o.v === state.freq ? ' sel' : ''}" role="option" aria-selected="${o.v === state.freq}" onclick="setFreq('${o.v}')">${o.label}</div>`).join('')}</div>
   </div>`;
 }
 function rkSkeletonHtml(left) {
-  const rows = Array.from({ length: 10 }, (_, i) => `<div class="rk-sk-row"><div class="sk sk-text rk-sk-lbl" style="width:${150 - (i % 3) * 22}px"></div><div class="rk-sk-bars"><div class="sk" style="height:15px;width:${92 - i * 7}%"></div><div class="sk" style="height:15px;width:${68 - (i % 4) * 4}%"></div></div></div>`).join('');
+  const rows = Array.from({ length: 10 }, (_, i) => `<div class="rk-sk-row"><div class="lt-skeleton lt-skeleton--line rk-sk-lbl" style="width:${150 - (i % 3) * 22}px"></div><div class="rk-sk-bars"><div class="lt-skeleton" style="height:15px;width:${92 - i * 7}%"></div><div class="lt-skeleton" style="height:15px;width:${68 - (i % 4) * 4}%"></div></div></div>`).join('');
   return `<div class="rk-wrap" style="--rk-left:${left}px" role="status" aria-live="polite" aria-label="Loading">${rows}</div>`;
 }
 function rankingsHtml() {
@@ -3396,7 +3649,7 @@ function rankingsHtml() {
   const chart = groups.length > 0;
   const { prev, next } = rkUpdateTimes();
   const series = chart ? rankSeries(groups) : [];
-  const skLegend = sk ? [60, 40, 44, 64].map(w => `<span class="sk sk-text" style="width:${w + 28}px;height:12px"></span>`).join('') : '';
+  const skLegend = sk ? [60, 40, 44, 64].map(w => `<span class="lt-skeleton lt-skeleton--line" style="width:${w + 28}px;height:12px"></span>`).join('') : '';
   const legend = skLegend || rankLegendNames(series).map(n => series.find(x => x.name === n)).map(x => `<span class="rk-leg-item"><span class="rk-leg-sw" style="background:${x.itemStyle.color}"></span>${x.name}</span>`).join('');   // 圖例照稿 GCP → AWS → Azure（堆疊順序另外是 Azure 貼軸）
   let body;
   if (sk) body = rkSkeletonHtml(left);
@@ -3614,6 +3867,7 @@ window.DEMO_APPLY = function (id) {
  *     isNoData:  boolean?,         // groups under "no data" sub-divider
  *     group:     string?,          // 2026-09-30：同一頁內的分組小標（依第一次出現的順序排）。沒寫 group 的頁面行為完全不變
  *     disabled:  boolean?,         // shows "Soon" badge, not clickable
+ *     onLeave:   function?,        // 2026-10-15：切走這個情境時呼叫 onLeave(nextId)，用來重設它留下的模組狀態（另有全域 window.DEMO_ON_LEAVE(prevId, nextId)）
  *   }
  *
  * Programmatic API:
@@ -3907,7 +4161,7 @@ window.DEMO_APPLY = function (id) {
     var fabEl = document.createElement('button');
     fabEl.className = 'demo-fab';
     fabEl.id = 'demo-fab';
-    fabEl.title = 'Designer Demo Scenarios';
+    fabEl.setAttribute('data-tip', 'Designer Demo Scenarios');   /* 原生 title 改 data-tip（#gl-tip），B 區 A-15 */
     fabEl.innerHTML =
       '<span class="material-symbols-outlined">science</span>' +
       '<span class="demo-pulse" id="demo-fab-pulse"></span>';
@@ -4094,8 +4348,46 @@ window.DEMO_APPLY = function (id) {
     window._demoFabSetPage(pageId);
   };
 
+  /** onLeave 鉤子（2026-10-15）：切走上一個情境時先呼叫它，讓頁面把該情境塞進模組狀態的東西重設掉（避免 Demo 殘留，例如 RS 先點 um-* 再開 modal-detail）。
+   *   寫法一：scenario.onLeave = function (nextId) {…}　寫法二：window.DEMO_ON_LEAVE = function (prevId, nextId) {…}（兩種都會呼叫，先 scenario 後全域）
+   *   觸發點有兩個：點 FAB 按鈕（_demoFabApply）與「直接呼叫 window.DEMO_APPLY(id)」（下面的 DEMO_APPLY 包裝，第二輪 R1 加，讓 sweep 工具也量得到殘留）。 */
+  function _runLeave(id) {
+    var prevId = _activeScenario;
+    if (prevId && prevId !== id) {
+      try {
+        var prev = (window.DEMO_SCENARIOS || []).filter(function (s) { return s.id === prevId; })[0];
+        if (prev && typeof prev.onLeave === 'function') prev.onLeave(id);
+        if (typeof window.DEMO_ON_LEAVE === 'function') window.DEMO_ON_LEAVE(prevId, id);
+      } catch (e) { console.error('[demo-fab] onLeave', e); }
+    }
+  }
+
+  /** 包住頁面的 window.DEMO_APPLY：直接呼叫（不經 FAB）時也先跑 onLeave，並記下目前情境。
+   *  經 _demoFabApply 進來的呼叫用 _inFabApply 旗標略過，所以 onLeave 不會被呼叫兩次。
+   *  頁面不論在 demo-fab.js 載入前或後指定 window.DEMO_APPLY = fn 都會被攔到（accessor 屬性）。 */
+  var _inFabApply = false;
+  (function _wrapDemoApply() {
+    var raw = window.DEMO_APPLY, wrapped = null, wrappedFor = null;
+    function get() {
+      if (typeof raw !== 'function') return raw;
+      if (wrappedFor !== raw) {
+        wrappedFor = raw;
+        wrapped = function (id) {
+          if (!_inFabApply) { _runLeave(id); _activeScenario = id; }
+          return raw.apply(this, arguments);
+        };
+      }
+      return wrapped;
+    }
+    try {
+      Object.defineProperty(window, 'DEMO_APPLY', { configurable: true, enumerable: true, get: get, set: function (fn) { raw = fn; } });
+    } catch (e) { /* 屬性不可重定義（極少見）：退回不包裝，只剩 FAB 點擊會觸發 onLeave */ }
+  })();
+
   /** Apply a scenario — called via event delegation or by host */
   window._demoFabApply = function (id, btn) {
+    _runLeave(id);
+    if (window.LumitureToast && window.LumitureToast.clear) { try { window.LumitureToast.clear(); } catch (e) {} }   // 換情境時清掉上一個情境留下的 toast
     _activeScenario = id;
     document.querySelectorAll('.demo-btn').forEach(function (b) {
       b.classList.remove('active');
@@ -4108,7 +4400,8 @@ window.DEMO_APPLY = function (id) {
       if (found) found.classList.add('active');
     }
     if (typeof window.DEMO_APPLY === 'function') {
-      window.DEMO_APPLY(id, btn);
+      _inFabApply = true;
+      try { window.DEMO_APPLY(id, btn); } finally { _inFabApply = false; }
     }
   };
 

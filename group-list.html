@@ -101,8 +101,11 @@
   --lt-radius-none:   0;
   --lt-radius-xs:     3px;      /* chips / badges / 薄狀指示器 (源自 lumi-tag v7 5 處用法) */
   --lt-radius-sm:     4px;
+  --lt-radius-btn:    5px;      /* 2026-10-15 B-8：按鈕／輸入框／下拉觸發欄（FE muiButton、Figma CMDS 都是 5） */
   --lt-radius-md:     8px;
   --lt-radius-lg:     12px;
+  --lt-radius-modal-sm: 10px;   /* 2026-10-15 B-4：確認類彈窗（Remove／Discard／Select Role） */
+  --lt-radius-modal:  15px;     /* 2026-10-15 B-4：表單類彈窗（稿量到 15） */
   --lt-radius-xl:     16px;
   --lt-radius-pill:   9999px;   /* pill button / chip — 矩形元素的最大圓角 */
   --lt-radius-circle: 50%;      /* 圓形 icon / avatar / toggle dot — 形狀無關 */
@@ -189,9 +192,10 @@
   --lt-color-text-primary:   var(--lt-grey-700);   /* 內文預設 */
   --lt-color-text-secondary: var(--lt-grey-500);   /* 次要文字 */
   --lt-color-text-tertiary:  var(--lt-grey-400);   /* hint / placeholder */
-  --lt-color-text-disabled:  var(--lt-grey-400);
+  --lt-color-text-disabled:  var(--lt-grey-400);   /* 白底上的停用文字／icon；停用「按鈕」的字用 --lt-button-disabled-text（白） */
   --lt-color-text-inverse:   var(--lt-white);
-  --lt-color-text-link:      var(--lt-blue-60);
+  --lt-color-text-link:      var(--lt-blue-70);    /* 2026-10-15 B-14：#0B6DD7 → #004FB0，連結一律加底線（稿 cell、FE ResourceButton） */
+  --lt-color-text-link-hover: var(--lt-blue-60);   /* hover 淺一階 #0B6DD7，底線保留 */
   --lt-color-text-heading:   var(--lt-grey-800);   /* 為未來 heading 獨立換色預留 */
   --lt-color-text-icon:      var(--lt-grey-600);   /* 為未來 icon 獨立換色預留 */
 
@@ -199,7 +203,8 @@
   --lt-color-bg-default:    var(--lt-white);
   --lt-color-bg-subtle:     var(--lt-grey-50);
   --lt-color-bg-emphasized: var(--lt-grey-100);
-  --lt-color-bg-disabled:   var(--lt-grey-100);
+  --lt-color-bg-disabled:   var(--lt-grey-100);   /* 停用的「欄位」底（輸入框／下拉，FE SelectButton gray.disableLight）。2026-10-15 B-1：停用「按鈕」改用 FE 版 #CCCCCC 底白字，見 --lt-button-disabled-bg／-text；這顆維持 #F2F2F2，不然舊頁 `.btn:disabled` 用它當底又用 #CCCCCC 當字會變灰壓灰 */
+  --lt-color-text-on-disabled: var(--lt-white);   /* 停用按鈕上的字（= --lt-button-disabled-text） */
   --lt-color-bg-inverse:    var(--lt-blue-90);
   --lt-color-bg-overlay:    rgba(0, 0, 0, 0.5);
   --lt-color-bg-skeleton:   var(--lt-grey-200);   /* 骨架屏；2026-09-24 定，對應前端 gray.skeleton → gray.10；用途命名，日後可單獨換色 */
@@ -208,7 +213,8 @@
   --lt-color-border-default: var(--lt-grey-200);
   --lt-color-border-strong:  var(--lt-grey-300);
   --lt-color-border-focus:   var(--lt-color-primary);
-  --lt-color-border-input:   #DCE3EC;   /* prototype --tf-border；略不同於 grey-200 */
+  --lt-color-border-input:   var(--lt-grey-300);   /* 2026-10-15 B-7：#DCE3EC → #CCCCCC（FE、X-6 稿、RS／RO 稿一致） */
+  --lt-color-border-input-hover: var(--lt-grey-400); /* 下拉／輸入 hover 框 #B3B3B3（Guideline Dropdown 已是這個） */
   --lt-color-border-error:   var(--lt-color-error-base);
 
 
@@ -232,11 +238,15 @@
   /* --- Card --- */
   --lt-card-bg:      var(--lt-color-bg-default);
   --lt-card-radius:  var(--lt-radius-md);
-  --lt-card-shadow:  var(--lt-shadow-dialog);    /* CMDS 明確規範 Card 用 Dialog shadow */
+  --lt-card-shadow:  0 0 20px 0 rgba(0, 0, 0, 0.10);   /* 2026-10-15 B-3：Figma 對稿量到的卡片陰影（CB／AD／LumiTag 10/02）；原 var(--lt-shadow-dialog) 0 0 6px .2 */
   --lt-card-padding: var(--lt-space-24);
 
   /* --- Button --- */
-  --lt-button-radius:     var(--lt-radius-sm);
+  --lt-button-radius:     var(--lt-radius-btn);   /* 2026-10-15 B-8：4 → 5 */
+  --lt-button-font-weight: var(--lt-fw-bold);     /* 2026-10-15 A-2：稿（CMDS Button Bold 1）與 FE muiButton 都是 700 */
+  --lt-button-height:     36px;
+  --lt-button-disabled-bg:   var(--lt-grey-300);  /* 2026-10-15 B-1：FE 版 */
+  --lt-button-disabled-text: var(--lt-white);
   --lt-button-padding-x:  var(--lt-space-16);
   --lt-button-padding-y:  var(--lt-space-8);
   --lt-button-focus-ring: 0 0 0 3px rgba(0, 79, 176, 0.10);
@@ -244,13 +254,15 @@
   /* --- Input / Text Field --- */
   --lt-input-bg:        var(--lt-color-bg-default);
   --lt-input-border:    var(--lt-color-border-input);
-  --lt-input-radius:    var(--lt-radius-sm);
+  --lt-input-radius:    var(--lt-radius-btn);   /* 2026-10-15：36h r5（Figma 輸入與下拉） */
+  --lt-input-height:    36px;
   --lt-input-padding-x: var(--lt-space-16);
   --lt-input-padding-y: var(--lt-space-8);
 
   /* --- Modal --- */
-  --lt-modal-radius:   var(--lt-radius-lg);
-  --lt-modal-shadow:   var(--lt-shadow-dialog);  /* CMDS Dialog shadow（Modal = Dialog 同類）*/
+  --lt-modal-radius:   var(--lt-radius-modal);     /* 2026-10-15 B-4：表單類 15（原 12） */
+  --lt-modal-radius-sm: var(--lt-radius-modal-sm); /* 確認類 10 */
+  --lt-modal-shadow:   0 0 6px 0 rgba(0, 0, 0, 0.2);  /* 全站彈窗統一（B-4）；等同 --lt-shadow-dialog，寫死以免 dialog 陰影日後獨立換值時彈窗跟著動 */
   --lt-modal-padding:  var(--lt-space-24);
   --lt-modal-backdrop: rgba(0, 0, 0, 0.5);
 
@@ -259,6 +271,16 @@
   --lt-tooltip-text:    var(--lt-white);
   --lt-tooltip-radius:  var(--lt-radius-sm);
   --lt-tooltip-padding: var(--lt-space-8);
+
+  /* --- Page title / Toast（2026-10-15 修正輪新增） --- */
+  --lt-page-title-size:   var(--lt-fs-24);   /* B-2：頁標題 24／700 */
+  --lt-page-title-weight: var(--lt-fw-bold);
+  --lt-toast-success-bg:  #008F88;           /* 照 FE toast.css；CLAUDE.md 10/13 */
+  --lt-toast-error-bg:    #BF302E;
+  --lt-toast-info-bg:     #0B6DD7;           /* FE toast.css --infoMain */
+  --lt-toast-warning-bg:  #EC6F09;           /* FE toast.css --warningMain */
+  --lt-toast-radius:      4px;
+  --lt-toast-width:       400px;
 }
 
 
@@ -277,6 +299,76 @@
 
 </style>
 <style>
+/* === Inlined: shared/lumiture-ui.css === */
+/* ============================================================
+ * lumiture-ui.css — 共用小元件樣式（2026-10-15 修正輪 S 組）
+ * 引用：<link rel="stylesheet" href="../shared/lumiture-ui.css?v=2026-10-15">（tokens.css 之後；沒載 tokens.css 的頁面也能用，var 都有備用值）
+ *
+ *   .lt-select   下拉／輸入觸發欄（A-11）
+ *   .lt-skeleton 骨架屏（A-18）
+ *   .lt-link     文字連結（B-14）
+ *   .lt-btn-icon 表格 Action icon button（B-6，CB 版）
+ *   空狀態／無權限見 lumiture-empty.js；Toast 見 lumiture-toast.js
+ * ============================================================ */
+
+/* ---------- .lt-select ----------
+ * 結構：
+ *   <button type="button" class="lt-select" aria-haspopup="listbox" aria-expanded="false">
+ *     <span class="lt-select__v">All Types</span>                       ← 沒選時加 .is-placeholder 在 .lt-select 上，字變 #B3B3B3
+ *     <span class="material-symbols-outlined lt-select__arrow">arrow_drop_down</span>   ← MUI 實心 ▾，不要用 expand_more／chevron
+ *   </button>
+ * 狀態 class：.is-open（框 primary＋focus ring，箭頭轉 180）、.is-error、.is-disabled 或 :disabled、.is-placeholder
+ * 高 36、圓角 5、字 14／400、框 #CCCCCC、hover 框 #B3B3B3（Guideline Dropdown；舊的 hover 框變藍底 #F2FAFF 已廢）。寬度由頁面給（width／min-width）。 */
+.lt-select{display:inline-flex;align-items:center;justify-content:space-between;gap:8px;box-sizing:border-box;height:var(--lt-input-height,36px);padding:0 4px 0 12px;
+  background:var(--lt-color-bg-default,#fff);border:1px solid var(--lt-color-border-input,#CCCCCC);border-radius:var(--lt-input-radius,5px);
+  font-family:inherit;font-size:14px;font-weight:400;line-height:1.5;color:var(--lt-color-text-primary,#262626);text-align:left;cursor:pointer;
+  transition:border-color .15s ease,box-shadow .15s ease}
+.lt-select:hover{border-color:var(--lt-color-border-input-hover,#B3B3B3)}
+.lt-select:focus-visible,.lt-select.is-open{outline:none;border-color:var(--lt-color-border-focus,#004FB0);box-shadow:var(--lt-button-focus-ring,0 0 0 3px rgba(0,79,176,.1))}
+.lt-select__v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lt-select.is-placeholder .lt-select__v{color:var(--lt-grey-400,#B3B3B3)}
+.lt-select__arrow{flex-shrink:0;font-size:24px;line-height:1;color:var(--lt-grey-500,#676767);transition:transform .2s ease;
+  font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+.lt-select.is-open .lt-select__arrow{transform:rotate(180deg)}
+.lt-select.is-error{border-color:var(--lt-color-error,#FF403D)}
+.lt-select.is-error:focus-visible,.lt-select.is-error.is-open{box-shadow:0 0 0 3px rgba(255,64,61,.1)}
+.lt-select:disabled,.lt-select.is-disabled{background:var(--lt-grey-100,#F2F2F2);border-color:var(--lt-grey-300,#CCCCCC);color:var(--lt-grey-300,#CCCCCC);cursor:not-allowed;box-shadow:none}
+.lt-select:disabled .lt-select__arrow,.lt-select.is-disabled .lt-select__arrow{color:var(--lt-grey-300,#CCCCCC)}
+
+/* ---------- .lt-skeleton ----------
+ * 骨架屏統一用 --lt-color-bg-skeleton（#E6E6E6）。**靜態**不跑 shimmer（X-6 現況，Guideline 已回改）；要 shimmer 才加 .lt-skeleton--shimmer。
+ * 用法：<div class="lt-skeleton" style="width:120px;height:16px"></div>；表格列慣例見各頁稿 #01-6（表頭文字照常、只有儲存格內容換成灰條；卡片標題照常、按鈕 disabled）。
+ * 變體：.lt-skeleton--line（高 14、r4）、.lt-skeleton--title（高 24、r4）、.lt-skeleton--circle（圓）、.lt-skeleton--block（r8，大塊如圖表區） */
+.lt-skeleton{display:block;background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;min-height:8px}
+.lt-skeleton--line{height:14px}
+.lt-skeleton--title{height:24px}
+.lt-skeleton--circle{border-radius:50%}
+.lt-skeleton--block{border-radius:8px}
+.lt-skeleton--shimmer{background:linear-gradient(90deg,var(--lt-color-bg-skeleton,#E6E6E6) 0%,#F2F2F2 50%,var(--lt-color-bg-skeleton,#E6E6E6) 100%);background-size:200% 100%;animation:lt-skeleton-shimmer 1.3s ease-in-out infinite}
+@keyframes lt-skeleton-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.lt-skeleton--shimmer{animation:none}}
+
+/* ---------- .lt-link ----------
+ * 文字連結（B-14）：#004FB0＋底線；hover 淺一階 #0B6DD7（底線保留）。字級繼承；稿 cell 連結 14／500，連結鈕（Learn More 等）12／700 請頁面自己給 font-size／weight。
+ * icon 不畫底線（CMDS Text Button 慣例）：有 icon 時文字包在 .lt-link__t。 */
+.lt-link{color:var(--lt-color-text-link,#004FB0);text-decoration:underline;cursor:pointer;background:none;border:none;padding:0;font:inherit}
+.lt-link:hover{color:var(--lt-color-text-link-hover,#0B6DD7)}
+.lt-link:focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:2px;border-radius:2px}
+.lt-link.has-icon{text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.lt-link.has-icon .lt-link__t{text-decoration:underline}
+
+/* ---------- .lt-btn-icon（表格 Action icon button，B-6 取 CB 版）----------
+ * 20×20 box、icon 16、FILL 1、primary 色、圓形；hover 底 #D1EEFF。disabled 色 #B3B3B3。
+ * <button type="button" class="lt-btn-icon" data-tip="Edit"><span class="material-symbols-outlined">edit</span></button> */
+.lt-btn-icon{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:20px;height:20px;padding:0;border:none;border-radius:50%;
+  background:none;color:var(--lt-color-primary,#004FB0);cursor:pointer;flex-shrink:0;transition:background .15s ease}
+.lt-btn-icon .material-symbols-outlined{font-size:16px;line-height:1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
+.lt-btn-icon:hover{background:var(--lt-blue-20,#D1EEFF)}
+.lt-btn-icon:focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:1px}
+.lt-btn-icon:disabled{color:var(--lt-grey-400,#B3B3B3);cursor:not-allowed;background:none}
+
+</style>
+<style>
 *{box-sizing:border-box}
 body{margin:0;background:var(--lt-color-primary-bg);color:var(--lt-color-text-primary);font-family:var(--lt-font-sans);font-size:var(--lt-fs-14);letter-spacing:var(--lt-tracking-normal)}
 button,input{font:inherit}
@@ -292,7 +384,7 @@ button,input{font:inherit}
 .crumb{font-size:12px;color:var(--lt-color-text-secondary);margin-bottom:4px}
 
 /* ---- page card ---- */
-.card{background:var(--lt-color-bg-default);border-radius:var(--lt-radius-md);box-shadow:0 1px 3px rgba(0,0,0,.08);padding:24px}
+.card{background:var(--lt-color-bg-default);border-radius:var(--lt-card-radius);box-shadow:var(--lt-card-shadow);padding:var(--lt-card-padding)}   /* B-3：卡片陰影／圓角／內距吃 token */
 
 /* ---- list page header (type scale read off Figma text-node heights:
  * CloudMile 36px→H3 24, "Tier 1 Group List (13)" 24px→H6 16, description 18px→Caption 12) ---- */
@@ -301,29 +393,25 @@ button,input{font:inherit}
 .section-head h2{font-size:var(--lt-fs-16);font-weight:700;line-height:var(--lt-leading-tight);margin:0 0 8px;color:var(--lt-color-text-heading)}
 .section-head p{margin:0;color:var(--lt-color-text-secondary);font-size:var(--lt-fs-12);line-height:var(--lt-leading-tight)}
 .section-copy{margin:0;color:var(--lt-color-text-secondary);font-size:var(--lt-fs-12);line-height:var(--lt-leading-tight)}
-.btn{display:inline-flex;align-items:center;gap:4px;min-width:80px;height:36px;border-radius:5px;padding:0 16px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;gap:4px;min-width:80px;height:36px;border-radius:5px;padding:0 16px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;justify-content:center}   /* A-2：稿與 FE 都是 700 */
 .btn .material-symbols-outlined{font-size:18px}
 .btn-pri{border:0;background:var(--lt-color-primary);color:#fff;box-shadow:var(--lt-shadow-button)}
 .btn-pri:hover{background:var(--lt-color-primary-hover)}
 .btn-pri:active{background:var(--lt-blue-90)}
-.btn-pri:disabled{background:var(--lt-grey-100);color:var(--lt-grey-300);cursor:not-allowed;box-shadow:none}
+.btn-pri:disabled{background:var(--lt-button-disabled-bg);color:var(--lt-button-disabled-text);cursor:not-allowed;box-shadow:none}   /* B-1：FE 版 #CCCCCC 底白字 */
 .btn-out{border:1px solid var(--lt-color-primary);background:#fff;color:var(--lt-color-primary)}
 .btn-out:hover{background:var(--lt-color-primary-bg)}
 .btn-out:disabled{border-color:var(--lt-grey-200);color:var(--lt-grey-300);cursor:not-allowed}
 .btn-out.danger{border-color:var(--lt-color-error);color:var(--lt-color-error)}
 .btn-out.danger:hover{background:var(--lt-color-error-light)}
-.btn-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;border:0;background:transparent;border-radius:5px;color:var(--lt-color-text-secondary);cursor:pointer}
-.btn-icon:hover{background:var(--lt-color-bg-subtle);color:var(--lt-color-text-primary)}
-.btn-icon.danger:hover{background:var(--lt-color-error-light);color:var(--lt-color-error)}
-.btn-icon:disabled{color:var(--lt-grey-300);cursor:not-allowed;background:transparent}
-.btn-icon .material-symbols-outlined{font-size:20px}
+/* A-5／B-6：表格 Action icon 改用 shared/lumiture-ui.css 的 .lt-btn-icon（20 box／16 icon／FILL 1／primary／hover #D1EEFF），本頁不再自己定義 */
 
 /* ---- table ---- */
-.table-wrap{border-radius:var(--lt-radius-sm);overflow:auto;overscroll-behavior:contain;max-height:575px;border:1px solid var(--lt-color-border-default)}
+.table-wrap{overflow:auto;overscroll-behavior:contain;max-height:575px}   /* A-34①：稿 #01／#07 的表格沒有外框 */
 .table-wrap::-webkit-scrollbar{width:6px;height:6px}
 .table-wrap::-webkit-scrollbar-thumb{background:var(--lt-grey-300);border-radius:3px}
 table{border-collapse:collapse;width:100%;min-width:760px;text-align:left;table-layout:fixed}
-thead th{position:sticky;top:0;z-index:2;height:50px;padding:7px 16px 8px;background:var(--lt-color-primary-bg);border-bottom:1px solid var(--lt-color-border-default);color:var(--lt-color-text-heading);font-size:var(--lt-fs-14);font-weight:700;white-space:nowrap}
+thead th{position:sticky;top:0;z-index:2;height:50px;padding:7px 16px 8px;background:var(--lt-color-primary-bg);border-bottom:1px solid var(--lt-grey-400);color:var(--lt-color-text-heading);font-size:var(--lt-fs-14);font-weight:700;white-space:nowrap}   /* A-12：表頭底線 #B3B3B3 */
 th.center,td.center{text-align:center}
 th.sortable{cursor:pointer;user-select:none}
 /* 表頭不做整格灰底 hover（Kabin 2026-09-11）：那是一整片色塊，比它要表達的
@@ -343,8 +431,8 @@ tbody tr.pending td{background:var(--lt-grey-100);color:var(--lt-grey-400)}
 .cell-ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cell-double .l1{color:var(--lt-color-text-primary)}
 .cell-double .l2{color:var(--lt-color-text-secondary);font-size:12px;margin-top:2px;overflow-wrap:anywhere}
-.link-btn{border:0;background:transparent;color:var(--lt-color-text-link);font-weight:600;font-size:14px;padding:0;cursor:pointer}
-.link-btn:hover{text-decoration:underline}
+.link-btn{border:0;background:transparent;color:var(--lt-color-text-link);font-weight:500;font-size:14px;padding:0;cursor:pointer;text-decoration:underline;font-family:inherit}   /* A-28／B-14：#004FB0／500／底線（稿 cell、FE ResourceButton） */
+.link-btn:hover{color:var(--lt-color-text-link-hover)}
 .actions-cell{display:flex;align-items:center;gap:4px}
 td.center .actions-cell{justify-content:center}
 .status-text{font-size:14px}
@@ -364,6 +452,7 @@ td.center .actions-cell{justify-content:center}
 .pill-tab{height:28px;padding:0 12px;border:0;background:transparent;border-radius:5px;font-size:13px;font-weight:600;color:var(--lt-color-text-secondary);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .pill-tab.active{background:#fff;color:var(--lt-color-primary);box-shadow:0 1px 2px rgba(0,0,0,.06)}
 .pill-tab .csp-dot{width:8px;height:8px;border-radius:50%}
+.cloud-tabs{margin-bottom:16px}
 .groupby-toggle{display:flex;align-items:center;gap:8px;flex:0 0 auto}
 .groupby-toggle .lbl{font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);white-space:nowrap}
 .groupby-toggle .pill-tabs{margin:0}
@@ -382,11 +471,11 @@ td.center .actions-cell{justify-content:center}
 .empty-state .material-symbols-outlined{font-size:64px;color:var(--lt-blue-30);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48;margin-bottom:12px}
 .empty-title{font-size:16px;font-weight:700;margin:0 0 4px;color:var(--lt-color-text-heading)}
 .empty-copy{margin:0;color:var(--lt-color-text-secondary);line-height:1.65;white-space:pre-line}   /* v3：拿掉 v2 的 max-width:420px，#01-2 / #05-1 的兩行文案被它擠成三行（不要加設計稿沒有的 max-width） */
-.empty-state.error .material-symbols-outlined{color:var(--lt-color-error);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
+/* A-19：error 變體不再用紅色實心 icon，全站空狀態／無權限一律 FILL 0、#9ED7FF（見 shared/lumiture-empty.js） */
 .empty-state .btn{margin-top:16px}
 
 /* ---- skeleton ---- */
-.skel{background:linear-gradient(90deg,#edf2f5 0%,#f7f9fa 50%,#edf2f5 100%);background-size:200% 100%;animation:shimmer 1.25s linear infinite;border-radius:var(--lt-radius-sm)}
+.skel{background:var(--lt-color-bg-skeleton);border-radius:var(--lt-radius-sm)}   /* A-18：skeleton 統一吃 token（#E6E6E6）、靜態不跑 shimmer（X-6 現況） */
 @keyframes shimmer{to{background-position:-200% 0}}
 .skel-title{height:24px;width:220px;margin-bottom:12px}
 .skel-btn{height:36px;width:120px}
@@ -398,9 +487,9 @@ td.center .actions-cell{justify-content:center}
 
 /* ---- confirm dialog ---- */
 .dlg-backdrop{position:fixed;inset:0;z-index:2000;background:var(--lt-modal-backdrop);display:grid;place-items:center;padding:24px}
-.dlg{width:min(440px,100%);background:#fff;border-radius:var(--lt-radius-lg);box-shadow:var(--lt-modal-shadow);padding:24px}
+.dlg{width:min(440px,100%);background:#fff;border-radius:var(--lt-modal-radius-sm);box-shadow:var(--lt-modal-shadow);padding:24px}   /* B-4：確認類彈窗圓角 10 */
 .dlg-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.dlg-head .material-symbols-outlined{color:var(--lt-color-warning);font-size:24px}
+.dlg-head .material-symbols-outlined{color:var(--lt-color-error);font-size:30px}   /* B-12：危險確認彈窗標題 icon 用 CB 版紅 error 圓（稿 #20 也是） */
 .dlg-head h3{margin:0;font-size:18px}
 .dlg-body{color:var(--lt-color-text-primary);line-height:1.65;margin-bottom:20px}
 .dlg-body b{font-weight:700}
@@ -410,7 +499,7 @@ td.center .actions-cell{justify-content:center}
 
 /* ---- assign-resource modal + folder tree ---- */
 .rmodal-backdrop{position:fixed;inset:0;z-index:2000;background:var(--lt-modal-backdrop);display:grid;place-items:center;padding:24px}
-.rmodal{width:min(660px,100%);height:min(720px,calc(100vh - 48px));display:flex;flex-direction:column;background:#fff;border-radius:var(--lt-radius-lg);box-shadow:var(--lt-modal-shadow)}
+.rmodal{width:min(660px,100%);height:min(720px,calc(100vh - 48px));display:flex;flex-direction:column;background:#fff;border-radius:var(--lt-modal-radius);box-shadow:var(--lt-modal-shadow)}   /* B-4：表單類 15 */
 .rmodal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:24px 24px 0}
 .rmodal-head h3{margin:0 0 4px;font-size:var(--lt-fs-18);line-height:var(--lt-leading-tight)}
 .rmodal-head p{margin:0;font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);line-height:var(--lt-leading-tight)}
@@ -594,7 +683,7 @@ td.has-fptip:focus-visible{outline:2px solid var(--lt-color-primary);outline-off
  * 「create group 流程優化…連帶出現一些寬度 800px 的彈窗，其餘都是 700px」）。
  * ============================================================ */
 .wz-backdrop{position:fixed;inset:0;z-index:2000;background:var(--lt-modal-backdrop);display:grid;place-items:center;padding:24px}
-.wz{width:min(800px,100%);height:min(720px,calc(100vh - 48px));display:flex;background:#fff;border-radius:15px;box-shadow:var(--lt-modal-shadow);overflow:hidden}   /* Figma: rounded-[15px]，不對應任何既有 --lt-radius-* token（get_design_context 核對） */
+.wz{width:min(800px,100%);height:min(720px,calc(100vh - 48px));display:flex;background:#fff;border-radius:var(--lt-modal-radius);box-shadow:var(--lt-modal-shadow);overflow:hidden}   /* Figma: rounded-[15px]，不對應任何既有 --lt-radius-* token（get_design_context 核對） */
 /* 左側垂直 stepper：done / active 都是藍色實心勾（#30 第一、二步同時是勾），
  * 未到的步驟是灰色空心圓 + 灰字。步驟之間一條 2px 直線接在圓心下方。 */
 .wz-steps{flex:0 0 200px;padding:32px 8px 32px 24px;display:flex;flex-direction:column;border-right:1px solid transparent}
@@ -617,7 +706,8 @@ td.has-fptip:focus-visible{outline:2px solid var(--lt-color-primary);outline-off
 /* 內嵌的資源選單：#31 / #37 把清單裝在一個帶框線的容器裡，這裡復用 v2 的
  * picker（工具列 + 提示條 + 清單），只換外殼。 */
 .wz-picker{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--lt-color-border-default);border-radius:5px;overflow:hidden}
-.wz-picker .rmodal-tools{padding:12px 16px}
+.wz-picker .rmodal-tools{padding:12px 16px;flex-wrap:wrap}
+.wz-picker .rmodal-tools .search-box{flex:1 1 300px;min-width:300px}   /* A-34③：placeholder 完整顯示，放不下時 Group by 換到下一行 */
 .wz-picker .rmodal-body{border-bottom:0}
 .wz-picker .tnotice{padding:8px 16px}
 .wz-count{margin-top:8px}
@@ -665,8 +755,9 @@ td.has-fptip:focus-visible{outline:2px solid var(--lt-color-primary);outline-off
 
 /* ---- Assign Resource by Label / Tag（#56 / #57）：800px 寬、高度 hug。
  * 下拉面板（#56-1 / #57-1）會超出彈窗底部，所以彈窗本身不能 overflow:hidden。 ---- */
-.lmodal{width:min(800px,100%);background:#fff;border-radius:var(--lt-radius-lg);box-shadow:var(--lt-modal-shadow);padding:24px;position:relative}
+.lmodal{width:min(800px,100%);background:#fff;border-radius:var(--lt-modal-radius);box-shadow:var(--lt-modal-shadow);padding:24px;position:relative}
 .lmodal .rmodal-head{padding:0;margin-bottom:20px}
+.lmodal .rmodal-head h3{font-size:var(--lt-fs-20);font-weight:var(--lt-fw-bold)}   /* A-34②：稿 #56 標題 20/700 */
 .dd{position:relative}
 .dd-trigger{width:100%;height:36px;border:1px solid var(--lt-grey-300);border-radius:5px;padding:0 32px 0 12px;background:#fff;text-align:left;font:inherit;font-size:14px;color:var(--lt-color-text-primary);cursor:pointer;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative}   /* 同上 */
 .dd-trigger.placeholder{color:var(--lt-grey-400)}
@@ -677,9 +768,9 @@ td.has-fptip:focus-visible{outline:2px solid var(--lt-color-primary);outline-off
 .dd-panel{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:60;background:#fff;border:1px solid var(--lt-color-border-default);border-radius:6px;box-shadow:var(--lt-shadow-dialog);padding:10px;max-height:360px;display:flex;flex-direction:column;overflow:hidden}   /* 上一版猜 elevation/1（MUI Paper 陰影）是錯的——get_design_context 直接讀到這個元件自己的 shadow-[0px_0px_6px_...rgba(0,0,0,0.2)]，就是站台既有的扁平 Dialog/Card/Dropdown 陰影 --lt-shadow-dialog。get_variable_defs 那次抓到的 elevation/1 屬於同一個畫布範圍內的別的東西，不是這個下拉本身。順帶核對：外距 10px、圓角 6px、清單列 40px（見下） */
 .dd-search{padding:0 0 8px;border-bottom:1px solid var(--lt-color-border-default);margin-bottom:8px}   /* .dd-panel 已經有 10px 外距，搜尋框不用再自己內縮；改成搜尋列跟清單之間畫一條分隔線（get_design_context：Line 73） */
 .dd-search .search-box{width:100%}
-/* #56-1 的搜尋 icon 在右邊（跟頁面搜尋框相反），照設計稿 */
-.dd-search .search-box input{padding:0 36px 0 12px;height:32px}
-.dd-search .search-box .material-symbols-outlined{left:auto;right:9px;top:6px}
+/* #56-1／#57-1 稿的搜尋 icon 在右邊，B-9 裁決全站統一放左（見下方 DEVIATION） */
+.dd-search .search-box input{padding:0 12px 0 36px;height:32px}   /* ⚠ DEVIATION（B-9 全站統一放左，稿 #56-1／#57-1 是右，Figma 待回改） */
+.dd-search .search-box .material-symbols-outlined{left:9px;right:auto;top:6px}
 .dd-list{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding-bottom:4px}
 .dd-list::-webkit-scrollbar{width:6px}
 .dd-list::-webkit-scrollbar-thumb{background:var(--lt-grey-300);border-radius:3px}
@@ -704,12 +795,13 @@ td.has-fptip:focus-visible{outline:2px solid var(--lt-color-primary);outline-off
  * 寬度照 Figma instance 實測：Edit Group / Remove Group / Edit User / Remove User 640、
  * Group Deletion Not Allowed 655、Invite User 800（跟 Create Group 同一顆元件）。
  * ⚠️ CMDS 預設 660 與這裡量到的 640 差 20px，已列入回報請 Kabin 確認哪個是準的。 */
-.dlg.fm{padding:24px 32px;border-radius:15px}   /* Figma「Modal / Left Aligned / Field」：px-32 py-24 + rounded-15，不是 v2 .dlg 沿用的 24px 全邊 + --lt-radius-lg（get_design_context 核對 #09） */
-.dlg.fm.is-warn{border-radius:10px}   /* Remove Group／Remove User／Group Deletion Not Allowed 用的是「Modal / Left Aligned / Normal」，圓角 10px，不是 Field 變體的 15px（get_design_context 核對 #10／#13） */
+.dlg.fm{padding:24px 32px;border-radius:var(--lt-modal-radius)}   /* Figma「Modal / Left Aligned / Field」：px-32 py-24 + rounded-15，不是 v2 .dlg 沿用的 24px 全邊 + --lt-radius-lg（get_design_context 核對 #09） */
+.dlg.fm.is-warn{border-radius:var(--lt-modal-radius-sm)}   /* Remove Group／Remove User／Group Deletion Not Allowed 用的是「Modal / Left Aligned / Normal」，圓角 10px，不是 Field 變體的 15px（get_design_context 核對 #10／#13） */
 .fm-head{display:flex;align-items:center;gap:15px;margin-bottom:32px}   /* Normal 變體：icon-標題 gap 15px、Content 統一 32px 間距，不是 10px/20px（get_design_context 核對） */
 .fm-head h3{margin:0;font-size:var(--lt-fs-20);font-weight:var(--lt-fw-bold);line-height:30px;flex:1}   /* 同上，H4 20px Bold */
 /* #10 / #13 的警示 icon 是深色實心三角，不是琥珀色（跟 v2 Unlink 那顆不同，照各自的稿） */
-.fm-head .material-symbols-outlined.fm-warn{font-size:30px;color:var(--lt-color-text-primary)}   /* Warning icon 是 30x30，不是 24（get_design_context 核對） */
+.fm-head .material-symbols-outlined.fm-warn{font-size:30px;color:var(--lt-color-text-primary)}
+.fm-head .material-symbols-outlined.fm-err{font-size:30px;color:var(--lt-color-error)}   /* B-12：Remove Group／Remove User 標題 icon 改 CB 版紅 error 圓 */   /* Warning icon 是 30x30，不是 24（get_design_context 核對） */
 .fm-name{color:var(--lt-color-primary);font-weight:500}   /* Figma 群組/使用者名稱是 Medium 500，不是預設 400（get_design_context 核對） */
 .fld-static{font-size:14px;color:var(--lt-color-text-primary);padding:2px 0}
 /* .fm 內的 .wz-desc（Invite Admin/Invite User）沒有另外驗證出不同的間距，拿掉原本猜的 20px override，直接繼承上面驗證過的 32px */
@@ -722,7 +814,7 @@ td.has-fptip:focus-visible{outline:2px solid var(--lt-color-primary);outline-off
 .crumb{display:flex;align-items:center;gap:4px;white-space:nowrap}
 .crumb-item{display:inline-block;max-width:135px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 /* Learn More 連結（#01 / #02 / #07）：問號 icon + 深灰底線粗體小字，放在卡片內表格下方 */
-.learn-more{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.learn-more{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:20px}   /* R2：align-items:flex-start，按鈕寬度只吃文字＋icon，不再整行可點 */
 .learn{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;padding:0;cursor:pointer;font:inherit;font-size:var(--lt-fs-12);font-weight:700;color:var(--lt-color-text-primary);text-decoration:underline}
 .learn .material-symbols-outlined{font-size:16px;color:var(--lt-color-text-secondary);text-decoration:none}
 .learn:hover{color:var(--lt-color-primary)}
@@ -732,16 +824,13 @@ thead th.skel-th{background:var(--lt-grey-100)}
 /* 讀取中的分頁列：維持樣式但不可點（#34 註記「用來顯示使用者身處何處的 tab / button group 等元件需維持原樣式，但點擊無作用」） */
 .is-loading-ui{pointer-events:none}
 
-/* ---- toast ---- */
-.toast{position:fixed;left:var(--lt-toast-left, 274px);bottom:24px;z-index:4000;display:flex;align-items:center;gap:10px;max-width:440px;border-radius:var(--lt-radius-sm);padding:12px 16px;background:var(--lt-color-success);color:#fff;box-shadow:var(--lt-shadow-overlay-strong);font-size:14px;transform:translateY(100px);opacity:0;transition:var(--lt-transition-base)}
-.toast.error{background:var(--lt-color-error)}
-.toast.show{opacity:1;transform:none}
+/* ---- toast：改用 shared/lumiture-toast.js（A-1） ---- */
 
 
 /* ---- footer ---- */
 .footer{display:flex;justify-content:space-between;gap:16px;padding:20px 32px;margin-top:auto;font-size:12px;background:#fff;border-top:1px solid var(--lt-color-border-default)}
 .footer-version{color:var(--lt-color-text-primary);font-weight:600}
-.ver-tag{display:inline-block;margin-left:6px;background:#34B5D9;color:#fff;border-radius:999px;padding:2px 8px;font-size:11px}
+.ver-tag{background:#34B5D9;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}   /* A-41：同其他頁 r10／高 18／10px／700 */
 .footer-credit{color:#676767}
 
 @media(max-width:800px){.main{padding:24px 16px 96px}.section-head{flex-direction:column}.res-toolbar{flex-direction:column;align-items:flex-start}.search-box{width:100%}}
@@ -762,7 +851,6 @@ thead th.skel-th{background:var(--lt-grey-100)}
   </div>
 </div>
 
-<div class="toast" id="toast"><span class="material-symbols-outlined" id="toast-icon">check_circle</span><span id="toast-text"></span></div>
 <div id="dialog-root"></div>
 <div id="assign-root"></div>
 <div id="tag-root"></div>
@@ -777,7 +865,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
  * lumiture-checkbox.js — Lumiture Shared Checkbox v1
  *
  * Design spec: Lumiture-Guideline #Checkbox（S size / Primary / unchecked-checked-mixed）
- *   16×16、--lt-radius-sm、border --lt-grey-300、checked/mixed 皆 --lt-color-primary
+ *   16×16、圓角 2、unchecked 框 --lt-color-primary（2026-10-15 A-13：稿 CB 註解／GB #02 都是 primary 框 r2，原本灰框 #CCCCCC r4；CB／ARL 頁面層的覆寫可刪）、checked/mixed 皆 --lt-color-primary
  *   四態齊全：hover / focus-visible / disabled / mixed
  *   mixed 用 remove icon、checked 用 check icon
  *
@@ -872,13 +960,13 @@ thead th.skel-th{background:var(--lt-grey-100)}
      * 那兩個會讓它拿不到焦點，:focus-visible 就沒有東西可以掛。 */
     '.checkbox input.checkbox__input{position:absolute;width:16px;height:16px;margin:0;opacity:0;cursor:inherit;z-index:1}',
     '.checkbox input.checkbox__input:disabled{cursor:not-allowed}',
-    '.checkbox__box{display:inline-flex;align-items:center;justify-content:center;flex:0 0 16px;width:16px;height:16px;border:1px solid var(--lt-grey-300,#CCCCCC);border-radius:var(--lt-radius-sm,4px);background:#fff;transition:border-color 150ms ease,background 150ms ease,box-shadow 200ms ease}',
+    '.checkbox__box{display:inline-flex;align-items:center;justify-content:center;flex:0 0 16px;width:16px;height:16px;border:1px solid var(--lt-color-primary,#004FB0);border-radius:2px;background:#fff;transition:border-color 150ms ease,background 150ms ease,box-shadow 200ms ease}',
     '.checkbox__icon{color:#fff;display:none;font-size:12px;line-height:1;font-variation-settings:\'FILL\' 1,\'wght\' 700,\'GRAD\' 0,\'opsz\' 20}',
     '.checkbox__label{font-size:14px;color:var(--lt-color-text-primary,#262626);user-select:none}',
     '.checkbox.is-disabled .checkbox__label{color:var(--lt-color-text-disabled,#B3B3B3)}',
 
     /* hover */
-    '.checkbox:hover .checkbox__box{border-color:var(--lt-grey-400,#B3B3B3)}',
+    '.checkbox:hover .checkbox__box{border-color:var(--lt-color-primary-hover,#0B6DD7)}',
 
     /* checked／mixed 的填色。左邊是 DOM 派（真 input），右邊是重繪派（class）。 */
     '.checkbox__input:checked~.checkbox__box,',
@@ -1115,8 +1203,8 @@ thead th.skel-th{background:var(--lt-grey-100)}
     ]},
 
     { type: 'group', id: 'optimization', label: 'Optimization', items: [
-      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', href: './rightsizing.html' },
-      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'percent', href: './rate-optimization.html' },
+      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'arrows_input', href: './rightsizing.html' },
+      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'percent_discount', href: './rate-optimization.html' },
     ]},
 
     { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
@@ -1331,18 +1419,18 @@ thead th.skel-th{background:var(--lt-grey-100)}
   function _logoBody(icon) {
     return '<div class="lt-sb-logo-wrap">' + icon + '</div>' +
       '<span class="lt-sb-logo-text">LumiTure.ai</span>' +
-      '<span class="lt-sb-proto" title="Prototype">PROTO<span class="lt-sb-proto-x">TYPE</span></span>';
+      '<span class="lt-sb-proto" data-tip="Prototype" data-tip-pos="below">PROTO<span class="lt-sb-proto-x">TYPE</span></span>';
   }
   function _renderLogo() {
     var href = _homeHref();
-    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" title="Go to Overview">' : '<div class="lt-sb-logo">';
+    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-sb-logo">';
     return open + _logoBody(LOGO_ICON) + (href ? '</a>' : '</div>');
   }
   // 收合時顯示在 topbar 左側的 logo（同一組圖形，mask id 改 ltT* 避免跟 sidebar 那份撞 id）
   function _renderTopbarLogo() {
     var href = _homeHref();
     var icon = LOGO_ICON.replace(/ltH(ring|bars|leg)/g, 'ltT$1');
-    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" title="Go to Overview">' : '<div class="lt-tb-logo">';
+    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-tb-logo">';
     return open + _logoBody(icon) + (href ? '</a>' : '</div>');
   }
   function _mountTopbarLogo(host) {
@@ -1592,7 +1680,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
  *     version:     'v1.19.0',               // Software version 列
  *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
  *     quota: {                              // AI Quota box 數據；total 已含 add-on
- *       refreshDate: 'Jul 1, 2026',         // 下次重置日（= 自然月下月 1 號）
+ *       refreshDate: '2 Nov. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）
  *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
  *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
  *     },
@@ -1625,7 +1713,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
     version: 'v1.19.0',
     addonPacks: 0,
     quota: {
-      refreshDate: '2 Jul. 2026',
+      refreshDate: '2 Nov. 2026',          // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期（原 2 Jul. 2026 已過期）
       analyses:    { used: 32,  total: 80 },
       rightsizing: { used: 410, total: 1000 },
     },
@@ -1638,7 +1726,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
   // plan → 顯示哪些 quota 項目
   //   Essential = 兩項（照 Notion PRD，2026-06-22 Kabin 拍板）；Starter = 只 analyses；
   //   Standard = 兩項；Premium = 兩項（2026-10-14 Kabin 裁決照稿 #01-4：Unlimited 是 PRD 誤植、稿已劃掉，Premium 也顯示 `{remaining}/{total} left`，sub 只寫 Org-wide）；none = 不顯示 box
-  //   ⚠ specs ai-quota README 說 Essential 只 rightsizing，與 PRD 衝突、待 PM 對齊；此處照 PRD
+  //   Essential 兩項：PRD 已更新（Essential 衝突解除，2026-06-22 起照 Notion PRD；specs repo 的 ai-quota README 寫「只 rightsizing」是落後、待 PM sync）
   var PLAN_QUOTA_ITEMS = {
     Essential: ['analyses', 'rightsizing'],
     Starter:   ['analyses'],
@@ -1678,7 +1766,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
     'border:2px solid #002663;border-radius:50%}',
 
     /* User chip — avatar + name + role + chevron */
-    '.lt-tb-user{display:flex;align-items:center;gap:10px;padding-left:16px;margin-left:0;',
+    '.lt-tb-user{display:flex;align-items:center;gap:10px;padding:0 0 0 16px;margin-left:0;font-family:inherit;',   /* A-20②（2026-10-15）：padding 寫全，頁面沒 reset button 時不會吃到瀏覽器預設 1px 6px 而變 162×36 */
     'border-left:1px solid rgba(255,255,255,.1);color:#fff;cursor:pointer;transition:opacity .15s;background:none;border-top:none;border-right:none;border-bottom:none}',
     '.lt-tb-user:hover{opacity:.92}',
     '.lt-tb-avatar-ic{font-size:34px;color:#fff;flex-shrink:0;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 34}',
@@ -1748,7 +1836,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
     '@keyframes lt-q-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}',
     '@media (prefers-reduced-motion:reduce){.lt-q-skel{animation:none}}',
     /* error（#01-7）：只有這塊壞（partial degrade），整塊 85 高；help icon＋文字＋右側 Retry（青、粗、底線） */
-    '.lt-q-err{display:flex;align-items:center;gap:8px;height:24px;padding-left:8px;font-size:12px;line-height:18px;color:#CCCCCC}',
+    '.lt-q-err{display:flex;align-items:center;gap:8px;height:24px;padding-left:0;font-size:12px;line-height:18px;color:#CCCCCC}',
     '.lt-q-err-msg{flex:1;min-width:0}',
     '.lt-q-err .material-symbols-outlined{font-size:16px;color:#CCCCCC;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20}',
     '.lt-q-err a{color:#4ADFFF;font-weight:700;text-decoration:underline;cursor:pointer;flex-shrink:0;border-radius:2px}',
@@ -1775,6 +1863,14 @@ thead th.skel-th{background:var(--lt-grey-100)}
   }
 
   // ===== Helpers =====
+  /* 角色 chip icon（A-3；稿 #01-4／#01-7、FE UserRoleChip ROLE_ICON_MAP）：Member account_circle、Manager supervised_user_circle、Admin／Owner admin_panel_settings。
+     role 字串寫法：'Admin'／'Owner'／'Manager - Cost Center'／'Member - Finance-APAC'。topbar 上的頭像是使用者頭像（稿 #01 就是人像圓），不是角色 chip，不跟著換 */
+  function _roleIcon(role) {
+    var r = String(role || '');
+    if (/^Member\b/i.test(r)) return 'account_circle';
+    if (/^Manager\b/i.test(r)) return 'supervised_user_circle';
+    return 'admin_panel_settings';
+  }
   function _esc(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   }
@@ -1799,7 +1895,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
 
   // ===== Renderers =====
   function _renderIcon(item) {
-    var attrs = ' class="lt-tb-ic" title="' + _esc(item.title || '') + '"';
+    var attrs = ' class="lt-tb-ic" data-tip="' + _esc(item.title || '') + '" data-tip-pos="below" aria-label="' + _esc(item.title || '') + '"';   /* 原生 title 改 data-tip（#gl-tip） */
     if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
     var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
     return '<button type="button"' + attrs + '>' +
@@ -1900,7 +1996,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
                  '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
                  '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
                '</div>' +
-               '<span class="lt-am-chip"><span class="material-symbols-outlined">account_circle</span>' + _esc(u.role) + '</span>' +
+               '<span class="lt-am-chip"><span class="material-symbols-outlined">' + _roleIcon(u.role) + '</span>' + _esc(u.role) + '</span>' +
              '</div>' +
              '<div class="lt-am-div"></div>' +
              (box ? box + '<div class="lt-am-div"></div>' : '') +
@@ -2018,7 +2114,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
   var ROLE_CSS = [
     '.lt-rd-back{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:990;display:flex;align-items:center;justify-content:center;padding:32px;animation:lt-rd-fade .15s ease-out;font-family:\'Noto Sans\',sans-serif}',
     '@keyframes lt-rd-fade{from{opacity:0}to{opacity:1}}',
-    '.lt-rd{background:#fff;border-radius:10px;box-shadow:0 0 20px rgba(0,0,0,.1);width:600px;max-width:100%;max-height:100%;overflow:auto;padding:24px 32px;display:flex;flex-direction:column;color:#262626}',
+    '.lt-rd{background:#fff;border-radius:var(--lt-modal-radius-sm,10px);box-shadow:var(--lt-shadow-dialog,0 0 6px rgba(0,0,0,.2));width:600px;max-width:100%;max-height:100%;overflow:auto;padding:24px 32px;display:flex;flex-direction:column;color:#262626}',
     '.lt-rd:focus{outline:none}',
     '.lt-rd-hd{display:flex;flex-direction:column;align-items:center;text-align:center}',
     '.lt-rd-ic{margin-bottom:15px;line-height:0}',
@@ -2365,29 +2461,23 @@ thead th.skel-th{background:var(--lt-grey-100)}
 
   // ===== INIT =====
   /* 登入後的一次性 toast：Auth prototype 登入成功導回 Overview 前寫進 sessionStorage，
-     落地頁（任何用 shared topbar 的頁）讀到就顯示一次再清掉。樣式照 FE Toaster（bottom-left、成功 #008F88、5 秒） */
+     落地頁（任何用 shared topbar 的頁）讀到就顯示一次再清掉。樣式與行為見 shared/lumiture-toast.js */
+  var _TB_SRC = (document.currentScript && document.currentScript.src) || '';
+  function _withToast(cb) {   // 頁面沒引 lumiture-toast.js 時，從 topbar 同資料夾補載一次
+    if (window.LumitureToast) { cb(window.LumitureToast); return; }
+    if (!_TB_SRC) return;
+    var sc = document.createElement('script');
+    sc.src = _TB_SRC.replace(/lumiture-topbar\.js.*$/, 'lumiture-toast.js');
+    sc.onload = function () { if (window.LumitureToast) cb(window.LumitureToast); };
+    document.head.appendChild(sc);
+  }
   function _showPendingToast() {
     var raw = null;
     try { raw = sessionStorage.getItem('lt-pending-toast'); sessionStorage.removeItem('lt-pending-toast'); } catch (e) { return; }
     if (!raw) return;
     var msgs = []; try { msgs = JSON.parse(raw).msgs || []; } catch (e) { return; }
     if (!msgs.length) return;
-    var wrap = document.createElement('div');
-    wrap.style.cssText = 'position:fixed;left:var(--lt-toast-left,274px);bottom:24px;z-index:var(--lt-z-toast,1400);display:flex;flex-direction:column-reverse;gap:16px';
-    msgs.forEach(function (msg) {
-      var el = document.createElement('div');
-      el.setAttribute('role', 'status');
-      el.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 16px;width:400px;max-width:calc(100vw - 96px);' +
-        'background:#008F88;color:#fff;border-radius:4px;' +
-        'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);' +
-        'font-family:inherit;font-size:14px;line-height:24.5px;cursor:pointer';
-      el.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">check_circle</span><span></span>';
-      el.lastChild.textContent = msg;
-      el.addEventListener('click', function () { if (el.parentNode) el.parentNode.removeChild(el); });
-      wrap.appendChild(el);
-      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 5000);
-    });
-    document.body.appendChild(wrap);
+    _withToast(function (T) { msgs.forEach(function (msg) { T.show({ kind: 'success', message: msg }); }); });   // 2026-10-15 A-1：改用共用 LumitureToast
   }
 
   /* 換頁後（導回 Overview、或之後點 sidebar 去別頁）讓頁面套用剛切的角色：頁面有定義 LUMITURE_ROLE_CHANGE 才呼叫。
@@ -2405,6 +2495,202 @@ thead th.skel-th{background:var(--lt-grey-100)}
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _init);
   } else { _init(); }
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-toast.js === */
+/*!
+ * lumiture-toast.js — 全站共用 Toast（2026-10-15 修正輪 A-1）
+ *
+ * 規格（FE libs/lumiture-ui/src/Toaster/toast.css＋Toaster.tsx，Figma GB #02-3／GL #18-3／EI #08／RS #06／RO #06 逐值一致）：
+ *   成功 #008F88、錯誤 #BF302E、info #0B6DD7、warning #EC6F09｜圓角 4｜寬 400｜最小高 46｜內距 8／16｜icon 20（check_circle／info／warning）
+ *   位置：左下，left = var(--lt-toast-left)（sidebar 展開 274／收合 45；沒有 sidebar 的頁面自動改 24），bottom 24｜z-index 4000（高於彈窗 2000、Demo FAB 999）
+ *   5 秒自動消失，點一下立即關閉｜可堆疊（新的在最下面，column-reverse，gap 16）｜字 14／400／行高 24.5
+ *
+ * 用法（頁面把自己的 toast() 換成這個，不要再各寫一套 CSS）：
+ *   <script src="../shared/lumiture-toast.js?v=2026-10-15"><\/script>        // 在 tokens.css／sidebar 之後、頁面 script 之前
+ *   LumitureToast.show({ kind: 'success', message: 'Budget saved successfully.' });
+ *   LumitureToast.success('…') / .error('…') / .info('…') / .warning('…')   // 簡寫
+ *   選項：duration（毫秒，預設 5000，0＝不自動關）、action:{label,onClick}（右側底線文字鈕，例如 Undo）、
+ *        extra:HTMLElement（第二行額外節點，2026-10-15 R1 加：toast 本體仍是一行文字，extra 另起一行、靠左對齊訊息文字；
+ *        給 prototype 專用的展示入口用，例如 Auth 的「Open this email (prototype)」，不是產品 UI，不要拿來放正式功能）
+ *   LumitureToast.clear()                                                    // 全部清掉（Demo 切情境時用）
+ *   回傳該 toast 元素；文案一律 textContent，不吃 HTML。
+ *
+ * 文案寫法：照稿原句。不要用 em dash。
+ */
+(function () {
+  'use strict';
+  if (window.LumitureToast) return;
+
+  var ICON = { success: 'check_circle', error: 'info', info: 'info', warning: 'warning' };   /* FE：error 也是 info icon */
+  var BG   = { success: '#008F88', error: '#BF302E', info: '#0B6DD7', warning: '#EC6F09' };
+
+  function _css() {
+    if (document.getElementById('lt-toast-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-toast-css';
+    s.textContent = [
+      '.lt-toast-wrap{position:fixed;left:var(--lt-toast-left,274px);bottom:24px;z-index:var(--lt-z-toast,4000);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif)}',
+      '.lt-toast{pointer-events:auto;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:var(--lt-toast-width,400px);max-width:calc(100vw - 96px);min-height:46px;padding:8px 16px;',
+      'border-radius:var(--lt-toast-radius,4px);color:#fff;cursor:pointer;',
+      'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);',   /* MUI shadows[1]，FE Toaster 的 inline style */
+      'animation:lt-toast-in .2s ease}',
+      '.lt-toast.is-success{background:var(--lt-toast-success-bg,#008F88)}',
+      '.lt-toast.is-error{background:var(--lt-toast-error-bg,#BF302E)}',
+      '.lt-toast.is-info{background:var(--lt-toast-info-bg,#0B6DD7)}',
+      '.lt-toast.is-warning{background:var(--lt-toast-warning-bg,#EC6F09)}',
+      '.lt-toast-ic{font-size:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;',
+      'font-family:\'Material Symbols Outlined\';font-weight:400;font-style:normal;line-height:1;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20;letter-spacing:normal;text-transform:none;white-space:nowrap;-webkit-font-feature-settings:\'liga\';font-feature-settings:\'liga\'}',
+      '.lt-toast-msg{flex:1;min-width:0;font-size:14px;font-weight:400;line-height:24.5px;color:#fff;overflow-wrap:anywhere}',
+      '.lt-toast-extra{flex:0 0 100%;display:flex;align-items:center;padding-left:28px;margin-top:-2px;padding-bottom:2px}',
+      '.lt-toast-act{flex-shrink:0;background:none;border:none;color:#fff;font:inherit;font-size:14px;font-weight:700;text-decoration:underline;cursor:pointer;padding:0 0 0 8px}',
+      '@keyframes lt-toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}',
+      '@media (prefers-reduced-motion:reduce){.lt-toast{animation:none}}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+
+  var _wrap = null;
+  function _getWrap() {
+    if (_wrap && _wrap.parentNode) return _wrap;
+    _css();
+    _wrap = document.createElement('div');
+    _wrap.className = 'lt-toast-wrap';
+    _wrap.setAttribute('aria-live', 'polite');
+    // 沒有 sidebar 的頁面（Auth、通知信展示頁）沒有 --lt-toast-left，改貼視窗左下 24（FE Toaster 預設位置）
+    try { if (!getComputedStyle(document.documentElement).getPropertyValue('--lt-toast-left').trim()) _wrap.style.left = '24px'; } catch (e) {}
+    (document.body || document.documentElement).appendChild(_wrap);
+    return _wrap;
+  }
+
+  function show(opts) {
+    if (typeof opts === 'string') opts = { message: opts };
+    opts = opts || {};
+    var kind = BG[opts.kind] ? opts.kind : 'success';
+    var el = document.createElement('div');
+    el.className = 'lt-toast is-' + kind;
+    el.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+    var ic = document.createElement('span'); ic.className = 'lt-toast-ic material-symbols-outlined'; ic.textContent = ICON[kind]; ic.setAttribute('aria-hidden', 'true');
+    var msg = document.createElement('span'); msg.className = 'lt-toast-msg'; msg.textContent = opts.message == null ? '' : String(opts.message);
+    el.appendChild(ic); el.appendChild(msg);
+    function close() { if (el.parentNode) el.parentNode.removeChild(el); }
+    if (opts.action && opts.action.label) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'lt-toast-act'; b.textContent = opts.action.label;
+      b.addEventListener('click', function (e) { e.stopPropagation(); try { if (opts.action.onClick) opts.action.onClick(); } finally { close(); } });
+      el.appendChild(b);
+    }
+    if (opts.extra && opts.extra.nodeType === 1) {
+      var row = document.createElement('div'); row.className = 'lt-toast-extra';
+      row.addEventListener('click', function (e) { e.stopPropagation(); });   // 點額外節點不要順便關掉 toast（例如連結要能點）
+      row.appendChild(opts.extra); el.appendChild(row);
+    }
+    el.addEventListener('click', close);
+    _getWrap().appendChild(el);
+    var d = opts.duration == null ? 5000 : opts.duration;
+    if (d > 0) setTimeout(close, d);
+    return el;
+  }
+
+  window.LumitureToast = {
+    show: show,
+    success: function (m, o) { return show(Object.assign({}, o, { kind: 'success', message: m })); },
+    error:   function (m, o) { return show(Object.assign({}, o, { kind: 'error',   message: m })); },
+    info:    function (m, o) { return show(Object.assign({}, o, { kind: 'info',    message: m })); },
+    warning: function (m, o) { return show(Object.assign({}, o, { kind: 'warning', message: m })); },
+    clear: function () { if (_wrap) _wrap.innerHTML = ''; }
+  };
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-empty.js === */
+/*!
+ * lumiture-empty.js — 共用空狀態／無權限／錯誤版型（2026-10-15 修正輪 A-19）
+ *
+ * 規格（Guideline Empty State，全站唯一用 outlined icon 的元件）：
+ *   icon：Material Symbols FILL 0、色 #9ED7FF（Primary Light 30）；尺寸 S 48／M 64／L 80
+ *   標題 S 14／M 16／L 20，Bold｜說明 S 12／M 14／L 14（#676767）｜整體水平垂直置中｜icon→標題 12（page 版 16）→說明 4~8→按鈕 16
+ *   page：整頁卡片版（ARL 10/09 裁決方案 B）：icon 64、標題 18／700、說明 14、按鈕離說明 32、卡片最小高 521
+ *
+ * 用法：
+ *   <script src="../shared/lumiture-empty.js?v=2026-10-15"><\/script>
+ *   el.innerHTML = LumitureEmpty.html({ size:'m', icon:'table_view', title:'No data found', desc:'Try adjusting your filters.', action:{ label:'Clear Filter', onclick:'clearFilter()' } });
+ *   // action 可給 href（連結鈕）或 onclick（inline handler 字串）；action 預設主按鈕樣式用 .lt-empty__btn（藍底白字 36 高 r5 字 700），頁面想用自己的 .btn 就給 action.cls
+ *   預設內容：
+ *   LumitureEmpty.noAccess({ href })     // 整頁無權限：lock／「You do not have access to this page」／「Please contact your organization's administrator if you believe this is a mistake.」／Back to Overview（href 預設 ./overview.html）。回傳含卡片外框的 HTML，放在頁標題下方
+ *   LumitureEmpty.error({ size, onclick }) // 「Something Went Wrong」／「Please ensure you have a stable internet connection\nand try refreshing the page.」（FE EmptyState constants），按鈕 Retry（有給 onclick 才出）
+ *   LumitureEmpty.noData({ size, title, desc, icon })  // 「No Data Available」
+ * 文字一律 escape；desc 的 \n 轉成換行。不要自己加 max-width（全站規則：段落不設 max-width，寬度交給外層）。
+ */
+(function () {
+  'use strict';
+  if (window.LumitureEmpty) return;
+
+  function css() {
+    if (document.getElementById('lt-empty-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-empty-css';
+    s.textContent = [
+      '.lt-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;box-sizing:border-box;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif);color:var(--lt-color-text-primary,#262626)}',
+      '.lt-empty .lt-empty__ic{font-family:\'Material Symbols Outlined\';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;-webkit-font-feature-settings:\'liga\';font-feature-settings:\'liga\';',
+      'color:#9ED7FF;font-variation-settings:\'FILL\' 0,\'wght\' 400,\'GRAD\' 0,\'opsz\' 48;width:1em;height:1em;display:block;overflow:hidden}',
+      '.lt-empty--s .lt-empty__ic{font-size:48px}.lt-empty--m .lt-empty__ic,.lt-empty--page .lt-empty__ic{font-size:64px}.lt-empty--l .lt-empty__ic{font-size:80px}',
+      '.lt-empty__t{margin:12px 0 0;font-weight:700;line-height:1.5;color:var(--lt-color-text-primary,#262626)}',
+      '.lt-empty--s .lt-empty__t{font-size:14px}.lt-empty--m .lt-empty__t{font-size:16px}.lt-empty--l .lt-empty__t{font-size:20px}.lt-empty--page .lt-empty__t{font-size:18px;margin-top:16px}',
+      '.lt-empty__d{margin:8px 0 0;font-size:14px;line-height:24.5px;color:var(--lt-color-text-secondary,#676767);white-space:pre-line}',
+      '.lt-empty--s .lt-empty__d{font-size:12px;line-height:18px;margin-top:4px}',
+      '.lt-empty__a{margin-top:16px}.lt-empty--page .lt-empty__a{margin-top:32px}',
+      '.lt-empty__btn{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;height:var(--lt-button-height,36px);padding:0 16px;border:none;border-radius:var(--lt-button-radius,5px);',
+      'background:var(--lt-color-primary,#004FB0);color:#fff;font-family:inherit;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer}',
+      '.lt-empty__btn:hover{background:var(--lt-color-primary-hover,#0B6DD7)}',
+      '.lt-empty-card{background:#fff;border-radius:var(--lt-card-radius,8px);box-shadow:var(--lt-card-shadow,0 0 20px rgba(0,0,0,.10));min-height:521px;display:flex;align-items:center;justify-content:center}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+  function html(o) {
+    css();
+    o = o || {};
+    var size = ({ s: 's', m: 'm', l: 'l', page: 'page' })[o.size] || 'm';
+    var a = '';
+    if (o.action && o.action.label) {
+      var cls = o.action.cls || 'lt-empty__btn';
+      a = '<div class="lt-empty__a">' + (o.action.href
+        ? '<a class="' + esc(cls) + '" href="' + esc(o.action.href) + '">' + esc(o.action.label) + '</a>'
+        : '<button type="button" class="' + esc(cls) + '"' + (o.action.onclick ? ' onclick="' + esc(o.action.onclick) + '"' : '') + '>' + esc(o.action.label) + '</button>') + '</div>';
+    }
+    return '<div class="lt-empty lt-empty--' + size + '">' +
+      (o.icon ? '<span class="lt-empty__ic material-symbols-outlined" aria-hidden="true">' + esc(o.icon) + '</span>' : '') +
+      (o.title ? '<h3 class="lt-empty__t">' + esc(o.title) + '</h3>' : '') +
+      (o.desc ? '<p class="lt-empty__d">' + esc(o.desc) + '</p>' : '') + a + '</div>';
+  }
+
+  window.LumitureEmpty = {
+    html: html,
+    noAccess: function (o) {
+      o = o || {};
+      return '<div class="lt-empty-card">' + html({
+        size: 'page', icon: 'lock', title: 'You do not have access to this page',
+        desc: 'Please contact your organization\'s administrator if you believe this is a mistake.',
+        action: { label: 'Back to Overview', href: o.href || './overview.html' }
+      }) + '</div>';
+    },
+    error: function (o) {
+      o = o || {};
+      return html({
+        size: o.size || 'm', icon: o.icon || 'error', title: 'Something Went Wrong',
+        desc: 'Please ensure you have a stable internet connection\nand try refreshing the page.',
+        action: o.onclick ? { label: 'Retry', onclick: o.onclick } : null
+      });
+    },
+    noData: function (o) {
+      o = o || {};
+      return html({ size: o.size || 'm', icon: o.icon || 'table_view', title: o.title || 'No Data Available', desc: o.desc, action: o.action });
+    }
+  };
 })();
 
 </script>
@@ -3076,16 +3362,10 @@ function findT1(id){return T1_GROUPS.find(g=>g.id===id)}
 function findT2(t1id,t2id){return tier2GroupsFor(findT1(t1id)).find(g=>g.id===t2id)}
 
 /* ---------- toast ---------- */
-let toastTimer;
-function showToast(text,type='success'){
-  const t=document.getElementById('toast');
-  document.getElementById('toast-text').textContent=text;
-  document.getElementById('toast-icon').textContent = type==='error'?'error':'check_circle';
-  t.classList.toggle('error', type==='error');
-  t.classList.add('show');
-  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3400);
+function showToast(text,type='success'){   /* A-1：改走 shared/lumiture-toast.js（#008F88／#BF302E、寬 400、r4、left 跟 sidebar） */
+  LumitureToast.show({kind: type==='error'?'error':'success', message: text});
 }
-function deferredAction(label){ showToast(label+'：設計稿尚無這張畫面或內容待確認，本版留佔位（見 CLAUDE.md Group List v3 段落）'); }
+function deferredAction(label){ LumitureToast.info(label+'：設計稿尚無這張畫面或內容待確認，本版留佔位（見 CLAUDE.md Group List v3 段落）'); }
 
 /* ---------- confirm dialog: Unlink Resource（#20）。v2 行為維持不變（規則：#18-2 兩張同編號的稿都不動）；
  * v3 只是多了 Label / Tag 那條入口，bucket 以 '-tag' 結尾時 names 從 label 表找、確認後從已指派集合移除。 ---------- */
@@ -3098,7 +3378,7 @@ function openUnlinkDialog(groupId, cloud, ids, bucket){
   state.pendingUnlink = {ids, bucket};
   root.innerHTML = `<div class="dlg-backdrop" onclick="if(event.target===this)closeDialog()">
     <div class="dlg">
-      <div class="dlg-head"><span class="material-symbols-outlined">warning</span><h3>Unlink Resource</h3></div>
+      <div class="dlg-head"><span class="material-symbols-outlined">error</span><h3>Unlink Resource</h3></div>
       <div class="dlg-body">Do you confirm that you want to unlink this resource from the group?<br><br>${names.map(n=>'<b>'+esc(n)+'</b>').join('<br>')}</div>
       <div class="dlg-actions">
         <button class="btn btn-out" onclick="closeDialog()">Cancel</button>
@@ -3210,8 +3490,8 @@ Please create a new group or contact your administrator for assistance.</p>
     tds.push(`<td>${esc(g.lastUpdated)}</td>`, `<td class="cell-ellipsis">${esc(g.creator)}</td>`, `<td>${esc(g.created)}</td>`);
     if(showAction){
       tds.push(`<td><div class="actions-cell">
-        <button class="btn-icon" data-testid="edit-group-button" onclick="event.stopPropagation();openEditGroup('${g.id}',${opts.tier===2?`'${opts.t1IdForRow}'`:'null'})" title="Edit Group"><span class="material-symbols-outlined">edit</span></button>
-        ${actions().removeGroup?`<button class="btn-icon danger" data-testid="remove-group-button" onclick="event.stopPropagation();openRemoveGroup('${g.id}',${opts.tier===2?`'${opts.t1IdForRow}'`:'null'})" title="Remove Group"><span class="material-symbols-outlined">delete</span></button>`:''}
+        <button class="lt-btn-icon" data-testid="edit-group-button" onclick="event.stopPropagation();openEditGroup('${g.id}',${opts.tier===2?`'${opts.t1IdForRow}'`:'null'})"data-tip="Edit Group" aria-label="Edit Group"><span class="material-symbols-outlined">edit</span></button>
+        ${actions().removeGroup?`<button class="lt-btn-icon" data-testid="remove-group-button" onclick="event.stopPropagation();openRemoveGroup('${g.id}',${opts.tier===2?`'${opts.t1IdForRow}'`:'null'})"data-tip="Remove Group" aria-label="Remove Group"><span class="material-symbols-outlined">delete</span></button>`:''}
         </div></td>`);
     }
     const clickTarget = opts.tier===2 ? `openDetail(2,'${opts.t1IdForRow}','${g.id}')` : `openDetail(1,'${g.id}')`;
@@ -3223,26 +3503,29 @@ Please create a new group or contact your administrator for assistance.</p>
 
 function renderList(){
   if(state.pageState==='nodata'){
-    return `<h1 class="org-title">${ORG_NAME}</h1><div class="card"><div class="empty-state error"><div>
-      <span class="material-symbols-outlined">cloud_off</span>
-      <p class="empty-title">Unable to load Group List</p>
-      <p class="empty-copy">Please try again. If the problem persists, contact your administrator.</p>
-      <button class="btn btn-pri" onclick="state.pageState='set';render()">Retry</button>
-      </div></div></div>`;
+    /* A-19／A-34⑤：改用共用 LumitureEmpty.error（FE EmptyState 統一文案 Something Went Wrong） */
+    return `<div class="card"><h1 class="org-title">${ORG_NAME}</h1>${LumitureEmpty.error({size:'m', onclick:"state.pageState='set';render()"})}</div>`;
   }
-  const total = state.pageState==='empty' ? 0 : T1_GROUPS.length;
-  const groups = state.pageState==='empty' ? [] : T1_GROUPS;
+  /* A-26：僅有 T2 權限者直接看到 Tier 2 Group List、不顯示下層群組欄（稿 #58）。
+   * mock：T2 使用者屬於 Business Development 底下的 T2 群組 */
+  const isT2User = state.role==='t2-manager' || state.role==='t2-member';
+  const t2Owner = T1_GROUPS[0];
+  const total = state.pageState==='empty' ? 0 : (isT2User ? tier2GroupsFor(t2Owner).length : T1_GROUPS.length);
+  const groups = state.pageState==='empty' ? [] : (isT2User ? tier2GroupsFor(t2Owner) : T1_GROUPS);
   const titleCount = total;   // #32：讀取中標題的計數照樣顯示（註記「群組名稱以及群組/資源數量等需讀取內容，可先按照上圖呈現」）
-  return `<h1 class="org-title">${ORG_NAME}</h1>
-    <div class="card">
+  const tierNo = isT2User ? 2 : 1;
+  const tableOpts = isT2User ? {showTier2:false, editable:actions().editGroup, tier:2, t1IdForRow:t2Owner.id, sortTable:'tier2'} : {showTier2:true, editable:actions().editGroup, tier:1, sortTable:'t1'};
+  /* A-27：頁標題 CloudMile 在卡片內第一行（稿 #01、FE tier-one-groups/page.tsx 的 Paper 內） */
+  return `<div class="card">
+      <h1 class="org-title">${ORG_NAME}</h1>
       <div class="section-head">
         <div>
-          <h2>Tier 1 Group List (${titleCount})</h2>
-          <p>You can quickly view the Tier 1 group information here, and click on each group to check details such as group members.</p>
+          <h2>Tier ${tierNo} Group List (${titleCount})</h2>
+          <p>You can quickly view the Tier ${tierNo} group information here, and click on each group to check details such as group members.</p>
         </div>
         ${actions().createGroup ? `<button class="btn btn-pri" ${state.pageState==='loading'?'disabled':''} onclick="openCreateGroup(1)"><span class="material-symbols-outlined">add</span>Create Group</button>` : ''}
       </div>
-      ${groupTable(groups, {showTier2:true, editable:actions().editGroup, tier:1, sortTable:'t1'})}
+      ${groupTable(groups, tableOpts)}
       ${learnMoreHtml(true)}
     </div>`;
 }
@@ -3275,7 +3558,7 @@ function membersTab(group){
     /* #33：說明文字與 Invite User 按鈕（disabled）照常出現，表格整個 skeleton */
     return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px">
       <p class="section-copy">You can explore the details of this group here, including members, resources, and subgroups belonging to this group.</p>
-      ${actions().inviteUser?'<button class="btn btn-pri" disabled><span class="material-symbols-outlined">person_add</span>Invite User</button>':''}
+      ${actions().inviteUser?'<button class="btn btn-pri" disabled><span class="material-symbols-outlined">add</span>Invite User</button>':''}
     </div>${skeletonTable(6)}`;
   }
   const users = usersFor(group.id);
@@ -3296,8 +3579,8 @@ Invite users to the group or check with your administrator if assistance is need
       <td class="center"><span class="status-text ${u.active?'':'inactive'}">${u.active?'Active':'Inactive'}</span></td>
       <td class="center">${esc(u.lastLogin)}</td>
       ${showAction?`<td class="center"><div class="actions-cell">
-        ${actions().editUser?`<button class="btn-icon" data-testid="edit-user-button" onclick="openEditUser('${group.id}','${u.id}')" title="Edit"><span class="material-symbols-outlined">edit</span></button>`:''}
-        ${actions().removeUser?`<button class="btn-icon danger" data-testid="delete-user-button" ${u.email===CURRENT_USER_EMAIL?'disabled':''} onclick="openRemoveUser('${group.id}','${u.id}')" title="Remove"><span class="material-symbols-outlined">delete</span></button>`:''}
+        ${actions().editUser?`<button class="lt-btn-icon" data-testid="edit-user-button" onclick="openEditUser('${group.id}','${u.id}')"data-tip="Edit" aria-label="Edit"><span class="material-symbols-outlined">edit</span></button>`:''}
+        ${actions().removeUser?`<button class="lt-btn-icon" data-testid="delete-user-button" ${u.email===CURRENT_USER_EMAIL?'disabled':''} onclick="openRemoveUser('${group.id}','${u.id}')"data-tip="Remove" aria-label="Remove"><span class="material-symbols-outlined">delete</span></button>`:''}
         </div></td>`:''}
     </tr>`).join('');
   const headCells = colDefs.map(([label,key,centered])=>sortHeader(label,'members',key,centered)).join('') + (showAction?'<th class="center">Action</th>':'');
@@ -3306,7 +3589,7 @@ Invite users to the group or check with your administrator if assistance is need
     : '<colgroup><col style="width:25%"><col style="width:30%"><col style="width:13%"><col style="width:16%"><col style="width:16%"></colgroup>';
   return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px">
       <p class="section-copy">You can explore the details of this group here, including members, resources, and subgroups belonging to this group.</p>
-      ${actions().inviteUser?`<button class="btn btn-pri" onclick="openInviteUser('${group.id}')"><span class="material-symbols-outlined">person_add</span>Invite User</button>`:''}
+      ${actions().inviteUser?`<button class="btn btn-pri" onclick="openInviteUser('${group.id}')"><span class="material-symbols-outlined">add</span>Invite User</button>`:''}
     </div>
     <div class="table-wrap"><table>${memberCols}<thead><tr>${headCells}</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
@@ -3362,9 +3645,8 @@ function onResSearch(input){
 function resourcesTab(group){
   const isT2 = state.tier===2;
   const notAuthorized = state.cloudAuth==='gcp-only' && state.cloud!=='gcp';
-  const pillTabs = (clickable) => `<div class="pill-tabs">${Object.keys(CLOUD_META).map(c=>clickable
-    ? `<button class="pill-tab ${c===state.cloud?'active':''}" onclick="state.cloud='${c}';render()"><span class="csp-dot" style="background:${CLOUD_META[c].dot}"></span>${CLOUD_META[c].label}</button>`
-    : `<span class="pill-tab ${c===state.cloud?'active':''}"><span class="csp-dot" style="background:${CLOUD_META[c].dot}"></span>${CLOUD_META[c].label}</span>`).join('')}</div>`;
+  /* A-30：Resources 的雲端切換是底線 tabs（稿 #03、FE ResourcesTableWithTabs 的 Tabs），不是灰底 pill＋色點 */
+  const pillTabs = (clickable) => `<div class="tabs-row cloud-tabs"><div class="tabs ${clickable?'':'is-loading-ui'}">${Object.keys(CLOUD_META).map(c=>`<button class="tab ${c===state.cloud?'active':''}" ${clickable?`onclick="state.cloud='${c}';render()"`:'tabindex="-1"'}>${CLOUD_META[c].label}</button>`).join('')}</div></div>`;
   const body = () => {
     if(state.pageState==='loading'){
       /* #34：雲端分頁、Project|Label 子分頁（含計數）、搜尋框都留著但不可操作，Assign Resource disabled，表格 skeleton */
@@ -3429,7 +3711,7 @@ Please assign new resources or reach out to your administrator for help.</p></di
           <td class="cell-ellipsis">${esc(r.key)}</td>
           <td class="cell-ellipsis">${esc(r.value)}</td>
           <td class="cell-double"><div class="l1">${esc(r.parent.name)}</div><div class="l2">${esc(r.parent.id)}</div></td>
-          <td><button class="btn-icon ${canRemove?'danger':''}" ${canRemove?'':'disabled'} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'],'${bucketKey}')" title="Unlink Resource"><span class="material-symbols-outlined">link_off</span></button></td>
+          <td><button class="lt-btn-icon" ${canRemove?'':'disabled'} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'],'${bucketKey}')"data-tip="Unlink Resource" aria-label="Unlink Resource"><span class="material-symbols-outlined">link_off</span></button></td>
         </tr>`).join('');
       /* #03-5：表頭第一格是全選 checkbox（部分勾選時顯示 mixed） */
       tableBlock = `<div class="table-wrap"><table><colgroup><col style="width:48px"><col style="width:22%"><col style="width:22%"><col><col style="width:80px"></colgroup><thead><tr>
@@ -3462,7 +3744,7 @@ Please assign new resources or reach out to your administrator for help.</p></di
           <td class="cell-double"><div class="l1">${hlq(r.parentName,q)}</div><div class="l2">${hlq(r.parentId,q)}</div></td>
           ${hasOrgCol?`<td class="cell-double"><div class="l1">${hlq(r.orgName||'',q)}</div><div class="l2">${hlq(r.orgId||'',q)}</div></td>`:''}
           ${hasFolderCol?`<td class="cell-ellipsis${r.folderNode?' has-fptip':' is-nofolder'}"${r.folderNode?` tabindex="0"${hasOrgCol&&r.orgName?` data-forg="${esc(r.orgName)}"`:''} data-fpath="${esc(folderColumnSegmentsFull(r.folderNode, state.cloud).join('\n'))}" aria-label="${esc(folderColumnFullPath(r.folderNode, state.cloud))}"`:''}>${r.folderNode?folderColumnHtml(r.folderNode, state.cloud, q):esc(noHierLabel)}</td>`:''}
-          <td><button class="btn-icon ${r.canRemove&&canRemove?'danger':''}" ${!(r.canRemove&&canRemove)?'disabled':''} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'],'${bucketKey}')" title="Unlink Resource"><span class="material-symbols-outlined">link_off</span></button></td>
+          <td><button class="lt-btn-icon" ${!(r.canRemove&&canRemove)?'disabled':''} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'],'${bucketKey}')"data-tip="Unlink Resource" aria-label="Unlink Resource"><span class="material-symbols-outlined">link_off</span></button></td>
         </tr>`).join('');
       /* 欄位順序（2026-09-24 第二次調整）：Project → Billing Account → (Organization) → Folder → Action。
        * ①跟彈窗 Group by 切換器同一個順序（Billing account → Folder）
@@ -3511,7 +3793,7 @@ function renderDetail(){
   const backHref = isT2 && state.role==='t2-member' ? null : null; // both roles route back to list in this prototype scope
   /* #06 註記：麵包屑每項最多約 135px、超過顯示 …（.crumb-item） */
   const crumb = isT2
-    ? `<span class="crumb-item">${esc(ORG_NAME)}</span> / <span class="crumb-item" title="${esc(t1.name)}">${esc(t1.name)}</span>`
+    ? `<span class="crumb-item">${esc(ORG_NAME)}</span> / <span class="crumb-item" data-tip="${esc(t1.name)}">${esc(t1.name)}</span>`
     : `<span class="crumb-item">${esc(ORG_NAME)}</span> /`;
   const loading = state.pageState==='loading';
   let body;
@@ -3529,7 +3811,7 @@ function renderDetail(){
         <h1 style="font-size:24px;font-weight:700;margin:0">${esc(group.name)}</h1>
         <div style="display:flex;gap:8px">
           ${actions().editGroup?`<button class="btn btn-out" ${loading?'disabled':''} onclick="openEditGroup('${group.id}',${isT2?`'${t1.id}'`:'null'})"><span class="material-symbols-outlined">edit</span>Edit Group</button>`:''}
-          ${actions().removeGroup?`<button class="btn btn-out danger" ${loading?'disabled':''} onclick="openRemoveGroup('${group.id}',${isT2?`'${t1.id}'`:'null'})"><span class="material-symbols-outlined">delete</span>Remove Group</button>`:''}
+          ${actions().removeGroup?`<button class="btn btn-out" ${loading?'disabled':''} onclick="openRemoveGroup('${group.id}',${isT2?`'${t1.id}'`:'null'})"><span class="material-symbols-outlined">delete</span>Remove Group</button>`:''}
         </div>
       </div>
       ${tabsHeader(group, isT2?2:1)}
@@ -3826,6 +4108,7 @@ function setGroupBy(mode){
     const picked = Object.keys(assign.selected);
     if(picked.length){
       assign.clearedSelection = { ...assign.selected };
+      assign.clearedFromView = {groupBy: assign.groupBy, expanded: {...assign.expanded}};   // B-19：Undo 時一併切回原視角
       assign.clearedCount = picked.length;
       assign.selected = {};
     }
@@ -4071,7 +4354,7 @@ function folderRow(node, depth, ancestors = [], ancIds = []){
       node.projects.filter(project => folderMatches(node) ? inFolderScope(project) : projectVisible(project)).map(project=>projectRow(project, depth+1, ancIds.concat(node.id))).join('')
     ) : '';
   return `<div class="tbranch">
-      <div class="tnode is-folder" data-depth="${depth}"${ancIds.length?` data-parent="${ancIds[ancIds.length-1]}"`:''} style="padding-left:${indentPx(depth)}px;top:${folderStickyTop()}px;z-index:${30+depth}"${node.folderId?` title="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth, ancIds)}${hoverGuidesHtml(ancIds)}
+      <div class="tnode is-folder" data-depth="${depth}"${ancIds.length?` data-parent="${ancIds[ancIds.length-1]}"`:''} style="padding-left:${indentPx(depth)}px;top:${folderStickyTop()}px;z-index:${30+depth}"${node.folderId?` data-tip="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth, ancIds)}${hoverGuidesHtml(ancIds)}
         <button class="tchev" onclick="event.stopPropagation();toggleExpand('${node.id}')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
         ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome)}
         <span class="material-symbols-outlined ticon">folder</span>
@@ -4082,7 +4365,10 @@ function folderRow(node, depth, ancestors = [], ancIds = []){
 function undoClearedSelection(){
   if(!assign.clearedSelection) return;
   assign.selected = assign.clearedSelection;
+  /* B-19：Undo 一併切回原視角，還原的勾選才看得見（不然停在收合的資料夾視角，勾選正好藏起來） */
+  if(assign.clearedFromView){ assign.groupBy = assign.clearedFromView.groupBy; assign.expanded = assign.clearedFromView.expanded; }
   assign.clearedSelection = null;
+  assign.clearedFromView = null;
   assign.clearedCount = 0;
   renderAssign();
 }
@@ -4171,7 +4457,7 @@ function toggleSelectAll(){ forgetClearedNotice(); toggleScope(allVisibleSelecta
  * 字級小一階。四個線索同時在講「這不是資料夾」，不是只靠顏色。
  * 明度往上加深（org blue-20 > folder blue-10 > project 白底），層級一眼讀得出來。 */
 function orgHeaderRow(org){
-  return `<div class="tnode is-org" style="top:${SELECT_ALL_H}px" title="Organization ID: ${esc(org.orgId)}">
+  return `<div class="tnode is-org" style="top:${SELECT_ALL_H}px" data-tip="Organization ID: ${esc(org.orgId)}">
       <span class="material-symbols-outlined org-icon">domain</span>
       <span class="org-name">${hl(org.name)}</span>
     </div>`;
@@ -4301,7 +4587,7 @@ function assignPickerParts(){
         <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="${searchPlaceholder()}" value="${esc(assign.typed != null ? assign.typed : assign.search)}" oninput="onAssignSearch(this.value)"></div>
         ${showGroupByToggle() ? `<div class="groupby-toggle">
           <span class="lbl">Group by</span>
-          <span class="material-symbols-outlined gb-info" title="${esc(GROUPBY_HELP)}">info</span>
+          <span class="material-symbols-outlined gb-info" data-tip="${esc(GROUPBY_HELP)}" tabindex="0">info</span>
           <div class="pill-tabs">
             <button class="pill-tab ${assign.groupBy==='ba'?'active':''}" onclick="setGroupBy('ba')"><span class="material-symbols-outlined" style="font-size:16px">${cfg().parentIcon}</span>${esc(cfg().parentLabel)}</button>
             <button class="pill-tab ${assign.groupBy==='folder'?'active':''}" onclick="setGroupBy('folder')"><span class="material-symbols-outlined" style="font-size:16px">folder</span>Folder</button>
@@ -5065,7 +5351,7 @@ function renderFm(){
     const group = fmGroup();
     /* #10 的主按鈕在稿上寫「Remove user」，是複製 #13 留下的錯字；這裡改成 Remove group
      * （沿用稿上小寫第二個字的寫法），已列入設計稿問題。 */
-    html = `<div class="fm-head"><span class="material-symbols-outlined fm-warn">warning</span><h3>Remove Group</h3>${closeBtn}</div>
+    html = `<div class="fm-head"><span class="material-symbols-outlined fm-err">error</span><h3>Remove Group</h3>${closeBtn}</div>
       <div class="dlg-body">Are you sure you want to remove this group: <span class="fm-name">${esc(group?group.name:'')}</span>?</div>
       <div class="dlg-actions">${cancel}${primary('Remove group')}</div>`;
   } else if(fm.kind==='deletionNotAllowed'){
@@ -5075,7 +5361,7 @@ function renderFm(){
       <div class="dlg-actions"><button class="btn btn-pri" onclick="closeFm()">Got it</button></div>`;
   } else if(fm.kind==='removeUser'){
     const user = fmUser();
-    html = `<div class="fm-head"><span class="material-symbols-outlined fm-warn">warning</span><h3>Remove User</h3>${closeBtn}</div>
+    html = `<div class="fm-head"><span class="material-symbols-outlined fm-err">error</span><h3>Remove User</h3>${closeBtn}</div>
       <div class="dlg-body">Are you sure you want to remove: <span class="fm-name">${esc(user ? (user.name.trim() || user.email) : '')}</span>?<br>This action is irreversible. Data belonging to the member will also be cleared.</div>
       <div class="dlg-actions">${cancel}${primary('Remove user')}</div>`;
   }
@@ -5120,17 +5406,13 @@ function renderAdmin(){
   const cols = '<colgroup><col style="width:22%"><col style="width:26%"><col style="width:12%"><col style="width:14%"><col style="width:15%"><col style="width:11%"></colgroup>';
   let body;
   if(!canSee){
-    /* 註記「只有權限在 Admin 以上層級者可看見此頁面」，沒畫非 Admin 看到什麼。設計端暫擬：沿用 no-access 語彙。 */
-    body = `<div class="empty-state error"><div><span class="material-symbols-outlined">lock</span>
-      <p class="empty-title">Admin List is only available to administrators</p>
-      <p class="empty-copy">Please reach out to your administrator if you need access.</p></div></div>`;
+    /* 註記「只有權限在 Admin 以上層級者可看見此頁面」，沒畫非 Admin 看到什麼。
+     * A-19：沿用 ARL 10/09 裁決的整頁無權限（共用 LumitureEmpty.noAccess），標題留在卡片外 */
+    return `<h1 class="org-title">Admin List</h1>${LumitureEmpty.noAccess()}`;
   } else if(loading){
     body = skeletonTable(6, cols);
   } else if(state.pageState==='nodata'){
-    body = `<div class="empty-state error"><div><span class="material-symbols-outlined">cloud_off</span>
-      <p class="empty-title">Unable to load Admin List</p>
-      <p class="empty-copy">Please try again. If the problem persists, contact your administrator.</p>
-      <button class="btn btn-pri" onclick="state.pageState='set';render()">Retry</button></div></div>`;
+    body = LumitureEmpty.error({size:'m', onclick:"state.pageState='set';render()"});
   } else {
     /* Owner 固定第一位，其餘照原順序（#07 註記） */
     const rows = [...ADMINS].sort((a,b)=>(a.role==='owner'?0:1)-(b.role==='owner'?0:1)).map(admin=>{
@@ -5141,7 +5423,7 @@ function renderAdmin(){
         <td class="center">${admin.role==='owner'?'Owner':'Admin'}</td>
         <td class="center"><span class="status-text ${admin.active?'':'inactive'}">${admin.active?'Active':'Inactive'}</span></td>
         <td class="center">${esc(admin.lastLogin)}</td>
-        <td class="center"><div class="actions-cell"><button class="btn-icon danger" ${locked?'disabled':''} onclick="deferredAction('Remove Admin')" title="Remove"><span class="material-symbols-outlined">delete</span></button></div></td>
+        <td class="center"><div class="actions-cell"><button class="lt-btn-icon" ${locked?'disabled':''} onclick="deferredAction('Remove Admin')"data-tip="Remove" aria-label="Remove"><span class="material-symbols-outlined">delete</span></button></div></td>
       </tr>`;
     }).join('');
     body = `<div class="table-wrap"><table>${cols}<thead><tr><th>User Name</th><th>Email</th><th class="center">Role</th><th class="center">Active Status</th><th class="center">Last Login</th><th class="center">Action</th></tr></thead><tbody>${rows}</tbody></table></div>`;
@@ -5159,9 +5441,17 @@ function renderAdmin(){
 function openInviteAdmin(){ openFm('inviteAdmin', {}); }
 
 /* ---------- top-level render ---------- */
+/* A-20①：Demo 切角色時 topbar 帳號 chip 跟著變（ARL／AL 同做法）。第一次 render 不動，
+ * 免得蓋掉 topbar 從 sessionStorage 還原的「View as Another Role」群組 chip */
+const GL_CHIP = {admin:'Admin', 't1-manager':'Manager - Cost Center', 't1-member':'Member - Cost Center', 't2-manager':'Manager - Platform Team', 't2-member':'Member - Platform Team'};
+let _chipRole = null;
 function render(){
   const app = document.getElementById('app');
   app.innerHTML = state.view==='admin' ? renderAdmin() : state.view==='list' ? renderList() : renderDetail();
+  /* A-34④：Demo 情境切到 Admin List 不會改 hash（改了會 reload 掉狀態），sidebar 選中項這裡手動跟 */
+  if(window.LumitureSidebar && LumitureSidebar.setActive) LumitureSidebar.setActive(state.view==='admin' ? 'admin-list' : 'group-list');
+  if(_chipRole !== null && _chipRole !== state.role && window.LumitureTopbar && GL_CHIP[state.role]) LumitureTopbar.setRole(GL_CHIP[state.role]);
+  _chipRole = state.role;
 }
 /* sidebar 的 Group List / Admin List 都指向這支檔案（差一個 #admin），點了只會改 hash，
  * 直接 reload 讓 LUMITURE_ACTIVE 與 view 重新算，不用另外同步 sidebar 的 active 樣式。 */
@@ -5274,6 +5564,16 @@ function gotoResourcesTable(groupId){
   state.tab='resources'; state.resSub[state.cloud]='primary'; render();
 }
 window.DEMO_DEFAULT = 'admin';
+/* R2：切情境前先把上一個情境留下的彈窗關掉（Invite User 等表單彈窗、Create Group wizard、Assign by Label／Tag、Unlink 確認），
+ * 不然 crud-invite → tag-gcp／wz-gcp 這類切換會疊在一起。這些彈窗都是新情境需要時自己重開；
+ * Assign picker 例外：assign-／style-／sel-／org-multi／org-single 這組情境會沿用開著的 picker（只換旗標或視角），所以不關。 */
+window.DEMO_ON_LEAVE = function (prevId, nextId) {
+  if (wizard.open) closeWizard();
+  if (fm.kind) closeFm();
+  if (tagPick.open) closeTagAssign();
+  closeDialog();
+  if (assign.open && !/^(assign-|style-|sel-|org-multi$|org-single$)/.test(String(nextId))) closeAssign();
+};
 window.DEMO_APPLY = function (id) {
   /* 策展列是 List 分類專用，切到別的情境一律關掉，不然會黏在畫面上 */
   if (id !== 'list-hier') state.hierShowcase = false;
@@ -5381,6 +5681,7 @@ window.DEMO_APPLY = function (id) {
  *     isNoData:  boolean?,         // groups under "no data" sub-divider
  *     group:     string?,          // 2026-09-30：同一頁內的分組小標（依第一次出現的順序排）。沒寫 group 的頁面行為完全不變
  *     disabled:  boolean?,         // shows "Soon" badge, not clickable
+ *     onLeave:   function?,        // 2026-10-15：切走這個情境時呼叫 onLeave(nextId)，用來重設它留下的模組狀態（另有全域 window.DEMO_ON_LEAVE(prevId, nextId)）
  *   }
  *
  * Programmatic API:
@@ -5674,7 +5975,7 @@ window.DEMO_APPLY = function (id) {
     var fabEl = document.createElement('button');
     fabEl.className = 'demo-fab';
     fabEl.id = 'demo-fab';
-    fabEl.title = 'Designer Demo Scenarios';
+    fabEl.setAttribute('data-tip', 'Designer Demo Scenarios');   /* 原生 title 改 data-tip（#gl-tip），B 區 A-15 */
     fabEl.innerHTML =
       '<span class="material-symbols-outlined">science</span>' +
       '<span class="demo-pulse" id="demo-fab-pulse"></span>';
@@ -5861,8 +6162,46 @@ window.DEMO_APPLY = function (id) {
     window._demoFabSetPage(pageId);
   };
 
+  /** onLeave 鉤子（2026-10-15）：切走上一個情境時先呼叫它，讓頁面把該情境塞進模組狀態的東西重設掉（避免 Demo 殘留，例如 RS 先點 um-* 再開 modal-detail）。
+   *   寫法一：scenario.onLeave = function (nextId) {…}　寫法二：window.DEMO_ON_LEAVE = function (prevId, nextId) {…}（兩種都會呼叫，先 scenario 後全域）
+   *   觸發點有兩個：點 FAB 按鈕（_demoFabApply）與「直接呼叫 window.DEMO_APPLY(id)」（下面的 DEMO_APPLY 包裝，第二輪 R1 加，讓 sweep 工具也量得到殘留）。 */
+  function _runLeave(id) {
+    var prevId = _activeScenario;
+    if (prevId && prevId !== id) {
+      try {
+        var prev = (window.DEMO_SCENARIOS || []).filter(function (s) { return s.id === prevId; })[0];
+        if (prev && typeof prev.onLeave === 'function') prev.onLeave(id);
+        if (typeof window.DEMO_ON_LEAVE === 'function') window.DEMO_ON_LEAVE(prevId, id);
+      } catch (e) { console.error('[demo-fab] onLeave', e); }
+    }
+  }
+
+  /** 包住頁面的 window.DEMO_APPLY：直接呼叫（不經 FAB）時也先跑 onLeave，並記下目前情境。
+   *  經 _demoFabApply 進來的呼叫用 _inFabApply 旗標略過，所以 onLeave 不會被呼叫兩次。
+   *  頁面不論在 demo-fab.js 載入前或後指定 window.DEMO_APPLY = fn 都會被攔到（accessor 屬性）。 */
+  var _inFabApply = false;
+  (function _wrapDemoApply() {
+    var raw = window.DEMO_APPLY, wrapped = null, wrappedFor = null;
+    function get() {
+      if (typeof raw !== 'function') return raw;
+      if (wrappedFor !== raw) {
+        wrappedFor = raw;
+        wrapped = function (id) {
+          if (!_inFabApply) { _runLeave(id); _activeScenario = id; }
+          return raw.apply(this, arguments);
+        };
+      }
+      return wrapped;
+    }
+    try {
+      Object.defineProperty(window, 'DEMO_APPLY', { configurable: true, enumerable: true, get: get, set: function (fn) { raw = fn; } });
+    } catch (e) { /* 屬性不可重定義（極少見）：退回不包裝，只剩 FAB 點擊會觸發 onLeave */ }
+  })();
+
   /** Apply a scenario — called via event delegation or by host */
   window._demoFabApply = function (id, btn) {
+    _runLeave(id);
+    if (window.LumitureToast && window.LumitureToast.clear) { try { window.LumitureToast.clear(); } catch (e) {} }   // 換情境時清掉上一個情境留下的 toast
     _activeScenario = id;
     document.querySelectorAll('.demo-btn').forEach(function (b) {
       b.classList.remove('active');
@@ -5875,7 +6214,8 @@ window.DEMO_APPLY = function (id) {
       if (found) found.classList.add('active');
     }
     if (typeof window.DEMO_APPLY === 'function') {
-      window.DEMO_APPLY(id, btn);
+      _inFabApply = true;
+      try { window.DEMO_APPLY(id, btn); } finally { _inFabApply = false; }
     }
   };
 

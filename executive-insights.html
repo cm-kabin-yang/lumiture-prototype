@@ -9,14 +9,375 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 <style>
+/* === Inlined: shared/tokens.css === */
+/* ============================================================
+ * Lumiture Design Tokens
+ * ============================================================
+ * 來源：Figma CMDS + prototype scan + 8 項設計決策 (2026-05-12)
+ * 命名規範：W3C Design Tokens spec（長名結構化 BEM）
+ * 三層架構：Primitive → Semantic → Component
+ * 完整決策紀錄：~/.claude/.../project_design_tokens_decisions.md
+ * ============================================================ */
+
+:root {
+
+  /* ============================================================
+   * LAYER 1 — PRIMITIVE
+   * 原子層：純色號 / 純數值；不直接給 component 用
+   * ============================================================ */
+
+  /* --- Color: Brand Sky Blue (對齊 Figma Theme: LumiTure.ai/Primary) --- */
+  --lt-blue-10: #F2FAFF;   /* Figma: Primary/Light 10 */
+  --lt-blue-20: #D1EEFF;   /* Figma: Primary/Light 20 */
+  --lt-blue-30: #9ED7FF;   /* Figma: Primary/Light 30 */
+  --lt-blue-60: #0B6DD7;   /* Figma: Primary/Light */
+  --lt-blue-70: #004FB0;   /* Figma: Primary/Main */
+  --lt-blue-90: #002663;   /* Figma: Primary/Dark */
+
+  /* --- Color: Brand Turquoise (對齊 Figma Theme: LumiTure.ai/Secondary) --- */
+  --lt-turquoise-10: #F0FFFF;   /* Figma: Turquoise 10 */
+  --lt-turquoise-20: #DBFDFF;   /* Figma: Turquoise 20 */
+  --lt-turquoise-30: #B0F8FF;   /* Figma: Turquoise 30 */
+  --lt-turquoise-60: #4ADFFF;   /* Figma: Turquoise 60 (Chart) */
+  --lt-turquoise-70: #34B5D9;   /* Figma: Secondary/Main */
+  --lt-turquoise-80: #228EB3;   /* Figma: Secondary/Dark */
+
+  /* --- Color: Grey (9 階；同值不同 token = 為未來情境換色保留彈性) --- */
+  --lt-grey-50:  #F6F6F6;
+  --lt-grey-100: #F2F2F2;
+  --lt-grey-200: #E6E6E6;
+  --lt-grey-300: #CCCCCC;
+  --lt-grey-400: #B3B3B3;
+  --lt-grey-500: #676767;
+  --lt-grey-600: #676767;   /* 暫同 500；保留為 icon-default 等情境獨立換色用 */
+  --lt-grey-700: #262626;
+  --lt-grey-800: #262626;   /* 暫同 700；保留為 heading 等情境獨立換色用 */
+  --lt-grey-900: #262626;   /* 暫同 700；保留為 highest contrast 情境用 */
+
+  /* --- Color: Black / White --- */
+  --lt-black: #000000;
+  --lt-white: #FFFFFF;
+
+  /* --- Color: Chart Palette (對齊 Figma General Behavior 規範)
+   * 來源：Figma file 🧞‍♂️-General-Behavior, node 1642-36013
+   * 使用規則：圖表配色一律按 1→10 順序套用；超過 10 個則循環使用
+   * 命名按官方 "#N Main" 編號 + 視覺色名註解
+   */
+  --lt-chart-1:  #7A8BA9;   /* CMDS Color Kit Main #1 — Navy Blue 50 */
+  --lt-chart-2:  #9ED7FF;   /* CMDS Color Kit Main #2 — Sky Blue 30 (corrected from #86CBFC 2026-05-21; #86CBFC is GCP brand color, not CMDS palette) */
+  --lt-chart-3:  #9CF3FF;   /* CMDS Color Kit Main #3 — Turquoise Blue 40 */
+  --lt-chart-4:  #00DCC2;   /* CMDS Color Kit Main #4 — Green 60 */
+  --lt-chart-5:  #94F29D;   /* CMDS Color Kit Main #5 — Emerald Green 40 */
+  --lt-chart-6:  #F3BE68;   /* CMDS Color Kit Main #6 — Tangerine Orange 40 */
+  --lt-chart-7:  #F4B581;   /* CMDS Color Kit Main #7 — Lantern Orange 50 */
+  --lt-chart-8:  #FFA4A9;   /* CMDS Color Kit Main #8 — Red 30 */
+  --lt-chart-9:  #FE89C1;   /* CMDS Color Kit Main #9 — Fuchsia 30 */
+  --lt-chart-10: #C096FF;   /* CMDS Color Kit Main #10 — Purple 40 */
+  --lt-chart-11: #B3B3B3;   /* CMDS Color Kit Main #11 — Gray 30 (for n+1 fallback) */
+
+  /* --- Color: Functional (TBC — Figma 未做 Variable，待下輪 audit) --- */
+  --lt-color-success-base:  #00B5A6;   /* TBC: Figma audit needed */
+  --lt-color-success-dark:  #008F88;   /* TBC: Figma audit needed */
+  --lt-color-success-light: #E6FFF8;   /* TBC: Figma audit needed */
+  --lt-color-error-base:    #FF403D;   /* TBC: Figma audit needed */
+  --lt-color-error-light:   #FFEBEF;   /* TBC: Figma audit needed */
+  --lt-color-warning-base:  #FC9A0F;   /* TBC: Figma audit needed */
+  --lt-color-warning-light: #FEF3E1;   /* TBC: Figma audit needed */
+  --lt-color-info-base:     #0B6DD7;   /* = blue-60，符合 Figma info usage */
+  --lt-color-info-light:    #E6F6FF;   /* TBC: Figma audit needed */
+
+  /* --- Spacing: 嚴格 8px grid，4px 為微間距例外 --- */
+  --lt-space-0:    0;
+  --lt-space-4:    4px;     /* 例外：僅限 icon-text gap、border-thin 等微間距 */
+  --lt-space-8:    8px;
+  --lt-space-16:   16px;
+  --lt-space-24:   24px;
+  --lt-space-32:   32px;
+  --lt-space-48:   48px;
+  --lt-space-64:   64px;
+  --lt-space-96:   96px;
+  --lt-space-128:  128px;
+
+  /* --- Radius --- */
+  --lt-radius-none:   0;
+  --lt-radius-xs:     3px;      /* chips / badges / 薄狀指示器 (源自 lumi-tag v7 5 處用法) */
+  --lt-radius-sm:     4px;
+  --lt-radius-btn:    5px;      /* 2026-10-15 B-8：按鈕／輸入框／下拉觸發欄（FE muiButton、Figma CMDS 都是 5） */
+  --lt-radius-md:     8px;
+  --lt-radius-lg:     12px;
+  --lt-radius-modal-sm: 10px;   /* 2026-10-15 B-4：確認類彈窗（Remove／Discard／Select Role） */
+  --lt-radius-modal:  15px;     /* 2026-10-15 B-4：表單類彈窗（稿量到 15） */
+  --lt-radius-xl:     16px;
+  --lt-radius-pill:   9999px;   /* pill button / chip — 矩形元素的最大圓角 */
+  --lt-radius-circle: 50%;      /* 圓形 icon / avatar / toggle dot — 形狀無關 */
+
+  /* --- Typography: Font Family --- */
+  --lt-font-sans: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'PingFang TC', sans-serif;
+  --lt-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* --- Typography: Font Size (對齊 Figma 8 階；13px 為例外備用) --- */
+  --lt-fs-12: 12px;   /* Figma: Caption */
+  --lt-fs-13: 13px;   /* 例外：半 body 半 caption 過渡用；不在 Figma 主規範 */
+  --lt-fs-14: 14px;   /* Figma: Body / Button Regular 1 / Link */
+  --lt-fs-16: 16px;   /* Figma: H6 / Button 2 */
+  --lt-fs-18: 18px;   /* Figma: H5 / Subtitle */
+  --lt-fs-20: 20px;   /* Figma: H4 */
+  --lt-fs-24: 24px;   /* Figma: H3 */
+  --lt-fs-36: 36px;   /* Figma: H2 */
+  --lt-fs-48: 48px;   /* Figma: H1 */
+
+  /* --- Typography: Font Weight --- */
+  --lt-fw-regular:  400;
+  --lt-fw-medium:   500;
+  --lt-fw-semibold: 600;   /* Figma: Button Medium 2 */
+  --lt-fw-bold:     700;
+
+  /* --- Typography: Line Height (對齊 Figma; Body 系列 1.75) --- */
+  --lt-leading-heading: 1.25;   /* Figma: H1 */
+  --lt-leading-tight:   1.5;    /* Figma: H2-H6 / Caption / Button / Link */
+  --lt-leading-body:    1.75;   /* Figma: Body Regular/Medium/Bold */
+
+  /* --- Typography: Letter Spacing (對齊 Figma: 全部 0) --- */
+  --lt-tracking-normal: 0;
+
+  /* --- Shadow: 對齊 CMDS Figma 規範 (2026-05-12 audit)
+   * 來源：Figma node 20599-107518 — CMDS 4 個官方 shadow variables
+   * 命名按「用途」而非「強度」(Cell / Button / Chip / Dialog)，跟 Material/Tailwind 不同
+   * Overlay 系列為 Lumiture 補充規範（CMDS 未涵蓋的較強 floating overlay 場景）
+   */
+  --lt-shadow-cell:   0 2px 0 0 rgba(0, 0, 0, 0.2);              /* 銳邊，blur=0；table row 分隔線替代 */
+  --lt-shadow-button: 0 2px 14px 0 rgba(137, 174, 255, 0.2);     /* 藍色 tinted，#89AEFF；clickable elevation */
+  --lt-shadow-chip:   0 2px 4px 0 rgba(0, 0, 0, 0.3);            /* chip / tag 用，較深 opacity */
+  --lt-shadow-dialog: 0 0 6px 0 rgba(0, 0, 0, 0.2);              /* Card / Dialog / Dropdown 共用；無 offset */
+  --lt-shadow-overlay:        0 4px 12px rgba(0, 0, 0, 0.14);    /* CMDS 未涵蓋；popover / floating menu */
+  --lt-shadow-overlay-strong: 0 4px 16px rgba(0, 0, 0, 0.18);    /* CMDS 未涵蓋；drawer / 較重 overlay */
+
+  /* --- Transition --- */
+  --lt-transition-fast: .15s ease;
+  --lt-transition-base: .2s ease;
+  --lt-transition-slow: .3s ease;
+
+  /* --- Z-index --- */
+  --lt-z-base:     0;
+  --lt-z-elevated: 10;
+  --lt-z-sticky:   100;
+  --lt-z-dropdown: 1000;
+  --lt-z-modal:    2000;
+  --lt-z-tooltip:  3000;
+  --lt-z-toast:    4000;
+
+
+  /* ============================================================
+   * LAYER 2 — SEMANTIC
+   * 語意層：引用 primitive，描述用途；component 預設用此層
+   * ============================================================ */
+
+  /* --- Color: Brand --- */
+  --lt-color-primary:         var(--lt-blue-70);
+  --lt-color-primary-hover:   var(--lt-blue-60);
+  --lt-color-primary-active:  var(--lt-blue-90);
+  --lt-color-primary-bg:      var(--lt-blue-10);
+  --lt-color-primary-bg-emphasized: var(--lt-blue-20);
+
+  --lt-color-secondary:       var(--lt-turquoise-70);
+  --lt-color-secondary-hover: var(--lt-turquoise-60);
+  --lt-color-secondary-bg:    var(--lt-turquoise-10);
+
+  /* --- Color: Functional (alias) --- */
+  --lt-color-success: var(--lt-color-success-base);
+  --lt-color-error:   var(--lt-color-error-base);
+  --lt-color-warning: var(--lt-color-warning-base);
+  --lt-color-info:    var(--lt-color-info-base);
+
+  /* --- Color: Text --- */
+  --lt-color-text-primary:   var(--lt-grey-700);   /* 內文預設 */
+  --lt-color-text-secondary: var(--lt-grey-500);   /* 次要文字 */
+  --lt-color-text-tertiary:  var(--lt-grey-400);   /* hint / placeholder */
+  --lt-color-text-disabled:  var(--lt-grey-400);   /* 白底上的停用文字／icon；停用「按鈕」的字用 --lt-button-disabled-text（白） */
+  --lt-color-text-inverse:   var(--lt-white);
+  --lt-color-text-link:      var(--lt-blue-70);    /* 2026-10-15 B-14：#0B6DD7 → #004FB0，連結一律加底線（稿 cell、FE ResourceButton） */
+  --lt-color-text-link-hover: var(--lt-blue-60);   /* hover 淺一階 #0B6DD7，底線保留 */
+  --lt-color-text-heading:   var(--lt-grey-800);   /* 為未來 heading 獨立換色預留 */
+  --lt-color-text-icon:      var(--lt-grey-600);   /* 為未來 icon 獨立換色預留 */
+
+  /* --- Color: Background --- */
+  --lt-color-bg-default:    var(--lt-white);
+  --lt-color-bg-subtle:     var(--lt-grey-50);
+  --lt-color-bg-emphasized: var(--lt-grey-100);
+  --lt-color-bg-disabled:   var(--lt-grey-100);   /* 停用的「欄位」底（輸入框／下拉，FE SelectButton gray.disableLight）。2026-10-15 B-1：停用「按鈕」改用 FE 版 #CCCCCC 底白字，見 --lt-button-disabled-bg／-text；這顆維持 #F2F2F2，不然舊頁 `.btn:disabled` 用它當底又用 #CCCCCC 當字會變灰壓灰 */
+  --lt-color-text-on-disabled: var(--lt-white);   /* 停用按鈕上的字（= --lt-button-disabled-text） */
+  --lt-color-bg-inverse:    var(--lt-blue-90);
+  --lt-color-bg-overlay:    rgba(0, 0, 0, 0.5);
+  --lt-color-bg-skeleton:   var(--lt-grey-200);   /* 骨架屏；2026-09-24 定，對應前端 gray.skeleton → gray.10；用途命名，日後可單獨換色 */
+
+  /* --- Color: Border --- */
+  --lt-color-border-default: var(--lt-grey-200);
+  --lt-color-border-strong:  var(--lt-grey-300);
+  --lt-color-border-focus:   var(--lt-color-primary);
+  --lt-color-border-input:   var(--lt-grey-300);   /* 2026-10-15 B-7：#DCE3EC → #CCCCCC（FE、X-6 稿、RS／RO 稿一致） */
+  --lt-color-border-input-hover: var(--lt-grey-400); /* 下拉／輸入 hover 框 #B3B3B3（Guideline Dropdown 已是這個） */
+  --lt-color-border-error:   var(--lt-color-error-base);
+
+
+  /* ============================================================
+   * LAYER 3 — COMPONENT
+   * 元件層：給特定元件使用；引用 semantic
+   * ============================================================ */
+
+  /* --- Sidebar (深海軍藍) --- */
+  --lt-sidebar-width:      250px;
+  --lt-sidebar-bg:         var(--lt-blue-90);
+  --lt-sidebar-text:       rgba(255, 255, 255, 0.85);
+  --lt-sidebar-text-muted: rgba(255, 255, 255, 0.50);
+  --lt-sidebar-hover-bg:   rgba(255, 255, 255, 0.06);
+  --lt-sidebar-active-bg:  var(--lt-color-primary);
+
+  /* --- Topbar --- */
+  --lt-topbar-bg:     var(--lt-white);
+  --lt-topbar-shadow: var(--lt-shadow-dialog);   /* CMDS Dialog shadow（Card 級別 elevation）*/
+
+  /* --- Card --- */
+  --lt-card-bg:      var(--lt-color-bg-default);
+  --lt-card-radius:  var(--lt-radius-md);
+  --lt-card-shadow:  0 0 20px 0 rgba(0, 0, 0, 0.10);   /* 2026-10-15 B-3：Figma 對稿量到的卡片陰影（CB／AD／LumiTag 10/02）；原 var(--lt-shadow-dialog) 0 0 6px .2 */
+  --lt-card-padding: var(--lt-space-24);
+
+  /* --- Button --- */
+  --lt-button-radius:     var(--lt-radius-btn);   /* 2026-10-15 B-8：4 → 5 */
+  --lt-button-font-weight: var(--lt-fw-bold);     /* 2026-10-15 A-2：稿（CMDS Button Bold 1）與 FE muiButton 都是 700 */
+  --lt-button-height:     36px;
+  --lt-button-disabled-bg:   var(--lt-grey-300);  /* 2026-10-15 B-1：FE 版 */
+  --lt-button-disabled-text: var(--lt-white);
+  --lt-button-padding-x:  var(--lt-space-16);
+  --lt-button-padding-y:  var(--lt-space-8);
+  --lt-button-focus-ring: 0 0 0 3px rgba(0, 79, 176, 0.10);
+
+  /* --- Input / Text Field --- */
+  --lt-input-bg:        var(--lt-color-bg-default);
+  --lt-input-border:    var(--lt-color-border-input);
+  --lt-input-radius:    var(--lt-radius-btn);   /* 2026-10-15：36h r5（Figma 輸入與下拉） */
+  --lt-input-height:    36px;
+  --lt-input-padding-x: var(--lt-space-16);
+  --lt-input-padding-y: var(--lt-space-8);
+
+  /* --- Modal --- */
+  --lt-modal-radius:   var(--lt-radius-modal);     /* 2026-10-15 B-4：表單類 15（原 12） */
+  --lt-modal-radius-sm: var(--lt-radius-modal-sm); /* 確認類 10 */
+  --lt-modal-shadow:   0 0 6px 0 rgba(0, 0, 0, 0.2);  /* 全站彈窗統一（B-4）；等同 --lt-shadow-dialog，寫死以免 dialog 陰影日後獨立換值時彈窗跟著動 */
+  --lt-modal-padding:  var(--lt-space-24);
+  --lt-modal-backdrop: rgba(0, 0, 0, 0.5);
+
+  /* --- Tooltip --- */
+  --lt-tooltip-bg:      #31383E;            /* 2026-10-09 Kabin 裁決改成 Figma 量到的值（原 #3C3C3C）；對齊 Lumiture-Guideline.md 規範；非品牌色，刻意不引用 brand token */
+  --lt-tooltip-text:    var(--lt-white);
+  --lt-tooltip-radius:  var(--lt-radius-sm);
+  --lt-tooltip-padding: var(--lt-space-8);
+
+  /* --- Page title / Toast（2026-10-15 修正輪新增） --- */
+  --lt-page-title-size:   var(--lt-fs-24);   /* B-2：頁標題 24／700 */
+  --lt-page-title-weight: var(--lt-fw-bold);
+  --lt-toast-success-bg:  #008F88;           /* 照 FE toast.css；CLAUDE.md 10/13 */
+  --lt-toast-error-bg:    #BF302E;
+  --lt-toast-info-bg:     #0B6DD7;           /* FE toast.css --infoMain */
+  --lt-toast-warning-bg:  #EC6F09;           /* FE toast.css --warningMain */
+  --lt-toast-radius:      4px;
+  --lt-toast-width:       400px;
+}
+
+
+/* ============================================================
+ * NOT YET DEFINED (Pass 3+)
+ * ============================================================
+ * - ~~Chart palette~~ ✅ 已加入（2026-05-12 從 Figma General Behavior file audit）
+ * - Gradient tokens (Figma 有 Lumiture.ai Blue / Orange / Lemon C 等)
+ * - Opacity tokens (Figma 有 CM Opacity Color 系列)
+ * - Composite typography tokens (--lt-type-h1, --lt-type-body 等 style sets)
+ * - Focus / Inset shadow 特殊變體
+ * - Dark mode 對應 token
+ *
+ * Shadow 結構待 Figma audit：v7/v8 用單層、tokens.css 主階用雙層；Overlay 已用單層作折衷
+ * ============================================================ */
+
+</style>
+<style>
+/* === Inlined: shared/lumiture-ui.css === */
+/* ============================================================
+ * lumiture-ui.css — 共用小元件樣式（2026-10-15 修正輪 S 組）
+ * 引用：<link rel="stylesheet" href="../shared/lumiture-ui.css?v=2026-10-15">（tokens.css 之後；沒載 tokens.css 的頁面也能用，var 都有備用值）
+ *
+ *   .lt-select   下拉／輸入觸發欄（A-11）
+ *   .lt-skeleton 骨架屏（A-18）
+ *   .lt-link     文字連結（B-14）
+ *   .lt-btn-icon 表格 Action icon button（B-6，CB 版）
+ *   空狀態／無權限見 lumiture-empty.js；Toast 見 lumiture-toast.js
+ * ============================================================ */
+
+/* ---------- .lt-select ----------
+ * 結構：
+ *   <button type="button" class="lt-select" aria-haspopup="listbox" aria-expanded="false">
+ *     <span class="lt-select__v">All Types</span>                       ← 沒選時加 .is-placeholder 在 .lt-select 上，字變 #B3B3B3
+ *     <span class="material-symbols-outlined lt-select__arrow">arrow_drop_down</span>   ← MUI 實心 ▾，不要用 expand_more／chevron
+ *   </button>
+ * 狀態 class：.is-open（框 primary＋focus ring，箭頭轉 180）、.is-error、.is-disabled 或 :disabled、.is-placeholder
+ * 高 36、圓角 5、字 14／400、框 #CCCCCC、hover 框 #B3B3B3（Guideline Dropdown；舊的 hover 框變藍底 #F2FAFF 已廢）。寬度由頁面給（width／min-width）。 */
+.lt-select{display:inline-flex;align-items:center;justify-content:space-between;gap:8px;box-sizing:border-box;height:var(--lt-input-height,36px);padding:0 4px 0 12px;
+  background:var(--lt-color-bg-default,#fff);border:1px solid var(--lt-color-border-input,#CCCCCC);border-radius:var(--lt-input-radius,5px);
+  font-family:inherit;font-size:14px;font-weight:400;line-height:1.5;color:var(--lt-color-text-primary,#262626);text-align:left;cursor:pointer;
+  transition:border-color .15s ease,box-shadow .15s ease}
+.lt-select:hover{border-color:var(--lt-color-border-input-hover,#B3B3B3)}
+.lt-select:focus-visible,.lt-select.is-open{outline:none;border-color:var(--lt-color-border-focus,#004FB0);box-shadow:var(--lt-button-focus-ring,0 0 0 3px rgba(0,79,176,.1))}
+.lt-select__v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lt-select.is-placeholder .lt-select__v{color:var(--lt-grey-400,#B3B3B3)}
+.lt-select__arrow{flex-shrink:0;font-size:24px;line-height:1;color:var(--lt-grey-500,#676767);transition:transform .2s ease;
+  font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+.lt-select.is-open .lt-select__arrow{transform:rotate(180deg)}
+.lt-select.is-error{border-color:var(--lt-color-error,#FF403D)}
+.lt-select.is-error:focus-visible,.lt-select.is-error.is-open{box-shadow:0 0 0 3px rgba(255,64,61,.1)}
+.lt-select:disabled,.lt-select.is-disabled{background:var(--lt-grey-100,#F2F2F2);border-color:var(--lt-grey-300,#CCCCCC);color:var(--lt-grey-300,#CCCCCC);cursor:not-allowed;box-shadow:none}
+.lt-select:disabled .lt-select__arrow,.lt-select.is-disabled .lt-select__arrow{color:var(--lt-grey-300,#CCCCCC)}
+
+/* ---------- .lt-skeleton ----------
+ * 骨架屏統一用 --lt-color-bg-skeleton（#E6E6E6）。**靜態**不跑 shimmer（X-6 現況，Guideline 已回改）；要 shimmer 才加 .lt-skeleton--shimmer。
+ * 用法：<div class="lt-skeleton" style="width:120px;height:16px"></div>；表格列慣例見各頁稿 #01-6（表頭文字照常、只有儲存格內容換成灰條；卡片標題照常、按鈕 disabled）。
+ * 變體：.lt-skeleton--line（高 14、r4）、.lt-skeleton--title（高 24、r4）、.lt-skeleton--circle（圓）、.lt-skeleton--block（r8，大塊如圖表區） */
+.lt-skeleton{display:block;background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;min-height:8px}
+.lt-skeleton--line{height:14px}
+.lt-skeleton--title{height:24px}
+.lt-skeleton--circle{border-radius:50%}
+.lt-skeleton--block{border-radius:8px}
+.lt-skeleton--shimmer{background:linear-gradient(90deg,var(--lt-color-bg-skeleton,#E6E6E6) 0%,#F2F2F2 50%,var(--lt-color-bg-skeleton,#E6E6E6) 100%);background-size:200% 100%;animation:lt-skeleton-shimmer 1.3s ease-in-out infinite}
+@keyframes lt-skeleton-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.lt-skeleton--shimmer{animation:none}}
+
+/* ---------- .lt-link ----------
+ * 文字連結（B-14）：#004FB0＋底線；hover 淺一階 #0B6DD7（底線保留）。字級繼承；稿 cell 連結 14／500，連結鈕（Learn More 等）12／700 請頁面自己給 font-size／weight。
+ * icon 不畫底線（CMDS Text Button 慣例）：有 icon 時文字包在 .lt-link__t。 */
+.lt-link{color:var(--lt-color-text-link,#004FB0);text-decoration:underline;cursor:pointer;background:none;border:none;padding:0;font:inherit}
+.lt-link:hover{color:var(--lt-color-text-link-hover,#0B6DD7)}
+.lt-link:focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:2px;border-radius:2px}
+.lt-link.has-icon{text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.lt-link.has-icon .lt-link__t{text-decoration:underline}
+
+/* ---------- .lt-btn-icon（表格 Action icon button，B-6 取 CB 版）----------
+ * 20×20 box、icon 16、FILL 1、primary 色、圓形；hover 底 #D1EEFF。disabled 色 #B3B3B3。
+ * <button type="button" class="lt-btn-icon" data-tip="Edit"><span class="material-symbols-outlined">edit</span></button> */
+.lt-btn-icon{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:20px;height:20px;padding:0;border:none;border-radius:50%;
+  background:none;color:var(--lt-color-primary,#004FB0);cursor:pointer;flex-shrink:0;transition:background .15s ease}
+.lt-btn-icon .material-symbols-outlined{font-size:16px;line-height:1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
+.lt-btn-icon:hover{background:var(--lt-blue-20,#D1EEFF)}
+.lt-btn-icon:focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:1px}
+.lt-btn-icon:disabled{color:var(--lt-grey-400,#B3B3B3);cursor:not-allowed;background:none}
+
+</style>
+<style>
 :root{
   --pri:#004FB0;--pri-dk:#002663;--pri-lt:#0B6DD7;--pri-lt30:#9ED7FF;--pri-lt20:#D1EEFF;--pri-lt10:#F2FAFF;
   --sec:#34B5D9;--sec-dk:#228EB3;--sec-lt:#4ADFFF;
   --wh:#FFF;--g50:#F6F6F6;--g100:#F2F2F2;--g200:#E6E6E6;--g300:#CCCCCC;--g400:#B3B3B3;--g500:#676767;--g700:#262626;--g900:#262626;
   --ok:#00B5A6;--ok-lt:#E6FFF8;--ok-dk:#008F88;--warn:#FC9A0F;--warn-lt:#FEF3E1;--err:#FF403D;--err-lt:#FFEBEF;--info-lt:#E6F6FF;
   --r-sm:5px;--r-md:8px;--r-lg:12px;
-  --tf-border:#DCE3EC;
-  --sw:264px;
+  --tf-border:#CCCCCC;   /* B-7：輸入與下拉框 #CCCCCC */
+  --sw:var(--lt-sb-w,250px);   /* A-17：固定底列貼齊 sidebar（原本寫死 264，展開時跟 sidebar 之間空 14px） */
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{overscroll-behavior:none}
@@ -45,15 +406,24 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .pg-hdr-meta .lu-item strong{color:var(--g700);font-weight:700;font-variant-numeric:tabular-nums}
 .pg-hdr-meta .lu-info{display:inline-flex;align-items:center;color:var(--g400);cursor:help}
 .pg-hdr-meta .lu-info:hover{color:var(--g500)}
+/* A-23：Next Update 後面的截圖鈕（稿 #01；FE ScreenShot icon，24×24，同 Overview 子頁 .rk-shot） */
+/* ⏸ PARKED：UX 提案 badge（icon-only，琥珀 lightbulb；同 General Budget .gb-pk、Audit Log .pk-badge.mini）。Demo FAB「隱藏暫緩的設計」看上線版 */
+.ei-pk{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-left:2px;border-radius:10px;background:var(--warn-lt);vertical-align:middle}
+.ei-pk .material-symbols-outlined{font-size:14px;color:var(--warn);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
+body.hide-parked .ei-parked{display:none}
+.ei-shot{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;color:var(--pri);border-radius:50%;margin-left:-6px}
+.ei-shot svg{width:18px;height:18px;fill:currentColor}
+.ei-shot:hover{background:var(--pri-lt20)}
+.ei-shot:disabled{color:var(--g400);cursor:not-allowed;background:none}
 .pg-desc-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:20px;flex-wrap:wrap}
-.pg-desc{font-size:13px;color:var(--g500);line-height:1.65;max-width:920px;flex:1;min-width:0}
+.pg-desc{font-size:13px;color:var(--g500);line-height:1.65;flex:1;min-width:0}
 .pg-desc b{color:var(--g700);font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:.5px}
-.pg-desc .lm{color:var(--pri);font-weight:500;cursor:pointer}
+.pg-desc .lm{color:var(--pri);font-weight:500;cursor:pointer;text-decoration:underline}   /* B-14 */
 .pg-desc .lm:hover{text-decoration:underline}
 .pg-desc-r{display:flex;align-items:center;gap:10px;flex-shrink:0}
 
 /* ===== Buttons (CMDS) ===== */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:80px;padding:0 16px;height:36px;border-radius:var(--r-sm);font-weight:500;font-size:14px;transition:background-color .15s,border-color .15s,color .15s,box-shadow .2s;line-height:1.5;white-space:nowrap;border:1px solid transparent;font-family:inherit;letter-spacing:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:80px;padding:0 16px;height:36px;border-radius:var(--r-sm);font-weight:var(--lt-button-font-weight,700);font-size:14px;transition:background-color .15s,border-color .15s,color .15s,box-shadow .2s;line-height:1.5;white-space:nowrap;border:1px solid transparent;font-family:inherit;letter-spacing:0}
 .btn-p{background:var(--pri);color:#fff}
 .btn-p:hover{background:var(--pri-lt)}
 .btn-p:active{background:var(--pri-dk)}
@@ -68,14 +438,15 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .btn-sm{height:30px;padding:0 12px;font-size:14px}
 .btn-xs{height:26px;padding:0 12px;font-size:12px}
 .btn .material-symbols-outlined{font-size:18px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 18}
-.btn:disabled{background:var(--g100)!important;color:var(--g300)!important;border-color:transparent!important;cursor:not-allowed}
-.btn-o:disabled{background:transparent!important;border-color:var(--g300)!important}
+/* B-1：停用的按鈕用 FE 版（底 #CCCCCC 白字）；Outlined 白底灰框灰字 */
+.btn:disabled{background:var(--lt-button-disabled-bg,#CCCCCC)!important;color:var(--lt-button-disabled-text,#fff)!important;border-color:transparent!important;cursor:not-allowed}
+.btn-o:disabled{background:#fff!important;color:var(--g400)!important;border-color:var(--g300)!important}
 
 /* Modal-internal buttons use min-width:100px (CMDS spec) */
 .mf .btn{min-width:100px}
 
 /* ===== Cards (paper) ===== */
-.paper{background:#fff;border-radius:var(--r-md);padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);margin-bottom:16px}
+.paper{background:#fff;border-radius:var(--r-md);padding:24px;box-shadow:var(--lt-card-shadow);margin-bottom:16px}   /* B-3：0 0 20px .10、內距 24、圓角 8 */
 .paper-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:16px}
 .paper-title{font-size:18px;font-weight:700;color:var(--g900);line-height:1.5;display:flex;align-items:center;gap:8px}
 .paper-title .ic-info{font-size:16px;color:var(--g400);cursor:help;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16}
@@ -108,12 +479,12 @@ input,select,textarea{font-family:inherit;font-size:14px}
  */
 .cvr-section-sub{font-size:13px;color:var(--g500);font-style:italic;margin-top:2px;font-weight:500}
 .cvr-section-fy-r{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g700);font-weight:500;white-space:nowrap}
-.cvr-section-fy-r .material-symbols-outlined{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 18}
+.cvr-section-fy-r .material-symbols-outlined{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 18}   /* B-15（R1）：FY 觸發欄 calendar_month FILL 1，跟主頁 Month Picker 一致 */
 .cvr-section-fy-r strong{color:var(--g900);font-weight:700}
 .cvr-section-fy-link{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--pri);font-weight:600;padding:4px 8px;border-radius:var(--r-sm);background:none;border:none;font-family:inherit;line-height:1.4;cursor:pointer}
 .cvr-section-fy-link:hover{background:var(--pri-lt10)}
 .cvr-section-fy-link:hover .cvr-section-fy-link-text{text-decoration:underline}
-.cvr-section-fy-link .material-symbols-outlined{font-size:16px;color:var(--pri);font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 16}
+.cvr-section-fy-link .material-symbols-outlined{font-size:16px;color:var(--pri);font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 16}   /* B-15（R1）：按鈕內 icon FILL 1 */
 
 /* Two-column layout: LEFT (score + metrics) + RIGHT (chart) */
 .cvr-grid{display:grid;grid-template-columns:minmax(380px,1fr) minmax(0,1.2fr);gap:24px;align-items:start}
@@ -150,7 +521,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
  *   - Cost per Customer: 兩數字並列（無框）
  *   - 框內結構：小 label (12px bold, gray) + 大數字 (36px bold, color=state) + meaning row (mood icon + 12px medium colored text)
  */
-.trio{display:grid;grid-template-columns:320fr 320fr 381fr;gap:16px;margin-bottom:16px}
+.trio{display:grid;grid-template-columns:340fr 320fr 361fr;gap:16px;margin-bottom:16px}   /* A-44③：第一欄多給 20fr，1367 寬時「Cloud Spend as a % of Revenue」標題才放得進一行 */
 .trio .paper{margin-bottom:0;display:flex;flex-direction:column;min-height:260px}
 .trio .paper-body{flex:1;display:flex;flex-direction:column;gap:14px}
 .trio .paper-sub-period{font-size:13px;color:#B3B3B3;font-weight:500;font-style:italic;line-height:1.6;margin-top:2px}
@@ -160,11 +531,9 @@ input,select,textarea{font-family:inherit;font-size:14px}
  * 框內背景隨 state 淡色填色，邊框、數字、meaning text 一致 state 色
  */
 .metric-frame{background:#fff;border:1px solid var(--g200);border-radius:var(--r-md);padding:16px;display:flex;flex-direction:column;gap:4px;transition:background .15s,border-color .15s}
-.metric-frame.ok{background:var(--ok-lt);border-color:rgba(0,181,166,.3)}
-.metric-frame.info{background:var(--pri-lt10);border-color:var(--pri-lt20)}
-.metric-frame.warn{background:var(--warn-lt);border-color:rgba(252,154,15,.3)}
-.metric-frame.over{background:var(--err-lt);border-color:rgba(255,64,61,.3)}
-.metric-frame.neutral{background:#FAFAFA;border-color:var(--g200)}
+/* B-18（2026-10-15 裁決）：主數值框照稿 #01 `5425:107659` 改白底加框線；第二輪 R1：框線一律中性 #E6E6E6（稿兩個框都是 1px #E6E6E6 r8），
+ * 狀態只用數字與說明文字的顏色表達（.mf-val／.mf-meaning 的 ok／info／warn／over），不再讓框線跟著變色 */
+.metric-frame.ok,.metric-frame.info,.metric-frame.warn,.metric-frame.over,.metric-frame.neutral{background:#fff;border-color:#E6E6E6}
 .metric-frame .mf-lbl{font-size:12px;font-weight:700;color:var(--g500);line-height:1.5}
 .metric-frame .mf-val-row{display:flex;align-items:flex-end;gap:6px}
 .metric-frame .mf-val{font-size:36px;font-weight:700;line-height:1.5;color:var(--g900);letter-spacing:-.3px;font-variant-numeric:tabular-nums}
@@ -255,39 +624,29 @@ input,select,textarea{font-family:inherit;font-size:14px}
 /* ===== FOCUS section — layout handled by shared/focus-treemap.js (.lt-focus-section grid: 1fr + 452px) ===== */
 
 /* ===== Empty / Loading / Error / No-auth states ===== */
-.state-block{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;min-height:280px}
-.state-block .state-ic{width:72px;height:72px;border-radius:50%;background:var(--pri-lt10);color:var(--pri);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
-.state-block .state-ic .material-symbols-outlined{font-size:36px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 36;color:var(--pri)}
-.state-block.warn .state-ic{background:var(--warn-lt);color:var(--warn)}
-.state-block.warn .state-ic .material-symbols-outlined{color:var(--warn)}
-.state-block.err .state-ic{background:var(--err-lt);color:var(--err)}
-.state-block.err .state-ic .material-symbols-outlined{color:var(--err)}
-.state-block.ok .state-ic{background:var(--ok-lt);color:var(--ok-dk)}
-.state-block.ok .state-ic .material-symbols-outlined{color:var(--ok-dk)}
-.state-block .state-title{font-size:20px;font-weight:700;color:var(--g900);margin-bottom:8px;line-height:1.4}
-.state-block .state-desc{font-size:13px;color:var(--g500);line-height:1.7;max-width:520px;white-space:pre-line;margin-bottom:20px}
-.state-block .state-actions{display:flex;gap:12px}
+/* 空狀態改用 shared/lumiture-empty.js（A-19），舊 .state-block 樣式已移除 */
 
 /* Top10 Overspend celebration empty - smaller variant inside paper */
 .rank-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;min-height:200px}
 .rank-empty .re-ic{width:56px;height:56px;border-radius:50%;background:var(--ok-lt);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
 .rank-empty .re-ic .material-symbols-outlined{font-size:30px;color:var(--ok-dk);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 30}
 .rank-empty .re-title{font-size:16px;font-weight:700;color:var(--g900);margin-bottom:4px}
-.rank-empty .re-desc{font-size:12px;color:var(--g500);line-height:1.6;max-width:380px}
+.rank-empty .re-desc{font-size:12px;color:var(--g500);line-height:1.6}
 
 /* ===== Skeleton loading ===== */
-.sk{background:linear-gradient(90deg,var(--g100) 0%,var(--g50) 50%,var(--g100) 100%);background-size:200% 100%;animation:sk-shimmer 1.4s ease-in-out infinite;border-radius:var(--r-sm)}
-@keyframes sk-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* A-18：骨架屏吃 --lt-color-bg-skeleton（#E6E6E6），靜態不跑 shimmer（X-6 現況） */
+.sk{background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:var(--r-sm)}
 .sk-line{height:14px;margin-bottom:8px}
 .sk-line.w20{width:20%}.sk-line.w40{width:40%}.sk-line.w60{width:60%}.sk-line.w80{width:80%}
 .sk-block{height:80px;margin-bottom:8px}
 .sk-large{height:240px}
 
 /* ===== Month picker (read-only display in v1) ===== */
-.month-picker-btn{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;background:#fff;border:1px solid var(--tf-border);border-radius:var(--r-sm);font-size:13px;color:var(--g700);font-family:inherit;cursor:pointer;line-height:1.4;transition:border-color .12s,background .12s}
-.month-picker-btn:hover{border-color:var(--pri);background:var(--pri-lt10)}
+.month-picker-btn{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 4px 0 12px;background:#fff;border:1px solid var(--tf-border);border-radius:var(--r-sm);font-size:14px;color:var(--g700);font-family:inherit;cursor:pointer;line-height:1.4;transition:border-color .12s,background .12s}
+.month-picker-btn:hover{border-color:var(--g400)}   /* A-11：hover 只換框 #B3B3B3，不再變藍底 */
 .month-picker-btn .material-symbols-outlined{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 18}
 .month-picker-btn .mp-cal{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 18}
+.month-picker-btn .mp-arr{font-size:24px;color:var(--g500);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
 .month-picker-btn .mp-val{color:var(--g900);font-weight:500}
 
 /* ===== Month picker popover (interactive) ===== */
@@ -319,15 +678,15 @@ input,select,textarea{font-family:inherit;font-size:14px}
 
 /* ==== FY year switcher（頁首右上，page-level 導覽；往前兩年/往後一年。移植自 General Budget v2）==== */
 .fy-sw{position:relative;display:inline-block}
-.fy-sw-trigger{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:1px solid var(--g300);border-radius:var(--r-sm);background:#fff;font-family:inherit;font-size:13px;font-weight:600;color:var(--g900);cursor:pointer;line-height:1;transition:border-color .12s,background .12s,box-shadow .12s}
-.fy-sw-trigger:hover{border-color:var(--pri);background:var(--pri-lt10)}
+.fy-sw-trigger{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 4px 0 10px;border:1px solid var(--g300);border-radius:var(--r-sm);background:#fff;font-family:inherit;font-size:14px;font-weight:600;color:var(--g900);cursor:pointer;line-height:1;transition:border-color .12s,background .12s,box-shadow .12s}
+.fy-sw-trigger:hover{border-color:var(--g400)}
 .fy-sw.open .fy-sw-trigger{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 .fy-sw-trigger:disabled{color:var(--g400);background:var(--g100);border-color:var(--g200);cursor:not-allowed}
 .fy-sw-trigger:disabled .fy-sw-cal{color:var(--g400)}
 .fy-sw-cal{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400}
 .fy-sw-val{letter-spacing:0}
 .fy-sw-trigger-range{font-size:13px;font-weight:400;color:var(--g500);letter-spacing:0;white-space:nowrap}
-.fy-sw-arr{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400;transition:transform .15s;margin-left:2px}
+.fy-sw-arr{font-size:24px;color:var(--g500);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;transition:transform .15s;margin-left:2px}   /* A-11：實心 ▾ */
 .fy-sw.open .fy-sw-arr{transform:rotate(180deg)}
 /* dropdown 行內 chip（實心、白字）：Incomplete = 青色（Secondary）*/
 .fy-sw-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;letter-spacing:.02em;line-height:1.5;text-transform:none;white-space:nowrap;color:#fff}
@@ -346,17 +705,17 @@ input,select,textarea{font-family:inherit;font-size:14px}
  * 設計原則：reduce visual weight by integrating context into the same paragraph that explains the page
  * 主段：解釋頁面目的；副段（淺藍框）：明示 GB 依賴關係，因為這是頁面前提條件需要醒目
  */
-.settings-desc{margin-bottom:20px;max-width:920px}
+.settings-desc{margin-bottom:20px}
 .settings-desc p{font-size:13px;color:var(--g500);line-height:1.7;margin-bottom:10px}
 .settings-desc p:last-child{margin-bottom:0}
 .settings-desc strong{color:var(--g700);font-weight:700}
 .settings-desc-gb{display:flex;align-items:flex-start;gap:8px;padding:10px 14px;background:var(--pri-lt10);border-left:3px solid var(--pri-lt);border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--g700)!important;font-size:13px!important}
 .settings-desc-gb .material-symbols-outlined{font-size:18px;color:var(--pri);font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 18;flex-shrink:0;margin-top:1px}
 .settings-desc-gb strong{color:var(--g900);font-weight:700}
-.settings-desc-gb-link{color:var(--pri);font-weight:600;cursor:pointer;text-decoration:none}
+.settings-desc-gb-link{color:var(--pri);font-weight:600;cursor:pointer;text-decoration:underline}   /* B-14：文字連結 #004FB0＋底線 */
 .settings-desc-gb-link:hover{text-decoration:underline}
 
-.section-card{background:#fff;border-radius:var(--r-md);padding:24px 28px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);margin-bottom:16px}
+.section-card{background:#fff;border-radius:var(--r-md);padding:24px;box-shadow:var(--lt-card-shadow);margin-bottom:16px}
 .section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
 .section-hdr-l{display:flex;flex-direction:column;gap:2px}
 .section-title{font-size:18px;font-weight:700;color:var(--g900);line-height:1.5;display:flex;align-items:center;gap:10px}
@@ -437,27 +796,23 @@ body.state-settings.role-admin .savebar{display:flex}
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
 .mo.active{display:flex}
 /* CMDS 預設彈窗寬度 660px (per 設計規範) */
-.modal{background:#fff;border-radius:var(--r-lg);padding:24px 28px;width:660px;max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.2)}
-.modal-sm{width:440px}
+/* B-4：表單彈窗圓角 15、確認彈窗 10，陰影 0 0 6px .2。B-11：確認彈窗寬照稿 #12（655），不是 440 */
+.modal{background:#fff;border-radius:var(--lt-modal-radius,15px);padding:24px 28px;width:660px;max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:var(--lt-modal-shadow,0 0 6px 0 rgba(0,0,0,.2))}
+.modal-sm{width:655px;border-radius:var(--lt-modal-radius-sm,10px)}
 .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .mt{font-size:20px;font-weight:700;color:var(--g900)}
-.mx{color:var(--g400);cursor:pointer;display:flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:50%;background:none;border:none;padding:0}
+.mt-err{color:#FF403D;font-size:24px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;flex-shrink:0}   /* B-12（R1）：危險確認彈窗標題前的紅 error 圓，同 Customized Budget */
+.mx{color:var(--g500);cursor:pointer;display:flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:50%;background:none;border:none;padding:0}
 .mx:hover{background:var(--g100);color:var(--g700)}
 .mdesc{font-size:14px;color:var(--g900);margin-bottom:16px;line-height:1.75}
 .mb{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-right:4px;min-height:0}
-.mf{display:flex;justify-content:flex-end;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--g200)}
+.mf{display:flex;justify-content:flex-end;gap:12px;margin-top:24px}   /* A-38②：按鈕上方沒有分隔線（稿 #09／#12） */
 
 /* Fiscal Start Month Dialog form */
 .fsm-form{display:flex;flex-direction:column;gap:12px}
 .fsm-form .fsm-lbl{font-size:13px;font-weight:600;color:var(--g700);margin-bottom:6px}
 
-/* ===== Toast ===== */
-.toast-wrap{position:fixed;bottom:20px;left:var(--lt-toast-left, 274px);z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.toast{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--ok);color:#fff;border-radius:var(--r-md);box-shadow:0 4px 12px rgba(0,0,0,.15);font-size:13px;font-weight:500;min-width:280px;animation:toast-in .25s ease-out;pointer-events:auto}
-.toast.err{background:var(--err)}
-.toast.warn{background:var(--warn);color:#fff}
-.toast .material-symbols-outlined{font-size:20px}
-@keyframes toast-in{0%{transform:translateY(20px);opacity:0}100%{transform:translateY(0);opacity:1}}
+/* Toast 改用 shared/lumiture-toast.js（A-1）：成功 #008F88／錯誤 #BF302E／r4／寬 400，左緣吃 --lt-toast-left */
 
 /* ===== Page visibility (single HTML, two pages via toggle) ===== */
 .content > .page-dashboard,.content > .page-settings{display:none}
@@ -484,7 +839,7 @@ body.state-settings .content > .page-settings{display:block}
 /* ===== Non-admin lock state (sidebar item disabled visual handled by shared sidebar) ===== */
 body.role-nonadmin .content > .page-dashboard,
 body.role-nonadmin .content > .page-settings{display:none!important}
-body.role-nonadmin .role-block{display:flex}
+body.role-nonadmin .role-block{display:block}   /* A-19／A-38①：頁標題＋整頁無權限卡（卡內自己置中） */
 .role-block{display:none}
 </style>
 </head>
@@ -502,13 +857,9 @@ body.role-nonadmin .role-block{display:flex}
       <!-- ===== NON-ADMIN BLOCK (T1/T2 — no access at all) ===== -->
       <!-- ====================================================== -->
       <div class="role-block">
-        <div class="state-block warn" style="min-height:60vh">
-          <div class="state-ic"><span class="material-symbols-outlined">lock</span></div>
-          <div class="state-title">Executive Insights is not available for your role</div>
-          <div class="state-desc">Executive Insights and Fiscal Settings affect organization-level finance KPIs and are restricted to <b>Owner / Admin</b> users only.
-
-If you need access, please reach out to your administrator.</div>
-        </div>
+        <!-- 第二輪 R1（A-19）：整頁無權限統一成 shared LumitureEmpty.noAccess()（頁標題在、「You do not have access to this page」＋Back to Overview，同 ARL／RO） -->
+        <div class="pg-hdr"><div class="pg-hdr-l"><div class="pg-title">Executive Insights</div></div></div>
+        <div id="ei-noaccess"></div>
       </div>
 
       <!-- ============================================ -->
@@ -525,6 +876,7 @@ If you need access, please reach out to your administrator.</div>
             <span class="lu-item"><span style="color:var(--g500)">Last Updated</span> <strong id="last-updated">10/09/2026</strong></span>
             <span class="lu-item"><span style="color:var(--g500)">Next Update</span> <strong id="next-updated">10/10/2026</strong> <span style="color:var(--g500);font-size:12px">(UTC+0)</span></span>
             <span class="lu-info" data-tip="Cloud cost data is refreshed monthly. Latency may vary depending on each cloud provider's billing readiness."><span class="material-symbols-outlined icon-outline" style="font-size:16px">info</span></span>
+            <button type="button" class="ei-shot" data-tip="Take Screenshot" aria-label="Take Screenshot" onclick="takeScreenshot()"><svg viewBox="0 0 24 25"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.3999 4.16675C3.29533 4.16675 2.3999 5.06218 2.3999 6.16675V7.59612V14.1696C2.3999 15.2741 3.29533 16.1696 4.3999 16.1696H7.7184V14.3696H4.3999C4.28945 14.3696 4.1999 14.28 4.1999 14.1696V7.59612H16.0321V8.31538H17.8321V7.59612V6.16675C17.8321 6.09771 17.8286 6.02949 17.8218 5.96226C17.7194 4.95375 16.8676 4.16675 15.8321 4.16675H4.3999ZM19.1571 12.2168H19.8899C20.8329 12.2168 21.5999 12.9956 21.5999 13.953V18.6661C21.5999 19.6235 20.8329 20.4023 19.8899 20.4023H11.584C10.6411 20.4023 9.87408 19.6235 9.87408 18.6661V13.953C9.87408 12.9956 10.6411 12.2168 11.584 12.2168H12.3169C12.3931 12.2168 12.4665 12.179 12.5125 12.1176L13.4319 11.0628C13.7572 10.6927 14.2224 10.4805 14.71 10.4805H16.764C17.2516 10.4805 17.7168 10.6927 18.042 11.0628L18.9234 12.07C19.0075 12.1801 19.0809 12.2168 19.1571 12.2168ZM13.2942 16.1855C13.2942 17.5528 14.3904 18.6661 15.737 18.6661C17.0836 18.6661 18.1798 17.5528 18.1798 16.1855C18.1798 14.8184 17.0836 13.7051 15.737 13.7051C14.3904 13.7051 13.2942 14.8184 13.2942 16.1855Z"/></svg></button>
           </div>
         </div>
 
@@ -533,16 +885,16 @@ If you need access, please reach out to your administrator.</div>
             Please note that some charts on this dashboard are group-based, so totals may differ from the organization's overall total due to resources counted in multiple groups. Values may also vary from your console due to cloud provider time zone and currency settings, and the <b>INCLUSION OF CREDITS</b> on this page. <span class="lm" data-tip="Powered by FOCUS spec. Service categories are normalized across GCP, AWS, and Azure for cross-cloud comparison.">(Learn More)</span>
           </div>
           <div class="pg-desc-r">
-            <button class="curr-btn" onclick="CurrencyPicker.open(this,document.getElementById('curr-code').textContent.trim(),setCurrency)" title="Change currency">
+            <button class="curr-btn" onclick="CurrencyPicker.open(this,document.getElementById('curr-code').textContent.trim(),setCurrency)" data-tip="Change currency" aria-label="Change currency">
               <span class="curr-flag" id="curr-flag">🇺🇸</span>
               <span class="curr-code" id="curr-code">USD</span>
-              <span class="material-symbols-outlined">expand_more</span>
+              <span class="material-symbols-outlined curr-arrow">arrow_drop_down</span>
             </button>
             <div class="mp-wrap" id="mp-wrap">
-              <button class="month-picker-btn" id="mp-trigger" onclick="toggleMonthPicker(event)" title="Select month" aria-haspopup="true" aria-expanded="false">
+              <button class="month-picker-btn" id="mp-trigger" onclick="toggleMonthPicker(event)" data-tip="Select month" aria-haspopup="true" aria-expanded="false">
                 <span class="material-symbols-outlined mp-cal">calendar_month</span>
                 <span class="mp-val" id="mp-val">Sep. 2026</span>
-                <span class="material-symbols-outlined">expand_more</span>
+                <span class="material-symbols-outlined mp-arr">arrow_drop_down</span>
               </button>
               <div class="mp-pop" id="mp-pop"></div>
             </div>
@@ -674,77 +1026,33 @@ If you need access, please reach out to your administrator.</div>
             </div>
             <div class="paper">
               <div class="paper-hdr"><div><div class="paper-title">Top 10 Highest Spending Groups</div></div></div>
-              <div class="state-block" style="min-height:200px">
-                <div class="state-ic" style="background:#F6F6F6"><span class="material-symbols-outlined" style="color:#B3B3B3">bar_chart</span></div>
-                <div class="state-title" style="font-size:16px">No Spending Data Yet</div>
-                <div class="state-desc" style="max-width:520px">Your cloud accounts have not generated any spending, or resources have not yet been synced to LumiTure.ai. Once you begin using your resources, your spending will be displayed here.</div>
-              </div>
+              <div data-lt-empty='{"size":"m","icon":"bar_chart","title":"No Spending Data Yet","desc":"Your cloud accounts have not generated any spending, or resources have not yet been synced to LumiTure.ai. Once you begin using your resources, your spending will be displayed here."}' style="min-height:200px;display:flex;align-items:center;justify-content:center"></div>
             </div>
             <!-- FOCUS No Data -->
             <div class="paper">
               <div class="paper-hdr"><div><div class="paper-title">Cost by FOCUS Framework</div></div></div>
-              <div class="state-block" style="min-height:200px">
-                <div class="state-ic" style="background:#F6F6F6"><span class="material-symbols-outlined" style="color:#B3B3B3">bar_chart</span></div>
-                <div class="state-title" style="font-size:16px">No Spending Data Yet</div>
-                <div class="state-desc" style="max-width:520px">Your cloud accounts have not generated any spending, or resources have not yet been synced to LumiTure.ai. Once you begin using your resources, your spending will be displayed here.</div>
-              </div>
+              <div data-lt-empty='{"size":"m","icon":"bar_chart","title":"No Spending Data Yet","desc":"Your cloud accounts have not generated any spending, or resources have not yet been synced to LumiTure.ai. Once you begin using your resources, your spending will be displayed here."}' style="min-height:200px;display:flex;align-items:center;justify-content:center"></div>
             </div>
           </div>
 
           <!-- ====== FIRST-TIME EMPTY STATE — 對齊 Figma 5587-131792 文案 ====== -->
           <div class="state-view" data-state="firsttime" style="display:none">
             <div class="paper">
-              <div class="state-block">
-                <div class="state-ic"><span class="material-symbols-outlined">monitoring</span></div>
-                <div class="state-title">Your Journey to Smarter Cloud Decisions Starts Here</div>
-                <div class="state-desc">Provide just a few key details to set up your fiscal profile.
-This one-time setup will unlock LumiTure.ai's ability to generate personalized executive insights.
-Helping you gain clarity, discover hidden cost-saving opportunities, and make smarter business decisions with confidence.</div>
-                <div class="state-actions">
-                  <button class="btn btn-p" onclick="openFiscalStartDialog()">
-                    <span class="material-symbols-outlined">auto_awesome</span>
-                    Begin My Insights Journey
-                  </button>
-                </div>
-              </div>
+              <div data-lt-empty='{"size":"l","icon":"monitoring","title":"Your Journey to Smarter Cloud Decisions Starts Here","desc":"Provide just a few key details to set up your fiscal profile.\nThis one-time setup will unlock LumiTure.ai&#39;s ability to generate personalized executive insights.\nHelping you gain clarity, discover hidden cost-saving opportunities, and make smarter business decisions with confidence.","action":{"label":"Begin My Insights Journey","onclick":"openFiscalStartDialog()"}}' style="min-height:280px;padding:24px 0;display:flex;align-items:center;justify-content:center"></div>
             </div>
           </div>
 
           <!-- ====== CSP NOT AUTHORIZED STATE — 對齊 Figma #06 (5425:107906) 文案 ====== -->
           <div class="state-view" data-state="no-auth" style="display:none">
             <div class="paper">
-              <div class="state-block">
-                <div class="state-ic"><span class="material-symbols-outlined">lock_open</span></div>
-                <div class="state-title">Unlock the Value of Your Cloud Investments Today</div>
-                <div class="state-desc">Begin your cloud cost optimization journey by authorizing your first cloud account.
-Once connected, you'll gain a comprehensive view of your cloud performance, allowing you to track key <b>ROI</b> and <b>KPI metrics</b>.
-This empowers you to make informed decisions to improve your investments and easily identify cost-saving opportunities.</div>
-                <div class="state-actions">
-                  <button class="btn btn-p">
-                    <span class="material-symbols-outlined">add</span>
-                    Add Your Authorization
-                  </button>
-                </div>
-              </div>
+              <div data-lt-empty='{"size":"l","icon":"lock_open","title":"Unlock the Value of Your Cloud Investments Today","desc":"Begin your cloud cost optimization journey by authorizing your first cloud account.\nOnce connected, you&#39;ll gain a comprehensive view of your cloud performance, allowing you to track key ROI and KPI metrics.\nThis empowers you to make informed decisions to improve your investments and easily identify cost-saving opportunities.","bold":["ROI","KPI metrics"],"action":{"label":"Add Your Authorization"}}' style="min-height:280px;padding:24px 0;display:flex;align-items:center;justify-content:center"></div>
             </div>
           </div>
 
           <!-- ====== ERROR STATE ====== -->
           <div class="state-view" data-state="error" style="display:none">
             <div class="paper">
-              <div class="state-block err">
-                <div class="state-ic"><span class="material-symbols-outlined">cloud_off</span></div>
-                <div class="state-title">Unable to load Executive Insights</div>
-                <div class="state-desc">We couldn't fetch your fiscal report data. This may be a temporary issue with one of your connected cloud providers.
-
-Please try again in a few moments. If the problem persists, contact support.</div>
-                <div class="state-actions">
-                  <button class="btn btn-o" onclick="setState('set')">
-                    <span class="material-symbols-outlined">refresh</span>
-                    Retry
-                  </button>
-                </div>
-              </div>
+              <div data-lt-empty='{"size":"l","icon":"cloud_off","title":"Unable to load Executive Insights","desc":"We couldn&#39;t fetch your fiscal report data. This may be a temporary issue with one of your connected cloud providers.\n\nPlease try again in a few moments. If the problem persists, contact support.","action":{"label":"Retry","onclick":"setState(&#39;set&#39;)"}}' style="min-height:280px;padding:24px 0;display:flex;align-items:center;justify-content:center"></div>
             </div>
           </div>
 
@@ -923,9 +1231,11 @@ Please try again in a few moments. If the problem persists, contact support.</di
                   <div class="paper-title">Top 10 Highest Budget Overspend Groups</div>
                 </div>
                 <div class="paper-r">
-                  <button class="btn btn-b btn-sm">
+                  <!-- ⏸ PARKED（specs/parked-designs.md #21）：View Group Detail 是設計端的 UX 提案，稿 #01 沒有、PRD 也沒有；badge 只放 icon，說明在 tooltip。Demo FAB「UX 提案」可整批隱藏看上線版 -->
+                  <button class="btn btn-b btn-sm ei-parked" data-tip="UX proposal: jump to the group-level detail from this ranking. Not in the Figma design or PRD, and not scheduled for development yet.">
                     <span class="material-symbols-outlined">visibility</span>
                     <span class="btn-text">View Group Detail</span>
+                    <span class="ei-pk" role="img" aria-label="UX proposal"><span class="material-symbols-outlined">lightbulb</span></span>
                   </button>
                 </div>
               </div>
@@ -968,9 +1278,11 @@ Please try again in a few moments. If the problem persists, contact support.</di
                   <div class="paper-title">Top 10 Highest Spending Groups</div>
                 </div>
                 <div class="paper-r">
-                  <button class="btn btn-b btn-sm">
+                  <!-- ⏸ PARKED（specs/parked-designs.md #21）：View Group Detail 是設計端的 UX 提案，稿 #01 沒有、PRD 也沒有；badge 只放 icon，說明在 tooltip。Demo FAB「UX 提案」可整批隱藏看上線版 -->
+                  <button class="btn btn-b btn-sm ei-parked" data-tip="UX proposal: jump to the group-level detail from this ranking. Not in the Figma design or PRD, and not scheduled for development yet.">
                     <span class="material-symbols-outlined">visibility</span>
                     <span class="btn-text">View Group Detail</span>
+                    <span class="ei-pk" role="img" aria-label="UX proposal"><span class="material-symbols-outlined">lightbulb</span></span>
                   </button>
                 </div>
               </div>
@@ -1082,7 +1394,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
                     Estimated Financial Budget <span class="req">*</span>
                     <span class="material-symbols-outlined ic-info" data-tip="A forward-looking estimate of your monthly cloud budget. Pre-filled from General Budget monthly totals, but edits stay here only and won't affect General Budget. Use this to reflect your actual planned spending from a company-wide perspective, even if group budgets are incomplete or include buffers.">info</span>
                   </div>
-                  <button class="btn btn-b" onclick="syncAllFromGB('budget-grid')" title="Reset every month back to its General Budget monthly total" style="flex-shrink:0">
+                  <button class="btn btn-b" onclick="syncAllFromGB('budget-grid')" data-tip="Reset every month back to its General Budget monthly total" style="flex-shrink:0">
                     <span class="material-symbols-outlined">sync</span>
                     <span class="btn-text">Sync all from General Budget</span>
                   </button>
@@ -1204,14 +1516,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
           <!-- Settings empty (first-time setup) -->
           <div class="settings-view" data-state="empty" style="display:none">
             <div class="section-card">
-              <div class="state-block">
-                <div class="state-ic"><span class="material-symbols-outlined">edit_calendar</span></div>
-                <div class="state-title">No fiscal year configured yet</div>
-                <div class="state-desc">Add your first fiscal year to start filling in baseline data: budget, ROI, revenue, customers, and forecast.</div>
-                <div class="state-actions">
-                  <button class="btn btn-p" onclick="openFiscalStartDialog()"><span class="material-symbols-outlined">edit_calendar</span>Set Fiscal Year Start</button>
-                </div>
-              </div>
+              <div data-lt-empty='{"size":"l","icon":"edit_calendar","title":"No fiscal year configured yet","desc":"Add your first fiscal year to start filling in baseline data: budget, ROI, revenue, customers, and forecast.","action":{"label":"Set Fiscal Year Start","onclick":"openFiscalStartDialog()"}}' style="min-height:280px;padding:24px 0;display:flex;align-items:center;justify-content:center"></div>
             </div>
           </div>
 
@@ -1291,7 +1596,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
 <div class="mo" id="modal-switch-year">
   <div class="modal modal-sm">
     <div class="mh">
-      <div class="mt">Discard unsaved changes?</div>
+      <div style="display:flex;align-items:center;gap:10px"><span class="material-symbols-outlined mt-err" aria-hidden="true">error</span><div class="mt">Discard unsaved changes?</div></div>
       <button class="mx" onclick="closeModal('modal-switch-year')"><span class="material-symbols-outlined">close</span></button>
     </div>
     <div class="mdesc">Switching the fiscal year will discard the changes you've made to the current year. This action cannot be undone.</div>
@@ -1306,7 +1611,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
 <div class="mo" id="modal-discard">
   <div class="modal modal-sm">
     <div class="mh">
-      <div class="mt">Discard unsaved changes?</div>
+      <div style="display:flex;align-items:center;gap:10px"><span class="material-symbols-outlined mt-err" aria-hidden="true">error</span><div class="mt">Discard unsaved changes?</div></div>
       <button class="mx" onclick="closeModal('modal-discard')"><span class="material-symbols-outlined">close</span></button>
     </div>
     <div class="mdesc">Any changes you've made to Fiscal Settings will be lost. This action cannot be undone.</div>
@@ -1322,7 +1627,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
   <div class="modal modal-sm">
     <div class="mh">
       <div style="display:flex;align-items:center;gap:10px">
-        <span class="material-symbols-outlined" style="color:#FF403D;font-size:24px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;flex-shrink:0">error</span>
+        <span class="material-symbols-outlined mt-err" aria-hidden="true">error</span>
         <div class="mt">Change Fiscal Year Start Month?</div>
       </div>
       <button class="mx" onclick="closeModal('modal-guard-esm')"><span class="material-symbols-outlined">close</span></button>
@@ -1334,9 +1639,6 @@ Please try again in a few moments. If the problem persists, contact support.</di
     </div>
   </div>
 </div>
-
-<!-- Toast container -->
-<div class="toast-wrap" id="toast-wrap"></div>
 
 <!-- ===== Shared sidebar + Demo FAB ===== -->
 <script>
@@ -1380,8 +1682,8 @@ Please try again in a few moments. If the problem persists, contact support.</di
     ]},
 
     { type: 'group', id: 'optimization', label: 'Optimization', items: [
-      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'tune', href: './rightsizing.html' },
-      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'percent', href: './rate-optimization.html' },
+      { id: 'usage-optimization', label: 'Usage Optimization', icon: 'arrows_input', href: './rightsizing.html' },
+      { id: 'rate-optimization',  label: 'Rate Optimization',  icon: 'percent_discount', href: './rate-optimization.html' },
     ]},
 
     { type: 'group', id: 'budget', label: 'Budget Monitoring & Alert', items: [
@@ -1596,18 +1898,18 @@ Please try again in a few moments. If the problem persists, contact support.</di
   function _logoBody(icon) {
     return '<div class="lt-sb-logo-wrap">' + icon + '</div>' +
       '<span class="lt-sb-logo-text">LumiTure.ai</span>' +
-      '<span class="lt-sb-proto" title="Prototype">PROTO<span class="lt-sb-proto-x">TYPE</span></span>';
+      '<span class="lt-sb-proto" data-tip="Prototype" data-tip-pos="below">PROTO<span class="lt-sb-proto-x">TYPE</span></span>';
   }
   function _renderLogo() {
     var href = _homeHref();
-    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" title="Go to Overview">' : '<div class="lt-sb-logo">';
+    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-sb-logo">';
     return open + _logoBody(LOGO_ICON) + (href ? '</a>' : '</div>');
   }
   // 收合時顯示在 topbar 左側的 logo（同一組圖形，mask id 改 ltT* 避免跟 sidebar 那份撞 id）
   function _renderTopbarLogo() {
     var href = _homeHref();
     var icon = LOGO_ICON.replace(/ltH(ring|bars|leg)/g, 'ltT$1');
-    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" title="Go to Overview">' : '<div class="lt-tb-logo">';
+    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-tb-logo">';
     return open + _logoBody(icon) + (href ? '</a>' : '</div>');
   }
   function _mountTopbarLogo(host) {
@@ -1857,7 +2159,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
  *     version:     'v1.19.0',               // Software version 列
  *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
  *     quota: {                              // AI Quota box 數據；total 已含 add-on
- *       refreshDate: 'Jul 1, 2026',         // 下次重置日（= 自然月下月 1 號）
+ *       refreshDate: '2 Nov. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）
  *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
  *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
  *     },
@@ -1890,7 +2192,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
     version: 'v1.19.0',
     addonPacks: 0,
     quota: {
-      refreshDate: '2 Jul. 2026',
+      refreshDate: '2 Nov. 2026',          // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期（原 2 Jul. 2026 已過期）
       analyses:    { used: 32,  total: 80 },
       rightsizing: { used: 410, total: 1000 },
     },
@@ -1903,7 +2205,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
   // plan → 顯示哪些 quota 項目
   //   Essential = 兩項（照 Notion PRD，2026-06-22 Kabin 拍板）；Starter = 只 analyses；
   //   Standard = 兩項；Premium = 兩項（2026-10-14 Kabin 裁決照稿 #01-4：Unlimited 是 PRD 誤植、稿已劃掉，Premium 也顯示 `{remaining}/{total} left`，sub 只寫 Org-wide）；none = 不顯示 box
-  //   ⚠ specs ai-quota README 說 Essential 只 rightsizing，與 PRD 衝突、待 PM 對齊；此處照 PRD
+  //   Essential 兩項：PRD 已更新（Essential 衝突解除，2026-06-22 起照 Notion PRD；specs repo 的 ai-quota README 寫「只 rightsizing」是落後、待 PM sync）
   var PLAN_QUOTA_ITEMS = {
     Essential: ['analyses', 'rightsizing'],
     Starter:   ['analyses'],
@@ -1943,7 +2245,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
     'border:2px solid #002663;border-radius:50%}',
 
     /* User chip — avatar + name + role + chevron */
-    '.lt-tb-user{display:flex;align-items:center;gap:10px;padding-left:16px;margin-left:0;',
+    '.lt-tb-user{display:flex;align-items:center;gap:10px;padding:0 0 0 16px;margin-left:0;font-family:inherit;',   /* A-20②（2026-10-15）：padding 寫全，頁面沒 reset button 時不會吃到瀏覽器預設 1px 6px 而變 162×36 */
     'border-left:1px solid rgba(255,255,255,.1);color:#fff;cursor:pointer;transition:opacity .15s;background:none;border-top:none;border-right:none;border-bottom:none}',
     '.lt-tb-user:hover{opacity:.92}',
     '.lt-tb-avatar-ic{font-size:34px;color:#fff;flex-shrink:0;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 34}',
@@ -2013,7 +2315,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
     '@keyframes lt-q-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}',
     '@media (prefers-reduced-motion:reduce){.lt-q-skel{animation:none}}',
     /* error（#01-7）：只有這塊壞（partial degrade），整塊 85 高；help icon＋文字＋右側 Retry（青、粗、底線） */
-    '.lt-q-err{display:flex;align-items:center;gap:8px;height:24px;padding-left:8px;font-size:12px;line-height:18px;color:#CCCCCC}',
+    '.lt-q-err{display:flex;align-items:center;gap:8px;height:24px;padding-left:0;font-size:12px;line-height:18px;color:#CCCCCC}',
     '.lt-q-err-msg{flex:1;min-width:0}',
     '.lt-q-err .material-symbols-outlined{font-size:16px;color:#CCCCCC;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20}',
     '.lt-q-err a{color:#4ADFFF;font-weight:700;text-decoration:underline;cursor:pointer;flex-shrink:0;border-radius:2px}',
@@ -2040,6 +2342,14 @@ Please try again in a few moments. If the problem persists, contact support.</di
   }
 
   // ===== Helpers =====
+  /* 角色 chip icon（A-3；稿 #01-4／#01-7、FE UserRoleChip ROLE_ICON_MAP）：Member account_circle、Manager supervised_user_circle、Admin／Owner admin_panel_settings。
+     role 字串寫法：'Admin'／'Owner'／'Manager - Cost Center'／'Member - Finance-APAC'。topbar 上的頭像是使用者頭像（稿 #01 就是人像圓），不是角色 chip，不跟著換 */
+  function _roleIcon(role) {
+    var r = String(role || '');
+    if (/^Member\b/i.test(r)) return 'account_circle';
+    if (/^Manager\b/i.test(r)) return 'supervised_user_circle';
+    return 'admin_panel_settings';
+  }
   function _esc(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   }
@@ -2064,7 +2374,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
 
   // ===== Renderers =====
   function _renderIcon(item) {
-    var attrs = ' class="lt-tb-ic" title="' + _esc(item.title || '') + '"';
+    var attrs = ' class="lt-tb-ic" data-tip="' + _esc(item.title || '') + '" data-tip-pos="below" aria-label="' + _esc(item.title || '') + '"';   /* 原生 title 改 data-tip（#gl-tip） */
     if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
     var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
     return '<button type="button"' + attrs + '>' +
@@ -2165,7 +2475,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
                  '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
                  '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
                '</div>' +
-               '<span class="lt-am-chip"><span class="material-symbols-outlined">account_circle</span>' + _esc(u.role) + '</span>' +
+               '<span class="lt-am-chip"><span class="material-symbols-outlined">' + _roleIcon(u.role) + '</span>' + _esc(u.role) + '</span>' +
              '</div>' +
              '<div class="lt-am-div"></div>' +
              (box ? box + '<div class="lt-am-div"></div>' : '') +
@@ -2283,7 +2593,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
   var ROLE_CSS = [
     '.lt-rd-back{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:990;display:flex;align-items:center;justify-content:center;padding:32px;animation:lt-rd-fade .15s ease-out;font-family:\'Noto Sans\',sans-serif}',
     '@keyframes lt-rd-fade{from{opacity:0}to{opacity:1}}',
-    '.lt-rd{background:#fff;border-radius:10px;box-shadow:0 0 20px rgba(0,0,0,.1);width:600px;max-width:100%;max-height:100%;overflow:auto;padding:24px 32px;display:flex;flex-direction:column;color:#262626}',
+    '.lt-rd{background:#fff;border-radius:var(--lt-modal-radius-sm,10px);box-shadow:var(--lt-shadow-dialog,0 0 6px rgba(0,0,0,.2));width:600px;max-width:100%;max-height:100%;overflow:auto;padding:24px 32px;display:flex;flex-direction:column;color:#262626}',
     '.lt-rd:focus{outline:none}',
     '.lt-rd-hd{display:flex;flex-direction:column;align-items:center;text-align:center}',
     '.lt-rd-ic{margin-bottom:15px;line-height:0}',
@@ -2630,29 +2940,23 @@ Please try again in a few moments. If the problem persists, contact support.</di
 
   // ===== INIT =====
   /* 登入後的一次性 toast：Auth prototype 登入成功導回 Overview 前寫進 sessionStorage，
-     落地頁（任何用 shared topbar 的頁）讀到就顯示一次再清掉。樣式照 FE Toaster（bottom-left、成功 #008F88、5 秒） */
+     落地頁（任何用 shared topbar 的頁）讀到就顯示一次再清掉。樣式與行為見 shared/lumiture-toast.js */
+  var _TB_SRC = (document.currentScript && document.currentScript.src) || '';
+  function _withToast(cb) {   // 頁面沒引 lumiture-toast.js 時，從 topbar 同資料夾補載一次
+    if (window.LumitureToast) { cb(window.LumitureToast); return; }
+    if (!_TB_SRC) return;
+    var sc = document.createElement('script');
+    sc.src = _TB_SRC.replace(/lumiture-topbar\.js.*$/, 'lumiture-toast.js');
+    sc.onload = function () { if (window.LumitureToast) cb(window.LumitureToast); };
+    document.head.appendChild(sc);
+  }
   function _showPendingToast() {
     var raw = null;
     try { raw = sessionStorage.getItem('lt-pending-toast'); sessionStorage.removeItem('lt-pending-toast'); } catch (e) { return; }
     if (!raw) return;
     var msgs = []; try { msgs = JSON.parse(raw).msgs || []; } catch (e) { return; }
     if (!msgs.length) return;
-    var wrap = document.createElement('div');
-    wrap.style.cssText = 'position:fixed;left:var(--lt-toast-left,274px);bottom:24px;z-index:var(--lt-z-toast,1400);display:flex;flex-direction:column-reverse;gap:16px';
-    msgs.forEach(function (msg) {
-      var el = document.createElement('div');
-      el.setAttribute('role', 'status');
-      el.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 16px;width:400px;max-width:calc(100vw - 96px);' +
-        'background:#008F88;color:#fff;border-radius:4px;' +
-        'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);' +
-        'font-family:inherit;font-size:14px;line-height:24.5px;cursor:pointer';
-      el.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;flex-shrink:0">check_circle</span><span></span>';
-      el.lastChild.textContent = msg;
-      el.addEventListener('click', function () { if (el.parentNode) el.parentNode.removeChild(el); });
-      wrap.appendChild(el);
-      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 5000);
-    });
-    document.body.appendChild(wrap);
+    _withToast(function (T) { msgs.forEach(function (msg) { T.show({ kind: 'success', message: msg }); }); });   // 2026-10-15 A-1：改用共用 LumitureToast
   }
 
   /* 換頁後（導回 Overview、或之後點 sidebar 去別頁）讓頁面套用剛切的角色：頁面有定義 LUMITURE_ROLE_CHANGE 才呼叫。
@@ -2670,6 +2974,202 @@ Please try again in a few moments. If the problem persists, contact support.</di
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _init);
   } else { _init(); }
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-toast.js === */
+/*!
+ * lumiture-toast.js — 全站共用 Toast（2026-10-15 修正輪 A-1）
+ *
+ * 規格（FE libs/lumiture-ui/src/Toaster/toast.css＋Toaster.tsx，Figma GB #02-3／GL #18-3／EI #08／RS #06／RO #06 逐值一致）：
+ *   成功 #008F88、錯誤 #BF302E、info #0B6DD7、warning #EC6F09｜圓角 4｜寬 400｜最小高 46｜內距 8／16｜icon 20（check_circle／info／warning）
+ *   位置：左下，left = var(--lt-toast-left)（sidebar 展開 274／收合 45；沒有 sidebar 的頁面自動改 24），bottom 24｜z-index 4000（高於彈窗 2000、Demo FAB 999）
+ *   5 秒自動消失，點一下立即關閉｜可堆疊（新的在最下面，column-reverse，gap 16）｜字 14／400／行高 24.5
+ *
+ * 用法（頁面把自己的 toast() 換成這個，不要再各寫一套 CSS）：
+ *   <script src="../shared/lumiture-toast.js?v=2026-10-15"><\/script>        // 在 tokens.css／sidebar 之後、頁面 script 之前
+ *   LumitureToast.show({ kind: 'success', message: 'Budget saved successfully.' });
+ *   LumitureToast.success('…') / .error('…') / .info('…') / .warning('…')   // 簡寫
+ *   選項：duration（毫秒，預設 5000，0＝不自動關）、action:{label,onClick}（右側底線文字鈕，例如 Undo）、
+ *        extra:HTMLElement（第二行額外節點，2026-10-15 R1 加：toast 本體仍是一行文字，extra 另起一行、靠左對齊訊息文字；
+ *        給 prototype 專用的展示入口用，例如 Auth 的「Open this email (prototype)」，不是產品 UI，不要拿來放正式功能）
+ *   LumitureToast.clear()                                                    // 全部清掉（Demo 切情境時用）
+ *   回傳該 toast 元素；文案一律 textContent，不吃 HTML。
+ *
+ * 文案寫法：照稿原句。不要用 em dash。
+ */
+(function () {
+  'use strict';
+  if (window.LumitureToast) return;
+
+  var ICON = { success: 'check_circle', error: 'info', info: 'info', warning: 'warning' };   /* FE：error 也是 info icon */
+  var BG   = { success: '#008F88', error: '#BF302E', info: '#0B6DD7', warning: '#EC6F09' };
+
+  function _css() {
+    if (document.getElementById('lt-toast-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-toast-css';
+    s.textContent = [
+      '.lt-toast-wrap{position:fixed;left:var(--lt-toast-left,274px);bottom:24px;z-index:var(--lt-z-toast,4000);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif)}',
+      '.lt-toast{pointer-events:auto;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:var(--lt-toast-width,400px);max-width:calc(100vw - 96px);min-height:46px;padding:8px 16px;',
+      'border-radius:var(--lt-toast-radius,4px);color:#fff;cursor:pointer;',
+      'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);',   /* MUI shadows[1]，FE Toaster 的 inline style */
+      'animation:lt-toast-in .2s ease}',
+      '.lt-toast.is-success{background:var(--lt-toast-success-bg,#008F88)}',
+      '.lt-toast.is-error{background:var(--lt-toast-error-bg,#BF302E)}',
+      '.lt-toast.is-info{background:var(--lt-toast-info-bg,#0B6DD7)}',
+      '.lt-toast.is-warning{background:var(--lt-toast-warning-bg,#EC6F09)}',
+      '.lt-toast-ic{font-size:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;',
+      'font-family:\'Material Symbols Outlined\';font-weight:400;font-style:normal;line-height:1;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 20;letter-spacing:normal;text-transform:none;white-space:nowrap;-webkit-font-feature-settings:\'liga\';font-feature-settings:\'liga\'}',
+      '.lt-toast-msg{flex:1;min-width:0;font-size:14px;font-weight:400;line-height:24.5px;color:#fff;overflow-wrap:anywhere}',
+      '.lt-toast-extra{flex:0 0 100%;display:flex;align-items:center;padding-left:28px;margin-top:-2px;padding-bottom:2px}',
+      '.lt-toast-act{flex-shrink:0;background:none;border:none;color:#fff;font:inherit;font-size:14px;font-weight:700;text-decoration:underline;cursor:pointer;padding:0 0 0 8px}',
+      '@keyframes lt-toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}',
+      '@media (prefers-reduced-motion:reduce){.lt-toast{animation:none}}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+
+  var _wrap = null;
+  function _getWrap() {
+    if (_wrap && _wrap.parentNode) return _wrap;
+    _css();
+    _wrap = document.createElement('div');
+    _wrap.className = 'lt-toast-wrap';
+    _wrap.setAttribute('aria-live', 'polite');
+    // 沒有 sidebar 的頁面（Auth、通知信展示頁）沒有 --lt-toast-left，改貼視窗左下 24（FE Toaster 預設位置）
+    try { if (!getComputedStyle(document.documentElement).getPropertyValue('--lt-toast-left').trim()) _wrap.style.left = '24px'; } catch (e) {}
+    (document.body || document.documentElement).appendChild(_wrap);
+    return _wrap;
+  }
+
+  function show(opts) {
+    if (typeof opts === 'string') opts = { message: opts };
+    opts = opts || {};
+    var kind = BG[opts.kind] ? opts.kind : 'success';
+    var el = document.createElement('div');
+    el.className = 'lt-toast is-' + kind;
+    el.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+    var ic = document.createElement('span'); ic.className = 'lt-toast-ic material-symbols-outlined'; ic.textContent = ICON[kind]; ic.setAttribute('aria-hidden', 'true');
+    var msg = document.createElement('span'); msg.className = 'lt-toast-msg'; msg.textContent = opts.message == null ? '' : String(opts.message);
+    el.appendChild(ic); el.appendChild(msg);
+    function close() { if (el.parentNode) el.parentNode.removeChild(el); }
+    if (opts.action && opts.action.label) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'lt-toast-act'; b.textContent = opts.action.label;
+      b.addEventListener('click', function (e) { e.stopPropagation(); try { if (opts.action.onClick) opts.action.onClick(); } finally { close(); } });
+      el.appendChild(b);
+    }
+    if (opts.extra && opts.extra.nodeType === 1) {
+      var row = document.createElement('div'); row.className = 'lt-toast-extra';
+      row.addEventListener('click', function (e) { e.stopPropagation(); });   // 點額外節點不要順便關掉 toast（例如連結要能點）
+      row.appendChild(opts.extra); el.appendChild(row);
+    }
+    el.addEventListener('click', close);
+    _getWrap().appendChild(el);
+    var d = opts.duration == null ? 5000 : opts.duration;
+    if (d > 0) setTimeout(close, d);
+    return el;
+  }
+
+  window.LumitureToast = {
+    show: show,
+    success: function (m, o) { return show(Object.assign({}, o, { kind: 'success', message: m })); },
+    error:   function (m, o) { return show(Object.assign({}, o, { kind: 'error',   message: m })); },
+    info:    function (m, o) { return show(Object.assign({}, o, { kind: 'info',    message: m })); },
+    warning: function (m, o) { return show(Object.assign({}, o, { kind: 'warning', message: m })); },
+    clear: function () { if (_wrap) _wrap.innerHTML = ''; }
+  };
+})();
+
+</script>
+<script>
+/* === Inlined: shared/lumiture-empty.js === */
+/*!
+ * lumiture-empty.js — 共用空狀態／無權限／錯誤版型（2026-10-15 修正輪 A-19）
+ *
+ * 規格（Guideline Empty State，全站唯一用 outlined icon 的元件）：
+ *   icon：Material Symbols FILL 0、色 #9ED7FF（Primary Light 30）；尺寸 S 48／M 64／L 80
+ *   標題 S 14／M 16／L 20，Bold｜說明 S 12／M 14／L 14（#676767）｜整體水平垂直置中｜icon→標題 12（page 版 16）→說明 4~8→按鈕 16
+ *   page：整頁卡片版（ARL 10/09 裁決方案 B）：icon 64、標題 18／700、說明 14、按鈕離說明 32、卡片最小高 521
+ *
+ * 用法：
+ *   <script src="../shared/lumiture-empty.js?v=2026-10-15"><\/script>
+ *   el.innerHTML = LumitureEmpty.html({ size:'m', icon:'table_view', title:'No data found', desc:'Try adjusting your filters.', action:{ label:'Clear Filter', onclick:'clearFilter()' } });
+ *   // action 可給 href（連結鈕）或 onclick（inline handler 字串）；action 預設主按鈕樣式用 .lt-empty__btn（藍底白字 36 高 r5 字 700），頁面想用自己的 .btn 就給 action.cls
+ *   預設內容：
+ *   LumitureEmpty.noAccess({ href })     // 整頁無權限：lock／「You do not have access to this page」／「Please contact your organization's administrator if you believe this is a mistake.」／Back to Overview（href 預設 ./overview.html）。回傳含卡片外框的 HTML，放在頁標題下方
+ *   LumitureEmpty.error({ size, onclick }) // 「Something Went Wrong」／「Please ensure you have a stable internet connection\nand try refreshing the page.」（FE EmptyState constants），按鈕 Retry（有給 onclick 才出）
+ *   LumitureEmpty.noData({ size, title, desc, icon })  // 「No Data Available」
+ * 文字一律 escape；desc 的 \n 轉成換行。不要自己加 max-width（全站規則：段落不設 max-width，寬度交給外層）。
+ */
+(function () {
+  'use strict';
+  if (window.LumitureEmpty) return;
+
+  function css() {
+    if (document.getElementById('lt-empty-css')) return;
+    var s = document.createElement('style');
+    s.id = 'lt-empty-css';
+    s.textContent = [
+      '.lt-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;box-sizing:border-box;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif);color:var(--lt-color-text-primary,#262626)}',
+      '.lt-empty .lt-empty__ic{font-family:\'Material Symbols Outlined\';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;-webkit-font-feature-settings:\'liga\';font-feature-settings:\'liga\';',
+      'color:#9ED7FF;font-variation-settings:\'FILL\' 0,\'wght\' 400,\'GRAD\' 0,\'opsz\' 48;width:1em;height:1em;display:block;overflow:hidden}',
+      '.lt-empty--s .lt-empty__ic{font-size:48px}.lt-empty--m .lt-empty__ic,.lt-empty--page .lt-empty__ic{font-size:64px}.lt-empty--l .lt-empty__ic{font-size:80px}',
+      '.lt-empty__t{margin:12px 0 0;font-weight:700;line-height:1.5;color:var(--lt-color-text-primary,#262626)}',
+      '.lt-empty--s .lt-empty__t{font-size:14px}.lt-empty--m .lt-empty__t{font-size:16px}.lt-empty--l .lt-empty__t{font-size:20px}.lt-empty--page .lt-empty__t{font-size:18px;margin-top:16px}',
+      '.lt-empty__d{margin:8px 0 0;font-size:14px;line-height:24.5px;color:var(--lt-color-text-secondary,#676767);white-space:pre-line}',
+      '.lt-empty--s .lt-empty__d{font-size:12px;line-height:18px;margin-top:4px}',
+      '.lt-empty__a{margin-top:16px}.lt-empty--page .lt-empty__a{margin-top:32px}',
+      '.lt-empty__btn{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;height:var(--lt-button-height,36px);padding:0 16px;border:none;border-radius:var(--lt-button-radius,5px);',
+      'background:var(--lt-color-primary,#004FB0);color:#fff;font-family:inherit;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer}',
+      '.lt-empty__btn:hover{background:var(--lt-color-primary-hover,#0B6DD7)}',
+      '.lt-empty-card{background:#fff;border-radius:var(--lt-card-radius,8px);box-shadow:var(--lt-card-shadow,0 0 20px rgba(0,0,0,.10));min-height:521px;display:flex;align-items:center;justify-content:center}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+  function html(o) {
+    css();
+    o = o || {};
+    var size = ({ s: 's', m: 'm', l: 'l', page: 'page' })[o.size] || 'm';
+    var a = '';
+    if (o.action && o.action.label) {
+      var cls = o.action.cls || 'lt-empty__btn';
+      a = '<div class="lt-empty__a">' + (o.action.href
+        ? '<a class="' + esc(cls) + '" href="' + esc(o.action.href) + '">' + esc(o.action.label) + '</a>'
+        : '<button type="button" class="' + esc(cls) + '"' + (o.action.onclick ? ' onclick="' + esc(o.action.onclick) + '"' : '') + '>' + esc(o.action.label) + '</button>') + '</div>';
+    }
+    return '<div class="lt-empty lt-empty--' + size + '">' +
+      (o.icon ? '<span class="lt-empty__ic material-symbols-outlined" aria-hidden="true">' + esc(o.icon) + '</span>' : '') +
+      (o.title ? '<h3 class="lt-empty__t">' + esc(o.title) + '</h3>' : '') +
+      (o.desc ? '<p class="lt-empty__d">' + esc(o.desc) + '</p>' : '') + a + '</div>';
+  }
+
+  window.LumitureEmpty = {
+    html: html,
+    noAccess: function (o) {
+      o = o || {};
+      return '<div class="lt-empty-card">' + html({
+        size: 'page', icon: 'lock', title: 'You do not have access to this page',
+        desc: 'Please contact your organization\'s administrator if you believe this is a mistake.',
+        action: { label: 'Back to Overview', href: o.href || './overview.html' }
+      }) + '</div>';
+    },
+    error: function (o) {
+      o = o || {};
+      return html({
+        size: o.size || 'm', icon: o.icon || 'error', title: 'Something Went Wrong',
+        desc: 'Please ensure you have a stable internet connection\nand try refreshing the page.',
+        action: o.onclick ? { label: 'Retry', onclick: o.onclick } : null
+      });
+    },
+    noData: function (o) {
+      o = o || {};
+      return html({ size: o.size || 'm', icon: o.icon || 'table_view', title: o.title || 'No Data Available', desc: o.desc, action: o.action });
+    }
+  };
 })();
 
 </script>
@@ -2749,6 +3249,8 @@ Please try again in a few moments. If the problem persists, contact support.</di
     /* Arrow icon */
     '.curr-btn .material-symbols-outlined{font-size:16px;',
     'color:#676767;flex-shrink:0;transition:transform .15s}',
+    /* 2026-10-15 R1（A-11）：下拉箭頭統一實心 ▾（arrow_drop_down 24）。markup 加 class="curr-arrow" 才套用（舊頁面仍是 expand_more 16 的 chevron） */
+    '.curr-btn .curr-arrow{font-size:24px;margin:0 -4px 0 -2px}',
     '.curr-btn.cp-open .material-symbols-outlined{transform:rotate(180deg)}',
 
     /* Dropdown container — 4px gap per CMDS spec */
@@ -3141,7 +3643,7 @@ Please try again in a few moments. If the problem persists, contact support.</di
       var share = (d.share != null) ? (d.share * 100).toFixed(2) + '%' : '--';
       return '<tr>' +
                '<td class="col-rank">' + _esc(rankStr) + '</td>' +
-               '<td class="col-name" title="' + _esc(d.name) + '">' + _esc(d.name) + '</td>' +
+               '<td class="col-name" data-tip="' + _esc(d.name) + '">' + _esc(d.name) + '</td>' +
                '<td class="col-spend tx-right">' + _esc(spending) + '</td>' +
                '<td class="col-share tx-right">' + _esc(share) + '</td>' +
                (showChange ? changeCell(d) : '') +
@@ -3208,6 +3710,15 @@ Please try again in a few moments. If the problem persists, contact support.</di
 
 </script>
 
+<script>
+(function(){ var n = document.getElementById('ei-noaccess'); if (n) n.innerHTML = LumitureEmpty.noAccess({ href: './overview.html' }); })();
+/* A-19：把 data-lt-empty 的設定交給 shared LumitureEmpty 產生（FILL 0、#9ED7FF、S／M／L／整頁）。bold 欄位是要粗體的詞 */
+document.querySelectorAll('[data-lt-empty]').forEach(function (el) {
+  var o = JSON.parse(el.getAttribute('data-lt-empty'));
+  el.innerHTML = LumitureEmpty.html(o);
+  (o.bold || []).forEach(function (w) { var d = el.querySelector('.lt-empty__d'); if (d) d.innerHTML = d.innerHTML.replace(w, '<b>' + w + '</b>'); });
+});
+</script>
 <script>
 /* ============================================================
  * Executive Insights Prototype v1 — Behavior
@@ -3519,15 +4030,9 @@ function updateCompletionChips(){
 }
 function closeModal(id){ document.getElementById(id).classList.remove('active'); }
 
-/* ===== Toast ===== */
+/* ===== Toast（A-1：改用 shared LumitureToast；type 沿用舊參數：err／warn／info，info 與預設都算成功色，維持原本畫面） ===== */
 function showToast(msg,type){
-  const wrap=document.getElementById('toast-wrap');
-  const t=document.createElement('div');
-  t.className='toast'+(type==='err'?' err':type==='warn'?' warn':type==='info'?'':'');
-  const ic=type==='err'?'error':type==='warn'?'warning':type==='info'?'info':'check_circle';
-  t.innerHTML='<span class="material-symbols-outlined">'+ic+'</span>'+msg;
-  wrap.appendChild(t);
-  setTimeout(()=>{t.style.transition='opacity .3s';t.style.opacity='0';setTimeout(()=>t.remove(),300);},2800);
+  LumitureToast.show({ kind: type==='err' ? 'error' : type==='warn' ? 'warning' : 'success', message: msg });
 }
 
 /* ===== FY year switcher (頁面層導覽，對齊 General Budget v2「往前兩年、往後一年」) =====
@@ -3547,7 +4052,7 @@ let eiDirty = false;                    // 是否有未儲存的 Fiscal Settings
 // 完成度（dropdown Incomplete chip + 切年時 loadNewFYData vs restoreSnapshot）。
 // FY2026 = 完整 showcase（6 section 全填）→ 誠實標 complete（無 chip）。
 // 「剛選到、未填」情境由空的未來年 FY2027 呈現（對應 Figma #07-4 freshly-selected 情境）。
-const EI_FY_INCOMPLETE = { 2024:false, 2025:false, 2026:true, 2027:true };
+const EI_FY_INCOMPLETE = { 2024:false, 2025:false, 2026:false, 2027:true };   // A-22：FY2026 是完整 showcase，不掛 Incomplete（原本 true 跟上面註解、CVR chip「12 / 12 complete」矛盾）
 
 let FISCAL_SNAPSHOT = null;
 
@@ -3580,7 +4085,7 @@ function renderFYPicker(){
         <span class="fy-sw-val">FY ${y}</span>
         <span class="fy-sw-trigger-range">· ${fyRangeFor(y)}</span>
         ${EI_FY_INCOMPLETE[y] ? '<span class="fy-sw-tag fy-sw-tag-incomplete">Incomplete</span>' : ''}
-        <span class="material-symbols-outlined fy-sw-arr">expand_more</span>
+        <span class="material-symbols-outlined fy-sw-arr">arrow_drop_down</span>
       </button>
       <div class="fy-sw-menu" id="fy-sw-menu" role="listbox" aria-label="Select fiscal year">
         ${opts}
@@ -3917,13 +4422,13 @@ function renderTop10(data, opts){
         const amtCls = isHeavy ? 'tx-right over-strong' : 'tx-right over';
         return `<tr>
           <td class="rk-rank">Top ${rank}</td>
-          <td class="rk-name" title="${d.name}">${d.name}</td>
+          <td class="rk-name" data-tip="${d.name}">${d.name}</td>
           <td class="${amtCls}">${(pctOver*100).toFixed(2)}%</td>
         </tr>`;
       } else {
         return `<tr>
           <td class="rk-rank">Top ${rank}</td>
-          <td class="rk-name" title="${d.name}">${d.name}</td>
+          <td class="rk-name" data-tip="${d.name}">${d.name}</td>
           <td class="tx-right amount-blue">${(d.val/1000).toFixed(2)}K</td>
         </tr>`;
       }
@@ -4147,7 +4652,7 @@ function setOverspendEmpty(empty){
 function setRole(role){
   document.body.classList.remove('role-admin','role-nonadmin');
   document.body.classList.add('role-'+role);
-  const newRole = role==='admin' ? 'Owner / Admin' : 'T1 / T2 Member';
+  const newRole = role==='admin' ? 'Admin' : 'Member - Platform Team';   // A-20③：全站 chip 用真實角色字串（Admin／Member - 群組名）；R1：不再寫「T1 / T2 Member」
   if(window.LumitureTopbar) window.LumitureTopbar.setRole(newRole);
 }
 
@@ -4227,6 +4732,7 @@ window.DEMO_PAGES = [
   { id:'role',      label:'Role',      icon:'person' },
   { id:'modal',     label:'Modal',     icon:'open_in_new' },
   { id:'toast',     label:'Toast',     icon:'sms' },
+  { id:'parked',    label:'UX 提案',   icon:'lightbulb' },
 ];
 
 window.DEMO_SCENARIOS = [
@@ -4279,9 +4785,16 @@ window.DEMO_SCENARIOS = [
   { id:'toast-fy-ok',        page:'toast', label:'Fiscal year updated',    icon:'event_available', tip:'Fiscal year updated successfully. Also synced to General Budget.' },
   { id:'toast-fy-load',      page:'toast', label:'Loaded FY (info)',       icon:'info',        tip:'Loaded FY2026 settings (info, 切換 FY 時用)。' },
   { id:'toast-discard',      page:'toast', label:'Changes discarded',      icon:'warning',     tip:'Changes discarded (warn)。' },
+  // ⏸ PARKED（specs/parked-designs.md #21）：兩張 Top 10 卡的 View Group Detail 是 UX 提案，可整批隱藏看上線版
+  { id:'parked-on',  page:'parked', group:'UX 提案', label:'顯示 UX 提案（預設）',      icon:'lightbulb',      tip:'⏸ PARKED：兩張 Top 10 卡右上的 View Group Detail 是設計端提案，不在 Figma 稿與 PRD，掛 UX 提案 badge。' },
+  { id:'parked-off', page:'parked', group:'UX 提案', label:'隱藏暫緩的設計（看上線版）', icon:'visibility_off', tip:'隱藏 View Group Detail，等於上線版。' },
 ];
 
 window.DEMO_DEFAULT = 'd-set';
+
+/* 第二輪 R1（驗證 #9）：切走任何情境先關掉所有開著的彈窗，Demo 依序點 modal-edit-start → modal-discard → modal-switch-year 不會疊在一起
+   （shared/demo-fab.js 的 onLeave 鉤子：點 FAB 或直接呼叫 DEMO_APPLY 都會觸發） */
+window.DEMO_ON_LEAVE = function(){ document.querySelectorAll('.mo.active').forEach(function(m){ m.classList.remove('active'); }); };
 
 window.DEMO_APPLY = function(id, btn){
   // Dashboard scenarios
@@ -4337,7 +4850,7 @@ window.DEMO_APPLY = function(id, btn){
   if(id==='r-nonadmin') { setRole('nonadmin'); }
 
   // Modal scenarios — 一鍵開 modal（先確保到對應頁面再開）
-  const openModalById = (mid)=>{ const m=document.getElementById(mid); if(m) m.classList.add('active'); };
+  const openModalById = (mid)=>{ const m=document.getElementById(mid); if(m) m.classList.add('active'); if(mid==='modal-fsm') updateFSMResult(); };   // A-38②：Demo 開也要有「Resulting fiscal year」那一行
   if(id==='modal-edit-start') { setRole('admin'); goToDashboard(); setState('set'); openModalById('modal-fsm'); }
   if(id==='modal-switch-year'){ setRole('admin'); goToSettings(); setSettingsState('set'); openModalById('modal-switch-year'); }
   if(id==='modal-discard')    { setRole('admin'); goToSettings(); setSettingsState('set'); openModalById('modal-discard'); }
@@ -4352,6 +4865,8 @@ window.DEMO_APPLY = function(id, btn){
   if(id==='toast-fy-ok')        { showToast('Fiscal year updated successfully. Also synced to General Budget.','info'); }
   if(id==='toast-fy-load')      { showToast('Loaded FY2026 settings','info'); }
   if(id==='toast-discard')      { showToast('Changes discarded.','warn'); }
+  if(id==='parked-on')          { document.body.classList.remove('hide-parked'); }
+  if(id==='parked-off')         { document.body.classList.add('hide-parked'); }
 };
 
 /* ===== Init ===== */
@@ -4471,6 +4986,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  *     isNoData:  boolean?,         // groups under "no data" sub-divider
  *     group:     string?,          // 2026-09-30：同一頁內的分組小標（依第一次出現的順序排）。沒寫 group 的頁面行為完全不變
  *     disabled:  boolean?,         // shows "Soon" badge, not clickable
+ *     onLeave:   function?,        // 2026-10-15：切走這個情境時呼叫 onLeave(nextId)，用來重設它留下的模組狀態（另有全域 window.DEMO_ON_LEAVE(prevId, nextId)）
  *   }
  *
  * Programmatic API:
@@ -4764,7 +5280,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     var fabEl = document.createElement('button');
     fabEl.className = 'demo-fab';
     fabEl.id = 'demo-fab';
-    fabEl.title = 'Designer Demo Scenarios';
+    fabEl.setAttribute('data-tip', 'Designer Demo Scenarios');   /* 原生 title 改 data-tip（#gl-tip），B 區 A-15 */
     fabEl.innerHTML =
       '<span class="material-symbols-outlined">science</span>' +
       '<span class="demo-pulse" id="demo-fab-pulse"></span>';
@@ -4951,8 +5467,46 @@ document.addEventListener('DOMContentLoaded',()=>{
     window._demoFabSetPage(pageId);
   };
 
+  /** onLeave 鉤子（2026-10-15）：切走上一個情境時先呼叫它，讓頁面把該情境塞進模組狀態的東西重設掉（避免 Demo 殘留，例如 RS 先點 um-* 再開 modal-detail）。
+   *   寫法一：scenario.onLeave = function (nextId) {…}　寫法二：window.DEMO_ON_LEAVE = function (prevId, nextId) {…}（兩種都會呼叫，先 scenario 後全域）
+   *   觸發點有兩個：點 FAB 按鈕（_demoFabApply）與「直接呼叫 window.DEMO_APPLY(id)」（下面的 DEMO_APPLY 包裝，第二輪 R1 加，讓 sweep 工具也量得到殘留）。 */
+  function _runLeave(id) {
+    var prevId = _activeScenario;
+    if (prevId && prevId !== id) {
+      try {
+        var prev = (window.DEMO_SCENARIOS || []).filter(function (s) { return s.id === prevId; })[0];
+        if (prev && typeof prev.onLeave === 'function') prev.onLeave(id);
+        if (typeof window.DEMO_ON_LEAVE === 'function') window.DEMO_ON_LEAVE(prevId, id);
+      } catch (e) { console.error('[demo-fab] onLeave', e); }
+    }
+  }
+
+  /** 包住頁面的 window.DEMO_APPLY：直接呼叫（不經 FAB）時也先跑 onLeave，並記下目前情境。
+   *  經 _demoFabApply 進來的呼叫用 _inFabApply 旗標略過，所以 onLeave 不會被呼叫兩次。
+   *  頁面不論在 demo-fab.js 載入前或後指定 window.DEMO_APPLY = fn 都會被攔到（accessor 屬性）。 */
+  var _inFabApply = false;
+  (function _wrapDemoApply() {
+    var raw = window.DEMO_APPLY, wrapped = null, wrappedFor = null;
+    function get() {
+      if (typeof raw !== 'function') return raw;
+      if (wrappedFor !== raw) {
+        wrappedFor = raw;
+        wrapped = function (id) {
+          if (!_inFabApply) { _runLeave(id); _activeScenario = id; }
+          return raw.apply(this, arguments);
+        };
+      }
+      return wrapped;
+    }
+    try {
+      Object.defineProperty(window, 'DEMO_APPLY', { configurable: true, enumerable: true, get: get, set: function (fn) { raw = fn; } });
+    } catch (e) { /* 屬性不可重定義（極少見）：退回不包裝，只剩 FAB 點擊會觸發 onLeave */ }
+  })();
+
   /** Apply a scenario — called via event delegation or by host */
   window._demoFabApply = function (id, btn) {
+    _runLeave(id);
+    if (window.LumitureToast && window.LumitureToast.clear) { try { window.LumitureToast.clear(); } catch (e) {} }   // 換情境時清掉上一個情境留下的 toast
     _activeScenario = id;
     document.querySelectorAll('.demo-btn').forEach(function (b) {
       b.classList.remove('active');
@@ -4965,7 +5519,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       if (found) found.classList.add('active');
     }
     if (typeof window.DEMO_APPLY === 'function') {
-      window.DEMO_APPLY(id, btn);
+      _inFabApply = true;
+      try { window.DEMO_APPLY(id, btn); } finally { _inFabApply = false; }
     }
   };
 
