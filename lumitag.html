@@ -843,6 +843,8 @@ tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g20
 .ac-w{font-size:14px;font-weight:600;color:var(--g900);text-align:right;font-variant-numeric:tabular-nums}
 .ac-amt{font-size:13px;color:var(--g500);text-align:right;font-variant-numeric:tabular-nums}
 .ac-row-hint{font-size:12px;line-height:18px;color:#EC6F09;display:flex;gap:4px;align-items:flex-start}.ac-row-hint::before{content:'warning';font-family:'Material Symbols Outlined';font-variation-settings:'FILL' 1;font-size:16px;line-height:18px;color:var(--warn);flex-shrink:0} /* 10/13：文字 Warning/Dark、icon Warning/Main，意思不只靠顏色 */
+/* 10/15：權重清單改自動帶入後，分到 0 多半是「這個 value 本來就沒用到這些資源」，不是使用者做錯 → 改灰色 info（Kabin 同意）。下拉版（已不採用）維持橘色 */
+body:not(.v10-recip-select) .ac-row-hint{color:var(--g500)}body:not(.v10-recip-select) .ac-row-hint::before{content:'info';color:var(--g400)}
 .ac-row-basis{font-size:12px;color:var(--g500)}
 .ac-row-basis:empty{display:none}
 .ac-row.is-new .ac-row-main{animation:v9-row-flash 1.6s ease}
@@ -3132,7 +3134,7 @@ function _v9DemoApplyInner(name,btn){
   document.querySelectorAll('.demo-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');
   if(name==='v9-layout-mixed'||name==='v9-layout-zones'||name==='v9-layout-steps'){v9SetLayout(name.replace('v9-layout-',''));return}
   const k8sSet=mode=>{S._k8sMode=mode;S._k8sNorm=mode!=='native';[S.tags,_ORIG_TAGS,[S._tmp]].forEach(list=>(list||[]).forEach(t=>{if(t&&t.rows)v9K8sConvValues(t.values,mode)}))};
-  const settings={'v9-where-group':()=>{S._whereGroup=true;S._multiWhere=false},'v9-multiwhere-on':()=>{S._whereGroup=false;S._multiWhere=true},'v9-multiwhere-off':()=>{S._whereGroup=false;S._multiWhere=false},'v9-k8s-norm':()=>k8sSet('twostep'),'v9-k8s-grouped':()=>k8sSet('grouped'),'v9-k8s-native':()=>k8sSet('native'),'v9-taken-edit':()=>{S._takenInEdit=true},'v9-taken-preview':()=>{S._takenInEdit=false},'v9-name-unique':()=>{S._deptModel=false;S._recipFree=false;S._autoRecip=true},'v9-dept-on':()=>{S._deptModel=true;S._recipFree=false;S._autoRecip=false},'v9-dept-off':()=>{S._deptModel=false;S._recipFree=true;S._autoRecip=false},'v10-recip-auto':()=>{S._autoRecip=true},'v10-recip-select':()=>{S._autoRecip=false},'v9-parked-on':()=>S._showParked=true,'v9-parked-off':()=>S._showParked=false};
+  const settings={'v9-where-group':()=>{S._whereGroup=true;S._multiWhere=false},'v9-multiwhere-on':()=>{S._whereGroup=false;S._multiWhere=true},'v9-multiwhere-off':()=>{S._whereGroup=false;S._multiWhere=false},'v9-k8s-norm':()=>k8sSet('twostep'),'v9-k8s-grouped':()=>k8sSet('grouped'),'v9-k8s-native':()=>k8sSet('native'),'v9-taken-edit':()=>{S._takenInEdit=true},'v9-taken-preview':()=>{S._takenInEdit=false},'v9-name-unique':()=>{S._deptModel=false;S._recipFree=false;S._autoRecip=true},'v9-dept-on':()=>{S._deptModel=true;S._recipFree=false;S._autoRecip=false},'v9-dept-off':()=>{S._deptModel=false;S._recipFree=true;S._autoRecip=false},'v10-recip-auto':()=>{S._autoRecip=true;document.body.classList.remove('v10-recip-select')},'v10-recip-select':()=>{S._autoRecip=false;document.body.classList.add('v10-recip-select')},'v9-parked-on':()=>S._showParked=true,'v9-parked-off':()=>S._showParked=false};
   if(settings[name]){settings[name]();const v=document.querySelector('.view.active')?.id;if(v==='v-edit'&&S._curEdit)go('edit',S._curEdit);else if(v==='v-preview'){const t=S._tmp||S.tags.find(x=>x.id===S._curEdit);if(t)go('preview',t.id)}else go('list');toast('Demo setting updated.');return}
   _demoClean();
   // 「已不採用」分組只是對照：看完回到其他情境時，版面自動回到預設 A′
