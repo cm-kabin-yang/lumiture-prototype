@@ -364,7 +364,7 @@ input{font-family:inherit}
 
 /* ===== Tab（FE `ToggleGroup`，放在卡片外、跟 Export CSV 同一列；選中 primary.light20 底＋primary.dark 字）===== */
 .tg{display:inline-flex;height:36px;border:1px solid var(--lt-grey-300);border-radius:6px;overflow:hidden;background:#fff;flex-shrink:0}
-.tgb{display:inline-flex;align-items:center;gap:8px;justify-content:center;height:34px;padding:0 16px;color:var(--lt-grey-500);font-weight:var(--lt-fw-medium);transition:background var(--lt-transition-fast);white-space:nowrap}
+.tgb{display:inline-flex;align-items:center;gap:8px;justify-content:center;height:34px;padding:0 16px;color:var(--lt-grey-500);font-weight:400;/* X-9r1：CMDS Toggle Group 14/400（同 General Budget #01、Rightsizing、Rate Optimization、Anomaly Detection；原 500） */transition:background var(--lt-transition-fast);white-space:nowrap}
 .tgb+.tgb{border-left:1px solid var(--lt-grey-300)}
 .tgb:hover{background:var(--lt-grey-50)}
 .tgb.on{background:var(--lt-blue-20);color:var(--lt-blue-90)}
@@ -411,7 +411,7 @@ input{font-family:inherit}
 .sel:disabled,.dtrig:disabled{background:var(--lt-grey-100);border-color:var(--lt-grey-200);color:var(--lt-grey-400);cursor:not-allowed}
 .sel:disabled .tri{border-top-color:var(--lt-grey-300)}
 /* 日期觸發欄（FE `DatePickerCustomInput`：高 36、左右內距 16、圓角 6、calendar icon 20＋兩段日期＋east icon 16）*/
-.dtrig{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 16px;background:#fff;border:1px solid var(--al-field-border);border-radius:6px;color:var(--lt-color-text-secondary);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background var(--lt-transition-fast),border-color var(--lt-transition-fast)}
+.dtrig{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 16px;background:#fff;border:1px solid var(--al-field-border);border-radius:var(--lt-input-radius,5px);color:var(--lt-color-text-secondary);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background var(--lt-transition-fast),border-color var(--lt-transition-fast)}   /* B-8：觸發欄 r5（2026-10-16 X-9r1；FE DatePickerCustomInput 是 6，全站觸發欄統一 5） */
 .dtrig:hover{background:var(--lt-grey-50)}
 .dtrig:active{background:var(--lt-grey-200)}   /* FE DatePickerCustomInput：hover gray.hover、active gray.selected */
 .dtrig.open{border-color:var(--lt-color-border-focus);box-shadow:var(--lt-button-focus-ring)}
@@ -541,7 +541,7 @@ input{font-family:inherit}
 .es{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--lt-color-text-secondary);flex:1;min-height:400px;padding:16px 0}
 .es .es-ic{font-size:80px;color:var(--lt-blue-30);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;line-height:80px;width:80px;height:80px}
 .es .es-ic.is-outline{font-variation-settings:'FILL' 0,'wght' 700,'GRAD' 0,'opsz' 48}
-.es-title{font-size:var(--lt-fs-18);font-weight:var(--lt-fw-bold);line-height:27px;margin-top:16px;color:var(--lt-color-text-primary)}
+.es-title{font-size:var(--lt-fs-18);font-weight:var(--lt-fw-bold);line-height:27px;margin-top:16px;color:var(--lt-color-text-secondary)}   /* X-9r1：空狀態標題 #676767（同 Overview、Executive Insights、Anomaly Detection、General Budget 的稿） */
 .es-desc{font-size:var(--lt-fs-14);white-space:pre-line;margin-top:8px;line-height:24.5px}
 .es .btn{margin-top:24px}
 
@@ -2639,7 +2639,7 @@ function render() {
   closePop(false);
   const root = $('#content');
   if (!ROLES[state.role].canView) {
-    root.innerHTML = headerHtml() + `<div class="card is-full"><div class="es"><span class="material-symbols-outlined es-ic" style="font-size:64px;line-height:64px;width:64px;height:64px">lock</span><div class="es-title">${COPY.noAccess.title}</div><div class="es-desc">${esc(COPY.noAccess.desc)}</div><a class="btn btn-p" href="./overview.html">${COPY.noAccess.btn}</a></div></div>`;
+    root.innerHTML = headerHtml() + `<div class="card is-full"><div class="es"><span class="material-symbols-outlined es-ic" style="font-size:64px;line-height:64px;width:64px;height:64px;font-variation-settings:'FILL' 0,'wght' 600,'GRAD' 0,'opsz' 48">lock</span><div class="es-title">${COPY.noAccess.title}</div><div class="es-desc">${esc(COPY.noAccess.desc)}</div><a class="btn btn-p" href="./overview.html">${COPY.noAccess.btn}</a></div></div>`;
     return;
   }
   root.innerHTML = headerHtml() + `<div id="tabrow-root">${tabsHtml()}</div><div class="card is-full ${isUx('p1') ? 'ux-p1' : ''}" id="card" role="tabpanel" aria-labelledby="tab-${state.tab}"></div>`;

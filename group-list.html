@@ -442,7 +442,7 @@ td.center .actions-cell{justify-content:center}
 /* ---- tabs (primary, underline) ---- */
 .tabs-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:1px solid var(--lt-color-border-default);margin-bottom:20px}
 .tabs{display:flex;gap:4px}
-.tab{padding:8px 16px;height:36px;font-size:14px;font-weight:500;color:var(--lt-color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:var(--lt-transition-fast);background:none;border-left:none;border-right:none;border-top:none;font-family:inherit;white-space:nowrap}
+.tab{padding:8px 16px;height:36px;font-size:14px;font-weight:400;/* X-9r1：未選 400、選中 700（CMDS Tab，同 General Budget #01、All Resource List；原 500） */color:var(--lt-color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:var(--lt-transition-fast);background:none;border-left:none;border-right:none;border-top:none;font-family:inherit;white-space:nowrap}
 .tab:hover{color:var(--lt-color-text-heading);border-bottom-color:var(--lt-grey-200)}
 .tab.active{color:var(--lt-color-primary);font-weight:700;border-bottom-color:var(--lt-color-primary)}
 .tab:disabled{color:var(--lt-grey-300);cursor:not-allowed}
@@ -2611,6 +2611,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
  *
  * 規格（Guideline Empty State，全站唯一用 outlined icon 的元件）：
  *   icon：Material Symbols FILL 0、色 #9ED7FF（Primary Light 30）；尺寸 S 48／M 64／L 80
+ *   標題色 #676767（2026-10-16 X-9r1：Overview、Executive Insights、Anomaly Detection、General Budget 的稿都是 text-secondary）
  *   標題 S 14／M 16／L 20，Bold｜說明 S 12／M 14／L 14（#676767）｜整體水平垂直置中｜icon→標題 12（page 版 16）→說明 4~8→按鈕 16
  *   page：整頁卡片版（ARL 10/09 裁決方案 B）：icon 64、標題 18／700、說明 14、按鈕離說明 32、卡片最小高 521
  *
@@ -2637,7 +2638,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
       '.lt-empty .lt-empty__ic{font-family:\'Material Symbols Outlined\';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;-webkit-font-feature-settings:\'liga\';font-feature-settings:\'liga\';',
       'color:#9ED7FF;font-variation-settings:\'FILL\' 0,\'wght\' 400,\'GRAD\' 0,\'opsz\' 48;width:1em;height:1em;display:block;overflow:hidden}',
       '.lt-empty--s .lt-empty__ic{font-size:48px}.lt-empty--m .lt-empty__ic,.lt-empty--page .lt-empty__ic{font-size:64px}.lt-empty--l .lt-empty__ic{font-size:80px}',
-      '.lt-empty__t{margin:12px 0 0;font-weight:700;line-height:1.5;color:var(--lt-color-text-primary,#262626)}',
+      '.lt-empty__t{margin:12px 0 0;font-weight:700;line-height:1.5;color:var(--lt-color-text-secondary,#676767)}',
       '.lt-empty--s .lt-empty__t{font-size:14px}.lt-empty--m .lt-empty__t{font-size:16px}.lt-empty--l .lt-empty__t{font-size:20px}.lt-empty--page .lt-empty__t{font-size:18px;margin-top:16px}',
       '.lt-empty__d{margin:8px 0 0;font-size:14px;line-height:24.5px;color:var(--lt-color-text-secondary,#676767);white-space:pre-line}',
       '.lt-empty--s .lt-empty__d{font-size:12px;line-height:18px;margin-top:4px}',
@@ -3363,7 +3364,7 @@ function findT2(t1id,t2id){return tier2GroupsFor(findT1(t1id)).find(g=>g.id===t2
 
 /* ---------- toast ---------- */
 function showToast(text,type='success'){   /* A-1：改走 shared/lumiture-toast.js（#008F88／#BF302E、寬 400、r4、left 跟 sidebar） */
-  LumitureToast.show({kind: type==='error'?'error':'success', message: text});
+  LumitureToast.show({kind: type==='error'?'error':type==='info'?'info':'success', message: text});   // X-9r1：Demo 說明用 info（藍），跟其他頁一致，不冒充成功 toast
 }
 function deferredAction(label){ LumitureToast.info(label+'：設計稿尚無這張畫面或內容待確認，本版留佔位（見 CLAUDE.md Group List v3 段落）'); }
 
@@ -3773,7 +3774,7 @@ Please assign new resources or reach out to your administrator for help.</p></di
         <div class="res-toolbar-left">${seg}
           <div class="search-box"><span class="material-symbols-outlined">search</span>${sub==='primary'
             ? `<input id="res-search" placeholder="Search resources" value="${esc(state.resSearch[state.cloud]||'')}" oninput="onResSearch(this)">`
-            : `<input placeholder="Search resources" oninput="showToast('Filtering… (prototype does not filter mock data)')">`}</div>
+            : `<input placeholder="Search resources" oninput="showToast('Filtering… (prototype does not filter mock data)','info')">`}</div>
         </div>
         <div class="res-toolbar-actions">
           ${(canRemove && selectedIds.length)?`<button class="btn btn-out" onclick="openUnlinkDialog('${group.id}','${state.cloud}',[${selectedIds.map(id=>"'"+id+"'").join(',')}],'${bucketKey}')"><span class="material-symbols-outlined">link_off</span>Unlink Resource</button>`:''}
@@ -5600,19 +5601,19 @@ window.DEMO_APPLY = function (id) {
   if (id === 'list-single-org') { assign.multiOrg = false; state.hierShowcase = false; closeAssign(); invalidateHierIndex(); gotoResourcesTable('data-analytics'); return; }
   if (id === 'org-multi-table') { assign.multiOrg = true; assign.hasFolders = true; state.hierShowcase = false; closeAssign(); invalidateHierIndex(); gotoResourcesTable('data-analytics'); return; }
   if (id === 'org-single')      { assign.multiOrg = false; assign.hasFolders = true; if(!assign.open){ openAssign('gcp'); } setGroupBy('folder'); return; }
-  if (id === 'sel-clear')      { assign.keepSelection = false; if(!assign.open){ openAssign('gcp'); } else renderAssign(); showToast('切換 Group by 會清掉已勾選（開發團隊目前立場），清掉時會在彈窗裡告知並給 Undo'); return; }
-  if (id === 'sel-keep')       { assign.keepSelection = true;  if(!assign.open){ openAssign('gcp'); } else renderAssign(); showToast('切換 Group by 保留已勾選（UX 建議），勾選是專案 ID 的集合、跟視角無關'); return; }
+  if (id === 'sel-clear')      { assign.keepSelection = false; if(!assign.open){ openAssign('gcp'); } else renderAssign(); showToast('切換 Group by 會清掉已勾選（開發團隊目前立場），清掉時會在彈窗裡告知並給 Undo', 'info'); return; }
+  if (id === 'sel-keep')       { assign.keepSelection = true;  if(!assign.open){ openAssign('gcp'); } else renderAssign(); showToast('切換 Group by 保留已勾選（UX 建議），勾選是專案 ID 的集合、跟視角無關', 'info'); return; }
   if (id === 'assign-fail')    { setAssignedMode('mixed'); assign.hasFolders = true; openAssign('gcp'); setGroupBy('folder'); assign.forceFail = true; return; }
 
   /* ---- v3 P1：Create Group wizard ---- */
   const toList = () => { if(state.view!=='list'){ state.view='list'; render(); } };
   if (id === 'wz-open')   { toList(); openCreateGroup(1); return; }
   if (id === 'wz-format') { toList(); openCreateGroup(1); wizard.managers='mile.dsk, koe@mdl.com,'; wizardValidateInfo(); return; }
-  if (id === 'wz-apierr') { toList(); openCreateGroup(1); wizard.forceApiError=true; wizard.name='Cohort Integration'; wizard.managers='cameron.cooper@five9.com, geole.chan@five9.com, halweo.ieation@five9.com'; renderWizard(); showToast('按 Next 就會看到 Error Details（這個情境把所有 email 都當成已在其他群組）'); return; }
+  if (id === 'wz-apierr') { toList(); openCreateGroup(1); wizard.forceApiError=true; wizard.name='Cohort Integration'; wizard.managers='cameron.cooper@five9.com, geole.chan@five9.com, halweo.ieation@five9.com'; renderWizard(); showToast('按 Next 就會看到 Error Details（這個情境把所有 email 都當成已在其他群組）', 'info'); return; }
   if (id === 'wz-invite') { toList(); openCreateGroup(1); wizard.name='Cohort Integration'; wizardGo(1); return; }
   if (id === 'wz-gcp')    { toList(); state.cloudAuth='all'; openCreateGroup(1); wizard.name='Cohort Integration'; wizardGo(2); return; }
   if (id === 'wz-noauth') { toList(); state.cloudAuth='gcp-only'; render(); openCreateGroup(1); wizard.name='Cohort Integration'; wizardGo(3); return; }
-  if (id === 'wz-fail')   { toList(); openCreateGroup(1); wizard.name='Cohort Integration'; wizard.forceFail=true; wizardGo(3); showToast('按 Submit 會走失敗分支'); return; }
+  if (id === 'wz-fail')   { toList(); openCreateGroup(1); wizard.name='Cohort Integration'; wizard.forceFail=true; wizardGo(3); showToast('按 Submit 會走失敗分支', 'info'); return; }
 
   /* ---- v3 P1：Label / Tag ---- */
   const toResources = (cloud, sub) => { openDetail(1,'biz-dev',null,'resources'); state.cloud=cloud; state.resSub[cloud]=sub; render(); };
@@ -5628,10 +5629,10 @@ window.DEMO_APPLY = function (id) {
   if (id === 'crud-remove-block') { toMembers('biz-dev'); openRemoveGroup('biz-dev', null); return; }
   if (id === 'crud-remove-group') { USERS_CACHE.set('hr', []); toMembers('hr'); openRemoveGroup('hr', null); return; }
   if (id === 'crud-invite')       { toMembers('biz-dev'); openInviteUser('biz-dev'); return; }
-  if (id === 'crud-invite-err')   { toMembers('biz-dev'); openInviteUser('biz-dev'); fm.forceApiError=true; fm.role='manager'; fm.emails='cameron.cooper@five9.com, geole.chan@five9.com, halweo.ieation@five9.com'; renderFm(); showToast('按 Invite User 就會看到 Error Details（這個情境把所有 email 都當成已在其他群組）'); return; }
+  if (id === 'crud-invite-err')   { toMembers('biz-dev'); openInviteUser('biz-dev'); fm.forceApiError=true; fm.role='manager'; fm.emails='cameron.cooper@five9.com, geole.chan@five9.com, halweo.ieation@five9.com'; renderFm(); showToast('按 Invite User 就會看到 Error Details（這個情境把所有 email 都當成已在其他群組）', 'info'); return; }
   if (id === 'crud-edit-user')    { toMembers('biz-dev'); openEditUser('biz-dev', usersFor('biz-dev')[1].id); return; }
   if (id === 'crud-remove-user')  { toMembers('partnerships'); openRemoveUser('partnerships', usersFor('partnerships')[1].id); return; }   // partnerships 的第 4 位是 mock 的目前登入者，刪除鈕會是 disabled
-  if (id === 'crud-fail')         { fm.forceFail = true; showToast('下一個 Edit / Remove / Invite 送出會走失敗 toast'); return; }
+  if (id === 'crud-fail')         { fm.forceFail = true; showToast('下一個 Edit / Remove / Invite 送出會走失敗 toast', 'info'); return; }
   if (id === 'members-empty')     { USERS_CACHE.set('legal', []); toMembers('legal'); return; }
 
   /* ---- v3 P3 ---- */

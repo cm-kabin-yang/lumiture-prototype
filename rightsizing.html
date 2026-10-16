@@ -1367,6 +1367,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
  *
  * 規格（Guideline Empty State，全站唯一用 outlined icon 的元件）：
  *   icon：Material Symbols FILL 0、色 #9ED7FF（Primary Light 30）；尺寸 S 48／M 64／L 80
+ *   標題色 #676767（2026-10-16 X-9r1：Overview、Executive Insights、Anomaly Detection、General Budget 的稿都是 text-secondary）
  *   標題 S 14／M 16／L 20，Bold｜說明 S 12／M 14／L 14（#676767）｜整體水平垂直置中｜icon→標題 12（page 版 16）→說明 4~8→按鈕 16
  *   page：整頁卡片版（ARL 10/09 裁決方案 B）：icon 64、標題 18／700、說明 14、按鈕離說明 32、卡片最小高 521
  *
@@ -1393,7 +1394,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
       '.lt-empty .lt-empty__ic{font-family:\'Material Symbols Outlined\';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;-webkit-font-feature-settings:\'liga\';font-feature-settings:\'liga\';',
       'color:#9ED7FF;font-variation-settings:\'FILL\' 0,\'wght\' 400,\'GRAD\' 0,\'opsz\' 48;width:1em;height:1em;display:block;overflow:hidden}',
       '.lt-empty--s .lt-empty__ic{font-size:48px}.lt-empty--m .lt-empty__ic,.lt-empty--page .lt-empty__ic{font-size:64px}.lt-empty--l .lt-empty__ic{font-size:80px}',
-      '.lt-empty__t{margin:12px 0 0;font-weight:700;line-height:1.5;color:var(--lt-color-text-primary,#262626)}',
+      '.lt-empty__t{margin:12px 0 0;font-weight:700;line-height:1.5;color:var(--lt-color-text-secondary,#676767)}',
       '.lt-empty--s .lt-empty__t{font-size:14px}.lt-empty--m .lt-empty__t{font-size:16px}.lt-empty--l .lt-empty__t{font-size:20px}.lt-empty--page .lt-empty__t{font-size:18px;margin-top:16px}',
       '.lt-empty__d{margin:8px 0 0;font-size:14px;line-height:24.5px;color:var(--lt-color-text-secondary,#676767);white-space:pre-line}',
       '.lt-empty--s .lt-empty__d{font-size:12px;line-height:18px;margin-top:4px}',
@@ -2573,8 +2574,10 @@ bindTips();
  *
  * Design spec: CMDS Component Library > Currency Switch (H=30px)
  *   - Normal: transparent bg, no border; Hover: subtle gray bg; Focus: focus ring
- *   - Trigger format: [flag] [CODE] [expand_more]
- *   - Dropdown gap: 4px from trigger bottom
+ *   - Trigger format: [flag] [CODE] [▾]（箭頭由 CSS 統一畫成 arrow_drop_down，markup 寫 expand_more 也會被換掉）
+ *   - Dropdown gap: 4px from trigger bottom（2026-10-16 X-9r1：錨在按鈕本身，不是父層；預設右緣對齊按鈕右緣＝Overview #01-4，
+ *     按鈕寫 data-dd-align="left" 的改左緣對齊＝General Budget #01-7）
+ *   - Tooltip：沒寫 data-tip／data-tip-tip 的按鈕自動帶 FE CurrencySelector 的匯率說明（FE 全站同一顆元件）；下拉打開時不顯示
  *   - Dropdown items: "Full Name (CODE)", selected = gray bg, no checkmark
  *
  * Design spec: Figma #01-4 Overview: Change Currency
@@ -2622,45 +2625,51 @@ bindTips();
     { code: 'USD', name: 'United States dollar',   flag: '🇺🇸' },
   ];
 
+  /* 2026-10-16 X-9r1：全站同一組 mock 匯率（1 USD＝?），各頁換算一律用這組，不要各頁自備（原本 Overview 32.1、General Budget 31.5 對不起來）。
+     數值沿用 Overview 原本的表 */
+  var RATES = { USD: 1, TWD: 32.1, HKD: 7.8, SGD: 1.35, MYR: 4.7, PHP: 56.2, IDR: 15800 };
+  /* 金額前綴符號（tooltip 的完整金額用，例如 $10,816,382.11／NT$347,206,867.73）；沿用 Overview 原本的表 */
+  var SYMBOLS = { USD: '$', TWD: 'NT$', HKD: 'HK$', SGD: 'S$', MYR: 'RM', PHP: '₱', IDR: 'Rp' };
+  /* FE CurrencySelector/SelectInput.tsx 的 TooltipTitle（全站同一句） */
+  var TIP = 'Please note that due to exchange rate conversions and data latency in the console, the displayed numbers may slightly differ from those in the console. The actual amount should be based on your received invoice. (Exchange rate source: https://rter.info/)';
+
   /* ===== CSS ===== */
   var CSS = [
-    /* Trigger button — Normal: transparent, no border; H=30px per CMDS spec */
-    '.curr-btn{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 7px;',
-    'font-size:13px;color:#262626;',
-    'cursor:pointer;background:transparent;border:none;border-radius:6px;',
+    /* 2026-10-16 C-1（README 指定）：按鈕、箭頭、下拉照稿（GB #01-7 Currency Converter＋Dropdown；Overview #01／#01-4 同，C-5 已量）。
+       按鈕 80×30、內距 0／8、gap 4、r4；國旗 16 圓框 #CCCCCC；代碼 14／400 #676767；hover／開啟底 rgba(103,103,103,.12) */
+    '.curr-btn{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 4px 0 8px;',
+    'font-size:14px;color:#676767;',
+    'cursor:pointer;background:transparent;border:none;border-radius:4px;',
     'font-family:inherit;line-height:1;white-space:nowrap;',
     'transition:background .12s}',
-    /* Hover: subtle gray wash */
-    '.curr-btn:hover{background:rgba(0,0,0,.06)}',
-    /* Active/open: same wash + arrow flipped */
-    '.curr-btn.cp-open{background:rgba(0,0,0,.06)}',
+    '.curr-btn:hover,.curr-btn.cp-open{background:rgba(103,103,103,.12)}',
     /* Focus: blue focus ring (keyboard nav / Active state ring per CMDS) */
     '.curr-btn:focus-visible{outline:2px solid #004FB0;outline-offset:1px}',
-    /* Flag + code */
-    '.curr-flag{font-size:15px;line-height:1;flex-shrink:0}',
-    '.curr-code{font-size:14px;color:#262626}',
-    /* Arrow icon */
-    '.curr-btn .material-symbols-outlined{font-size:16px;',
-    'color:#676767;flex-shrink:0;transition:transform .15s}',
-    /* 2026-10-15 R1（A-11）：下拉箭頭統一實心 ▾（arrow_drop_down 24）。markup 加 class="curr-arrow" 才套用（舊頁面仍是 expand_more 16 的 chevron） */
-    '.curr-btn .curr-arrow{font-size:24px;margin:0 -4px 0 -2px}',
-    '.curr-btn.cp-open .material-symbols-outlined{transform:rotate(180deg)}',
+    /* Flag：16 圓、1px #CCCCCC 框（emoji 國旗放大後裁成圓形） */
+    '.curr-flag{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;',
+    'box-shadow:0 0 0 1px #CCCCCC;overflow:hidden;font-size:22px;line-height:1;flex-shrink:0}',
+    '.curr-code{font-size:14px;font-weight:400;color:#676767;line-height:24.5px}',
+    /* 箭頭（A-11 下拉箭頭統一實心 ▾）：不管各頁 markup 寫 expand_more 還是 arrow_drop_down，都用 ::after 畫成 arrow_drop_down，
+       原本的字藏起來（font-size:0），各頁不用改 markup。稿 #01-7 開啟時箭頭不翻轉 */
+    '.curr-btn > .material-symbols-outlined:last-child{font-size:0;line-height:1;color:#676767;flex-shrink:0;width:20px;margin-left:-4px;',
+    'display:inline-flex;align-items:center;justify-content:center}',
+    '.curr-btn > .material-symbols-outlined:last-child::after{content:"arrow_drop_down";font-size:20px;line-height:1;',
+    'font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 20}',
 
-    /* Dropdown container — 4px gap per CMDS spec */
+    /* Dropdown（稿 #01-7）：250 寬、r6、陰影 0 0 6px .2、無框、內距 10 */
     '.curr-dd{position:absolute;top:calc(100% + 4px);right:0;left:auto;',
-    'background:#fff;border:1px solid #DCE3EC;',
-    'border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);',
-    'z-index:300;min-width:220px;width:max-content;',
+    'background:#fff;border:none;',
+    'border-radius:6px;box-shadow:0 0 6px rgba(0,0,0,.2);padding:10px;',
+    'z-index:300;width:250px;box-sizing:border-box;',
     'overflow:hidden;overscroll-behavior:contain}',
 
-    /* Dropdown items — full name + (CODE), no flag */
-    '.curr-dd-item{display:flex;align-items:center;padding:9px 14px;width:100%;',
-    'font-size:13px;border:none;background:none;cursor:pointer;',
+    /* 項目：230×40、r5、內距 0／8、14／400 #262626；hover #F6F6F6、選中 #E6E6E6（不打勾） */
+    '.curr-dd-item{display:flex;align-items:center;height:40px;padding:0 8px;width:100%;box-sizing:border-box;',
+    'font-size:14px;font-weight:400;border:none;border-radius:5px;background:none;cursor:pointer;',
     'font-family:inherit;color:#262626;text-align:left;',
-    'transition:background .1s;line-height:1.4;white-space:nowrap}',
-    '.curr-dd-item:hover{background:#F5F5F5}',
-    /* Selected: gray bg per Figma, no color/weight change */
-    '.curr-dd-item.cp-active{background:#F0F0F0}',
+    'transition:background .1s;line-height:24.5px;white-space:nowrap}',
+    '.curr-dd-item:hover{background:#F6F6F6}',
+    '.curr-dd-item.cp-active{background:#E6E6E6}',
   ].join('');
 
   var style = document.createElement('style');
@@ -2676,6 +2685,7 @@ bindTips();
     if (dd) dd.remove();
     if (_activeTrigger) {
       _activeTrigger.classList.remove('cp-open');
+      if (_activeTrigger.hasAttribute('data-cp-tip')) { _activeTrigger.setAttribute('data-tip', _activeTrigger.getAttribute('data-cp-tip')); _activeTrigger.removeAttribute('data-cp-tip'); }
       _activeTrigger = null;
     }
   }
@@ -2687,6 +2697,9 @@ bindTips();
     /* Ensure parent is positioned */
     var wrap = triggerEl.parentElement;
     if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+    /* 下拉打開時不顯示 tooltip（FE：isOpen 時 title 清空） */
+    if (triggerEl.hasAttribute('data-tip')) { triggerEl.setAttribute('data-cp-tip', triggerEl.getAttribute('data-tip')); triggerEl.removeAttribute('data-tip'); }
+    var gl = document.getElementById('gl-tip'); if (gl) gl.style.display = 'none';
 
     var dd = document.createElement('div');
     dd.className = 'curr-dd';
@@ -2706,6 +2719,13 @@ bindTips();
     });
 
     wrap.appendChild(dd);
+    /* 錨在按鈕本身（父層常常還包著 Month Picker 等元素，right:0 會對到父層右緣，Executive Insights 曾偏 146px） */
+    if (triggerEl.offsetParent === wrap) {
+      dd.style.top = (triggerEl.offsetTop + triggerEl.offsetHeight + 4) + 'px';
+      dd.style.right = (wrap.clientWidth - triggerEl.offsetLeft - triggerEl.offsetWidth) + 'px';
+      /* 按鈕寫 data-dd-align="left" 的改成左緣對齊（General Budget #01-7） */
+      if (triggerEl.dataset.ddAlign === 'left') { dd.style.right = 'auto'; dd.style.left = triggerEl.offsetLeft + 'px'; }
+    }
 
     /* Outside click to close */
     setTimeout(function () {
@@ -2719,8 +2739,21 @@ bindTips();
   }
 
   /* ===== PUBLIC API ===== */
+  /* 預設 tooltip：滑過還沒有 tooltip 的幣別鈕時補上 data-tip（capture，比 demo-fab 的 #gl-tip 先跑） */
+  document.addEventListener('mouseover', function (e) {
+    var b = e.target.closest && e.target.closest('.curr-btn');
+    if (!b || b.classList.contains('cp-open') || b.disabled) return;
+    if (!b.hasAttribute('data-tip') && !b.hasAttribute('data-tip-tip') && !b.hasAttribute('data-no-tip')) b.setAttribute('data-tip', TIP);
+  }, true);
+
   window.CurrencyPicker = {
     CURRENCIES: CURRENCIES,
+    RATES: RATES,
+    TIP: TIP,
+    /** USD 金額換成 code 幣別（mock 匯率） */
+    convert: function (usd, code) { return usd * (RATES[code] || 1); },
+    /** 幣別前綴符號（找不到就回傳代碼＋空格） */
+    symbol: function (code) { return SYMBOLS[code] || (code + ' '); },
 
     /**
      * Toggle dropdown open / close.

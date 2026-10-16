@@ -206,22 +206,24 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .topbar{background:var(--pri-dk);padding:14px 32px;display:flex;align-items:center;justify-content:flex-end;gap:16px;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.1);min-height:68px}
 .tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.7)}
 .tb-ic:hover{background:rgba(255,255,255,.08);color:#fff}
-.content{padding:24px 32px;flex:1}
+.content{padding:32px;flex:1}   /* C-1 #61：稿 #01 內容區內距 32、頁首到 paper 32 */
 .content.has-savebar{padding-bottom:96px}
 
 /* ==== Page header ==== */
-.pg-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.pg-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;gap:16px;flex-wrap:wrap}
 .pg-title{font-size:var(--lt-page-title-size,24px);font-weight:var(--lt-page-title-weight,700);color:var(--g900);line-height:1.5}
 .pg-hdr-r{display:flex;align-items:center;gap:12px}
 
 /* ==== Paper (card) — wraps the whole page content ==== */
-.paper{background:#fff;border-radius:var(--r-md);padding:24px;box-shadow:var(--lt-card-shadow,0 0 20px 0 rgba(0,0,0,.10));border:1px solid transparent;transition:border-color .15s,box-shadow .15s}
+.paper{background:#fff;border-radius:var(--r-md);padding:24px;box-shadow:var(--lt-card-shadow,0 0 20px 0 rgba(0,0,0,.10))}   /* C-1：拿掉留給編輯框線的 1px 透明框（稿沒有，內容會多偏 1px） */
 /* 編輯模式不再用藍色外框（PM 反饋分散注意力；實際只有下方表格可編輯，Save/Cancel bar 已足夠指示編輯狀態）*/
-.paper-section-title{font-size:18px;font-weight:700;color:var(--g900);line-height:1.5}
+.paper-section-title{font-size:20px;font-weight:700;color:var(--g900);line-height:30px}   /* C-1 #3：稿 #01 區塊標題 20／700 */
 .paper-section-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:16px}
 /* When section title is hidden (T2 roles), force action buttons (Download CSV / Edit) to stay right-aligned
    instead of collapsing to the left edge of the row. */
 .paper-section-row > .pg-hdr-r{margin-left:auto}
+/* 稿 #01：Tier 1 Group Budget 標題列高 30、按鈕 36 往下凸出，提醒列在標題下 8（不是按鈕下 8） */
+#sec2-row{height:30px;align-items:flex-start}
 .paper-meta{font-size:12px;color:var(--g500);font-style:italic;white-space:nowrap}
 /* FY entry pattern (aligned with Executive Insights "Fiscal Year Start: ... · Set Fiscal Start Month" inline pattern) */
 .fy-inline{display:inline-flex;align-items:center;gap:12px;font-size:13px;color:var(--g700);font-style:normal;font-weight:500;white-space:nowrap}
@@ -239,46 +241,44 @@ input,select,textarea{font-family:inherit;font-size:14px}
 
 /* ==== FY year switcher（頁首右上，page-level 導覽；往前兩年/往後一年）==== */
 #fy-picker{display:inline-flex;align-items:center;gap:12px} /* Edit Start Month link + FY selector 並排 */
-.fy-sw{position:relative;display:inline-block}
+.fy-sw{position:relative;display:inline-flex}   /* inline-block 會多 2px 基線空隙，頁首變 38 高 */
 /* A-11：FY 觸發欄掛共用 .lt-select（shared/lumiture-ui.css：高 36、r5、14／400、框 #CCCCCC、hover 框 #B3B3B3、MUI 實心 ▾）。這裡只留 FY 自己的內容（日曆 icon＋FY＋range） */
-.fy-sw-trigger{gap:6px;padding:0 4px 0 10px;min-width:240px}   /* #01 trigger 寬 240 */
-.fy-sw.open .fy-sw-trigger{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
+.fy-sw-trigger{gap:0;padding:0 4px 0 8px;width:240px}   /* #01 trigger 寬 240 */
 .fy-sw.open .lt-select__arrow{transform:rotate(180deg)}
 .fy-sw-trigger:disabled{border-color:#E6E6E6}   /* #01-6：disabled 框 #E6E6E6 */
 .fy-sw-trigger:disabled .fy-sw-cal{color:var(--g300)}
-.fy-sw-cal{font-size:20px;color:var(--g500);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}   /* #01：event 實心日曆 */
+.fy-sw-trigger:disabled .fy-dot,.fy-sw-trigger:disabled .fy-sw-trigger-range{color:var(--g300)}
+.fy-sw-cal{font-size:24px;color:var(--g500);margin-right:8px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}   /* #01：event 實心日曆 24 */
 .fy-sw-val{letter-spacing:0;font-weight:400}
-/* trigger 上的 range（設計稿 #01：FY + range 直接寫在按鈕上）—— 次級灰、normal weight */
-.fy-sw-trigger-range{flex:1;text-align:left;font-size:14px;font-weight:400;color:var(--g500);letter-spacing:0;white-space:nowrap}
+/* C-1 #21／#22：稿 #01／#01-10 FY 文字 = FY 2026（14 #262626）＋「・」#B3B3B3＋range 12 #676767；觸發欄與選單項目同一個寫法 */
+.fy-dot{color:var(--g400);font-size:14px}
+.fy-sw-trigger-range{flex:1;text-align:left;font-size:12px;font-weight:400;color:var(--g500);letter-spacing:0;white-space:nowrap}
 /* 過去年：trigger 數字轉中性灰，暗示「非當年」（但不鎖，仍可編輯） */
-.fy-sw.past .fy-sw-trigger{color:var(--g600)}
-.fy-sw.past .fy-sw-val{color:var(--g600)}
-.fy-sw.future .fy-sw-trigger{color:var(--g900)}
-/* 下拉選單（無標題列、無底部 Edit link —— 那是設計備份）*/
-.fy-sw-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:100%;background:#fff;border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.1);padding:6px;z-index:60;display:none;overscroll-behavior:contain}
+.fy-sw.past .fy-sw-val{color:var(--g500)}
+/* 下拉選單（C-1 #22：稿 #01-10 CMDS Dropdown：寬同觸發欄、r6、陰影 0 0 6px .2、內距 10、無框；項目 40 高 r5 內距 0／8） */
+.fy-sw-menu{position:absolute;top:calc(100% + 4px);right:0;width:100%;background:#fff;border-radius:6px;box-shadow:0 0 6px rgba(0,0,0,.2);padding:10px;z-index:60;display:none;overscroll-behavior:contain}
 .fy-sw.open .fy-sw-menu{display:block}
-/* item 單行：FY（固定）+ range（中段佔滿、灰）*/
-.fy-sw-opt{display:flex;flex-direction:row;align-items:center;gap:10px;width:100%;padding:9px 12px;border:none;background:none;border-radius:var(--r-sm);cursor:pointer;font-family:inherit;text-align:left;transition:background .1s}
-.fy-sw-opt:hover{background:var(--g100)}
-.fy-sw-opt.sel{background:var(--g100)}
-.fy-sw-opt-fy{font-size:14px;font-weight:400;color:var(--g900);line-height:1.3;white-space:nowrap}
-.fy-sw-opt-range{flex:1;font-size:12px;color:var(--g500);line-height:1.4;white-space:nowrap}
-.paper-desc{font-size:12px;color:var(--g500);margin-bottom:24px}
+.fy-sw-opt{display:flex;flex-direction:row;align-items:center;gap:0;width:100%;height:40px;padding:0 8px;border:none;background:#fff;border-radius:5px;cursor:pointer;font-family:inherit;text-align:left;line-height:24.5px}
+.fy-sw-opt:hover,.fy-sw-opt.is-hl{background:var(--g50)}
+.fy-sw-opt.sel{background:var(--g200)}
+.fy-sw-opt-fy{font-size:14px;font-weight:400;color:var(--g900);white-space:nowrap}
+.fy-sw-opt-range{font-size:12px;color:var(--g500);white-space:nowrap}
+.paper-desc{font-size:12px;color:var(--g500);margin-bottom:24px;line-height:18px}
 .paper-desc b{color:var(--g700);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:11px}
 
 /* ==== Section divider inside paper ==== */
-.paper-sep{height:1px;background:var(--g200);margin:32px 0 24px}
+.paper-sep{height:0;margin:56px 0 0}   /* C-1 #8（K1）：稿沒有分隔線，Section 1 底 24＋paper gap 32 */
 
 /* ==== Org Annual Budget grid ==== */
-.orgrow{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:24px}
-/* Figma 對齊：第一張卡 (Total Annual Budget) 與後面 per-CSP 卡之間有垂直分隔線，
-   視覺分組「合計 vs 各雲」。用 ::after 偽元素畫在 gap 中央，不影響 grid layout。*/
-.orgcell{position:relative}
+.orgrow{display:flex;gap:24px;margin-bottom:24px}   /* C-1 #6：稿 #01 卡寬 227（1366 寬時）、間距 24；第一張後面多 24 再畫分隔線 */
+.orgcell{position:relative;flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:8px}
+.orgcell:first-child{margin-right:24px}
 .orgcell:first-child::after{
-  content:'';position:absolute;right:-12px;top:6px;bottom:6px;
+  content:'';position:absolute;right:-24px;top:0;bottom:0;
   width:1px;background:var(--g200);
 }
-.orgcell .ol{font-size:13px;font-weight:500;color:var(--g700);display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.orgcell .ol{font-size:12px;font-weight:700;color:var(--g500);display:flex;align-items:center;gap:4px;height:24px;line-height:18px}   /* C-1 #4：12／700 #676767、logo 24 */
+.orgcell .ol .csp-logo{width:24px;height:24px}
 .csp-ic{width:20px;height:20px;border-radius:4px;font-size:10px;font-weight:700;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:.2px}
 .csp-gcp{background:#34A853}.csp-aws{background:#FF9900}.csp-azure{background:#308CE3}.csp-focus{background:#7E55D9}
 /* 品牌 SVG logo container — 無底色，純 svg 呈現官方品牌色 */
@@ -305,8 +305,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .fy-select:hover{border-color:#B3B3B3}
 .fy-select:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 /* Preview chip — Figma 設計稿是純文字無底色（不是 pill）— 2026-06-04 對齊 */
-.fy-preview{font-size:14px;font-weight:500;color:var(--g900);line-height:1.75;margin-bottom:16px}
-.fy-preview strong{color:var(--g900);font-weight:700}
+.fy-preview{font-size:14px;font-weight:500;color:var(--g900);line-height:1.75;margin-bottom:16px}   /* C-1 #58：稿 #11 整句 500，FY 不另加粗 */
 /* Figma 對齊：bg #FEF3E1、文字色 #EC6F09 (Warning Dark)、14px Regular、24.5px line-height、padding 16px、rounded 8px、gap 4px */
 /* warn-dark：警告文字在 warn-light 底上的深琥珀（對比足夠），收成 token 避免 hardcode */
 :root{--warn-dark:#ec6f09;--warn-light:#fef3e1}
@@ -317,87 +316,104 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .fy-warning-list{margin:0;padding-left:28px;font-size:14px;line-height:1.75;color:var(--warn-dark);list-style:disc}
 .fy-warning-list li{margin-bottom:0}
 .fy-field-label{display:block;font-size:13px;font-weight:500;color:var(--g700);margin-bottom:6px}
-.orgcell .ov{font-size:36px;font-weight:700;color:var(--g900);line-height:1.5;letter-spacing:-.5px}
-.orgcell .ou{font-size:12px;font-weight:500;color:var(--g500);margin-left:6px}
-.orgcell .conv{font-size:12px;color:var(--g500);margin-top:4px;display:none;font-weight:500}
+.orgcell .ov{font-size:36px;font-weight:700;color:var(--g900);line-height:54px;letter-spacing:0;display:flex;align-items:flex-end;gap:4px;padding-bottom:8px}
+.orgcell .ou{font-size:12px;font-weight:700;color:#0D2037;line-height:18px;padding-bottom:9px}   /* C-1 #5：稿 USD 12／700 #0D2037 */
+.orgcell .conv{font-size:16px;line-height:24px;color:var(--g900);margin-top:-8px;display:none;font-weight:700}   /* C-1 #32：稿 #01-7 換算值 16／700，幣別代碼 12／700 */
+.orgcell .conv .conv-code{font-size:12px;margin-left:4px}
 .show-conv .orgcell .conv{display:block}
-.orgcell .expected{font-size:12px;color:var(--g500);margin-top:8px;display:flex;align-items:center;gap:6px}
-.orgcell .expected .material-symbols-outlined{font-size:14px;color:var(--g400)}
+.orgcell .expected{font-size:12px;line-height:18px;color:var(--g900);display:flex;align-items:center;gap:8px;padding:8px;background:var(--pri-lt10);border-radius:4px}   /* C-1 #47：稿 #05 Allocated Budget 框 #F2FAFF r4 內距 8 */
+.orgcell .expected .material-symbols-outlined{font-size:16px;color:var(--g500)}
+.orgcell .expected .exp-lbl{cursor:help}
 .orgcell .empty-val{color:var(--g400);font-weight:500}
+.orgcell .ov .empty-val{color:var(--g900);font-weight:700;cursor:default}   /* 稿 #00／#01-2：卡片的 -- 是 36／700 深色 */
 
 /* ==== Currency / converter row ==== */
-.curr-row{display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.curr-row{display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap;min-height:30px}
 /* A-13：Switch 30×16、白底＋primary 框，點是 12×12 空心圓；ON 實心 primary＋白點（Figma #02／#09；CB、AD 同款） */
 .toggle{position:relative;width:30px;height:16px;background:#fff;border-radius:8px;cursor:pointer;transition:background .15s;flex-shrink:0;display:inline-block;border:1px solid var(--pri);padding:0}
 .toggle::after{content:'';position:absolute;top:1px;left:1px;width:12px;height:12px;background:transparent;border:1px solid var(--pri);border-radius:50%;transition:left .15s,background .15s}
 .toggle.on{background:var(--pri)}
 .toggle.on::after{left:15px;background:#fff;border-color:#fff}
 .toggle:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,79,176,.1)}
-.toggle-label{font-size:13px;color:var(--g700);cursor:pointer;user-select:none}
+.toggle-label{font-size:14px;line-height:24.5px;color:var(--g700);cursor:pointer;user-select:none}   /* C-1 #7：14／400 */
+.toggle-label .tl-tail{}
+.show-conv .toggle-label .tl-tail{display:none}   /* C-1 #31：稿 #01-7 開啟換算後文案變「Display converted amounts in」接幣別鈕 */
 .curr-trigger-wrap{position:relative;display:none}
 .show-conv .curr-trigger-wrap{display:inline-flex}
+.curr-trigger-wrap .curr-dd{left:0;right:auto}   /* 稿 #01-7：幣別下拉左緣對齊按鈕 */
+.curr-row{gap:4px}
+.curr-row .toggle{margin-right:6px}   /* 稿：Switch→文字 10、文字→幣別鈕 4 */
 .disclaimer{font-size:11px;color:var(--g400);text-align:right;font-style:italic;margin-top:8px}
 /* A-36③：Organization Annual Budget 卡的註記靠左、貼在 toggle 下方 24（稿 #01：toggle 列 386–416、註記 440），原本靠右、離 toggle 32 */
-.disclaimer.org-note{text-align:left;margin-top:0;font-size:12px}
+.disclaimer.org-note{text-align:left;margin-top:0;font-size:12px;line-height:18px}
 
 /* ==== Tier 1 / Tier 2 section ==== */
-.alert-bar{font-size:13px;color:var(--g500);display:flex;align-items:center;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.alert-bar{font-size:12px;line-height:18px;color:var(--g700);display:flex;align-items:center;gap:4px;margin-bottom:24px;flex-wrap:wrap;min-height:18px}   /* C-1 #9：稿 #01 12／400 #262626，下方到 Tab 24；有 Alert Settings 鈕時列高 30（鈕高 30），T1／T2 沒有鈕時 18（稿 #05／#07） */
 .alert-bar .material-symbols-outlined{font-size:16px;color:var(--g500);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 16}   /* B-15：鈴鐺實心（稿 #01 #676767） */
 .alert-bar .alert-link .material-symbols-outlined{color:var(--pri)}
 .alert-bar b{color:var(--g700);font-weight:700}
-.alert-link{font-size:12px;color:var(--pri);font-weight:700;display:inline-flex;align-items:center;gap:4px;margin-left:4px;cursor:pointer;padding:2px 6px;border-radius:var(--r-sm);background:none;border:none;font-family:inherit;line-height:1.5}
+.alert-link{font-size:12px;color:var(--pri);font-weight:700;display:inline-flex;align-items:center;gap:4px;margin-left:4px;cursor:pointer;padding:0 4px;height:30px;border-radius:var(--r-sm);background:none;border:none;font-family:inherit;line-height:1.5}
 .alert-link .material-symbols-outlined{font-size:16px;color:var(--pri)}
 
 /* ==== Tabs ==== */
-.tabs-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:2px solid var(--g200);margin-bottom:8px}
-.tabs{display:flex;gap:0}
-.tab{padding:8px 16px;font-size:14px;font-weight:500;color:var(--g500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;display:flex;align-items:center;gap:6px;background:none;border-left:none;border-right:none;border-top:none;font-family:inherit;line-height:1.5}
+/* C-1 #10：稿 #01 Tab：14、未選 400 #676767、選中 700 #004FB0；tab 間距 32、高 30；選中底線 4px r10（跨在 2px 灰底線上下各 1px） */
+.tabs-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:2px solid var(--g200);margin-bottom:17px}   /* 稿 Tab 元件高 30（底線下還有 1px），再 gap 16 */
+.tabs{display:flex;gap:32px}
+.tab{position:relative;padding:0 0 8px;font-size:14px;font-weight:400;color:var(--g500);cursor:pointer;margin-bottom:-2px;display:flex;align-items:center;gap:4px;background:none;border:none;font-family:inherit;line-height:21px}
+.tab .csp-logo{width:16px;height:16px}
 .tab:hover{color:var(--g700)}
-.tab.active{color:var(--pri);border-bottom-color:var(--pri)}
+.tab.active{color:var(--pri);font-weight:700}
+.tab.active::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:4px;border-radius:10px;background:var(--pri)}
 .unit{font-size:12px;color:var(--g500);margin-bottom:12px}
 
-/* ==== Segmented Control (Monthly view: Budget/Spend/Remaining) — Demo FAB toggle ==== */
-.seg-wrap{display:none;align-items:center;margin-bottom:6px;gap:8px}
+/* ==== Monthly View（C-1 #11，K2：照稿 #01 改 Toggle Group，同 B-13 RS／RO）==== */
+/* 標籤 14／700 #676767 無冒號；Toggle Group 高 36、白底、框 #CCCCCC r6、項目間 1px 分隔線、內距 0／16、字 14／400 #676767；選中底 #D1EEFF 字 #002663 */
+.seg-wrap{display:none;align-items:center;gap:8px}
 .paper.show-seg .seg-wrap{display:inline-flex}
-/* "Monthly view:" label — gives the segment control explicit framing as a全表轉換 affordance
-   (vs. tooltip handles single-cell pinpoint). User research / finance-ui-design pattern：
-   labels improve discoverability of view-switching controls. */
-.seg-label{font-size:13px;color:var(--g500);font-weight:500;white-space:nowrap}
+.seg-label{font-size:14px;color:var(--g500);font-weight:700;white-space:nowrap;line-height:24.5px}
 /* Info hint icon — clarifies when to use segment vs hover tooltip */
 .seg-hint{font-size:16px;color:var(--g400);cursor:help;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16;transition:color .12s}
 .seg-hint:hover{color:var(--g700)}
-/* Trend 是提案（先不上）：superscript 標記 + 虛線底暗示實驗性，hover tooltip 說明 */
-.seg-btn-proposal{border-bottom:1px dashed var(--g400)}
 /* ⏸ PARKED：UX 提案 badge（icon-only，琥珀 lightbulb；樣式同 Audit Log .pk-badge.mini） */
 .gb-pk{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-left:4px;border-radius:10px;background:var(--warn-lt);vertical-align:middle;cursor:help}
 .gb-pk .material-symbols-outlined{font-size:14px;color:var(--warn);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
 /* Demo FAB「隱藏暫緩的設計」：看上線版（沒有 Trend） */
 body.hide-parked .seg-btn[data-mode="trend"]{display:none}
-.seg-ctrl{display:inline-flex;background:var(--g100);border-radius:var(--r-sm);padding:2px;gap:0}
-.seg-btn{padding:5px 14px;font-size:13px;font-weight:500;color:var(--g500);background:none;border:none;border-radius:calc(var(--r-sm) - 1px);cursor:pointer;font-family:inherit;line-height:1.4;letter-spacing:0;transition:background .12s,color .12s,box-shadow .12s}
-.seg-btn:hover:not(.active){color:var(--g700)}
-.seg-btn.active{background:#fff;color:var(--g900);box-shadow:0 1px 2px rgba(0,0,0,.1)}
-/* Locked Budget pill (edit mode) — Figma 設計稿對齊：seg-ctrl 仍顯示，但只剩 Budget 一顆 locked pill */
-.seg-lock-icon{display:none;font-size:14px;margin-right:4px;vertical-align:middle;font-variation-settings:'FILL' 1,'wght' 500;color:inherit}
-/* Edit mode: 留下 locked Budget pill，其他 3 顆 + info icon 隱藏 */
+.seg-ctrl{display:inline-flex;height:36px;background:#fff;border:1px solid var(--g300);border-radius:6px;overflow:hidden}
+.seg-btn{display:inline-flex;align-items:center;gap:8px;height:100%;padding:0 16px;font-size:14px;font-weight:400;color:var(--g500);background:#fff;border:none;border-left:1px solid var(--g300);border-radius:0;cursor:pointer;font-family:inherit;line-height:21px;letter-spacing:0;transition:background .12s,color .12s}
+.seg-btn:first-child{border-left:none}
+.seg-btn:hover:not(.active){background:var(--g50)}
+.seg-btn.active{background:var(--pri-lt20);color:var(--pri-dk)}
+.seg-btn:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--pri)}
+/* 編輯模式：只剩一顆鎖住的 Budget（稿 #02：白底、lock 20＋Budget #B3B3B3） */
+.seg-lock-icon{display:none;font-size:20px;vertical-align:middle;font-variation-settings:'FILL' 1,'wght' 400;color:inherit}
 .paper.editing.show-seg .seg-btn[data-mode="spend"],
 .paper.editing.show-seg .seg-btn[data-mode="remaining"],
 .paper.editing.show-seg .seg-btn[data-mode="trend"],
 .paper.editing.show-seg .seg-hint{display:none}
 .paper.editing.show-seg .seg-btn[data-mode="budget"]{
-  color:var(--g500);background:var(--g100);box-shadow:none;cursor:not-allowed;
+  color:var(--g400);background:#fff;cursor:not-allowed;
 }
 .paper.editing.show-seg .seg-btn[data-mode="budget"] .seg-lock-icon{display:inline-flex}
+/* Viewing 行（C-1 #2：稿 #01 14／500 #B3B3B3 斜體，(USD) 400 不斜） */
+.gb-viewing{font-size:14px;font-weight:500;color:var(--g400);line-height:24.5px;white-space:nowrap}
+.gb-viewing i{font-style:italic}
+.gb-viewing .vw-unit{font-weight:400}
 
 /* ==== Bulk bar (edit mode) ==== */
-.bulkbar{display:none;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--pri-lt10);border:1px solid var(--pri-lt20);border-radius:var(--r-md);font-size:13px;margin-bottom:12px;flex-wrap:wrap;gap:10px}
+/* C-1 #35：稿 #02 Bulk Action：高 68、底 #F2FAFF、內距 16、無框無圓角、直接接表頭；說明 14／400 #676767；按鈕 M 間距 16 */
+.bulkbar{display:none;align-items:center;justify-content:space-between;padding:16px;background:var(--pri-lt10);font-size:14px;line-height:21px;margin-bottom:0;flex-wrap:wrap;gap:16px;min-height:68px}
 .editing .bulkbar{display:flex}
 .bulkbar-l{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
 .bulkbar-tip{color:var(--g500)}
 .chip{display:inline-flex;align-items:center;gap:4px;background:var(--pri);color:#fff;border-radius:20px;padding:3px 4px 3px 10px;font-size:12px;font-weight:500;line-height:1.3}
 .chip-x{cursor:pointer;font-size:18px;color:rgba(255,255,255,.85);line-height:1;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:none;border:none;padding:0;margin:0 0 0 2px;font-family:inherit}
 .chip-x:hover{background:rgba(255,255,255,.2);color:#fff}
-.bulkbar-r{display:flex;gap:8px;flex-shrink:0}
+.bulkbar-r{display:flex;gap:16px;flex-shrink:0}
+/* Set Budgets 是 Dropdown button（稿 #02 r6、settings＋▾；#04 開啟時 #002663＋▲） */
+#btn-setbudgets{border-radius:6px;gap:4px}
+#btn-setbudgets .arr-down{font-size:20px;margin-right:-6px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
+#btn-setbudgets.is-open{background:var(--pri-dk)}
 
 /* ==== Buttons (CMDS) ==== */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:80px;padding:0 16px;height:36px;border-radius:var(--r-sm);font-weight:700;font-size:14px;transition:background-color .15s,border-color .15s,color .15s,box-shadow .2s;line-height:1.5;white-space:nowrap;border:1px solid transparent;font-family:inherit}
@@ -425,7 +441,7 @@ body.hide-parked .seg-btn[data-mode="trend"]{display:none}
 .btn-b:hover .btn-text{text-decoration:underline}
 
 /* ==== Budget table (inside the paper) ==== */
-.tblwrap{border:1px solid var(--g200);border-radius:var(--r-md);overflow:hidden;background:#fff}
+.tblwrap{overflow:hidden;background:#fff}   /* C-1 #12：稿 #01 表格沒有外框與圓角 */
 .tblscroll{max-height:627px;overflow:auto;position:relative}
 .tblscroll::-webkit-scrollbar{width:8px;height:8px}
 .tblscroll::-webkit-scrollbar-thumb{background:var(--g300);border-radius:4px}
@@ -434,16 +450,16 @@ body.hide-parked .seg-btn[data-mode="trend"]{display:none}
 table.budget{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
 table.budget thead th{
   background:var(--pri-lt10);
-  padding:0 12px;height:50px;text-align:right;
+  padding:0 16px;height:50px;text-align:right;
   font-weight:700;color:var(--g700);font-size:14px;
   position:sticky;top:0;z-index:3;
-  box-shadow:inset 0 -1px 0 var(--g300);
+  box-shadow:inset 0 -1px 0 var(--g400);   /* C-1 #13：表頭底線 #B3B3B3（稿 #01；CLAUDE.md 表格規格同） */
   white-space:nowrap;
 }
 table.budget thead th.tx-left{text-align:left}
 table.budget td{
-  padding:0 12px;height:50px;
-  border-bottom:1px solid var(--g100);
+  padding:0 16px;height:50px;
+  border-bottom:1px solid var(--g200);   /* C-1 #14／#15：列分隔線 #E6E6E6、左右內距 16（稿 #01） */
   text-align:right;
   font-size:14px;color:var(--g700);
   background:#fff;white-space:nowrap;
@@ -476,10 +492,16 @@ table.budget tbody tr.selected:hover td.fix{background:var(--pri-lt20)}
 /* 4-column annual summary (PRD §7.1 — when .paper has .show-4col)
    Order: Budget → Spend → Spent % → Remaining (aligned with PRD)
    Padding 縮減控制密度（保留 14px body 字級對齊 CMDS）*/
-.col-budget{width:88px;min-width:88px;left:264px;padding:0 8px!important}
-.col-spend{width:88px;min-width:88px;left:352px;padding:0 8px!important}
-.col-pct{width:112px;min-width:112px;left:440px;padding:0 8px!important}
-.col-remain{width:108px;min-width:108px;left:552px;padding:0 8px!important;border-right:2px solid var(--g200)}
+.col-budget{width:88px;min-width:88px;left:264px}
+.col-spend{width:88px;min-width:88px;left:352px}
+.col-pct{width:112px;min-width:112px;left:440px;text-align:left!important}
+.col-remain{width:108px;min-width:108px;left:552px}
+/* C-1 #18（K3）：Annual Summary 與月份的分界改用稿的陰影（2 -1 10 rgba(0,0,0,.1)，只往右投），不再畫 2px 線 */
+.paper.show-4col table.budget .col-remain,
+.paper.show-2col table.budget .col-gear,
+table.budget.no-gear .col-total{box-shadow:2px -1px 10px rgba(0,0,0,.1);clip-path:inset(0 -14px 0 0)}
+/* 數字字重：Annual Summary 與 Total／Allocated 500，月份 400（稿 #01） */
+table.budget td.col-budget,table.budget td.col-spend,table.budget td.col-remain,table.budget td.col-total{font-weight:500}
 /* Edit mode (show-2col): Total column here is narrower than the standalone .col-total baseline —
    Figma 實測 88px（跟 Budget 同寬），非 120px；見 .paper.show-2col 覆寫（下方，鄰近 .col-spend 的 show-2col 覆寫處）。 */
 /* When no checkbox (view mode), shift all sticky positions left by col-cb's width (48px) */
@@ -501,6 +523,12 @@ table.budget tbody tr.selected:hover td.fix{background:var(--pri-lt20)}
 .no-cb.no-gear .col-spend{left:248px}
 .no-cb.no-gear .col-pct{left:336px}
 .no-cb.no-gear .col-remain{left:448px}
+/* T2（C-1 #52）：沒有 Group Name 欄 */
+.no-cb.no-gear.no-name .col-budget{left:0}
+.no-cb.no-gear.no-name .col-spend{left:88px}
+.no-cb.no-gear.no-name .col-pct{left:176px}
+.no-cb.no-gear.no-name .col-remain{left:288px}
+.paper.is-t2 .org-note{display:none}   /* 稿 #07 T2 沒有「只加總已輸入值」註記 */
 
 .col-mon{width:88px;min-width:88px}
 /* View Mode month cell = 88px（Figma 已核實）。Edit Mode 月份格因為要塞 $ 前綴+可編輯數字輸入框，
@@ -508,7 +536,7 @@ table.budget tbody tr.selected:hover td.fix{background:var(--pri-lt20)}
    下方 .paper.editing 覆寫才是目前 Figma 對應的真值（2026-08-28 核實，見 pantograph HANDOVER 第十八輪）。 */
 .paper.editing .col-mon{width:140px;min-width:140px}
 /* Month header year suffix (e.g., '26) — subdued styling so month is primary, year secondary */
-.col-mon .mon-year{font-size:11px;color:var(--g500);margin-left:2px;font-weight:400;letter-spacing:0}
+.col-mon .mon-year{font-size:12px;color:var(--g500);margin-left:2px;font-weight:400;letter-spacing:0}   /* C-1 #20：稿 'YY 12／400 */
 /* Sparkline column (Demo 方向Y) — replaces 12 month cells in View Mode with a single mini chart cell */
 .col-spark-head{text-align:left!important;padding-left:24px!important;font-weight:700}
 /* border-box: height 50 含 padding+border。content area = 50 - (4+4) - 1 = 41 >= svg 40，不撐破 → 列高 50 跟其他 cell 一致（user feedback 5/27）*/
@@ -520,13 +548,15 @@ table.budget tbody tr.selected:hover td.fix{background:var(--pri-lt20)}
    - lumi-tag Coverage: high = good（>=70% ok / 40-69% warn / <40% low）
    - budget Spent %:    high = bad（0-79 ok / 80-99 warn / >=100% danger）
    Same 5-segment structure, color semantics inverted by intent. Worth extracting via /dc-make. */
-.pct-meter{display:inline-flex;align-items:center;gap:4px;vertical-align:middle}
-.pct-meter-bar{display:inline-flex;gap:1.5px;flex-shrink:0}
-.pct-seg{width:9px;height:10px;background:var(--g200);border-radius:1.5px;position:relative;overflow:hidden}
-.pct-seg-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--ok);transition:width .2s}
-.pct-meter.warn .pct-seg-fill{background:var(--warn)}
-.pct-meter.danger .pct-seg-fill{background:var(--err)}
-.pct-text{font-size:11px;font-weight:500;color:var(--g700);min-width:26px;line-height:1.4;letter-spacing:0}
+/* C-1 #17：Spent % 進度條照稿 #01（Chart / Progress Bar）：40×16 r4 底 #E6E6E6，填色依門檻，5 格用 2px 白線切；文字 12／400，條與字間距 8 */
+.pct-meter{display:inline-flex;align-items:center;gap:8px;vertical-align:middle}
+.pct-bar{position:relative;width:40px;height:16px;border-radius:4px;background:var(--g200);overflow:hidden;flex-shrink:0}
+.pct-bar-fill{position:absolute;left:0;top:0;bottom:0;background:var(--ok)}
+.pct-bar::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 6.4px,#fff 6.4px 8.4px)}
+.pct-meter.warn .pct-bar-fill{background:var(--warn)}
+.pct-meter.danger .pct-bar-fill{background:var(--err)}
+.pct-text{font-size:12px;font-weight:400;color:var(--g700);line-height:18px;letter-spacing:0}
+.pct-meter.danger .pct-text{color:var(--err)}
 /* Annual summary block uses plain white in normal/hover state (user feedback 5/22 — finance-ui-design
    recommendation: light-mode B2B mainstream pattern is no sticky tint, rely on border-right separator).
    Hover automatically falls through to `tr:hover td.fix{background:g50}` — visual continuity wins.
@@ -545,7 +575,7 @@ table.budget tbody tr.selected:hover td.fix{background:var(--pri-lt20)}
    (264+88), becomes the rightmost sticky col → gets border-right. */
 .paper.show-2col table.budget .col-total{width:88px;min-width:88px;left:208px}   /* B-17：編輯模式欄序 cb 48／Group Name 160／Budget 88／Spend 88／齒輪 56（稿 #02） */
 .paper.show-2col table.budget .col-spend{left:296px}
-.paper.show-2col table.budget .col-gear{left:384px;border-right:2px solid var(--g200)}   /* 齒輪成為最右的 sticky 欄，分隔線移到它右邊 */
+.paper.show-2col table.budget .col-gear{left:384px}   /* 齒輪是最右的 sticky 欄，分界陰影掛在它身上（見 C-1 #18） */
 .paper.show-2col table.budget tbody tr.selected td.col-total,
 .paper.show-2col table.budget tbody tr.selected td.col-spend{background:var(--pri-lt10)}
 .paper.show-2col table.budget tbody tr.selected:hover td.col-total,
@@ -583,16 +613,17 @@ table.budget td.over-budget{color:var(--err);font-weight:600}
    修 user feedback 5/27：Admin role 沒 Allocated row 時，Total bottom:50 會留 50px 空隙讓下面 row 露出 */
 table.budget tbody tr.totalrow td{
   background:var(--pri-lt10)!important;
-  font-weight:700;
-  border-top:1px solid var(--g300);
+  font-weight:500;   /* C-1 #19：稿 Total 列數字 500、標籤 700 靠右，底 #F2FAFF */
+  border-top:1px solid var(--g200);
   position:sticky;bottom:0;z-index:3;
 }
+table.budget tbody tr.totalrow td.col-name,table.budget tbody tr.expectedrow td.col-name{font-weight:700;text-align:right}
 table.budget tbody tr.totalrow.has-alloc-below td{bottom:50px}
 table.budget tbody tr.totalrow td.fix{z-index:4}
-/* Allocated row — sticky 在最底（Total 之下）。CSS class `.expectedrow` 保留為 PRD §7.4 rename 的向後相容名稱 */
+/* Allocated row — sticky 在最底（Total 之下）。C-1 #48：稿 #05 跟 Total 同樣式（底 #F2FAFF、標籤 700 靠右、數字 500），不是灰底斜體 */
 table.budget tbody tr.expectedrow td{
-  background:#FAFAFA!important;
-  color:var(--g500);font-weight:500;font-style:italic;
+  background:var(--pri-lt10)!important;
+  color:var(--g900);font-weight:500;
   border-top:1px solid var(--g200);
   position:sticky;bottom:0;z-index:3;
 }
@@ -614,35 +645,44 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
 .gear-btn .material-symbols-outlined{font-size:18px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 18}
 
 /* ==== Popover (single row + bulk action) ==== */
-.pop{position:absolute;background:#fff;border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.1);z-index:60;min-width:420px;width:max-content;max-width:480px;padding:16px;display:none}
-.pop.open{display:block}
-.pop-radios{display:flex;gap:18px;margin-bottom:14px;flex-wrap:wrap}
-.pop-radio{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--g700);cursor:pointer;line-height:1.5}
-.pop-radio input{accent-color:var(--pri);cursor:pointer}
+/* C-1 #41：稿 #03／#04 Popover_Group Budget：480 寬、r8、陰影 0 0 6px .2、無框、內距 16、區塊間距 16 */
+.pop{position:absolute;background:#fff;border-radius:8px;box-shadow:0 0 6px rgba(0,0,0,.2);z-index:60;width:480px;padding:16px;display:none;flex-direction:column;gap:16px}
+.pop.open{display:flex}
+.pop-radios{display:flex;gap:16px;flex-wrap:wrap}
+.pop-radio{display:flex;align-items:center;gap:10px;font-size:14px;color:#0D2037;cursor:pointer;line-height:24.5px}
+.pop-radio input{accent-color:var(--pri);cursor:pointer;width:16px;height:16px;margin:0}
+.pop-body{display:flex;flex-direction:column;gap:4px}
 .pop-field-row{display:flex;gap:10px;align-items:flex-end}
-.pop-field{flex:1;min-width:0}
-.pop-field .pop-lbl{font-size:12px;font-weight:700;color:var(--g700);margin-bottom:6px}
-.pop-input{display:flex;align-items:center;border:1px solid var(--tf-border);border-radius:var(--r-sm);padding:0 10px;height:36px;background:#fff;transition:border-color .15s,box-shadow .2s}
-.pop-input .dollar{color:var(--g500);font-size:14px;margin-right:6px}
+.pop-field{flex:0 0 160px;min-width:0}
+.pop-field .pop-lbl{font-size:12px;font-weight:700;color:var(--pri);line-height:18px;margin-bottom:4px}
+.pop-input{display:flex;align-items:center;border:1px solid var(--tf-border);border-radius:var(--r-sm);padding:0 8px;height:36px;background:#fff;transition:border-color .15s,box-shadow .2s}
+.pop-input .dollar{color:var(--g500);font-size:14px;margin-right:8px}
 .pop-input input{border:none;outline:none;background:transparent;width:100%;font-size:14px;color:var(--g700);padding:0}
 .pop-input:hover{border-color:var(--g400)}
 .pop-input:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 .pop-input.err{border-color:var(--err)}
 .pop-input.err:focus-within{box-shadow:0 0 0 3px rgba(255,64,61,.1)}
-.pop-select{padding:0 10px;border:1px solid var(--tf-border);border-radius:var(--r-sm);font-size:14px;background:#fff;height:36px;color:var(--g700);font-family:inherit;cursor:pointer;outline:none;min-width:180px}
-.pop-select:hover{border-color:var(--g400)}
-.pop-select:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
-.pop-hint{font-size:12px;color:var(--g500);margin-top:8px;line-height:1.5}
-.pop-err-msg{font-size:12px;color:var(--err);margin-top:8px;display:none}
+.pop-hint{font-size:12px;color:var(--g500);line-height:18px}
+.pop-err-msg{font-size:12px;color:var(--err);line-height:18px;display:none}
 .pop-err-msg.show{display:block}
-.pop-actions{display:flex;justify-content:flex-end;margin-top:16px}
+.pop-actions{display:flex;justify-content:flex-end}
 .pop-actions .btn{min-width:80px}
 
+/* ==== 自製下拉（C-1 #22／#45／#58，K6）：CMDS Dropdown（稿 #01-10、#04-1、#11）====
+   選單 r6、陰影 0 0 6px .2、內距 10、無框；項目高 40、r5、內距 0／8、14／400 #262626；hover #F6F6F6、選中 #E6E6E6 */
+.gb-dd{position:relative;display:inline-flex}
+.gb-dd > .lt-select{width:100%}
+.gb-menu{position:fixed;background:#fff;border-radius:6px;box-shadow:0 0 6px rgba(0,0,0,.2);padding:10px;z-index:400;display:none;max-height:300px;overflow-y:auto;overscroll-behavior:contain}
+.gb-menu.open{display:block}
+.gb-menu-item{display:flex;align-items:center;gap:8px;width:100%;height:40px;padding:0 8px;border:none;border-radius:5px;background:#fff;font-family:inherit;font-size:14px;line-height:24.5px;color:var(--g900);text-align:left;cursor:pointer;white-space:nowrap}
+.gb-menu-item:hover,.gb-menu-item.is-hl{background:var(--g50)}
+.gb-menu-item.is-sel{background:var(--g200)}
+
 /* ==== Bottom save bar ==== */
-.savebar{display:none;position:fixed;bottom:0;left:var(--lt-sb-w,250px);right:0;background:var(--pri-lt10);border-top:1px solid var(--g200);padding:14px 32px;align-items:center;justify-content:space-between;z-index:40;gap:16px}
+.savebar{display:none;position:fixed;bottom:0;left:var(--lt-sb-w,250px);right:0;background:var(--pri-lt10);box-shadow:0 0 6px rgba(0,0,0,.2);padding:16px 32px;min-height:68px;align-items:center;justify-content:space-between;z-index:40;gap:16px}   /* C-1 #37：稿 #02 底 #F2FAFF、陰影 0 0 6px .2、內距 16／32，沒有上框線 */
 .editing-mode .savebar{display:flex}
-.savebar-l{font-size:13px;color:var(--g500)}
-.savebar-r{display:flex;gap:12px}
+.savebar-l{font-size:14px;line-height:21px;color:var(--g500)}
+.savebar-r{display:flex;gap:16px}
 
 /* ==== Modal ==== */
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
@@ -657,6 +697,8 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
 .modal-sm .mh{margin-bottom:32px}   /* 稿 #02-6：標題→內文 32、內文→按鈕 32 */
 .modal-sm .mdesc{margin-bottom:0;padding-left:45px}   /* 內文對齊標題（icon 30＋15） */
 .modal-sm .mf{margin-top:32px}
+#mo-fy .mh{margin-bottom:32px}   /* C-1 #58：稿 #11 標題→內文 32、內文→按鈕 32 */
+#mo-fy .mf{margin-top:32px}
 .mt{font-size:20px;font-weight:700;color:var(--g900);line-height:1.5}
 .mx{color:var(--g500);cursor:pointer;display:flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:50%;background:none;border:none;padding:0}
 .mx:hover{background:var(--g100);color:var(--g700)}
@@ -670,43 +712,50 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
 #mo-alert .mb::-webkit-scrollbar-thumb{background:#D8D8D8;border:solid transparent;border-width:0 2px 0 3px;background-clip:padding-box;border-radius:2px;box-shadow:inset 0 0 0 1px #E6E6E6}   /* 稿 #09／#11／#02-6 按鈕上方沒有分隔線 */
 .mf .btn{min-width:100px}
 
-/* Alert modal specifics */
-.thr-item{margin-bottom:8px}
+/* Alert modal specifics — C-1 #54：稿 #09 Alert Settings：寬 700、內距 16／24、區塊間距 24；說明 12／400 #262626；
+   Thresholds 16／700＋說明 12 #676767（間距 8）；門檻欄 80×36、垃圾桶 24、列間 16；Notification Settings 卡 r8 框 #E6E6E6 內距 24 間距 16；
+   標題 16／700、說明 12、角色 12／700、Switch 字 14、群組（Admin｜Tier 1｜Tier 2）之間 1px #E6E6E6 */
+.modal.modal-alert{width:700px;padding:16px 24px}
+.modal-alert .mh{margin-bottom:24px}
+.modal-alert .mdesc{font-size:12px;line-height:18px;color:var(--g900);margin-bottom:24px}
+.modal-alert .mf{margin-top:24px}
+.thr-title{font-size:16px;font-weight:700;line-height:24px;color:var(--g900);margin-bottom:8px}
+#thr-list{margin-top:24px;display:flex;flex-direction:column;gap:16px}
+.thr-item{margin-bottom:0}
 .thr-row{display:flex;align-items:center;gap:8px}
-.thr-msg{font-size:12px;color:var(--err);margin-top:4px;display:none;line-height:1.5}
+.thr-msg{font-size:12px;color:var(--err);margin-top:4px;display:none;line-height:18px}
 .thr-msg.show{display:block}
-.thr-input{display:flex;align-items:center;border:1px solid var(--tf-border);border-radius:var(--r-sm);padding:0 8px;height:36px;background:#fff;width:100px}
+.thr-input{display:flex;align-items:center;border:1px solid var(--tf-border);border-radius:var(--r-sm);padding:0 8px;height:36px;background:#fff;width:80px}
 .thr-input input{border:none;outline:none;background:transparent;width:100%;font-size:14px;color:var(--g700);padding:0}
-.thr-input .pct{font-size:13px;color:var(--g500)}
+.thr-input .pct{font-size:14px;color:var(--g500)}
+.thr-input:hover{border-color:var(--g400)}
 .thr-input:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 .thr-input.err{border-color:var(--err)}
 .thr-input.err:focus-within{box-shadow:0 0 0 3px rgba(255,64,61,.1)}
-.thr-del{width:30px;height:30px;border-radius:var(--r-sm);color:var(--pri);display:inline-flex;align-items:center;justify-content:center;background:none;border:none;padding:0;cursor:pointer}
+.thr-del{width:24px;height:24px;border-radius:50%;color:var(--pri);display:inline-flex;align-items:center;justify-content:center;background:none;border:none;padding:0;cursor:pointer}
 .thr-del:hover{background:var(--pri-lt20);color:var(--pri)}   /* A-6：稿 #09 門檻刪除 primary FILL 1（CB 同位置也是藍） */
 .thr-del .material-symbols-outlined{font-size:18px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 18}
-.thr-add{display:inline-flex;align-items:center;gap:4px;font-size:14px;color:var(--pri);padding:6px 6px;font-weight:700;margin-top:6px;background:none;border:none;cursor:pointer;font-family:inherit;border-radius:var(--r-sm)}
+.thr-add{display:inline-flex;align-items:center;gap:4px;font-size:14px;line-height:24.5px;color:var(--pri);padding:0 4px 0 0;font-weight:700;margin-top:16px;background:none;border:none;cursor:pointer;font-family:inherit;border-radius:var(--r-sm)}
 .thr-add:hover .thr-add-text{text-decoration:underline}
-.thr-add:hover{background:var(--g50)}
-.thr-add .material-symbols-outlined{font-size:18px}
+.thr-add .material-symbols-outlined{font-size:16px}
 .thr-add:disabled{color:var(--lt-button-disabled-bg,#CCCCCC);cursor:not-allowed}
-.thr-add:disabled:hover{background:none}
 .thr-add:disabled:hover .thr-add-text{text-decoration:none}
-.thr-hint{font-size:12px;color:var(--g500);margin-bottom:10px}
+.thr-hint{font-size:12px;line-height:18px;color:var(--g500)}
 .thr-err{font-size:12px;color:var(--err);margin-top:4px;display:none;align-items:center;gap:4px}
 .thr-err.show{display:flex}
 .thr-err .material-symbols-outlined{font-size:14px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 14}
 
-.notif-block{margin-top:24px;padding:24px;background:#fff;border:1px solid var(--g200);border-radius:var(--r-md);transition:opacity .15s}   /* 稿 #09：白底＋#E6E6E6 框 */
+.notif-block{margin-top:24px;padding:24px;background:#fff;border:1px solid var(--g200);border-radius:var(--r-md);transition:opacity .15s;display:flex;flex-direction:column;gap:16px}   /* 稿 #09：白底＋#E6E6E6 框 */
 .notif-block.dis{opacity:.5}
 .notif-block.dis .notif-toggle{cursor:not-allowed}
-.thr-empty-msg{padding:24px;background:var(--g50);border-radius:var(--r-sm);text-align:center;color:var(--g500);font-size:13px;margin-bottom:8px}
-.notif-title{font-size:14px;font-weight:700;color:var(--g700);margin-bottom:4px}
-.notif-desc{font-size:12px;color:var(--g500);margin-bottom:14px;line-height:1.5}
-.notif-role{margin-bottom:12px}
-.notif-role:last-child{margin-bottom:0}
-.notif-role-lbl{font-size:12px;font-weight:700;color:var(--g700);margin-bottom:6px}
-.notif-toggles{display:flex;flex-wrap:wrap;gap:18px}
-.notif-toggle{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--g700);cursor:pointer;user-select:none}
+.thr-empty-msg{padding:24px;background:var(--g50);border-radius:var(--r-sm);text-align:center;color:var(--g500);font-size:13px}
+.notif-title{font-size:16px;font-weight:700;line-height:24px;color:var(--g900)}
+.notif-desc{font-size:12px;color:var(--g500);line-height:18px;margin-top:-8px}
+.notif-div{height:1px;background:var(--g200)}
+.notif-role{display:flex;flex-direction:column;gap:8px}
+.notif-role-lbl{font-size:12px;font-weight:700;line-height:18px;color:var(--g900)}
+.notif-toggles{display:flex;flex-wrap:wrap;gap:16px}
+.notif-toggle{display:inline-flex;align-items:center;gap:10px;font-size:14px;line-height:24.5px;color:var(--g900);cursor:pointer;user-select:none}
 
 /* ==== Toast：改用 shared/lumiture-toast.js（A-1，成功 #008F88／錯誤 #BF302E、r4、寬 400；頁面不再自己寫 toast CSS） ==== */
 
@@ -751,6 +800,23 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
 .empty-state--l .empty-state-title{font-size:20px}
 .empty-state--l .empty-state-sub{font-size:14px}
 
+/* C-1 #28／#29：稿 #01-2／#01-5 的空狀態與錯誤（無框、置中、icon #9ED7FF FILL 0、標題 #676767、icon 與文字間距 16、標題與說明 8） */
+.gb-nodata{background:transparent;gap:16px;padding:0}
+.gb-nodata .empty-state-title{color:var(--g500)}
+.gb-nodata .empty-state-sub{color:var(--g500);font-size:14px;line-height:24.5px;margin-top:8px}
+.gb-nodata--l{min-height:400px}
+.gb-nodata--l > .material-symbols-outlined{font-size:80px}
+.gb-nodata--l .empty-state-title{font-size:18px;line-height:27px}
+.gb-nodata--m{padding:0}
+.gb-nodata--m > .material-symbols-outlined{font-size:64px}
+.gb-nodata--m .empty-state-title{font-size:16px;line-height:24px}
+/* 錯誤狀態（稿 #01-5）：Switch 列、Tab、Monthly View 都不顯示；Viewing 照常 */
+.paper.is-nodata .curr-row,.paper.is-nodata .tabs-row,.paper.is-nodata .seg-wrap{display:none!important}
+.paper.is-nodata .gb-view-row{margin-bottom:24px}
+.paper.is-nodata #orgrow{margin-bottom:24px}
+.paper.is-nodata .vw-unit{display:none}   /* 稿 #01-5 錯誤時 Viewing 行沒有 (USD) */
+/* 稿 #01-5 的錯誤 icon 是「L 形座標軸＋長條」，Material Symbols 最接近的是 finance（bar_chart 沒有座標軸） */
+
 /* Skeleton（A-18）：骨架條用共用 .lt-skeleton（shared/lumiture-ui.css，色 --lt-color-bg-skeleton #E6E6E6、靜態）；這裡只留 GB 的排版 */
 .orgcell .ov.ov-skel{display:flex;align-items:center;height:54px;padding:0}
 .gb-sk-tbl{width:100%;table-layout:fixed;border-collapse:collapse}
@@ -764,7 +830,9 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
 .paper.is-loading .curr-row #curr-toggle.on{background:#CCCCCC}
 .paper.is-loading .curr-row #curr-toggle.on::after{background:#fff;border-color:#fff}
 .paper.is-loading .toggle-label{color:#CCCCCC;cursor:default;pointer-events:none}
-.paper.is-loading .seg-label,.paper.is-loading .seg-btn{color:var(--g400);pointer-events:none}
+.paper.is-loading .seg-btn{color:var(--g400);pointer-events:none}   /* C-1 #30：稿 #01-6 Monthly View 標籤照常、項目 #B3B3B3、選中不上色 */
+.paper.is-loading .seg-btn.active{background:#fff}
+.gb-sk-tbl tr.gb-sk-total td{background:var(--g100);text-align:left}
 .paper.is-loading .alert-link{color:#CCCCCC;pointer-events:none}
 .paper.is-loading .alert-link .material-symbols-outlined{color:#CCCCCC}
 
@@ -795,9 +863,9 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
         <div class="orgrow" id="orgrow"></div>
         <div class="curr-row">
           <button class="toggle" id="curr-toggle" aria-label="Toggle currency converter"></button>
-          <span class="toggle-label" onclick="document.getElementById('curr-toggle').click()">Display converted amounts in other currency</span>
+          <span class="toggle-label" onclick="document.getElementById('curr-toggle').click()">Display converted amounts in<span class="tl-tail"> other currency</span></span>
           <div class="curr-trigger-wrap" id="curr-trigger-wrap">
-            <button class="curr-btn" id="curr-btn" onclick="openCurrPicker(this)">
+            <button class="curr-btn" id="curr-btn" onclick="openCurrPicker(this)" aria-label="Change currency" data-dd-align="left" data-tip-tip="Please note that due to exchange rate conversions and data latency in the console, the displayed numbers may slightly differ from those in the console. The actual amount should be based on your received invoice. (Exchange rate source: https://rter.info/)">
               <span class="curr-flag" id="curr-flag">🇹🇼</span>
               <span class="curr-code" id="curr-code">TWD</span>
               <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16">expand_more</span>
@@ -809,7 +877,7 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
         <div class="paper-sep"></div>
 
         <!-- Section 2: Group Budget table -->
-        <div class="paper-section-row" id="sec2-row" style="align-items:center">
+        <div class="paper-section-row" id="sec2-row">
           <div class="paper-section-title" id="sec2-title">Tier 1 Group Budget</div>
           <div class="pg-hdr-r">
             <button class="btn btn-o" id="btn-csv" style="display:none"><span class="material-symbols-outlined">download</span>Download CSV</button>
@@ -821,10 +889,10 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
         <div class="tabs-row">
           <div class="tabs" id="tabs"></div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px">
-          <div class="paper-meta" id="paper-viewing" style="font-style:italic"></div>
+        <div class="gb-view-row" style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;min-height:36px">
+          <div class="gb-viewing" id="paper-viewing"></div>
           <div class="seg-wrap" id="seg-wrap">
-            <span class="seg-label">Monthly view:</span>
+            <span class="seg-label">Monthly View</span>
             <div class="seg-ctrl" id="seg-ctrl" role="tablist" aria-label="Monthly view">
               <button class="seg-btn active" data-mode="budget" type="button"><span class="material-symbols-outlined seg-lock-icon">lock</span>Budget</button>
               <button class="seg-btn" data-mode="spend" type="button">Spend</button>
@@ -841,8 +909,8 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
             <span class="chip" id="bulkchip" style="display:none"><span id="bulkchip-n">0</span> Selected<button class="chip-x" onclick="clearSel()" aria-label="Clear selection">×</button></span>
           </div>
           <div class="bulkbar-r">
-            <button class="btn btn-o btn-sm" id="btn-clearbudget" disabled data-tip-tip="Select multiple groups to set budgets at once.">Clear Budget</button>
-            <button class="btn btn-p btn-sm" id="btn-setbudgets" disabled data-tip-tip="Select multiple groups to set budgets at once."><span class="material-symbols-outlined">settings</span>Set Budgets<span class="arr-down material-symbols-outlined">expand_more</span></button>
+            <button class="btn btn-p" id="btn-clearbudget" disabled data-tip-tip="Select multiple groups to set budgets at once.">Clear Budget</button>
+            <button class="btn btn-p" id="btn-setbudgets" disabled data-tip-tip="Select multiple groups to set budgets at once."><span class="material-symbols-outlined">settings</span>Set Budgets<span class="arr-down material-symbols-outlined">arrow_drop_down</span></button>
           </div>
         </div>
 
@@ -876,15 +944,15 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
 <div class="pop" id="pop"></div>
 
 <!-- Alert Settings Modal -->
-<div class="mo" id="mo-alert"><div class="modal">
+<div class="mo" id="mo-alert"><div class="modal modal-alert">
   <div class="mh">
     <div class="mt">Alert Settings</div>
     <button class="mx" onclick="closeAlert()"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">close</span></button>
   </div>
   <div class="mdesc">Admin can set overall alerts to notify the Admin, group managers, and members via email in real time when spending exceeds configured thresholds.</div>
   <div class="mb">
-    <div style="font-size:14px;font-weight:700;color:var(--g700);margin-bottom:6px">Thresholds</div>
-    <div class="thr-hint">You can set up to 3 thresholds. Allowed values: 1–1000</div>
+    <div class="thr-title">Thresholds</div>
+    <div class="thr-hint">You can set up to 3 thresholds. Allowed values: 1~1000</div>
     <div id="thr-list"></div>
     <button class="thr-add" id="thr-add"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">add_circle</span><span class="thr-add-text">Add Threshold</span></button>
 
@@ -895,6 +963,7 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
         <label class="notif-toggle"><button class="toggle on"></button>Organization</label>
         <label class="notif-toggle"><button class="toggle on"></button>All Tier 1 groups</label>
       </div></div>
+      <div class="notif-div"></div>
       <div class="notif-role"><div class="notif-role-lbl">Tier 1 Manager</div><div class="notif-toggles">
         <label class="notif-toggle"><button class="toggle on"></button>Their own group</label>
         <label class="notif-toggle"><button class="toggle on"></button>Their Tier 2 groups</label>
@@ -903,6 +972,7 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
         <label class="notif-toggle"><button class="toggle on"></button>Their own group</label>
         <label class="notif-toggle"><button class="toggle"></button>Their Tier 2 groups</label>
       </div></div>
+      <div class="notif-div"></div>
       <div class="notif-role"><div class="notif-role-lbl">Tier 2 Manager</div><div class="notif-toggles">
         <label class="notif-toggle"><button class="toggle on"></button>Their own group</label>
       </div></div>
@@ -943,10 +1013,9 @@ table.budget tbody tr.expectedrow td.fix{z-index:4}
   </div>
   <div class="mdesc">Please select your organization's fiscal year start month.</div>
   <div class="mb">
-    <div style="margin-bottom:16px;max-width:240px">
-      <select id="fy-modal-month" class="fy-select" aria-label="Fiscal year start month"></select>
-    </div>
-    <div class="fy-preview">Resulting fiscal year: <strong id="fy-preview-label">FY2026</strong> <span id="fy-preview-range" style="color:var(--g500)"></span></div>
+    <!-- C-1 #58（K6）：月份下拉滿寬、CMDS 下拉（稿 #11），原生 select 換掉 -->
+    <div class="gb-dd" style="width:100%;margin-bottom:16px"><button type="button" class="lt-select" id="fy-modal-month" aria-haspopup="listbox" aria-expanded="false" aria-label="Fiscal year start month"><span class="lt-select__v">February</span><span class="material-symbols-outlined lt-select__arrow">arrow_drop_down</span></button></div>
+    <div class="fy-preview">Resulting fiscal year: <span id="fy-preview-label">FY2026</span> <span id="fy-preview-range"></span></div>
     <div class="fy-warning">
       <span class="material-symbols-outlined">warning</span>
       <div class="fy-warning-content">
@@ -1090,7 +1159,15 @@ for(let y = FY_VIEW_MIN; y <= FY_VIEW_MAX; y++){
   }
 }
 // 目前檢視年份的資料（view mode 用；edit mode 走 state.draft）
-function curYearData(){ return YEAR_DATA[state.viewYear] || ALL_GROUPS; }
+// C-1：Demo「尚未設定預算」（稿 #00）用一份全部留空的資料，不動真資料
+let _noBudgetData = null;
+function curYearData(){
+  if(state.noBudget){
+    if(!_noBudgetData){ const src = ALL_GROUPS; _noBudgetData = {}; Object.keys(src).forEach(k => _noBudgetData[k] = src[k].map(g => ({ ...deepClone(g), months: Array(12).fill(null) }))); }
+    return _noBudgetData;
+  }
+  return YEAR_DATA[state.viewYear] || ALL_GROUPS;
+}
 
 // Per-month Expected (Admin's per-month cap for the T1 group — values DO vary by month in real product,
 // not just annual/12 uniform distribution). Figma #05-1 shows variance: 3167, 7901, 3516, 9993, 3516, 9475, 4010, …
@@ -1103,7 +1180,9 @@ const EXPECTED = Object.fromEntries(
   Object.entries(EXPECTED_MONTHLY).map(([k, v]) => [k, v.reduce((a, b) => a + b, 0)])
 );
 
-const FX_RATES = { USD:1, TWD:31.5, HKD:7.78, IDR:15750, MYR:4.45, PHP:56.8, SGD:1.34 };
+/* 2026-10-16 X-9r1：匯率改讀共用 CurrencyPicker.RATES（全站同一組 mock 匯率），這組只在 shared 沒載到時備用 */
+const FX_FALLBACK = { USD:1, TWD:32.1, HKD:7.8, IDR:15800, MYR:4.7, PHP:56.2, SGD:1.35 };
+const fxRate = code => ((window.CurrencyPicker && CurrencyPicker.RATES) || FX_FALLBACK)[code] || 1;
 
 let state = {
   role: 'admin',
@@ -1320,16 +1399,16 @@ function renderOrgCards(){
   const row = $('#orgrow');
   if(state.pageState==='nodata'){
     row.style.display='block';
-    row.innerHTML = '<div class="empty-state empty-state--m" style="background:transparent;padding:32px 0;grid-column:1/-1"><span class="material-symbols-outlined">error_outline</span><div class="empty-state-title">Something went wrong</div><div class="empty-state-sub">Failed to load. Please try again later.</div></div>';
+    // C-1 #29（K5）：稿 #01-5 卡片區只放空狀態 bar_chart 64＋No Data Available 16／700（沒有說明、沒有 Retry）
+    row.innerHTML = '<div class="empty-state gb-nodata gb-nodata--m"><span class="material-symbols-outlined">finance</span><div class="empty-state-title">No Data Available</div></div>';
     return;
   }
   if(state.pageState==='loading'){
-    row.style.display='grid';
-    row.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    row.style.display='';
     // A-18：照稿 #01-6——卡片標籤（logo＋文字）照常，只有數字換成灰條（Total 200×36、各雲 200×24，色吃 token #E6E6E6，靜態）
     const loadCards = [
       { key:'current', label:role.currentLabel,            logo:CSP_LOGOS.total },
-      { key:'gcp',     label:'Google Cloud Annual Budget', logo:CSP_LOGOS.gcp },
+      { key:'gcp',     label:'GCP Annual Budget', logo:CSP_LOGOS.gcp },
       { key:'aws',     label:'AWS Annual Budget',          logo:CSP_LOGOS.aws },
       { key:'azure',   label:'Azure Annual Budget',        logo:CSP_LOGOS.azure },
     ];
@@ -1341,40 +1420,39 @@ function renderOrgCards(){
   if(state.pageState==='no-auth'){
     // Org cards still show — only the active provider tab is locked. Render normally below.
   }
-  row.style.display='grid';
+  row.style.display='';
   const cards = [
     { key:'current', label:role.currentLabel,            value:totals.current, badge:{cls:'csp-logo', logo:CSP_LOGOS.total} },
-    { key:'gcp',     label:'Google Cloud Annual Budget', value:totals.gcp,     badge:{cls:'csp-logo', logo:CSP_LOGOS.gcp} },
+    { key:'gcp',     label:'GCP Annual Budget', value:totals.gcp,     badge:{cls:'csp-logo', logo:CSP_LOGOS.gcp} },
     { key:'aws',     label:'AWS Annual Budget',          value:totals.aws,     badge:{cls:'csp-logo', logo:CSP_LOGOS.aws} },
     { key:'azure',   label:'Azure Annual Budget',        value:totals.azure,   badge:{cls:'csp-logo', logo:CSP_LOGOS.azure} },
   ];
-  // For 4 cards, switch to 4-col grid
-  row.style.gridTemplateColumns = 'repeat(4, 1fr)';
   row.innerHTML = '';
   cards.forEach(c => {
     const cell = document.createElement('div');
     cell.className = 'orgcell';
     const isEmpty = (state.pageState==='empty') || (c.value === 0);
     // 換算值是次要參考、設計稿 #01-7 要完整整數含千分位（不套 K/M/B 縮寫）
-    const convVal = state.showConv && !isEmpty ? Math.round(c.value * (FX_RATES[state.currency]||1)).toLocaleString('en-US') : null;
+    const convVal = state.showConv && !isEmpty ? Math.round(c.value * fxRate(state.currency)).toLocaleString('en-US') : null;
     const currCode = state.currency;
     const expectedKey = c.key === 'current' ? null : c.key;
     const expectedVal = expectedKey ? EXPECTED[expectedKey] : (EXPECTED.gcp + EXPECTED.aws + EXPECTED.azure);
     const expectedSet = expectedVal != null; // #05：Admin 未配 Allocated 時為 null → 顯示 --
     // #05-2：開換算時 Allocated（預期預算）也顯示換算值（同總預算，完整整數）；未設定則無換算
-    const expectedConv = (state.showConv && expectedSet) ? Math.round(expectedVal * (FX_RATES[state.currency]||1)).toLocaleString('en-US') : null;
+    const expectedConv = (state.showConv && expectedSet) ? Math.round(expectedVal * fxRate(state.currency)).toLocaleString('en-US') : null;
     // Figma #05-1 Hover (T1): when allocated budget > Allocated cap, card's Annual Budget number turns red + hover tooltip
     const cardOverExpected = role.showExpected && !isEmpty && c.key !== 'current' && expectedSet && c.value > expectedVal;
     const ovOverCls = cardOverExpected ? ' over-budget' : '';
-    const ovOverTip = cardOverExpected ? ' data-tip-tip="The budget cannot be empty and must not exceed the Allocated cap."' : '';
+    // ⚠ DEVIATION（C-1 #50，K8）：稿 #05-1 寫「…must not exceed the expected budget.」，同稿標籤已改叫 Allocated Budget，用語跟著改（Figma 待回改）
+    const ovOverTip = cardOverExpected ? ' data-tip-tip="The budget cannot be empty and must not exceed the Allocated Budget."' : '';
     // Info tooltip on Allocated pill (Figma #05-1) — PRD §7.4 rename
-    const expectedInfoTip = ''; // H2 拿掉：pill 文字「Allocated Budget」+ 數字已自我說明，不需 hover (per Kabin 2026-06-04)
+    // C-1 #49（K7）：稿 #05-1 的 Allocated Budget 標籤有說明 tooltip，照稿加回（6 月 H2 拿掉過，現行稿仍有）
     cell.innerHTML = `
       <div class="ol">${c.badge?`<span class="${c.badge.cls === 'csp-logo' ? c.badge.cls : 'csp-ic '+c.badge.cls}">${c.badge.logo || (c.badge.icon?`<span class="material-symbols-outlined">${c.badge.icon}</span>`:(c.badge.t||''))}</span>`:''}<span>${c.label}</span></div>
-      <div class="ov${ovOverCls}"${ovOverTip || (isAbbreviated(c.value) ? ' data-tip-tip="'+Math.round(c.value).toLocaleString()+' USD"' : '')}>${isEmpty?'<span class="empty-val">--</span>':fmtCardNum(c.value)}<span class="ou">USD</span></div>
-      <div class="conv">${isEmpty?'<span class="empty-val">--</span>':('≈ '+convVal+' '+currCode)}</div>
-      ${role.showExpected && c.key !== 'current' ?`<div class="expected"${(expectedSet && isAbbreviated(expectedVal)) ? ' data-tip-tip="'+expectedVal.toLocaleString()+' USD"' : ''}><span class="material-symbols-outlined">flag</span>Allocated Budget ${expectedSet ? fmtCardNum(expectedVal)+' USD' : '<span class="empty-val" data-tip-tip="Allocated budget not set by Admin">--</span>'}</div>`:''}
-      ${role.showExpected && c.key !== 'current' && expectedSet ?`<div class="conv expected-conv">≈ ${expectedConv} ${currCode}</div>`:''}
+      <div class="ov${ovOverCls}"${ovOverTip || (isAbbreviated(c.value) ? ' data-tip-tip="'+Math.round(c.value).toLocaleString()+' USD"' : '')}>${isEmpty?'<span class="empty-val" data-tip-tip="Budget not set (Unlimited)">--</span>':`<span>${fmtCardNum(c.value)}</span>`}<span class="ou">USD</span></div>
+      <div class="conv">${isEmpty?'<span class="empty-val">--</span>':('≈ '+convVal+'<span class="conv-code">'+currCode+'</span>')}</div>
+      ${role.showExpected && c.key !== 'current' ?`<div class="expected"${(expectedSet && isAbbreviated(expectedVal)) ? ' data-tip-tip="'+expectedVal.toLocaleString()+' USD"' : ''}><span class="material-symbols-outlined">flag</span><span><span class="exp-lbl" data-tip-tip="The budget limit set by the group's supervisor or the organization's Admin.">Allocated Budget</span> ${expectedSet ? fmtCardNum(expectedVal)+' USD' : '<span class="empty-val" data-tip-tip="Allocated budget not set by Admin">--</span>'}</span></div>`:''}
+      ${role.showExpected && c.key !== 'current' && expectedSet ?`<div class="conv expected-conv">≈ ${expectedConv}<span class="conv-code">${currCode}</span></div>`:''}
     `;
     row.appendChild(cell);
   });
@@ -1411,11 +1489,12 @@ function renderTable(){
   const tbl = $('#tbl');
 
   if(state.pageState==='nodata'){
-    wrap.innerHTML = '<div class="empty-state empty-state--l"><span class="material-symbols-outlined">error_outline</span><div class="empty-state-title">Something went wrong</div><div class="empty-state-sub">Failed to load budget data. Please try again later.</div><button class="btn btn-p" onclick="toast(\'(Demo) Would refresh data.\')"><span class="material-symbols-outlined">refresh</span>Retry</button></div>';
+    wrap.innerHTML = '<div class="empty-state gb-nodata gb-nodata--l"><span class="material-symbols-outlined">finance</span><div class="empty-state-title">No Data Available</div></div>';   // C-1 #29：稿 #01-5
     return;
   }
   if(state.pageState==='empty'){
-    wrap.innerHTML = '<div class="empty-state empty-state--l"><span class="material-symbols-outlined">group</span><div class="empty-state-title">No Groups Yet</div><div class="empty-state-sub">It seems like there are no groups created yet. Please create a new group or contact your administrator for assistance.</div></div>';
+    // C-1 #28：稿 #01-2 空狀態沒有外框；list_alt 80 #9ED7FF；標題 18／700、說明 14／400 都是 #676767，說明在 yet. 後換行（同 IAM Group List）
+    wrap.innerHTML = '<div class="empty-state gb-nodata gb-nodata--l"><span class="material-symbols-outlined">list_alt</span><div><div class="empty-state-title">No Groups Yet</div><div class="empty-state-sub">It seems like there are no groups created yet.<br>Please create a new group or contact your administrator for assistance.</div></div></div>';
     return;
   }
   if(state.pageState==='loading'){
@@ -1424,6 +1503,7 @@ function renderTable(){
     const bar = w => `<span class="lt-skeleton lt-skeleton--line" style="width:${w}"></span>`;
     let h = '<table class="gb-sk-tbl" role="status" aria-label="Loading"><thead><tr><th class="first">'+bar('100px')+'</th>'+('<th>'+bar('50px')+'</th>').repeat(4)+'</tr></thead><tbody>';
     for(let r=0;r<4;r++) h += '<tr><td class="first">'+bar('100%')+'</td>'+('<td>'+bar('50px')+'</td>').repeat(4)+'</tr>';
+    h += '<tr class="gb-sk-total"><td colspan="5">'+bar('100px')+'</td></tr>';   // C-1 #30：稿 #01-6 最下面一列灰底（Total 列位置）
     h += '</tbody></table>';
     wrap.innerHTML = h;
     return;
@@ -1445,7 +1525,9 @@ function renderTable(){
   const showCheckbox = state.editing && role.editable;
   const showGear = state.editing && role.editable;
   const newTbl = $('#tbl');
-  newTbl.className = 'budget' + (showCheckbox?'':' no-cb') + (showGear?'':' no-gear');
+  // C-1 #52（K9）：稿 #07 T2 只看自己一組，表格沒有 Group Name 欄
+  const hideName = (state.role === 't2m' || state.role === 't2mb');
+  newTbl.className = 'budget' + (showCheckbox?'':' no-cb') + (showGear?'':' no-gear') + (hideName?' no-name':'');
 
   // PRD §5 + Kabin 5/22 refinement: Annual summary block has TWO modes
   //   - View mode (show4col): 4 cols (Budget / Spend / Spent% / Remaining) — full monitoring
@@ -1468,30 +1550,22 @@ function renderTable(){
   // Threshold for budget context (設計稿 #01)：0-79 Successful / 80-99 Warning / 100+ Error
   // Each block fills 0-100% based on which 20% step the actual % falls into
   function pctBar(spent, budget){
-    if(budget === null || budget === 0) return '<span class="empty-cell" data-tip-tip="Budget not set (Unlimited)">--</span>';
-    if(spent === null) return '<span class="empty-cell" data-tip-tip="Missing actual data">--</span>';
+    // 稿 #01：沒有預算／沒有花費時，進度條照樣畫（空條），文字是 --
+    const emptyBar = tip => `<span class="pct-meter"><span class="pct-bar"></span><span class="pct-text empty-cell" data-tip-tip="${tip}">--</span></span>`;
+    if(budget === null || budget === 0) return emptyBar('Budget not set (Unlimited)');
+    if(spent === null) return emptyBar('Missing actual data');
     const pct = Math.round(spent / budget * 100);
     let cls = '';
     if(pct >= 100) cls = 'danger';
     else if(pct >= 80) cls = 'warn';
-    const SEG = 5, STEP = 20;
-    let segs = '';
-    for(let i = 0; i < SEG; i++){
-      const segStart = i * STEP;
-      const segEnd = segStart + STEP;
-      let fill;
-      if(pct >= segEnd) fill = 100;
-      else if(pct <= segStart) fill = 0;
-      else fill = Math.round((pct - segStart) / STEP * 100);
-      segs += `<span class="pct-seg"><span class="pct-seg-fill" style="width:${fill}%"></span></span>`;
-    }
-    return `<span class="pct-meter ${cls}"><span class="pct-meter-bar">${segs}</span><span class="pct-text">${pct}%</span></span>`;
+    // C-1 #17：稿 #01 進度條是一整條 40×16（填色寬度＝花費比例，上限 100%），白線切成 5 格是 CSS 畫的
+    return `<span class="pct-meter ${cls}"><span class="pct-bar"><span class="pct-bar-fill" style="width:${Math.min(pct,100)}%"></span></span><span class="pct-text">${pct}%</span></span>`;
   }
 
   // Header — order: Budget → Spend → Spent % → Remaining (PRD §7.1; 4 欄全保留 view/edit 一致)
   let h = '<thead><tr>';
   if(showCheckbox) h += '<th class="fix col-cb">' + LumiCheckbox.html({stateful:true, id:'cb-all'}) + '</th>';
-  h += '<th class="fix col-name tx-left">Group Name</th>';
+  if(!hideName) h += '<th class="fix col-name tx-left">Group Name</th>';
   if(showGear && !show2col) h += '<th class="fix col-gear"></th>';   // 編輯模式（show2col）齒輪移到 Spend 之後（稿 #02：Group Name → Budget → Spend → 齒輪），B-17
   if(show4col){
     h += '<th class="fix col-budget">Budget</th>';
@@ -1538,8 +1612,8 @@ function renderTable(){
     const annualRemain = (total !== null && annualSpendVal !== null) ? (total - annualSpendVal) : null;
     b += `<tr data-gi="${gi}" class="${sel?'selected':''}">`;
     if(showCheckbox) b += `<td class="fix col-cb">${LumiCheckbox.html({stateful:true, cls:'cb-row', checked:sel, attrs:{'data-gi':gi}})}</td>`;
-    b += `<td class="fix col-name tx-left" data-tip-tip="${g.name}">${g.name}</td>`;
-    const gearCell = showGear ? `<td class="fix col-gear"><button class="gear-btn" data-gi="${gi}" aria-label="Row actions"><span class="material-symbols-outlined">settings</span></button></td>` : '';
+    if(!hideName) b += `<td class="fix col-name tx-left" data-tip-tip="${g.name}">${g.name}</td>`;
+    const gearCell = showGear ? `<td class="fix col-gear"><button class="gear-btn" data-gi="${gi}" aria-label="Set Budgets" data-tip-tip="Set Budgets"><span class="material-symbols-outlined">settings</span></button></td>` : '';
     if(!show2col) b += gearCell;   // 編輯模式（show2col）齒輪在 Spend 之後，見下
     if(show4col){
       // Order: Budget → Spend → Spent % → Remaining (PRD §7.1; 4 欄全保留)
@@ -1598,7 +1672,7 @@ function renderTable(){
         const fakeCap = Math.round(mv * 0.4);
         const overAmt = mv - fakeCap;
         const overPct = fakeCap > 0 ? Math.round((overAmt / fakeCap) * 100) : 0;
-        warnTipContent = `Tier 1 Budget Over Your Cap\n• Tier 1 Planned: ${fmt(mv)}\n• Your Allocated cap: ${fmt(fakeCap)}\n• Over by ${fmt(overAmt)} (${overPct}% of your cap)`;
+        warnTipContent = `Tier 1 Budget Over Your Cap\nTier 1 Planned: ${fmt(mv)}\nYour Allocated cap: ${fmt(fakeCap)}\nOver by ${fmt(overAmt)} (${overPct}% of your cap)`;   // C-1 #26：稿 #01-1 沒有項目符號
       }
       const warnTip = warnTipContent ? ` data-tip-tip="${warnTipContent}"` : '';
       if(state.editing && role.editable){
@@ -1748,7 +1822,7 @@ function renderTable(){
       const monthlyExp = role.showExpected ? (EXPECTED_MONTHLY[state.currentTab]?.[mi] ?? null) : null;
       const overMonthlyExp = monthlyExp !== null && mt !== null && mt > monthlyExp;
       const overCls = overMonthlyExp ? ' over-budget' : '';
-      const overTip = overMonthlyExp ? ' data-tip-tip="Total exceeds Allocated cap."' : ''; // generic 紅字 rule
+      const overTip = overMonthlyExp ? ' data-tip-tip="The budget cannot be empty and must not exceed the Allocated Budget."' : ''; // C-1 #50：稿 #05-1 Total 月份紅字的 tooltip（expected→Allocated，⚠ DEVIATION 同卡片）
       // T2 視角 (warningOn:'total-row') 才加 cap dot：「我超主管 cap」
       const t2 = t2BudgetTip(mt);
       const cls = overCls + t2.cls;
@@ -1913,16 +1987,15 @@ function updateSaveBarState(){
   if(role.showExpected){
     // T1 view: validate + show info text
     const v = validateT1Save();
+    // C-1 #51：稿 #06／#06-1 底列左側固定是上限說明（灰），超額時只把 Save Change disabled，懸停說明用同一句；哪一格超額看表格紅字（#05-1）
+    const LIMIT_MSG = 'The budget of all groups should not exceed the assigned budget.';
     if(saveBtn){
       saveBtn.disabled = !v.ok;
-      saveBtn.setAttribute('data-tip-tip', v.ok ? '' : v.reason);
-      if(v.ok) saveBtn.removeAttribute('data-tip-tip');
+      if(v.ok) saveBtn.removeAttribute('data-tip-tip'); else saveBtn.setAttribute('data-tip-tip', LIMIT_MSG);
     }
     if(savebarL){
-      savebarL.innerHTML = v.ok
-        ? '<span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;color:var(--g500);font-variation-settings:\'FILL\' 0,\'wght\' 400;margin-right:6px">info</span>The budget of all groups should not exceed the assigned budget.'
-        : '<span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;color:var(--err);font-variation-settings:\'FILL\' 1,\'wght\' 500;margin-right:6px">error</span>' + v.reason;
-      savebarL.style.color = v.ok ? '' : 'var(--err)';
+      savebarL.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;color:var(--g500);font-variation-settings:\'FILL\' 1,\'wght\' 400;margin-right:8px">info</span>' + LIMIT_MSG;
+      savebarL.style.color = '';
     }
   } else {
     // Admin / T2 view: clear
@@ -1961,7 +2034,7 @@ function fyRangeFor(y){
   const startMLabel = FY_START_MONTHS[m].label;
   const endMLabel = FY_START_MONTHS[(m + 11) % 12].label;
   const endY = m === 0 ? y : y + 1;
-  return `${startMLabel}. '${String(y).slice(-2)} - ${endMLabel}. '${String(endY).slice(-2)}`;
+  return `${MONTHS[m]} '${String(y).slice(-2)} - ${MONTHS[(m + 11) % 12]} '${String(endY).slice(-2)}`;   // MONTHS 已含句點（May 沒有）
 }
 function fyStatusOf(y){
   if(y === CURRENT_FY) return {key:'current', tag:'Current'};
@@ -1975,15 +2048,14 @@ function renderFYPicker(){
   const y = state.viewYear;
   const st = fyStatusOf(y);
   // 凍結 FY selector + Edit Start Month：編輯模式，或 loading/error（資料未就緒，切年/改起始月無意義且會算錯）
-  const locked = state.editing || state.pageState === 'loading' || state.pageState === 'nodata';
+  const locked = state.editing || state.pageState === 'loading';   // C-1 #29：稿 #01-5 錯誤狀態頁首 FY／Edit Start Month 照常可用（換年份或改起始月可能就有資料）
   const lockTip = state.editing ? 'Finish editing budgets first' : 'Available once data has loaded';
   const isAdmin = state.role === 'admin';
   // 下拉選項：由新到舊，單行 = FY + range。無 pill（FE 回饋移除以避免混淆，2026-06-22）
   let opts = '';
   for(let oy = FY_VIEW_MAX; oy >= FY_VIEW_MIN; oy--){
     opts += `<button type="button" class="fy-sw-opt${oy===y?' sel':''}" role="option" aria-selected="${oy===y}" onclick="selectViewYear(${oy})">
-      <span class="fy-sw-opt-fy">FY ${oy}</span>
-      <span class="fy-sw-opt-range">${fyRangeFor(oy)}</span>
+      <span class="fy-sw-opt-fy">FY ${oy}</span><span class="fy-dot">・</span><span class="fy-sw-opt-range">${fyRangeFor(oy)}</span>
     </button>`;
   }
   // Edit Start Month：設計稿 #01 現況移到頁首右上（緊鄰 FY selector），admin only，編輯態凍結
@@ -1998,7 +2070,7 @@ function renderFYPicker(){
         onclick="toggleFYSwitcher(event)">
         <span class="material-symbols-outlined fy-sw-cal">event</span>
         <span class="fy-sw-val">FY ${y}</span>
-        <span class="fy-sw-trigger-range">· ${fyRangeFor(y)}</span>
+        <span class="fy-dot">・</span><span class="fy-sw-trigger-range">${fyRangeFor(y)}</span>
         <span class="material-symbols-outlined lt-select__arrow">arrow_drop_down</span>
       </button>
       <div class="fy-sw-menu" id="fy-sw-menu" role="listbox" aria-label="Select fiscal year">
@@ -2053,7 +2125,9 @@ function updatePeriodLabel(){
       const endY = m === 0 ? y : y + 1;
       const yy = String(y).slice(-2);
       const eyy = String(endY).slice(-2);
-      viewing.textContent = `Viewing: FY${y} · ${startMLabel}. '${yy} – ${startMLabel}. '${eyy} (USD)`;
+      // C-1 #1：結束月是起始月往後 11 個月（原本誤用起始月，照抄了稿的筆誤 Feb.–Feb.；FY 下拉寫的 Feb. – Jan. 才對）
+      const endMLabel = FY_START_MONTHS[(m + 11) % 12].label;
+      viewing.innerHTML = `<i>Viewing: FY ${y} · ${MONTHS[m]} '${yy} – ${MONTHS[(m + 11) % 12]} '${eyy}</i> <span class="vw-unit">(USD)</span>`;
     } else {
       viewing.textContent = '(USD)';
     }
@@ -2086,30 +2160,35 @@ function openFYModalGuarded(){
 }
 function openFYModal(){
   closeAllModals(); // Ensure no other modal is open (Demo FAB stacking fix)
-  const monthSel = $('#fy-modal-month');
-  monthSel.innerHTML = '';
-  FY_START_MONTHS.forEach(m => {
-    monthSel.innerHTML += `<option value="${m.idx}" ${m.idx === state.fyStartMonth ? 'selected' : ''}>${m.full}</option>`;
-  });
+  const trig = $('#fy-modal-month');
+  trig.dataset.value = String(state.fyStartMonth);
+  trig.querySelector('.lt-select__v').textContent = FY_START_MONTHS[state.fyStartMonth].full;
+  if(!trig._gbBound){
+    trig._gbBound = true;
+    gbDropdownBind(trig, () => FY_START_MONTHS.map(m => ({value:String(m.idx), label:m.full})), () => trig.dataset.value, v => {
+      trig.dataset.value = v;
+      trig.querySelector('.lt-select__v').textContent = FY_START_MONTHS[+v].full;
+      updateFYPreview();
+    });
+  }
   updateFYPreview();
-  monthSel.onchange = updateFYPreview;
   $('#mo-fy').classList.add('active');
 }
-function closeFYModal(){ $('#mo-fy').classList.remove('active'); }
+function closeFYModal(){ gbDropdownClose(); $('#mo-fy').classList.remove('active'); }
 function updateFYPreview(){
-  // Use the same verbose FY label format as fyLabel() for visual consistency
+  // 稿 #11：Resulting fiscal year: FY2026 (Feb. 2026 – Jan. 2027)
   const y = state.fyStartYear; // implicit — always current year
-  const m = parseInt($('#fy-modal-month').value);
+  const m = parseInt($('#fy-modal-month').dataset.value);
   const monthLabel = FY_START_MONTHS[m].label;
   const endMonth = FY_START_MONTHS[(m + 11) % 12].label;
   const endY = m === 0 ? y : y + 1;
   const label = `FY${y}`;
-  const range = `(${monthLabel}. ${y} – ${endMonth}. ${endY})`;
+  const range = `(${MONTHS[m]} ${y} – ${MONTHS[(m + 11) % 12]} ${endY})`;
   $('#fy-preview-label').textContent = label;
   $('#fy-preview-range').textContent = range;
 }
 function confirmFY(){
-  const m = parseInt($('#fy-modal-month').value);
+  const m = parseInt($('#fy-modal-month').dataset.value);
   state.fyStartMonth = m;
   closeFYModal();
   toast('Fiscal Start Month updated successfully.');
@@ -2218,36 +2297,99 @@ function openSingleRowPop(gi, anchor){
   anchor.classList.add('open');
 }
 function openBulkPop(anchor){
+  const wasOpen = popCtx && popCtx.mode === 'bulk';
   closePop();
+  if(wasOpen) return;   // 再點一次 Set Budgets 收起
   popCtx = { mode:'bulk', mode2:'allocate', anchor };
   buildPop();
   positionPop(anchor);
+  anchor.classList.add('is-open');   // 稿 #04：開啟時 #002663＋▲
+  const ar = anchor.querySelector('.arr-down'); if(ar) ar.textContent = 'arrow_drop_up';
 }
+// ===== 自製下拉（C-1 K6）：CMDS Dropdown，取代原生 <select>。trigger 用共用 .lt-select，選單 .gb-menu 掛在 body（fixed），鍵盤上下／Enter／Esc =====
+let _gbDD = null;
+function gbDropdownClose(){
+  if(!_gbDD) return;
+  _gbDD.menu.remove();
+  _gbDD.trigger.classList.remove('is-open');
+  _gbDD.trigger.setAttribute('aria-expanded','false');
+  _gbDD = null;
+}
+function gbDropdownOpen(trigger, getOpts, getVal, onPick){
+  gbDropdownClose();
+  const opts = getOpts(), cur = getVal();
+  const menu = document.createElement('div');
+  menu.className = 'gb-menu open'; menu.setAttribute('role','listbox');
+  menu.innerHTML = opts.map((o,i) => `<button type="button" class="gb-menu-item${o.value===cur?' is-sel':''}" role="option" aria-selected="${o.value===cur}" data-i="${i}">${o.html || o.label}</button>`).join('');
+  document.body.appendChild(menu);
+  const r = trigger.getBoundingClientRect();
+  menu.style.width = r.width + 'px';
+  let top = r.bottom + 4;
+  if(top + menu.offsetHeight > window.innerHeight - 8) top = Math.max(8, r.top - 4 - menu.offsetHeight);
+  menu.style.left = r.left + 'px'; menu.style.top = top + 'px';
+  trigger.classList.add('is-open'); trigger.setAttribute('aria-expanded','true');
+  let hl = Math.max(0, opts.findIndex(o => o.value === cur));
+  const items = [...menu.querySelectorAll('.gb-menu-item')];
+  const setHl = i => { items.forEach(b => b.classList.remove('is-hl')); hl = i; items[i].classList.add('is-hl'); items[i].scrollIntoView({block:'nearest'}); };
+  items.forEach(b => {
+    b.addEventListener('mousedown', e => e.preventDefault());
+    b.addEventListener('click', e => { e.stopPropagation(); const o = opts[+b.dataset.i]; gbDropdownClose(); trigger.focus(); onPick(o.value); });
+  });
+  const sel = items[hl]; if(sel) sel.scrollIntoView({block:'nearest'});
+  _gbDD = { trigger, menu, key: e => {
+    if(e.key === 'ArrowDown'){ e.preventDefault(); setHl(Math.min(items.length-1, hl+1)); }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); setHl(Math.max(0, hl-1)); }
+    else if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); items[hl].click(); }
+    else if(e.key === 'Escape' || e.key === 'Tab'){ if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); } gbDropdownClose(); }
+  }};
+}
+function gbDropdownBind(trigger, getOpts, getVal, onPick){
+  trigger.addEventListener('click', e => {
+    e.stopPropagation();
+    if(_gbDD && _gbDD.trigger === trigger){ gbDropdownClose(); return; }
+    gbDropdownOpen(trigger, getOpts, getVal, onPick);
+  });
+  trigger.addEventListener('keydown', e => {
+    if(_gbDD && _gbDD.trigger === trigger){ _gbDD.key(e); return; }
+    if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){ e.preventDefault(); gbDropdownOpen(trigger, getOpts, getVal, onPick); }
+  });
+}
+document.addEventListener('mousedown', e => { if(_gbDD && !_gbDD.menu.contains(e.target) && !_gbDD.trigger.contains(e.target)) gbDropdownClose(); }, true);
+window.addEventListener('resize', () => gbDropdownClose());
+document.addEventListener('scroll', e => { if(_gbDD && !_gbDD.menu.contains(e.target)) gbDropdownClose(); }, true);
+// C-1 #41–45：Popover 照稿 #03／#04（文案、間距、Each group 自製下拉）
+const POP_HINT = {
+  allocate: 'The amount will be evenly allocated to the 12 months. The amounts will be rounded down to the nearest whole number.',
+  fill: 'The amount will be directly fill into each month\'s field.',   // 稿 #03-2 原文（文法筆誤已進 Figma 清單，文案以稿為準）
+  rebalance: 'The budgets within the chosen groups will be summed up and evenly rebalanced to the 12 months within each group.  The amounts will be rounded down to the nearest whole number.',   // 稿 #03-3／#04-3 單組與批次同一句
+};
+const POP_DIST = [{value:'each', label:'Each group'}, {value:'distribute', label:'Distribute to groups'}];
 function buildPop(){
   if(!popCtx) return;
   const p = $('#pop');
   const isBulk = popCtx.mode === 'bulk';
   const m2 = popCtx.mode2;
+  if(!popCtx.dist) popCtx.dist = 'each';
   let html = '<div class="pop-radios">';
   ['allocate','fill','rebalance'].forEach(opt => {
     const lbl = opt==='allocate'?'Allocate':opt==='fill'?'Fill':'Rebalance within the group';
     html += `<label class="pop-radio"><input type="radio" name="popm2" value="${opt}" ${m2===opt?'checked':''}>${lbl}</label>`;
   });
-  html += '</div>';
-  if(m2 === 'rebalance'){
-    html += `<div class="pop-hint">${isBulk?'Sum the budget within each selected group, then evenly distribute across 12 months.':'Sum the budget of this group, then evenly distribute across 12 months.'}</div>`;
-  }else{
+  html += '</div><div class="pop-body">';
+  if(m2 !== 'rebalance'){
     html += '<div class="pop-field-row">';
-    html += `<div class="pop-field"><div class="pop-lbl">Amount</div><div class="pop-input"><span class="dollar">$</span><input type="text" id="pop-amt" inputmode="numeric" placeholder="0"></div></div>`;
+    html += `<div class="pop-field"><div class="pop-lbl">Amount</div><div class="pop-input"><span class="dollar">$</span><input type="text" id="pop-amt" inputmode="numeric" aria-label="Amount"></div></div>`;
     if(isBulk && m2==='allocate'){
-      html += `<div class="pop-field" style="flex:0 0 180px"><div class="pop-lbl">&nbsp;</div><select class="pop-select" id="pop-mode"><option value="each">Each group</option><option value="distribute">Distribute to groups</option></select></div>`;
+      const cur = POP_DIST.find(o => o.value === popCtx.dist);
+      html += `<div class="gb-dd" style="width:200px"><button type="button" class="lt-select" id="pop-mode" aria-haspopup="listbox" aria-expanded="false" data-value="${cur.value}"><span class="lt-select__v">${cur.label}</span><span class="material-symbols-outlined lt-select__arrow">arrow_drop_down</span></button></div>`;
     }
     html += '</div>';
-    if(m2 === 'allocate') html += '<div class="pop-hint">The amount will be evenly allocated to the 12 months. The amounts will be rounded down to the nearest whole number.</div>';
-    html += '<div class="pop-err-msg" id="pop-err"></div>';
+    html += '<div class="pop-err-msg" id="pop-err"></div>';   // 稿 #03-1：錯誤在輸入框正下方、說明之上
   }
+  html += `<div class="pop-hint">${POP_HINT[m2]}</div>`;
+  html += '</div>';
   const btnLabel = m2==='allocate'?'Allocate':m2==='fill'?'Fill':'Rebalance';
-  html += `<div class="pop-actions"><button class="btn btn-p btn-sm" id="pop-go" ${m2!=='rebalance'?'disabled':''}>${btnLabel}</button></div>`;
+  html += `<div class="pop-actions"><button class="btn btn-p" id="pop-go" ${m2!=='rebalance'?'disabled':''}>${btnLabel}</button></div>`;
   p.innerHTML = html;
   p.classList.add('open');
   p.querySelectorAll('input[name=popm2]').forEach(r => r.addEventListener('change', e => {
@@ -2255,6 +2397,11 @@ function buildPop(){
     buildPop();
     positionPop(popCtx.anchor);
   }));
+  const modeBtn = p.querySelector('#pop-mode');
+  if(modeBtn) gbDropdownBind(modeBtn, () => POP_DIST, () => popCtx.dist, v => {
+    popCtx.dist = v; modeBtn.dataset.value = v;
+    modeBtn.querySelector('.lt-select__v').textContent = POP_DIST.find(o=>o.value===v).label;
+  });
   const amt = p.querySelector('#pop-amt');
   if(amt){
     amt.addEventListener('input', e => {
@@ -2266,6 +2413,7 @@ function buildPop(){
       $('#pop-err').classList.remove('show');
       amt.parentElement.classList.remove('err');
     });
+    amt.addEventListener('keydown', e => { if(e.key === 'Enter' && !$('#pop-go').disabled) applyPop(); });
     amt.focus();
   }
   $('#pop-go').addEventListener('click', applyPop);
@@ -2273,7 +2421,7 @@ function buildPop(){
 function positionPop(anchor){
   const p = $('#pop');
   const r = anchor.getBoundingClientRect();
-  // Pop is already display:block (.open). offsetWidth / offsetHeight are valid now.
+  // Pop is already display:flex (.open). offsetWidth / offsetHeight are valid now.
   const pw = p.offsetWidth, ph = p.offsetHeight;
   let left, top;
   if(popCtx && popCtx.mode === 'bulk'){
@@ -2281,9 +2429,11 @@ function positionPop(anchor){
     left = r.right - pw;
     top  = r.bottom + 8;
   } else {
-    // Single-row gear: open to the right of the gear (Figma #03)
-    left = r.right + 8;
-    top  = r.top;
+    // C-1 #40：單列齒輪向下彈出（稿 #03 註記「向下彈出 popover」，左緣對齊齒輪）
+    left = r.left;
+    top  = r.bottom + 4;
+    // 下方放不下時改往上開（表格最後幾列）
+    if(top + ph > window.innerHeight - 16) top = r.top - ph - 4;
   }
   // Clamp to viewport
   if(left + pw > window.innerWidth - 16) left = window.innerWidth - pw - 16;
@@ -2294,6 +2444,8 @@ function positionPop(anchor){
   p.style.top  = (top + window.scrollY) + 'px';
 }
 function closePop(){
+  gbDropdownClose();
+  const sb = $('#btn-setbudgets'); if(sb){ sb.classList.remove('is-open'); const ar = sb.querySelector('.arr-down'); if(ar) ar.textContent = 'arrow_drop_down'; }
   $('#pop').classList.remove('open');
   $('#pop').innerHTML = '';
   $$('.gear-btn.open').forEach(b => b.classList.remove('open'));
@@ -2316,7 +2468,7 @@ function applyPop(){
     if(!amt || amt <= 0){ closePop(); return; }
     if(m2 === 'allocate'){
       let perGroupAmt = amt;
-      const distMode = $('#pop-mode') ? $('#pop-mode').value : null;
+      const distMode = $('#pop-mode') ? popCtx.dist : null;
       if(popCtx.mode === 'bulk' && distMode === 'distribute'){
         const minNeeded = 12 * tgtList.length;
         if(amt < minNeeded){
@@ -2465,6 +2617,7 @@ function setRole(r){
   if(state.editing) exitEdit();
   const role = ROLES[state.role];
   $('#paper-title').textContent = role.card1Title;
+  $('#paper').classList.toggle('is-t2', r === 't2m' || r === 't2mb');
   $('#sec2-title').textContent = role.secTitle || '';
   $('#sec2-title').style.display = role.secTitle ? '' : 'none';
   syncActionBtns();
@@ -2474,12 +2627,14 @@ function setRole(r){
   if(sec2Row) sec2Row.style.display = (role.secTitle || role.editable) ? '' : 'none';
   renderAll();
 }
-// Edit Budget／Download CSV 的顯示與 disabled：只有 'set' 可用；loading 時照稿 #01-6 仍顯示但 disabled（A-18），其他狀態隱藏
+// Edit Budget／Download CSV 的顯示與 disabled：只有 'set' 可用；loading（#01-6）、No Groups（#01-2）、錯誤（#01-5）照稿仍顯示但 disabled
+// （C-1 #27／#29：稿註記「Disable 不可操作的按鈕」）；no-auth 只鎖當前 provider 的表格，按鈕維持隱藏（稿沒畫）
 function syncActionBtns(){
-  const ld = state.pageState === 'loading', ok = state.pageState === 'set';
+  const ok = state.pageState === 'set';
+  const shown = ok || ['loading','empty','nodata'].includes(state.pageState);
   const e = $('#btn-edit'), c = $('#btn-csv');
-  if(e){ e.style.display = (ROLES[state.role].editable && (ok || ld)) ? 'inline-flex' : 'none'; e.disabled = ld; }
-  if(c){ c.style.display = ((ok || ld) && state.showSegCtrl && !state.editing) ? '' : 'none'; c.disabled = ld; }
+  if(e){ e.style.display = (ROLES[state.role].editable && shown) ? 'inline-flex' : 'none'; e.disabled = !ok; }
+  if(c){ c.style.display = (shown && state.showSegCtrl && !state.editing) ? '' : 'none'; c.disabled = !ok; }
 }
 function setPageState(s){
   state.pageState = s;
@@ -2499,13 +2654,13 @@ function renderAlertBar(){
   const isAdmin = state.role === 'admin';
   const linkHtml = isAdmin ? '<button class="alert-link" onclick="openAlert()"><span class="material-symbols-outlined">settings</span><span class="alert-link-text">Alert Settings</span></button>' : '';
   if(!state.thresholds || state.thresholds.length === 0){
-    bar.innerHTML = '<span class="material-symbols-outlined">notifications_off</span><span>No alerts have been set yet.</span>' + linkHtml;
+    bar.innerHTML = '<span class="material-symbols-outlined">notifications_off</span><span>No alerts are configured.</span>' + linkHtml;   // C-1 #53：稿 #08-1 文案
   } else {
     bar.innerHTML = '<span class="material-symbols-outlined">notifications_active</span><span>You will receive alert when the cost reach</span><b>'+state.thresholds.join(', ')+'</b><span>% of the monthly budget.</span>' + linkHtml;
   }
 }
 
-function renderAll(){ const _pp = $('#paper'); if(_pp) _pp.classList.toggle('is-loading', state.pageState === 'loading'); renderFYPicker(); updatePeriodLabel(); renderOrgCards(); renderTabs(); renderTable(); renderAlertBar(); }
+function renderAll(){ const _pp = $('#paper'); if(_pp){ _pp.classList.toggle('is-loading', state.pageState === 'loading'); _pp.classList.toggle('is-nodata', state.pageState === 'nodata'); } renderFYPicker(); updatePeriodLabel(); renderOrgCards(); renderTabs(); renderTable(); renderAlertBar(); }
 
 // ===== Wire =====
 $('#btn-edit').addEventListener('click', enterEdit);
@@ -2527,7 +2682,7 @@ $('#btn-setbudgets').addEventListener('click', e => openBulkPop(e.currentTarget)
 $('#btn-clearbudget').addEventListener('click', () => {
   if(!state.draft) return;
   Array.from(state.selected).forEach(gi => state.draft[state.currentTab][gi].months = Array(12).fill(null));
-  toast('Budget cleared for selected groups.');
+  toast('Amount applied successfully.');   // C-1：稿 #04-4 註記「[Toast] 請參照 #03-4」
   renderTable();
   renderOrgCards();
 });
@@ -2685,6 +2840,8 @@ window.DEMO_PAGES = [
   { id:'state', label:'State', icon:'layers' },
   { id:'alert', label:'Alert', icon:'notifications' },
   { id:'warning', label:'Warning', icon:'warning' },
+  { id:'view',  label:'View',  icon:'visibility' },
+  { id:'edit',  label:'Edit',  icon:'edit' },
   { id:'modal', label:'Modal', icon:'open_in_new' },
   { id:'toast', label:'Toast', icon:'sms' },
   { id:'parked', label:'Parked', icon:'lightbulb' },
@@ -2703,6 +2860,25 @@ window.DEMO_SCENARIOS = [
   { id:'empty',    page:'state', label:'No groups created',          icon:'group_off',       isNoData:true, tip:'尚未建立任何 group，表格呈空狀態，引導前往 Organization Settings 建立組別。' },
   { id:'no-auth',  page:'state', label:'CSP not authorized',         icon:'lock',            isNoData:true, tip:'當前 provider 未授權。Admin 看到 Authorize CTA，T1/T2 看到「請聯絡管理員」提示。切 Role 看差異。' },
   { id:'nodata',   page:'state', label:'Error (API failure)',        icon:'cloud_off',       isNoData:true, tip:'資料無法載入。Org 卡片與表格都呈現 error 空狀態。' },
+  { id:'no-budget', page:'state', label:'No budget set (#00)',  icon:'money_off',       tip:'Figma #00：尚未設定任何預算，預算本身與算不出來的欄位全部顯示 --（卡片 -- 懸停：Budget not set (Unlimited)）。' },
+  // View — 稿 #01-1～#01-10 的檢視狀態（C-1 補）
+  { id:'view-currency',  page:'view', label:'Currency converter ON (#01-7)', icon:'currency_exchange', tip:'Figma #01-7：開啟換算，文案變成「Display converted amounts in」接幣別鈕，卡片下方顯示換算值；幣別鈕懸停是匯率說明。' },
+  { id:'view-currency-dd', page:'view', label:'Currency dropdown (#01-7)', icon:'arrow_drop_down_circle', tip:'Figma #01-7：幣別下拉（共用 currency-picker.js）。' },
+  { id:'view-spend',     page:'view', label:'Monthly View: Spend (#01-8)',     icon:'payments',       tip:'Figma #01-8：月份改看花費，超過預算的月份紅字。' },
+  { id:'view-remaining', page:'view', label:'Monthly View: Remaining (#01-9)', icon:'savings',        tip:'Figma #01-9：月份改看剩餘，負數紅字。' },
+  { id:'view-fy',        page:'view', label:'Fiscal Year selector (#01-10)',   icon:'event',          tip:'Figma #01-10：FY 下拉，往前兩年、往後一年。' },
+  { id:'view-collapsed', page:'view', label:'Collapse sidebar (#01-4)',        icon:'left_panel_close', tip:'Figma #01-4：sidebar 收合。切別的情境會回到展開。' },
+  // Edit — 稿 #02～#06-1（C-1 補）
+  { id:'edit-on',        page:'edit', label:'Edit Mode (#02)',                 icon:'edit',           tip:'Figma #02：編輯模式，隱藏 Edit Budget 與 Total 頁籤，FY／Edit Start Month 鎖住，Monthly View 只剩鎖住的 Budget。' },
+  { id:'edit-single',    page:'edit', label:'Single row: Allocate (#03)',     icon:'settings',       tip:'Figma #03：點齒輪向下彈出 popover。' },
+  { id:'edit-single-err',page:'edit', label:'Allocate error (#03-1)',          icon:'error',          tip:'Figma #03-1：輸入 11，分到 12 個月不到 1，提示最低金額。' },
+  { id:'edit-single-fill',page:'edit', label:'Single row: Fill (#03-2)',      icon:'format_color_fill', tip:'Figma #03-2' },
+  { id:'edit-single-reb',page:'edit', label:'Single row: Rebalance (#03-3)',  icon:'balance',        tip:'Figma #03-3：點了直接執行。' },
+  { id:'edit-bulk',      page:'edit', label:'Bulk: Set Budgets (#04)',        icon:'library_add_check', tip:'Figma #04：勾兩組，Set Budgets 展開。' },
+  { id:'edit-bulk-dist', page:'edit', label:'Bulk Allocate: Each group (#04-1)', icon:'call_split', tip:'Figma #04-1：Each group／Distribute to groups 下拉展開。' },
+  { id:'edit-bulk-clear',page:'edit', label:'Bulk: Clear Budget (#04-4)',     icon:'backspace',      tip:'Figma #04-4：勾選後 Clear Budget 可按，點了直接清空。' },
+  { id:'edit-t1',        page:'edit', label:'T1 Edit Mode (#06)',             icon:'supervisor_account', tip:'Figma #06：T1 編輯，底列左側是上限說明。' },
+  { id:'edit-t1-over',   page:'edit', label:'T1 Unable to Save (#06-1)',      icon:'block',          tip:'Figma #06-1：分配超過 Allocated，Save Change disabled，懸停說明。' },
   // Alert
   { id:'alert-set',   page:'alert', label:'Alerts set (60/80/90)', icon:'notifications_active', tip:'已設定 3 個 threshold，一般狀態。' },
   { id:'alert-empty', page:'alert', label:'No alerts set',          icon:'notifications_off',    tip:'尚未設定任何 alert threshold，提示文案改為「No alerts have been set yet.」並切換 icon。Alert Settings 仍可點開設定。' },
@@ -2724,12 +2900,72 @@ window.DEMO_SCENARIOS = [
   { id:'toast-amount-ok',   page:'toast', label:'Amount applied',             icon:'check_circle',        tip:'Figma #03-4 single/bulk apply success toast' },
   { id:'toast-alert-ok',    page:'toast', label:'Alert settings updated',     icon:'check_circle',        tip:'Figma #10 alert save success toast' },
   { id:'toast-fy-ok',       page:'toast', label:'Fiscal Start Month updated', icon:'check_circle',        tip:'Figma #12 FY submit success toast' },
+  { id:'toast-apply-err',   page:'toast', label:'Unable to apply',            icon:'error',               tip:'Figma #03-4 failure toast（稿註記：流程都擋住了，實際應該不會出現）' },
+  { id:'toast-alert-err',   page:'toast', label:'Unable to update alert',     icon:'error',               tip:'Figma #10 failure toast' },
+  { id:'toast-fy-err',      page:'toast', label:'Unable to update Fiscal Start Month', icon:'error',      tip:'Figma #12 failure toast' },
   // ⏸ PARKED（specs/parked-designs.md #20）：Trend 視角是 UX 提案，這裡可整批隱藏看上線版
   { id:'parked-on',  page:'parked', group:'UX 提案', label:'顯示 UX 提案（預設）',             icon:'lightbulb',      tip:'⏸ PARKED：Monthly View 的 Trend（12 個月走勢 sparkline）是設計端提案，不在 Figma 稿與 PRD，掛 UX 提案 badge。' },
   { id:'parked-off', page:'parked', group:'UX 提案', label:'隱藏暫緩的設計（看上線版）',        icon:'visibility_off', tip:'隱藏 Trend，只剩 Budget／Spend／Remaining 三個視角，等於上線版。' },
 ];
 window.DEMO_DEFAULT = 'admin';
+// C-1：Demo 情境共用的重設（收起 popover／下拉、sidebar 回展開、換算關、Monthly View 回 Budget、清掉「尚未設定預算」）
+function demoReset(){
+  closePop(); gbDropdownClose(); closeFYSwitcher(); if(window.CurrencyPicker) CurrencyPicker.close();
+  if(window.LumitureSidebar && LumitureSidebar.isCollapsed && LumitureSidebar.isCollapsed()) LumitureSidebar.setCollapsed(false);
+  if(state.showConv){ state.showConv = false; $('#curr-toggle').classList.remove('on'); document.body.classList.remove('show-conv'); }
+  if(state.noBudget){ state.noBudget = false; }
+  if(state.monthlyView !== 'budget'){ state.monthlyView = 'budget'; document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === 'budget')); }
+}
+function demoEdit(role){
+  if(state.role !== role){ setRole(role); }
+  if(state.pageState !== 'set') setPageState('set');
+  if(state.editing) exitEdit();
+  state.currentTab = 'gcp';
+  enterEdit();
+}
+const demoWait = ms => new Promise(r => setTimeout(r, ms));
 window.DEMO_APPLY = function(id){
+  demoReset();
+  if(id === 'no-budget'){ if(state.role !== 'admin') setRole('admin'); state.noBudget = true; setPageState('set'); return; }
+  if(id === 'view-currency' || id === 'view-currency-dd'){
+    if(!state.showConv) $('#curr-toggle').click();
+    if(id === 'view-currency-dd') setTimeout(() => $('#curr-btn').click(), 50);
+    return;
+  }
+  if(id === 'view-spend' || id === 'view-remaining'){
+    if(state.warningPreset !== 'mixed') setWarningPreset('mixed');
+    document.querySelector(`.seg-btn[data-mode="${id === 'view-spend' ? 'spend' : 'remaining'}"]`).click();
+    return;
+  }
+  if(id === 'view-fy'){ setTimeout(() => toggleFYSwitcher(), 50); return; }
+  if(id === 'view-collapsed'){ if(window.LumitureSidebar) LumitureSidebar.setCollapsed(true); return; }
+  if(id.startsWith('edit-')){
+    demoEdit(id.startsWith('edit-t1') ? 't1m' : 'admin');
+    (async () => {
+      await demoWait(60);
+      const gear = () => document.querySelectorAll('.gear-btn')[2];
+      if(id === 'edit-single' || id === 'edit-single-err' || id === 'edit-single-fill' || id === 'edit-single-reb'){
+        gear().click();
+        await demoWait(30);
+        if(id === 'edit-single-err'){ const a = $('#pop-amt'); a.value = '11'; a.dispatchEvent(new Event('input')); $('#pop-go').click(); }
+        if(id === 'edit-single-fill'){ $('#pop input[value="fill"]').click(); }
+        if(id === 'edit-single-reb'){ $('#pop input[value="rebalance"]').click(); }
+      }
+      if(id === 'edit-bulk' || id === 'edit-bulk-dist' || id === 'edit-bulk-clear'){
+        [1,2].forEach(i => state.selected.add(i)); updateBulkBar(); renderTable();
+        if(id !== 'edit-bulk-clear'){
+          $('#btn-setbudgets').click();
+          await demoWait(30);
+          if(id === 'edit-bulk-dist') $('#pop-mode').click();
+        }
+      }
+      if(id === 'edit-t1-over'){
+        state.draft.gcp[1].months = Array(12).fill(9999);
+        updateAfterCellEdit();
+      }
+    })();
+    return;
+  }
   if(['admin','t1m','t1mb','t2m','t2mb'].includes(id)){
     // Role switch acts as soft-reset: also clears page state + warning preset so the role demos cleanly
     // (Reset to Default fires DEMO_APPLY('admin'), so this path is also the canonical reset)
@@ -2758,6 +2994,9 @@ window.DEMO_APPLY = function(id){
   else if(id === 'toast-amount-ok')   toast('Amount applied successfully.');
   else if(id === 'toast-alert-ok')    toast('Alert settings updated successfully.');
   else if(id === 'toast-fy-ok')       toast('Fiscal Start Month updated successfully.');
+  else if(id === 'toast-apply-err')   toast('Unable to apply. Please try again later.', 'err');
+  else if(id === 'toast-alert-err')   toast('Unable to update alert. Please try again later.', 'err');
+  else if(id === 'toast-fy-err')      toast('Unable to update Fiscal Start Month. Please try again later.', 'err');
   else if(id === 'parked-on')         setParkedShown(true);
   else if(id === 'parked-off')        setParkedShown(false);
 };
@@ -3096,8 +3335,10 @@ renderFYPicker();
  *
  * Design spec: CMDS Component Library > Currency Switch (H=30px)
  *   - Normal: transparent bg, no border; Hover: subtle gray bg; Focus: focus ring
- *   - Trigger format: [flag] [CODE] [expand_more]
- *   - Dropdown gap: 4px from trigger bottom
+ *   - Trigger format: [flag] [CODE] [▾]（箭頭由 CSS 統一畫成 arrow_drop_down，markup 寫 expand_more 也會被換掉）
+ *   - Dropdown gap: 4px from trigger bottom（2026-10-16 X-9r1：錨在按鈕本身，不是父層；預設右緣對齊按鈕右緣＝Overview #01-4，
+ *     按鈕寫 data-dd-align="left" 的改左緣對齊＝General Budget #01-7）
+ *   - Tooltip：沒寫 data-tip／data-tip-tip 的按鈕自動帶 FE CurrencySelector 的匯率說明（FE 全站同一顆元件）；下拉打開時不顯示
  *   - Dropdown items: "Full Name (CODE)", selected = gray bg, no checkmark
  *
  * Design spec: Figma #01-4 Overview: Change Currency
@@ -3145,45 +3386,51 @@ renderFYPicker();
     { code: 'USD', name: 'United States dollar',   flag: '🇺🇸' },
   ];
 
+  /* 2026-10-16 X-9r1：全站同一組 mock 匯率（1 USD＝?），各頁換算一律用這組，不要各頁自備（原本 Overview 32.1、General Budget 31.5 對不起來）。
+     數值沿用 Overview 原本的表 */
+  var RATES = { USD: 1, TWD: 32.1, HKD: 7.8, SGD: 1.35, MYR: 4.7, PHP: 56.2, IDR: 15800 };
+  /* 金額前綴符號（tooltip 的完整金額用，例如 $10,816,382.11／NT$347,206,867.73）；沿用 Overview 原本的表 */
+  var SYMBOLS = { USD: '$', TWD: 'NT$', HKD: 'HK$', SGD: 'S$', MYR: 'RM', PHP: '₱', IDR: 'Rp' };
+  /* FE CurrencySelector/SelectInput.tsx 的 TooltipTitle（全站同一句） */
+  var TIP = 'Please note that due to exchange rate conversions and data latency in the console, the displayed numbers may slightly differ from those in the console. The actual amount should be based on your received invoice. (Exchange rate source: https://rter.info/)';
+
   /* ===== CSS ===== */
   var CSS = [
-    /* Trigger button — Normal: transparent, no border; H=30px per CMDS spec */
-    '.curr-btn{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 7px;',
-    'font-size:13px;color:#262626;',
-    'cursor:pointer;background:transparent;border:none;border-radius:6px;',
+    /* 2026-10-16 C-1（README 指定）：按鈕、箭頭、下拉照稿（GB #01-7 Currency Converter＋Dropdown；Overview #01／#01-4 同，C-5 已量）。
+       按鈕 80×30、內距 0／8、gap 4、r4；國旗 16 圓框 #CCCCCC；代碼 14／400 #676767；hover／開啟底 rgba(103,103,103,.12) */
+    '.curr-btn{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 4px 0 8px;',
+    'font-size:14px;color:#676767;',
+    'cursor:pointer;background:transparent;border:none;border-radius:4px;',
     'font-family:inherit;line-height:1;white-space:nowrap;',
     'transition:background .12s}',
-    /* Hover: subtle gray wash */
-    '.curr-btn:hover{background:rgba(0,0,0,.06)}',
-    /* Active/open: same wash + arrow flipped */
-    '.curr-btn.cp-open{background:rgba(0,0,0,.06)}',
+    '.curr-btn:hover,.curr-btn.cp-open{background:rgba(103,103,103,.12)}',
     /* Focus: blue focus ring (keyboard nav / Active state ring per CMDS) */
     '.curr-btn:focus-visible{outline:2px solid #004FB0;outline-offset:1px}',
-    /* Flag + code */
-    '.curr-flag{font-size:15px;line-height:1;flex-shrink:0}',
-    '.curr-code{font-size:14px;color:#262626}',
-    /* Arrow icon */
-    '.curr-btn .material-symbols-outlined{font-size:16px;',
-    'color:#676767;flex-shrink:0;transition:transform .15s}',
-    /* 2026-10-15 R1（A-11）：下拉箭頭統一實心 ▾（arrow_drop_down 24）。markup 加 class="curr-arrow" 才套用（舊頁面仍是 expand_more 16 的 chevron） */
-    '.curr-btn .curr-arrow{font-size:24px;margin:0 -4px 0 -2px}',
-    '.curr-btn.cp-open .material-symbols-outlined{transform:rotate(180deg)}',
+    /* Flag：16 圓、1px #CCCCCC 框（emoji 國旗放大後裁成圓形） */
+    '.curr-flag{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;',
+    'box-shadow:0 0 0 1px #CCCCCC;overflow:hidden;font-size:22px;line-height:1;flex-shrink:0}',
+    '.curr-code{font-size:14px;font-weight:400;color:#676767;line-height:24.5px}',
+    /* 箭頭（A-11 下拉箭頭統一實心 ▾）：不管各頁 markup 寫 expand_more 還是 arrow_drop_down，都用 ::after 畫成 arrow_drop_down，
+       原本的字藏起來（font-size:0），各頁不用改 markup。稿 #01-7 開啟時箭頭不翻轉 */
+    '.curr-btn > .material-symbols-outlined:last-child{font-size:0;line-height:1;color:#676767;flex-shrink:0;width:20px;margin-left:-4px;',
+    'display:inline-flex;align-items:center;justify-content:center}',
+    '.curr-btn > .material-symbols-outlined:last-child::after{content:"arrow_drop_down";font-size:20px;line-height:1;',
+    'font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 20}',
 
-    /* Dropdown container — 4px gap per CMDS spec */
+    /* Dropdown（稿 #01-7）：250 寬、r6、陰影 0 0 6px .2、無框、內距 10 */
     '.curr-dd{position:absolute;top:calc(100% + 4px);right:0;left:auto;',
-    'background:#fff;border:1px solid #DCE3EC;',
-    'border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);',
-    'z-index:300;min-width:220px;width:max-content;',
+    'background:#fff;border:none;',
+    'border-radius:6px;box-shadow:0 0 6px rgba(0,0,0,.2);padding:10px;',
+    'z-index:300;width:250px;box-sizing:border-box;',
     'overflow:hidden;overscroll-behavior:contain}',
 
-    /* Dropdown items — full name + (CODE), no flag */
-    '.curr-dd-item{display:flex;align-items:center;padding:9px 14px;width:100%;',
-    'font-size:13px;border:none;background:none;cursor:pointer;',
+    /* 項目：230×40、r5、內距 0／8、14／400 #262626；hover #F6F6F6、選中 #E6E6E6（不打勾） */
+    '.curr-dd-item{display:flex;align-items:center;height:40px;padding:0 8px;width:100%;box-sizing:border-box;',
+    'font-size:14px;font-weight:400;border:none;border-radius:5px;background:none;cursor:pointer;',
     'font-family:inherit;color:#262626;text-align:left;',
-    'transition:background .1s;line-height:1.4;white-space:nowrap}',
-    '.curr-dd-item:hover{background:#F5F5F5}',
-    /* Selected: gray bg per Figma, no color/weight change */
-    '.curr-dd-item.cp-active{background:#F0F0F0}',
+    'transition:background .1s;line-height:24.5px;white-space:nowrap}',
+    '.curr-dd-item:hover{background:#F6F6F6}',
+    '.curr-dd-item.cp-active{background:#E6E6E6}',
   ].join('');
 
   var style = document.createElement('style');
@@ -3199,6 +3446,7 @@ renderFYPicker();
     if (dd) dd.remove();
     if (_activeTrigger) {
       _activeTrigger.classList.remove('cp-open');
+      if (_activeTrigger.hasAttribute('data-cp-tip')) { _activeTrigger.setAttribute('data-tip', _activeTrigger.getAttribute('data-cp-tip')); _activeTrigger.removeAttribute('data-cp-tip'); }
       _activeTrigger = null;
     }
   }
@@ -3210,6 +3458,9 @@ renderFYPicker();
     /* Ensure parent is positioned */
     var wrap = triggerEl.parentElement;
     if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+    /* 下拉打開時不顯示 tooltip（FE：isOpen 時 title 清空） */
+    if (triggerEl.hasAttribute('data-tip')) { triggerEl.setAttribute('data-cp-tip', triggerEl.getAttribute('data-tip')); triggerEl.removeAttribute('data-tip'); }
+    var gl = document.getElementById('gl-tip'); if (gl) gl.style.display = 'none';
 
     var dd = document.createElement('div');
     dd.className = 'curr-dd';
@@ -3229,6 +3480,13 @@ renderFYPicker();
     });
 
     wrap.appendChild(dd);
+    /* 錨在按鈕本身（父層常常還包著 Month Picker 等元素，right:0 會對到父層右緣，Executive Insights 曾偏 146px） */
+    if (triggerEl.offsetParent === wrap) {
+      dd.style.top = (triggerEl.offsetTop + triggerEl.offsetHeight + 4) + 'px';
+      dd.style.right = (wrap.clientWidth - triggerEl.offsetLeft - triggerEl.offsetWidth) + 'px';
+      /* 按鈕寫 data-dd-align="left" 的改成左緣對齊（General Budget #01-7） */
+      if (triggerEl.dataset.ddAlign === 'left') { dd.style.right = 'auto'; dd.style.left = triggerEl.offsetLeft + 'px'; }
+    }
 
     /* Outside click to close */
     setTimeout(function () {
@@ -3242,8 +3500,21 @@ renderFYPicker();
   }
 
   /* ===== PUBLIC API ===== */
+  /* 預設 tooltip：滑過還沒有 tooltip 的幣別鈕時補上 data-tip（capture，比 demo-fab 的 #gl-tip 先跑） */
+  document.addEventListener('mouseover', function (e) {
+    var b = e.target.closest && e.target.closest('.curr-btn');
+    if (!b || b.classList.contains('cp-open') || b.disabled) return;
+    if (!b.hasAttribute('data-tip') && !b.hasAttribute('data-tip-tip') && !b.hasAttribute('data-no-tip')) b.setAttribute('data-tip', TIP);
+  }, true);
+
   window.CurrencyPicker = {
     CURRENCIES: CURRENCIES,
+    RATES: RATES,
+    TIP: TIP,
+    /** USD 金額換成 code 幣別（mock 匯率） */
+    convert: function (usd, code) { return usd * (RATES[code] || 1); },
+    /** 幣別前綴符號（找不到就回傳代碼＋空格） */
+    symbol: function (code) { return SYMBOLS[code] || (code + ' '); },
 
     /**
      * Toggle dropdown open / close.

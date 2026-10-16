@@ -431,6 +431,58 @@
     .usage-subscription-layout .select-field,.usage-subscription-layout .outcome-grid{margin:0}
     @media(max-width:800px){.demo{left:16px}.journey-item{grid-template-columns:28px minmax(0,1fr)}.journey-state{grid-column:2}.field{grid-template-columns:1fr}.field input{width:100%}}
   </style>
+  <style>
+    /* ============================================================
+     * C 區 C-6 對稿（2026-10-16）：只對視覺與文案，journey 結構維持 v4（Kabin 10/15）
+     * 依據：Figma Main Feature「Organization Settings (IAM)」各授權 section；條號對 specs/2026-10-15-c-region/c6-compare.md
+     * ============================================================ */
+    .page-title{margin-bottom:0}.instruction{color:var(--lt-color-text-secondary)}   /* #32：Learn More 緊貼說明句、#676767（#22） */
+    .azure-panel{border-radius:var(--lt-card-radius);box-shadow:var(--lt-card-shadow);padding:var(--lt-card-padding)}   /* #20：B-3 卡片 token（稿本身沒白卡，見 compare 結構差異） */
+    .azure-panel>h2{color:var(--lt-color-text-secondary)}.azure-panel.is-form>h2{color:var(--lt-color-text-primary)}   /* #22：導引區段標題 #676767、表單標題 #262626 */
+    .tutorial-content h3{color:var(--lt-color-text-secondary)}   /* #22：步驟標題 16/700 #676767 */
+    .azure-panel>p.c6-lead{margin:0 0 16px}
+    .c6-section{margin-top:16px}.c6-section h3{margin:0 0 8px!important;font-size:18px!important;line-height:27px!important;color:var(--lt-color-text-secondary)}.c6-section p,.c6-section ol{margin:0 0 8px}.c6-section ol{padding-left:22px}.c6-section .c6-strong{font-weight:700}
+    .c6-hint{display:inline-flex;align-items:center;gap:4px;color:var(--lt-color-primary);font-size:12px;font-weight:700;line-height:18px}.c6-hint .material-symbols-outlined{font-size:16px}
+    /* #21：CMDS Alert（白底、r4、陰影 0 0 6 .2、左側 4px 色條、20px 實心 icon、內距 8／16） */
+    .notice,.tutorial-content .tutorial-note{position:relative;border:0;border-radius:4px;background:#fff;box-shadow:0 0 6px rgba(0,0,0,.2);padding:8px 16px 8px 46px;color:var(--lt-color-text-primary);line-height:24.5px;overflow:hidden}
+    .notice::before,.tutorial-content .tutorial-note::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--lt-color-primary)}
+    .notice::after,.tutorial-content .tutorial-note::after{content:'info';position:absolute;left:16px;top:11px;font-family:'Material Symbols Outlined';font-size:20px;line-height:1;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;color:var(--lt-color-primary)}
+    .notice.warning,.tutorial-content .tutorial-warn{background:#fff}.notice.warning::before,.tutorial-content .tutorial-warn::before{background:var(--lt-color-warning)}.notice.warning::after,.tutorial-content .tutorial-warn::after{content:'warning';color:var(--lt-color-warning)}
+    .notice ul{margin:0;padding-left:20px}.notice li+li{margin-top:0}.notice .c6-red{color:var(--lt-color-error)}
+    /* #23：表單欄位（標籤欄寬依表單、輸入框撐滿、欄距 8、子群內縮 20、必填星號、錯誤字在框下方） */
+    .azure-panel .field{grid-template-columns:var(--field-label-w,131px) minmax(0,1fr);align-items:start;column-gap:8px;row-gap:4px;max-width:none;margin-top:8px}
+    .azure-panel .field.sub{padding-left:20px;grid-template-columns:calc(var(--field-label-w,131px) - 20px) minmax(0,1fr)}
+    .azure-panel .field label{line-height:36px;font-size:14px;font-weight:700;white-space:nowrap}.azure-panel .field .req{color:var(--lt-color-error)}
+    .azure-panel .field input{width:100%;height:36px;padding:0 8px;border:1px solid var(--lt-color-border-input,#CCCCCC);border-radius:5px;font-size:14px;color:var(--lt-color-text-primary);background:#fff}
+    .azure-panel .field input::placeholder{color:#B3B3B3}.azure-panel .field input:disabled{background:#F6F6F6;color:#676767}
+    .azure-panel .field input.error{border-color:var(--lt-color-error)}
+    .azure-panel .field .field-error{grid-column:2;font-size:12px;line-height:18px;color:var(--lt-color-error)}
+    .azure-panel .c6-subhead{margin:8px 0 0!important;font-size:16px;line-height:36px!important;color:var(--lt-color-text-primary)}
+    .azure-panel .c6-form-intro{margin:0 0 8px}
+    /* #24：上一步連結（arrow_circle_left 16、14/700 #004FB0、文字底線） */
+    .secondary-action{gap:4px;color:var(--lt-color-primary)}.secondary-action::before{font-size:16px}.secondary-action .sa-label{text-decoration:underline;text-underline-offset:2px}
+    .flow-actions.stickyish{box-shadow:0 0 6px rgba(0,0,0,.2)}   /* #25 */
+    .flow-actions .c6-right{display:flex;align-items:center;gap:16px}
+    .primary-action:disabled{background:var(--lt-button-disabled-bg);color:var(--lt-button-disabled-text);cursor:not-allowed}
+    .primary-action .material-symbols-outlined{font-size:18px;vertical-align:-4px;margin-right:4px}
+    .c6-spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:c6spin .8s linear infinite;vertical-align:-2px}@keyframes c6spin{to{transform:rotate(360deg)}}
+    .c6-tip-wrap{position:relative;display:inline-flex}.c6-tip-wrap[data-tip-c6]:hover::after{content:attr(data-tip-c6);position:absolute;right:0;bottom:calc(100% + 8px);white-space:nowrap;background:var(--lt-tooltip-bg,#31383E);color:#fff;font-size:14px;line-height:21px;padding:4px 8px;border-radius:4px}
+    /* #26：錯誤／確認彈窗（icon #676767、遮罩黑 50%、間距 32、按鈕寬 100；圓角維持 B-4 確認類 10） */
+    .prototype-dialog-backdrop{background:rgba(0,0,0,.5)}
+    .prototype-dialog-head{margin-bottom:32px}.prototype-dialog-title .material-symbols-outlined{color:var(--lt-color-text-secondary)}
+    .prototype-dialog-content{font-size:14px;line-height:24.5px}.prototype-dialog-content p{margin:0}.prototype-dialog-content p+p,.prototype-dialog-content p+ul,.prototype-dialog-content ul+p{margin-top:24.5px}.prototype-dialog-content .c6-dlg-h{font-weight:700}
+    .prototype-dialog-actions{margin-top:32px;gap:16px}.prototype-dialog-actions button{min-width:100px;height:36px;justify-content:center}
+    .dialog-cancel{border:1px solid var(--lt-color-primary);border-radius:5px;padding:0 16px;background:#fff;color:var(--lt-color-primary);font-weight:700;cursor:pointer}
+    /* #27：程式碼區塊 header 只留右側 Copy code（顏色照稿 #B4B4B4；字級維持 12，K4） */
+    .code-snippet-head{justify-content:flex-end;padding:6px 11px}.code-copy{color:#B4B4B4;font-size:12px}.code-copy .material-symbols-outlined{font-size:14px}
+    .code-snippet code{font-weight:500;line-height:1.3}
+    /* #28：單值複製框（Element / Copy Corner） */
+    .copy-corner{display:flex;width:fit-content;flex-direction:column;align-items:center;gap:8px;min-width:400px;max-width:100%;margin:8px 0;padding:24px;border-radius:8px;background:#fff;box-shadow:0 0 20px rgba(0,0,0,.10);text-align:center}
+    .copy-corner .cc-label{font-size:14px;font-weight:700;line-height:24.5px;color:var(--lt-color-text-secondary)}
+    .copy-corner .cc-row{display:inline-flex;align-items:center;gap:8px;max-width:100%}.copy-corner .cc-val{font-size:14px;font-weight:500;line-height:24.5px;color:var(--lt-color-primary);overflow-wrap:anywhere}
+    .copy-corner .cc-btn{display:inline-grid;place-items:center;width:20px;height:20px;padding:0;border:0;border-radius:4px;background:transparent;color:var(--lt-color-primary);cursor:pointer}.copy-corner .cc-btn:hover{background:#D1EEFF}.copy-corner .cc-btn .material-symbols-outlined{font-size:16px}
+    @media(max-width:800px){.azure-panel .field,.azure-panel .field.sub{grid-template-columns:1fr;padding-left:0}.azure-panel .field .field-error{grid-column:1}.copy-corner{min-width:0;width:100%}}
+  </style>
 </head>
 <body>
   <div class="shell">
@@ -1890,6 +1942,7 @@
  *
  * 規格（Guideline Empty State，全站唯一用 outlined icon 的元件）：
  *   icon：Material Symbols FILL 0、色 #9ED7FF（Primary Light 30）；尺寸 S 48／M 64／L 80
+ *   標題色 #676767（2026-10-16 X-9r1：Overview、Executive Insights、Anomaly Detection、General Budget 的稿都是 text-secondary）
  *   標題 S 14／M 16／L 20，Bold｜說明 S 12／M 14／L 14（#676767）｜整體水平垂直置中｜icon→標題 12（page 版 16）→說明 4~8→按鈕 16
  *   page：整頁卡片版（ARL 10/09 裁決方案 B）：icon 64、標題 18／700、說明 14、按鈕離說明 32、卡片最小高 521
  *
@@ -1916,7 +1969,7 @@
       '.lt-empty .lt-empty__ic{font-family:\'Material Symbols Outlined\';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;-webkit-font-feature-settings:\'liga\';font-feature-settings:\'liga\';',
       'color:#9ED7FF;font-variation-settings:\'FILL\' 0,\'wght\' 400,\'GRAD\' 0,\'opsz\' 48;width:1em;height:1em;display:block;overflow:hidden}',
       '.lt-empty--s .lt-empty__ic{font-size:48px}.lt-empty--m .lt-empty__ic,.lt-empty--page .lt-empty__ic{font-size:64px}.lt-empty--l .lt-empty__ic{font-size:80px}',
-      '.lt-empty__t{margin:12px 0 0;font-weight:700;line-height:1.5;color:var(--lt-color-text-primary,#262626)}',
+      '.lt-empty__t{margin:12px 0 0;font-weight:700;line-height:1.5;color:var(--lt-color-text-secondary,#676767)}',
       '.lt-empty--s .lt-empty__t{font-size:14px}.lt-empty--m .lt-empty__t{font-size:16px}.lt-empty--l .lt-empty__t{font-size:20px}.lt-empty--page .lt-empty__t{font-size:18px;margin-top:16px}',
       '.lt-empty__d{margin:8px 0 0;font-size:14px;line-height:24.5px;color:var(--lt-color-text-secondary,#676767);white-space:pre-line}',
       '.lt-empty--s .lt-empty__d{font-size:12px;line-height:18px;margin-top:4px}',
@@ -2002,8 +2055,8 @@
     provider = function (p, empty) {
       const billing = empty ? [] : p.billing;
       const usage = empty ? [] : p.usage;
-      const usageDisabled = p.key === 'gcp' && !billing.length;
-      return '<section class="provider"><div class="provider-head"><div class="provider-name">' + csp(p.key) + '<h2>' + p.name + '</h2></div><div class="provider-actions"><span class="sync"><span class="material-symbols-outlined">sync</span><span class="sync-tip">Authorization status is refreshed periodically. Some cloud providers can take up to one day to show the latest result.</span></span><div class="add-wrap"><button class="add-button" type="button" aria-expanded="' + (openMenu === p.key) + '" onclick="toggleMenu(\'' + p.key + '\')"><span class="label">Add Authorization</span><span class="material-symbols-outlined">arrow_drop_down</span></button><div class="menu ' + (openMenu === p.key ? 'open' : '') + '"><div class="menu-item"><button onclick="addAuthorization(\'' + p.name + '\',\'Billing Data\')">Billing Data</button></div><div class="menu-item" ' + (usageDisabled ? 'data-tooltip="To authorize the Scoping Project, you must first complete the authorization for its parent Billing Account."' : '') + '><button ' + (usageDisabled ? 'disabled' : '') + ' onclick="addAuthorization(\'' + p.name + '\',\'Usage Data\')">Usage Data</button></div></div></div></div></div>' + (empty ? '<div class="empty-card">' + LumitureEmpty.html({size:'s', icon:'cloud_off', title:'No authorization yet', desc:'Add a Billing Data source to connect your ' + p.name + ' account and start managing cloud cost data in LumiTure.ai.'}) + '</div>' : '<div class="card">' + table(p.billingTitle, p.billingHead, billing) + table(p.usageTitle, p.usageHead, usage) + '</div>') + '</section>';
+      const usageDisabled = !billing.length;   /* C-6 #15：稿 #21 註記「所有雲通用」，沒有 Billing 授權就 disable Usage Data */
+      return '<section class="provider"><div class="provider-head"><div class="provider-name">' + csp(p.key) + '<h2>' + p.name + '</h2></div><div class="provider-actions"><span class="sync"><span class="material-symbols-outlined">sync</span><span class="sync-tip">Authorization status is refreshed periodically. Some cloud providers can take up to one day to show the latest result.</span></span><div class="add-wrap"><button class="add-button" type="button" aria-expanded="' + (openMenu === p.key) + '" onclick="toggleMenu(\'' + p.key + '\')"><span class="label">Add Authorization</span><span class="material-symbols-outlined">arrow_drop_down</span></button><div class="menu ' + (openMenu === p.key ? 'open' : '') + '"><div class="menu-item"><button onclick="addAuthorization(\'' + p.name + '\',\'Billing Data\')">Billing Data</button></div><div class="menu-item" ' + (usageDisabled ? 'data-tooltip="To authorize the Scoping Project, you must first complete the authorization for its parent Billing Account."' : '') + '><button ' + (usageDisabled ? 'disabled' : '') + ' onclick="addAuthorization(\'' + p.name + '\',\'Usage Data\')">Usage Data</button></div></div></div></div></div>' + (empty ? '<div class="empty-card">' + LumitureEmpty.html({size:'s', icon:'add_link', title:'No Authorization Yet', desc:'No authorization have been assigned to this organization yet.\nPlease add authorization to start your FinOps journey on LumiTure.ai!'})   /* C-6 #14：照稿 #21 原文（文法錯登記 Figma 修改清單，K5） */ + '</div>' : '<div class="card">' + table(p.billingTitle, p.billingHead, billing) + table(p.usageTitle, p.usageHead, usage) + '</div>') + '</section>';
     };
     skeleton = function () {
       return Object.values(PROVIDERS).map(p => '<section class="provider"><div class="provider-head"><div class="provider-name">' + csp(p.key) + '<h2>' + p.name + '</h2></div><div class="loading-actions"><span class="sync"><span class="material-symbols-outlined">sync</span></span><button class="add-button" type="button" disabled><span class="label">Add Authorization</span><span class="material-symbols-outlined">arrow_drop_down</span></button></div></div><div class="skeleton-card"><div class="skel skel-title"></div><div class="skel skel-table"></div></div></section>').join('');
@@ -2099,14 +2152,14 @@
       azureFlowStep = step;
       const kind = azureFlowKind;
       let content = '';
-      if (kind === 'billing' && step === 0) content = '<div class="azure-panel"><h2>Prepare your Azure billing export</h2><p>Start with the export, then connect the same subscription and grant the two read-only data paths.</p><div class="notice"><strong>Please note</strong><ul style="margin:8px 0 0;padding-left:20px"><li>The update time of Azure data is several hours.</li><li style="color:#FF403D">After you complete the Azure authentication process, it may take up to <strong>1 day</strong> to see your resources in the LumiTure.ai platform.</li><li>If "Billing Export" is not shown in the sidebar, switch to an account that has the permission, or contact your organization; the organization account can assign the role to your account.</li><li>This process only exports the billing of resources linked to the corresponding billing account.</li></ul></div><div class="notice" style="margin-top:16px"><strong>Permissions you will need</strong><br>Application Administrator in Microsoft Entra ID, plus Owner or User Access Administrator and Contributor or Cost Management Contributor on the target subscription. Azure may take up to one day to synchronize.</div>' + journeyOverview(AZURE_FLOW.billing.labels,0) + detailedSteps('billing',0) + '<div class="flow-actions stickyish"><span aria-hidden="true"></span><button class="primary-action" onclick="renderAzureFlow(1)">I created the billing export</button></div></div>';
-      if (kind === 'billing' && step === 1) content = '<div class="azure-panel"><h2>Set Azure Authorization</h2><p>Copy both IDs from the same Azure tenant and subscription that owns the billing export.</p><div class="field"><label for="tenant-id">Tenant ID</label><input id="tenant-id" value="' + escapeHtml(azureBillingTenantId) + '" placeholder="e.g. 72f988bf-86f1-41af-91ab-2d7cd011db47"></div><div class="field"><label for="subscription-id">Subscription ID</label><input id="subscription-id" value="' + escapeHtml(azureBillingSubscriptionId) + '" placeholder="e.g. 3a4c5b6d-7e8f-4a0b-9c1d-2e3f4a5b6c7d"></div><div class="notice" style="margin-top:20px"><strong>Where to find them</strong><br>Tenant ID: Microsoft Entra ID → Overview. Subscription ID: Subscriptions → select the billing-export subscription.</div>' + detailedSteps('billing',1) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAzureFlow(0)">Back to Authorization Guide</button><button class="primary-action" onclick="submitAzureAuthorization()">Permission Check and Integrate</button></div></div>';
-      if (kind === 'billing' && step === 2) content = '<div class="azure-panel"><h2>Create and assign LumiTure FinOps Reader</h2><p>Create the approved custom read-only role in the connected subscription, then assign it to <strong>LumiTure-App</strong>.</p><div class="notice warning" style="display:flex;gap:10px;align-items:flex-start"><span class="material-symbols-outlined" style="color:#FC9A0F">warning</span><div><strong>A critical final step is required for full functionality.</strong><br><strong style="color:#FF403D">Failure to complete these steps will prevent LumiTure.ai from accessing the necessary Azure data.</strong><br>Please finish the remaining steps so LumiTure.ai can securely access your Azure data and deliver valuable cloud spending insights.</div></div><div class="notice" style="margin-top:16px"><strong>Azure path</strong><br>Subscriptions → connected subscription → Access control (IAM) → + Add → Add custom role → JSON → Edit</div>' + copyPayload('Azure Portal custom-role JSON','Copy the complete JSON and replace all content in the Azure custom-role editor.','azure-billing-role-json',azureBillingRoleJson(),'Copy entire JSON') + detailedSteps('billing',2) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAzureFlow(1)">Back</button><button class="primary-action" onclick="renderAzureFlow(3)">Custom role created and assigned</button></div></div>';
-      if (kind === 'billing' && step === 3) content = '<div class="azure-panel"><h2>Grant storage access</h2><p>Give LumiTure-App read-only access to the storage account that contains your billing export.</p><div class="notice"><strong>Azure path</strong><br>Storage accounts → billing-export storage account → Access control (IAM) → + Add → Add role assignment → Storage Blob Data Reader</div>' + detailedSteps('billing',3) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAzureFlow(2)">Back</button><button class="primary-action" onclick="renderAzureFlow(4)">Storage access assigned</button></div></div>';
-      if (kind === 'billing' && step === 4) content = '<div class="azure-panel"><h2>Create the export event</h2><p>Create one Azure Event Grid subscription so LumiTure.ai is notified whenever a new billing export arrives.</p><div class="notice"><strong>Azure path</strong><br>Storage accounts → billing-export storage account → Events → + Event Subscription → Blob Created → Web Hook</div><h3>Subscriber endpoint <span class="generated-badge">Example</span></h3><div class="copy-box"><code id="azure-endpoint">https://your-lumiture-event-endpoint.example/api/billing_event_trigger</code><button class="copy-button" onclick="copyAzureValue(\'azure-endpoint\')">Copy</button></div>' + detailedSteps('billing',4) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAzureFlow(3)">Back</button><button class="primary-action" onclick="completeAzureFlow()">Check Authorization Status</button></div></div>';
-      if (kind === 'usage' && step === 0) content = '<div class="azure-panel"><h2>Select a connected subscription</h2><p>Usage Data authorization is available only after Billing Data is connected. Your selection generates the exact subscription scope inside the custom-role JSON.</p><div class="notice"><strong>Before you begin</strong><br>You need Owner or User Access Administrator on the selected subscription.</div>' + journeyOverview(AZURE_FLOW.usage.labels,0) + '<div class="usage-subscription-layout"><div class="select-field"><label for="azure-subscription">Azure Subscription</label><select id="azure-subscription" onchange="setAzureSubscription(this.value)">' + azureSubscriptionOptions() + '</select></div><div class="outcome-grid"><div class="outcome"><span class="material-symbols-outlined">query_stats</span><strong>Rightsizing</strong><p>Unlock utilization-based recommendations.</p></div><div class="outcome"><span class="material-symbols-outlined">recommend</span><strong>Recommendations</strong><p>Improve Azure cost optimization coverage.</p></div><div class="outcome"><span class="material-symbols-outlined">lock</span><strong>Read only</strong><p>No resource changes are performed.</p></div></div></div>' + detailedSteps('usage',0) + '<div class="flow-actions stickyish"><span aria-hidden="true"></span><button class="primary-action" onclick="renderAzureFlow(1)">Generate role update</button></div></div>';
-      if (kind === 'usage' && step === 1) content = '<div class="azure-panel"><h2>Update LumiTure FinOps Reader</h2><p>Update the existing Billing Data custom role with the approved Usage Data read permissions on <strong>' + AZURE_SUBSCRIPTIONS[azureSelectedSubscription].name + '</strong>.</p><div class="notice"><strong>Azure path</strong><br>Subscriptions → selected subscription → Access control (IAM) → Roles → LumiTure FinOps Reader → JSON → Edit</div>' + copyPayload('Azure Portal custom-role JSON','Copy the complete JSON and replace all content in the Azure custom-role JSON editor.','azure-role-json',azureRoleJson(),'Copy entire JSON') + detailedSteps('usage',1) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAzureFlow(0)">Back</button><button class="primary-action" onclick="renderAzureFlow(2)">Role updated</button></div></div>';
-      if (kind === 'usage' && step === 2) content = '<div class="azure-panel"><h2>Verify Usage Data authorization</h2><p>LumiTure.ai will check whether the generated role is assigned to <strong>' + AZURE_SUBSCRIPTIONS[azureSelectedSubscription].name + '</strong>.</p>' + detailedSteps('usage',2) + '<div class="notice" style="margin-top:20px"><strong>Synchronization timing</strong><br>The record may remain In Progress for up to one day. You can safely leave this page and refresh the list later.</div><div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAzureFlow(1)">Back</button><button class="primary-action" onclick="completeAzureFlow()">Go to check Usage Data Authorization</button></div></div>';
+      if (kind === 'billing' && step === 0) content = '<div class="azure-panel"><h2>Prepare your Azure billing export</h2><p>Start with the export, then connect the same subscription and grant the two read-only data paths.</p><div class="notice">Please Note That:<ul><li>The update time of Azure data is several hours.<br><span class="c6-red">After you complete the Azure authentication process, it may take up to <strong>1 day</strong> to see your resources in the LumiTure.ai platform.</span></li><li>If “Billing Export” does not been showed in the side bar, please change to the account that has the permission or contact the organization. The organization account can assign the role to the account.</li><li>This process will only export the billing of resources linked to the corresponding billing account.</li></ul></div><section class="c6-section"><h3>Prerequisites: Permissions Check</h3><p class="c6-strong">To enable and configure integration with your Azure environment, you need the following permissions:</p><ol><li>For Azure Active Directory (Entra ID) Tenant, you need the <strong>Application Administrator</strong> (or Global Administrator) role.</li><li>For Azure Resource Permissions (RBAC), you need the <strong>User Access Administrator</strong> (or Owner) role on the target Azure Subscription.</li><li>For Azure Billing Management, you need the <strong>Contributor</strong> (or Cost Management Contributor) role on the target Azure Subscription.</li></ol></section>' + journeyOverview(AZURE_FLOW.billing.labels,0) + detailedSteps('billing',0) + '<div class="flow-actions stickyish"><span aria-hidden="true"></span><button class="primary-action" onclick="renderAzureFlow(1)">Next</button></div></div>';
+      if (kind === 'billing' && step === 1) content = '<div class="azure-panel is-form" style="--field-label-w:114px"><h2>Set Azure Authorization</h2><p class="c6-form-intro">Please furnish the following information obtainable from your Azure account.</p>' + c6Field('tenant-id','Tenant ID','e.g. sampleid-xxxx-xxxx-xxxx-xxxxxxxxxxxx',{value:azureBillingTenantId}) + c6Field('subscription-id','Subscription ID','e.g. sampleid-xxxx-xxxx-xxxx-xxxxxxxxxxxx',{value:azureBillingSubscriptionId}) + '<div class="notice" style="margin-top:20px"><strong>Where to find them</strong><br>Tenant ID: Microsoft Entra ID → Overview. Subscription ID: Subscriptions → select the billing-export subscription.</div>' + detailedSteps('billing',1) + '<div class="flow-actions stickyish">' + c6Prev('renderAzureFlow(0)') + '<button class="primary-action" onclick="submitAzureAuthorization()">Permission Check and Integrate</button></div></div>';
+      if (kind === 'billing' && step === 2) content = '<div class="azure-panel"><h2>Create and assign LumiTure FinOps Reader</h2><p>Create the approved custom read-only role in the connected subscription, then assign it to <strong>LumiTure-App</strong>.</p><div class="notice warning">A critical final step is required for full functionality.<br>Failure to complete these steps will prevent LumiTure.ai from accessing the necessary Azure data.<br>Please finish the remaining steps so LumiTure.ai can securely access your Azure data and deliver valuable cloud spending insights.</div><div class="notice" style="margin-top:16px"><strong>Azure path</strong><br>Subscriptions → connected subscription → Access control (IAM) → + Add → Add custom role → JSON → Edit</div>' + copyPayload('Azure Portal custom-role JSON','Copy the complete JSON and replace all content in the Azure custom-role editor.','azure-billing-role-json',azureBillingRoleJson(),'Copy entire JSON') + detailedSteps('billing',2) + '<div class="flow-actions stickyish">' + c6Prev('renderAzureFlow(1)') + '<button class="primary-action" onclick="renderAzureFlow(3)">Next</button></div></div>';
+      if (kind === 'billing' && step === 3) content = '<div class="azure-panel"><h2>Grant storage access</h2><p>Give LumiTure-App read-only access to the storage account that contains your billing export.</p><div class="notice warning">A critical final step is required for full functionality.<br>Failure to complete these steps will prevent LumiTure.ai from accessing the necessary Azure data.<br>Please finish the remaining steps so LumiTure.ai can securely access your Azure data and deliver valuable cloud spending insights.</div><div class="notice" style="margin-top:16px"><strong>Azure path</strong><br>Storage accounts → billing-export storage account → Access control (IAM) → + Add → Add role assignment → Storage Blob Data Reader</div>' + detailedSteps('billing',3) + '<div class="flow-actions stickyish">' + c6Prev('renderAzureFlow(2)') + '<button class="primary-action" onclick="renderAzureFlow(4)">Next</button></div></div>';
+      if (kind === 'billing' && step === 4) content = '<div class="azure-panel"><h2>Create the export event</h2><p>Create one Azure Event Grid subscription so LumiTure.ai is notified whenever a new billing export arrives.</p><div class="notice warning">A critical final step is required for full functionality.<br>Failure to complete these steps will prevent LumiTure.ai from accessing the necessary Azure data.<br>Please finish the remaining steps so LumiTure.ai can securely access your Azure data and deliver valuable cloud spending insights.</div><div class="notice" style="margin-top:16px"><strong>Azure path</strong><br>Storage accounts → billing-export storage account → Events → + Event Subscription → Blob Created → Web Hook</div>' + c6CopyCorner('Subscriber endpoint','azure-endpoint','https://your-lumiture-event-endpoint.example/api/billing_event_trigger') + '' + detailedSteps('billing',4) + '<div class="flow-actions stickyish">' + c6Prev('renderAzureFlow(3)') + '<button class="primary-action" onclick="completeAzureFlow()">Check Authorization Status</button></div></div>';
+      if (kind === 'usage' && step === 0) content = '<div class="azure-panel"><h2>Select a connected subscription</h2><p>Usage Data authorization is available only after Billing Data is connected. Your selection generates the exact subscription scope inside the custom-role JSON.</p><div class="notice">Please Note That:<ul><li>Please complete this step for full functionality of <strong>Rightsizing</strong> and <strong>Recommendation</strong> features.</li><li class="c6-red">After you complete the Azure authentication process, it may take up to <strong>1 day</strong> to see your resources in the LumiTure.ai platform.</li></ul></div><section class="c6-section"><h3>Prerequisites</h3><ul><li>Please ensure that the Azure Billing Account has already been authorized. The Billing authorization grants the LumiTure-App service principal access to your Azure tenant, which is required for usage data access.</li><li>To create and assign roles, you must be granted the Owner or User Access Administrator IAM role on the target subscription. This is required to configure custom roles and role assignments.</li></ul></section>' + journeyOverview(AZURE_FLOW.usage.labels,0) + '<div class="usage-subscription-layout"><div class="select-field"><label for="azure-subscription">Azure Subscription</label><select id="azure-subscription" onchange="setAzureSubscription(this.value)">' + azureSubscriptionOptions() + '</select></div><div class="outcome-grid"><div class="outcome"><span class="material-symbols-outlined">query_stats</span><strong>Rightsizing</strong><p>Unlock utilization-based recommendations.</p></div><div class="outcome"><span class="material-symbols-outlined">recommend</span><strong>Recommendations</strong><p>Improve Azure cost optimization coverage.</p></div><div class="outcome"><span class="material-symbols-outlined">lock</span><strong>Read only</strong><p>No resource changes are performed.</p></div></div></div>' + detailedSteps('usage',0) + '<div class="flow-actions stickyish"><span aria-hidden="true"></span><button class="primary-action" onclick="renderAzureFlow(1)">Next</button></div></div>';
+      if (kind === 'usage' && step === 1) content = '<div class="azure-panel"><h2>Update LumiTure FinOps Reader</h2><p>Update the existing Billing Data custom role with the approved Usage Data read permissions on <strong>' + AZURE_SUBSCRIPTIONS[azureSelectedSubscription].name + '</strong>.</p><div class="notice"><strong>Azure path</strong><br>Subscriptions → selected subscription → Access control (IAM) → Roles → LumiTure FinOps Reader → JSON → Edit</div>' + copyPayload('Azure Portal custom-role JSON','Copy the complete JSON and replace all content in the Azure custom-role JSON editor.','azure-role-json',azureRoleJson(),'Copy entire JSON') + detailedSteps('usage',1) + '<div class="flow-actions stickyish">' + c6Prev('renderAzureFlow(0)') + '<button class="primary-action" onclick="renderAzureFlow(2)">Next</button></div></div>';
+      if (kind === 'usage' && step === 2) content = '<div class="azure-panel"><h2>Verify Usage Data authorization</h2><p>LumiTure.ai will check whether the generated role is assigned to <strong>' + AZURE_SUBSCRIPTIONS[azureSelectedSubscription].name + '</strong>.</p>' + detailedSteps('usage',2) + '<div class="notice" style="margin-top:20px"><strong>Synchronization timing</strong><br>The record may remain In Progress for up to one day. You can safely leave this page and refresh the list later.</div><div class="flow-actions stickyish">' + c6Prev('renderAzureFlow(1)') + '<button class="primary-action" onclick="completeAzureFlow()">Go to check Usage Data Authorization</button></div></div>';
       document.querySelector('.main').innerHTML = azureFlowShell(kind, step, content); focusActiveStep();
     };
     submitAzureAuthorization = function () { const tenant = document.getElementById('tenant-id'), subscription = document.getElementById('subscription-id'); const missing = !tenant.value.trim() || !subscription.value.trim(); tenant.classList.toggle('error', !tenant.value.trim()); subscription.classList.toggle('error', !subscription.value.trim()); if (missing) { showToast('Enter both Tenant ID and Subscription ID to continue.','error'); return; } if (tenant.value.trim().toLowerCase()==='invalid') { tenant.classList.add('error'); showToast('Invalid Tenant ID. Check Azure Overview and try again.','error'); tenant.focus(); return; } if (subscription.value.trim().toLowerCase()==='registered') { subscription.classList.add('error'); showToast('This Subscription ID is already registered.','error'); subscription.focus(); return; } azureBillingTenantId=tenant.value.trim(); azureBillingSubscriptionId=subscription.value.trim(); renderAzureFlow(2); showToast('Azure connected. Complete the remaining data-access tasks.'); };
@@ -2128,7 +2181,7 @@
       showToast('Copied successfully.');
     }
     function completeAzureFlow() { const kind = azureFlowKind; closeAzureFlow(); showToast(kind === 'billing' ? 'Azure Billing Data authorization check started.' : 'Azure Usage Data authorization integrated successfully.'); }
-    const GCP_SERVICE_ACCOUNT = 'lumiture-client@your-project.iam.gserviceaccount.com';
+    const GCP_SERVICE_ACCOUNT = 'lumiture-client@tw-rd-app-finops-prod.iam.gserviceaccount.com';   /* C-6：照稿 #23／#42 的值 */
     const GCP_FLOW = {
       billing: { title:'Cloud Billing Data Integration', type:'Billing Data', labels:['Prepare export project','Enable required APIs','Create billing dataset','Grant read-only access','Enable exports','Connect in LumiTure.ai'] },
       usage: { title:'Cloud Usage Data Integration', type:'Usage Data', labels:['Prepare a scoping project','Grant Monitoring Viewer','Connect in LumiTure.ai'] }
@@ -2169,15 +2222,18 @@
         const copy = kind === 'billing' ? billingCopy[step] : usageCopy[step];
         const path = kind === 'billing' ? ['Google Cloud Console → project selector','APIs & Services → Library','BigQuery → export project → Create dataset','BigQuery dataset → Sharing; Billing Account → Manage users','Billing → Billing export'][step] : ['Monitoring → Settings → Metrics Scope','IAM & Admin → IAM → Grant access'][step];
         const overview = step === 0 ? journeyOverview(GCP_FLOW[kind].labels,0) : '';
+        /* C-6 #19：第 1 步的提醒框與前置條件照稿 #23／#42 原文 */
         const preflight = kind === 'billing'
-          ? '<div class="notice"><strong>Before you begin</strong><br>You need Billing Account Administrator on the target Billing Account, BigQuery Data Owner on the export project, and Editor access on the project that contains the dataset.</div>'
-          : '<div class="notice"><strong>Before you begin</strong><br>Billing Data must already be connected for the parent Billing Account. You also need Monitoring Admin to configure the metrics scope and enough IAM access to grant Monitoring Viewer.</div>';
+          ? '<div class="notice">Please Note That:<ul><li>The update time of Google Cloud data is several hours.<br><span class="c6-red">After you complete the Google Cloud authentication process, it may take up to <strong>1 day</strong> to see your resources in the LumiTure.ai platform.</span></li><li>If “Billing Export” does not been showed in the side bar, please change to the account that has the permission or contact the organization. The organization account can assign the role to the account.</li><li>This process will only export the billing of resources linked to the corresponding billing account.</li></ul></div><section class="c6-section"><h3>Prerequisites: Permissions Check</h3><p class="c6-strong">To enable and configure the export of Google Cloud billing usage cost to BigQuery dataset, you need the following permissions:</p><ol><li>For Cloud Billing management, you need the <strong>Billing Account Administrator</strong> role on the target Cloud Billing account.</li><li>For BigQuery, you need the <strong>BigQuery Data Owner</strong> role on the project.</li><li>For the project containing the target dataset, you need the <strong>Editor</strong> role.</li></ol><span class="c6-hint"><span class="material-symbols-outlined">info</span>If you are unsure how to check, simply proceed with the steps below.</span></section>'
+          : '<div class="notice">Please Note That:<ul><li>Please complete this step for full functionality of <strong>Rightsizing</strong> and <strong>Recommendation</strong> features.</li><li>The update time of GCP data is several hours.<br><span class="c6-red">After you complete the GCP authentication process, it may take up to <strong>1 day</strong> to see your resources in the LumiTure.ai platform.</span></li><li>If <strong>“Monitoring”</strong> is not shown in the sidebar please change to the account that has the permission or contact the organization. The organization account can assign the role to the account.</li><li>This process will only export the monitoring data of resources linked to the corresponding <strong>scoping projects</strong>.</li></ul></div><section class="c6-section"><h3>Prerequisites</h3><ul><li>Please ensure that the Billing Account associated with your Scoping Project has already been authorized.</li><li>To view the time-series data that can be charted or monitored within a project, your IAM role must include all the permissions of the Monitoring Viewer role (roles/monitoring.viewer).</li><li>To configure a metrics scope, you must be granted the Monitoring Admin (roles/monitoring.admin) IAM role.</li></ul></section><section class="c6-section"><h3>Recommandation</h3><ul><li>Create or select the Google Cloud project without any existing resources to act as the scoping project.</li><li>Ensure that the scoping project is linked to the Billing Account where the Billing Authentication Flow has already been completed.</li></ul></section>';
         const location = '<div class="notice"><strong>Google Cloud Console path</strong><br>' + path + '</div>';
-        content = '<div class="azure-panel"><h2>' + labels[step] + '</h2><p>' + copy + '</p>' + (step===0?preflight:location) + overview + (step === 3 || (kind === 'usage' && step === 1) ? '<h3>LumiTure.ai service account <span class="generated-badge">Example</span></h3><div class="copy-box"><code id="gcp-service-account">' + GCP_SERVICE_ACCOUNT + '</code><button class="copy-button" onclick="copyAzureValue(\'gcp-service-account\')">Copy</button></div>' : '') + gcpHelp(kind, step) + '<div class="flow-actions stickyish">' + previousControl(step,'renderGcpFlow(' + (step - 1) + ')') + '<button class="primary-action" onclick="renderGcpFlow(' + (step + 1) + ')">' + (step === 3 ? 'Roles granted' : (kind === 'billing' && step === 4 ? 'Both exports are enabled' : 'Continue')) + '</button></div></div>';
+        content = '<div class="azure-panel"><h2>' + labels[step] + '</h2><p>' + copy + '</p>' + (step===0?preflight:location) + overview + (step === 3 || (kind === 'usage' && step === 1) ? '<p class="c6-lead">Copy the service account below:</p>' + c6CopyCorner('Service Account','gcp-service-account',GCP_SERVICE_ACCOUNT) : '') + gcpHelp(kind, step) + '<div class="flow-actions stickyish">' + previousControl(step,'renderGcpFlow(' + (step - 1) + ')') + '<button class="primary-action" onclick="renderGcpFlow(' + (step + 1) + ')">' + 'Next' + '</button></div></div>';
       } else if (kind === 'billing') {
-        content = '<div class="azure-panel"><h2>Connect billing data in LumiTure.ai</h2><p>Paste the identifiers from the Billing Account and BigQuery exports. You can use the same project and dataset for both exports when that is how you configured Google Cloud.</p><div class="field"><label for="gcp-billing-account">Billing Account ID</label><input id="gcp-billing-account" placeholder="e.g. LLLLLL-UUUUUU-MMMMMM"></div><h3>Detailed usage cost</h3><div class="field"><label for="gcp-detailed-project">Project ID</label><input id="gcp-detailed-project" placeholder="e.g. lumiture-project-id"></div><div class="field"><label for="gcp-detailed-dataset">Dataset Name</label><input id="gcp-detailed-dataset" placeholder="e.g. lumiture_billing_data"></div><h3>Pricing</h3><div class="field"><label for="gcp-pricing-project">Project ID</label><input id="gcp-pricing-project" placeholder="e.g. lumiture-project-id"></div><div class="field"><label for="gcp-pricing-dataset">Dataset Name</label><input id="gcp-pricing-dataset" placeholder="e.g. lumiture_billing_data"></div>' + gcpHelp('billing', 5) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderGcpFlow(4)">Back</button><button class="primary-action" onclick="submitGcpBilling()">Integrate</button></div></div>';
+        /* C-6 #12／#17／#18／#23／#29：照稿 #28-1（標題、說明句、必填星號、子群內縮、Information Check → Integrate） */
+        content = '<div class="azure-panel is-form" style="--field-label-w:131px"><h2>Set Google Cloud Authorization</h2><p class="c6-form-intro">Please furnish the following information from your Google Cloud account.<br>For optimal performance and efficient cost analysis, we recommend using the same dataset name for both <strong>Detailed Usage Cost</strong> and <strong>Pricing</strong>.</p>' + c6Field('gcp-billing-account','Billing Account ID','e.g. LLLLLL-UUUUUU-MMMMMM') + '<h3 class="c6-subhead">Detailed Usage Cost</h3>' + c6Field('gcp-detailed-project','Project ID','e.g. lumiture-project-id',{sub:true}) + c6Field('gcp-detailed-dataset','Dataset Name','e.g. lumiture_billing_data',{sub:true}) + '<h3 class="c6-subhead">Pricing</h3>' + c6Field('gcp-pricing-project','Project ID','e.g. lumiture-project-id',{sub:true}) + c6Field('gcp-pricing-dataset','Dataset Name','e.g. lumiture_billing_data',{sub:true}) + gcpHelp('billing', 5) + '<div class="flow-actions stickyish">' + c6Prev('renderGcpFlow(4)') + c6CheckIntegrate('gcp-billing','Information Check','submitGcpBilling()') + '</div></div>';
       } else {
-        content = '<div class="azure-panel"><h2>Connect usage data in LumiTure.ai</h2><p>Enter the project ID of the Monitoring scoping project. LumiTure.ai will verify the associated Billing Account and service account access.</p><div class="field"><label for="gcp-scoping-project">Scoping Project ID</label><input id="gcp-scoping-project" placeholder="e.g. finops-monitor-scope-example"></div>' + gcpHelp('usage', 2) + '<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderGcpFlow(1)">Back</button><button class="primary-action" onclick="submitGcpUsage()">Integrate</button></div></div>';
+        /* C-6 #12／#17：照稿 #43-1 */
+        content = '<div class="azure-panel is-form" style="--field-label-w:187px"><h2>Google Cloud Usage Data Authorization</h2><p class="c6-form-intro">Please furnish the following information obtainable from your Google Cloud account.</p>' + c6Field('gcp-scoping-project','Scoping Project ID','e.g. finops-monitor-scope-example') + gcpHelp('usage', 2) + '<div class="flow-actions stickyish">' + c6Prev('renderGcpFlow(1)') + '<button class="primary-action" onclick="submitGcpUsage()">Integrate</button></div></div>';
       }
       document.querySelector('.main').innerHTML = gcpFlowShell(kind, step, content); focusActiveStep();
     }
@@ -2248,23 +2304,26 @@
     }
     function awsFlowShell(kind, step, content) { const config = AWS_FLOW[kind]; const steps = config.labels.map((label,index) => '<div class="step '+(index===step?'active':(index<step?'done':''))+'"><span class="step-dot">'+(index<step?'✓':index+1)+'</span><span>'+label+'</span></div>').join(''); return '<section class="azure-flow">'+flowReturnControl()+'<div class="flow-top"><div><div class="flow-heading"><h1 class="flow-title">'+config.title+'</h1><span class="flow-type '+(kind==='usage'?'usage':'')+'">'+config.type+'</span></div><p class="flow-lead">'+(kind==='billing'?'Allow LumiTure.ai to securely create and read AWS billing exports.':'Deploy read-only member monitoring access for Rightsizing and Recommendations.')+'</p></div></div><div class="stepper">'+steps+'</div>'+content+'</section>'; }
     function openAwsFlow(kind) { if (!azureListMarkup) azureListMarkup = document.querySelector('.main').innerHTML; setFlowPage(true); awsFlowKind = kind || 'billing'; renderAwsFlow(0); }
-    function awsCopy(label, id, value) { return '<h3>'+label+'</h3><div class="copy-box"><code id="'+id+'">'+value+'</code><button class="copy-button" onclick="copyAzureValue(\''+id+'\')">Copy</button></div>'; }
+    function awsCopy(label, id, value) { return c6CopyCorner(label, id, value); }   /* C-6 #28：Element / Copy Corner */
     function renderAwsFlow(step) {
       const kind = awsFlowKind, final = kind==='billing'?3:2, labels = AWS_FLOW[kind].labels; let content = '';
       if (step < final) {
         const paths = kind==='billing' ? ['AWS Organizations → Management Account','IAM → Policies → Create policy','IAM → Roles → Create role'] : ['AWS Organization Management Account','CloudFormation → StackSets → Create stack set'];
         let extra = '';
         if (kind==='billing' && step===1) extra = copyPayload('Complete IAM policy JSON','Replace both {ACCOUNT ID} placeholders before pasting this entire policy into IAM.','aws-billing-policy-json',AWS_BILLING_POLICY,'Copy entire policy');
-        if (kind==='billing' && step===2) extra = awsCopy("LumiTure.ai AWS Account ID (example)",'aws-lumiture-account',AWS_LUMITURE_ACCOUNT) + awsCopy('External ID (example)','aws-external-id',AWS_EXTERNAL_ID);
+        if (kind==='billing' && step===2) extra = awsCopy("LumiTure's AWS Account ID",'aws-lumiture-account',AWS_LUMITURE_ACCOUNT) + awsCopy('External ID','aws-external-id',AWS_EXTERNAL_ID);   /* C-6：標籤照稿 #24 Step 2 */
         if (kind==='usage' && step===1) extra = copyPayload('AWS CloudShell setup script','Replace the three placeholders, then paste this entire script into CloudShell inside AWS Management Console.','aws-usage-cloudshell-script',AWS_USAGE_CLOUDSHELL_SCRIPT,'Copy entire script');
         const overview = step===0 ? journeyOverview(AWS_FLOW[kind].labels,0) : '';
-        const preflight = kind==='billing' ? '<div class="notice"><strong>Before you begin</strong><br>Sign in to the AWS Organization Management Account with administrative access. Confirm the account has room for up to 5 CUR 2.0 and 2 FOCUS exports.</div>' : '<div class="notice"><strong>Before you begin</strong><br>Billing Data Authorization must already be connected for this Management Account, and you need administrative access to deploy Organization-wide CloudFormation StackSets.</div>';
+        /* C-6 #19：第 1 步的提醒框與前置條件照稿 #24／#48 原文（#48 第三點講 Method A／B，v4 單一路徑，略過） */
+        const preflight = kind==='billing' ? '<div class="notice">Please Note That:<ul><li>The update time of AWS data is several hours. After you complete the AWS authentication process, it may take up to 1 day to see your resources in the LumiTure.ai platform.</li><li class="c6-red">Each AWS account is limited to <strong>5 CUR 2.0 and 2 FOCUS data exports</strong>. Please verify that your management account has not reached these specific limits before proceeding with the integration.</li><li>It can take up to 24 hours for AWS to start delivering exports to your Amazon S3 bucket. Once delivery starts, AWS refreshes the export output in your S3 bucket at least once a day. The actual refresh rate may be different due to various factors. Therefore, the data displayed and accessible on the console is from one day prior, rather than in real-time.</li></ul></div><section class="c6-section"><h3>Prerequisites</h3><ul><li><strong>Ensure you have administrative access to your Organization Management Account.</strong></li></ul></section>' : '<div class="notice">Please Note That:<ul><li>The update time of AWS account data is several hours. After you complete the AWS authentication process, it may take up to 1 day to see your resources in the LumiTure.ai platform.</li><li><span class="c6-red">Each AWS account is limited to a maximum of <strong>5 Cost and Usage Report 2.0 (CUR 2.0) configurations</strong></span>. Please verify that your AWS management account has not reached this limit before proceeding with the integration.</li><li>It can take up to 24 hours for AWS to start delivering exports to your Amazon S3 bucket. Once delivery starts, AWS refreshes the export output in your S3 bucket at least once a day. The actual refresh rate may be different due to various factors. Therefore, the data displayed and accessible on the console is from one day prior, rather than in real-time.</li></ul></div><section class="c6-section"><h3>Prerequisites</h3><ul><li>Please confirm that the Management Account has been authorized for Billing Data.</li><li>Ensure you have administrative access to your Organization Management Account.</li></ul></section>';
         const location = '<div class="notice"><strong>AWS Console path</strong><br>'+(kind==='usage'?'AWS Management Console → CloudShell':paths[step])+'</div>';
-        content = '<div class="azure-panel"><h2>'+labels[step]+'</h2><p>'+ (kind==='billing' ? ['Check account access and export quota before creating resources.','Create the least-privilege policy that lets AWS deliver the required billing exports.','Trust LumiTure.ai through an external-ID protected role.'][step] : ['Prepare the authorized AWS Management Account and open its built-in CloudShell.','Paste the LumiTure.ai setup script in AWS CloudShell to deploy the monitoring StackSet.'][step]) +'</p>'+(step===0?preflight:location)+overview+extra+awsHelp(kind,step)+'<div class="flow-actions stickyish">'+previousControl(step,'renderAwsFlow('+(step-1)+')')+'<button class="primary-action" onclick="renderAwsFlow('+(step+1)+')">'+(kind==='billing'&&step===2?'Role created':(kind==='usage'&&step===1?'StackSet deployed':'Continue'))+'</button></div></div>';
+        content = '<div class="azure-panel"><h2>'+labels[step]+'</h2><p>'+ (kind==='billing' ? ['Check account access and export quota before creating resources.','Create the least-privilege policy that lets AWS deliver the required billing exports.','Trust LumiTure.ai through an external-ID protected role.'][step] : ['Prepare the authorized AWS Management Account and open its built-in CloudShell.','Paste the LumiTure.ai setup script in AWS CloudShell to deploy the monitoring StackSet.'][step]) +'</p>'+(step===0?preflight:location)+overview+extra+awsHelp(kind,step)+'<div class="flow-actions stickyish">'+previousControl(step,'renderAwsFlow('+(step-1)+')')+'<button class="primary-action" onclick="renderAwsFlow('+(step+1)+')">'+'Next'+'</button></div></div>';
       } else if (kind==='billing') {
-        content = '<div class="azure-panel"><h2>Connect billing data in LumiTure.ai</h2><p>Enter the AWS IAM details created in the Management Account. LumiTure.ai will run a permission check before creating the billing exports.</p><div class="field"><label for="aws-billing-account">Your AWS Management Account ID</label><input id="aws-billing-account" placeholder="e.g. 123456789012"></div><div class="field"><label for="aws-billing-role">IAM Role ARN</label><input id="aws-billing-role" placeholder="e.g. arn:aws:iam::123456789012:role/LumiTureIntegrationRole"></div><div class="field"><label for="aws-billing-policy">IAM Policy ARN</label><input id="aws-billing-policy" placeholder="e.g. arn:aws:iam::123456789012:policy/LumiTureIntegrationPolicy"></div><div class="field"><label for="aws-billing-external-input">External ID from LumiTure.ai</label><input id="aws-billing-external-input" value="'+AWS_EXTERNAL_ID+'"></div>'+awsHelp('billing',3)+'<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAwsFlow(2)">Back</button><button class="primary-action" onclick="submitAwsBilling()">Permission Check and Integrate</button></div></div>';
+        /* C-6 #12／#17／#18／#23／#29：照稿 #24-2（Permission Check → Integrate） */
+        content = '<div class="azure-panel is-form" style="--field-label-w:245px"><h2>Set AWS Authorization</h2><p class="c6-form-intro">Please furnish the following information obtainable from your AWS account.</p>' + c6Field('aws-billing-account','Your AWS Management Account ID','e.g. 123456789012') + c6Field('aws-billing-role','IAM Role ARN','e.g. arn:aws:iam::{account_id}:role/{role_name}') + c6Field('aws-billing-policy','IAM Policy ARN','e.g. arn:aws:iam::{account_id}:policy/{policy_name}') + c6Field('aws-billing-external-input','External ID from LumiTure.ai','Please copy the external ID from previous page') + awsHelp('billing',3) + '<div class="flow-actions stickyish">' + c6Prev('renderAwsFlow(2)') + c6CheckIntegrate('aws-billing','Permission Check','submitAwsBilling()') + '</div></div>';
       } else {
-        content = '<div class="azure-panel"><h2>Connect usage data in LumiTure.ai</h2><p>Provide the StackSet, member role, Management Account, and External ID that were created in AWS.</p><div class="field"><label for="aws-usage-stackset">StackSet Name</label><input id="aws-usage-stackset" placeholder="e.g. LumiTureAccountMemberMonitoringSet"></div><div class="field"><label for="aws-usage-role">Member Management Role Name</label><input id="aws-usage-role" placeholder="e.g. LumiTureAccountMemberMonitoringRole"></div><div class="field"><label for="aws-usage-account">AWS Management Account ID</label><input id="aws-usage-account" placeholder="e.g. 123456789012"></div><div class="field"><label for="aws-usage-external-input">External ID from LumiTure.ai</label><input id="aws-usage-external-input" value="'+AWS_EXTERNAL_ID+'"></div>'+awsHelp('usage',2)+'<div class="flow-actions stickyish"><button class="secondary-action" onclick="renderAwsFlow(1)">Back</button><button class="primary-action" onclick="submitAwsUsage()">Integrate</button></div></div>';
+        /* C-6 #12／#17／#23：照稿 #49-1 */
+        content = '<div class="azure-panel is-form" style="--field-label-w:236px"><h2>AWS Usage Data Authorization</h2><p class="c6-form-intro">Please furnish the following information obtainable from your AWS account.</p>' + c6Field('aws-usage-stackset','StackSet Name','e.g. LumiTureAccountMemberMonitoringSet') + c6Field('aws-usage-role','Member Management Role Name','e.g. LumiTureAccountMemberMonitoringRole') + c6Field('aws-usage-account','AWS Management Account ID','e.g. 123456789012') + c6Field('aws-usage-external-input','External ID from LumiTure.ai','',{value:AWS_EXTERNAL_ID}) + awsHelp('usage',2) + '<div class="flow-actions stickyish">' + c6Prev('renderAwsFlow(1)') + '<button class="primary-action" onclick="submitAwsUsage()">Integrate</button></div></div>';
       }
       document.querySelector('.main').innerHTML = awsFlowShell(kind,step,content); focusActiveStep();
     }
@@ -2275,18 +2334,212 @@
     render();
   </script>
   <script>
-    /* Claude Demo Scenarios contract: shared FAB owns presentation; this page owns state. */
-    window.DEMO_SCENARIOS = [
-      {id:'default', label:'Default (matches Figma #22 mock data)'},
-      {id:'empty', label:'Empty — nothing authorized yet'},
-      {id:'loading', label:'Loading'},
-      {id:'load-error', label:'Load Error'},
-      {id:'gcp-perm-denied', label:'GCP — Permission Denied (on submit, use Billing Account ID 000000-000000-000000)'},
-      {id:'aws-quota', label:'AWS — Quota Exceeded (on submit, use Account ID 000000000000)'},
-      {id:'no-access', label:'No Access (non Owner/Admin)'}
+    /* ============================================================
+     * C 區 C-6 對稿（2026-10-16）：表單、彈窗、toast、離開確認與 Demo 情境
+     * 只對視覺與文案，journey 結構維持 v4（Kabin 10/15）。條號對 specs/2026-10-15-c-region/c6-compare.md
+     * ============================================================ */
+    const C6_FORMS = {
+      'gcp-billing': ['gcp-billing-account','gcp-detailed-project','gcp-detailed-dataset','gcp-pricing-project','gcp-pricing-dataset'],
+      'gcp-usage': ['gcp-scoping-project'],
+      'aws-billing': ['aws-billing-account','aws-billing-role','aws-billing-policy','aws-billing-external-input'],
+      'aws-usage': ['aws-usage-stackset','aws-usage-role','aws-usage-account','aws-usage-external-input'],
+      'azure-billing': ['tenant-id','subscription-id']
+    };
+    const C6_FORM_DEFAULTS = {'aws-usage-external-input': AWS_EXTERNAL_ID};
+    const C6_FORM_STEP = {'gcp-billing':()=>renderGcpFlow(5),'gcp-usage':()=>renderGcpFlow(2),'aws-billing':()=>renderAwsFlow(3),'aws-usage':()=>renderAwsFlow(2),'azure-billing':()=>renderAzureFlow(1)};
+    const C6_DIRTY_TEXT = 'Unsaved changes will be lost. Are you sure you want to leave?';
+    let c6Vals = {};      /* #30：已填內容依雲保留（稿 #28-1／#24-2 註記：切回 guide 再回來要保留） */
+    let c6Checked = {};   /* #29：已通過 Information／Permission Check 的表單（欄位轉 disabled） */
+    let c6Flow = null;    /* 目前開著的流程，例如 'gcp-billing' */
+
+    /* #12／#23：欄位＝標籤（必填紅星）＋撐滿的輸入框＋框下方錯誤字 */
+    function c6Field(id, label, ph, opts) {
+      opts = opts || {};
+      const v = (id in c6Vals) ? c6Vals[id] : (opts.value || C6_FORM_DEFAULTS[id] || '');
+      return '<div class="field' + (opts.sub ? ' sub' : '') + '"><label for="' + id + '">' + label + '<span class="req"> *</span></label><input id="' + id + '" value="' + escapeHtml(v) + '" placeholder="' + escapeHtml(ph) + '" oninput="c6OnInput(this)"><div class="field-error" id="' + id + '-err" hidden></div></div>';
+    }
+    function c6LabelOf(id) { const l = document.querySelector('label[for="' + id + '"]'); return l ? l.childNodes[0].textContent.trim() : id; }
+    function c6SetError(id, msg) { const i = document.getElementById(id), e = document.getElementById(id + '-err'); if (!i || !e) return; i.classList.toggle('error', !!msg); e.hidden = !msg; e.textContent = msg || ''; }
+    function c6OnInput(el) { c6Vals[el.id] = el.value; c6SetError(el.id, el.value.trim() ? '' : c6LabelOf(el.id) + ' cannot be empty'); }   /* 稿 #49-1 註記：是否為空，編輯後立即判斷 */
+    function c6Validate(ids) { let ok = true; ids.forEach(id => { const el = document.getElementById(id); if (!el) return; c6Vals[id] = el.value; const empty = !el.value.trim(); c6SetError(id, empty ? c6LabelOf(id) + ' cannot be empty' : ''); if (empty && ok) { el.focus(); } ok = ok && !empty; }); return ok; }
+    function c6Val(id) { const el = document.getElementById(id); return (el ? el.value : (c6Vals[id] || '')).trim(); }
+
+    /* #16／#24：上一步一律 Previous（Kabin 10/15 規則；樣式照稿 secondary/link/borderless） */
+    function c6Prev(onclick) { return '<button class="secondary-action" type="button" onclick="' + onclick + '"><span class="sa-label">Previous</span></button>'; }
+    previousControl = function (step, onclick) { return step === 0 ? '<span aria-hidden="true"></span>' : c6Prev(onclick); };
+    /* #31（K2）：照稿 #38 註記拿掉左上 Back to Authorization List，離開走 sidebar */
+    flowReturnControl = function () { return ''; };
+    /* #27：程式碼區塊 header 只留右側 Copy code */
+    copyPayload = function (title, caption, id, value, badge) {
+      return '<section class="copy-section"><h3>' + title + '</h3>' + (caption ? '<p class="copy-caption">' + caption + '</p>' : '') + '<div class="code-snippet"><div class="code-snippet-head"><button class="code-copy" onclick="copyAzureValue(\'' + id + '\')"><span class="material-symbols-outlined">content_paste</span>Copy code</button></div><pre><code id="' + id + '">' + escapeHtml(value) + '</code></pre></div></section>';
+    };
+    /* #28：單值複製框 Element / Copy Corner */
+    function c6CopyCorner(label, id, value) { return '<div class="copy-corner"><span class="cc-label">' + label + '</span><span class="cc-row"><span class="cc-val" id="' + id + '">' + escapeHtml(value) + '</span><button class="cc-btn" type="button" aria-label="Copy ' + escapeHtml(label) + '" onclick="copyAzureValue(\'' + id + '\')"><span class="material-symbols-outlined">content_copy</span></button></span></div>'; }
+
+    /* #29（K3）：GCP／AWS Billing 表單先 Check 再 Integrate（稿 #28-1、#24-2、#24-4） */
+    function c6CheckIntegrate(form, checkLabel, submit) {
+      const ok = !!c6Checked[form];
+      return '<div class="c6-right"><button class="primary-action" type="button" id="' + form + '-check" ' + (ok ? 'disabled' : '') + ' onclick="c6RunCheck(\'' + form + '\')">' + (ok ? '<span class="material-symbols-outlined">check</span>' : '') + checkLabel + '</button><span class="c6-tip-wrap"' + (ok ? '' : ' data-tip-c6="You should process “' + checkLabel + '” first."') + '><button class="primary-action" type="button" id="' + form + '-integrate" ' + (ok ? '' : 'disabled') + ' onclick="' + submit + '">Integrate</button></span></div>';
+    }
+    function c6RunCheck(form) {
+      const ids = C6_FORMS[form]; if (!c6Validate(ids)) return;
+      if (form === 'aws-billing' && !/^\d{12}$/.test(c6Val('aws-billing-account'))) { c6SetError('aws-billing-account', 'Invalid account ID'); return; }
+      const btn = document.getElementById(form + '-check'); btn.disabled = true; btn.innerHTML = '<span class="c6-spin" aria-label="Checking"></span>';   /* 稿註記：需要時間時按鈕上顯示 spinner */
+      setTimeout(() => { c6Checked[form] = true; C6_FORM_STEP[form](); }, 800);
+    }
+    /* 檢查通過後欄位轉 disabled（#24-4 註記）；focusActiveStep 是每條流程 render 完都會呼叫的收尾 */
+    const _c6Focus = focusActiveStep;
+    focusActiveStep = function () { _c6Focus(); c6FitLabels(); Object.keys(c6Checked).forEach(form => { if (c6Checked[form]) C6_FORMS[form].forEach(id => { const el = document.getElementById(id); if (el) el.disabled = true; }); }); };
+
+    /* 標籤欄寬以稿為下限；實際字寬比稿寬時（字型 metrics 差幾 px）自動加寬，紅星不被擠到下一行 */
+    function c6FitLabels() { document.querySelectorAll('.azure-panel.is-form').forEach(panel => { const base = parseFloat(panel.style.getPropertyValue('--field-label-w')) || 131; let need = base; panel.querySelectorAll('.field').forEach(f => { const l = f.querySelector('label'); need = Math.max(need, Math.ceil(l.scrollWidth) + (f.classList.contains('sub') ? 20 : 0)); }); if (need > base) panel.style.setProperty('--field-label-w', need + 'px'); }); }
+    /* 流程開關：記住目前流程、離開時清掉已填內容 */
+    function c6Reset(flow) { (flow ? (C6_FORMS[flow] || []) : Object.values(C6_FORMS).flat()).forEach(id => delete c6Vals[id]); if (flow) delete c6Checked[flow]; else c6Checked = {}; }
+    const _c6OpenGcp = openGcpFlow, _c6OpenAws = openAwsFlow, _c6OpenAzure = openAzureFlow;
+    openGcpFlow = function (kind) { c6Flow = 'gcp-' + (kind || 'billing'); _c6OpenGcp(kind); };
+    openAwsFlow = function (kind) { c6Flow = 'aws-' + (kind || 'billing'); _c6OpenAws(kind); };
+    openAzureFlow = function (kind) { c6Flow = 'azure-' + (kind || 'billing'); _c6OpenAzure(kind); };
+    const _c6Close = closeAzureFlow;
+    closeAzureFlow = function () { if (c6Flow) c6Reset(c6Flow); c6Flow = null; closePrototypeDialog(); _c6Close(); };
+    function c6Dirty() { if (!c6Flow || !C6_FORMS[c6Flow]) return false; if (c6Checked[c6Flow]) return true; return C6_FORMS[c6Flow].some(id => { const v = (c6Vals[id] || '').trim(); return v && v !== (C6_FORM_DEFAULTS[id] || ''); }); }
+
+    /* #26：錯誤／確認彈窗（標題 icon #676767、Got it 寬 100；可帶兩顆按鈕） */
+    function c6Dialog(title, body, actions) {
+      const root = document.getElementById('prototype-dialog-root');
+      root.innerHTML = '<div class="prototype-dialog-backdrop" role="presentation" onclick="if(event.target===this)closePrototypeDialog()"><section class="prototype-dialog" role="dialog" aria-modal="true" aria-labelledby="prototype-dialog-title"><div class="prototype-dialog-head"><div class="prototype-dialog-title"><span class="material-symbols-outlined">warning</span><h2 id="prototype-dialog-title">' + title + '</h2></div><button class="dialog-close" aria-label="Close" onclick="closePrototypeDialog()"><span class="material-symbols-outlined">close</span></button></div><div class="prototype-dialog-content">' + body + '</div><div class="prototype-dialog-actions">' + (actions || '<button class="primary-action" onclick="closePrototypeDialog()">Got it</button>') + '</div></section></div>';
+      requestAnimationFrame(() => { const b = root.querySelector('.prototype-dialog-actions button:last-child'); if (b) b.focus(); });
+    }
+    showPrototypeDialog = c6Dialog;
+    /* #10：#27 Confirmation Before Leaving（表單有填值或已檢查，從 sidebar 離開時；回頭看 guide 不算） */
+    let c6PendingHref = null;
+    function c6ConfirmLeave(href) { c6PendingHref = href; c6Dialog('Confirmation', '<p>' + C6_DIRTY_TEXT + '</p>', '<button class="dialog-cancel" onclick="c6PendingHref=null;closePrototypeDialog()">Cancel</button><button class="primary-action" onclick="c6DiscardAndLeave()">Discard changes</button>'); }
+    function c6DiscardAndLeave() { const href = c6PendingHref; c6PendingHref = null; c6Reset(c6Flow); closePrototypeDialog(); if (href && href !== '#') location.href = href; else closeAzureFlow(); }
+    document.addEventListener('click', e => { const a = e.target.closest('#lt-sidebar a[href], #lt-topbar a[href]'); if (!a || !document.body.classList.contains('is-flow-page') || !c6Dirty()) return; e.preventDefault(); e.stopPropagation(); c6ConfirmLeave(a.getAttribute('href')); }, true);
+
+    /* #13：toast 照稿 #26／#40／#46／#53 */
+    const C6_OK = 'Authorization integrated successfully.', C6_FAIL = 'Unable to integrate authorization. Please try again later.';
+    function c6Success() { closeAzureFlow(); showToast(C6_OK); }
+
+    /* #3／#4：GCP Billing Integrate（#29 Permission Denied、#29-1 Path Not Found；fail → 失敗 toast） */
+    submitGcpBilling = function () {
+      if (!c6Validate(C6_FORMS['gcp-billing'])) return;
+      if (c6Val('gcp-billing-account') === '000000-000000-000000') { c6Dialog('Permission Denied', '<p>Please check the permission settings in <strong>Google Cloud Authorization Guide Step 4</strong> and ensure the following:</p><ul><li>The <strong>Project ID</strong> is correct (including detailed and pricing datasets).</li><li>The <strong>Dataset name</strong> is correct (including detailed and pricing datasets).</li><li>The Service Account has both <strong>BigQuery Data Viewer</strong> and <strong>Billing Account Viewer</strong> roles.</li></ul>'); return; }
+      if (c6Val('gcp-detailed-project') === 'path-not-found') { c6Dialog('Path Not Found', '<p>Please check the input and ensure the following:</p><ul><li>The <strong>Project ID</strong> is correct.</li></ul>'); return; }   /* 稿 {Project ID} 依後端回傳換成 Billing Account ID／Project ID／Dataset Name */
+      if (c6Val('gcp-billing-account') === 'fail') { showToast(C6_FAIL, 'error'); return; }
+      c6Success();
+    };
+    /* #5／#6：GCP Usage Integrate（#44、#45；已註冊用欄位錯誤字，⚠ 設計端暫擬：稿只畫了 AWS 的 StackSet 版） */
+    submitGcpUsage = function () {
+      if (!c6Validate(C6_FORMS['gcp-usage'])) return;
+      const id = c6Val('gcp-scoping-project');
+      if (id === 'permission-denied') { c6Dialog('Service Account Access Denied', '<p>LumiTure.ai was not granted the <strong>Monitoring Viewer</strong> role for the corresponding project.</p><p>To resolve this, please take one of the following actions:</p><ul><li><strong>Grant Access</strong><br>Go to the respective project’s IAM/Permissions page and assign the Monitoring Viewer role to the LumiTure.ai service account.</li><li><strong>Verify Project ID</strong><br>If permissions were already granted, please confirm that the Project ID entered is correct and belongs to the project where permissions were set.</li></ul>'); return; }
+      if (id === 'user-permission') { c6Dialog('User Permission Error', '<p>You do not have the required permissions to access resources for this Project ID in LumiTure. To resolve this, please follow these steps:</p><ul><li><strong>Check Billing Account Status</strong><br>Confirm that the Billing Account associated with this Scoping Project has been fully authorized.</li><li><strong>Check LumiTure Login</strong><br>Confirm that you are logged into LumiTure with the correct user account that holds the necessary project access.</li><li><strong>Verify Project Permission</strong><br>If the issue persists, please contact your Google Cloud Administrator to ensure your user account has the required permissions for the submitted Project ID.</li></ul>'); return; }
+      if (id === 'already-exists') { c6SetError('gcp-scoping-project', 'This Scoping Project ID is already registered.'); return; }
+      if (id === 'fail') { showToast(C6_FAIL, 'error'); return; }
+      c6Success();
+    };
+    /* #7／#8：AWS Billing Integrate（#25-1 Quota Exceeded 三種字、#25 Permission Denied） */
+    submitAwsBilling = function () {
+      if (!c6Validate(C6_FORMS['aws-billing'])) return;
+      const account = c6Val('aws-billing-account');
+      const quota = {'000000000000':'<strong>5 CUR 2.0</strong> and <strong>2 FOCUS</strong>','000000000001':'<strong>5 CUR 2.0</strong>','000000000002':'<strong>2 FOCUS</strong>'}[account];
+      if (quota) { c6Dialog('Quota Exceeded', '<p>Each AWS account is limited to ' + quota + ' data exports. Please ensure your management account has not reached these specific limits before proceeding with the integration.</p>'); return; }
+      if (account === '111111111111') { c6Dialog('Permission Denied', '<p>Configuration error detected. This could be due to one of the following reasons:</p><ul><li>Incorrect IAM Information provided.</li><li>Missing required permissions in the policy to <strong>create Billing Exports</strong>.</li><li>Insufficient permissions to <strong>update Lambda roles or S3 triggers</strong>.</li><li>Improper policy attachment to the designated IAM user or role.</li></ul>'); return; }
+      if (account === '999999999999') { showToast(C6_FAIL, 'error'); return; }
+      c6Success();
+    };
+    /* #9：AWS Usage Integrate（#49-1 欄位錯誤、#50／#51／#52） */
+    submitAwsUsage = function () {
+      let bad = !c6Validate(C6_FORMS['aws-usage']);   /* 稿 #49-1：空白、格式、已註冊的錯誤一次全部顯示 */
+      const account = c6Val('aws-usage-account'), ext = c6Val('aws-usage-external-input');
+      if (account && !/^\d{12}$/.test(account)) { c6SetError('aws-usage-account', 'Invalid account ID'); bad = true; }
+      if (ext && ext.length < 6) { c6SetError('aws-usage-external-input', 'Invalid External ID'); bad = true; }
+      const stackset = c6Val('aws-usage-stackset').toLowerCase();
+      if (stackset === 'registered') { c6SetError('aws-usage-stackset', 'This StackSet Name is already registered.'); bad = true; }
+      if (bad) return;
+      if (stackset === 'stackset-failed') { c6Dialog('StackSet Deployment Failed', '<p>The StackSet failed to deploy to one or more target AWS accounts. This prevents LumiTure.ai from gaining necessary read access to your environment.</p><p>Please check the <strong>AWS Cloudformation</strong> for the specific StackSet deployment status and detailed error logs to identify the root cause in the target account(s).</p>'); return; }
+      if (stackset === 'policy-mismatch') { c6Dialog('IAM Policy Mismatch', '<p>The StackSet deployment succeeded, but the <strong>inline IAM Policy</strong> does not match the permissions required by LumiTure.ai, resulting in an authorization failure.</p><p>Verify that the inline IAM Policy created by the StackSet strictly adheres to the policy document provided in our setup documentation. A re-deployment may be required.</p>'); return; }
+      if (stackset === 'invalid-parameters') { c6Dialog('Invalid Configuration Parameters', '<p>The AWS parameters you provided could not be mapped to a valid, existing deployment configuration within your AWS Organization.</p><p>Please double-check the <strong>StackSet Name </strong>and the <strong>Member Management Role Name</strong> you entered, ensuring they are active and correct in your AWS Organization console.</p>'); return; }
+      if (stackset === 'fail') { showToast(C6_FAIL, 'error'); return; }
+      c6Success();
+    };
+    /* #11／#13：Azure 第 2 步（#39-2 欄位錯誤字、#40 toast） */
+    submitAzureAuthorization = function () {
+      let bad = !c6Validate(C6_FORMS['azure-billing']);
+      const tenant = c6Val('tenant-id'), sub = c6Val('subscription-id');
+      if (tenant.toLowerCase() === 'invalid') { c6SetError('tenant-id', 'Invalid Tenant ID.'); bad = true; }
+      if (sub.toLowerCase() === 'invalid') { c6SetError('subscription-id', 'Invalid Subscription ID.'); bad = true; }
+      if (sub.toLowerCase() === 'registered') { c6SetError('subscription-id', 'This ID is already registered.'); bad = true; }
+      if (bad) return;
+      if (tenant.toLowerCase() === 'fail') { showToast(C6_FAIL, 'error'); return; }
+      azureBillingTenantId = tenant; azureBillingSubscriptionId = sub; renderAzureFlow(2);
+      showToast('You\'re almost done! Please complete the Azure Data Access steps to unlock full LumiTure.ai functionality.');
+    };
+    /* Azure 最後一步：照稿 #41-1／#59-1 回到 Authorization List 並捲到 Azure（稿沒有 toast） */
+    completeAzureFlow = function () { closeAzureFlow(); requestAnimationFrame(() => { const s = [...document.querySelectorAll('.provider')].find(x => /Azure/.test(x.querySelector('h2') ? x.querySelector('h2').textContent : '')); if (s) s.scrollIntoView({block:'start'}); }); };
+  </script>
+  <script>
+    /* Claude Demo Scenarios contract: shared FAB owns presentation; this page owns state.
+     * C-6（2026-10-16）：補上六條流程每一步、每張彈窗與 toast 的情境（README 完工判準：每張稿都要有 Demo），分類 列表／Google Cloud／AWS／Azure */
+    window.DEMO_CATEGORIES = [
+      {id:'list', label:'列表', icon:'list'},
+      {id:'gcp', label:'Google Cloud', icon:'cloud'},
+      {id:'aws', label:'AWS', icon:'cloud'},
+      {id:'azure', label:'Azure', icon:'cloud'}
     ];
+    const C6_STEP_SCEN = [];
+    [['gcp','billing','Billing',['#23 Prepare export project','Enable required APIs','Create billing dataset','Grant read-only access','Enable exports','#28-1 表單 Set Google Cloud Authorization']],
+     ['gcp','usage','Usage',['#42 Prepare a scoping project','Grant Monitoring Viewer','#43-1 表單 Google Cloud Usage Data Authorization']],
+     ['aws','billing','Billing',['#24 Check prerequisites','Create IAM policy','Create IAM role','#24-2 表單 Set AWS Authorization']],
+     ['aws','usage','Usage',['#48 Prepare AWS Console','Run setup script','#49-1 表單 AWS Usage Data Authorization']],
+     ['azure','billing','Billing',['#38 Prepare billing export','#39-1 表單 Set Azure Authorization','#47 Create FinOps Reader','#41 Grant storage access','#41 Create export event']],
+     ['azure','usage','Usage',['#59 Select subscription','#59 Update custom role','#59 Verify authorization']]
+    ].forEach(([cloud, kind, kindLabel, labels]) => labels.forEach((l, i) => C6_STEP_SCEN.push({id:cloud + '-' + kind + '-' + (i + 1), label:kindLabel + ' 第 ' + (i + 1) + ' 步：' + l, icon:'counter_' + Math.min(i + 1, 9), category:cloud, group:kindLabel + ' Data 流程'})));
+    window.DEMO_SCENARIOS = [
+      {id:'default', label:'#22 Authorization List（預設）', icon:'list', category:'list'},
+      {id:'menu', label:'#22-1 Add Authorization 下拉', icon:'arrow_drop_down_circle', category:'list'},
+      {id:'empty', label:'#21 尚無授權（Usage Data 不能選）', icon:'add_link', category:'list'},
+      {id:'loading', label:'#36 讀取中', icon:'hourglass_empty', category:'list'},
+      {id:'load-error', label:'讀取錯誤', icon:'error', category:'list'},
+      {id:'gcp-perm-denied', label:'列表狀態：Google Cloud Permission Denied', icon:'block', category:'list'},
+      {id:'aws-quota', label:'列表狀態：AWS Quota Exceeded', icon:'block', category:'list'},
+      {id:'no-access', label:'無權限（不是 Owner／Admin）', icon:'lock', category:'list'},
+    ].concat(C6_STEP_SCEN, [
+      {id:'gcp-b-required', label:'#28-1 必填未填（欄位錯誤字）', icon:'error', category:'gcp', group:'表單狀態、彈窗與 Toast'},
+      {id:'gcp-b-checked', label:'#28-1 Information Check 通過', icon:'check_circle', category:'gcp', group:'表單狀態、彈窗與 Toast', tip:'欄位轉 disabled、Integrate 可按'},
+      {id:'gcp-dlg-29', label:'#29 Permission Denied', icon:'warning', category:'gcp', group:'表單狀態、彈窗與 Toast', tip:'Billing Account ID 填 000000-000000-000000 再 Integrate'},
+      {id:'gcp-dlg-29-1', label:'#29-1 Path Not Found', icon:'warning', category:'gcp', group:'表單狀態、彈窗與 Toast', tip:'Detailed Usage Cost 的 Project ID 填 path-not-found'},
+      {id:'gcp-dlg-44', label:'#44 Service Account Access Denied', icon:'warning', category:'gcp', group:'表單狀態、彈窗與 Toast', tip:'Scoping Project ID 填 permission-denied'},
+      {id:'gcp-dlg-45', label:'#45 User Permission Error', icon:'warning', category:'gcp', group:'表單狀態、彈窗與 Toast', tip:'Scoping Project ID 填 user-permission'},
+      {id:'gcp-toast-ok', label:'#46 Toast：成功', icon:'check', category:'gcp', group:'表單狀態、彈窗與 Toast'},
+      {id:'gcp-toast-fail', label:'#46 Toast：失敗', icon:'close', category:'gcp', group:'表單狀態、彈窗與 Toast', tip:'Scoping Project ID 填 fail'},
+      {id:'gcp-leave', label:'#27 離開確認（表單有填值時點 sidebar）', icon:'logout', category:'gcp', group:'表單狀態、彈窗與 Toast'},
+      {id:'aws-b-checked', label:'#24-4 Permission Check 通過', icon:'check_circle', category:'aws', group:'表單狀態、彈窗與 Toast'},
+      {id:'aws-dlg-25-1', label:'#25-1 Quota Exceeded', icon:'warning', category:'aws', group:'表單狀態、彈窗與 Toast', tip:'Account ID 000000000000（只超 CUR 2.0：000000000001；只超 FOCUS：000000000002）'},
+      {id:'aws-dlg-25', label:'#25 Permission Denied', icon:'warning', category:'aws', group:'表單狀態、彈窗與 Toast', tip:'Account ID 111111111111'},
+      {id:'aws-u-errors', label:'#49-1 欄位錯誤字', icon:'error', category:'aws', group:'表單狀態、彈窗與 Toast', tip:'StackSet Name 填 registered'},
+      {id:'aws-dlg-50', label:'#50 StackSet Deployment Failed', icon:'warning', category:'aws', group:'表單狀態、彈窗與 Toast', tip:'StackSet Name 填 stackset-failed'},
+      {id:'aws-dlg-51', label:'#51 IAM Policy Mismatch', icon:'warning', category:'aws', group:'表單狀態、彈窗與 Toast', tip:'StackSet Name 填 policy-mismatch'},
+      {id:'aws-dlg-52', label:'#52 Invalid Configuration Parameters', icon:'warning', category:'aws', group:'表單狀態、彈窗與 Toast', tip:'StackSet Name 填 invalid-parameters'},
+      {id:'aws-toast-ok', label:'#26／#53 Toast：成功', icon:'check', category:'aws', group:'表單狀態、彈窗與 Toast'},
+      {id:'aws-toast-fail', label:'#26／#53 Toast：失敗', icon:'close', category:'aws', group:'表單狀態、彈窗與 Toast', tip:'StackSet Name 填 fail（Billing：Account ID 999999999999）'},
+      {id:'aws-leave', label:'#27 離開確認', icon:'logout', category:'aws', group:'表單狀態、彈窗與 Toast'},
+      {id:'az-errors', label:'#39-2 欄位錯誤字', icon:'error', category:'azure', group:'表單狀態、彈窗與 Toast', tip:'Tenant ID／Subscription ID 填 invalid；Subscription ID 填 registered 是已註冊'},
+      {id:'az-toast-ok', label:'#40 Toast：成功（進第 3 步）', icon:'check', category:'azure', group:'表單狀態、彈窗與 Toast'},
+      {id:'az-toast-fail', label:'#40 Toast：失敗', icon:'close', category:'azure', group:'表單狀態、彈窗與 Toast', tip:'Tenant ID 填 fail'}
+    ]);
     window.DEMO_DEFAULT = 'default';
+    const C6_OPEN = {gcp:[o=>openGcpFlow(o), s=>renderGcpFlow(s)], aws:[o=>openAwsFlow(o), s=>renderAwsFlow(s)], azure:[o=>openAzureFlow(o), s=>renderAzureFlow(s)]};
+    function c6Go(cloud, kind, step, vals) { C6_OPEN[cloud][0](kind); if (vals) Object.assign(c6Vals, vals); if (step) C6_OPEN[cloud][1](step); else if (vals) C6_OPEN[cloud][1](0); }
+    const C6_GCP_OK = {'gcp-billing-account':'00AH83-KJD294-KO37LS','gcp-detailed-project':'lumiture-project-id','gcp-detailed-dataset':'lumiture_billing_data','gcp-pricing-project':'lumiture-project-id','gcp-pricing-dataset':'lumiture_billing_data'};
+    const C6_AWS_OK = {'aws-billing-account':'876543210987','aws-billing-role':'arn:aws:iam::876543210987:role/LumiTureIntegrationRole','aws-billing-policy':'arn:aws:iam::876543210987:policy/LumiTureIntegrationPolicy','aws-billing-external-input':AWS_EXTERNAL_ID};
+    const C6_AWSU_OK = {'aws-usage-stackset':'LumiTureAccountMemberMonitoringSet','aws-usage-role':'LumiTureAccountMemberMonitoringRole','aws-usage-account':'876543210987','aws-usage-external-input':AWS_EXTERNAL_ID};
+    function c6Submit(fn) { requestAnimationFrame(() => fn()); }
     window.DEMO_APPLY = function(id) {
+      /* C-6 #1：在流程頁切情境時先回到列表（原本 #app 不在了，render() 會丟例外） */
+      closePrototypeDialog();
+      if (azureListMarkup) { setFlowPage(false); document.querySelector('.main').innerHTML = azureListMarkup; azureListMarkup = null; }
+      c6Reset(); c6Flow = null;
       const gcpRow = PROVIDERS.gcp.billing[0];
       const awsRow = PROVIDERS.aws.billing[0];
       gcpRow[2] = 'Connected'; gcpRow[4] = '';
@@ -2296,11 +2549,36 @@
       if (id === 'loading') state = 'loading';
       if (id === 'load-error') state = 'error';
       if (id === 'no-access') state = 'no-access';
+      if (id === 'menu') openMenu = 'gcp';
       if (id === 'gcp-perm-denied') { gcpRow[2] = 'Permission Denied'; gcpRow[4] = 'Check the Billing Account ID and the permission granted to LumiTure-App, then try again.'; }
       if (id === 'aws-quota') { awsRow[2] = 'Quota Exceeded'; awsRow[4] = 'The AWS account quota has been exceeded. Use another account or contact your administrator.'; }
       /* A-20①：Demo 切角色時 topbar 帳號 chip 跟著變（第一次載入不動，免得蓋掉 topbar 還原的群組 chip） */
       if (window.LumitureTopbar) { if (id === 'no-access') { LumitureTopbar.setRole('Manager - Cost Center'); window._orgChipNA = true; } else if (window._orgChipNA) { LumitureTopbar.setRole('Admin'); window._orgChipNA = false; } }
       render();
+      const m = /^(gcp|aws|azure)-(billing|usage)-(\d+)$/.exec(id);
+      if (m) { c6Go(m[1], m[2], +m[3] - 1); return; }
+      if (id === 'gcp-b-required') { c6Go('gcp', 'billing', 5); c6Submit(() => c6RunCheck('gcp-billing')); }
+      if (id === 'gcp-b-checked') { c6Checked['gcp-billing'] = true; c6Go('gcp', 'billing', 5, C6_GCP_OK); }
+      if (id === 'gcp-dlg-29') { c6Checked['gcp-billing'] = true; c6Go('gcp', 'billing', 5, Object.assign({}, C6_GCP_OK, {'gcp-billing-account':'000000-000000-000000'})); c6Submit(submitGcpBilling); }
+      if (id === 'gcp-dlg-29-1') { c6Checked['gcp-billing'] = true; c6Go('gcp', 'billing', 5, Object.assign({}, C6_GCP_OK, {'gcp-detailed-project':'path-not-found'})); c6Submit(submitGcpBilling); }
+      if (id === 'gcp-dlg-44') { c6Go('gcp', 'usage', 2, {'gcp-scoping-project':'permission-denied'}); c6Submit(submitGcpUsage); }
+      if (id === 'gcp-dlg-45') { c6Go('gcp', 'usage', 2, {'gcp-scoping-project':'user-permission'}); c6Submit(submitGcpUsage); }
+      if (id === 'gcp-toast-ok') { c6Go('gcp', 'usage', 2, {'gcp-scoping-project':'finops-monitor-scope-example'}); c6Submit(submitGcpUsage); }
+      if (id === 'gcp-toast-fail') { c6Go('gcp', 'usage', 2, {'gcp-scoping-project':'fail'}); c6Submit(submitGcpUsage); }
+      if (id === 'gcp-leave') { c6Go('gcp', 'billing', 5, {'gcp-billing-account':'00AH83-KJD294-KO37LS'}); c6Submit(() => c6ConfirmLeave('#')); }
+      if (id === 'aws-b-checked') { c6Checked['aws-billing'] = true; c6Go('aws', 'billing', 3, C6_AWS_OK); }
+      if (id === 'aws-dlg-25-1') { c6Checked['aws-billing'] = true; c6Go('aws', 'billing', 3, Object.assign({}, C6_AWS_OK, {'aws-billing-account':'000000000000'})); c6Submit(submitAwsBilling); }
+      if (id === 'aws-dlg-25') { c6Checked['aws-billing'] = true; c6Go('aws', 'billing', 3, Object.assign({}, C6_AWS_OK, {'aws-billing-account':'111111111111'})); c6Submit(submitAwsBilling); }
+      if (id === 'aws-u-errors') { c6Go('aws', 'usage', 2, {'aws-usage-stackset':'registered','aws-usage-role':'','aws-usage-account':'333','aws-usage-external-input':'444'}); c6Submit(submitAwsUsage); }
+      if (id === 'aws-dlg-50') { c6Go('aws', 'usage', 2, Object.assign({}, C6_AWSU_OK, {'aws-usage-stackset':'stackset-failed'})); c6Submit(submitAwsUsage); }
+      if (id === 'aws-dlg-51') { c6Go('aws', 'usage', 2, Object.assign({}, C6_AWSU_OK, {'aws-usage-stackset':'policy-mismatch'})); c6Submit(submitAwsUsage); }
+      if (id === 'aws-dlg-52') { c6Go('aws', 'usage', 2, Object.assign({}, C6_AWSU_OK, {'aws-usage-stackset':'invalid-parameters'})); c6Submit(submitAwsUsage); }
+      if (id === 'aws-toast-ok') { c6Go('aws', 'usage', 2, C6_AWSU_OK); c6Submit(submitAwsUsage); }
+      if (id === 'aws-toast-fail') { c6Go('aws', 'usage', 2, Object.assign({}, C6_AWSU_OK, {'aws-usage-stackset':'fail'})); c6Submit(submitAwsUsage); }
+      if (id === 'aws-leave') { c6Go('aws', 'billing', 3, {'aws-billing-account':'876543210987'}); c6Submit(() => c6ConfirmLeave('#')); }
+      if (id === 'az-errors') { c6Go('azure', 'billing', 1, {'tenant-id':'invalid','subscription-id':'invalid'}); c6Submit(submitAzureAuthorization); }
+      if (id === 'az-toast-ok') { c6Go('azure', 'billing', 1, {'tenant-id':'72f988bf-86f1-41af-91ab-2d7cd011db47','subscription-id':'3a4c5b6d-7e8f-4a0b-9c1d-2e3f4a5b6c7d'}); c6Submit(submitAzureAuthorization); }
+      if (id === 'az-toast-fail') { c6Go('azure', 'billing', 1, {'tenant-id':'fail','subscription-id':'3a4c5b6d-7e8f-4a0b-9c1d-2e3f4a5b6c7d'}); c6Submit(submitAzureAuthorization); }
     };
   </script>
   <script>

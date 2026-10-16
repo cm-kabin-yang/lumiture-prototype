@@ -2139,8 +2139,10 @@ body.is-shot .content{padding:0}
  *
  * Design spec: CMDS Component Library > Currency Switch (H=30px)
  *   - Normal: transparent bg, no border; Hover: subtle gray bg; Focus: focus ring
- *   - Trigger format: [flag] [CODE] [expand_more]
- *   - Dropdown gap: 4px from trigger bottom
+ *   - Trigger format: [flag] [CODE] [▾]（箭頭由 CSS 統一畫成 arrow_drop_down，markup 寫 expand_more 也會被換掉）
+ *   - Dropdown gap: 4px from trigger bottom（2026-10-16 X-9r1：錨在按鈕本身，不是父層；預設右緣對齊按鈕右緣＝Overview #01-4，
+ *     按鈕寫 data-dd-align="left" 的改左緣對齊＝General Budget #01-7）
+ *   - Tooltip：沒寫 data-tip／data-tip-tip 的按鈕自動帶 FE CurrencySelector 的匯率說明（FE 全站同一顆元件）；下拉打開時不顯示
  *   - Dropdown items: "Full Name (CODE)", selected = gray bg, no checkmark
  *
  * Design spec: Figma #01-4 Overview: Change Currency
@@ -2188,45 +2190,51 @@ body.is-shot .content{padding:0}
     { code: 'USD', name: 'United States dollar',   flag: '🇺🇸' },
   ];
 
+  /* 2026-10-16 X-9r1：全站同一組 mock 匯率（1 USD＝?），各頁換算一律用這組，不要各頁自備（原本 Overview 32.1、General Budget 31.5 對不起來）。
+     數值沿用 Overview 原本的表 */
+  var RATES = { USD: 1, TWD: 32.1, HKD: 7.8, SGD: 1.35, MYR: 4.7, PHP: 56.2, IDR: 15800 };
+  /* 金額前綴符號（tooltip 的完整金額用，例如 $10,816,382.11／NT$347,206,867.73）；沿用 Overview 原本的表 */
+  var SYMBOLS = { USD: '$', TWD: 'NT$', HKD: 'HK$', SGD: 'S$', MYR: 'RM', PHP: '₱', IDR: 'Rp' };
+  /* FE CurrencySelector/SelectInput.tsx 的 TooltipTitle（全站同一句） */
+  var TIP = 'Please note that due to exchange rate conversions and data latency in the console, the displayed numbers may slightly differ from those in the console. The actual amount should be based on your received invoice. (Exchange rate source: https://rter.info/)';
+
   /* ===== CSS ===== */
   var CSS = [
-    /* Trigger button — Normal: transparent, no border; H=30px per CMDS spec */
-    '.curr-btn{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 7px;',
-    'font-size:13px;color:#262626;',
-    'cursor:pointer;background:transparent;border:none;border-radius:6px;',
+    /* 2026-10-16 C-1（README 指定）：按鈕、箭頭、下拉照稿（GB #01-7 Currency Converter＋Dropdown；Overview #01／#01-4 同，C-5 已量）。
+       按鈕 80×30、內距 0／8、gap 4、r4；國旗 16 圓框 #CCCCCC；代碼 14／400 #676767；hover／開啟底 rgba(103,103,103,.12) */
+    '.curr-btn{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 4px 0 8px;',
+    'font-size:14px;color:#676767;',
+    'cursor:pointer;background:transparent;border:none;border-radius:4px;',
     'font-family:inherit;line-height:1;white-space:nowrap;',
     'transition:background .12s}',
-    /* Hover: subtle gray wash */
-    '.curr-btn:hover{background:rgba(0,0,0,.06)}',
-    /* Active/open: same wash + arrow flipped */
-    '.curr-btn.cp-open{background:rgba(0,0,0,.06)}',
+    '.curr-btn:hover,.curr-btn.cp-open{background:rgba(103,103,103,.12)}',
     /* Focus: blue focus ring (keyboard nav / Active state ring per CMDS) */
     '.curr-btn:focus-visible{outline:2px solid #004FB0;outline-offset:1px}',
-    /* Flag + code */
-    '.curr-flag{font-size:15px;line-height:1;flex-shrink:0}',
-    '.curr-code{font-size:14px;color:#262626}',
-    /* Arrow icon */
-    '.curr-btn .material-symbols-outlined{font-size:16px;',
-    'color:#676767;flex-shrink:0;transition:transform .15s}',
-    /* 2026-10-15 R1（A-11）：下拉箭頭統一實心 ▾（arrow_drop_down 24）。markup 加 class="curr-arrow" 才套用（舊頁面仍是 expand_more 16 的 chevron） */
-    '.curr-btn .curr-arrow{font-size:24px;margin:0 -4px 0 -2px}',
-    '.curr-btn.cp-open .material-symbols-outlined{transform:rotate(180deg)}',
+    /* Flag：16 圓、1px #CCCCCC 框（emoji 國旗放大後裁成圓形） */
+    '.curr-flag{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;',
+    'box-shadow:0 0 0 1px #CCCCCC;overflow:hidden;font-size:22px;line-height:1;flex-shrink:0}',
+    '.curr-code{font-size:14px;font-weight:400;color:#676767;line-height:24.5px}',
+    /* 箭頭（A-11 下拉箭頭統一實心 ▾）：不管各頁 markup 寫 expand_more 還是 arrow_drop_down，都用 ::after 畫成 arrow_drop_down，
+       原本的字藏起來（font-size:0），各頁不用改 markup。稿 #01-7 開啟時箭頭不翻轉 */
+    '.curr-btn > .material-symbols-outlined:last-child{font-size:0;line-height:1;color:#676767;flex-shrink:0;width:20px;margin-left:-4px;',
+    'display:inline-flex;align-items:center;justify-content:center}',
+    '.curr-btn > .material-symbols-outlined:last-child::after{content:"arrow_drop_down";font-size:20px;line-height:1;',
+    'font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 20}',
 
-    /* Dropdown container — 4px gap per CMDS spec */
+    /* Dropdown（稿 #01-7）：250 寬、r6、陰影 0 0 6px .2、無框、內距 10 */
     '.curr-dd{position:absolute;top:calc(100% + 4px);right:0;left:auto;',
-    'background:#fff;border:1px solid #DCE3EC;',
-    'border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);',
-    'z-index:300;min-width:220px;width:max-content;',
+    'background:#fff;border:none;',
+    'border-radius:6px;box-shadow:0 0 6px rgba(0,0,0,.2);padding:10px;',
+    'z-index:300;width:250px;box-sizing:border-box;',
     'overflow:hidden;overscroll-behavior:contain}',
 
-    /* Dropdown items — full name + (CODE), no flag */
-    '.curr-dd-item{display:flex;align-items:center;padding:9px 14px;width:100%;',
-    'font-size:13px;border:none;background:none;cursor:pointer;',
+    /* 項目：230×40、r5、內距 0／8、14／400 #262626；hover #F6F6F6、選中 #E6E6E6（不打勾） */
+    '.curr-dd-item{display:flex;align-items:center;height:40px;padding:0 8px;width:100%;box-sizing:border-box;',
+    'font-size:14px;font-weight:400;border:none;border-radius:5px;background:none;cursor:pointer;',
     'font-family:inherit;color:#262626;text-align:left;',
-    'transition:background .1s;line-height:1.4;white-space:nowrap}',
-    '.curr-dd-item:hover{background:#F5F5F5}',
-    /* Selected: gray bg per Figma, no color/weight change */
-    '.curr-dd-item.cp-active{background:#F0F0F0}',
+    'transition:background .1s;line-height:24.5px;white-space:nowrap}',
+    '.curr-dd-item:hover{background:#F6F6F6}',
+    '.curr-dd-item.cp-active{background:#E6E6E6}',
   ].join('');
 
   var style = document.createElement('style');
@@ -2242,6 +2250,7 @@ body.is-shot .content{padding:0}
     if (dd) dd.remove();
     if (_activeTrigger) {
       _activeTrigger.classList.remove('cp-open');
+      if (_activeTrigger.hasAttribute('data-cp-tip')) { _activeTrigger.setAttribute('data-tip', _activeTrigger.getAttribute('data-cp-tip')); _activeTrigger.removeAttribute('data-cp-tip'); }
       _activeTrigger = null;
     }
   }
@@ -2253,6 +2262,9 @@ body.is-shot .content{padding:0}
     /* Ensure parent is positioned */
     var wrap = triggerEl.parentElement;
     if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+    /* 下拉打開時不顯示 tooltip（FE：isOpen 時 title 清空） */
+    if (triggerEl.hasAttribute('data-tip')) { triggerEl.setAttribute('data-cp-tip', triggerEl.getAttribute('data-tip')); triggerEl.removeAttribute('data-tip'); }
+    var gl = document.getElementById('gl-tip'); if (gl) gl.style.display = 'none';
 
     var dd = document.createElement('div');
     dd.className = 'curr-dd';
@@ -2272,6 +2284,13 @@ body.is-shot .content{padding:0}
     });
 
     wrap.appendChild(dd);
+    /* 錨在按鈕本身（父層常常還包著 Month Picker 等元素，right:0 會對到父層右緣，Executive Insights 曾偏 146px） */
+    if (triggerEl.offsetParent === wrap) {
+      dd.style.top = (triggerEl.offsetTop + triggerEl.offsetHeight + 4) + 'px';
+      dd.style.right = (wrap.clientWidth - triggerEl.offsetLeft - triggerEl.offsetWidth) + 'px';
+      /* 按鈕寫 data-dd-align="left" 的改成左緣對齊（General Budget #01-7） */
+      if (triggerEl.dataset.ddAlign === 'left') { dd.style.right = 'auto'; dd.style.left = triggerEl.offsetLeft + 'px'; }
+    }
 
     /* Outside click to close */
     setTimeout(function () {
@@ -2285,8 +2304,21 @@ body.is-shot .content{padding:0}
   }
 
   /* ===== PUBLIC API ===== */
+  /* 預設 tooltip：滑過還沒有 tooltip 的幣別鈕時補上 data-tip（capture，比 demo-fab 的 #gl-tip 先跑） */
+  document.addEventListener('mouseover', function (e) {
+    var b = e.target.closest && e.target.closest('.curr-btn');
+    if (!b || b.classList.contains('cp-open') || b.disabled) return;
+    if (!b.hasAttribute('data-tip') && !b.hasAttribute('data-tip-tip') && !b.hasAttribute('data-no-tip')) b.setAttribute('data-tip', TIP);
+  }, true);
+
   window.CurrencyPicker = {
     CURRENCIES: CURRENCIES,
+    RATES: RATES,
+    TIP: TIP,
+    /** USD 金額換成 code 幣別（mock 匯率） */
+    convert: function (usd, code) { return usd * (RATES[code] || 1); },
+    /** 幣別前綴符號（找不到就回傳代碼＋空格） */
+    symbol: function (code) { return SYMBOLS[code] || (code + ' '); },
 
     /**
      * Toggle dropdown open / close.
@@ -2322,7 +2354,9 @@ body.is-shot .content{padding:0}
  *
  * 規則（per PM 註解 2026-05-21）：
  *   - 顯示「所有」FOCUS 分類（202512 官方文件約 19+ 項）；花費為 0 不顯示
- *   - 不做 Top 9 + Others 收尾（如要顯示 Others 桶，由 caller 自行傳入）
+ *   - 預設不做 Top 9 + Others 收尾；caller 傳 othersAfter:9 才合併（C-4，稿 #01 註記「前 9 大＋Others」）
+ *   - C-4（2026-10-16，Overview 稿 #01／#01-1、Executive Insights 稿 #01 量值，C-5 登記於 specs/2026-10-15-c-region/shared-requests.md）：
+ *     表格外框 #E6E6E6 r8 內距 16、表頭底 #E6F6FF 12/500 #676767、列 14px；色塊標籤與 tooltip 用完整金額＋幣別代碼；hover 色塊 80%
  *   - 顏色順序按 ranking：rank 1→#2、rank 2→#4、rank 3→#6、rank 4→#10、
  *     rank 5→#9、rank 6→#8、rank 7→#7、rank 8→#5、rank 9→#3、rank 10→#1
  *     （CMDS Color Kit Main palette；參考 FE rankingColor array）
@@ -2353,6 +2387,7 @@ body.is-shot .content{padding:0}
  *       tableSymbol: '',       // optional — 表格金額前綴（預設同 currencySymbol）
  *       showChange: true,      // optional — 表格多一欄 Change（Overview 用；對齊 FE Top10CostByFOCUSTable）
  *       noCompareTip: '...',   // optional — Change 為 -- 時的 hover 文案（走 host page 的 [data-tip] tooltip）
+ *       othersAfter: 9,        // optional — treemap 只畫前 N 名＋Others（其餘合併）；表格不受影響（Executive Insights 用，C-4 2026-10-16）
  *     });
  *   <\/script>
  *
@@ -2396,7 +2431,7 @@ body.is-shot .content{padding:0}
     '.lt-focus-section{display:grid;grid-template-columns:1fr 452px;gap:24px;align-items:stretch}',
     '.lt-focus-treemap{height:388px;background:#fff;border-radius:8px;overflow:hidden;position:relative;min-width:0}',
     /* table-wrap 改 scrollable，table 內維持標準 layout 讓 border-spacing 正常運作 */
-    '.lt-focus-table-wrap{height:388px;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;min-width:0;scrollbar-width:thin}',
+    '.lt-focus-table-wrap{box-sizing:border-box;height:388px;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;min-width:0;scrollbar-width:thin;background:#fff;border:1px solid #E6E6E6;border-radius:8px;padding:8px 16px 6px}',
     '.lt-focus-table-wrap::-webkit-scrollbar{width:6px}',
     '.lt-focus-table-wrap::-webkit-scrollbar-thumb{background:#CCCCCC;border-radius:3px}',
     '.lt-focus-table-wrap::-webkit-scrollbar-track{background:transparent}',
@@ -2405,24 +2440,24 @@ body.is-shot .content{padding:0}
        Scroll 由 wrap container 負責；thead 用 position:sticky 維持頂部固定 */
     '.lt-focus-table{width:100%;border-collapse:separate;border-spacing:0 8px;font-size:12px;table-layout:fixed}',
     '.lt-focus-table thead th{position:sticky;top:0;z-index:2}',
-    '.lt-focus-table thead th{padding:0 10px;height:32px;text-align:left;font-weight:700;color:#262626;font-size:11px;background:#F2FAFF;border-bottom:none;letter-spacing:.2px;white-space:nowrap}',
+    '.lt-focus-table thead th{padding:0 4px;height:26px;text-align:left;font-weight:500;color:#676767;font-size:12px;line-height:18px;background:#E6F6FF;border-bottom:none;letter-spacing:0;white-space:nowrap}',
     '.lt-focus-table thead tr th:first-child{border-radius:4px 0 0 4px}',
     '.lt-focus-table thead tr th:last-child{border-radius:0 4px 4px 0}',
     '.lt-focus-table thead th.tx-right{text-align:right}',
-    '.lt-focus-table thead th.col-rank{width:60px;white-space:nowrap}',
+    '.lt-focus-table thead th.col-rank{width:64px;white-space:nowrap}',
     '.lt-focus-table thead th.col-name{width:auto}',
-    '.lt-focus-table thead th.col-spend{width:80px}',
-    '.lt-focus-table thead th.col-share{width:60px}',
-    '.lt-focus-table thead th.col-change{width:72px}',
+    '.lt-focus-table thead th.col-spend{width:88px}',
+    '.lt-focus-table thead th.col-share{width:68px}',
+    '.lt-focus-table thead th.col-change{width:68px}',
     /* tbody / tr 維持標準 table layout（display:table-row-group / display:table-row）讓 border-spacing 生效 */
-    '.lt-focus-table td{padding:0 10px;height:25px;border-bottom:none;font-size:12px;color:#676767;vertical-align:middle;background:#fff}',
+    '.lt-focus-table td{padding:0 4px;height:25px;border-bottom:none;font-size:14px;color:#676767;vertical-align:middle;background:#fff}',
     '.lt-focus-table td.tx-right{text-align:right;font-weight:700}',
-    '.lt-focus-table td.col-rank{color:#676767;font-weight:700;font-size:11px;width:60px;white-space:nowrap;letter-spacing:.2px}',
-    '.lt-focus-table td.col-name{width:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;color:#262626}',
-    '.lt-focus-table td.col-spend{width:80px;color:#0B6DD7;font-weight:700}',
-    '.lt-focus-table td.col-share{width:60px;color:#262626;font-weight:700}',
+    '.lt-focus-table td.col-rank{color:#676767;font-weight:700;font-size:14px;width:64px;white-space:nowrap;letter-spacing:0}',
+    '.lt-focus-table td.col-name{width:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;color:#676767}',
+    '.lt-focus-table td.col-spend{width:88px;color:#308CE3;font-weight:700}',
+    '.lt-focus-table td.col-share{width:68px;color:#308CE3;font-weight:700}',
     /* Change 欄（opt-in `showChange`；對齊 FE Top10CostByFOCUSTable：+ 紅 / − 綠 / 0 或 null 顯示 -- 並帶 tooltip） */
-    '.lt-focus-table td.col-change{width:72px;font-weight:700;color:var(--lt-color-text-secondary,#676767);white-space:nowrap}',
+    '.lt-focus-table td.col-change{width:68px;font-weight:700;color:var(--lt-color-text-secondary,#676767);white-space:nowrap}',
     '.lt-focus-table td.col-change.is-up{color:var(--lt-color-error,#FF403D)}',
     '.lt-focus-table td.col-change.is-down{color:var(--lt-color-success,#00B5A6)}',
     '.lt-focus-table td.col-change .lt-focus-nocmp{cursor:help}',
@@ -2464,6 +2499,12 @@ body.is-shot .content{padding:0}
     return sign + abs.toFixed(d);
   }
 
+  // 完整金額：3935412.28 → "3,935,412.28"（稿：treemap 標籤與 tooltip 不縮寫，縮寫只套 KPI 卡與座標軸）
+  function fullFormat(n) {
+    if (n === null || n === undefined || isNaN(n)) return '--';
+    return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
   function _resolveEl(elOrSelector) {
     if (typeof elOrSelector === 'string') return document.querySelector(elOrSelector);
     return elOrSelector;
@@ -2501,6 +2542,19 @@ body.is-shot .content{padding:0}
         itemStyle: { color: getRankColor(rank) },
       };
     });
+    // othersAfter：前 N 名＋Others（第 N+1 名以後合併，用第 N+1 名的色）
+    var topN = opts.othersAfter;
+    if (topN && formattedData.length > topN + 1) {
+      var rest = nonZero.slice(topN);
+      formattedData = formattedData.slice(0, topN);
+      formattedData.push({
+        name: 'Others',
+        value: rest.reduce(function (s, d) { return s + d.spending; }, 0),
+        _rank: (topN + 1) + '+',
+        _share: rest.reduce(function (s, d) { return s + (d.share || 0); }, 0),
+        itemStyle: { color: getRankColor(topN + 1) },
+      });
+    }
 
     var chart = echarts.init(el);
     var symbol = opts.currencySymbol || '$';
@@ -2515,15 +2569,17 @@ body.is-shot .content{padding:0}
         backgroundColor: '#FFFFFF',
         textStyle: { color: '#262626', fontSize: 12 },
         extraCssText: 'border-radius:6px;padding:10px 12px;max-width:280px;box-shadow:0 4px 16px rgba(0,0,0,.12)',
+        // C-4：稿 #01-1 Chart / Tooltip＝標題＋（色點）名稱＋完整金額與幣別代碼
         formatter: function (p) {
           var d = p.data;
-          var share = (d._share != null) ? (d._share * 100).toFixed(2) + '%' : '--';
+          var c = (d.itemStyle && d.itemStyle.color) || p.color;
           return '<div class="lt-focus-tooltip">' +
-                 '<div class="lt-focus-tooltip-name" style="color:#262626;font-weight:700;font-size:13px;margin-bottom:6px">' + _esc(d.name) + '</div>' +
-                 '<div style="color:#676767;line-height:1.6">Spending: <strong style="color:#0B6DD7">' + symbol + nFormat(d.value) + ' ' + _esc(currencyCode) + '</strong></div>' +
-                 '<div style="color:#676767;line-height:1.6">Share: <strong style="color:#262626">' + share + '</strong></div>' +
-                 '<div style="color:#676767;line-height:1.6">Rank: <strong style="color:#262626">Top ' + d._rank + '</strong></div>' +
-                 '</div>';
+                 '<div class="lt-focus-tooltip-name" style="color:#262626;font-weight:700;font-size:12px;margin-bottom:4px">' + _esc(d.name) + '</div>' +
+                 '<div style="display:flex;align-items:center;gap:8px;color:#676767;font-size:12px;line-height:1.8">' +
+                   '<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:' + c + '"></span>' +
+                   '<span style="flex:1">' + _esc(d.name) + '</span>' +
+                   '<strong style="color:#262626;margin-left:16px">' + _esc(symbol) + fullFormat(d.value) + (currencyCode ? ' ' + _esc(currencyCode) : '') + '</strong>' +
+                 '</div></div>';
         },
       },
       series: [{
@@ -2545,9 +2601,10 @@ body.is-shot .content{padding:0}
           lineHeight: 18,
           // 面積過小 ECharts 預設會自動隱藏 label（min font size constraint）
           formatter: function (p) {
-            return p.name + '\n' + symbol + nFormat(p.value);
+            return p.name + '\n' + symbol + fullFormat(p.value);   // C-4：完整金額（稿「USD 3,935,412.28」）
           },
         },
+        emphasis: { itemStyle: { opacity: 0.8 }, label: { show: true } },   // C-4：hover 色塊 80%（Overview #01-1 註記）
         // 不做 drill-down upper label
         upperLabel: { show: false },
         levels: [{
@@ -2598,7 +2655,7 @@ body.is-shot .content{padding:0}
     var tbody = '<tbody>' + rows.map(function (d, i) {
       var rank = i + 1;
       var rankStr = 'Top ' + String(rank).padStart(2, '0');
-      var spending = symbol + nFormat(d.spending);
+      var spending = symbol + (Math.abs(d.spending) >= 1e5 ? nFormat(d.spending) : fullFormat(d.spending));   // C-4：十萬以上才縮寫（Guideline；稿 87,293.19）
       var share = (d.share != null) ? (d.share * 100).toFixed(2) + '%' : '--';
       return '<tr>' +
                '<td class="col-rank">' + _esc(rankStr) + '</td>' +
@@ -2637,6 +2694,7 @@ body.is-shot .content{padding:0}
       currency: config.currency,
       currencySymbol: config.currencySymbol,
       emptyText: config.emptyText,
+      othersAfter: config.othersAfter,     // optional — 前 N 名＋Others（C-4）
     });
 
     _renderTable(bEl, config.data || [], {
@@ -2871,7 +2929,9 @@ let _mainShown = false;   // 第一次切進「有資料」畫面才跑一次 sk
  * 3. Helpers
  * ============================================================ */
 const cur = () => CURRENCY[state.currency] || CURRENCY.USD;
-const cx = (usd) => (usd === null || usd === undefined) ? null : usd * cur().rate;   // convert
+/* 2026-10-16 X-9r1：匯率讀共用 CurrencyPicker.RATES（全站同一組；上表的 rate 只在 shared 沒載到時備用），symbol 仍用上表 */
+const curRate = () => (window.CurrencyPicker && CurrencyPicker.RATES && CurrencyPicker.RATES[state.currency]) || cur().rate;
+const cx = (usd) => (usd === null || usd === undefined) ? null : usd * curRate();   // convert
 function fmtNum(n, fixed = 2) {
   return Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: fixed, maximumFractionDigits: fixed });
 }
@@ -3566,17 +3626,8 @@ function mountFocus() {
     data, currency: '', currencySymbol: `${state.currency} `,   // FE treemap label = `${currency.value} 31.24K`
     tableSymbol: '',                                            // FE Top10 表格金額不帶前綴（幣別在卡片 `Cost (USD)`）
     tableLimit: 10, showChange: true, noCompareTip: COPY.focusNoCompare,
+    othersAfter: 9,   // C-5 #26（稿 #01 註記）：Treemap 只畫前 9 大＋Others（第十名以後合併，用第 10 名的色）；右表照常 Top 10。2026-10-16 X-9r1 改用 shared 選項（C-4 新增），頁面層換資料那段拿掉
   });
-  /* C-5 #26（稿 #01 註記）：Treemap 只畫前 9 大＋Others（第十名以後合併）；右表照常 Top 10。
-   * shared focus-treemap 規定 Others 由 caller 處理，這裡在 render 後換掉 treemap 的資料（不動 shared，K7）。Others 用第 10 名的色 */
-  const sorted = data.filter(d => d.spending > 0).sort((a, b) => b.spending - a.spending);
-  const inst = echarts.getInstanceByDom(document.getElementById('focus-treemap'));
-  if (inst && sorted.length > 10) {
-    const top = sorted.slice(0, 9).map((d, i) => ({ name: d.name, value: d.spending, _rank: i + 1, _share: d.share, itemStyle: { color: LumitureFocusTreemap.getRankColor(i + 1) } }));
-    const rest = sorted.slice(9);
-    top.push({ name: 'Others', value: rest.reduce((s, d) => s + d.spending, 0), _rank: '10+', _share: rest.reduce((s, d) => s + (d.share || 0), 0), itemStyle: { color: LumitureFocusTreemap.getRankColor(10) } });
-    inst.setOption({ series: [{ data: top }] });
-  }
 }
 
 function mountCharts() {
@@ -3802,7 +3853,7 @@ function rkSkeletonHtml(left) {
 function rankingsHtml() {
   /* 角色權限資料驅動：T2 後端不回傳 viewSpendingRanking → 主頁沒有 Top 10 入口，直接輸入網址進來也要擋（⚠ 設計端暫擬，稿與 FE 都沒有這個畫面） */
   if (!state.availableActions.viewSpendingRanking) {
-    return `${rkTopHtml(false)}<div class="rk-card"><div class="es" style="min-height:520px"><span class="material-symbols-outlined" style="font-size:64px;color:var(--lt-blue-30)">lock</span><div class="es-title">${COPY.rank.noAccessTitle}</div><div class="es-desc">${COPY.rank.noAccessDesc}</div><button class="btn btn-p" onclick="goOverview()">${COPY.rank.back}</button></div></div>`;
+    return `${rkTopHtml(false)}<div class="rk-card"><div class="es" style="min-height:520px"><span class="material-symbols-outlined" style="font-size:64px;color:var(--lt-blue-30);font-variation-settings:'FILL' 0,'wght' 600,'GRAD' 0,'opsz' 48">lock</span><div class="es-title">${COPY.rank.noAccessTitle}</div><div class="es-desc">${COPY.rank.noAccessDesc}</div><button class="btn btn-p" onclick="goOverview()">${COPY.rank.back}</button></div></div>`;
   }
   /* ⚠ 設計端暫擬：沒有授權任何雲的 org（hasAssignedResources=false）。主頁 no-auth 時沒有排名入口；直接進子頁就沿用主頁的 no-auth 畫面（FE 子頁沒有 gate，只會抓到空資料） */
   if (state.pageState === 'no-auth') return `${rkTopHtml(false)}${noAuthHtml(false)}`;

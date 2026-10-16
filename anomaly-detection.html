@@ -635,7 +635,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 
 /* ===== Skeleton（#01-6：表頭 #F2F2F2＋上緣 2px、四列、左欄與右四欄間 1px 分隔）===== */
 /* 對稿修正（Figma #01-6）：條的底色 #E6E6E6（稿上再疊一層動畫光），原本 #EBEBEB 偏淡 */
-.sk{background:linear-gradient(90deg,#E6E6E6 25%,#F2F2F2 50%,#E6E6E6 75%);background-size:200% 100%;animation:shimmer 1.5s infinite linear;border-radius:4px;height:14px}
+.sk{background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;height:14px}   /* A-18 靜態（2026-10-16 X-9r1 拿掉 shimmer） */
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 .sk-tbl{display:grid;grid-template-columns:476fr 1px 528fr}
 .sk-tbl .sk-div{background:var(--lt-grey-200)}
@@ -875,7 +875,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
 /* Skeleton（#04）：標籤保留、內容換成灰條；讀取中不能操作的按鈕 Disabled */
 .skl{background:var(--lt-grey-100)}
 .sk-b{height:14px;border-radius:4px}
-.sk-s{background:linear-gradient(90deg,#E6E6E6 25%,#F2F2F2 50%,#E6E6E6 75%);background-size:200% 100%;animation:shimmer 1.5s infinite linear;border-radius:4px}
+.sk-s{background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px}   /* A-18 靜態（X-9r1） */
 .dsk-chart{position:relative;height:360px}   /* 對稿修正（#04 Skeleton/Line Chart，1005×360）：以下座標都是稿的值（相對圖表區左上）*/
 .dsk-grid{position:absolute;left:35px;right:4px;top:38px;height:250px}
 .dsk-h{position:absolute;left:0;right:0;height:1px;background:repeating-linear-gradient(90deg,#E6E6E6 0 5px,transparent 5px 10px)}
@@ -900,8 +900,8 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
 .dsk-tbl .l .hd,.dsk-tbl .l .rw{padding:0 16px}
 .dsk-tbl .r .hd,.dsk-tbl .r .rw{display:grid;grid-template-columns:repeat(4,1fr);justify-items:center}
 /* AI Analysis 讀取中：灰條是 #676767@12%（疊在淡藍底上）*/
-.sk-a{background:linear-gradient(90deg,rgba(103,103,103,.12) 25%,rgba(103,103,103,.06) 50%,rgba(103,103,103,.12) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite linear;border-radius:4px;height:14px;margin:5.25px 0;flex-shrink:0}
-.es .es-ic.is-err{font-size:80px}
+.sk-a{background:rgba(103,103,103,.12);   /* A-18 靜態（X-9r1）；深底上的半透明條照稿 #04 */border-radius:4px;height:14px;margin:5.25px 0;flex-shrink:0}
+.es .es-ic.is-err{font-size:80px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48}   /* A-19 空狀態／錯誤 icon FILL 0（2026-10-16 X-9r1；稿 #05 是實心，裁決優先） */
 .card.is-dtall{min-height:538px}   /* Figma #05：卡片高 538（141→679）*/
 /* 對稿修正（#05 Empty state 1053×538 蓋滿整張卡）：圖示＋文字以整張卡置中，不是扣掉標題列後置中（差 30px）*/
 .card.is-dtall{position:relative}
@@ -2556,7 +2556,7 @@ function renderList() {
   } else if (ps === 'error') body = esCard(`${ILLUS_ERR}<div class="es-title">${COPY.error.title}</div><div class="es-desc">${esc(COPY.error.desc)}</div>`, true);
   else {
     const pinnedEmpty = state.view === 'pinned' && !pinnedFlat().length;
-    if (pinnedEmpty) body = `<div class="card is-tall">${toolbarHtml('full')}<div class="es"><span class="material-symbols-outlined es-ic">keep</span><div class="es-title">${COPY.pinnedEmpty.title}</div><div class="es-desc">${esc(COPY.pinnedEmpty.desc)}</div></div></div>`;
+    if (pinnedEmpty) body = `<div class="card is-tall">${toolbarHtml('full')}<div class="es"><span class="material-symbols-outlined es-ic" style="font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48">keep</span><div class="es-title">${COPY.pinnedEmpty.title}</div><div class="es-desc">${esc(COPY.pinnedEmpty.desc)}</div></div></div>`;
     else body = `<div class="card">${toolbarHtml('full')}${tableHtml(bodyRows())}</div>`;
   }
   root.innerHTML = headerHtml() + body;
