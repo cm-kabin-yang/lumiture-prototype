@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lumiture.ai — Executive Insights v2 (FY Selector 對齊 General Budget)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>   <!-- X-9r3 FB21：字型檔實際從 gstatic 下載 -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
@@ -402,8 +403,9 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .pg-hdr-l{display:flex;align-items:center;gap:12px}
 .pg-title{font-size:24px;font-weight:700;color:var(--g900);line-height:1.4}
 .pg-hdr-meta{display:flex;align-items:center;gap:18px;font-size:12px;color:var(--g500);flex-wrap:wrap}
-.pg-hdr-meta .lu-item{display:inline-flex;align-items:center;gap:6px}
-.pg-hdr-meta .lu-item strong{color:var(--g700);font-weight:700;font-variant-numeric:tabular-nums}
+.pg-hdr-meta .lu-item{display:inline-flex;align-items:center;gap:4px}   /* X-9r3 FB3：標籤與時間間距 4（同 Overview .upd-times b） */
+.pg-hdr-meta .lu-lbl{font-weight:500;color:var(--g500)}   /* X-9r3 FB3：標籤 12／500、時間 12／400（稿 #01） */
+.pg-hdr-meta .lu-item strong{color:var(--g500);font-weight:400;font-variant-numeric:tabular-nums}
 .pg-hdr-meta .lu-info{display:inline-flex;align-items:center;color:var(--g400);cursor:help}
 .pg-hdr-meta .lu-info:hover{color:var(--g500)}
 /* A-23：Next Update 後面的截圖鈕（稿 #01；FE ScreenShot icon，24×24，同 Overview 子頁 .rk-shot） */
@@ -416,10 +418,9 @@ body.hide-parked .ei-parked{display:none}
 .ei-shot:hover{background:var(--pri-lt20)}
 .ei-shot:disabled{color:var(--g400);cursor:not-allowed;background:none}
 .pg-desc-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:20px;flex-wrap:wrap}
-.pg-desc{font-size:13px;color:var(--g500);line-height:1.65;flex:1;min-width:0}
-.pg-desc b{color:var(--g700);font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:.5px}
-.pg-desc .lm{color:var(--pri);font-weight:500;cursor:pointer;text-decoration:underline}   /* B-14 */
-.pg-desc .lm:hover{text-decoration:underline}
+.pg-desc{font-size:12px;color:var(--g500);line-height:18px;flex:1;min-width:0}   /* X-9r3 FB3：稿 #01 說明段落 12／18 */
+.pg-desc b{color:var(--g700);font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:0}
+.pg-desc .lm{color:var(--g500);font-weight:400;cursor:help;text-decoration:underline}   /* X-9r3 FB3：稿 #01 只有底線、沒改色（tooltip 觸發不是連結；B-14 只管文字連結），同 Overview .disclaimer .lm */
 .pg-desc-r{display:flex;align-items:center;gap:10px;flex-shrink:0}
 
 /* ===== Buttons (CMDS) ===== */
@@ -431,8 +432,8 @@ body.hide-parked .ei-parked{display:none}
 .btn-o:hover{background:var(--g50);color:var(--pri-lt);border-color:var(--pri-lt)}
 .btn-o:active{background:var(--g200);color:var(--pri-dk);border-color:var(--pri-dk)}
 .btn-b{background:transparent;color:var(--pri);min-width:auto;padding:0 8px}
-.btn-b:hover{background:var(--g50);color:var(--pri-lt)}
-.btn-b:active{background:var(--g200);color:var(--pri-dk)}
+.btn-b:hover{background:transparent;color:var(--pri-lt)}   /* X-9r3 FB11：CMDS text button hover＝文字底線＋#0B6DD7，不加底色 */
+.btn-b:active{background:transparent;color:var(--pri-dk)}
 .btn-b .btn-text{transition:text-decoration .15s}
 .btn-b:hover .btn-text{text-decoration:underline}
 .btn-sm{height:30px;padding:0 12px;font-size:14px}
@@ -481,9 +482,10 @@ body.hide-parked .ei-parked{display:none}
 .cvr-section-fy-r{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g700);font-weight:500;white-space:nowrap}
 .cvr-section-fy-r .material-symbols-outlined{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 18}   /* B-15（R1）：FY 觸發欄 calendar_month FILL 1，跟主頁 Month Picker 一致 */
 .cvr-section-fy-r strong{color:var(--g900);font-weight:700}
-.cvr-section-fy-link{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--pri);font-weight:600;padding:4px 8px;border-radius:var(--r-sm);background:none;border:none;font-family:inherit;line-height:1.4;cursor:pointer}
-.cvr-section-fy-link:hover{background:var(--pri-lt10)}
+.cvr-section-fy-link{display:inline-flex;align-items:center;gap:4px;font-size:14px;color:var(--pri);font-weight:700;padding:4px 8px;border-radius:var(--r-sm);background:none;border:none;font-family:inherit;line-height:1.4;cursor:pointer}   /* X-9r3 FB6：Edit Start Month 14／700（稿 #07 secondary/link/borderless，overlay #004FB0） */
+.cvr-section-fy-link:hover{background:none;color:var(--pri-lt)}   /* X-9r3 FB6／FB11：hover 底線＋#0B6DD7，不加底色 */
 .cvr-section-fy-link:hover .cvr-section-fy-link-text{text-decoration:underline}
+.cvr-section-fy-link:hover .material-symbols-outlined{color:var(--pri-lt)}
 .cvr-section-fy-link .material-symbols-outlined{font-size:16px;color:var(--pri);font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 16}   /* B-15（R1）：按鈕內 icon FILL 1 */
 
 /* Two-column layout: LEFT (score + metrics) + RIGHT (chart) */
@@ -641,51 +643,57 @@ body.hide-parked .ei-parked{display:none}
 .sk-block{height:80px;margin-bottom:8px}
 .sk-large{height:240px}
 
-/* ===== Month picker (read-only display in v1) ===== */
-.month-picker-btn{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 4px 0 12px;background:#fff;border:1px solid var(--tf-border);border-radius:var(--r-sm);font-size:14px;color:var(--g700);font-family:inherit;cursor:pointer;line-height:1.4;transition:border-color .12s,background .12s}
+/* ===== Month picker — X-9r3 FB2：觸發欄與彈出層照 Overview（C-5 K4／#01-5），同一個元件兩頁長一樣 =====
+ * 觸發欄：稿 #01 Date Picker 120×36、日曆 icon 20 FILL 1 #676767、文字 14／400 #676767、沒有下拉箭頭（開的是日曆不是清單）
+ * 彈出層：300 寬、r10、陰影 0 0 6px .2、標題 16／700＋雙箭頭、標題下分隔線、月份格 36 高 14／700 */
+.month-picker-btn{display:inline-flex;align-items:center;justify-content:flex-start;gap:8px;height:36px;min-width:120px;padding:0 16px;background:#fff;border:1px solid var(--tf-border);border-radius:var(--r-sm);font-size:14px;font-weight:400;color:var(--g500);font-family:inherit;cursor:pointer;line-height:1.5;transition:border-color .12s,background .12s,box-shadow .15s}
 .month-picker-btn:hover{border-color:var(--g400)}   /* A-11：hover 只換框 #B3B3B3，不再變藍底 */
-.month-picker-btn .material-symbols-outlined{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 18}
-.month-picker-btn .mp-cal{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 18}
-.month-picker-btn .mp-arr{font-size:24px;color:var(--g500);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
-.month-picker-btn .mp-val{color:var(--g900);font-weight:500}
+.month-picker-btn:focus-visible,.mp-wrap.open .month-picker-btn{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
+.month-picker-btn .material-symbols-outlined{font-size:20px;color:var(--g500);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
+.month-picker-btn .mp-val{color:var(--g500);font-weight:400}
 
-/* ===== Month picker popover (interactive) ===== */
 .mp-wrap{position:relative;display:inline-block}
-.mp-pop{position:absolute;top:calc(100% + 6px);right:0;width:320px;background:#fff;border:1px solid var(--g200);border-radius:var(--r-md);box-shadow:0 4px 16px rgba(0,0,0,.14),0 1px 3px rgba(0,0,0,.1);z-index:60;overscroll-behavior:contain;display:none}
+.mp-pop{position:absolute;top:calc(100% + 4px);right:0;width:300px;background:#fff;border-radius:var(--lt-modal-radius-sm,10px);box-shadow:var(--lt-shadow-dialog,0 0 6px 0 rgba(0,0,0,.2));z-index:60;overscroll-behavior:contain;display:none}
 .mp-wrap.open .mp-pop{display:block}
-.mp-pop-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--g200)}
-.mp-pop-title{font-size:14px;font-weight:700;color:var(--g900);line-height:1.4;text-align:center;flex:1}
-.mp-pop-nav{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:none;background:none;border-radius:var(--r-sm);cursor:pointer;color:var(--g700);flex:0 0 auto}
+.mp-pop-hdr{display:flex;align-items:center;justify-content:space-between;height:36px;margin-top:20px;padding:0 20px}
+.mp-pop-div{height:1px;background:var(--g300);margin:10px 20px}   /* 稿：標題下分隔線 #CCCCCC，左右 20 */
+.mp-pop-title{font-size:16px;font-weight:700;color:var(--g900);line-height:24px;text-align:center;flex:1}
+.mp-pop-nav{display:inline-flex;align-items:center;justify-content:center;width:36px;height:24px;border:none;background:none;border-radius:var(--r-sm);cursor:pointer;color:var(--g700);flex:0 0 auto}
 .mp-pop-nav:hover{background:var(--g100)}
 .mp-pop-nav.hidden{visibility:hidden;pointer-events:none}
-.mp-pop-nav .material-symbols-outlined{font-size:20px;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20}
-.mp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:14px}
-.mp-cell{height:38px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--r-sm);font-family:inherit;font-size:13px;font-weight:500;color:var(--g900);cursor:pointer;transition:background .1s}
-.mp-cell:hover{background:var(--g100)}
+.mp-pop-nav .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20}   /* 稿 double_arrow_left／right 16 */
+.mp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px 20px}   /* 稿：格 81×36、間距 8、內距 8／20 */
+.mp-cell{height:36px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;border-radius:var(--r-sm);font-family:inherit;font-size:14px;font-weight:700;color:var(--g500);cursor:pointer;transition:background .1s}
+.mp-cell:hover{background:var(--pri-lt10)}
 .mp-cell.sel{background:var(--pri);color:#fff}
-.mp-cell.sel:hover{background:var(--pri)}
-.mp-cell.disabled{color:var(--g400);cursor:not-allowed;background:none}
-.mp-pop-ftr{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border-top:1px solid var(--g200)}
-.mp-pop-ftr .mp-ftr-right{display:flex;align-items:center;gap:8px}
+.mp-cell:focus-visible,.mp-pop-nav:focus-visible,.mp-pop .btn:focus-visible{outline:2px solid var(--pri);outline-offset:2px}   /* X-9r3 R8：同 Overview 的 focus 框 */
+.mp-cell.sel:hover{background:var(--pri-lt)}
+.mp-cell.disabled{color:var(--g300);cursor:not-allowed;background:none}
+.mp-pop-ftr{display:flex;align-items:center;gap:16px;padding:12px 20px 20px}
+.mp-pop-ftr .mp-ftr-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.mp-pop-ftr .btn-b{font-weight:700}
+.mp-pop-ftr .btn{min-width:auto}
 
 /* Currency selector — 由 shared/currency-picker.js 提供樣式（CMDS Component Library Currency Switch H=30px） */
 
 /* ===== Settings Page ===== */
 .gobk{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--pri);font-weight:500;padding:6px 8px;margin-left:-8px;border-radius:var(--r-sm);background:none;border:none;font-family:inherit;cursor:pointer;line-height:1.5}
-.gobk:hover{background:var(--pri-lt10)}
+.gobk:hover{background:none;color:var(--pri-lt)}   /* X-9r3 FB11：CMDS text button hover＝底線＋#0B6DD7，不加底色 */
 .gobk:hover .gobk-text{text-decoration:underline}
-.gobk .material-symbols-outlined{font-size:18px;color:var(--pri);font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 18}
+.gobk .material-symbols-outlined{font-size:18px;color:inherit;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 18}
 
 /* ==== FY year switcher（頁首右上，page-level 導覽；往前兩年/往後一年。移植自 General Budget v2）==== */
 .fy-sw{position:relative;display:inline-block}
-.fy-sw-trigger{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 4px 0 10px;border:1px solid var(--g300);border-radius:var(--r-sm);background:#fff;font-family:inherit;font-size:14px;font-weight:600;color:var(--g900);cursor:pointer;line-height:1;transition:border-color .12s,background .12s,box-shadow .12s}
+.fy-sw-trigger{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 4px 0 10px;border:1px solid var(--g300);border-radius:var(--r-sm);background:#fff;font-family:inherit;font-size:14px;font-weight:400;color:var(--g900);cursor:pointer;line-height:1;transition:border-color .12s,background .12s,box-shadow .12s}
 .fy-sw-trigger:hover{border-color:var(--g400)}
 .fy-sw.open .fy-sw-trigger{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 .fy-sw-trigger:disabled{color:var(--g400);background:var(--g100);border-color:var(--g200);cursor:not-allowed}
 .fy-sw-trigger:disabled .fy-sw-cal{color:var(--g400)}
-.fy-sw-cal{font-size:18px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400}
-.fy-sw-val{letter-spacing:0}
-.fy-sw-trigger-range{font-size:13px;font-weight:400;color:var(--g500);letter-spacing:0;white-space:nowrap}
+.fy-sw-cal{font-size:24px;color:var(--g500);font-variation-settings:'FILL' 0,'wght' 400}
+.cvr-section-fy-r .fy-sw-cal{font-size:24px;color:var(--g500)}   /* X-9r3 FB6：稿日曆 icon 24（上面 .cvr-section-fy-r 的 18 會蓋掉）。FILL 維持原樣 */
+.cvr-section-fy-r .fy-sw-arr{font-size:24px;color:var(--g500)}
+.fy-sw-val{letter-spacing:0;font-weight:400}   /* X-9r3 FB6：稿 #07、#07-4 Title 14／400 一段 */
+.fy-sw-trigger-range{font-size:14px;font-weight:400;color:inherit;letter-spacing:0;white-space:nowrap}
 .fy-sw-arr{font-size:24px;color:var(--g500);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;transition:transform .15s;margin-left:2px}   /* A-11：實心 ▾ */
 .fy-sw.open .fy-sw-arr{transform:rotate(180deg)}
 /* dropdown 行內 chip（實心、白字）：Incomplete = 青色（Secondary）*/
@@ -801,7 +809,8 @@ body.state-settings.role-admin .savebar{display:flex}
 .modal-sm{width:655px;border-radius:var(--lt-modal-radius-sm,10px)}
 .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .mt{font-size:20px;font-weight:700;color:var(--g900)}
-.mt-err{color:#FF403D;font-size:24px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;flex-shrink:0}   /* B-12（R1）：危險確認彈窗標題前的紅 error 圓，同 Customized Budget */
+.mt-err{color:#FF403D;font-size:30px;width:30px;height:30px;line-height:30px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;flex-shrink:0}   /* X-9r3 FB8：稿 #12 紅 error icon 30，與標題間距 15（同 Customized Budget .m-hd） */
+.modal-sm .mdesc{padding-left:45px}   /* X-9r3 FB8：稿 #12 Dialog Body 左內距 45，對齊標題文字 */   /* B-12（R1）：危險確認彈窗標題前的紅 error 圓，同 Customized Budget */
 .mx{color:var(--g500);cursor:pointer;display:flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:50%;background:none;border:none;padding:0}
 .mx:hover{background:var(--g100);color:var(--g700)}
 .mdesc{font-size:14px;color:var(--g900);margin-bottom:16px;line-height:1.75}
@@ -846,7 +855,7 @@ body.role-nonadmin .role-block{display:block}   /* A-19／A-38①：頁標題＋
    C-4（2026-10-16）對 9/22 新稿整頁重對：數值出自 Figma Dashboard 檔 page 5321:122923
    （#01、#01-1、#03-1、#04、#05、#07、#07-2、#07-5、#07-6）。差異清單 specs/2026-10-15-c-region/c4-compare.md
    ===================================================================== */
-body #gl-tip{white-space:pre-line;max-width:400px}        /* #01-1 tooltip 寬 400、公式換行 */
+body #gl-tip{white-space:pre-line;max-width:600px;font-size:14px;line-height:24.5px;padding:8px 16px;border-radius:var(--lt-tooltip-radius,4px);text-align:left}   /* 公式換行。X-9r3 FB1：稿 #01-1 Tooltip 元件 14／24.5、內距 8／16、r4，最大寬 600（CLAUDE.md tooltip 600；C-4 當時的 400 改成 600），同 General Budget（X-9r2 F3） */
 .pg-hdr-meta .lu-info{color:var(--g500)}
 /* CVR：左右各半（稿 494／494、間距 16）；Viewing 行淡灰；指標 info icon 實心 */
 .cvr-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
@@ -886,19 +895,23 @@ body #gl-tip{white-space:pre-line;max-width:400px}        /* #01-1 tooltip 寬 4
 .focus-idx{margin:0 0 16px}
 /* 空狀態慶祝卡（#04）：同 Empty State 規格的淡藍線框 icon，不用綠圓 */
 .rank-empty .re-ic{width:auto;height:auto;background:none;border-radius:0;margin-bottom:8px}
-.rank-empty .re-ic .material-symbols-outlined{font-size:64px;color:#9ED7FF;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48}
-.rank-empty .re-title{font-size:14px;color:var(--g500)}
-.rank-empty .re-desc{font-size:12px;color:var(--g500)}
+.rank-empty .re-ic .material-symbols-outlined{font-size:80px;color:#9ED7FF;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48}   /* X-9r3 FB5：稿 #04 大卡 Empty state icon 80、標題 18／700、說明 14 */
+.rank-empty .re-title{font-size:18px;color:var(--g500)}
+.rank-empty .re-desc{font-size:14px;line-height:24.5px;color:var(--g500)}
+.ei-empty-box.ei-empty-lg .lt-empty .lt-empty__t,.ei-empty-box.ei-empty-err .lt-empty .lt-empty__t{font-size:18px}   /* X-9r3 FB5：大卡（Top 10 ×2、FOCUS）空狀態與錯誤用 size L（icon 80）但標題 18（稿 #04、#05），CVR 圖區錯誤標題也是 18；No Data Available 的 16 維持 */
 /* 頁首只留標題（#06 No Authorization、#11 First-Time） */
 body.ei-hdr-min #page-dashboard > .pg-hdr .pg-hdr-meta,body.ei-hdr-min #page-dashboard > .pg-desc-row{display:none}
 body.ei-hdr-min #page-dashboard .state-view[data-state="no-auth"] .paper,body.ei-hdr-min #page-dashboard .state-view[data-state="firsttime"] .paper{min-height:530px;display:flex;align-items:center;justify-content:center}
 /* 讀取中：頁首按鈕 disabled（#03-1） */
-.curr-btn:disabled,.month-picker-btn:disabled{cursor:not-allowed;opacity:1;color:var(--g400);background:var(--g50);border-color:var(--g200)}
-.curr-btn:disabled *,.month-picker-btn:disabled *{color:var(--g400)!important;opacity:.6}
+/* X-9r3 FB4：停用的觸發欄＝底 #F2F2F2、框 #E6E6E6、字 #B3B3B3、icon #CCCCCC（OV 稿 #11 Date Picker、EI 稿 #03-1／#07-6 Dropdown）；停用的幣別鈕整顆 .32 吃 shared（拿掉頁面覆寫） */
+.month-picker-btn:disabled{cursor:not-allowed;color:var(--g400);background:var(--g100);border-color:var(--g200);box-shadow:none}
+.month-picker-btn:disabled .mp-val{color:var(--g400)}
+.month-picker-btn:disabled .material-symbols-outlined{color:var(--g300)}
 .ei-sk-time{display:inline-block;width:200px;height:12px;border-radius:2px;background:var(--lt-color-bg-skeleton,#E6E6E6);vertical-align:middle}
 /* Fiscal Settings（#07） */
-.gobk{font-size:16px;font-weight:700;color:#308CE3}
-.gobk .material-symbols-outlined{font-size:20px;color:#308CE3;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
+.gobk{font-size:16px;font-weight:700;color:var(--lt-color-text-link,#004FB0)}   /* X-9r3 FB6／FB15：稿 #07 文字圖層 fill #308CE3 上蓋 overlay #004FB0（取樣 #004FB0），C-4 讀到底下那層；用 .lt-link 的色 */
+.gobk:hover{color:var(--lt-color-text-link-hover,#0B6DD7)}
+.gobk .material-symbols-outlined{font-size:20px;color:inherit;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
 .settings-desc p{font-size:12px;line-height:18px}
 .completion-chip{height:24px;padding:0 8px;border-radius:4px;background:#00B5A6;color:#fff;font-size:12px;font-weight:400;letter-spacing:0}
 .completion-chip.incomplete{background:#FF403D;color:#fff}
@@ -920,7 +933,11 @@ body.ei-hdr-min #page-dashboard .state-view[data-state="no-auth"] .paper,body.ei
 /* Fiscal Settings 讀取中（#07-6）：Edit Start Month、FY 下拉 disabled，不顯示固定底列 */
 body.ei-s-loading .savebar{display:none!important}
 body.ei-s-loading #page-settings .cvr-section-fy-link,body.ei-s-loading #page-settings .fy-sw-trigger{pointer-events:none;color:var(--g400)}
-body.ei-s-loading #page-settings .cvr-section-fy-link *,body.ei-s-loading #page-settings .fy-sw-trigger *{color:var(--g400)!important}
+body.ei-s-loading #page-settings .cvr-section-fy-link *{color:var(--g400)!important}
+/* X-9r3 FB4：FY 觸發欄停用＝底 #F2F2F2、框 #E6E6E6、字 #B3B3B3、icon #CCCCCC（原本白底、框 #CCCCCC） */
+body.ei-s-loading #page-settings .fy-sw-trigger{background:var(--g100);border-color:var(--g200)}
+body.ei-s-loading #page-settings .fy-sw-trigger .material-symbols-outlined{color:var(--g300)!important}
+body.ei-s-loading #page-settings .fy-sw-trigger .fy-sw-val,body.ei-s-loading #page-settings .fy-sw-trigger .fy-sw-trigger-range{color:var(--g400)!important}
 .ei-sgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px 8px}
 .ei-sgrid .sk-l{height:12px;width:45%;margin-bottom:6px}
 .ei-sgrid .sk-i{height:30px}
@@ -945,6 +962,19 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
 /* #07-1：往下捲時固定住 Fiscal Settings 那一行（含 Edit Start Month 與 FY 下拉）；topbar 是 sticky 64 */
 #page-settings > .pg-hdr{position:sticky;top:64px;z-index:45;background:var(--pri-lt10);padding:8px 0;margin-top:0!important}
 .fy-sw-tag{font-size:12px;font-weight:400;padding:1px 8px;border-radius:4px;letter-spacing:0;line-height:18px}   /* #07-4：方角 chip r4、12/400 */
+
+/* =====================================================================
+   X-9r3 FX-B（2026-10-22）輪檢修正輪。出處 specs/2026-10-21-audit/X-9r3-dashboard.md；紀錄 fix-X-9r3-B.md
+   ===================================================================== */
+/* FB9／FB20 → X-9r3 R9（verify-2 N2，主 session 裁決：稿 ＞ CLS 推論）：骨架卡高度照稿 #03-1／#07-6（矮卡），不再用 min-height 撐到載入後的高度；
+   保留的是灰條 36 高、FOCUS 11 列、Top 10 排行表 10 列。載入後換成真資料時卡片會長高（CLS 來源③，登記 shared-requests，不在這處理）。class 名稱保留當鉤子 */
+/* FB13：三張中卡的標題列共用同一列高（subgrid）：1280 寬第一張標題換成兩行時，Period、數值框、Revenue 仍與另外兩張對齊，不縮字 */
+.trio.ei-trio-sub{grid-template-rows:auto 1fr}
+.trio.ei-trio-sub .paper{display:grid;grid-template-rows:subgrid;grid-row:span 2;row-gap:0}
+/* FB17：月份格整格可點（label 包住輸入框） */
+.month-cell-input{cursor:text}
+/* FB19：可聚焦的 info icon／Learn More 的 focus 框 */
+.ic-info:focus-visible,.lu-info:focus-visible,.lm:focus-visible{outline:2px solid var(--pri);outline-offset:2px;border-radius:4px}
 </style>
 </head>
 <body class="state-dashboard role-admin">
@@ -955,14 +985,14 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
   <div class="main">
     <header id="lt-topbar"></header>
 
-    <div class="content">
+    <main class="content" id="main">
 
       <!-- ====================================================== -->
       <!-- ===== NON-ADMIN BLOCK (T1/T2 — no access at all) ===== -->
       <!-- ====================================================== -->
       <div class="role-block">
         <!-- 第二輪 R1（A-19）：整頁無權限統一成 shared LumitureEmpty.noAccess()（頁標題在、「You do not have access to this page」＋Back to Overview，同 ARL／RO） -->
-        <div class="pg-hdr"><div class="pg-hdr-l"><div class="pg-title">Executive Insights</div></div></div>
+        <div class="pg-hdr"><div class="pg-hdr-l"><h1 class="pg-title">Executive Insights</h1></div></div>
         <div id="ei-noaccess"></div>
       </div>
 
@@ -974,11 +1004,11 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
         <!-- Page Header — Figma node 5425-107659 對齊 -->
         <div class="pg-hdr">
           <div class="pg-hdr-l">
-            <div class="pg-title">Executive Insights</div>
+            <h1 class="pg-title">Executive Insights</h1>
           </div>
           <div class="pg-hdr-meta">
-            <span class="lu-item"><span style="color:var(--g500)">Last Updated</span> <strong id="last-updated">10/09/2026</strong></span>
-            <span class="lu-item"><span style="color:var(--g500)">Next Update</span> <strong id="next-updated">10/10/2026</strong> <span style="color:var(--g500);font-size:12px">(UTC+0)</span></span>
+            <span class="lu-item"><span class="lu-lbl">Last Updated</span> <strong id="last-updated">10/09/2026</strong></span>
+            <span class="lu-item"><span class="lu-lbl">Next Update</span> <strong id="next-updated">10/10/2026</strong> <span style="color:var(--g500);font-size:12px">(UTC+0)</span></span>
             <span class="lu-info" data-tip="Due to data latency from cloud service provider, the cloud cost here may be slightly different from the final billing."><span class="material-symbols-outlined" style="font-size:16px">info</span></span>
             <span class="ei-sk-time" aria-hidden="true"></span>
             <button type="button" class="ei-shot" data-tip="Take Screenshot" aria-label="Take Screenshot" onclick="takeScreenshot()"><svg viewBox="0 0 24 25"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.3999 4.16675C3.29533 4.16675 2.3999 5.06218 2.3999 6.16675V7.59612V14.1696C2.3999 15.2741 3.29533 16.1696 4.3999 16.1696H7.7184V14.3696H4.3999C4.28945 14.3696 4.1999 14.28 4.1999 14.1696V7.59612H16.0321V8.31538H17.8321V7.59612V6.16675C17.8321 6.09771 17.8286 6.02949 17.8218 5.96226C17.7194 4.95375 16.8676 4.16675 15.8321 4.16675H4.3999ZM19.1571 12.2168H19.8899C20.8329 12.2168 21.5999 12.9956 21.5999 13.953V18.6661C21.5999 19.6235 20.8329 20.4023 19.8899 20.4023H11.584C10.6411 20.4023 9.87408 19.6235 9.87408 18.6661V13.953C9.87408 12.9956 10.6411 12.2168 11.584 12.2168H12.3169C12.3931 12.2168 12.4665 12.179 12.5125 12.1176L13.4319 11.0628C13.7572 10.6927 14.2224 10.4805 14.71 10.4805H16.764C17.2516 10.4805 17.7168 10.6927 18.042 11.0628L18.9234 12.07C19.0075 12.1801 19.0809 12.2168 19.1571 12.2168ZM13.2942 16.1855C13.2942 17.5528 14.3904 18.6661 15.737 18.6661C17.0836 18.6661 18.1798 17.5528 18.1798 16.1855C18.1798 14.8184 17.0836 13.7051 15.737 13.7051C14.3904 13.7051 13.2942 14.8184 13.2942 16.1855Z"/></svg></button>
@@ -996,12 +1026,11 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
               <span class="material-symbols-outlined curr-arrow">arrow_drop_down</span>
             </button>
             <div class="mp-wrap" id="mp-wrap">
-              <button class="month-picker-btn" id="mp-trigger" onclick="toggleMonthPicker(event)" data-tip="Select month" aria-haspopup="true" aria-expanded="false">
-                <span class="material-symbols-outlined mp-cal">calendar_month</span>
+              <button class="month-picker-btn" id="mp-trigger" onclick="toggleMonthPicker(event)" data-tip="Select month" aria-haspopup="dialog" aria-expanded="false">
+                <span class="material-symbols-outlined mp-cal" aria-hidden="true">calendar_month</span>
                 <span class="mp-val" id="mp-val">Sep. 2026</span>
-                <span class="material-symbols-outlined mp-arr">arrow_drop_down</span>
               </button>
-              <div class="mp-pop" id="mp-pop"></div>
+              <div class="mp-pop" id="mp-pop" role="dialog" aria-label="Select month"></div>
             </div>
             <button class="btn btn-p" onclick="goToSettings()">
               <span class="material-symbols-outlined">settings</span>
@@ -1015,23 +1044,23 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
 
           <!-- ====== LOADING STATE — C-4：對齊 Figma #03-1 Skeleton Loader（第一階段簡化版）：卡片標題照常、頁首時間換骨架條、按鈕 disabled（setState 處理） ====== -->
           <div class="state-view" data-state="loading" style="display:none">
-            <div class="paper">
-              <div class="paper-hdr"><div class="paper-title">Cloud Value Realization (CVR)</div></div>
+            <div class="paper ei-sk-card ei-sk-cvr">
+              <div class="paper-hdr"><h2 class="paper-title">Cloud Value Realization (CVR)</h2></div>
               <div class="cvr-grid" style="align-items:stretch"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px"><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div></div><div class="sk" style="min-height:140px"></div></div>
             </div>
-            <div class="trio"><div class="paper"><div class="paper-hdr"><div class="paper-title">Cloud Spend as a % of Revenue</div></div><div class="sk" style="height:140px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px"><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div></div></div><div class="paper"><div class="paper-hdr"><div class="paper-title">Cloud Cost per Customer</div></div><div class="sk" style="height:140px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px"><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div></div></div><div class="paper"><div class="paper-hdr"><div class="paper-title">Cloud Cost Forecast &amp; Variance</div></div><div class="sk" style="height:140px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px"><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div></div></div></div>
-            <div class="paper">
-              <div class="paper-hdr"><div class="paper-title">Top 10 Highest Budget Overspend Groups</div></div>
-              <div class="rank-grid overspend-layout" style="align-items:stretch"><div class="rank-table" style="align-self:stretch"><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div></div><div class="sk" style="height:180px"></div></div>
+            <div class="trio ei-sk-trio"><div class="paper"><div class="paper-hdr"><h2 class="paper-title">Cloud Spend as a % of Revenue</h2></div><div class="sk" style="height:140px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px"><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div></div></div><div class="paper"><div class="paper-hdr"><h2 class="paper-title">Cloud Cost per Customer</h2></div><div class="sk" style="height:140px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px"><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div></div></div><div class="paper"><div class="paper-hdr"><h2 class="paper-title">Cloud Cost Forecast &amp; Variance</h2></div><div class="sk" style="height:140px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px"><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:50%;margin-bottom:8px"></div><div class="sk" style="height:36px"></div></div></div></div></div>
+            <div class="paper ei-sk-card ei-sk-top">
+              <div class="paper-hdr"><h2 class="paper-title">Top 10 Highest Budget Overspend Groups</h2></div>
+              <div class="rank-grid overspend-layout" style="align-items:stretch"><div class="rank-table" style="align-self:stretch"><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div></div><div class="sk" style="height:180px"></div></div>
             </div>
-            <div class="paper">
-              <div class="paper-hdr"><div class="paper-title">Top 10 Highest Spending Groups</div></div>
-              <div class="rank-grid spending-layout" style="align-items:stretch"><div class="sk" style="height:180px"></div><div class="rank-table" style="align-self:stretch"><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div></div></div>
+            <div class="paper ei-sk-card ei-sk-top">
+              <div class="paper-hdr"><h2 class="paper-title">Top 10 Highest Spending Groups</h2></div>
+              <div class="rank-grid spending-layout" style="align-items:stretch"><div class="sk" style="height:180px"></div><div class="rank-table" style="align-self:stretch"><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div><div class="sk" style="height:12px;margin:10px 0"></div></div></div>
             </div>
-            <div class="paper">
-              <div class="paper-hdr"><div class="paper-title">Cost by FOCUS Framework</div></div>
+            <div class="paper ei-sk-card ei-sk-focus">
+              <div class="paper-hdr"><h2 class="paper-title">Cost by FOCUS Framework</h2></div>
               <div class="rank-chart-idx focus-idx"><div class="sk" style="height:12px;width:48px"></div><div class="sk" style="height:12px;width:96px"></div></div>
-              <div class="lt-focus-section"><div><div style="display:grid;grid-template-columns:1.2fr 1fr .5fr;grid-template-rows:1fr 1fr;gap:4px;height:340px"><div class="sk" style="grid-row:1 / 3"></div><div class="sk" style=""></div><div class="sk" style=""></div><div class="sk" style=""></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px"><div class="sk" style=""></div><div class="sk" style=""></div></div></div><div class="sk" style="height:8px;width:96px;margin:12px auto 0"></div></div><div class="rank-table" style="align-self:stretch"><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div></div></div>
+              <div class="lt-focus-section"><div><div style="display:grid;grid-template-columns:1.2fr 1fr .5fr;grid-template-rows:1fr 1fr;gap:4px;height:368px"><div class="sk" style="grid-row:1 / 3"></div><div class="sk" style=""></div><div class="sk" style=""></div><div class="sk" style=""></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px"><div class="sk" style=""></div><div class="sk" style=""></div></div></div><div class="sk" style="height:8px;width:96px;margin:12px auto 0"></div></div><div class="rank-table" style="align-self:stretch"><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:10px 0"><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div><div class="sk" style="height:12px"></div></div></div></div>
             </div>
           </div>
 
@@ -1039,7 +1068,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
           <div class="state-view" data-state="nodata" style="display:none">
             <div class="paper">
               <div class="paper-hdr">
-                <div><div class="paper-title">Cloud Value Realization (CVR)</div><div class="cvr-section-sub">Viewing: FY2026 · Feb. 2026 – Sep. 2026</div></div>
+                <div><h2 class="paper-title">Cloud Value Realization (CVR)</h2><div class="cvr-section-sub">Viewing: FY2026 · Feb. 2026 – Sep. 2026</div></div>
                 <div class="cvr-section-fy-r"><span class="material-symbols-outlined">calendar_today</span><strong>Fiscal Year Start: February</strong></div>
               </div>
               <div class="cvr-grid">
@@ -1057,35 +1086,35 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
                 <div data-lt-empty='{"size":"m","icon":"bar_chart","title":"No Data Available"}' class="ei-empty-box"></div>
               </div>
             </div>
-            <div class="trio">
+            <div class="trio ei-trio-sub">
               <div class="paper">
-                <div class="paper-hdr"><div><div class="paper-title">Cloud Spend as a % of Revenue</div><div class="paper-sub-period">Period: Sep. 2026</div></div></div>
+                <div class="paper-hdr"><div><h2 class="paper-title">Cloud Spend as a % of Revenue</h2><div class="paper-sub-period">Period: Sep. 2026</div></div></div>
                 <div class="paper-body">
                   <div class="metric-frame neutral"><div class="mf-lbl">Your Cloud Spend as % of Revenue</div><div class="mf-val-row"><span class="mf-val neutral"><span class="ei-nd" data-tip="Fill out your fiscal settings completely to unlock these powerful insights!">No Data</span></span></div></div>
                   <div class="trio-meta-row"><div class="meta-cell"><span class="meta-lbl">Revenue</span><span class="meta-val"><span class="ei-nd" data-tip="Fill out your fiscal settings completely to unlock these powerful insights!">No Data</span></span></div><div class="meta-cell"><span class="meta-lbl">Industry Benchmark</span><span class="meta-val"><span class="ei-nd" data-tip="Fill out your fiscal settings completely to unlock these powerful insights!">No Data</span></span></div></div>
                 </div>
               </div>
               <div class="paper">
-                <div class="paper-hdr"><div><div class="paper-title">Cloud Cost per Customer</div><div class="paper-sub-period">Period: Sep. 2026</div></div></div>
+                <div class="paper-hdr"><div><h2 class="paper-title">Cloud Cost per Customer</h2><div class="paper-sub-period">Period: Sep. 2026</div></div></div>
                 <div class="paper-body">
                   <div class="trio-dual"><div class="dual-cell primary"><div class="dual-val-row"><span class="dual-val"><span class="ei-nd" data-tip="Fill out your fiscal settings completely to unlock these powerful insights!">No Data</span></span></div></div><div class="dual-cell secondary"><span class="dual-lbl">Active Customers</span><span class="dual-val"><span class="ei-nd" data-tip="Fill out your fiscal settings completely to unlock these powerful insights!">No Data</span></span></div></div>
                   <div class="cpc-trend"><div class="cpc-trend-lbl">Monthly Trend</div><div class="ei-nd-chart">No Data Available</div></div>
                 </div>
               </div>
               <div class="paper">
-                <div class="paper-hdr"><div><div class="paper-title">Cloud Cost Forecast &amp; Variance</div><div class="paper-sub-period">Period: Sep. 2026</div></div></div>
+                <div class="paper-hdr"><div><h2 class="paper-title">Cloud Cost Forecast &amp; Variance</h2><div class="paper-sub-period">Period: Sep. 2026</div></div></div>
                 <div class="paper-body">
                   <div class="metric-frame neutral"><div class="mf-lbl">Variance %</div><div class="mf-val-row"><span class="mf-val neutral"><span class="ei-nd" data-tip="Fill out your fiscal settings completely to unlock these powerful insights!">No Data</span></span></div></div>
                   <div class="trio-meta-row three"><div class="meta-cell"><span class="meta-lbl">Your Forecast</span><span class="meta-val"><span class="ei-nd" data-tip="Fill out your fiscal settings completely to unlock these powerful insights!">No Data</span></span></div><div class="meta-cell"><span class="meta-lbl">Actual Cost</span><span class="meta-val"><span class="ei-nd" data-tip="Fill out your fiscal settings completely to unlock these powerful insights!">No Data</span></span></div><div class="meta-cell"><span class="meta-lbl">Variance <span class="material-symbols-outlined ic-info" data-tip="Variance  is calculated as:&#10;Forecast - Actual Cost">info</span></span><span class="meta-val"><span class="ei-nd" data-tip="Fill out your fiscal settings completely to unlock these powerful insights!">No Data</span></span></div></div>
                 </div>
               </div>
             </div>
-            <div class="paper"><div class="paper-hdr"><div class="paper-title">Top 10 Highest Budget Overspend Groups</div></div><div class="rank-chart-idx focus-idx"><span></span><span class="paper-sub-period">Period: Sep. 2026</span></div>
+            <div class="paper"><div class="paper-hdr"><h2 class="paper-title">Top 10 Highest Budget Overspend Groups</h2></div><div class="rank-chart-idx focus-idx"><span></span><span class="paper-sub-period">Period: Sep. 2026</span></div>
               <div class="ei-nd-overspend"><div class="rank-empty"><div class="re-ic"><span class="material-symbols-outlined">celebration</span></div><div class="re-title">Zero Budget Overspends!</div><div class="re-desc">No groups have exceeded their budget! Your proactive management has kept all spending perfectly in check.<br>This is a great achievement! Keep up the excellent work!</div></div></div>
-              <div class="ei-nd-nobudget" style="display:none"><div data-lt-empty='{"size":"m","icon":"bar_chart","title":"No Budget Data Yet","desc":"You have not yet set a budget for your group. Please go to the General Budget page to set it up."}' class="ei-empty-box ei-empty-lg ei-gb-link"></div></div>
+              <div class="ei-nd-nobudget" style="display:none"><div data-lt-empty='{"size":"l","icon":"bar_chart","title":"No Budget Data Yet","desc":"You have not yet set a budget for your group. Please go to the General Budget page to set it up."}' class="ei-empty-box ei-empty-lg ei-gb-link"></div></div>
             </div>
-            <div class="paper"><div class="paper-hdr"><div class="paper-title">Top 10 Highest Spending Groups</div></div><div class="rank-chart-idx focus-idx"><span></span><span class="paper-sub-period">Period: Sep. 2026</span></div><div data-lt-empty='{"size":"m","icon":"bar_chart","title":"No Spending Data Yet","desc":"Your cloud accounts have not generated any spending, or resources have not yet been synced to LumiTure.ai.\nOnce you begin using your resources, your spending will be displayed here."}' class="ei-empty-box ei-empty-lg"></div></div>
-            <div class="paper"><div class="paper-hdr"><div class="paper-title">Cost by FOCUS Framework <span class="material-symbols-outlined ic-info" data-tip="FOCUS: FinOps Open Cost &amp; Usage Specification, an open specification that standardizes cost and usage data across cloud providers to simplify FinOps.">info</span></div></div><div class="rank-chart-idx focus-idx"><span></span><span class="paper-sub-period">Period: Sep. 2026</span></div><div data-lt-empty='{"size":"m","icon":"bar_chart","title":"No Spending Data Yet","desc":"Your cloud accounts have not generated any spending, or resources have not yet been synced to LumiTure.ai.\nOnce you begin using your resources, your spending will be displayed here."}' class="ei-empty-box ei-empty-lg"></div></div>
+            <div class="paper"><div class="paper-hdr"><h2 class="paper-title">Top 10 Highest Spending Groups</h2></div><div class="rank-chart-idx focus-idx"><span></span><span class="paper-sub-period">Period: Sep. 2026</span></div><div data-lt-empty='{"size":"l","icon":"bar_chart","title":"No Spending Data Yet","desc":"Your cloud accounts have not generated any spending, or resources have not yet been synced to LumiTure.ai.\nOnce you begin using your resources, your spending will be displayed here."}' class="ei-empty-box ei-empty-lg"></div></div>
+            <div class="paper"><div class="paper-hdr"><h2 class="paper-title">Cost by FOCUS Framework <span class="material-symbols-outlined ic-info" data-tip="FOCUS: FinOps Open Cost &amp; Usage Specification, an open specification that standardizes cost and usage data across cloud providers to simplify FinOps.">info</span></h2></div><div class="rank-chart-idx focus-idx"><span></span><span class="paper-sub-period">Period: Sep. 2026</span></div><div data-lt-empty='{"size":"l","icon":"bar_chart","title":"No Spending Data Yet","desc":"Your cloud accounts have not generated any spending, or resources have not yet been synced to LumiTure.ai.\nOnce you begin using your resources, your spending will be displayed here."}' class="ei-empty-box ei-empty-lg"></div></div>
           </div>
 
           <!-- ====== FIRST-TIME EMPTY STATE — 對齊 Figma 5587-131792 文案 ====== -->
@@ -1098,7 +1127,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
           <!-- ====== CSP NOT AUTHORIZED STATE — 對齊 Figma #06 (5425:107906) 文案 ====== -->
           <div class="state-view" data-state="no-auth" style="display:none">
             <div class="paper">
-              <div data-lt-empty='{"size":"l","icon":"lock_open","title":"Unlock the Value of Your Cloud Investments Today","desc":"Begin your cloud cost optimization journey by authorizing your first cloud account.\nOnce connected, you&#39;ll gain a comprehensive view of your cloud performance, allowing you to track key ROI and KPI metrics.\nThis empowers you to make informed decisions to improve your investments and easily identify cost-saving opportunities.","action":{"label":"Add Your Authorization"}}' style="min-height:280px;padding:24px 0;display:flex;align-items:center;justify-content:center"></div>
+              <div data-lt-empty='{"size":"l","icon":"lock_open","title":"Unlock the Value of Your Cloud Investments Today","desc":"Begin your cloud cost optimization journey by authorizing your first cloud account.\nOnce connected, you&#39;ll gain a comprehensive view of your cloud performance, allowing you to track key ROI and KPI metrics.\nThis empowers you to make informed decisions to improve your investments and easily identify cost-saving opportunities.","action":{"label":"Add Your Authorization","href":"./organization-settings.html"}}' style="min-height:280px;padding:24px 0;display:flex;align-items:center;justify-content:center"></div>
             </div>
           </div>
 
@@ -1106,7 +1135,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
           <div class="state-view" data-state="error" style="display:none">
             <div class="paper">
               <div class="paper-hdr">
-                <div><div class="paper-title">Cloud Value Realization (CVR)</div><div class="cvr-section-sub">Viewing: FY2026 · Feb. 2026 – Sep. 2026</div></div>
+                <div><h2 class="paper-title">Cloud Value Realization (CVR)</h2><div class="cvr-section-sub">Viewing: FY2026 · Feb. 2026 – Sep. 2026</div></div>
                 <div class="cvr-section-fy-r"><span class="material-symbols-outlined">calendar_today</span><strong>Fiscal Year Start: February</strong></div>
               </div>
               <div class="cvr-grid">
@@ -1121,35 +1150,35 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
                     <div class="cvr-metric"><div class="cm-lbl">Cost Variance <span class="material-symbols-outlined ic-info" data-tip="Cost Variance is calculated as:&#10;Realized Value - Actual Cost">info</span></div><div class="cm-val"><span class="ei-nd">No Data</span></div></div>
                   </div>
                 </div>
-                <div data-lt-empty='{"size":"m","icon":"error","title":"Something Went Wrong","desc":"Please ensure you have a stable internet connection\nand try refreshing the page."}' class="ei-empty-box"></div>
+                <div data-lt-empty='{"size":"m","icon":"error","title":"Something Went Wrong","desc":"Please ensure you have a stable internet connection\nand try refreshing the page."}' class="ei-empty-box ei-empty-err"></div>
               </div>
             </div>
-            <div class="trio">
+            <div class="trio ei-trio-sub">
               <div class="paper">
-                <div class="paper-hdr"><div><div class="paper-title">Cloud Spend as a % of Revenue</div><div class="paper-sub-period">Period: Sep. 2026</div></div></div>
+                <div class="paper-hdr"><div><h2 class="paper-title">Cloud Spend as a % of Revenue</h2><div class="paper-sub-period">Period: Sep. 2026</div></div></div>
                 <div class="paper-body">
                   <div class="metric-frame neutral"><div class="mf-lbl">Your Cloud Spend as % of Revenue</div><div class="mf-val-row"><span class="mf-val neutral"><span class="ei-nd">No Data</span></span></div></div>
                   <div class="trio-meta-row"><div class="meta-cell"><span class="meta-lbl">Revenue</span><span class="meta-val"><span class="ei-nd">No Data</span></span></div><div class="meta-cell"><span class="meta-lbl">Industry Benchmark</span><span class="meta-val"><span class="ei-nd">No Data</span></span></div></div>
                 </div>
               </div>
               <div class="paper">
-                <div class="paper-hdr"><div><div class="paper-title">Cloud Cost per Customer</div><div class="paper-sub-period">Period: Sep. 2026</div></div></div>
+                <div class="paper-hdr"><div><h2 class="paper-title">Cloud Cost per Customer</h2><div class="paper-sub-period">Period: Sep. 2026</div></div></div>
                 <div class="paper-body">
                   <div class="trio-dual"><div class="dual-cell primary"><div class="dual-val-row"><span class="dual-val"><span class="ei-nd">No Data</span></span></div></div><div class="dual-cell secondary"><span class="dual-lbl">Active Customers</span><span class="dual-val"><span class="ei-nd">No Data</span></span></div></div>
                   <div class="cpc-trend"><div class="cpc-trend-lbl">Monthly Trend</div><div class="ei-nd-chart">Something Went Wrong</div></div>
                 </div>
               </div>
               <div class="paper">
-                <div class="paper-hdr"><div><div class="paper-title">Cloud Cost Forecast &amp; Variance</div><div class="paper-sub-period">Period: Sep. 2026</div></div></div>
+                <div class="paper-hdr"><div><h2 class="paper-title">Cloud Cost Forecast &amp; Variance</h2><div class="paper-sub-period">Period: Sep. 2026</div></div></div>
                 <div class="paper-body">
                   <div class="metric-frame neutral"><div class="mf-lbl">Variance %</div><div class="mf-val-row"><span class="mf-val neutral"><span class="ei-nd">No Data</span></span></div></div>
                   <div class="trio-meta-row three"><div class="meta-cell"><span class="meta-lbl">Your Forecast</span><span class="meta-val"><span class="ei-nd">No Data</span></span></div><div class="meta-cell"><span class="meta-lbl">Actual Cost</span><span class="meta-val"><span class="ei-nd">No Data</span></span></div><div class="meta-cell"><span class="meta-lbl">Variance <span class="material-symbols-outlined ic-info" data-tip="Variance  is calculated as:&#10;Forecast - Actual Cost">info</span></span><span class="meta-val"><span class="ei-nd">No Data</span></span></div></div>
                 </div>
               </div>
             </div>
-            <div class="paper"><div class="paper-hdr"><div class="paper-title">Top 10 Highest Budget Overspend Groups</div></div><div class="rank-chart-idx focus-idx"><span></span><span class="paper-sub-period">Period: Sep. 2026</span></div><div data-lt-empty='{"size":"m","icon":"error","title":"Something Went Wrong","desc":"Please ensure you have a stable internet connection and try refreshing the page."}' class="ei-empty-box ei-empty-lg"></div></div>
-            <div class="paper"><div class="paper-hdr"><div class="paper-title">Top 10 Highest Spending Groups</div></div><div class="rank-chart-idx focus-idx"><span></span><span class="paper-sub-period">Period: Sep. 2026</span></div><div data-lt-empty='{"size":"m","icon":"error","title":"Something Went Wrong","desc":"Please ensure you have a stable internet connection and try refreshing the page."}' class="ei-empty-box ei-empty-lg"></div></div>
-            <div class="paper"><div class="paper-hdr"><div class="paper-title">Cost by FOCUS Framework <span class="material-symbols-outlined ic-info" data-tip="FOCUS: FinOps Open Cost &amp; Usage Specification, an open specification that standardizes cost and usage data across cloud providers to simplify FinOps.">info</span></div></div><div class="rank-chart-idx focus-idx"><span></span><span class="paper-sub-period">Period: Sep. 2026</span></div><div data-lt-empty='{"size":"m","icon":"error","title":"Something Went Wrong","desc":"Please ensure you have a stable internet connection and try refreshing the page."}' class="ei-empty-box ei-empty-lg"></div></div>
+            <div class="paper"><div class="paper-hdr"><h2 class="paper-title">Top 10 Highest Budget Overspend Groups</h2></div><div class="rank-chart-idx focus-idx"><span></span><span class="paper-sub-period">Period: Sep. 2026</span></div><div data-lt-empty='{"size":"l","icon":"error","title":"Something Went Wrong","desc":"Please ensure you have a stable internet connection and try refreshing the page."}' class="ei-empty-box ei-empty-lg"></div></div>
+            <div class="paper"><div class="paper-hdr"><h2 class="paper-title">Top 10 Highest Spending Groups</h2></div><div class="rank-chart-idx focus-idx"><span></span><span class="paper-sub-period">Period: Sep. 2026</span></div><div data-lt-empty='{"size":"l","icon":"error","title":"Something Went Wrong","desc":"Please ensure you have a stable internet connection and try refreshing the page."}' class="ei-empty-box ei-empty-lg"></div></div>
+            <div class="paper"><div class="paper-hdr"><h2 class="paper-title">Cost by FOCUS Framework <span class="material-symbols-outlined ic-info" data-tip="FOCUS: FinOps Open Cost &amp; Usage Specification, an open specification that standardizes cost and usage data across cloud providers to simplify FinOps.">info</span></h2></div><div class="rank-chart-idx focus-idx"><span></span><span class="paper-sub-period">Period: Sep. 2026</span></div><div data-lt-empty='{"size":"l","icon":"error","title":"Something Went Wrong","desc":"Please ensure you have a stable internet connection and try refreshing the page."}' class="ei-empty-box ei-empty-lg"></div></div>
           </div>
 
           <!-- ====== SET STATE (default — with data) ====== -->
@@ -1159,7 +1188,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
             <div class="paper">
               <div class="paper-hdr">
                 <div>
-                  <div class="paper-title">Cloud Value Realization (CVR)</div>
+                  <h2 class="paper-title">Cloud Value Realization (CVR)</h2>
                   <div class="cvr-section-sub">Viewing: FY2026 · Feb. 2026 – Sep. 2026</div>
                 </div>
                 <!-- Dashboard CVR: 只顯示 FY read-only info；改設定的入口已在 page header 的 Fiscal Settings 按鈕 -->
@@ -1172,7 +1201,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
               <div class="cvr-grid">
                 <!-- LEFT column: CVR Score (gradient) + 6 metric grid -->
                 <div>
-                  <div class="cvr-score-card" id="cvr-score-card" data-tip="CVR refers to CPI (Cloud Performance Index), calculated as:&#10;Realized Value ÷ Actual Cost&#10;&#10;Indicators:&#10;• &gt; 1 — Realized value exceeds expectations&#10;• = 1 — Realized value meets expectations&#10;• &lt; 1 — Realized value falls below expectations" data-tip-pos="below">
+                  <div class="cvr-score-card" id="cvr-score-card" data-tip="CVR refers to CPI (Cost Performance Index), calculated as:&#10;Realized Value ÷ Actual Cost&#10;&#10;Indicators:&#10;• &gt; 1 — Realized value exceeds expectations&#10;• = 1 — Realized value meets expectations&#10;• &lt; 1 — Realized value falls below expectations" data-tip-pos="below">
                     <div>
                       <div class="csc-lbl">CVR Score</div>
                       <div class="csc-val" id="cvr-score">2.28</div>
@@ -1199,11 +1228,11 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
                     </div>
                     <div class="cvr-metric">
                       <div class="cm-lbl">Realized Value <span class="material-symbols-outlined ic-info" data-tip="Realized Value represents the tangible business benefits derived from the consumption of cloud services, indicating the progress made toward achieving strategic goals.">info</span></div>
-                      <div class="cm-val" data-usd="22020000" data-tip="$22,020,000.00">22.02M<span class="cm-unit">USD</span></div>
+                      <div class="cm-val" data-usd="9348000" data-tip="$9,348,000.00">9.35M<span class="cm-unit">USD</span></div>
                     </div>
                     <div class="cvr-metric">
                       <div class="cm-lbl">Cost Variance <span class="material-symbols-outlined ic-info" data-tip="Cost Variance is calculated as:&#10;Realized Value - Actual Cost">info</span></div>
-                      <div class="cm-val" data-usd="17920000" data-tip="$17,920,000.00">17.92M<span class="cm-unit">USD</span></div>
+                      <div class="cm-val" data-usd="5248000" data-tip="$5,248,000.00">5.25M<span class="cm-unit">USD</span></div>
                     </div>
                   </div>
                 </div>
@@ -1221,13 +1250,13 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
                  - Spend % / Forecast: 重點數字在白底框內（border + label + big + meaning row）
                  - Cost per Customer: 兩數字並列（無框）
             -->
-            <div class="trio">
+            <div class="trio ei-trio-sub">
 
               <!-- Spend % of Revenue — Figma 5749 states: ok/info/over/neutral -->
               <div class="paper">
                 <div class="paper-hdr">
                   <div>
-                    <div class="paper-title">Cloud Spend as a % of Revenue</div>
+                    <h2 class="paper-title">Cloud Spend as a % of Revenue</h2>
                     <div class="paper-sub-period">Period: Sep. 2026</div>
                   </div>
                 </div>
@@ -1259,7 +1288,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
               <div class="paper">
                 <div class="paper-hdr">
                   <div>
-                    <div class="paper-title">Cloud Cost per Customer</div>
+                    <h2 class="paper-title">Cloud Cost per Customer</h2>
                     <div class="paper-sub-period">Period: Sep. 2026</div>
                   </div>
                 </div>
@@ -1284,7 +1313,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
               <div class="paper">
                 <div class="paper-hdr">
                   <div>
-                    <div class="paper-title">Cloud Cost Forecast &amp; Variance</div>
+                    <h2 class="paper-title">Cloud Cost Forecast &amp; Variance</h2>
                     <div class="paper-sub-period">Period: Sep. 2026</div>
                   </div>
                 </div>
@@ -1321,7 +1350,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
             <div class="paper">
               <div class="paper-hdr">
                 <div>
-                  <div class="paper-title">Top 10 Highest Budget Overspend Groups</div>
+                  <h2 class="paper-title">Top 10 Highest Budget Overspend Groups</h2>
                 </div>
                 <div class="paper-r">
                   <!-- ⏸ PARKED（specs/parked-designs.md #21）：View Group Detail 是設計端的 UX 提案，稿 #01 沒有、PRD 也沒有；badge 只放 icon，說明在 tooltip。Demo FAB「UX 提案」可整批隱藏看上線版 -->
@@ -1337,12 +1366,12 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
               <div class="overspend-show">
                 <div class="rank-grid overspend-layout">
                   <div class="rank-table rank-table--over">
-                    <table>
+                    <table aria-label="Top 10 Highest Budget Overspend Groups">
                       <thead>
                         <tr>
-                          <th class="col-rank">Rank</th>
-                          <th class="col-name">Group Name</th>
-                          <th class="col-amt tx-right">Overspend</th>
+                          <th scope="col" class="col-rank">Rank</th>
+                          <th scope="col" class="col-name">Group Name</th>
+                          <th scope="col" class="col-amt tx-right">Overspend</th>
                         </tr>
                       </thead>
                       <tbody id="overspend-tbody">
@@ -1364,7 +1393,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
             <div class="paper">
               <div class="paper-hdr">
                 <div>
-                  <div class="paper-title">Top 10 Highest Spending Groups</div>
+                  <h2 class="paper-title">Top 10 Highest Spending Groups</h2>
                 </div>
                 <div class="paper-r">
                   <!-- ⏸ PARKED（specs/parked-designs.md #21）：View Group Detail 是設計端的 UX 提案，稿 #01 沒有、PRD 也沒有；badge 只放 icon，說明在 tooltip。Demo FAB「UX 提案」可整批隱藏看上線版 -->
@@ -1379,12 +1408,12 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
               <div class="rank-grid spending-layout">
                 <div class="rank-chart-col"><div class="rank-chart-idx"><span class="rci-unit">Cost (USD)</span><span class="paper-sub-period">Period: Sep. 2026</span></div><div class="rank-chart" id="spending-chart"></div></div>
                 <div class="rank-table rank-table--spend">
-                  <table>
+                  <table aria-label="Top 10 Highest Spending Groups">
                     <thead>
                       <tr>
-                        <th class="col-rank">Rank</th>
-                        <th class="col-name">Group Name</th>
-                        <th class="col-amt tx-right">Spending</th>
+                        <th scope="col" class="col-rank">Rank</th>
+                        <th scope="col" class="col-name">Group Name</th>
+                        <th scope="col" class="col-amt tx-right">Spending</th>
                       </tr>
                     </thead>
                     <tbody id="spending-tbody">
@@ -1399,10 +1428,10 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
             <div class="paper">
               <div class="paper-hdr">
                 <div>
-                  <div class="paper-title">
+                  <h2 class="paper-title">
                     Cost by FOCUS Framework
                     <span class="material-symbols-outlined ic-info" data-tip="FOCUS: FinOps Open Cost &amp; Usage Specification, an open specification that standardizes cost and usage data across cloud providers to simplify FinOps.">info</span>
-                  </div>
+                  </h2>
                 </div>
               </div>
               <div class="rank-chart-idx focus-idx"><span class="rci-unit">Cost (USD)</span><span class="paper-sub-period">Period: Sep. 2026</span></div>
@@ -1430,7 +1459,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
 
         <div class="pg-hdr" style="margin-top:8px">
           <div>
-            <div class="pg-title">Fiscal Settings</div>
+            <h1 class="pg-title">Fiscal Settings</h1>
           </div>
           <!-- 頁首右上並排：[Edit Start Month link] + [FY selector dropdown]（對齊 General Budget v2 #01）。
                FY context（年 + range）改由 dropdown trigger 承載，故移除原「Fiscal Year Start: February」重複文字。 -->
@@ -1453,7 +1482,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
           <!-- Loading state -->
           <div class="settings-view" data-state="loading" style="display:none">
             <!-- C-4：對齊 Figma #07-6 Skeleton Loader：四張卡標題照常、每張兩排六格；Edit Start Month／FY 下拉 disabled、不顯示底列（setSettingsState） -->
-            <div class="section-card"><div class="section-hdr"><div class="section-title">Cloud Value Realization</div></div><div class="ei-sgrid"><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div></div></div><div class="section-card"><div class="section-hdr"><div class="section-title">Cloud Spend as a % of Revenue</div></div><div class="ei-sgrid"><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div></div></div><div class="section-card"><div class="section-hdr"><div class="section-title">Cloud Cost per Customer</div></div><div class="ei-sgrid"><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div></div></div><div class="section-card"><div class="section-hdr"><div class="section-title">Cloud Cost Forecast &amp; Variance</div></div><div class="ei-sgrid"><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:30px"></div></div></div></div>
+            <div class="section-card ei-sk-s1"><div class="section-hdr"><h2 class="section-title">Cloud Value Realization</h2></div><div class="ei-sgrid"><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div></div></div><div class="section-card ei-sk-s2"><div class="section-hdr"><h2 class="section-title">Cloud Spend as a % of Revenue</h2></div><div class="ei-sgrid"><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div></div></div><div class="section-card ei-sk-s3"><div class="section-hdr"><h2 class="section-title">Cloud Cost per Customer</h2></div><div class="ei-sgrid"><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div></div></div><div class="section-card ei-sk-s4"><div class="section-hdr"><h2 class="section-title">Cloud Cost Forecast &amp; Variance</h2></div><div class="ei-sgrid"><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div><div><div class="sk" style="height:12px;width:45%;margin-bottom:6px"></div><div class="sk" style="height:36px"></div></div></div></div>
           </div>
 
           <!-- Set state (with data) -->
@@ -1467,10 +1496,10 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
             <div class="section-card">
               <div class="section-hdr">
                 <div class="section-hdr-l">
-                  <div class="section-title">
+                  <h2 class="section-title">
                     Cloud Value Realization
                     <span class="completion-chip">Completed</span>
-                  </div>
+                  </h2>
                   <!-- Section description 移除：兩個 child field 的 hint 已涵蓋 (Expected Value baseline + 必填規則靠 * 標示) -->
 
                 </div>
@@ -1510,7 +1539,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
             <div class="section-card">
               <div class="section-hdr">
                 <div class="section-hdr-l">
-                  <div class="section-title">Cloud Spend as a % of Revenue</div>
+                  <h2 class="section-title">Cloud Spend as a % of Revenue</h2>
                 </div>
               </div>
 
@@ -1519,7 +1548,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
                 <div class="inline-field-lbl">
                   <span>Industry Benchmark <span class="material-symbols-outlined ic-info" data-tip="Lumiture.ai will periodically update industry benchmarks. Choose the one that is closest to your business to unlock insights and discover their value firsthand.">info</span></span>
                 </div>
-                <select class="inline-select">
+                <select class="inline-select" aria-label="Industry Benchmark">
                   <option value="" disabled>Select Industry Benchmark</option>
                   <option>Automotive</option>
                   <option>Construction</option>
@@ -1544,7 +1573,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
             <div class="section-card">
               <div class="section-hdr">
                 <div class="section-hdr-l">
-                  <div class="section-title">Cloud Cost per Customer</div>
+                  <h2 class="section-title">Cloud Cost per Customer</h2>
                 </div>
               </div>
 
@@ -1556,7 +1585,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
                 </div>
                 <div class="inline-input" id="cpc-input-wrap">
                   <span class="pre">$</span>
-                  <input type="text" id="cpc-input" value="45.00" />
+                  <input type="text" id="cpc-input" value="45.00" aria-label="Cloud Cost per Active Customer" />
                 </div>
                 <div class="ei-blue-hint ei-formula">Calculated as: Total Cloud Cost ÷ Active Customers</div>
               </div>
@@ -1574,10 +1603,10 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
             <div class="section-card">
               <div class="section-hdr">
                 <div class="section-hdr-l">
-                  <div class="section-title">
+                  <h2 class="section-title">
                     Cloud Cost Forecast & Variance
                     <span class="completion-chip">Completed</span>
-                  </div>
+                  </h2>
                 </div>
               </div>
 
@@ -1606,7 +1635,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
         </div><!-- /#settings-content -->
       </div><!-- /.page-settings -->
 
-    </div><!-- /.content -->
+    </main><!-- /.content -->
 
     <!-- Footer -->
     <div class="footer">
@@ -1630,13 +1659,13 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
 <div class="mo" id="modal-fsm">
   <div class="modal">
     <div class="mh">
-      <div class="mt">Edit Start Month</div>
-      <button class="mx" onclick="closeModal('modal-fsm')"><span class="material-symbols-outlined">close</span></button>
+      <h2 class="mt">Edit Start Month</h2>
+      <button class="mx" aria-label="Close" onclick="closeModal('modal-fsm')"><span class="material-symbols-outlined">close</span></button>
     </div>
     <div class="mdesc">Please select your organization's fiscal year start month.</div>
     <div class="mb">
       <div class="fsm-form">
-        <select class="inline-select" id="fsm-select" style="width:100%" onchange="updateFSMResult()">
+        <select class="inline-select" id="fsm-select" style="width:100%" onchange="updateFSMResult()" aria-label="Fiscal year start month">
           <option value="1">January</option>
           <option value="2" selected>February</option>
           <option value="3">March</option>
@@ -1677,8 +1706,8 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
 <div class="mo" id="modal-switch-year">
   <div class="modal modal-sm">
     <div class="mh">
-      <div style="display:flex;align-items:center;gap:10px"><span class="material-symbols-outlined mt-err" aria-hidden="true">error</span><div class="mt">Discard unsaved changes?</div></div>
-      <button class="mx" onclick="closeModal('modal-switch-year')"><span class="material-symbols-outlined">close</span></button>
+      <div style="display:flex;align-items:center;gap:15px"><span class="material-symbols-outlined mt-err" aria-hidden="true">error</span><h2 class="mt">Discard unsaved changes?</h2></div>
+      <button class="mx" aria-label="Close" onclick="closeModal('modal-switch-year')"><span class="material-symbols-outlined">close</span></button>
     </div>
     <div class="mdesc">Switching the fiscal year will discard the changes you've made to the current year. This action cannot be undone.</div>
     <div class="mf">
@@ -1692,8 +1721,8 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
 <div class="mo" id="modal-discard">
   <div class="modal modal-sm">
     <div class="mh">
-      <div style="display:flex;align-items:center;gap:10px"><span class="material-symbols-outlined mt-err" aria-hidden="true">error</span><div class="mt">Discard unsaved changes?</div></div>
-      <button class="mx" onclick="closeModal('modal-discard')"><span class="material-symbols-outlined">close</span></button>
+      <div style="display:flex;align-items:center;gap:15px"><span class="material-symbols-outlined mt-err" aria-hidden="true">error</span><h2 class="mt">Discard unsaved changes?</h2></div>
+      <button class="mx" aria-label="Close" onclick="closeModal('modal-discard')"><span class="material-symbols-outlined">close</span></button>
     </div>
     <div class="mdesc">Any changes you've made to Fiscal Settings will be lost. This action cannot be undone.</div>
     <div class="mf">
@@ -1707,11 +1736,11 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
 <div class="mo" id="modal-guard-esm">
   <div class="modal modal-sm">
     <div class="mh">
-      <div style="display:flex;align-items:center;gap:10px">
+      <div style="display:flex;align-items:center;gap:15px">
         <span class="material-symbols-outlined mt-err" aria-hidden="true">error</span>
-        <div class="mt">Change Fiscal Year Start Month?</div>
+        <h2 class="mt">Change Fiscal Year Start Month?</h2>
       </div>
-      <button class="mx" onclick="closeModal('modal-guard-esm')"><span class="material-symbols-outlined">close</span></button>
+      <button class="mx" aria-label="Close" onclick="closeModal('modal-guard-esm')"><span class="material-symbols-outlined">close</span></button>
     </div>
     <div class="mdesc">We recommend saving your current draft before making this change. If you proceed and select "Discard Changes", any unsaved progress will be permanently lost.</div>
     <div class="mf">
@@ -1899,7 +1928,9 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     '.lt-sb-group{margin-bottom:0}',
     '.lt-sb-group-hdr{display:flex;align-items:center;justify-content:space-between;',
     'padding:8px;min-height:40px;box-sizing:border-box;margin-bottom:8px;font-size:14px;font-weight:500;line-height:24px;color:#fff;border-radius:4px;',
-    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0}',
+    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0;',
+    'width:100%;background:none;border:0;font-family:inherit;text-align:left;appearance:none;-webkit-appearance:none}',   /* X-9r6 F16：div 改 button，樣式 reset 回跟原本一樣 */
+    '.lt-sb-group-hdr:focus-visible{outline:2px solid #fff;outline-offset:-2px}',
     '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
     '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
     '.lt-sb-group-arrow{font-size:24px;transition:transform .18s;flex-shrink:0}',
@@ -2017,8 +2048,9 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     var tag = useHref ? 'a' : 'div';
     var hrefAttr = useHref ? ' href="' + _esc(item.href) + '"' : '';
     var dataId = ' data-nav-id="' + _esc(item.id) + '"';
-    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + '>' +
-             '<span class="material-symbols-outlined">' + _esc(item.icon || 'circle') + '</span>' +
+    var curAttr = isActive ? ' aria-current="page"' : '';   // X-9r6 F16
+    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + curAttr + '>' +
+             '<span class="material-symbols-outlined" aria-hidden="true">' + _esc(item.icon || 'circle') + '</span>' +
              '<span>' + _esc(item.label) + '</span>' +
            '</' + tag + '>';
   }
@@ -2029,17 +2061,17 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
       return _renderItem(item, true);
     }).join('');
     return '<div class="lt-sb-group' + collapsed + '" data-group-id="' + _esc(grp.id) + '">' +
-             '<div class="lt-sb-group-hdr">' +
+             '<button type="button" class="lt-sb-group-hdr" aria-expanded="' + (grp.collapsed ? 'false' : 'true') + '">' +
                '<span>' + _esc(grp.label) + '</span>' +
-               '<span class="material-symbols-outlined lt-sb-group-arrow">keyboard_arrow_up</span>' +
-             '</div>' +
+               '<span class="material-symbols-outlined lt-sb-group-arrow" aria-hidden="true">keyboard_arrow_up</span>' +
+             '</button>' +
              '<div class="lt-sb-group-children">' + children + '</div>' +
            '</div>';
   }
 
   function _renderNav() {
     var nav = window.LUMITURE_NAV || [];
-    var html = '<div class="lt-sb-nav">';
+    var html = '<nav class="lt-sb-nav" aria-label="Main">';
     nav.forEach(function (entry) {
       if (entry.type === 'group') {
         html += _renderGroup(entry);
@@ -2048,7 +2080,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
       }
     });
     html += '<div class="lt-sb-skel" aria-hidden="true">' + '<span class="lt-sb-skel-bar"></span>'.repeat(5) + '</div>';
-    html += '</div>';
+    html += '</nav>';
     return html;
   }
 
@@ -2142,7 +2174,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
       hdr.addEventListener('click', function () {
         var grp = hdr.parentElement;
-        if (grp) grp.classList.toggle('lt-collapsed');
+        if (grp) { grp.classList.toggle('lt-collapsed'); hdr.setAttribute('aria-expanded', grp.classList.contains('lt-collapsed') ? 'false' : 'true'); }
       });
     });
     // Collapse the whole sidebar
@@ -2158,7 +2190,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
   window.LumitureSidebar = {
     toggleGroup: function (groupId) {
       var grp = document.querySelector('[data-group-id="' + groupId + '"]');
-      if (grp) grp.classList.toggle('lt-collapsed');
+      if (grp) { grp.classList.toggle('lt-collapsed'); var h = grp.querySelector('.lt-sb-group-hdr'); if (h) h.setAttribute('aria-expanded', grp.classList.contains('lt-collapsed') ? 'false' : 'true'); }
     },
     toggleCollapse: function (opts) { _setCollapsed(!_collapsed, opts); },
     setCollapsed: function (on, opts) { _setCollapsed(on, opts); },
@@ -2169,6 +2201,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
       window.LUMITURE_ACTIVE = itemId;
       document.querySelectorAll('.lt-sb-item, .lt-sb-subitem').forEach(function (el) {
         el.classList.toggle('lt-active', el.dataset.navId === itemId);
+        if (el.dataset.navId === itemId) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
       });
     },
     setLoading: function (on) { _loading = !!on; _applyLoading(); },
@@ -2331,7 +2364,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     '.lt-tb-user:hover{opacity:.92}',
     '.lt-tb-avatar-ic{font-size:34px;color:#fff;flex-shrink:0;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 34}',
     '.lt-tb-user-text{display:flex;flex-direction:column;font-size:12px;line-height:1.3;min-width:0;font-family:\'Noto Sans\',sans-serif;text-align:left}',
-    '.lt-tb-user-name{font-weight:600;color:#fff;white-space:nowrap}',
+    '.lt-tb-user-name{font-weight:500;color:#fff;white-space:nowrap}',   /* X-9r6 R3：稿 #01-3 使用者姓名 500；原 600 不在字重表，沒載 600 的頁會退成 700 */
     '.lt-tb-user-role{color:rgba(255,255,255,.6);font-size:11px;white-space:nowrap}',
     '.lt-tb-chev{color:rgba(255,255,255,.6);font-size:20px;transition:transform .18s}',
     '.lt-tb-user.is-open .lt-tb-chev{transform:rotate(180deg)}',
@@ -2455,22 +2488,22 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
 
   // ===== Renderers =====
   function _renderIcon(item) {
-    var attrs = ' class="lt-tb-ic" data-tip="' + _esc(item.title || '') + '" data-tip-pos="below" aria-label="' + _esc(item.title || '') + '"';   /* 原生 title 改 data-tip（#gl-tip） */
+    var attrs = ' class="lt-tb-ic" data-tip="' + _esc(item.title || '') + '" data-tip-pos="below" aria-label="' + _esc((item.title || '') + (item.badge ? ', 1 unread' : '')) + '"';   /* X-9r6 F17：紅點只有 CSS，讀屏要有字（aria-label 會蓋掉內部文字，所以未讀訊息寫進 label） */   /* 原生 title 改 data-tip（#gl-tip） */
     if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
     var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
     return '<button type="button"' + attrs + '>' +
-             '<span class="material-symbols-outlined">' + _esc(item.icon) + '</span>' + badge +
+             '<span class="material-symbols-outlined" aria-hidden="true">' + _esc(item.icon) + '</span>' + badge +
            '</button>';
   }
 
   function _renderUserChip(u) {
     return '<button type="button" class="lt-tb-user" id="lt-tb-user" aria-haspopup="true" aria-expanded="false">' +
-             '<span class="material-symbols-outlined lt-tb-avatar-ic">account_circle</span>' +
+             '<span class="material-symbols-outlined lt-tb-avatar-ic" aria-hidden="true">account_circle</span>' +
              '<div class="lt-tb-user-text">' +
                '<span class="lt-tb-user-name">' + _esc(u.name) + '</span>' +
                '<span class="lt-tb-user-role" id="lt-tb-user-role">' + _esc(u.role) + '</span>' +
              '</div>' +
-             '<span class="material-symbols-outlined lt-tb-chev">keyboard_arrow_down</span>' +
+             '<span class="material-symbols-outlined lt-tb-chev" aria-hidden="true">keyboard_arrow_down</span>' +
            '</button>';
   }
 
@@ -2521,7 +2554,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     if (u.quota.state === 'error') {
       var headErr = '<div class="lt-q-head"><span class="lt-q-title">AI Quota</span><span class="lt-q-sub">Org-wide</span></div>';
       return '<div class="lt-q">' + headErr +
-               '<div class="lt-q-err"><span class="material-symbols-outlined">help</span>' +
+               '<div class="lt-q-err"><span class="material-symbols-outlined" aria-hidden="true">help</span>' +
                '<span class="lt-q-err-msg">Couldn\'t load quota</span>' +
                '<a role="menuitem" tabindex="0" onclick="window.LumitureTopbar._retryQuota()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.LumitureTopbar._retryQuota()}">Retry</a></div>' +
              '</div>';
@@ -2529,7 +2562,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     var rows = items.map(function (k) { return _renderQuotaItem(k, u.quota[k] || {}); }).join('');
     // add-on 行（packs>0，Premium 不適用）；naming 對齊 PRD：單數 "AI Quota Add-on × N"
     var addon = (!isPremium && (u.addonPacks || 0) > 0)
-      ? '<div class="lt-q-addon"><span class="material-symbols-outlined">auto_awesome</span>' +
+      ? '<div class="lt-q-addon"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>' +
           u.addonPacks + ' × AI Quota Add-ons Activated</div>'
       : '';
     return '<div class="lt-q">' + head + rows + addon + '</div>';
@@ -2541,12 +2574,12 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     var viewAs = u.canSwitchRole
       ? '<div class="lt-am-grp">' +
           '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar.openRoleDialog()">' +
-            '<span class="material-symbols-outlined">sync_alt</span>View as Another Role</button></div>' +
+            '<span class="material-symbols-outlined" aria-hidden="true">sync_alt</span>View as Another Role</button></div>' +
         '<div class="lt-am-div"></div>'
       : '';
     var box = _renderQuotaBox(u);
     return '<div class="lt-am-backdrop" id="lt-am-backdrop" onclick="window.LumitureTopbar.closeMenu()"></div>' +
-           '<div class="lt-am" id="lt-am" role="menu">' +
+           '<div class="lt-am" id="lt-am" role="menu" aria-label="Account menu">' +
              '<div class="lt-am-plan" style="' + bannerStyle + '">' +
                '<span class="lt-am-plan-name">' + planName + '</span>' +
                '<span class="lt-am-plan-date">' + _esc(u.planDateRange) + '</span>' +
@@ -2556,21 +2589,21 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
                  '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
                  '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
                '</div>' +
-               '<span class="lt-am-chip"><span class="material-symbols-outlined">' + _roleIcon(u.role) + '</span>' + _esc(u.role) + '</span>' +
+               '<span class="lt-am-chip"><span class="material-symbols-outlined" aria-hidden="true">' + _roleIcon(u.role) + '</span>' + _esc(u.role) + '</span>' +
              '</div>' +
              '<div class="lt-am-div"></div>' +
              (box ? box + '<div class="lt-am-div"></div>' : '') +
              viewAs +
              '<div class="lt-am-grp">' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Profile\')">' +
-                 '<span class="material-symbols-outlined">manage_accounts</span>Profile</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">manage_accounts</span>Profile</button>' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Settings\')">' +
-                 '<span class="material-symbols-outlined">settings</span>Settings</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">settings</span>Settings</button>' +
              '</div>' +
              '<div class="lt-am-div"></div>' +
              '<div class="lt-am-grp">' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar.logout()">' +
-                 '<span class="material-symbols-outlined">logout</span>Log out</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">logout</span>Log out</button>' +
              '</div>' +
            '</div>';
   }
@@ -2785,7 +2818,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
         '<div class="lt-rd-desc">' + ROLE_COPY.desc.map(function (l) { return '<p>' + _esc(l) + '</p>'; }).join('') + '</div></div>' +
       '<div class="lt-rd-body"><div class="lt-rd-sel" id="lt-rd-sel" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="' + (r.ddOpen ? 'true' : 'false') +
         '" aria-controls="lt-rd-list" aria-labelledby="lt-rd-t"><span class="lt-rd-v">' + _esc(sel.name) + '</span><span class="lt-rd-chip">' + _esc(sel.role) +
-        '</span><span class="material-symbols-outlined lt-rd-arr">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
+        '</span><span class="material-symbols-outlined lt-rd-arr" aria-hidden="true">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
       '<div class="lt-rd-act"><button type="button" class="lt-rd-btn out" id="lt-rd-keep"' + (r.loading ? ' disabled' : '') + '>' + ROLE_COPY.keep + '</button>' +
         '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') + '>' +
         (r.loading ? '<span class="lt-rd-spin" role="status" aria-label="Loading"></span>' : ROLE_COPY.cont) + '</button></div>' +
@@ -2832,7 +2865,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     _rd.ddOpen = true; s.setAttribute('aria-expanded', 'true'); s.querySelector('.lt-rd-arr').textContent = 'arrow_drop_up';
     var host = _rdPopHost();
     host.innerHTML = '<div class="lt-rd-pop" id="lt-rd-popbox"><div class="lt-rd-pop-in"><div class="lt-rd-search"><input id="lt-rd-q" placeholder="' + ROLE_COPY.search +
-      '" autocomplete="off" role="combobox" aria-label="' + ROLE_COPY.search + '" aria-controls="lt-rd-list" aria-expanded="true" aria-autocomplete="list"><span class="material-symbols-outlined">search</span></div><hr>' +
+      '" autocomplete="off" role="combobox" aria-label="' + ROLE_COPY.search + '" aria-controls="lt-rd-list" aria-expanded="true" aria-autocomplete="list"><span class="material-symbols-outlined" aria-hidden="true">search</span></div><hr>' +
       '<div class="lt-rd-list" id="lt-rd-list" role="listbox" aria-label="Roles">' + _rdOptsHtml('') + '</div></div></div>';
     var el = document.getElementById('lt-rd-popbox'), rc = s.getBoundingClientRect();
     el.style.width = rc.width + 'px'; el.style.left = rc.left + 'px';
@@ -2954,6 +2987,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
       window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, user || {});
       _render(); if (_menuOpen) _openMenu();
     },
+    roleIcon: _roleIcon,   /* 角色 chip icon 對應公開給頁面用（X-9r6 F1：GBH Role view 卡） */
     setRole: function (role) {
       var el = document.getElementById('lt-tb-user-role');
       if (el) el.textContent = role;
@@ -3182,7 +3216,8 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
  *   預設內容：
  *   LumitureEmpty.noAccess({ href })     // 整頁無權限：lock／「You do not have access to this page」／「Please contact your organization's administrator if you believe this is a mistake.」／Back to Overview（href 預設 ./overview.html）。回傳含卡片外框的 HTML，放在頁標題下方
  *   LumitureEmpty.error({ size, onclick }) // 「Something Went Wrong」／「Please ensure you have a stable internet connection\nand try refreshing the page.」（FE EmptyState constants），按鈕 Retry（有給 onclick 才出）
- *   LumitureEmpty.noData({ size, title, desc, icon })  // 「No Data Available」
+ *   LumitureEmpty.noData({ size, title, desc, icon, iconHtml })  // 「No Data Available」
+ *   html()／noData() 的 iconHtml（2026-10-22 X-9r3 FA17，選用）：直接給一段 <svg>（呼叫端自己保證內容可信），會取代 icon；沒給時行為完全不變。
  * 文字一律 escape；desc 的 \n 轉成換行。不要自己加 max-width（全站規則：段落不設 max-width，寬度交給外層）。
  */
 (function () {
@@ -3198,6 +3233,9 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
       '.lt-empty .lt-empty__ic{font-family:\'Material Symbols Outlined\';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;-webkit-font-feature-settings:\'liga\';font-feature-settings:\'liga\';',
       'color:#9ED7FF;font-variation-settings:\'FILL\' 0,\'wght\' 400,\'GRAD\' 0,\'opsz\' 48;width:1em;height:1em;display:block;overflow:hidden}',
       '.lt-empty--s .lt-empty__ic{font-size:48px}.lt-empty--m .lt-empty__ic,.lt-empty--page .lt-empty__ic{font-size:64px}.lt-empty--l .lt-empty__ic{font-size:80px}',
+      /* 2026-10-22 X-9r3 FA17：iconHtml（自帶 SVG 的圖示，additive）。尺寸跟著 S 48／M 64／L 80／page 64，SVG 自己 viewBox 縮放 */
+      '.lt-empty__ic-svg{display:block;line-height:0}.lt-empty__ic-svg svg{display:block;width:64px;height:64px}',
+      '.lt-empty--s .lt-empty__ic-svg svg{width:48px;height:48px}.lt-empty--l .lt-empty__ic-svg svg{width:80px;height:80px}',
       '.lt-empty__t{margin:12px 0 0;font-weight:700;line-height:1.5;color:var(--lt-color-text-secondary,#676767)}',
       '.lt-empty--s .lt-empty__t{font-size:14px}.lt-empty--m .lt-empty__t{font-size:16px}.lt-empty--l .lt-empty__t{font-size:20px}.lt-empty--page .lt-empty__t{font-size:18px;margin-top:16px}',
       '.lt-empty__d{margin:8px 0 0;font-size:14px;line-height:24.5px;color:var(--lt-color-text-secondary,#676767);white-space:pre-line}',
@@ -3224,7 +3262,8 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
         : '<button type="button" class="' + esc(cls) + '"' + (o.action.onclick ? ' onclick="' + esc(o.action.onclick) + '"' : '') + '>' + esc(o.action.label) + '</button>') + '</div>';
     }
     return '<div class="lt-empty lt-empty--' + size + '">' +
-      (o.icon ? '<span class="lt-empty__ic material-symbols-outlined" aria-hidden="true">' + esc(o.icon) + '</span>' : '') +
+      (o.iconHtml ? '<span class="lt-empty__ic-svg" aria-hidden="true">' + o.iconHtml + '</span>'
+        : (o.icon ? '<span class="lt-empty__ic material-symbols-outlined" aria-hidden="true">' + esc(o.icon) + '</span>' : '')) +
       (o.title ? '<h3 class="lt-empty__t">' + esc(o.title) + '</h3>' : '') +
       (o.desc ? '<p class="lt-empty__d">' + esc(o.desc) + '</p>' : '') + a + '</div>';
   }
@@ -3249,7 +3288,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     },
     noData: function (o) {
       o = o || {};
-      return html({ size: o.size || 'm', icon: o.icon || 'table_view', title: o.title || 'No Data Available', desc: o.desc, action: o.action });
+      return html({ size: o.size || 'm', icon: o.icon || 'table_view', iconHtml: o.iconHtml, title: o.title || 'No Data Available', desc: o.desc, action: o.action });
     }
   };
 })();
@@ -3331,6 +3370,8 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     'font-family:inherit;line-height:1;white-space:nowrap;',
     'transition:background .12s}',
     '.curr-btn:hover,.curr-btn.cp-open{background:rgba(103,103,103,.12)}',
+    /* 2026-10-22 X-9r3 FA3：讀取中停用（OV 稿 #11、EI 稿 #03-1）整顆 32% 透明、無底無框 */
+    '.curr-btn:disabled{opacity:.32;cursor:not-allowed;pointer-events:none;background:transparent}',
     /* Focus: blue focus ring (keyboard nav / Active state ring per CMDS) */
     '.curr-btn:focus-visible{outline:2px solid #004FB0;outline-offset:1px}',
     /* Flag：16 圓、1px #CCCCCC 框（emoji 國旗放大後裁成圓形） */
@@ -3759,11 +3800,11 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
 
     var thead =
       '<thead><tr>' +
-        '<th class="col-rank">Rank</th>' +
-        '<th class="col-name">Service Category</th>' +
-        '<th class="col-spend tx-right">Spending</th>' +
-        '<th class="col-share tx-right">Share</th>' +
-        (showChange ? '<th class="col-change tx-right">Change</th>' : '') +
+        '<th scope="col" class="col-rank">Rank</th>' +
+        '<th scope="col" class="col-name">Service Category</th>' +
+        '<th scope="col" class="col-spend tx-right">Spending</th>' +
+        '<th scope="col" class="col-share tx-right">Share</th>' +
+        (showChange ? '<th scope="col" class="col-change tx-right">Change</th>' : '') +
       '</tr></thead>';
 
     // Change 欄：對齊 FE Top10CostByFOCUSTable — 0 / null 都顯示 '--'（FE 用 !value 判斷）並帶 tooltip
@@ -3789,7 +3830,8 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
              '</tr>';
     }).join('') + '</tbody>';
 
-    el.innerHTML = '<table class="lt-focus-table">' + thead + tbody + '</table>';
+    /* 2026-10-22 X-9r3 FA22：th scope＋表格名稱（讀屏用，不改外觀） */
+    el.innerHTML = '<table class="lt-focus-table" aria-label="' + _esc(opts.tableLabel || 'Cost by FOCUS service category') + '">' + thead + tbody + '</table>';
   }
 
   // ===== Public API =====
@@ -3827,7 +3869,16 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
       tableSymbol: config.tableSymbol,     // optional — 表格金額前綴（預設同 currencySymbol；Overview 傳 '' 對齊 FE）
       showChange: config.showChange,       // optional — 多一欄 Change（Overview 用；EI 預設不開，畫面不變）
       noCompareTip: config.noCompareTip,   // optional — Change 為 -- 時的 tooltip 文案
+      tableLabel: config.tableLabel,       // optional — 表格 aria-label
     });
+
+    /* 2026-10-22 X-9r3 FA22：treemap 容器給讀屏替代文字（role="img"＋由資料組出的 aria-label；caller 可用 config.ariaLabel 覆寫） */
+    var sym = config.currencySymbol || '$';
+    var label = config.ariaLabel || ('Cost by FOCUS service category treemap. ' + (config.data || []).slice(0, 5).map(function (d) {
+      return d.name + ' ' + sym + fullFormat(d.spending);
+    }).join(', '));
+    tEl.setAttribute('role', 'img');
+    tEl.setAttribute('aria-label', label);
 
     var instance = { chart: chart, treemapEl: tEl, tableEl: bEl, config: config };
     _instances.push(instance);
@@ -3853,8 +3904,11 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
 <script>
 (function(){ var n = document.getElementById('ei-noaccess'); if (n) n.innerHTML = LumitureEmpty.noAccess({ href: './overview.html' }); })();
 /* A-19：把 data-lt-empty 的設定交給 shared LumitureEmpty 產生（FILL 0、#9ED7FF、S／M／L／整頁）。bold 欄位是要粗體的詞 */
+/* X-9r3 FB5：No Data（bar_chart）用稿 #04 那顆帶底線與左軸的長條圖（Overview ILLUS.chart，FE public/images 的空狀態插圖），不用共用的三根長條 */
+var EI_ND_ICON = '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40.3212 38.7686H44.4823C44.8422 38.7442 45.1812 38.5883 45.4362 38.3298C45.6913 38.0713 45.8452 37.7278 45.8693 37.3631V22.6107C45.8452 22.246 45.6913 21.9025 45.4362 21.644C45.1812 21.3855 44.8422 21.2296 44.4823 21.2052H40.3212C39.9612 21.2296 39.6223 21.3855 39.3672 21.644C39.1121 21.9025 38.9582 22.246 38.9341 22.6107V37.3661C38.9589 37.7303 39.1131 38.073 39.3681 38.3309C39.6231 38.5888 39.9617 38.7443 40.3212 38.7686ZM50.721 38.7686H54.8821C55.242 38.7442 55.581 38.5883 55.8361 38.3298C56.0911 38.0713 56.245 37.7278 56.2691 37.3631V12.0721C56.2449 11.7068 56.0906 11.363 55.835 11.1044C55.5793 10.8458 55.2396 10.6902 54.8791 10.6665H50.721C50.361 10.6909 50.0221 10.8468 49.767 11.1053C49.5119 11.3638 49.358 11.7073 49.3339 12.0721V37.3661C49.3587 37.7303 49.5129 38.073 49.7679 38.3309C50.0229 38.5888 50.3615 38.7443 50.721 38.7686ZM19.5215 38.7686H23.6797C24.0396 38.7442 24.3786 38.5883 24.6337 38.3298C24.8888 38.0713 25.0426 37.7278 25.0667 37.3631V29.6206C25.0426 29.2559 24.8888 28.9124 24.6337 28.6539C24.3786 28.3954 24.0396 28.2395 23.6797 28.2151H19.5215C19.1616 28.2395 18.8226 28.3954 18.5675 28.6539C18.3125 28.9124 18.1586 29.2559 18.1345 29.6206V37.3631C18.1586 37.7278 18.3125 38.0713 18.5675 38.3298C18.8226 38.5883 19.1616 38.7442 19.5215 38.7686ZM29.9213 38.7686H34.0824C34.4424 38.7442 34.7813 38.5883 35.0364 38.3298C35.2915 38.0713 35.4454 37.7278 35.4695 37.3631V15.5859C35.4454 15.2212 35.2915 14.8777 35.0364 14.6192C34.7813 14.3607 34.4424 14.2048 34.0824 14.1804H29.9213C29.5614 14.2048 29.2224 14.3607 28.9674 14.6192C28.7123 14.8777 28.5584 15.2212 28.5343 15.5859V37.3661C28.5591 37.7303 28.7133 38.073 28.9683 38.3309C29.2233 38.5888 29.5619 38.7443 29.9213 38.7686ZM58 45.8053H11.1993V12.4234C11.1993 11.958 11.0171 11.5115 10.6925 11.1821C10.368 10.8527 9.92779 10.6673 9.46847 10.6665H6.00088C5.54105 10.6665 5.10006 10.8516 4.77491 11.1811C4.44976 11.5106 4.26709 11.9575 4.26709 12.4234V49.3073C4.26709 50.2392 4.63242 51.133 5.28272 51.792C5.93302 52.451 6.81501 52.8212 7.73467 52.8212H58C58.4598 52.8212 58.9008 52.6361 59.2259 52.3066C59.5511 51.9771 59.7338 51.5302 59.7338 51.0642V47.5504C59.7307 47.0865 59.5466 46.6426 59.2218 46.3157C58.897 45.9888 58.4578 45.8053 58 45.8053Z" fill="#9ED7FF"/></svg>';
 document.querySelectorAll('[data-lt-empty]').forEach(function (el) {
   var o = JSON.parse(el.getAttribute('data-lt-empty'));
+  if (o.icon === 'bar_chart') o.iconHtml = EI_ND_ICON;
   el.innerHTML = LumitureEmpty.html(o);
   (o.bold || []).forEach(function (w) { var d = el.querySelector('.lt-empty__d'); if (d) d.innerHTML = d.innerHTML.replace(w, '<b>' + w + '</b>'); });
   // C-4：#04「No Budget Data Yet」說明裡的 General Budget 是頁面超連結
@@ -3950,9 +4004,26 @@ let mpDraftYear = MP_NOW.year, mpDraftMonth = MP_NOW.month;     // 暫選（Appl
 function mpIsDisabled(year, month){
   return year > MP_NOW.year || (year === MP_NOW.year && month > MP_NOW.month);
 }
+/* X-9r3 R8（同 Overview R1）：重畫整個彈出層前記下焦點在哪，重畫後還原 */
+function mpFocusKey(pop){
+  const a = document.activeElement; if(!a || !pop.contains(a)) return null;
+  if(a.classList.contains('mp-cell')) return { t:'cell', i:[].indexOf.call(pop.querySelectorAll('.mp-cell'), a) };
+  if(a.classList.contains('mp-pop-nav')) return { t:'nav', i:[].indexOf.call(pop.querySelectorAll('.mp-pop-nav'), a) };
+  return { t:'btn', i:[].indexOf.call(pop.querySelectorAll('.mp-pop-ftr .btn'), a) };
+}
+function mpFocusRestore(pop, k){
+  if(!k) return;
+  let el = null;
+  if(k.t === 'cell') el = pop.querySelectorAll('.mp-cell')[k.i];
+  else if(k.t === 'nav'){ const navs = pop.querySelectorAll('.mp-pop-nav'); el = navs[k.i]; if(!el || el.classList.contains('hidden')) el = navs[1-k.i]; }   // 翻到頭／尾那顆是 visibility:hidden，改去另一顆
+  else el = pop.querySelectorAll('.mp-pop-ftr .btn')[k.i];
+  if(!el || el.disabled || el.classList.contains('hidden')) el = pop.querySelector('.mp-cell.sel') || pop.querySelector('.mp-cell:not(:disabled)');
+  if(el) el.focus({preventScroll:true});
+}
 function renderMonthPicker(){
   const pop = document.getElementById('mp-pop');
   if(!pop) return;
+  const fk = mpFocusKey(pop);
   const prevHidden = mpViewYear <= MP_MIN_YEAR ? ' hidden' : '';
   const nextHidden = mpViewYear >= MP_MAX_YEAR ? ' hidden' : '';
   let cells = '';
@@ -3968,10 +4039,11 @@ function renderMonthPicker(){
   }
   pop.innerHTML = `
     <div class="mp-pop-hdr">
-      <button type="button" class="mp-pop-nav${prevHidden}" onclick="mpStepYear(-1,event)" aria-label="Previous year"><span class="material-symbols-outlined">chevron_left</span></button>
+      <button type="button" class="mp-pop-nav${prevHidden}" onclick="mpStepYear(-1,event)" aria-label="Previous year"><span class="material-symbols-outlined" aria-hidden="true">keyboard_double_arrow_left</span></button>
       <div class="mp-pop-title">${MP_MONTHS[mpDraftMonth-1]} ${mpDraftYear}</div>
-      <button type="button" class="mp-pop-nav${nextHidden}" onclick="mpStepYear(1,event)" aria-label="Next year"><span class="material-symbols-outlined">chevron_right</span></button>
+      <button type="button" class="mp-pop-nav${nextHidden}" onclick="mpStepYear(1,event)" aria-label="Next year"><span class="material-symbols-outlined" aria-hidden="true">keyboard_double_arrow_right</span></button>
     </div>
+    <div class="mp-pop-div"></div>
     <div class="mp-grid">${cells}</div>
     <div class="mp-pop-ftr">
       <button type="button" class="btn btn-b btn-sm" onclick="mpReset(event)"><span class="btn-text">Reset</span></button>
@@ -3980,6 +4052,7 @@ function renderMonthPicker(){
         <button type="button" class="btn btn-p btn-sm" onclick="mpApply()">Apply</button>
       </div>
     </div>`;
+  mpFocusRestore(pop, fk);
 }
 function toggleMonthPicker(e){
   if(e) e.stopPropagation();
@@ -3993,13 +4066,30 @@ function toggleMonthPicker(e){
   renderMonthPicker();
   wrap.classList.add('open');
   const trig = document.getElementById('mp-trigger');
-  if(trig) trig.setAttribute('aria-expanded','true');
+  if(trig){
+    trig.setAttribute('aria-expanded','true');
+    /* X-9r3 FB10（A29）：彈出層開著時「Select month」tooltip 收起；data-tip 先拿掉（不然游標在鈕內移動會再叫出來），關閉時還原 */
+    if(trig.hasAttribute('data-tip')){ trig.dataset.tipBak = trig.getAttribute('data-tip'); trig.removeAttribute('data-tip'); }
+    const gt = document.getElementById('gl-tip'); if(gt) gt.style.display = 'none';
+  }
+  /* X-9r3 R8：開啟時焦點進彈出層當前選中的月份格（同 Overview） */
+  const cell = wrap.querySelector('.mp-cell.sel') || wrap.querySelector('.mp-cell:not(:disabled)');
+  if(cell) cell.focus({preventScroll:true});
 }
 function closeMonthPicker(){
   const wrap = document.getElementById('mp-wrap');
+  const wasOpen = !!(wrap && wrap.classList.contains('open'));
   if(wrap) wrap.classList.remove('open');
   const trig = document.getElementById('mp-trigger');
-  if(trig) trig.setAttribute('aria-expanded','false');
+  if(trig){
+    trig.setAttribute('aria-expanded','false');
+    if(trig.dataset.tipBak){ trig.setAttribute('data-tip', trig.dataset.tipBak); delete trig.dataset.tipBak; }
+    /* X-9r3 R8：Esc／Cancel／Apply／點外面關閉後，焦點在彈出層裡或已掉到 body 時還給觸發欄（點到別的可聚焦元件時不搶） */
+    if(wasOpen && !trig.disabled){
+      const a = document.activeElement;
+      if(!a || a === document.body || wrap.contains(a)) trig.focus({preventScroll:true});
+    }
+  }
 }
 function mpStepYear(delta,e){
   if(e) e.stopPropagation();
@@ -4046,6 +4136,12 @@ function mpApply(){
 document.addEventListener('click', e => {
   const wrap = document.getElementById('mp-wrap');
   if(wrap && wrap.classList.contains('open') && !wrap.contains(e.target)) closeMonthPicker();
+});
+/* X-9r3：Esc 關閉 Month Picker（焦點回觸發欄），同 Overview */
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return;
+  const wrap = document.getElementById('mp-wrap');
+  if(wrap && wrap.classList.contains('open')){ closeMonthPicker(); const t = document.getElementById('mp-trigger'); if(t) t.focus({preventScroll:true}); }
 });
 
 /* ===== Take screenshot (demo only) ===== */
@@ -4111,10 +4207,14 @@ function saveChanges(){
  * Optional fields (Section chip = "Incomplete" but can save):
  *   - Industry Benchmark, Revenue, Active Customers, Cost per Active Customer（2026-08-10 改為非必填）
  */
+function eiClearInvalidAria(){
+  document.querySelectorAll('#page-settings input[aria-invalid]').forEach(function(i){ i.removeAttribute('aria-invalid'); i.removeAttribute('aria-describedby'); });
+}
 function validateFiscalSettings(){
   const errors = [];
   // Clear all error states first
   document.querySelectorAll('#page-settings .month-cell.error').forEach(c=>c.classList.remove('error'));
+  eiClearInvalidAria();
   document.querySelectorAll('#page-settings .field-block.has-error').forEach(c=>c.classList.remove('has-error'));
   document.querySelectorAll('#page-settings .inline-field.has-error').forEach(c=>c.classList.remove('has-error'));
   document.querySelectorAll('#page-settings .inline-input.error').forEach(c=>c.classList.remove('error'));
@@ -4127,6 +4227,8 @@ function validateFiscalSettings(){
     grid.querySelectorAll('input').forEach(inp=>{
       if (!inp.value.trim()){
         inp.closest('.month-cell').classList.add('error');
+        inp.setAttribute('aria-invalid','true');   // X-9r3 FB17：錯誤與格子的錯誤字關聯
+        if (document.getElementById(inp.id + '-err')) inp.setAttribute('aria-describedby', inp.id + '-err');
         if (!hasEmpty) hasEmpty = true;
       }
     });
@@ -4315,6 +4417,7 @@ function updateMonthYearLabels(startYear){
       if (suffixes[i]) span.textContent = suffixes[i];
     });
   });
+  eiRefreshGridLabels();
 }
 
 /* 把目前（已填好的）表單值存成 snapshot，供切回已設定年份時還原 */
@@ -4367,6 +4470,7 @@ function restoreFiscalSnapshot(){
   // 清掉任何 invalid 錯誤殘留並更新 completion chips
   document.querySelectorAll('#page-settings .month-cell.error,#page-settings .field-block.has-error,#page-settings .inline-field.has-error,#page-settings .inline-input.error')
     .forEach(el=>el.classList.remove('error','has-error'));
+  eiClearInvalidAria();
   updateCompletionChips();
 }
 
@@ -4406,6 +4510,7 @@ function loadNewFYData(){
   // 清掉錯誤殘留 + 重算 completion chips（Budget 完整、其餘空 → 視 section 而定）
   document.querySelectorAll('#page-settings .month-cell.error,#page-settings .field-block.has-error,#page-settings .inline-field.has-error,#page-settings .inline-input.error')
     .forEach(el=>el.classList.remove('error','has-error'));
+  eiClearInvalidAria();
   updateCompletionChips();
 }
 
@@ -4416,6 +4521,17 @@ function loadNewFYData(){
  *   - When user modifies value away from GB total, "Reset to General Budget value" button appears
  *   - 兩值互不連動：input 編輯不會 cascade 回 GB；reset 是單向 (GB → input)
  */
+/* X-9r3 FB17：Fiscal Settings 每格輸入的可讀名稱（讀屏：「Estimated Financial Budget, Feb. '26」）；FY 年份換了要重算 */
+const EI_GRID_NAMES = { 'budget-grid':'Estimated Financial Budget', 'roi-grid':'Expected ROI', 'revenue-grid':'Revenue', 'customers-grid':'Active Customers', 'forecast-grid':'Monthly Cost Forecast' };
+function eiRefreshGridLabels(){
+  Object.keys(EI_GRID_NAMES).forEach(function(id){
+    var g = document.getElementById(id); if(!g) return;
+    g.querySelectorAll('.month-cell').forEach(function(cell){
+      var inp = cell.querySelector('input'), l = cell.querySelector('.month-cell-lbl'), y = cell.querySelector('.month-cell-year');
+      if(inp && l) inp.setAttribute('aria-label', EI_GRID_NAMES[id] + ', ' + (l.childNodes[0] ? l.childNodes[0].textContent : '') + ' ' + (y ? y.textContent : ''));
+    });
+  });
+}
 function buildMonthGrid(containerId, opts){
   const c=document.getElementById(containerId);
   if(!c) return;
@@ -4435,17 +4551,18 @@ function buildMonthGrid(containerId, opts){
     // GB ref 也顯示在 input 旁的 hint，避免 user 清空後忘記原值
     // Placeholder 純數字（per 2026-05-22 Gemini Option 6 + Kabin 確認）
     // Source 來源資訊靠 focus tooltip 顯示，不擠進 placeholder 文字
-    const placeholder = ref || (opts.placeholder || '0');
+    const placeholder = ref || (opts.placeholder != null ? opts.placeholder : '0');   // X-9r3 FB14：允許空字串（Revenue／Active Customers 照稿 #07-4 不寫 optional）
     cell.innerHTML=
-      '<div class="month-cell-lbl">'+lbl+'<span class="month-cell-year">'+yearSuffix+'</span></div>'+
-      '<div class="month-cell-input">'+
+      '<label class="month-cell-lbl" for="'+containerId+'-'+i+'">'+lbl+'<span class="month-cell-year">'+yearSuffix+'</span></label>'+   // X-9r3 FB17：label 對到輸入，點月份也能聚焦
+      '<label class="month-cell-input">'+
         (opts.prefix?'<span class="pre">'+opts.prefix+'</span>':'')+
-        '<input type="text" value="'+displayVal+'" data-gb-ref="'+(ref||'')+'"'+(ref?' data-source-tip="Source value from General Budget: $'+ref+'"':'')+' oninput="onMonthCellInput(this)" onfocus="showSourceTip(this)" onblur="hideSourceTip(this)" placeholder="'+placeholder+'" />'+
+        '<input type="text" id="'+containerId+'-'+i+'" value="'+displayVal+'" data-gb-ref="'+(ref||'')+'"'+(ref?' data-source-tip="Source value from General Budget: $'+ref+'"':'')+' oninput="onMonthCellInput(this)" onfocus="showSourceTip(this)" onblur="hideSourceTip(this)" placeholder="'+placeholder+'" />'+
         (opts.suffix?'<span class="pre" style="margin-left:4px;margin-right:0">'+opts.suffix+'</span>':'')+
-      '</div>'+
-      (opts.errorMsg?'<div class="month-cell-err">'+opts.errorMsg+'</div>':'');
+      '</label>'+
+      (opts.errorMsg?'<div class="month-cell-err" id="'+containerId+'-'+i+'-err">'+opts.errorMsg+'</div>':'');
     c.appendChild(cell);
   }
+  eiRefreshGridLabels();   // X-9r3 FB17：輸入框名稱「欄位名, 月份」
   // 初始 is-empty 狀態（空值 → $ muted），涵蓋所有 grid（含 ROI / Forecast / Revenue）
   c.querySelectorAll('.month-cell-input').forEach(w=>{
     const inp = w.querySelector('input');
@@ -4576,7 +4693,7 @@ function eiRenderMoney(){
 function eiKmb(v){ const a=Math.abs(v); if(a>=1e9) return (v/1e9).toFixed(2)+'B'; if(a>=1e6) return (v/1e6).toFixed(2)+'M'; return (v/1e3).toFixed(2)+'K'; }
 // 卡片數字：十萬以上縮寫、一律兩位小數（Guideline；稿 4.50M、180.03M）
 function eiCardNum(n){ const a=Math.abs(n), sg=n<0?'-':''; if(a>=1e9) return sg+(a/1e9).toFixed(2)+'B'; if(a>=1e6) return sg+(a/1e6).toFixed(2)+'M'; if(a>=1e5) return sg+(a/1e3).toFixed(2)+'K'; return sg+a.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-// 座標軸縮寫：150K、22.02M、0（稿的軸標籤不帶 $）
+// 座標軸縮寫：150K、9.35M、0（稿的軸標籤不帶 $）
 function eiAxisAbbr(v, dec){
   if (!v) return '0';
   const a = Math.abs(v);
@@ -4654,6 +4771,8 @@ function renderTop10(data, opts){
   // 超過預算 30% 深紅 #BF302E、其餘橘 #EC6F09；Spending 單一藍 #308CE3（稿長條實際色）
   const barColors = data.map(d => isOver ? (pctOf(d) >= 0.30 ? '#BF302E' : '#EC6F09') : '#308CE3');
   const niceMax = eiNiceMax(Math.max(...data.map(d=>d.val)));
+  eiChartAria(opts.chartId, (isOver ? 'Top 10 Highest Budget Overspend Groups, ranked by percent over budget. ' : 'Top 10 Highest Spending Groups. ') +
+    data.map((d,i) => (i+1) + '. ' + d.name + ', ' + (isOver ? (pctOf(d)*100).toFixed(2) + '% over budget (' + fmtMoney(d.val) + ')' : fmtMoney(d.val))).join('; ') + '.');
 
   chart.setOption({
     grid:{ top:12, right:8, bottom:8, left:8, containLabel:true },
@@ -4692,11 +4811,14 @@ function renderTop10(data, opts){
 
 /* ===== ECharts: CVR Trend（C-4：照稿 #01 只畫到所選月份；Y 軸 0＋最大值五等分、不帶 $；虛線格線；Actual Cost #55698A） ===== */
 let cvrChart, cpcChart;
-// 累計值（FY Feb. 起），月底那一格對得上下方三個指標：Expected Value 10.62M、Realized Value 22.02M、YTD Actual Cost 4.10M（Sep.）
+// 累計值（FY Feb. 起），月底那一格對得上下方三個指標：Expected Value 10.62M、Realized Value 9.35M、YTD Actual Cost 4.10M（Sep.）
+// X-9r3 R10（verify-2 N4，主 session 裁決）：YTD Budget 8.50M、Expected Value 10.62M（＝8.50M × ROI 1.25）照稿 #01。稿上只有 Realized 22.02M／Cost Variance 對不上
+// （Realized 22.02M ÷ Actual 4.10M＝5.37，但 CVR Score 寫 2.28；c4-compare 設計稿問題 #1），這兩個往回推：Realized＝2.28 × 4.10M＝9.348M、Cost Variance＝Realized − Actual＝5.248M（⚠ 設計端暫擬）。
+// Expected 線在 Realized 上方；狀態標籤（Realized cloud value exceeds expectations.）比的是 CVR Score 2.28 與 Expected ROI 1.25（2.28 ≥ 1.25 → 正向），不是 Realized 與 Expected 金額（⚠ 設計端暫擬）
 const CVR_SERIES = {
-  expected: [1296500,2618300,3950200,5284700,6612400,7946100,9281300,10620000,11940000,13270000,14600000,15930000],
-  realized: [2386400,5094800,7712600,10418300,13206900,16101500,19004200,22020000,24880000,27720000,30580000,33450000],
-  actual:   [ 478300, 981200,1482700,1996400,2521800,3048600,3579300,4100000,4630000,5160000,5690000,6220000],
+  expected: [ 1100000,2700000,3850000,5300000,7000000,8100000,9400000,10620000,11900000,13000000,14300000,15500000],
+  realized: [  950000,2350000,3470000,4810000,6330000,7430000,8610000, 9348000,10500000,11550000,12800000,13900000],
+  actual:   [  380000, 950000,1400000,2020000,2570000,3010000,3610000, 4100000, 4620000, 5200000, 5700000, 6250000],
 };
 const CPC_SERIES = [612.40,588.10,571.30,590.20,556.80,538.40,522.70,510.29,506.10,502.40,498.70,495.20];   // Sep. 510.29 對上卡片數字
 function renderCvrChart(){
@@ -4712,6 +4834,7 @@ function renderCvrChart(){
     { name:'Actual Cost',    color:'#55698A', dashed:false, data:fx(CVR_SERIES.actual) },
   ];
   const max = Math.max(SER[0].data[n-1], SER[1].data[n-1], SER[2].data[n-1]);
+  eiChartAria('cvr-chart', 'Cloud Value Realization trend, ' + eiMonthLabel(0) + ' to ' + eiMonthLabel(n-1) + ', cumulative. At ' + eiMonthLabel(n-1) + ': ' + SER.map(s => s.name + ' ' + fmtMoney(s.data[n-1])).join(', ') + '.');
   cvrChart.setOption({
     grid:{ top:12, right:8, bottom:40, left:8, containLabel:true },
     tooltip:Object.assign({}, EI_TIP_BASE, { trigger:'axis', axisPointer:{ type:'line', lineStyle:{ color:'#B3B3B3' } },
@@ -4724,7 +4847,7 @@ function renderCvrChart(){
       data: SER.map(s => s.dashed ? { name:s.name, icon:'path://M0,0 L4,0 L4,2 L0,2 Z M6,0 L10,0 L10,2 L6,2 Z M12,0 L16,0 L16,2 L12,2 Z' } : { name:s.name }) },
     xAxis:{ type:'category', boundaryGap:false, data:FY_MONTHS.map(m => m==='May' ? m : m+'.'),
       axisLine:{ lineStyle:{ color:'#B3B3B3' } }, axisTick:{ show:false }, axisLabel:{ color:'#262626', fontSize:12, interval:0 } },
-    // 稿：頂端標最大值（22.02M）、0 到最大值五等分（取整刻度會讓頂端最大值標不出來，所以用精確五等分）
+    // 稿：頂端標最大值（9.35M）、0 到最大值五等分（取整刻度會讓頂端最大值標不出來，所以用精確五等分）
     yAxis:{ type:'value', min:0, max:max, interval:max/5, axisLine:{ show:false }, axisTick:{ show:false },
       splitLine:{ lineStyle:{ color:'#CCCCCC', type:'dashed' } },
       axisLabel:{ color:'#262626', fontSize:12, formatter:(v)=>eiAxisAbbr(v, 2) } },
@@ -4740,6 +4863,7 @@ function renderCpcChart(){
   const n = eiFyIndex() + 1;
   const CPC = CPC_SERIES.map(eiFx);
   const N = eiNiceMax(Math.max(...CPC.slice(0, n)));
+  eiChartAria('cpc-mini-chart', 'Cloud Cost per Customer monthly trend, ' + eiMonthLabel(0) + ' to ' + eiMonthLabel(n-1) + '. ' + eiMonthLabel(0) + ': ' + fmtMoney(CPC[0]) + '. ' + eiMonthLabel(n-1) + ': ' + fmtMoney(CPC[n-1]) + '.');
   cpcChart.setOption({
     grid:{ top:8, right:12, bottom:4, left:4, containLabel:true },
     tooltip:Object.assign({}, EI_TIP_BASE, { trigger:'axis', axisPointer:{ type:'line', lineStyle:{ color:'#B3B3B3' } },
@@ -4888,7 +5012,7 @@ function setSpendRevenueState(state){
   const m = { ok:['2.30%','mood','Lower than the industry benchmark.','5%'],
               info:['5.00%','check_circle','Equal to the industry benchmark.','5%'],
               over:['7.77%','warning','Higher than the industry benchmark.','5%'],
-              neutral:['2.30%','info','No benchmark is set for comparison.','—'] }[state];
+              neutral:['2.30%','info','No benchmark is set for comparison.','--'] }[state];   // X-9r3：沒有值一律寫 --（全站慣例），不用破折號
   if (m) {
     val.textContent = m[0];
     meaning.innerHTML = '<span class="material-symbols-outlined">'+m[1]+'</span><span>'+m[2]+'</span>';
@@ -4936,56 +5060,56 @@ window.DEMO_PAGES = [
 
 window.DEMO_SCENARIOS = [
   // Dashboard page scenarios
-  { id:'d-set',       page:'dashboard', label:'With Data (default)',          icon:'check_circle', tip:'Normal dashboard with all sections filled' },
-  { id:'d-overspend-empty', page:'dashboard', label:'All Within Budget (celebration)', icon:'celebration', tip:'Top10 Overspend section shows celebration empty state when all T1 groups stay under budget.' },
-  { id:'d-overspend-partial', page:'dashboard', label:'Overspend Under 10 (8 groups)', icon:'format_list_numbered', tip:'Fewer than 10 groups overspent. List shows only ranked groups, height hugs content, vertically centered against the chart (per Figma 註釋).' },
-  { id:'d-loading',   page:'dashboard', label:'Loading (Skeleton)',          icon:'hourglass_top', isNoData:true, tip:'Skeleton placeholders while fiscal report loads' },
-  { id:'d-firsttime', page:'dashboard', label:'First-Time (Begin Journey)',  icon:'insights',      isNoData:true, tip:'No fiscal data yet. Shows the Begin Insights Journey CTA.' },
-  { id:'d-no-auth',   page:'dashboard', label:'CSP Not Authorized',          icon:'lock_open',     isNoData:true, tip:'No cloud provider connected. Shows the Authorize CTA.' },
-  { id:'d-error',     page:'dashboard', label:'Error',                       icon:'cloud_off',     isNoData:true, tip:'Fiscal report API failed' },
+  { id:'d-set',       page:'dashboard', label:'With Data (default)',          icon:'check_circle', tip:'一般狀態：所有區塊都有資料' },
+  { id:'d-overspend-empty', page:'dashboard', label:'All Within Budget (celebration)', icon:'celebration', tip:'所有群組都沒超支時，Top 10 Highest Budget Overspend Groups 顯示慶祝空狀態' },
+  { id:'d-overspend-partial', page:'dashboard', label:'Overspend Under 10 (8 groups)', icon:'format_list_numbered', tip:'超支的群組不到 10 個：只列有超支的，清單高度貼合內容，並在圖表高度內垂直置中（稿 #01 註釋）' },
+  { id:'d-loading',   page:'dashboard', label:'Loading (Skeleton)',          icon:'hourglass_top', isNoData:true, tip:'報表載入中的骨架畫面（Figma #03-1）' },
+  { id:'d-firsttime', page:'dashboard', label:'First-Time (Begin Journey)',  icon:'insights',      isNoData:true, tip:'還沒有任何會計年度資料：顯示 Begin My Insights Journey 按鈕' },
+  { id:'d-no-auth',   page:'dashboard', label:'CSP Not Authorized',          icon:'lock_open',     isNoData:true, tip:'還沒連任何雲端平台：顯示 Add Your Authorization 按鈕（連到 Organization Settings）' },
+  { id:'d-error',     page:'dashboard', label:'Error',                       icon:'cloud_off',     isNoData:true, tip:'報表 API 失敗：數值卡 No Data、圖表區 Something Went Wrong（Figma #05）' },
   { id:'d-nodata',    page:'dashboard', label:'No Data (Pre-Spending)',      icon:'data_object',   isNoData:true, tip:'Figma #04：各區塊各自 No Data；數值 hover 顯示「Fill out your fiscal settings…」；Overspend 有設預算但無人超標 → Zero Budget Overspends!' },
   { id:'d-nobudget',  page:'dashboard', label:'No Data · No Budget Set',     icon:'savings',       isNoData:true, tip:'Figma #04 下方：沒有在 General Budget 設團隊預算時，Overspend 顯示 No Budget Data Yet（General Budget 是連結）' },
 
   // Settings page scenarios
-  { id:'s-set',     page:'settings', label:'With Data (default)', icon:'check_circle', tip:'Settings filled. Completion chips show progress.' },
-  { id:'s-invalid', page:'settings', label:'Invalid Format',      icon:'error',         tip:'Required fields empty: red borders, error messages, Section "Incomplete" chip (per Figma 5572)' },
-  { id:'s-loading', page:'settings', label:'Loading',             icon:'hourglass_top', isNoData:true, tip:'Skeleton while settings load' },
-  { id:'s-empty',   page:'settings', label:'No Fiscal Year Yet',  icon:'add_circle',   isNoData:true, tip:'No fiscal year configured. Prompt to add first FY.' },
+  { id:'s-set',     page:'settings', label:'With Data (default)', icon:'check_circle', tip:'設定都填好：各區塊的完成標籤顯示 Completed' },
+  { id:'s-invalid', page:'settings', label:'Invalid Format',      icon:'error',         tip:'必填欄位留空：紅框、欄位下方錯誤字、區塊標籤變 Incomplete（Figma #07-5）' },
+  { id:'s-loading', page:'settings', label:'Loading',             icon:'hourglass_top', isNoData:true, tip:'設定頁載入中的骨架畫面（Figma #07-6）' },
+  { id:'s-empty',   page:'settings', label:'No Fiscal Year Yet',  icon:'add_circle',   isNoData:true, tip:'還沒設定任何會計年度：提示新增第一個會計年度' },
   { id:'s-new-fy',  page:'settings', label:'Newly Added FY', icon:'event_upcoming', isNoData:true, tip:'切到未填的 FY2027：Financial Budget 依 PRD 從 General Budget 預填、Expected ROI 預設 1，其餘 section（CPC / Forecast / Revenue / Customers）留空待填，dropdown chip = Incomplete。' },
 
   // Card state scenarios — Figma 5749-141112
-  { id:'cs-cvr-ok',     page:'card-state', label:'CVR: Above Target (2.28×)',       icon:'trending_up',  tip:'Realized cloud value exceeds expectations (green gradient)' },
-  { id:'cs-cvr-info',   page:'card-state', label:'CVR: On Target (1.00×)',          icon:'check_circle', tip:'Meets expectations (blue gradient)' },
-  { id:'cs-cvr-over',   page:'card-state', label:'CVR: Below Target (0.59×)',       icon:'warning',      tip:'Falls below expectations (red gradient)' },
-  { id:'cs-sr-ok',      page:'card-state', label:'Spend/Rev: Lower than benchmark',  icon:'mood',         tip:'2.30% vs 5% benchmark (green frame)' },
-  { id:'cs-sr-info',    page:'card-state', label:'Spend/Rev: Equal to benchmark',    icon:'check_circle', tip:'5.00% vs 5% benchmark (blue frame)' },
-  { id:'cs-sr-over',    page:'card-state', label:'Spend/Rev: Higher than benchmark', icon:'warning',      tip:'7.77% vs 5% benchmark (red frame)' },
-  { id:'cs-sr-neutral', page:'card-state', label:'Spend/Rev: No benchmark set',      icon:'help',         tip:'No benchmark (gray frame, no comparison)' },
-  { id:'cs-var-ok',     page:'card-state', label:'Variance: Accurate (+3.29%)',     icon:'mood',         tip:'Forecast accuracy: ok (green frame)' },
-  { id:'cs-var-warn',   page:'card-state', label:'Variance: Moderate (−8.90%)',     icon:'warning',      tip:'Forecast accuracy: moderate drift (orange frame)' },
-  { id:'cs-var-over',   page:'card-state', label:'Variance: High (+16.68%)',        icon:'warning',      tip:'Forecast accuracy: high drift (red frame)' },
-  { id:'cs-var-bad',    page:'card-state', label:'Variance: Inaccurate (+53.29%)',  icon:'dangerous',    tip:'Forecast accuracy: severely off (red frame)' },
+  { id:'cs-cvr-ok',     page:'card-state', label:'CVR: Above Target (2.28×)',       icon:'trending_up',  tip:'實現價值高於預期（綠色漸層）' },
+  { id:'cs-cvr-info',   page:'card-state', label:'CVR: On Target (1.00×)',          icon:'check_circle', tip:'實現價值符合預期（藍色漸層）' },
+  { id:'cs-cvr-over',   page:'card-state', label:'CVR: Below Target (0.59×)',       icon:'warning',      tip:'實現價值低於預期（紅色漸層）' },
+  { id:'cs-sr-ok',      page:'card-state', label:'Spend/Rev: Lower than benchmark',  icon:'mood',         tip:'2.30%，低於產業基準 5%（綠色框）' },
+  { id:'cs-sr-info',    page:'card-state', label:'Spend/Rev: Equal to benchmark',    icon:'check_circle', tip:'5.00%，等於產業基準 5%（藍色框）' },
+  { id:'cs-sr-over',    page:'card-state', label:'Spend/Rev: Higher than benchmark', icon:'warning',      tip:'7.77%，高於產業基準 5%（紅色框）' },
+  { id:'cs-sr-neutral', page:'card-state', label:'Spend/Rev: No benchmark set',      icon:'help',         tip:'沒有設定產業基準（灰色框，不做比較）' },
+  { id:'cs-var-ok',     page:'card-state', label:'Variance: Accurate (+3.29%)',     icon:'mood',         tip:'預測準確度：Accurate（綠色框）' },
+  { id:'cs-var-warn',   page:'card-state', label:'Variance: Moderate (−8.90%)',     icon:'warning',      tip:'預測準確度：Moderate，有些偏差（橘色框）' },
+  { id:'cs-var-over',   page:'card-state', label:'Variance: High (+16.68%)',        icon:'warning',      tip:'預測準確度：High，偏差大（紅色框）' },
+  { id:'cs-var-bad',    page:'card-state', label:'Variance: Inaccurate (+53.29%)',  icon:'dangerous',    tip:'預測準確度：Inaccurate，嚴重偏離（紅色框）' },
 
   // Role scenarios
-  { id:'r-admin',    page:'role', label:'Owner / Admin',     icon:'admin_panel_settings', tip:'Full access (can view + edit Executive Insights and Fiscal Settings)' },
-  { id:'r-nonadmin', page:'role', label:'Non-Admin (T1/T2)', icon:'lock',                 tip:'T1 / T2 Manager / Member (cannot enter Executive Insights at all, per new PRD)' },
+  { id:'r-admin',    page:'role', label:'Owner / Admin',     icon:'admin_panel_settings', tip:'完整權限：可以看也可以編輯 Executive Insights 與 Fiscal Settings' },
+  { id:'r-nonadmin', page:'role', label:'Non-Admin (T1/T2)', icon:'lock',                 tip:'T1／T2 的 Manager 與 Member：完全進不了 Executive Insights（新版 PRD）' },
 
   // Modal scenarios — 一鍵開啟各 modal（GB v2 對齊）
-  { id:'modal-edit-start', page:'modal', label:'Edit Start Month',         icon:'event',     tip:'Figma #09 — 改 Fiscal Year start month modal（warning box + 動態 Resulting FY 文字）。' },
+  { id:'modal-edit-start', page:'modal', label:'Edit Start Month',         icon:'event',     tip:'Figma #09：改會計年度起始月份的彈窗（警示框＋會隨選擇更新的 Resulting fiscal year 文字）' },
   { id:'modal-switch-year',page:'modal', label:'Switch Year (guard)',      icon:'warning',   tip:'切換 FY 時若有未存編輯的防呆 confirm dialog（確認後續切年，不跳回 Dashboard）。' },
   { id:'modal-discard',    page:'modal', label:'Discard unsaved changes?', icon:'warning',   tip:'Settings 有未存改動時離開的 confirm dialog。' },
-  { id:'modal-guard-esm',  page:'modal', label:'Change FY Start Month? (guard)', icon:'error', tip:'Figma #12：Fiscal Settings 有改過內容又點 Edit Start Month，先跳這個防呆；Discard Changes 才前往 #09。' },
+  { id:'modal-guard-esm',  page:'modal', label:'Change FY Start Month? (guard)', icon:'error', tip:'Figma #12：Fiscal Settings 有改過內容又點 Edit Start Month，先跳這個防呆；按 Discard Changes 才前往 #09' },
 
   // Toast scenarios — 演示文案（GB v2 對齊句型「X updated successfully.」/「Unable to update X.」）
-  { id:'toast-settings-ok',  page:'toast', label:'Settings updated (ok)',  icon:'check_circle',tip:'Fiscal Settings updated successfully.' },
-  { id:'toast-settings-err', page:'toast', label:'Settings update failed', icon:'error',       tip:'Unable to update Fiscal Settings. Please try again later.' },
-  { id:'toast-fsm-ok',       page:'toast', label:'Start month saved (ok)', icon:'check_circle',tip:'Fiscal Start Month updated successfully.' },
-  { id:'toast-fsm-err',      page:'toast', label:'Start month save failed',icon:'error',       tip:'Unable to update Fiscal Start Month. Please try again later.' },
-  { id:'toast-sync-ok',      page:'toast', label:'Budget synced (ok)',     icon:'check_circle',tip:'All Estimated Financial Budgets synced successfully.' },
-  { id:'toast-sync-err',     page:'toast', label:'Budget sync failed',     icon:'error',       tip:'Unable to sync budget. Please try again later.' },
-  { id:'toast-fy-ok',        page:'toast', label:'Fiscal year updated',    icon:'event_available', tip:'Fiscal year updated successfully. Also synced to General Budget.' },
-  { id:'toast-fy-load',      page:'toast', label:'Loaded FY (info)',       icon:'info',        tip:'Loaded FY2026 settings (info, 切換 FY 時用)。' },
-  { id:'toast-discard',      page:'toast', label:'Changes discarded',      icon:'warning',     tip:'Changes discarded (warn)。' },
+  { id:'toast-settings-ok',  page:'toast', label:'Settings updated (ok)',  icon:'check_circle',tip:'成功 toast：「Fiscal Settings updated successfully.」' },
+  { id:'toast-settings-err', page:'toast', label:'Settings update failed', icon:'error',       tip:'錯誤 toast：「Unable to update Fiscal Settings. Please try again later.」' },
+  { id:'toast-fsm-ok',       page:'toast', label:'Start month saved (ok)', icon:'check_circle',tip:'成功 toast：「Fiscal Start Month updated successfully.」' },
+  { id:'toast-fsm-err',      page:'toast', label:'Start month save failed',icon:'error',       tip:'錯誤 toast：「Unable to update Fiscal Start Month. Please try again later.」' },
+  { id:'toast-sync-ok',      page:'toast', label:'Budget synced (ok)',     icon:'check_circle',tip:'成功 toast：「All Estimated Financial Budgets synced successfully.」' },
+  { id:'toast-sync-err',     page:'toast', label:'Budget sync failed',     icon:'error',       tip:'錯誤 toast：「Unable to sync budget. Please try again later.」' },
+  { id:'toast-fy-ok',        page:'toast', label:'Fiscal year updated',    icon:'event_available', tip:'成功 toast：「Fiscal year updated successfully. Also synced to General Budget.」' },
+  { id:'toast-fy-load',      page:'toast', label:'Loaded FY (info)',       icon:'info',        tip:'切換會計年度時的提示 toast：「Loaded FY2026 settings」' },
+  { id:'toast-discard',      page:'toast', label:'Changes discarded',      icon:'warning',     tip:'放棄變更後的 warning toast：「Changes discarded.」' },
   // ⏸ PARKED（specs/parked-designs.md #21）：兩張 Top 10 卡的 View Group Detail 是 UX 提案，可整批隱藏看上線版
   { id:'parked-on',  page:'parked', group:'UX 提案', label:'顯示 UX 提案（預設）',      icon:'lightbulb',      tip:'⏸ PARKED：兩張 Top 10 卡右上的 View Group Detail 是設計端提案，不在 Figma 稿與 PRD，掛 UX 提案 badge。' },
   { id:'parked-off', page:'parked', group:'UX 提案', label:'隱藏暫緩的設計（看上線版）', icon:'visibility_off', tip:'隱藏 View Group Detail，等於上線版。' },
@@ -5076,6 +5200,78 @@ window.DEMO_APPLY = function(id, btn){
   if(id==='parked-off')         { document.body.classList.add('hide-parked'); }
 };
 
+/* ===== X-9r3 FB16：四個彈窗的對話框語意（抄 Auth v1 的做法）=====
+ * role=dialog／aria-modal／aria-labelledby 加在 .modal；開啟時焦點進彈窗、背景 .app 加 inert、Tab 只在彈窗內循環、Esc 等於 × 關閉、關閉後焦點回到開啟前的位置。
+ * 彈窗是用 classList.add('active') 開的（頁面各處與 Demo FAB 都是），所以用 MutationObserver 看 class，不用改任何開啟端；id 與 .mo.active 都不變。 */
+(function(){
+  var FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  var openers = {}, chain = null;
+  /* X-9r3 R8：焦點還原的後備。開啟端已不能聚焦（例：FY 下拉的選項在選單收起後被藏起來）時，改回對應的觸發鈕；
+   * 防呆彈窗按「Discard Changes」接著開 Edit Start Month 時，沿用防呆彈窗原本的開啟端（Edit Start Month 鈕） */
+  var FALLBACK = { 'modal-switch-year': '#fy-sw-trigger' };
+  function usable(el){ return !!(el && el.isConnected && el.offsetParent !== null && !el.closest('[inert]') && !el.disabled); }
+  function focusables(mo){ return [].filter.call(mo.querySelectorAll(FOCUSABLE), function(el){ return el.offsetParent !== null; }); }
+  function topActive(){ var a = document.querySelectorAll('.mo.active'); return a.length ? a[a.length-1] : null; }
+  function onChange(mo){
+    var active = mo.classList.contains('active');
+    var app = document.querySelector('.app');
+    if(active && !mo._eiOpen){
+      mo._eiOpen = true;
+      var a = document.activeElement;
+      var op = (a && a !== document.body && !a.closest('.mo') && !a.closest('#fy-sw')) ? a : null;
+      if(!op && chain && Date.now() - chain.t < 600) op = chain.el;
+      if(!op && FALLBACK[mo.id]) op = document.querySelector(FALLBACK[mo.id]);
+      openers[mo.id] = op;
+      if(app) app.inert = true;
+      var box = mo.querySelector('.modal'); if(box) box.focus({preventScroll:true});
+    } else if(!active && mo._eiOpen){
+      mo._eiOpen = false;
+      if(app && !document.querySelector('.mo.active')) app.inert = false;
+      var back = openers[mo.id]; openers[mo.id] = null;
+      if(!back && FALLBACK[mo.id]) back = document.querySelector(FALLBACK[mo.id]);
+      if(back){
+        chain = { el: back, t: Date.now() };
+        /* 同一輪裡已經有另一個彈窗接著開了（防呆 → Edit Start Month）：把開啟端交給它 */
+        document.querySelectorAll('.mo.active').forEach(function(o){ if(o !== mo && o._eiOpen && !openers[o.id]) openers[o.id] = back; });
+      }
+      if(!usable(back) && FALLBACK[mo.id]) back = document.querySelector(FALLBACK[mo.id]);   // 確認切年後 FY 切換器會整個重畫，舊節點已不在 DOM，重新找
+      if(usable(back)) back.focus({preventScroll:true});
+    }
+  }
+  document.querySelectorAll('.mo').forEach(function(mo){
+    var box = mo.querySelector('.modal'), t = mo.querySelector('.mt');
+    if(box){
+      box.setAttribute('role','dialog'); box.setAttribute('aria-modal','true'); box.setAttribute('tabindex','-1');
+      if(t){ if(!t.id) t.id = mo.id + '-title'; box.setAttribute('aria-labelledby', t.id); }
+    }
+    new MutationObserver(function(){ onChange(mo); }).observe(mo, { attributes:true, attributeFilter:['class'] });
+  });
+  document.addEventListener('keydown', function(e){
+    var mo = topActive(); if(!mo) return;
+    if(e.key === 'Escape'){ e.preventDefault(); mo.classList.remove('active'); return; }
+    if(e.key !== 'Tab') return;
+    var list = focusables(mo); if(!list.length){ e.preventDefault(); return; }
+    var first = list[0], last = list[list.length-1], a = document.activeElement;
+    var box = mo.querySelector('.modal');
+    if(!a || !mo.contains(a) || a === box){ e.preventDefault(); (e.shiftKey ? last : first).focus(); return; }
+    if(e.shiftKey && a === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && a === last){ e.preventDefault(); first.focus(); }
+  });
+})();
+
+/* ===== X-9r3 FB19：info icon、Learn More 可用鍵盤聚焦（focus 時顯示同一個 #gl-tip，由 shared/demo-fab.js 處理 :focus-visible）；名稱＝tooltip 文字 ===== */
+document.querySelectorAll('.ic-info[data-tip],.lu-info[data-tip],.lm[data-tip]').forEach(function(el){
+  var tip = (el.getAttribute('data-tip') || '').replace(/\s+/g,' ').trim();
+  el.setAttribute('tabindex','0'); el.setAttribute('role','button');
+  el.setAttribute('aria-label', el.classList.contains('lm') ? 'Learn More. ' + tip : tip);
+});
+
+/* ===== X-9r3 FB18：ECharts 容器的替代文字（role=img＋由資料組出的 aria-label）；FOCUS treemap 由 shared/focus-treemap.js 處理 ===== */
+function eiChartAria(id, label){
+  var el = document.getElementById(id); if(!el) return;
+  el.setAttribute('role','img'); el.setAttribute('aria-label', label);
+}
+
 /* ===== Init ===== */
 document.addEventListener('DOMContentLoaded',()=>{
   // FY2026 Feb. 2026 – Jan. 2027；Apr/Jul 故意 empty 示意「user 清空 → placeholder 顯示 GB ref 值」
@@ -5092,11 +5288,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     values:['1.20','1.27','1.35','1.43','1.50','1.58','1.65','1.62','1.53','1.47','1.38','1.28']
   });
   buildMonthGrid('revenue-grid',{
-    prefix:'$', placeholder:'optional',
+    prefix:'$', placeholder:'',
     values:['920000','945000','968000','992000','1015000','1038000','1055000','1047000','1029000','1012000','985000','962000']
   });
   buildMonthGrid('customers-grid',{
-    placeholder:'optional',
+    placeholder:'',
     values:['22400','22800','23200','23600','24000','24400','24820','24600','24300','24100','23800','23500']
   });
   buildMonthGrid('forecast-grid',{
@@ -5220,6 +5416,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);',
     'color:#fff;box-shadow:0 4px 14px rgba(13,27,62,.36);z-index:999;cursor:pointer;',
     'display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;border:0}',
+    /* X-9r6 F11：sidebar 收合時 toast 的 left 是 45（--lt-toast-left 收合值），會蓋住移到 left 54 的 FAB（5 秒內點不到）；
+       收合時把 FAB 與說明面板抬到 toast 上方（toast 預設 bottom 24、高 46、間距 16 → 86）。展開時 toast left 274 不碰到 FAB，位置不變 */
+    'html.lt-sb-collapsed .demo-fab{bottom:86px}',
+    'html.lt-sb-collapsed .demo-popover{bottom:146px;max-height:calc(100vh - 170px)}',   /* X-9r6 R1：視窗 ≤625 高時面板頂端不被切 */
     '.demo-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(13,27,62,.45)}',
     '.demo-fab:active{transform:scale(.96)}',
     '.demo-fab .material-symbols-outlined{font-size:24px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}',
@@ -5578,15 +5778,33 @@ document.addEventListener('DOMContentLoaded',()=>{
     if (document.getElementById('gl-tip')) return; // host page already provides one
     var tip = document.createElement('div');
     tip.id = 'gl-tip';
+    tip.setAttribute('role', 'tooltip');   /* 2026-10-22 X-9r3 R4：讀屏要認得這是 tooltip */
     document.body.appendChild(tip);
-    var cur = null;
+    var cur = null, described = null;
+    /* 2026-10-22 X-9r3 R4：tooltip 顯示時給觸發元件 aria-describedby="gl-tip"（保留它原本的 describedby，只加／移除自己的 token），收起時移除 */
+    function describe(node) {
+      undescribe();
+      if (!node || !node.setAttribute) return;
+      var ids = (node.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+      if (ids.indexOf('gl-tip') === -1) { ids.push('gl-tip'); node.setAttribute('aria-describedby', ids.join(' ')); }
+      described = node;
+    }
+    function undescribe() {
+      if (!described) return;
+      var ids = (described.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (x) { return x && x !== 'gl-tip'; });
+      if (ids.length) described.setAttribute('aria-describedby', ids.join(' ')); else described.removeAttribute('aria-describedby');
+      described = null;
+    }
+    function hideTip() { cur = null; tip.style.display = 'none'; undescribe(); }
+    /* 頁面自己把 #gl-tip 設成 display:none（例：開 Month Picker 時收起）也要跟著移除 describedby */
+    if (window.MutationObserver) new MutationObserver(function () { if (tip.style.display === 'none') undescribe(); }).observe(tip, { attributes: true, attributeFilter: ['style'] });
     // 2026-10-09 Kabin 裁決：全站 tooltip 改成錨在元件上（Figma／MUI 行為），不再跟著游標跑。
     // 規則照 Anomaly Detection #01-3 量到的：預設出現在元件上方 6px、水平靠元件左緣，
     // 右邊放不下就改靠元件右緣 +2；上方放不下改到下方。
     // 可選屬性：data-tip-pos="below"（固定放下方）、data-tip-dy（下方距離，預設 4）、
     // data-tip-anchor（CSS 選擇器，錨在子元素上）、data-tip-align="content-right"（右緣對齊內容右緣 −16）。
     function place() {
-      if (!cur || !cur.isConnected) { cur = null; tip.style.display = 'none'; return; }
+      if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
       var r = a.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
       var vw = window.innerWidth, vh = window.innerHeight;
@@ -5603,11 +5821,33 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.addEventListener('mouseover', function (e) {
       var el = e.target.closest && e.target.closest('[data-tip]');
       if (!el || (el === cur && tip.style.display !== 'none')) return;
-      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place();
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place(); describe(el);
     });
     document.addEventListener('mouseout', function (e) {
       var el = e.target.closest && e.target.closest('[data-tip]');
-      if (el && el === cur && !el.contains(e.relatedTarget)) { cur = null; tip.style.display = 'none'; }
+      if (el && el === cur && !el.contains(e.relatedTarget)) hideTip();
+    });
+    /* 2026-10-22 X-9r3 FA23：鍵盤 focus 到帶 data-tip 的元素也顯示、blur／Esc 收起（additive，只吃 :focus-visible，滑鼠點擊不觸發） */
+    /* 2026-10-22 X-9r3 R4：:focus-visible 改判真正拿到焦點的 e.target（不是帶 data-tip 的祖先）；describedby 掛在拿到焦點的那個元素上 */
+    document.addEventListener('focusin', function (e) {
+      var t = e.target, el = t.closest && t.closest('[data-tip]');
+      if (!el || !t.matches || !t.matches(':focus-visible')) return;
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place(); describe(t);
+    });
+    document.addEventListener('focusout', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && el === cur) hideTip();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && cur) { hideTip(); return; }
+      /* role="button" 的 info icon（非原生按鈕）按 Enter／Space 切換 tooltip；滑鼠行為不變 */
+      if ((e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented) {
+        var t = e.target, b = t.closest && t.closest('[role="button"][data-tip]');
+        if (!b || b !== t || /^(BUTTON|A|INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+        e.preventDefault();
+        if (cur === b && tip.style.display !== 'none') hideTip();
+        else { cur = b; tip.textContent = b.dataset.tip; tip.style.display = 'block'; place(); describe(b); }
+      }
     });
     window.addEventListener('scroll', place, true);
     window.addEventListener('resize', place);
