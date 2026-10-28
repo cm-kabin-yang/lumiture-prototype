@@ -433,6 +433,9 @@
     '.checkbox__input:focus-visible~.checkbox__box,',
     '.checkbox:focus-visible .checkbox__box{border-color:var(--lt-color-primary,#004FB0);box-shadow:0 0 0 3px rgba(0,79,176,.1);outline:none}',
     '.checkbox:focus-visible{outline:none}',
+    /* X-9r1 S5：光暈對白底只有 1.18:1，鍵盤 focus 另補 2px 實線外框（跟 .lt-btn-icon、.lt-link 同一套）；滑鼠不受影響 */
+    '.checkbox__input:focus-visible~.checkbox__box,',
+    '.checkbox:focus-visible .checkbox__box{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:2px}',
 
     /* disabled 最後宣告，蓋掉上面所有狀態 */
     '.checkbox__input:disabled~.checkbox__box,',
@@ -723,8 +726,53 @@
 .v10-loading .vc.ac .add-csp-btn,.v10-loading .v10-split-empty .btn{color:var(--g300)!important;border-color:var(--g200)!important;pointer-events:none}
 .v10-loading .vc.ac .csp-blocks-area{background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:8px;min-height:86px}.v10-loading .vc.ac .csp-blocks-area *{visibility:hidden!important}
 .v10-loading .ac-match>*{display:none}.v10-loading .ac-match::before{content:'receipt_long';font-family:'Material Symbols Outlined';font-size:18px;color:var(--g300)}.v10-loading .ac-match::after{content:'Calculating…';color:var(--g400)}
-.v10-loading .ac-w,.v10-loading .ac-amt{color:transparent!important;background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;height:12px;width:56px;justify-self:end;align-self:center;overflow:hidden}
+.v10-loading .ac-w,.v10-loading .ac-amt,.v10-loading .ac-dc{color:transparent!important;background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;height:12px;width:56px;justify-self:end;align-self:center;overflow:hidden}
 .v10-loading .ac-row-basis,.v10-loading .ac-row-hint{display:none}
+/* 2026-10-27 RD：× 拿掉／Add Value 加回後重算（實際 0.5～3 秒）：只有這張卡的 Share、Allocated 變 skeleton，× 仍可連按；算完前 Next／Save 不能按 */
+.vc.ac.ac-recalc .ac-w,.vc.ac.ac-recalc .ac-amt,.vc.ac.ac-recalc .ac-dc{color:transparent!important;background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;height:12px;width:56px;justify-self:end;align-self:center;overflow:hidden}
+.vc.ac.ac-recalc .ac-row-basis,.vc.ac.ac-recalc .ac-row-hint{display:none}
+/* 2026-10-28 過期：保留舊數字但變灰（不用 skeleton，skeleton＝正在算），提示句放在表頭上方 */
+.vc.ac.ac-stale .ac-w,.vc.ac.ac-stale .ac-amt,.vc.ac.ac-stale .ac-dc,.vc.ac.ac-stale.ac-stale-cond .ac-match>span:not(.ac-match-status){color:var(--g400,#B3B3B3)!important} /* matched 只跟條件有關：只改分給誰時維持原色（10/28 設計審查） */
+.vc.ac.ac-stale.ac-stale-cond .ac-match>.material-symbols-outlined,.vc.ac.ac-stale .ac-match>span:not(.ac-match-status) strong{color:inherit}
+/* 計算摘要列的過期狀態（預設） */
+.vc.ac.ac-stale .ac-match:has(.ac-match-status),.vc.ac.ac-recalc .ac-match:has(.ac-match-status){background:var(--warn-lt,#FEF3E1)}
+.ac-match-status{margin-left:auto;display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--g900)}
+.ac-match-status>.material-symbols-outlined{font-size:20px;color:var(--warn,#FC9A0F)!important;font-variation-settings:'FILL' 1}
+.ac-match-status .btn{height:30px;padding:0 12px;margin:-4px 0 -4px 4px;font-size:14px} /* 負邊距：灰條高度不變，切換過期時版面不位移 */
+.vc.ac:not(.ac-stale):not(.ac-recalc) .ac-match-status{display:none}
+.vc.ac.ac-stale .ac-alerts,.vc.ac.ac-stale .ac-row-hint{opacity:.45}
+/* 2026-10-28 UX 提案：Choose Values 多選清單 */
+.v10-choose{position:absolute;z-index:520;width:380px;background:var(--wh);border-radius:var(--r-md,8px);box-shadow:0 4px 16px rgba(0,0,0,.14);padding:16px;display:flex;flex-direction:column;gap:8px}
+.v10-ch-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.v10-ch-title{font-size:14px;font-weight:700;color:var(--g900)}
+.v10-ch-search{display:flex;align-items:center;gap:4px;height:36px;padding:0 10px;border:1px solid var(--lt-color-border-input,#CCCCCC);border-radius:5px}.v10-ch-search:focus-within{border-color:var(--pri)}
+.v10-ch-search .material-symbols-outlined{font-size:20px;color:var(--g400)}.v10-ch-search input{flex:1;border:none;outline:none;font:inherit;font-size:14px;color:var(--g900);min-width:0}
+.v10-ch-bulk{display:flex;gap:16px}.v10-ch-bulk button{border:none;background:none;padding:0;font:inherit;font-size:12px;font-weight:700;color:var(--pri);cursor:pointer}.v10-ch-bulk button:hover{text-decoration:underline}
+.v10-ch-h{display:flex;justify-content:space-between;font-size:12px;color:var(--g500);padding:0 4px;border-bottom:1px solid var(--g200);padding-bottom:4px}
+.v10-ch-list{max-height:280px;overflow:auto;overscroll-behavior:contain;display:flex;flex-direction:column}
+.v10-ch-row{display:flex;align-items:center;gap:8px;min-height:36px;padding:0 4px;border-radius:4px;cursor:pointer}.v10-ch-row:hover{background:#F6F6F6}.v10-ch-row[hidden]{display:none}
+.v10-ch-name{flex:1;font-size:14px;color:var(--g900)}.v10-ch-amt{font-size:13px;color:var(--g500);font-variant-numeric:tabular-nums}
+.v10-ch-empty{font-size:12px;color:var(--g500);padding:8px 4px}
+.v10-ch-foot{display:flex;align-items:center;gap:8px;border-top:1px solid var(--g200);padding-top:12px}.v10-ch-count{font-size:12px;color:var(--g500)}.v10-ch-count.is-warn{color:#EC6F09}
+.v10-ch-foot .btn:disabled{background:var(--lt-button-disabled-bg,#CCCCCC)!important;border-color:var(--lt-button-disabled-bg,#CCCCCC)!important;color:#fff!important;cursor:not-allowed}
+/* 2026-10-28 UX 提案：分到 0 的 value 收起來 */
+.ac-zero{margin-top:4px;padding-top:8px;border-top:1px dashed var(--g200,#E6E6E6);display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.ac-zero-h{display:inline-flex;align-items:center;gap:4px;border:none;background:none;padding:2px 0;font:inherit;font-size:14px;color:var(--g500,#676767);cursor:pointer}
+.ac-zero-h .material-symbols-outlined{font-size:20px;transition:transform .15s}.ac-zero.is-open .ac-zero-h .material-symbols-outlined{transform:rotate(90deg)}
+.ac-zero-h:hover .ac-zero-t{text-decoration:underline}.ac-zero-h:focus-visible{outline:2px solid var(--pri);outline-offset:2px;border-radius:4px}
+.ac-zero-body{display:none;flex-basis:100%;flex-direction:column;gap:8px}.ac-zero.is-open .ac-zero-body{display:flex}
+.ac-zero-d{font-size:12px;line-height:18px;color:var(--g500,#676767)}.ac-zero .ac-row-hint{display:none}
+.ac-stale-note{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:8px 16px;background:var(--wh);border-radius:4px;box-shadow:0 0 6px rgba(0,0,0,.2);border-left:4px solid var(--warn,#FC9A0F);font-size:14px;line-height:24.5px;color:var(--g900)}
+.ac-stale-note>.material-symbols-outlined{font-size:24px;color:var(--warn,#FC9A0F);font-variation-settings:'FILL' 1;flex-shrink:0}
+.ac-stale-txt{flex:1;display:flex;flex-direction:column}.ac-stale-txt strong{font-weight:700}
+.ac-stale-btn{flex-shrink:0}
+.vc.ac:not(.ac-stale):not(.ac-recalc) .ac-stale-note{display:none} /* 重算中提醒框留著，按鈕轉圈 */
+.v10-recalc-btn .material-symbols-outlined{font-size:20px}
+/* 停用照 B-1：底 #CCCCCC 白字 */
+.sbtm .v10-recalc-btn:disabled,.sbtm .v10-next-wrap .btn:disabled{background:var(--lt-button-disabled-bg,#CCCCCC)!important;border-color:var(--lt-button-disabled-bg,#CCCCCC)!important;color:var(--lt-button-disabled-text,#fff)!important;cursor:not-allowed}
+.v10-next-wrap{display:inline-flex}.v10-next-wrap .btn:disabled{pointer-events:none}
+.v10-spin{animation:v10spin 1s linear infinite}@keyframes v10spin{to{transform:rotate(360deg)}}
+.v10-step.is-blocked{cursor:not-allowed}.v10-step.is-blocked .v10-step-t{color:var(--g400)}.v10-step.is-blocked:hover .v10-step-t{text-decoration:none}
+.v10-recalc-busy .sbtm .btn{background:var(--wh)!important;color:var(--g300)!important;border-color:var(--g200)!important;pointer-events:none}.v10-recalc-busy .sbtm .btn-p{background:var(--lt-button-disabled-bg,#CCCCCC)!important;border-color:var(--lt-button-disabled-bg,#CCCCCC)!important;color:#fff!important}
 .v10-loading .sbtm .btn{background:var(--wh)!important;color:var(--g300)!important;border-color:var(--g200)!important;pointer-events:none}.v10-loading .sbtm .btn-p{background:var(--lt-button-disabled-bg,#CCCCCC)!important;border-color:var(--lt-button-disabled-bg,#CCCCCC)!important;color:#fff!important}
 /* 2026-10-15 Kabin（Figma #08-1／#08-2）：Apply 彈窗提醒框＝白底、左側 4px 色條、陰影 0 0 6 .2、圓角 4、字 14；跟按鈕距離 72 */
 .v10-apply-notice{display:flex;align-items:flex-start;gap:10px;margin:20px 0 42px;padding:8px 16px;background:var(--wh);border-radius:4px;box-shadow:0 0 6px rgba(0,0,0,.2);border-left:4px solid var(--v10n,#FC9A0F);font-size:14px;line-height:24.5px;color:var(--g900)}
@@ -750,8 +798,15 @@
 .v10-direct-h .material-symbols-outlined{font-size:18px;color:var(--g500)}
 .v10-direct-sub{font-weight:400;font-size:12px;color:var(--g500)}
 .v10-direct-h a{margin-left:auto;font-weight:400;font-size:13px;color:var(--pri)}
-.v10-direct-list{display:flex;flex-wrap:wrap;gap:8px 24px}
-.v10-direct-item strong,.v10-direct-rest strong{color:var(--g900);font-variant-numeric:tabular-nums;margin-left:4px}
+.v10-sum{display:flex;align-items:flex-end;gap:48px}
+.v10-sum-stat{display:flex;flex-direction:column;gap:4px}
+.v10-sum-l{font-size:12px;line-height:18px;color:var(--g500)}
+.v10-sum-v{display:flex;align-items:baseline;gap:8px;font-size:16px;line-height:24px;font-weight:700;color:var(--g900);font-variant-numeric:tabular-nums}
+.v10-sum-n{font-size:12px;font-weight:400;color:var(--g500);text-decoration:underline dotted var(--g400);text-underline-offset:3px;cursor:help}.v10-sum-n:focus-visible{outline:2px solid var(--pri);outline-offset:2px;border-radius:2px}
+/* 2026-10-28 Kabin：期間放左上當這塊的標示、Edit value cards 放右上 */
+.v10-sum-period{display:inline-flex;align-items:center;gap:4px;font-size:14px;line-height:21px;font-weight:700;color:var(--g900)}.v10-sum-when{font-weight:400;color:var(--g500)} /* 2026-10-28 Kabin：給統整標題，期間放括號 */.v10-sum-period .material-symbols-outlined{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 1}
+.v10-sum-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;font-size:12px;line-height:18px;color:var(--g500)}.v10-sum-h a{font-size:14px;line-height:21px;color:var(--pri)}
+.v10-direct-rest strong{color:var(--g900);font-variant-numeric:tabular-nums;margin-left:4px}
 .v10-direct-rest{color:var(--g600);padding-left:24px;border-left:1px solid var(--g200)}
 .ms-server .ms-list>.ms-item:first-child,.ms-server .ms-divider{display:none}.ms-server .ms-list .ms-item:not(:first-child){display:none}.ms-server .ms-list .ms-item.v10-hit,.ms-server .ms-list .ms-item:has(.ms-chk:checked){display:flex}.v10-ms-hint{padding:8px 12px;font-size:12px;color:var(--g500)}
 .v10-skip{background:none;border:1px solid transparent;color:var(--pri);font-weight:700;white-space:nowrap;margin-left:12px}.v10-skip:hover{text-decoration:underline}
@@ -846,7 +901,7 @@ tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g20
 .ac-sec{display:flex;flex-direction:column;gap:2px;margin:8px 0}
 .ac-sec-t{font-size:13px;font-weight:700;color:var(--g800)}
 .ac-sec-d{font-size:12px;color:var(--g500)}
-.ac-match{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g700);padding:8px 12px;background:var(--g50);border-radius:var(--r-sm);margin-top:8px}
+.ac-match{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g700);padding:8px 12px;background:var(--g50);border-radius:var(--r-sm);margin-top:24px} /* 2026-10-28 Kabin：跟 Add Data Source 太近；摘要列是條件與結果的分界，上下各 24 */
 .ac-match .material-symbols-outlined{font-size:18px;color:var(--g400)}
 .ac-muted{color:var(--g500)}
 .ac-sample{margin-left:auto;font-size:12px;color:var(--g500);border:1px dashed var(--g300);border-radius:10px;padding:1px 8px;cursor:help}
@@ -854,7 +909,7 @@ tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g20
 /* 一列＝可往下長的容器：第一行是 value／Share／金額，下方 .ac-row-ext 預留給 Phase 2 的「認定條件」（Phase 1 為空、不佔高度）；
  * Share 欄 96px 預留 Phase 3 Fixed Proportional 的百分比輸入框 */
 .ac-row{display:flex;flex-direction:column;gap:4px}
-.ac-row-main{display:grid;grid-template-columns:minmax(200px,320px) 96px 112px 28px;align-items:center;gap:12px}
+.ac-row-main{display:grid;grid-template-columns:minmax(200px,320px) 168px 96px 112px 28px;align-items:center;gap:12px}
 .ac-row-ext:empty{display:none}
 .ac-row .ac-sel,.ac-row .ac-txt{height:36px;padding:0 10px;border:1px solid var(--g300);border-radius:5px;font-size:14px;font-family:inherit;background:var(--wh);color:var(--g900)}
 .ac-w{font-size:14px;font-weight:600;color:var(--g900);text-align:right;font-variant-numeric:tabular-nums}
@@ -863,6 +918,12 @@ tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g20
 /* 10/15：權重清單改自動帶入後，分到 0 多半是「這個 value 本來就沒用到這些資源」，不是使用者做錯 → 改灰色 info（Kabin 同意）。下拉版（已不採用）維持橘色 */
 body:not(.v10-recip-select) .ac-row-hint{color:var(--g500)}body:not(.v10-recip-select) .ac-row-hint::before{content:'info';color:var(--g400)}
 .ac-row-basis{font-size:12px;color:var(--g500)}
+/* 2026-10-27 Q1（RD 問 Based on 為什麼跟上方金額不同）：比例依據改成獨立一欄，範圍寫在欄名，一列一個數字，Value → Direct cost → Share → Allocated 從左讀到右就是計算過程。原本的 Based on 那行不再顯示 */
+.ac-dc{font-size:13px;color:var(--g500);text-align:right;font-variant-numeric:tabular-nums} /* 2026-10-28：跟 Allocated 同樣式，整列只有 Share 是粗體重點 */
+.ac-dc.is-multi{text-decoration:underline dotted var(--g400);text-underline-offset:3px;cursor:help}
+.ac-dc-h{min-width:0}.ac-dc-h .ac-dc-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac-row-basis{display:none!important}
+body #gl-tip{white-space:pre-line} /* shared demo-fab 注入的 #gl-tip 樣式排在後面，要加 body 才蓋得過 */
 .ac-row-basis:empty{display:none}
 .ac-row.is-new .ac-row-main{animation:v9-row-flash 1.6s ease}
 @keyframes v9-row-flash{0%,60%{background:var(--pri-lt10);box-shadow:0 0 0 4px var(--pri-lt10)}100%{background:transparent;box-shadow:none}}
@@ -890,8 +951,13 @@ body:not(.v10-recip-select) .ac-row-hint{color:var(--g500)}body:not(.v10-recip-s
 .v9-name-dd button.is-cur{color:var(--pri);font-weight:600}
 .v9-name-dd .v9-name-dd-new{border-top:1px solid var(--g200,#E6E6E6);margin-top:4px;color:var(--pri);display:flex;align-items:center;gap:4px}
 .v9-name-dd .v9-name-dd-new .material-symbols-outlined{font-size:18px}
-.ac-rows-h{display:grid;grid-template-columns:minmax(200px,320px) 96px 112px 28px;gap:12px;font-size:12px;color:var(--g500);margin-bottom:4px}
-.ac-rows-h>span:nth-child(2),.ac-rows-h>span:nth-child(3){text-align:right;display:flex;justify-content:flex-end;align-items:center;gap:2px}
+.ac-rows-h{display:grid;grid-template-columns:minmax(200px,320px) 168px 96px 112px 28px;gap:12px;font-size:12px;color:var(--g500);margin-bottom:4px}
+.ac-rows-h>span:nth-child(2),.ac-rows-h>span:nth-child(3),.ac-rows-h>span:nth-child(4){text-align:right;display:flex;justify-content:flex-end;align-items:center;gap:4px;position:relative}
+/* 2026-10-28 Kabin：icon 放左邊看起來怪 → 放回文字右邊，但「懸」在欄位外（跟懸掛標點同一招），表頭文字右緣仍跟下面數字的右緣對齊。
+   右邊空間：欄距 12＋下一欄的空白（Share、Allocated 標籤靠右，左側本來就空；Allocated 右邊是 × 欄） */
+/* 2026-10-28 Kabin：icon 懸在欄外仍然亂（看起來不屬於任何一欄）→ 表頭不放 icon，說明合併成「Split across」旁一顆 */
+.ac-sec-t{display:inline-flex;align-items:center;gap:4px}.ac-sec-ic{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 1;cursor:help}
+.ac-sec-ic:focus-visible{outline:2px solid var(--pri);outline-offset:2px;border-radius:50%}
 .ac-rows-h .material-symbols-outlined{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 1;cursor:help}
 .v9-name-dd{position:absolute;z-index:500;background:var(--wh);border-radius:var(--r-sm);box-shadow:0 4px 16px rgba(0,0,0,.14);padding:4px 0;max-height:240px;overflow:auto;overscroll-behavior:contain}
 .v9-name-dd-h{font-size:12px;color:var(--g500);padding:6px 12px}
@@ -2357,6 +2423,26 @@ const DEMO_ROWS=[
   V9_ROW({id:'r7',project_id:'prd-backend-001',service_description:'Cloud SQL',sku_description:'Cloud SQL for PostgreSQL: vCPU',resource_name:'cloud-sql-prod',labels:{team:'backend'},cost:20000})
 ];
 /* 沒開 GKE cost allocation 的同一個 cluster：①②⑤⑥ 合成一列、沒有 namespace（RD doc 決定 12） */
+/* 2026-10-27 Q1：兩個 cluster 的示範（data-gke 只有 Frontend 在跑，Backend 在那裡分不到） */
+const DEMO_ROWS_TWO_CL=()=>DEMO_ROWS.concat([
+  V9_ROW({id:'d1',project_id:'prd-data',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'gke-data-pool-node-a',labels:{'goog-k8s-cluster-name':'data-gke','k8s-namespace':'frontend'},cost:5000}),
+  V9_ROW({id:'d2',project_id:'prd-data',service_description:'GKE',sku_description:'Zonal Kubernetes Clusters',resource_name:'data-gke',labels:{'goog-k8s-cluster-name':'data-gke'},cost:8000}),
+  V9_ROW({id:'d3',project_id:'prd-data',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'gke-data-pool-node-a',labels:{'goog-k8s-cluster-name':'data-gke','k8s-namespace':'kube:unallocated'},cost:12000})
+]);
+/* 2026-10-27：三個 cluster＋8 個團隊（給 RD 看多 cluster 怎麼算，也給連按 × 感受 debounce）。
+ * 兩個 shared-gke 名字一樣、分屬 prd／stg 兩個 project（RD 10-02：cluster 要用 project＋名稱識別） */
+const DEMO_ROWS_MANY=(()=>{
+  const r=(id,proj,cl,ns,cost,extra)=>V9_ROW(Object.assign({id,project_id:proj,service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:`${cl}-pool-${id}`,labels:Object.assign({'goog-k8s-cluster-name':cl},ns?{'k8s-namespace':ns}:{}),cost},extra||{}));
+  const P='prd-platform-gke',S2='stg-platform-gke',D='prd-data';
+  return [
+    r('m1',P,'shared-gke','backend',30000),r('m2',P,'shared-gke','frontend',10000),r('m3',P,'shared-gke','payments',8000),r('m4',P,'shared-gke','search',6000),r('m5',P,'shared-gke','mobile-api',4000),
+    r('m6',P,'shared-gke',null,10000,{service_description:'GKE',sku_description:'Zonal Kubernetes Clusters',resource_name:'shared-gke'}),r('m7',P,'shared-gke','kube:unallocated',20000),
+    r('s1',S2,'shared-gke','backend',3000),r('s2',S2,'shared-gke','frontend',2000),r('s3',S2,'shared-gke','growth',1000),r('s4',S2,'shared-gke','kube:unallocated',6000),
+    r('d1',D,'data-gke','data',12000),r('d2',D,'data-gke','ml',9000),r('d3',D,'data-gke','search',3000),
+    r('d4',D,'data-gke',null,8000,{service_description:'GKE',sku_description:'Zonal Kubernetes Clusters',resource_name:'data-gke'}),r('d5',D,'data-gke','kube:unallocated',10000),
+    V9_ROW({id:'q1',project_id:'prd-backend-001',service_description:'Cloud SQL',sku_description:'Cloud SQL for PostgreSQL: vCPU',resource_name:'cloud-sql-prod',labels:{team:'backend'},cost:20000})
+  ];
+})();
 const DEMO_ROWS_NO_NS=[
   V9_ROW({id:'n1',project_id:'prd-platform-gke',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'gke-shared-pool',labels:{'goog-k8s-cluster-name':'shared-gke'},cost:80000}),
   DEMO_ROWS[2],DEMO_ROWS[3],DEMO_ROWS[6]
@@ -2400,6 +2486,7 @@ function v9ClusterToLabel(v){const one=x=>{if(typeof x!=='string'||x.includes(' 
 function v9ClusterToName(v){const one=x=>typeof x==='string'?x.replace(/ \(.*\)$/,''):x;return Array.isArray(v)?v.map(one):one(v)}
 TAG_VALUE_OPTS.Cluster=V9_CLUSTERS.map(v9ClusterLabel);
 TAG_VALUE_OPTS.Namespace=TAG_VALUE_OPTS['k8s-namespace'];
+TAG_VALUE_OPTS['k8s-namespace'].push('data','search','payments','ml','mobile-api','growth'); // 2026-10-27：三個 cluster、8 個團隊的示範（v9-many-values）
 /* RD 2026-10-02：Workload 值選單有 1,000 筆上限且會靜默截斷（LT-3436，Dcard 曾有 60 萬個名稱）→ 改成輸入後由後端搜尋。
  * prototype 用 1,200 個假名稱模擬，搜尋框打 2 個字以上才列結果，最多顯示 50 筆 */
 TAG_VALUE_OPTS.Workload=(()=>{const base=['api-server','web-frontend','etl-pipeline'];const teams=['backend','frontend','data','ml','infra','payments','search','growth'];const kinds=['api','worker','cron','consumer','gateway'];const out=[...base];for(let i=1;out.length<1200;i++){out.push(`${teams[i%teams.length]}-${kinds[i%kinds.length]}-${String(i).padStart(4,'0')}`)}return out})();
@@ -2555,10 +2642,10 @@ function v9Compute(cards,rows){
       const sum=recips.reduce((s,n)=>s+(base[n]||0),0);
       if(p!=='*'&&!rows.some(r=>v9Part(r)===p&&(r.labels||{})['k8s-namespace']))info.noNsParts.add(p);
       if(!sum){R.untagged+=row.cost;R.untaggedRows.push(row);info.unallocated+=row.cost;if(!info.noWeight.includes(p))info.noWeight.push(p);return}
-      recips.forEach(n=>{const amt=row.cost*(base[n]||0)/sum;if(!amt)return;R.alloc[n]=(R.alloc[n]||0)+amt;info.byRecip[n]=(info.byRecip[n]||0)+amt;info.allocated+=amt;addRes(n,row)});
+      recips.forEach(n=>{const amt=row.cost*(base[n]||0)/sum;if(!amt)return;R.alloc[n]=(R.alloc[n]||0)+amt;info.byRecip[n]=(info.byRecip[n]||0)+amt;info.allocated+=amt;addRes(n,row);const ap=(info.allocByPart=info.allocByPart||{})[p]=(info.allocByPart||{})[p]||{};ap[n]=(ap[n]||0)+amt});
     });
     // 權重依據：每個 value 在這些範圍裡的直接成本（每個範圍只算一次）
-    info.basis={};usedParts.forEach(p=>{const base=p==='*'?R.direct:(directPart[p]||{});recips.forEach(n=>info.basis[n]=(info.basis[n]||0)+(base[n]||0))});
+    info.basis={};info.basisByPart={};info.allocByPart=info.allocByPart||{};usedParts.forEach(p=>{const base=p==='*'?R.direct:(directPart[p]||{});info.basisByPart[p]={};recips.forEach(n=>{info.basis[n]=(info.basis[n]||0)+(base[n]||0);info.basisByPart[p][n]=base[n]||0})});
     info.usedParts=usedParts;info.basisWhere=usedParts.size===1?([...usedParts][0]==='*'?'across the tag key':`in ${[...usedParts][0].split('|')[1]}`):'where this shared cost sits';
     info.reason=!info.matched?'no-match':!info.allocated?'no-weight':info.unallocated?'partial':'ok';
   });
@@ -2594,7 +2681,36 @@ function v9AutoRecips(ac){
 function v9RmRecip(btn,cid){
   S._isDirty=true;const ac=btn.closest('.ac');const row=btn.closest('.ac-row');
   if(S._autoRecip){const ex=v9AcExcl(ac);const n=row.dataset.name;if(n&&!ex.includes(n)){ex.push(n);v9AcSetExcl(ac,ex)}}
+  // 2026-10-28：拿掉的是分到 0 的 value（而且數字本來就是新的）→ 其他人的金額不會變，不用 Recalculate
+  if(row.classList.contains('is-zero')&&!ac.classList.contains('ac-stale'))ac.dataset.keepFresh='1';
   row.remove();v9Sched(cid);
+}
+/* 2026-10-28 RD＋Kabin：改條件、按 ×、加回 value 都要打 API（約 1～3 秒），之後還會有多張 allocation card 互相影響，
+ * 所以不自動重算：改了就把這張卡的數字標成過期（變灰、留舊數字），按底部 Recalculate 一次算完所有卡；沒按就按 Next 會先自動算。
+ * 過期的判斷：卡片設定（條件＋分給誰）跟上次算的時候不一樣（data-calc-sig）。V10_RECALC_MS 是模擬的 API 時間 */
+const V10_RECALC_MS=1200;
+const v10AcSig=c=>JSON.stringify({b:c.cspBlocks,r:c.recipients});
+function v10RecalcAll(cid,then){
+  const ctn=document.getElementById(cid);if(!ctn)return;const view=ctn.closest('#v-create,#v-edit');
+  /* 2026-10-28 後端：不要每次全部重算 → 一顆按鈕，但只送過期的卡（每張卡各打一次 API），沒改過的卡不重算 */
+  const acs=[...ctn.querySelectorAll(':scope>.vc.ac.ac-stale')];if(!acs.length){then&&then();return}
+  acs.forEach(a=>{a.classList.remove('ac-stale');a.classList.add('ac-recalc')});view?.classList.add('v10-recalc-busy');v10UpdRecalcBtn(cid);
+  clearTimeout(ctn._rcT);
+  ctn._rcT=setTimeout(()=>{
+    v9ReadCards(cid).forEach(c=>{if(c.type==='alloc'&&acs.includes(c.el)){c.el.dataset.calcSig=v10AcSig(c);c.el.dataset.calcCond=JSON.stringify(c.cspBlocks)}});
+    acs.forEach(a=>a.classList.remove('ac-recalc'));view?.classList.remove('v10-recalc-busy');
+    clearTimeout(_v9T[cid]);v9UpdAll(cid);then&&then();
+  },V10_RECALC_MS);
+}
+function v10UpdRecalcBtn(cid){
+  /* 2026-10-28 Kabin（設計審查）：底部不再放 Recalculate，只留提醒框裡那顆（離原因最近）；Next 與 Step 3 照舊擋住 */
+  const ctn=document.getElementById(cid);const view=ctn?.closest('#v-create,#v-edit');if(!view||!v10On()||S._step!==2)return;
+  const busy=!!ctn.querySelector(':scope>.vc.ac.ac-recalc');const stale=!!ctn.querySelector(':scope>.vc.ac.ac-stale');
+  ctn.querySelectorAll(':scope>.vc.ac.ac-recalc .ac-stale-btn').forEach(b=>{b.disabled=true;b.innerHTML='<span class="material-symbols-outlined v10-spin" aria-hidden="true">progress_activity</span>Recalculate'});
+  const block=stale||busy;const nx=view.querySelector('[data-v10preview]');const wrap=nx?.parentElement;
+  if(nx){nx.disabled=block;if(wrap?.classList.contains('v10-next-wrap')){if(block)wrap.dataset.tip='Recalculate the amounts above first.';else delete wrap.dataset.tip}}
+  const s3=view.querySelectorAll('.v10-stepper .v10-step')[2];
+  if(s3){s3.classList.toggle('is-blocked',block);s3.setAttribute('aria-disabled',String(block));if(block)s3.dataset.tip='Recalculate the amounts above first.';else delete s3.dataset.tip}
 }
 function v9ReAddRecip(acid,name,cid){const ac=document.querySelector(`[data-acid=${acid}]`);if(!ac)return;S._isDirty=true;v9AcSetExcl(ac,v9AcExcl(ac).filter(n=>n!==name));ac.dataset.flash=name;v9Sched(cid)}
 /* 依「Last 30 days」金額由大到小排，同額照 value card 順序；名單或順序變了才重畫 */
@@ -2662,7 +2778,47 @@ function v9OpenAddMenu(btn,cid){
 /* Add Value：從還沒加入的既有 value 挑（自動帶入模式＝被拿掉的 value）；最下面「Create value card…」（Kabin 2026-10-01 提出，10/15 RD 看過覺得可做，拿掉 UX 提案）：
  * 跳去新增一張 value card，名稱填好就自動加進這張 allocation card，並提供「Back to allocation card」 */
 function v9AcId(ac){if(!ac.dataset.acid)ac.dataset.acid='ac'+Math.random().toString(36).slice(2,8);return ac.dataset.acid}
+/* 2026-10-28 UX 提案（Kabin）：使用者知道有幾個團隊不該分攤這筆費用時，要一個一個按 ×；只想分給 20 個裡的 3 個就要按 17 次。
+ * 把 Add Value 改成 Choose Values：checkbox 清單（預設全勾）、Select all／Clear all、搜尋、每列附這裡的直接成本，
+ * Apply 一次套用（卡片變過期，按一次 Recalculate）。× 保留給只拿掉一個的情況。前例：Group List 的 Assign Resource 選單 */
+function v10ChooseOn(){return S._autoRecip&&S._chooseVals===true} // 2026-10-28 Kabin：太複雜，不採用，預設關（Demo FAB 已不採用可看）
+function v10CloseChoose(){document.querySelectorAll('.v10-choose').forEach(m=>{const b=m._btn;m.remove();b?.setAttribute('aria-expanded','false')});document.removeEventListener('mousedown',v10ChooseOutside,true)}
+function v10ChooseOutside(e){const m=document.querySelector('.v10-choose');if(m&&!m.contains(e.target)&&!m._btn.contains(e.target))v10CloseChoose()}
+function v10OpenChoose(btn,cid){
+  if(document.querySelector('.v10-choose')){v10CloseChoose();return}
+  const ac=btn.closest('.ac');const names=v9ValueNames(cid);const ex=v9AcExcl(ac);
+  // 每個 value 在這張卡範圍裡的直接成本：用「全部 value 都參與」算一次（只算畫面要顯示的數字，不動卡片）
+  const cards=v9ReadCards(cid);const idx=cards.findIndex(c=>c.el===ac);
+  const cards2=cards.map((c,i)=>i===idx?Object.assign({},c,{recipients:names}):c);
+  const info=idx>=0?v9Compute(cards2,v9RowsFor(cid)).cards[idx]:{};const parts=[...(info.usedParts||[])];const mixed=parts.includes('*')&&parts.length>1;
+  const amt=n=>!info.matched?'--':mixed?'Varies':v9fmt((info.basis||{})[n]||0);
+  const order=names.map((n,i)=>[n,i]).sort((a,b)=>(((info.basis||{})[b[0]]||0)-((info.basis||{})[a[0]]||0))||a[1]-b[1]).map(x=>x[0]);
+  const head=ac.querySelector('.ac-dc-t')?.textContent||'Direct cost';
+  const m=document.createElement('div');m.className='v10-choose';m.setAttribute('role','dialog');m.setAttribute('aria-label','Choose values');m._btn=btn;
+  m.innerHTML=`<div class="v10-ch-top"><span class="v10-ch-title">Choose values to share this cost</span>${S._showParked?v9ParkedBadge('proposal'):''}</div>
+<div class="v10-ch-search"><span class="material-symbols-outlined" aria-hidden="true">search</span><input type="text" placeholder="Search values" aria-label="Search values"></div>
+<div class="v10-ch-bulk"><button type="button" data-act="all">Select all</button><button type="button" data-act="none">Clear all</button></div>
+<div class="v10-ch-h"><span>Value</span><span>${head}</span></div>
+<div class="v10-ch-list">${order.map(n=>`<label class="v10-ch-row" data-name="${n.replace(/"/g,'&quot;')}">${LumiCheckbox.html({stateful:true,cls:'v10-ch-chk',value:n,checked:!ex.includes(n),onchange:'v10ChooseCount(this)'})}<span class="v10-ch-name">${n}</span><span class="v10-ch-amt">${amt(n)}</span></label>`).join('')}<div class="v10-ch-empty" hidden>No matching values.</div></div>
+<div class="v10-ch-foot"><span class="v10-ch-count" role="status"></span><span style="flex:1"></span><button type="button" class="btn btn-s" data-act="cancel">Cancel</button><button type="button" class="btn btn-p" data-act="apply">Apply</button></div>`;
+  document.body.appendChild(m);btn.setAttribute('aria-expanded','true');
+  const r=btn.getBoundingClientRect();const h=m.offsetHeight;const below=window.innerHeight-r.bottom-80; // 底部固定列約 72
+  m.style.left=(r.left+window.scrollX)+'px';m.style.top=((below>=h?r.bottom+4:r.top-h-4)+window.scrollY)+'px';
+  const q=m.querySelector('.v10-ch-search input');
+  q.oninput=()=>{const t=q.value.trim().toLowerCase();let any=false;m.querySelectorAll('.v10-ch-row').forEach(row=>{const ok=!t||row.dataset.name.toLowerCase().includes(t);row.hidden=!ok;any=any||ok});m.querySelector('.v10-ch-empty').hidden=any};
+  m.onclick=e=>{const a=e.target.closest('[data-act]')?.dataset.act;if(!a)return;
+    if(a==='all'||a==='none'){m.querySelectorAll('.v10-ch-row:not([hidden]) .v10-ch-chk').forEach(c=>c.checked=a==='all');v10ChooseCount(m)}
+    if(a==='cancel'){v10CloseChoose();btn.focus()}
+    if(a==='apply'){const keep=[...m.querySelectorAll('.v10-ch-chk:checked')].map(c=>c.value);if(!keep.length)return;
+      const nx=names.filter(n=>!keep.includes(n));if(JSON.stringify(nx)!==JSON.stringify(ex)){v9AcSetExcl(ac,nx);S._isDirty=true;v9Sched(cid)}v10CloseChoose();btn.focus()}};
+  m.onkeydown=e=>{if(e.key==='Escape'){e.stopPropagation();v10CloseChoose();btn.focus()}};
+  v10ChooseCount(m);setTimeout(()=>{document.addEventListener('mousedown',v10ChooseOutside,true);q.focus()},0);
+}
+function v10ChooseCount(x){const m=x.closest?x.closest('.v10-choose'):x;if(!m)return;const all=m.querySelectorAll('.v10-ch-chk').length;const n=m.querySelectorAll('.v10-ch-chk:checked').length;
+  m.querySelector('.v10-ch-count').textContent=n?`${n} of ${all} selected`:'Choose at least one value.';m.querySelector('.v10-ch-count').classList.toggle('is-warn',!n);
+  const ap=m.querySelector('[data-act="apply"]');ap.disabled=!n}
 function v9OpenRecipMenu(btn,cid){
+  if(v10ChooseOn())return v10OpenChoose(btn,cid);
   v9CloseAddMenu();
   const ac=btn.closest('.ac');const acid=v9AcId(ac);const have=v9ReadRecipients(ac);
   const avail=v9ValueNames(cid).filter(n=>!have.includes(n));
@@ -2737,7 +2893,7 @@ function v9TryAddAC(cid){
   S._isDirty=true;
   const names=v9ValueNames(cid);
   // 新卡一律加在最下面（Q-C 的 UX 建議：預設就放在不會吃掉 value card 的位置）
-  const card=addAC(cid,{cspBlocks:[{csp:'GCP',conds:[]}],recipients:names});
+  const card=addAC(cid,{cspBlocks:[{csp:'GCP',conds:[]}],recipients:names});if(v10On()&&S._step===2){card.dataset.calcSig='';card.dataset.calcCond=''} // 2026-10-28：第 2 步新加的卡還沒算過
   requestAnimationFrame(()=>{card.classList.add('vc-new');card.scrollIntoView({behavior:'smooth',block:'nearest'});setTimeout(()=>card.classList.remove('vc-new'),1400)});
   v9Sched(cid);
 }
@@ -2746,11 +2902,11 @@ function v9TryAddAC(cid){
 const V9_BASIS_COPY={
   spend:{
     meta:'Split by Spend',
-    metaTip:"Shared cost is split by each value's direct cost from value cards.",
-    splitDesc:"Each value's share follows its direct cost from value cards.",
+    metaTip:"Shared cost is split by each value's direct cost. For cost in a cluster, only direct cost in that cluster counts.", // 2026-10-27：原句「from value cards」會被讀成上方區塊的整個 tag 金額
+    splitDesc:"Shared cost in a cluster is split by direct cost in that cluster. Other shared cost is split by direct cost across this tag.", // 2026-10-27：範圍寫在 Direct cost 欄名，這句只講規則、固定不變
     shareTip:"Calculated day by day, then added up for the last 30 days, so it can differ slightly from the 30-day spend ratio.",
     noShareHere:n=>`${n} has no direct cost in this cluster, so it receives nothing. Add a ${S._k8sNorm?'Namespace':'k8s-namespace'} condition to the ${n} value card if ${n} runs in this cluster.`,
-    noShareAny:n=>`${n} has no direct cost from value cards, so it receives nothing.`,
+    noShareAny:n=>`${n} has no direct cost in this tag, so it receives nothing.`,
     noWeight:(amt,where)=>`${amt} can't be split because none of these values has direct cost in ${where} this period. It stays Untagged.`,
     // 2026-10-16 Kabin：Preview 的數字要對得起來 → 寫出每個 value 分到多少、比例依據哪裡的直接成本（K8s 是 cluster 內，跟 Direct 欄的整個 tag 不同）
     previewSplit:(amt,parts,where)=>`${amt} split across ${parts} by their direct cost ${where}.`,
@@ -2769,8 +2925,8 @@ function addAC(cid,cfg){
 <div class="ac-sec"><span class="ac-sec-t">Shared cost to split</span><span class="ac-sec-d">Cost that matches these conditions and isn't assigned by a value card.</span></div>
 <div class="csp-blocks-area"></div><div class="add-csp-wrap"><button class="add-csp-btn" onclick="showCspPicker(this)"><span class="material-symbols-outlined">add</span>Add Data Source</button><div class="csp-picker"></div></div>
 <div class="ac-match" data-acmatch></div>
-<div class="ac-sec" style="margin-top:16px"><span class="ac-sec-t">Split across</span><span class="ac-sec-d">${v9Basis().splitDesc}</span></div>
-<div class="ac-rows-h"><span>Value</span><span>Share<span class="material-symbols-outlined" data-tip="${v9Basis().shareTip}">info</span></span><span>Last 30 days</span><span></span></div>
+<div class="ac-sec" style="margin-top:24px"><span class="ac-sec-t">Split across<span class="material-symbols-outlined ac-sec-ic" tabindex="0" data-tip="Amounts are estimated from the last 30 days. Each day is split on its own and then added up, so Share can differ slightly from the 30-day ratio.">info</span></span><span class="ac-sec-d">${v9Basis().splitDesc}</span></div>
+<div class="ac-rows-h"><span>Value</span><span class="ac-dc-h"><span class="ac-dc-t">Direct cost</span></span><span>Share</span><span>Allocated</span><span></span></div>
 <div class="ac-rows"></div>
 <button class="bac ac-addrow" type="button" onclick="v9OpenRecipMenu(this,'${cid}')"><span class="material-symbols-outlined">add_circle</span>Add Value</button>
 <div class="ac-alerts"></div>
@@ -2793,7 +2949,7 @@ function addAC(cid,cfg){
 function v9AddRecipRow(card,name,cidHint){
   const cid=cidHint||card.closest('[id]')?.id;const wrap=card.querySelector('.ac-rows');
   const r=document.createElement('div');r.className='ac-row';if(name)r.dataset.name=name;
-  r.innerHTML=`<div class="ac-row-main">${v9RecipInput(cid,name,card)}<span class="ac-w">--</span><span class="ac-amt"></span><button class="csp-block-rm ac-rm" type="button" data-tip="Remove this Value" onclick="v9RmRecip(this,'${cid}')"><span class="material-symbols-outlined" style="font-size:18px">close</span></button></div><div class="ac-row-basis"></div><div class="ac-row-ext"></div><div class="ac-row-hint"></div>`;
+  r.innerHTML=`<div class="ac-row-main">${v9RecipInput(cid,name,card)}<span class="ac-dc">--</span><span class="ac-w">--</span><span class="ac-amt"></span><button class="csp-block-rm ac-rm" type="button" data-tip="Remove this Value" onclick="v9RmRecip(this,'${cid}')"><span class="material-symbols-outlined" style="font-size:18px">close</span></button></div><div class="ac-row-basis"></div><div class="ac-row-ext"></div><div class="ac-row-hint"></div>`;
   wrap.appendChild(r);
 }
 function v9RecipInput(cid,name,card){
@@ -2879,6 +3035,47 @@ const _v9Renum=renum;renum=function(cid){
 };
 document.addEventListener('drop',e=>{if(e.target.closest&&e.target.closest('#cr-vals,#ed-vals'))window._v9Dragged=true},true);
 
+/* 2026-10-27 Q1：Direct cost 欄。欄名寫出範圍（一個 cluster／N 個 cluster／整個 tag key），這樣條件再複雜文案也不會變長。
+ * 多個 cluster 時每個 cluster 各自照自己的比例分再加總，加總後的 Direct cost 比例不會剛好等於 Share，所以滑過數字列出每個 cluster 的明細 */
+function v10DcParts(info){return [...(info.usedParts||[])]}
+function v10DcName(p,all){if(p==='*')return 'Outside clusters (compared across the whole tag)';const [proj,n]=p.split('|');return (all||[]).some(q=>q!==p&&q.split('|')[1]===n)?`${n} (${proj})`:n}
+function v10UpdDcHead(el,info){
+  const h=el.querySelector('.ac-dc-h');if(!h)return;const ps=v10DcParts(info);const cl=ps.filter(p=>p!=='*');
+  /* 範圍只看「抓到的帳單列落在哪裡」，跟條件怎麼寫（Cluster、Billing account、not equal…）無關，所以欄名只有這幾種：
+   * 都不在 cluster → Direct cost｜一個 cluster → in shared-gke｜多個 → in N clusters｜cluster 和 cluster 外都有 → 再加「+ other」 */
+  const out=ps.includes('*');let t='Direct cost',tip="Each value's direct cost across this tag. The split follows these amounts.";
+  if(cl.length){const row=cl.length===1?v9RowsFor(el.closest('[id]')?.id).find(r=>v9Part(r)===cl[0]):null;const full=row?v9ClusterOfRow(row):'';
+    t=`Direct cost in ${cl.length===1?v10DcName(cl[0]):cl.length+' clusters'}${out?' + other':''}`;
+    tip=ps.length===1?`Each value's direct cost inside ${full}. Shared cost in a cluster is split only among the values that run in that cluster, so cost outside it doesn't count.`
+      :`Shared cost in each cluster is split by the values' direct cost inside that cluster.${out?' Shared cost outside clusters is split by direct cost across this tag.':''} Each part is split separately, then added up, so the total here won't match Share exactly. Hover an amount to see each part.`}
+  h.querySelector('.ac-dc-t').textContent=t;h.querySelector('.ac-dc-t').title=t; // 2026-10-28：表頭不放 icon，範圍寫在欄名；規則寫在 Split across 說明句
+}
+function v10UpdDcCell(cell,n,info){
+  if(!cell)return;const ps=v10DcParts(info);const multi=ps.length>1;
+  /* cluster 內外混在一起時，cluster 外那份是拿整個 tag 的直接成本比（含 cluster 內的錢），加總會重複算，所以不顯示加總、只給 Varies＋明細 */
+  const mixed=ps.includes('*')&&ps.length>1;
+  cell.textContent=n&&info.matched?(mixed?'Varies':v9fmt((info.basis||{})[n]||0)):'--';cell.classList.toggle('is-multi',multi&&!!n&&!!info.matched);
+  if(multi&&n&&info.matched){cell.tabIndex=0;cell.dataset.tip=`${n}\n`+ps.map(p=>`${v10DcName(p,ps)}: direct ${v9fmt((info.basisByPart[p]||{})[n]||0)} · allocated ${v9fmt(((info.allocByPart||{})[p]||{})[n]||0)}`).join('\n')}
+  else{cell.removeAttribute('tabindex');delete cell.dataset.tip}
+}
+/* 2026-10-28 UX 提案（Kabin 想先感受）：權重清單自動帶入全部 value，在這裡沒有直接成本的一定分到 0，
+ * 留在清單裡只會讓人想一個個按 ×（每按一次都要重算）。把它們收進清單最下面一個可展開的區塊，預設收起；
+ * 至少要有一個分得到錢的 value 才收（全部都是 0 時由下方的 Not split 提醒處理）。Demo FAB「設定」可切回全部列出 */
+function v10GroupZero(el){
+  const wrap=el.querySelector('.ac-rows');if(!wrap)return;let g=wrap.querySelector(':scope>.ac-zero');
+  const rows=[...wrap.querySelectorAll('.ac-row')];const zero=rows.filter(r=>r.classList.contains('is-zero'));
+  const on=S._zeroGroup===true&&S._autoRecip&&zero.length&&zero.length<rows.length; // 2026-10-28 Kabin：不採用，預設關
+  if(!on){if(g){g.querySelectorAll('.ac-row').forEach(r=>wrap.insertBefore(r,g));g.remove()}return}
+  if(!g){g=document.createElement('div');g.className='ac-zero';
+    g.innerHTML=`<button type="button" class="ac-zero-h" aria-expanded="false"><span class="material-symbols-outlined" aria-hidden="true">chevron_right</span><span class="ac-zero-t"></span></button><span class="ac-zero-badge"></span><div class="ac-zero-body"><div class="ac-zero-d">They have no direct cost where this shared cost sits, so they receive nothing. To include one, add a Namespace condition to its value card.</div></div>`;
+    g.querySelector('.ac-zero-h').onclick=()=>{const o=!g.classList.contains('is-open');g.classList.toggle('is-open',o);g.querySelector('.ac-zero-h').setAttribute('aria-expanded',String(o));el.dataset.zeroOpen=o?'1':''}}
+  wrap.appendChild(g);const body=g.querySelector('.ac-zero-body');
+  rows.filter(r=>!r.classList.contains('is-zero')&&r.parentElement===body).forEach(r=>wrap.insertBefore(r,g));
+  zero.forEach(r=>body.appendChild(r));
+  g.querySelector('.ac-zero-t').textContent=`${zero.length} value${zero.length>1?'s':''} with no direct cost here`;
+  g.querySelector('.ac-zero-badge').innerHTML=S._showParked?v9ParkedBadge('proposal'):'';
+  const open=el.dataset.zeroOpen==='1';g.classList.toggle('is-open',open);g.querySelector('.ac-zero-h').setAttribute('aria-expanded',String(open));
+}
 function v9UpdAll(cid){
   v9ApplyNameMode();
   document.getElementById(cid)?.querySelectorAll('.vc').forEach(v9NumberBlocks);
@@ -2890,23 +3087,58 @@ function v9UpdAll(cid){
   cards.forEach((c,i)=>{
     if(c.type!=='alloc'){v9UpdNameHint(c,cards,i);return}
     const info=R.cards[i];const el=c.el;
+    // 2026-10-28：過期判斷。不在第 2 步（卡片看不到）或第一次畫出來時，直接當成已算過
+    const sig=v10AcSig(c);
+    const csig=JSON.stringify(c.cspBlocks);
+    if(!(v10On()&&S._step===2)||el.dataset.calcSig===undefined||el.dataset.keepFresh){el.dataset.calcSig=sig;el.dataset.calcCond=csig}delete el.dataset.keepFresh;
+    el.classList.toggle('ac-stale-cond',el.dataset.calcCond!==csig);
+    const stale=el.dataset.calcSig!==sig;el.classList.toggle('ac-stale',stale&&!el.classList.contains('ac-recalc'));
+    if(stale||el.classList.contains('ac-recalc')){ // 過期或重算中：只把剛加回的列先接在最後，數字與排序等算完再更新
+      const wrap=el.querySelector('.ac-rows');const have=[...wrap.querySelectorAll('.ac-row')].map(r=>r.dataset.name);
+      wrap.querySelectorAll('.ac-row').forEach(r=>{if(r.dataset.name&&!(c.recipients||[]).includes(r.dataset.name))r.remove()}); // Choose Values 取消勾的：跟按 × 一樣立刻拿掉
+      (c.recipients||[]).filter(n=>!have.includes(n)).forEach(n=>{wrap.querySelector('.ac-rows-empty')?.remove();v9AddRecipRow(el,n,cid)});
+      if(!(c.recipients||[]).length&&!wrap.querySelector('.ac-rows-empty'))wrap.innerHTML='<div class="ac-rows-empty">No value in this list. Use Add Value to add one back.</div>';
+      /* 2026-10-28 Kabin：提醒框位置與樣式再想 → 預設改成「計算摘要列」：條件（輸入）與分攤清單（結果）中間那條 matched 灰條，
+         本來就是這張卡的計算摘要，過期時就地變成琥珀底、右側顯示狀態＋Recalculate。不多一個元件、版面不位移、每張卡固定一個位置；
+         提醒框版本留在 Demo FAB 已不採用 */
+      if(S._staleStyle!=='alert'){
+        el.querySelector('.ac-stale-note')?.remove();
+        const bar=el.querySelector('[data-acmatch]');let st=bar.querySelector('.ac-match-status');
+        if(!st){st=document.createElement('span');st.className='ac-match-status';st.setAttribute('role','status');bar.appendChild(st)}
+        st.innerHTML=`<span class="material-symbols-outlined" aria-hidden="true">update</span><span>${el.dataset.calcSig===''?'Not calculated yet':'Amounts are out of date'}</span><button type="button" class="btn btn-o ac-stale-btn" onclick="v10RecalcAll('${cid}')">Recalculate</button>`;
+        v10UpdRecalcBtn(cid);return;
+      }
+      el.querySelector('[data-acmatch] .ac-match-status')?.remove();
+      let note=el.querySelector('.ac-stale-note');
+      if(!note){note=document.createElement('div');note.className='ac-stale-note';note.setAttribute('role','status');el.querySelector('.ac-rows-h').before(note)}
+      /* 2026-10-28 Kabin：只有變灰看不懂 → 改成跟 Apply 提醒同一種 CMDS Alert（白底、左側色條），標題講發生什麼、內文講哪些數字還沒更新，旁邊直接放 Recalculate */
+      const fresh0=el.dataset.calcSig==='';
+      note.innerHTML=`<span class="material-symbols-outlined" aria-hidden="true">update</span><div class="ac-stale-txt"><strong>${fresh0?"Amounts aren't calculated yet":'Amounts are out of date'}</strong><span>${fresh0?'Recalculate to see Share and Allocated for these conditions.':"Your changes aren't reflected in Share and Allocated yet."}</span></div><button type="button" class="btn btn-o ac-stale-btn" onclick="v10RecalcAll('${cid}')">Recalculate</button>`;
+      v10UpdRecalcBtn(cid);
+      return;
+    }
+    el.querySelector('.ac-stale-note')?.remove();v10UpdRecalcBtn(cid);
     if(S._autoRecip)v9SyncAutoRows(el,c.recipients,info,cid);
     const sample=v9IsSampleData(cid)?`<span class="ac-sample" data-tip="這個 tag 沒有示範帳單，數字借用 cost-owner 的示範帳單計算。">Sample bill</span>`:'';
     el.querySelector('[data-acmatch]').innerHTML=info.matched
       ?`<span class="material-symbols-outlined">receipt_long</span><span>Last 30 days: <strong>${v9fmt(info.matched)}</strong> matched · ${info.matchedRes.size} resource${info.matchedRes.size>1?'s':''}</span>${sample}`
       :`<span class="material-symbols-outlined">receipt_long</span><span class="ac-muted">No cost matches these conditions in the last 30 days.</span>${sample}`;
+    v10UpdDcHead(el,info);
     // 權重：⚠ ASSUMPTION（Q-B）顯示最近 30 天合計的比例，每天、每個 cluster 各自算的細節留給 Preview
     el.querySelectorAll('.ac-row').forEach(r=>{
       const n=(r.querySelector('.ac-sel')?.value||r.querySelector('.ac-txt')?.value||r.dataset.name||'').trim();
       const amt=info.byRecip[n]||0;const w=info.allocated?amt/info.allocated:0;
       r.querySelector('.ac-w').textContent=n&&info.allocated?(w*100).toFixed(2)+'%':'--';
       r.querySelector('.ac-amt').textContent=n&&info.allocated?v9fmt(amt):'--'; // 10/13 R10：還沒算＝--，不是 0
+      v10UpdDcCell(r.querySelector('.ac-dc'),n,info);
       const hint=r.querySelector('.ac-row-hint');
       const noDirect=n&&info.matched&&!amt;
       hint.textContent=noDirect?(R.direct[n]>0?v9Basis().noShareHere(n):v9Basis().noShareAny(n)):'';
       r.querySelector('.ac-row-basis').textContent=(n&&amt>0&&(info.basis||{})[n])?v9Basis().basis(v9fmt(info.basis[n]),info.basisWhere):'';
       r.classList.toggle('is-zero',!!noDirect);
     });
+    v10GroupZero(el);
+    const addB=el.querySelector('.ac-addrow');if(addB){const want=v10ChooseOn()?'<span class="material-symbols-outlined">checklist</span>Choose Values':'<span class="material-symbols-outlined">add_circle</span>Add Value';if(addB.innerHTML!==want)addB.innerHTML=want;addB.setAttribute('aria-haspopup','dialog')}
     // 提醒
     const al=[];
     if(info.stolenBelow){al.push(`<div class="ac-alert warn"><span class="material-symbols-outlined">warning</span><div>${v9fmt(info.stolenBelow)} of this cost also matches <strong>${[...info.stolenBy].join(', ')}</strong> below. Because this card is above them, that cost is being split instead of assigned directly.<div class="ac-alert-act"><button class="btn btn-o btn-sm" type="button" onclick="v9MoveToBottom(this)">Move to bottom</button></div></div></div>`)}
@@ -3137,6 +3369,10 @@ window.DEMO_SCENARIOS.push(
   {id:'v9-last-alloc',  tab:'alloc',group:'基本流程',label:'刪掉最後一張 allocation card 再 Apply',icon:'remove_circle',tip:'cost-owner 已套用、有一張 allocation card。刪掉它之後到 Preview 按 Apply，會看到「成員會重新看到這個 key」的提醒（2026-10-01 PM 定調）。'},
   {id:'v9-list',        tab:'alloc',group:'基本流程',label:'List：含 allocation card 的 key',icon:'list',tip:'cost-owner 名稱旁的 icon：成員在 Cost Dashboard 看不到。'},
   // ── 資料狀況 ──
+  {id:'v9-many-values',tab:'alloc',group:'資料狀況',label:'三個 cluster、8 個團隊（連按 × 看重算）',icon:'groups',tip:'三個 cluster 各自算再加總：兩個 shared-gke 名字一樣、分屬 prd 和 stg。Search 在 prd shared-gke 和 data-gke 都有跑，滑過它的 Direct cost 看兩邊各分多少。連按幾個 ×，最後一下之後 0.5 秒才開始重算（重算模擬 1.5 秒）。'},
+  {id:'v9-many-one',tab:'alloc',group:'資料狀況',label:'8 個團隊只分 prd shared-gke（3 個分到 0）',icon:'unfold_less',tip:'Data、ML 只在 data-gke 跑，Growth 只在 stg 的 shared-gke，這三個在 prd shared-gke 分到 0，列下方有灰色說明。'},
+  {id:'v9-by-ba',tab:'alloc',group:'資料狀況',label:'用 Billing account 抓（cluster 內外混在一起）',icon:'account_balance',tip:'條件不寫 cluster，改寫 Billing account：抓到兩個 cluster 的剩餘費用，加上不在 cluster 的共用 Logging $12K。欄名變成「in 2 clusters + other」。cluster 內照 cluster 內的比例分；cluster 外的 $12K 照整個 tag 的比例（Backend 含 Cloud SQL 是 $50K）分。'},
+  {id:'v9-two-clusters',tab:'alloc',group:'資料狀況',label:'一張卡分兩個 cluster（各自算再加總）',icon:'hub',tip:'shared-gke 照 30K：10K 分 60K；data-gke 只有 Frontend 在跑（5K），20K 全給 Frontend。Direct cost 欄加總是 30K：15K，但 Share 是 56%：44%，滑過金額看每個 cluster。'},
   {id:'v9-infra',       tab:'alloc',group:'資料狀況',label:'空位先歸 Infrastructure',icon:'dns',tip:'Infrastructure 先拿走 kube:* 的 $40K，allocation card 只分管理費和磁碟 $20K。'},
   {id:'v9-mixed-trap',   tab:'alloc',group:'資料狀況',label:'Backend 只用 Project 抓（分不到共用 cluster）',icon:'error',tip:'Backend 的 value card 只寫 Project，在 shared-gke 裡沒有直接成本，所以 allocation card 分給它 0。卡上與 Preview 都會提醒補 Namespace 條件。'},
   {id:'v9-no-match',    tab:'alloc',group:'資料狀況',label:'條件抓不到任何錢（未攤分）',icon:'search_off',tip:'條件寫 data-gke，這份帳單沒有這個 cluster。'},
@@ -3160,7 +3396,13 @@ window.DEMO_SCENARIOS.push(
   {id:'v10-or-row-on', tab:'alloc',group:'已不採用（留著對照）',label:'Add OR group：方案 A（移到最後一組下方）',icon:'low_priority',tip:'10/16 會議討論：移出條件動作列，放在最後一組下方的虛線分隔後、前面帶 OR，跟 OR Group 2 標頭同一層，預先標出下一組會出現的位置。'},
   {id:'v10-step-static', tab:'alloc',group:'設定（切換後停在目前畫面）',label:'Stepper 純顯示（10/16，預設）',icon:'linear_scale',tip:'10/16 會議前端回饋：stepper 可點會讓判斷變複雜，改成只顯示目前在第幾步，換步只能用 Next／Previous。'},
   {id:'v10-apply-two', tab:'alloc',group:'設定（切換後停在目前畫面）',label:'Apply 彈窗：有／沒有 allocation card 兩種（10/16，預設）',icon:'call_split',tip:'10/16 會議前端回饋：只要 tag 有 allocation card 就顯示「Managers and Members won\'t see」提醒；沒有就不顯示。刪掉最後一張的「will see again」提醒不做。'},
-  {id:'v10-recip-auto', tab:'alloc',group:'設定（切換後停在目前畫面）',label:'權重清單自動帶入 value（10/15，預設）',icon:'format_list_numbered',tip:'Split across 不用下拉：自動列出所有 value card 的 value，依 Last 30 days 金額由大到小排。按 × 拿掉的可以從 Add Value 加回，加回後一樣照金額排。'},
+  {id:'v9-stale-bar',tab:'alloc',group:'設定（切換後停在目前畫面）',label:'數字過期：計算摘要列（預設）',icon:'update',tip:'條件與分攤清單中間那條 matched 灰條，過期時就地變琥珀底，右側顯示 Amounts are out of date＋Recalculate。'},
+  {id:'v9-stale-alert',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：表格上方提醒框（10/28 第一版）',icon:'warning',tip:'CMDS Alert 放在權重清單上方。每次改動都會跳出一個大框、把表格往下推，太重。'},
+  {id:'v9-choose-on',tab:'alloc',group:'已不採用（留著對照）',label:'Choose Values 多選清單（10/28 覺得太複雜）',icon:'checklist',tip:'Add Value 改成多選清單：預設全勾、Select all／Clear all、搜尋、每列附這裡的直接成本，Apply 一次套用。只想分給少數幾個團隊時不用一個個按 ×。'},
+  {id:'v9-choose-off',tab:'alloc',group:'設定（切換後停在目前畫面）',label:'Add Value 只能加回（預設）',icon:'add_circle',tip:'10/15 的做法：拿掉靠每列的 ×，Add Value 只能把拿掉的加回來。'},
+  {id:'v9-zero-group-on',tab:'alloc',group:'已不採用（留著對照）',label:'分到 0 的 value 收起來（10/28 不採用）',icon:'unfold_less',tip:'在這裡沒有直接成本的 value 一定分到 0，收進清單最下面一個可展開的區塊，使用者不用為了整理清單一個個按 ×。'},
+  {id:'v9-zero-group-off',tab:'alloc',group:'設定（切換後停在目前畫面）',label:'分到 0 的 value 全部列出（預設）',icon:'unfold_more',tip:'10/15 權重清單自動帶入時的樣子：所有 value 都列出來，分到 0 的列下方有灰色說明。'},
+  {id:'v10-recip-auto', tab:'alloc',group:'設定（切換後停在目前畫面）',label:'權重清單自動帶入 value（10/15，預設）',icon:'format_list_numbered',tip:'Split across 不用下拉：自動列出所有 value card 的 value，依 Allocated 金額由大到小排。按 × 拿掉的可以從 Add Value 加回，加回後一樣照金額排。'},
   {id:'v9-parked-on',   tab:'alloc',group:'設定（切換後停在目前畫面）',label:'顯示暫緩的設計（預設）',icon:'pause_circle',tip:'顯示「已設計・PM 尚未安排開發」與「UX 提案」的區塊。'},
   {id:'v9-parked-off',  tab:'alloc',group:'設定（切換後停在目前畫面）',label:'隱藏暫緩的設計（看 PRD 原版）',icon:'hide_source',tip:'只看 PRD Phase 1 範圍內的畫面，版面也會回到 A。'},
   // ── 已不採用（留著對照） ──
@@ -3190,13 +3432,13 @@ function _v9DemoApplyInner(name,btn){
   document.querySelectorAll('.demo-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');
   if(name==='v9-layout-mixed'||name==='v9-layout-zones'||name==='v9-layout-steps'){v9SetLayout(name.replace('v9-layout-',''));return}
   const k8sSet=mode=>{S._k8sMode=mode;S._k8sNorm=mode!=='native';[S.tags,_ORIG_TAGS,[S._tmp]].forEach(list=>(list||[]).forEach(t=>{if(t&&t.rows)v9K8sConvValues(t.values,mode)}))};
-  const settings={'v9-where-group':()=>{S._whereGroup=true;S._multiWhere=false},'v9-multiwhere-on':()=>{S._whereGroup=false;S._multiWhere=true},'v9-multiwhere-off':()=>{S._whereGroup=false;S._multiWhere=false},'v9-k8s-norm':()=>k8sSet('twostep'),'v9-k8s-grouped':()=>k8sSet('grouped'),'v9-k8s-native':()=>k8sSet('native'),'v9-taken-edit':()=>{S._takenInEdit=true},'v9-taken-preview':()=>{S._takenInEdit=false},'v9-name-unique':()=>{S._deptModel=false;S._recipFree=false;S._autoRecip=true},'v9-dept-on':()=>{S._deptModel=true;S._recipFree=false;S._autoRecip=false},'v9-dept-off':()=>{S._deptModel=false;S._recipFree=true;S._autoRecip=false},'v10-or-row-off':()=>{S._orRow=false;S._orSep=false;S._orDash=false},'v10-or-row-on':()=>{S._orRow=true;S._orSep=false;S._orDash=false},'v10-or-dash':()=>{S._orRow=true;S._orSep=false;S._orDash=true;S._orDashAll=false},'v10-ac-pill-all':()=>{S._acPillExc=false},'v10-ac-pill-exc':()=>{S._acPillExc=true},'v10-or-dash-all':()=>{S._orRow=true;S._orSep=false;S._orDash=true;S._orDashAll=true},'v10-or-sep':()=>{S._orRow=true;S._orSep=true;S._orDash=false},'v10-step-static':()=>{S._stepClick=false},'v10-step-click':()=>{S._stepClick=true},'v10-apply-two':()=>{S._applyThree=false},'v10-apply-three':()=>{S._applyThree=true},'v10-recip-auto':()=>{S._autoRecip=true;document.body.classList.remove('v10-recip-select')},'v10-recip-select':()=>{S._autoRecip=false;document.body.classList.add('v10-recip-select')},'v9-parked-on':()=>S._showParked=true,'v9-parked-off':()=>S._showParked=false};
+  const settings={'v9-stale-bar':()=>{S._staleStyle='bar'},'v9-stale-alert':()=>{S._staleStyle='alert'},'v9-choose-on':()=>{S._chooseVals=true},'v9-choose-off':()=>{S._chooseVals=false},'v9-zero-group-on':()=>{S._zeroGroup=true},'v9-zero-group-off':()=>{S._zeroGroup=false},'v9-where-group':()=>{S._whereGroup=true;S._multiWhere=false},'v9-multiwhere-on':()=>{S._whereGroup=false;S._multiWhere=true},'v9-multiwhere-off':()=>{S._whereGroup=false;S._multiWhere=false},'v9-k8s-norm':()=>k8sSet('twostep'),'v9-k8s-grouped':()=>k8sSet('grouped'),'v9-k8s-native':()=>k8sSet('native'),'v9-taken-edit':()=>{S._takenInEdit=true},'v9-taken-preview':()=>{S._takenInEdit=false},'v9-name-unique':()=>{S._deptModel=false;S._recipFree=false;S._autoRecip=true},'v9-dept-on':()=>{S._deptModel=true;S._recipFree=false;S._autoRecip=false},'v9-dept-off':()=>{S._deptModel=false;S._recipFree=true;S._autoRecip=false},'v10-or-row-off':()=>{S._orRow=false;S._orSep=false;S._orDash=false},'v10-or-row-on':()=>{S._orRow=true;S._orSep=false;S._orDash=false},'v10-or-dash':()=>{S._orRow=true;S._orSep=false;S._orDash=true;S._orDashAll=false},'v10-ac-pill-all':()=>{S._acPillExc=false},'v10-ac-pill-exc':()=>{S._acPillExc=true},'v10-or-dash-all':()=>{S._orRow=true;S._orSep=false;S._orDash=true;S._orDashAll=true},'v10-or-sep':()=>{S._orRow=true;S._orSep=true;S._orDash=false},'v10-step-static':()=>{S._stepClick=false},'v10-step-click':()=>{S._stepClick=true},'v10-apply-two':()=>{S._applyThree=false},'v10-apply-three':()=>{S._applyThree=true},'v10-recip-auto':()=>{S._autoRecip=true;document.body.classList.remove('v10-recip-select')},'v10-recip-select':()=>{S._autoRecip=false;document.body.classList.add('v10-recip-select')},'v9-parked-on':()=>S._showParked=true,'v9-parked-off':()=>S._showParked=false};
   if(settings[name]){settings[name]();const v=document.querySelector('.view.active')?.id;if(v==='v-edit'&&S._curEdit)go('edit',S._curEdit);else if(v==='v-preview'){const t=S._tmp||S.tags.find(x=>x.id===S._curEdit);if(t)go('preview',t.id)}else go('list');toast('Demo setting updated.');return}
   _demoClean();
   // 「已不採用」分組只是對照：看完回到其他情境時，版面自動回到預設 A′
   S._layout='steps';
   // v10：跟 allocation card 有關的情境直接停在第 2 步
-  S._step=['v9-default','v9-infra','v9-zero','v9-no-ns','v9-mixed-trap','v9-no-match','v9-first-alloc','v9-last-alloc'].includes(name)?2:1;
+  S._step=['v9-many-one','v9-by-ba','v9-many-values','v9-two-clusters','v9-default','v9-infra','v9-zero','v9-no-ns','v9-mixed-trap','v9-no-match','v9-first-alloc','v9-last-alloc'].includes(name)?2:1;
   if(S._k8sMode==='grouped')k8sSet('twostep');
   S._multiWhere=false;S._whereGroup=true;
   const C=V9_CARDS;let values=V9_DEFAULT_VALUES,rows=DEMO_ROWS,dest='edit';
@@ -3204,6 +3446,17 @@ function _v9DemoApplyInner(name,btn){
   if(name==='v9-wrong-order'){values=[C.alloc(),C.backend,C.frontend];S._layout='mixed'}
   if(name==='v9-zero')values=[C.backend,C.frontend,C.alloc(['Backend','Frontend','Data'])];
   if(name==='v9-no-ns')rows=DEMO_ROWS_NO_NS;
+  if(name==='v9-many-one'){rows=DEMO_ROWS_MANY;
+    const ns=(n,v)=>({name:n,cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'k8s-namespace',o:'is',v,c:''}]}]});
+    values=[C.backend,ns('Frontend','frontend'),ns('Data','data'),ns('Search','search'),ns('Payments','payments'),ns('ML','ml'),ns('Mobile API','mobile-api'),ns('Growth','growth'),
+      {type:'alloc',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'goog-k8s-cluster-name',o:'is',v:[v9ClusterLabel(V9_CLUSTERS[0])],c:''}]}],recipients:['Backend','Frontend','Data','Search','Payments','ML','Mobile API','Growth'],res:0,cost:0}]}
+  if(name==='v9-many-values'){rows=DEMO_ROWS_MANY;
+    const ns=(n,v)=>({name:n,cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'k8s-namespace',o:'is',v,c:''}]}]});
+    values=[C.backend,ns('Frontend','frontend'),ns('Data','data'),ns('Search','search'),ns('Payments','payments'),ns('ML','ml'),ns('Mobile API','mobile-api'),ns('Growth','growth'),
+      {type:'alloc',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'goog-k8s-cluster-name',o:'is',v:V9_CLUSTERS.map(v9ClusterLabel),c:''}]}],recipients:['Backend','Frontend','Data','Search','Payments','ML','Mobile API','Growth'],res:0,cost:0}]}
+  if(name==='v9-by-ba'){rows=DEMO_ROWS_TWO_CL().concat([V9_ROW({id:'o1',project_id:'prd-shared-services',service_description:'Cloud Logging',sku_description:'Log Storage',resource_name:'shared-logging',labels:{},cost:12000})]);
+    values=[C.backend,C.frontend,{type:'alloc',cspBlocks:[{csp:'GCP',conds:[{f:'billing_account_id',o:'is',v:'012345-6789AB-CDEF01',c:''}]}],recipients:['Backend','Frontend'],res:0,cost:0}]}
+  if(name==='v9-two-clusters'){rows=DEMO_ROWS_TWO_CL();values=[C.backend,C.frontend,C.alloc(null,['shared-gke','data-gke'])]}
   if(name==='v9-two-groups')values=[C.backendTwoGroups,C.frontend,C.alloc()];
   if(name==='v9-value-only')values=[C.backend,C.frontend,C.infraCluster];
   if(name==='v9-mixed-trap')values=[C.backendByProject,C.frontend,C.alloc()];
@@ -3254,7 +3507,8 @@ function v10Apply(prefix){
   view.querySelector('.v10-stepper')?.remove();view.querySelectorAll('.v10-btn').forEach(b=>b.remove());
   valsCard.querySelector('.v10-desc')?.remove();valsCard.querySelector('.v10-direct')?.remove();valsCard.querySelectorAll('.v10-split,.v10-split-empty,.v10-done').forEach(x=>x.remove());
   const bar=view.querySelector('.sbtm');const btns=[...bar.querySelectorAll('button')];
-  const cancel=btns.find(b=>b.textContent.trim()==='Cancel');const preview=btns.find(b=>b.dataset.v10preview||b.textContent.includes('Coverage Preview'));if(preview)preview.dataset.v10preview='1';
+  const cancel=btns.find(b=>b.textContent.trim()==='Cancel');const inactive=btns.find(b=>b.textContent.trim()==='Save as Inactive Tag');
+  /* 2026-10-28 最新結論：Save as Inactive Tag 只在第 3 步 Coverage Preview 出現 */if(inactive)inactive.style.display=v10On()?'none':'';const preview=btns.find(b=>b.dataset.v10preview||b.textContent.includes('Coverage Preview'));if(preview)preview.dataset.v10preview='1';
   const addBtn=document.getElementById(prefix+'-add-val-btn');
   if(!v10On()){
     view.classList.remove('v10-s1','v10-s2');hdr.querySelector('span').textContent='Tag Values';
@@ -3277,7 +3531,7 @@ function v10Apply(prefix){
   const d=document.createElement('div');d.className='v10-desc';
   d.innerHTML=S._step===1
     ?'Value cards assign direct cost: each card gives the cost it matches to one value. Cards are checked from top to bottom, and the first match wins.'
-    :"Split cost not assigned by value cards across your values, based on each value's direct cost from step 1.";
+    :"Split cost not assigned by value cards across your values."; // 2026-10-27：拿掉「from step 1」，比例怎麼算交給下方 Direct cost 欄
   hdr.after(d);
   if(S._step===2){const sm=document.createElement('div');sm.className='v10-direct';d.after(sm)}
   // 底部按鈕：第 1 步 Next；第 2 步 Back＋Coverage Preview
@@ -3293,12 +3547,17 @@ function v10Apply(prefix){
     if(preview){preview.style.display='';preview.textContent='Next'}if(cancel)cancel.style.display='none';
     const bk=document.createElement('button');bk.className='back-btn v10-btn v10-back-link';bk.type='button'; // 10/13 Kabin：可回溯的步驟一律用頁首 LumiTag List 那種 text button
     bk.innerHTML='<span class="material-symbols-outlined">arrow_circle_left</span>Previous';bk.onclick=()=>v10Go(prefix,1);bar.prepend(bk);
+    /* 2026-10-28 Kabin：Recalculate 放 Next 左邊（原本 Save as Inactive Tag 的位置），沿用授權頁「Permission Check → Integrate」：
+       數字過期時 Recalculate 可按、Next 停用並說明要先算；算完 Recalculate 變停用＋打勾、Next 可按 */
+    if(preview){let wrap=preview.parentElement.classList.contains('v10-next-wrap')?preview.parentElement:null;
+      if(!wrap){wrap=document.createElement('span');wrap.className='v10-next-wrap';preview.before(wrap);wrap.appendChild(preview)}}
   }
   v9Sched(cid);
   if(S._step===2&&S._v10NeedLoad){S._v10NeedLoad=false;v10RunLoading(prefix)}else if(S._step!==2){clearTimeout(view._v10LoadT);view.classList.remove('v10-loading')}
 }
 function v10Go(prefix,n){
   const cid=prefix+'-vals';const ctn=document.getElementById(cid);if(!ctn)return;
+  if(n===3&&document.querySelector((prefix==='ed'?'#v-edit':'#v-create')+' .v10-stepper .v10-step.is-blocked'))return; // 2026-10-28：數字過期時要先 Recalculate
   if(n===3){const p=[...document.querySelectorAll((prefix==='ed'?'#v-edit':'#v-create')+' .sbtm button')].find(b=>!b.classList.contains('v10-skip')&&(b.dataset.v10preview||b.textContent.includes('Coverage Preview')));
     if(S._step===1&&!ctn.querySelector('.vc:not(.ac)')){toast('Add at least one value card first.',1);return}
     if(p)p.click();return}
@@ -3335,8 +3594,21 @@ function v10UpdDirect(cid){
   const cards=v9ReadCards(cid);const rows=v9RowsFor(cid);const R=v9Compute(cards,rows);
   const names=[];cards.forEach(c=>{if(c.type!=='alloc'&&c.name&&!names.includes(c.name))names.push(c.name)});
   const total=rows.reduce((a,r)=>a+r.cost,0);const direct=names.reduce((a,n)=>a+(R.direct[n]||0),0);
-  box.innerHTML=`<div class="v10-direct-h"><span class="material-symbols-outlined">sell</span>Direct cost from value cards<span class="v10-direct-sub">Last 30 days</span><a href="#" onclick="event.preventDefault();v10Go('${v10Pfx(cid)}',1)">Edit value cards</a></div>
-<div class="v10-direct-list">${names.map(n=>`<span class="v10-direct-item">${n} <strong>${v9fmt(R.direct[n]||0)}</strong></span>`).join('')||'<span class="ac-muted">No value has direct cost yet.</span>'}<span class="v10-direct-rest">Not assigned by value cards <strong>${v9fmt(Math.max(0,total-direct))}</strong></span></div>`;
+  /* 2026-10-28 Kabin：value 多的時候一排塞不下、Not assigned 被擠到第二行還帶左框線，很尷尬 → 改成兩列：
+     第一列 Assigned by value cards（合計＋各 value，依金額由大到小只列前 5 個，其餘收成 +N more，可展開）；
+     第二列 Not assigned by value cards（這一步要分的錢）。兩列的標籤與合計上下對齊，方便比較 */
+  /* 2026-10-28 Kabin（第三版）：一排 value 明細不管怎麼排都亂，而且各 value 的金額下方 Split across 表格已經有。
+     這一步只需要兩個數字：已經分掉多少、還剩多少可以分 → 兩個並排的數字（標籤小字在上、金額在下），
+     各 value 明細收進「N values」的 tooltip（依金額由大到小，最多列 10 個） */
+  const sorted=names.map((n,k)=>[n,k]).sort((a,b)=>((R.direct[b[0]]||0)-(R.direct[a[0]]||0))||a[1]-b[1]).map(x=>x[0]);
+  // tooltip 排版沿用同頁多選下拉的列表 tooltip：每項一行「• 項目」，最多 5 個，其餘「...+N more」
+  const TIP_MAX=5;const tip=sorted.slice(0,TIP_MAX).map(n=>`• ${n}: ${fmtCurr(Math.round((R.direct[n]||0)*100)/100)}`).join('\n')+(sorted.length>TIP_MAX?`\n...+${sorted.length-TIP_MAX} more`:'');
+  const amt=n=>fmtCurr(Math.round(n*100)/100);
+  box.innerHTML=`<div class="v10-sum-h"><span class="v10-sum-period"><span class="material-symbols-outlined" aria-hidden="true">date_range</span>Cost in this tag<span class="v10-sum-when">(last 30 days)</span></span><a href="#" onclick="event.preventDefault();v10Go('${v10Pfx(cid)}',1)">Edit value cards</a></div>
+<div class="v10-sum">
+<div class="v10-sum-stat"><span class="v10-sum-l">Assigned by value cards</span><span class="v10-sum-v">${amt(direct)}${names.length?`<span class="v10-sum-n" tabindex="0" data-tip="${tip.replace(/"/g,'&quot;')}">${names.length} value${names.length>1?'s':''}</span>`:''}</span></div>
+<div class="v10-sum-stat"><span class="v10-sum-l">Not assigned by value cards</span><span class="v10-sum-v">${amt(Math.max(0,total-direct))}</span></div>
+</div>`;
   const ze=ctn.querySelector('.v9-zone-empty');if(ze)ze.innerHTML='No shared cost to split? Continue to <strong>Coverage Preview</strong>. To split shared cost across values, use <strong>Add Allocation Card</strong>.';
   /* 2026-10-12：只有一張 allocation card → 用勾選代替 Add 按鈕。
    * 勾選是「主動選擇」：加了 allocation card，這個 tag 就會對 Manager、Member 隱藏，不能預設幫使用者打開。
@@ -3349,7 +3621,7 @@ function v10UpdDirect(cid){
   }else{
     // 10/13 Kabin（R11）：勾選框容易被當成說明略過 → 改成跟第 1 步 No Value Added 同一套的虛線空狀態框＋按鈕。
     // 按鈕寫動作（Split shared cost）不寫 Add allocation card：Phase 1 只有一張卡。取消分攤改由卡片標頭的 Remove
-    html=hasAC?'':`<div class="v10-split-empty"><div class="v10-split-t">Split shared cost across values</div><div class="v10-split-d">Choose which shared cost to split. It's divided by each value's direct cost from step 1. Once applied, Managers and Members won't see this tag in Cost Dashboard.</div><button type="button" class="btn btn-o" onclick="v10ToggleSplit('${cid}',true)"><span class="material-symbols-outlined">call_split</span>Split shared cost</button></div>`;
+    html=hasAC?'':`<div class="v10-split-empty"><div class="v10-split-t">Split shared cost across values</div><div class="v10-split-d">Choose which shared cost to split. It's divided by each value's direct cost. Once applied, Managers and Members won't see this tag in Cost Dashboard.</div><button type="button" class="btn btn-o" onclick="v10ToggleSplit('${cid}',true)"><span class="material-symbols-outlined">call_split</span>Split shared cost</button></div>`;
   }
   if(html)box.insertAdjacentHTML('afterend',html);
   // R11：卡片標頭加 Remove（text button，icon 不畫底線）
@@ -3362,7 +3634,7 @@ function v10ToggleSplit(cid,on){
   if(on){
     if(ctn.querySelector('.vc.ac'))return;
     const st=S._acStash[cid];
-    if(st){const card=addAC(cid,st);renum(cid);v9Sched(cid);card.scrollIntoView({behavior:'smooth',block:'nearest'})}
+    if(st){const card=addAC(cid,st);card.dataset.calcSig='';card.dataset.calcCond='';renum(cid);v9Sched(cid);card.scrollIntoView({behavior:'smooth',block:'nearest'})}
     else v9TryAddAC(cid);
   }else{
     const acs=[...ctn.querySelectorAll('.vc.ac')];if(!acs.length)return;
@@ -3468,7 +3740,9 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
  * Design spec: CMDS Component Library > Currency Switch (H=30px)
  *   - Normal: transparent bg, no border; Hover: subtle gray bg; Focus: focus ring
  *   - Trigger format: [flag] [CODE] [▾]（箭頭由 CSS 統一畫成 arrow_drop_down，markup 寫 expand_more 也會被換掉）
- *   - Dropdown gap: 4px from trigger bottom
+ *   - Dropdown gap: 4px from trigger bottom（2026-10-16 X-9r1：錨在按鈕本身，不是父層；預設右緣對齊按鈕右緣＝Overview #01-4，
+ *     按鈕寫 data-dd-align="left" 的改左緣對齊＝General Budget #01-7）
+ *   - Tooltip：沒寫 data-tip／data-tip-tip 的按鈕自動帶 FE CurrencySelector 的匯率說明（FE 全站同一顆元件）；下拉打開時不顯示
  *   - Dropdown items: "Full Name (CODE)", selected = gray bg, no checkmark
  *
  * Design spec: Figma #01-4 Overview: Change Currency
@@ -3516,6 +3790,14 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     { code: 'USD', name: 'United States dollar',   flag: '🇺🇸' },
   ];
 
+  /* 2026-10-16 X-9r1：全站同一組 mock 匯率（1 USD＝?），各頁換算一律用這組，不要各頁自備（原本 Overview 32.1、General Budget 31.5 對不起來）。
+     數值沿用 Overview 原本的表 */
+  var RATES = { USD: 1, TWD: 32.1, HKD: 7.8, SGD: 1.35, MYR: 4.7, PHP: 56.2, IDR: 15800 };
+  /* 金額前綴符號（tooltip 的完整金額用，例如 $10,816,382.11／NT$347,206,867.73）；沿用 Overview 原本的表 */
+  var SYMBOLS = { USD: '$', TWD: 'NT$', HKD: 'HK$', SGD: 'S$', MYR: 'RM', PHP: '₱', IDR: 'Rp' };
+  /* FE CurrencySelector/SelectInput.tsx 的 TooltipTitle（全站同一句） */
+  var TIP = 'Please note that due to exchange rate conversions and data latency in the console, the displayed numbers may slightly differ from those in the console. The actual amount should be based on your received invoice. (Exchange rate source: https://rter.info/)';
+
   /* ===== CSS ===== */
   var CSS = [
     /* 2026-10-16 C-1（README 指定）：按鈕、箭頭、下拉照稿（GB #01-7 Currency Converter＋Dropdown；Overview #01／#01-4 同，C-5 已量）。
@@ -3526,6 +3808,8 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     'font-family:inherit;line-height:1;white-space:nowrap;',
     'transition:background .12s}',
     '.curr-btn:hover,.curr-btn.cp-open{background:rgba(103,103,103,.12)}',
+    /* 2026-10-22 X-9r3 FA3：讀取中停用（OV 稿 #11、EI 稿 #03-1）整顆 32% 透明、無底無框 */
+    '.curr-btn:disabled{opacity:.32;cursor:not-allowed;pointer-events:none;background:transparent}',
     /* Focus: blue focus ring (keyboard nav / Active state ring per CMDS) */
     '.curr-btn:focus-visible{outline:2px solid #004FB0;outline-offset:1px}',
     /* Flag：16 圓、1px #CCCCCC 框（emoji 國旗放大後裁成圓形） */
@@ -3553,6 +3837,8 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     'transition:background .1s;line-height:24.5px;white-space:nowrap}',
     '.curr-dd-item:hover{background:#F6F6F6}',
     '.curr-dd-item.cp-active{background:#E6E6E6}',
+    /* X-9r1 S4：鍵盤焦點框（項目本來就是 button；滑鼠不受影響） */
+    '.curr-dd-item:focus-visible{outline:2px solid #004FB0;outline-offset:-2px}',
   ].join('');
 
   var style = document.createElement('style');
@@ -3561,13 +3847,17 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
 
   /* ===== STATE ===== */
   var _activeTrigger = null;
+  var _kbd = null;   /* X-9r1 S4：開啟期間的鍵盤／焦點監聽，_close 時移除 */
 
   /* ===== INTERNAL ===== */
   function _close() {
     var dd = document.getElementById('_curr-dd');
     if (dd) dd.remove();
+    if (_kbd) { document.removeEventListener('keydown', _kbd.key, true); document.removeEventListener('focusin', _kbd.focus, true); _kbd = null; }
     if (_activeTrigger) {
       _activeTrigger.classList.remove('cp-open');
+      _activeTrigger.setAttribute('aria-expanded', 'false');
+      if (_activeTrigger.hasAttribute('data-cp-tip')) { _activeTrigger.setAttribute('data-tip', _activeTrigger.getAttribute('data-cp-tip')); _activeTrigger.removeAttribute('data-cp-tip'); }
       _activeTrigger = null;
     }
   }
@@ -3579,25 +3869,75 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     /* Ensure parent is positioned */
     var wrap = triggerEl.parentElement;
     if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+    /* 下拉打開時不顯示 tooltip（FE：isOpen 時 title 清空） */
+    if (triggerEl.hasAttribute('data-tip')) { triggerEl.setAttribute('data-cp-tip', triggerEl.getAttribute('data-tip')); triggerEl.removeAttribute('data-tip'); }
+    var gl = document.getElementById('gl-tip'); if (gl) gl.style.display = 'none';
 
     var dd = document.createElement('div');
     dd.className = 'curr-dd';
     dd.id = '_curr-dd';
+    dd.setAttribute('role', 'listbox');   /* X-9r1 S4 */
+    dd.setAttribute('aria-label', 'Currency');
+    triggerEl.setAttribute('aria-haspopup', 'listbox');
+    triggerEl.setAttribute('aria-expanded', 'true');
     dd.innerHTML = CURRENCIES.map(function (c) {
       var isActive = c.code === currentCode;
-      return '<button class="curr-dd-item' + (isActive ? ' cp-active' : '') + '">' +
+      return '<button type="button" role="option" tabindex="-1" aria-selected="' + (isActive ? 'true' : 'false') + '" class="curr-dd-item' + (isActive ? ' cp-active' : '') + '">' +
         c.name + ' (' + c.code + ')' +
         '</button>';
     }).join('');
 
     dd.querySelectorAll('.curr-dd-item').forEach(function (btn, i) {
       btn.addEventListener('click', function () {
+        var idx = [].indexOf.call(document.querySelectorAll('.curr-btn'), triggerEl);
         _close();
+        try { triggerEl.focus({ preventScroll: true }); } catch (e) {}   /* X-9r1 S4：選完焦點回按鈕 */
         onChange(CURRENCIES[i].code);
+        /* 頁面常把整塊工具列重畫（舊按鈕被換掉），焦點會掉到 body；換掉的話回到同一位置的新按鈕 */
+        function refocus() {
+          var ae = document.activeElement;
+          if (ae && ae !== document.body && ae.isConnected) return;
+          var all = document.querySelectorAll('.curr-btn'), nb = idx > -1 ? all[idx] : null;
+          if (nb && nb !== triggerEl) { try { nb.focus({ preventScroll: true }); } catch (e) {} }
+        }
+        refocus(); setTimeout(refocus, 60);
       });
     });
 
     wrap.appendChild(dd);
+    /* 錨在按鈕本身（父層常常還包著 Month Picker 等元素，right:0 會對到父層右緣，Executive Insights 曾偏 146px） */
+    if (triggerEl.offsetParent === wrap) {
+      dd.style.top = (triggerEl.offsetTop + triggerEl.offsetHeight + 4) + 'px';
+      dd.style.right = (wrap.clientWidth - triggerEl.offsetLeft - triggerEl.offsetWidth) + 'px';
+      /* 按鈕寫 data-dd-align="left" 的改成左緣對齊（General Budget #01-7） */
+      if (triggerEl.dataset.ddAlign === 'left') { dd.style.right = 'auto'; dd.style.left = triggerEl.offsetLeft + 'px'; }
+    }
+
+    /* X-9r1 S4：鍵盤。開啟後焦點進選中項；↑↓／Home／End 移動、Enter／Space 選（原生 button 的 click）、Esc 關並回按鈕、Tab 離開即關 */
+    var items = [].slice.call(dd.querySelectorAll('.curr-dd-item'));
+    var sel = dd.querySelector('.cp-active') || items[0];
+    try { if (sel) sel.focus({ preventScroll: true }); } catch (e) {}
+    var kd = function (e) {
+      var ae = document.activeElement, inDd = dd.contains(ae);
+      if (e.key === 'Escape') {
+        if (!inDd && ae !== triggerEl) return;
+        e.preventDefault(); _close(); try { triggerEl.focus({ preventScroll: true }); } catch (err) {}
+        return;
+      }
+      if (!inDd) return;
+      var i = items.indexOf(ae);
+      if (e.key === 'ArrowDown') { e.preventDefault(); items[Math.min(items.length - 1, i + 1)].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); items[Math.max(0, i - 1)].focus(); }
+      else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+      else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (e.key === 'Tab') { try { triggerEl.focus({ preventScroll: true }); } catch (err) {} }   /* 焦點先回按鈕，預設的 Tab 再從按鈕往前／往後走，離開後 focusin 監聽會關掉選單 */
+    };
+    var fi = function (e) {
+      if (!dd.contains(e.target) && e.target !== triggerEl) _close();
+    };
+    _kbd = { key: kd, focus: fi };
+    document.addEventListener('keydown', kd, true);
+    document.addEventListener('focusin', fi, true);
 
     /* Outside click to close */
     setTimeout(function () {
@@ -3611,8 +3951,29 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
   }
 
   /* ===== PUBLIC API ===== */
+  /* 預設 tooltip：滑過還沒有 tooltip 的幣別鈕時補上 data-tip（capture，比 demo-fab 的 #gl-tip 先跑） */
+  document.addEventListener('mouseover', function (e) {
+    var b = e.target.closest && e.target.closest('.curr-btn');
+    if (!b || b.classList.contains('cp-open') || b.disabled) return;
+    if (!b.hasAttribute('data-tip') && !b.hasAttribute('data-tip-tip') && !b.hasAttribute('data-no-tip')) b.setAttribute('data-tip', TIP);
+  }, true);
+
+  /* X-9r1 S4：幣別鈕預設帶 aria-haspopup／aria-expanded（還沒打開過也要讓讀屏知道這是下拉）；hover／聚焦時補，不動頁面 markup */
+  function _markBtn(e) {
+    var b = e.target.closest && e.target.closest('.curr-btn');
+    if (b && !b.hasAttribute('aria-haspopup')) { b.setAttribute('aria-haspopup', 'listbox'); b.setAttribute('aria-expanded', b.classList.contains('cp-open') ? 'true' : 'false'); }
+  }
+  document.addEventListener('focusin', _markBtn, true);
+  document.addEventListener('mouseover', _markBtn, true);
+
   window.CurrencyPicker = {
     CURRENCIES: CURRENCIES,
+    RATES: RATES,
+    TIP: TIP,
+    /** USD 金額換成 code 幣別（mock 匯率） */
+    convert: function (usd, code) { return usd * (RATES[code] || 1); },
+    /** 幣別前綴符號（找不到就回傳代碼＋空格） */
+    symbol: function (code) { return SYMBOLS[code] || (code + ' '); },
 
     /**
      * Toggle dropdown open / close.
@@ -3808,7 +4169,9 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     '.lt-sb-group{margin-bottom:0}',
     '.lt-sb-group-hdr{display:flex;align-items:center;justify-content:space-between;',
     'padding:8px;min-height:40px;box-sizing:border-box;margin-bottom:8px;font-size:14px;font-weight:500;line-height:24px;color:#fff;border-radius:4px;',
-    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0}',
+    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0;',
+    'width:100%;background:none;border:0;font-family:inherit;text-align:left;appearance:none;-webkit-appearance:none}',   /* X-9r6 F16：div 改 button，樣式 reset 回跟原本一樣 */
+    '.lt-sb-group-hdr:focus-visible{outline:2px solid #fff;outline-offset:-2px}',
     '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
     '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
     '.lt-sb-group-arrow{font-size:24px;transition:transform .18s;flex-shrink:0}',
@@ -3926,8 +4289,9 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     var tag = useHref ? 'a' : 'div';
     var hrefAttr = useHref ? ' href="' + _esc(item.href) + '"' : '';
     var dataId = ' data-nav-id="' + _esc(item.id) + '"';
-    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + '>' +
-             '<span class="material-symbols-outlined">' + _esc(item.icon || 'circle') + '</span>' +
+    var curAttr = isActive ? ' aria-current="page"' : '';   // X-9r6 F16
+    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + curAttr + '>' +
+             '<span class="material-symbols-outlined" aria-hidden="true">' + _esc(item.icon || 'circle') + '</span>' +
              '<span>' + _esc(item.label) + '</span>' +
            '</' + tag + '>';
   }
@@ -3938,17 +4302,17 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
       return _renderItem(item, true);
     }).join('');
     return '<div class="lt-sb-group' + collapsed + '" data-group-id="' + _esc(grp.id) + '">' +
-             '<div class="lt-sb-group-hdr">' +
+             '<button type="button" class="lt-sb-group-hdr" aria-expanded="' + (grp.collapsed ? 'false' : 'true') + '">' +
                '<span>' + _esc(grp.label) + '</span>' +
-               '<span class="material-symbols-outlined lt-sb-group-arrow">keyboard_arrow_up</span>' +
-             '</div>' +
+               '<span class="material-symbols-outlined lt-sb-group-arrow" aria-hidden="true">keyboard_arrow_up</span>' +
+             '</button>' +
              '<div class="lt-sb-group-children">' + children + '</div>' +
            '</div>';
   }
 
   function _renderNav() {
     var nav = window.LUMITURE_NAV || [];
-    var html = '<div class="lt-sb-nav">';
+    var html = '<nav class="lt-sb-nav" aria-label="Main">';
     nav.forEach(function (entry) {
       if (entry.type === 'group') {
         html += _renderGroup(entry);
@@ -3957,7 +4321,7 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
       }
     });
     html += '<div class="lt-sb-skel" aria-hidden="true">' + '<span class="lt-sb-skel-bar"></span>'.repeat(5) + '</div>';
-    html += '</div>';
+    html += '</nav>';
     return html;
   }
 
@@ -4051,7 +4415,7 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
       hdr.addEventListener('click', function () {
         var grp = hdr.parentElement;
-        if (grp) grp.classList.toggle('lt-collapsed');
+        if (grp) { grp.classList.toggle('lt-collapsed'); hdr.setAttribute('aria-expanded', grp.classList.contains('lt-collapsed') ? 'false' : 'true'); }
       });
     });
     // Collapse the whole sidebar
@@ -4067,7 +4431,7 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
   window.LumitureSidebar = {
     toggleGroup: function (groupId) {
       var grp = document.querySelector('[data-group-id="' + groupId + '"]');
-      if (grp) grp.classList.toggle('lt-collapsed');
+      if (grp) { grp.classList.toggle('lt-collapsed'); var h = grp.querySelector('.lt-sb-group-hdr'); if (h) h.setAttribute('aria-expanded', grp.classList.contains('lt-collapsed') ? 'false' : 'true'); }
     },
     toggleCollapse: function (opts) { _setCollapsed(!_collapsed, opts); },
     setCollapsed: function (on, opts) { _setCollapsed(on, opts); },
@@ -4078,6 +4442,7 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
       window.LUMITURE_ACTIVE = itemId;
       document.querySelectorAll('.lt-sb-item, .lt-sb-subitem').forEach(function (el) {
         el.classList.toggle('lt-active', el.dataset.navId === itemId);
+        if (el.dataset.navId === itemId) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
       });
     },
     setLoading: function (on) { _loading = !!on; _applyLoading(); },
@@ -4240,7 +4605,7 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     '.lt-tb-user:hover{opacity:.92}',
     '.lt-tb-avatar-ic{font-size:34px;color:#fff;flex-shrink:0;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 34}',
     '.lt-tb-user-text{display:flex;flex-direction:column;font-size:12px;line-height:1.3;min-width:0;font-family:\'Noto Sans\',sans-serif;text-align:left}',
-    '.lt-tb-user-name{font-weight:600;color:#fff;white-space:nowrap}',
+    '.lt-tb-user-name{font-weight:500;color:#fff;white-space:nowrap}',   /* X-9r6 R3：稿 #01-3 使用者姓名 500；原 600 不在字重表，沒載 600 的頁會退成 700 */
     '.lt-tb-user-role{color:rgba(255,255,255,.6);font-size:11px;white-space:nowrap}',
     '.lt-tb-chev{color:rgba(255,255,255,.6);font-size:20px;transition:transform .18s}',
     '.lt-tb-user.is-open .lt-tb-chev{transform:rotate(180deg)}',
@@ -4364,22 +4729,22 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
 
   // ===== Renderers =====
   function _renderIcon(item) {
-    var attrs = ' class="lt-tb-ic" data-tip="' + _esc(item.title || '') + '" data-tip-pos="below" aria-label="' + _esc(item.title || '') + '"';   /* 原生 title 改 data-tip（#gl-tip） */
+    var attrs = ' class="lt-tb-ic" data-tip="' + _esc(item.title || '') + '" data-tip-pos="below" aria-label="' + _esc((item.title || '') + (item.badge ? ', 1 unread' : '')) + '"';   /* X-9r6 F17：紅點只有 CSS，讀屏要有字（aria-label 會蓋掉內部文字，所以未讀訊息寫進 label） */   /* 原生 title 改 data-tip（#gl-tip） */
     if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
     var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
     return '<button type="button"' + attrs + '>' +
-             '<span class="material-symbols-outlined">' + _esc(item.icon) + '</span>' + badge +
+             '<span class="material-symbols-outlined" aria-hidden="true">' + _esc(item.icon) + '</span>' + badge +
            '</button>';
   }
 
   function _renderUserChip(u) {
     return '<button type="button" class="lt-tb-user" id="lt-tb-user" aria-haspopup="true" aria-expanded="false">' +
-             '<span class="material-symbols-outlined lt-tb-avatar-ic">account_circle</span>' +
+             '<span class="material-symbols-outlined lt-tb-avatar-ic" aria-hidden="true">account_circle</span>' +
              '<div class="lt-tb-user-text">' +
                '<span class="lt-tb-user-name">' + _esc(u.name) + '</span>' +
                '<span class="lt-tb-user-role" id="lt-tb-user-role">' + _esc(u.role) + '</span>' +
              '</div>' +
-             '<span class="material-symbols-outlined lt-tb-chev">keyboard_arrow_down</span>' +
+             '<span class="material-symbols-outlined lt-tb-chev" aria-hidden="true">keyboard_arrow_down</span>' +
            '</button>';
   }
 
@@ -4430,7 +4795,7 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     if (u.quota.state === 'error') {
       var headErr = '<div class="lt-q-head"><span class="lt-q-title">AI Quota</span><span class="lt-q-sub">Org-wide</span></div>';
       return '<div class="lt-q">' + headErr +
-               '<div class="lt-q-err"><span class="material-symbols-outlined">help</span>' +
+               '<div class="lt-q-err"><span class="material-symbols-outlined" aria-hidden="true">help</span>' +
                '<span class="lt-q-err-msg">Couldn\'t load quota</span>' +
                '<a role="menuitem" tabindex="0" onclick="window.LumitureTopbar._retryQuota()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.LumitureTopbar._retryQuota()}">Retry</a></div>' +
              '</div>';
@@ -4438,7 +4803,7 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     var rows = items.map(function (k) { return _renderQuotaItem(k, u.quota[k] || {}); }).join('');
     // add-on 行（packs>0，Premium 不適用）；naming 對齊 PRD：單數 "AI Quota Add-on × N"
     var addon = (!isPremium && (u.addonPacks || 0) > 0)
-      ? '<div class="lt-q-addon"><span class="material-symbols-outlined">auto_awesome</span>' +
+      ? '<div class="lt-q-addon"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>' +
           u.addonPacks + ' × AI Quota Add-ons Activated</div>'
       : '';
     return '<div class="lt-q">' + head + rows + addon + '</div>';
@@ -4450,12 +4815,12 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     var viewAs = u.canSwitchRole
       ? '<div class="lt-am-grp">' +
           '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar.openRoleDialog()">' +
-            '<span class="material-symbols-outlined">sync_alt</span>View as Another Role</button></div>' +
+            '<span class="material-symbols-outlined" aria-hidden="true">sync_alt</span>View as Another Role</button></div>' +
         '<div class="lt-am-div"></div>'
       : '';
     var box = _renderQuotaBox(u);
     return '<div class="lt-am-backdrop" id="lt-am-backdrop" onclick="window.LumitureTopbar.closeMenu()"></div>' +
-           '<div class="lt-am" id="lt-am" role="menu">' +
+           '<div class="lt-am" id="lt-am" role="menu" aria-label="Account menu">' +
              '<div class="lt-am-plan" style="' + bannerStyle + '">' +
                '<span class="lt-am-plan-name">' + planName + '</span>' +
                '<span class="lt-am-plan-date">' + _esc(u.planDateRange) + '</span>' +
@@ -4465,21 +4830,21 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
                  '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
                  '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
                '</div>' +
-               '<span class="lt-am-chip"><span class="material-symbols-outlined">' + _roleIcon(u.role) + '</span>' + _esc(u.role) + '</span>' +
+               '<span class="lt-am-chip"><span class="material-symbols-outlined" aria-hidden="true">' + _roleIcon(u.role) + '</span>' + _esc(u.role) + '</span>' +
              '</div>' +
              '<div class="lt-am-div"></div>' +
              (box ? box + '<div class="lt-am-div"></div>' : '') +
              viewAs +
              '<div class="lt-am-grp">' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Profile\')">' +
-                 '<span class="material-symbols-outlined">manage_accounts</span>Profile</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">manage_accounts</span>Profile</button>' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Settings\')">' +
-                 '<span class="material-symbols-outlined">settings</span>Settings</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">settings</span>Settings</button>' +
              '</div>' +
              '<div class="lt-am-div"></div>' +
              '<div class="lt-am-grp">' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar.logout()">' +
-                 '<span class="material-symbols-outlined">logout</span>Log out</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">logout</span>Log out</button>' +
              '</div>' +
            '</div>';
   }
@@ -4694,7 +5059,7 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
         '<div class="lt-rd-desc">' + ROLE_COPY.desc.map(function (l) { return '<p>' + _esc(l) + '</p>'; }).join('') + '</div></div>' +
       '<div class="lt-rd-body"><div class="lt-rd-sel" id="lt-rd-sel" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="' + (r.ddOpen ? 'true' : 'false') +
         '" aria-controls="lt-rd-list" aria-labelledby="lt-rd-t"><span class="lt-rd-v">' + _esc(sel.name) + '</span><span class="lt-rd-chip">' + _esc(sel.role) +
-        '</span><span class="material-symbols-outlined lt-rd-arr">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
+        '</span><span class="material-symbols-outlined lt-rd-arr" aria-hidden="true">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
       '<div class="lt-rd-act"><button type="button" class="lt-rd-btn out" id="lt-rd-keep"' + (r.loading ? ' disabled' : '') + '>' + ROLE_COPY.keep + '</button>' +
         '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') + '>' +
         (r.loading ? '<span class="lt-rd-spin" role="status" aria-label="Loading"></span>' : ROLE_COPY.cont) + '</button></div>' +
@@ -4741,7 +5106,7 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     _rd.ddOpen = true; s.setAttribute('aria-expanded', 'true'); s.querySelector('.lt-rd-arr').textContent = 'arrow_drop_up';
     var host = _rdPopHost();
     host.innerHTML = '<div class="lt-rd-pop" id="lt-rd-popbox"><div class="lt-rd-pop-in"><div class="lt-rd-search"><input id="lt-rd-q" placeholder="' + ROLE_COPY.search +
-      '" autocomplete="off" role="combobox" aria-label="' + ROLE_COPY.search + '" aria-controls="lt-rd-list" aria-expanded="true" aria-autocomplete="list"><span class="material-symbols-outlined">search</span></div><hr>' +
+      '" autocomplete="off" role="combobox" aria-label="' + ROLE_COPY.search + '" aria-controls="lt-rd-list" aria-expanded="true" aria-autocomplete="list"><span class="material-symbols-outlined" aria-hidden="true">search</span></div><hr>' +
       '<div class="lt-rd-list" id="lt-rd-list" role="listbox" aria-label="Roles">' + _rdOptsHtml('') + '</div></div></div>';
     var el = document.getElementById('lt-rd-popbox'), rc = s.getBoundingClientRect();
     el.style.width = rc.width + 'px'; el.style.left = rc.left + 'px';
@@ -4863,6 +5228,7 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
       window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, user || {});
       _render(); if (_menuOpen) _openMenu();
     },
+    roleIcon: _roleIcon,   /* 角色 chip icon 對應公開給頁面用（X-9r6 F1：GBH Role view 卡） */
     setRole: function (role) {
       var el = document.getElementById('lt-tb-user-role');
       if (el) el.textContent = role;
@@ -5030,6 +5396,10 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);',
     'color:#fff;box-shadow:0 4px 14px rgba(13,27,62,.36);z-index:999;cursor:pointer;',
     'display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;border:0}',
+    /* X-9r6 F11：sidebar 收合時 toast 的 left 是 45（--lt-toast-left 收合值），會蓋住移到 left 54 的 FAB（5 秒內點不到）；
+       收合時把 FAB 與說明面板抬到 toast 上方（toast 預設 bottom 24、高 46、間距 16 → 86）。展開時 toast left 274 不碰到 FAB，位置不變 */
+    'html.lt-sb-collapsed .demo-fab{bottom:86px}',
+    'html.lt-sb-collapsed .demo-popover{bottom:146px;max-height:calc(100vh - 170px)}',   /* X-9r6 R1：視窗 ≤625 高時面板頂端不被切 */
     '.demo-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(13,27,62,.45)}',
     '.demo-fab:active{transform:scale(.96)}',
     '.demo-fab .material-symbols-outlined{font-size:24px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}',
@@ -5136,8 +5506,9 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     '.demo-page-tab[data-tip]::after,.demo-cat-tab[data-tip]::after{display:none!important}',
 
     /* #gl-tip — body-level fixed tooltip (auto-injected) */
-    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:12px;line-height:1.4;',
-    'padding:6px 10px;border-radius:4px;max-width:320px;white-space:normal;',
+    /* X-9r1 S1：預設值改稿值（Tooltip 元件 14／24.5、內距 8／16、r4、max-width 600）；各頁 body #gl-tip 覆寫維持有效 */
+    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:14px;line-height:24.5px;',
+    'padding:8px 16px;border-radius:4px;max-width:600px;white-space:normal;',
     'pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25);',
     'font-family:\'Noto Sans\',sans-serif}'
   ].join('');
@@ -5299,6 +5670,9 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     fabEl.className = 'demo-fab';
     fabEl.id = 'demo-fab';
     fabEl.setAttribute('data-tip', 'Designer Demo Scenarios');   /* 原生 title 改 data-tip（#gl-tip），B 區 A-15 */
+    fabEl.setAttribute('aria-label', 'Designer Demo Scenarios');   /* X-9r1 S6：原本讀屏只唸 icon 字「science」 */
+    fabEl.setAttribute('aria-expanded', 'false');
+    fabEl.setAttribute('aria-controls', 'demo-popover');
     fabEl.innerHTML =
       '<span class="material-symbols-outlined">science</span>' +
       '<span class="demo-pulse" id="demo-fab-pulse"></span>';
@@ -5308,13 +5682,15 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     var popEl = document.createElement('div');
     popEl.className = 'demo-popover';
     popEl.id = 'demo-popover';
+    popEl.setAttribute('role', 'dialog');   /* X-9r1 S6 */
+    popEl.setAttribute('aria-label', 'Demo scenarios');
     popEl.innerHTML =
       '<div class="demo-popover-hdr">' +
         '<div class="demo-popover-title">' +
           '<span class="material-symbols-outlined" style="font-size:16px">science</span>' +
           'Demo Scenarios' +
         '</div>' +
-        '<button class="demo-popover-close" id="demo-pop-close">' +
+        '<button class="demo-popover-close" id="demo-pop-close" aria-label="Close demo scenarios">' +
           '<span class="material-symbols-outlined" style="font-size:18px">close</span>' +
         '</button>' +
       '</div>' +
@@ -5377,7 +5753,21 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
       if (!pop.contains(e.target) && !fab.contains(e.target) && pop.classList.contains('show')) {
         pop.classList.remove('show');
         fab.classList.remove('popped');
+        fab.setAttribute('aria-expanded', 'false');
       }
+    });
+
+    /* X-9r1 S6：面板開著、焦點在面板或 FAB 上時 Esc 關面板並回 FAB；焦點在別處（頁面自己的彈窗、輸入框）不攔 */
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      var pop = document.getElementById('demo-popover'), fab = document.getElementById('demo-fab');
+      if (!pop || !fab || !pop.classList.contains('show')) return;
+      var ae = document.activeElement;
+      if (!ae || !(pop.contains(ae) || fab.contains(ae))) return;
+      pop.classList.remove('show');
+      fab.classList.remove('popped');
+      fab.setAttribute('aria-expanded', 'false');
+      try { fab.focus({ preventScroll: true }); } catch (err) { fab.focus(); }
     });
 
     _injectGlobalTooltip();
@@ -5385,23 +5775,52 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
 
   // ===== #gl-tip auto-injection =====
   function _injectGlobalTooltip() {
-    if (document.getElementById('gl-tip')) return; // host page already provides one
+    var hostTip = document.getElementById('gl-tip');
+    if (hostTip) { _enhanceHostTooltip(hostTip); return; } // host page already provides one：X-9r1 S8 只補語意，不接管位置與 hover
     var tip = document.createElement('div');
     tip.id = 'gl-tip';
+    tip.setAttribute('role', 'tooltip');   /* 2026-10-22 X-9r3 R4：讀屏要認得這是 tooltip */
     document.body.appendChild(tip);
-    var cur = null;
+    var cur = null, described = null;
+    /* 2026-10-22 X-9r3 R4：tooltip 顯示時給觸發元件 aria-describedby="gl-tip"（保留它原本的 describedby，只加／移除自己的 token），收起時移除 */
+    function describe(node) {
+      undescribe();
+      if (!node || !node.setAttribute) return;
+      var ids = (node.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+      if (ids.indexOf('gl-tip') === -1) { ids.push('gl-tip'); node.setAttribute('aria-describedby', ids.join(' ')); }
+      described = node;
+    }
+    function undescribe() {
+      if (!described) return;
+      var ids = (described.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (x) { return x && x !== 'gl-tip'; });
+      if (ids.length) described.setAttribute('aria-describedby', ids.join(' ')); else described.removeAttribute('aria-describedby');
+      described = null;
+    }
+    function hideTip() { cur = null; tip.style.display = 'none'; undescribe(); }
+    /* 頁面自己把 #gl-tip 設成 display:none（例：開 Month Picker 時收起）也要跟著移除 describedby */
+    if (window.MutationObserver) new MutationObserver(function () { if (tip.style.display === 'none') undescribe(); }).observe(tip, { attributes: true, attributeFilter: ['style'] });
     // 2026-10-09 Kabin 裁決：全站 tooltip 改成錨在元件上（Figma／MUI 行為），不再跟著游標跑。
     // 規則照 Anomaly Detection #01-3 量到的：預設出現在元件上方 6px、水平靠元件左緣，
     // 右邊放不下就改靠元件右緣 +2；上方放不下改到下方。
     // 可選屬性：data-tip-pos="below"（固定放下方）、data-tip-dy（下方距離，預設 4）、
     // data-tip-anchor（CSS 選擇器，錨在子元素上）、data-tip-align="content-right"（右緣對齊內容右緣 −16）。
+    function minX() {
+      try {
+        var sb = document.querySelector('.lt-sidebar');
+        if (sb && sb.offsetWidth > 0) return (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lt-sb-w')) || sb.offsetWidth) + 8;
+      } catch (err) {}
+      return 8;
+    }
     function place() {
-      if (!cur || !cur.isConnected) { cur = null; tip.style.display = 'none'; return; }
+      if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
+      /* X-9r1 R1：量測前先歸位，不然 tooltip 還停在上一個位置時寬度被視窗右緣擠窄（先 hover 右側短提示、再 hover 長提示，寬只有 440） */
+      tip.style.left = '0px'; tip.style.top = '0px';
       var r = a.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
       var vw = window.innerWidth, vh = window.innerHeight;
       var x = r.left;
-      if (x + tw > vw - 8) x = Math.max(8, Math.min(r.right + 2, vw - 8) - tw);
+      /* X-9r1 S2：放不下改靠右緣時，左緣不能落進 sidebar（600 寬在 1280 中間位置會伸進去）；沒有 sidebar 的頁維持 8，收合時 21＋8 */
+      if (x + tw > vw - 8) x = Math.max(minX(), Math.min(r.right + 2, vw - 8) - tw);
       if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
       var below = cur.dataset.tipPos === 'below';
       var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
@@ -5413,14 +5832,103 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     document.addEventListener('mouseover', function (e) {
       var el = e.target.closest && e.target.closest('[data-tip]');
       if (!el || (el === cur && tip.style.display !== 'none')) return;
-      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place();
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place(); describe(el);
     });
     document.addEventListener('mouseout', function (e) {
       var el = e.target.closest && e.target.closest('[data-tip]');
-      if (el && el === cur && !el.contains(e.relatedTarget)) { cur = null; tip.style.display = 'none'; }
+      if (el && el === cur && !el.contains(e.relatedTarget)) hideTip();
+    });
+    /* 2026-10-22 X-9r3 FA23：鍵盤 focus 到帶 data-tip 的元素也顯示、blur／Esc 收起（additive，只吃 :focus-visible，滑鼠點擊不觸發） */
+    /* 2026-10-22 X-9r3 R4：:focus-visible 改判真正拿到焦點的 e.target（不是帶 data-tip 的祖先）；describedby 掛在拿到焦點的那個元素上 */
+    document.addEventListener('focusin', function (e) {
+      var t = e.target, el = t.closest && t.closest('[data-tip]');
+      if (!el || !t.matches || !t.matches(':focus-visible')) return;
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place(); describe(t);
+    });
+    document.addEventListener('focusout', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && el === cur) hideTip();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && cur) { hideTip(); return; }
+      /* role="button" 的 info icon（非原生按鈕）按 Enter／Space 切換 tooltip；滑鼠行為不變 */
+      if ((e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented) {
+        var t = e.target, b = t.closest && t.closest('[role="button"][data-tip]');
+        if (!b || b !== t || /^(BUTTON|A|INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+        e.preventDefault();
+        if (cur === b && tip.style.display !== 'none') hideTip();
+        else { cur = b; tip.textContent = b.dataset.tip; tip.style.display = 'block'; place(); describe(b); }
+      }
     });
     window.addEventListener('scroll', place, true);
     window.addEventListener('resize', place);
+  }
+
+  /* X-9r1 S8：頁面自建 #gl-tip（Anomaly Detection、All Resource List、Audit Log）時，shared 不綁 mouseover／mouseout／scroll／resize，
+     位置與顯示邏輯留給頁面；這裡只補讀屏與鍵盤語意：role="tooltip"、顯示時給觸發元件 aria-describedby="gl-tip"、Esc 收起、
+     role="button" 的 Enter／Space 切換、鍵盤 focus-visible 顯示（兩者都是發合成 mouseover／mouseout 交給頁面自己的邏輯，位置規則不動）。
+     觸發元件靠 :hover／activeElement 與文字比對找，不靠自己綁 mouseover */
+  function _enhanceHostTooltip(tip) {
+    if (tip.getAttribute('role') !== 'tooltip') tip.setAttribute('role', 'tooltip');
+    var described = null, pending = null;
+    function visible() { return tip.style.display !== 'none' && getComputedStyle(tip).display !== 'none'; }
+    function undescribe() {
+      if (!described) return;
+      var ids = (described.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (x) { return x && x !== 'gl-tip'; });
+      if (ids.length) described.setAttribute('aria-describedby', ids.join(' ')); else described.removeAttribute('aria-describedby');
+      described = null;
+    }
+    function describe(node) {
+      if (node === described) return;
+      undescribe();
+      var ids = (node.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+      if (ids.indexOf('gl-tip') === -1) { ids.push('gl-tip'); node.setAttribute('aria-describedby', ids.join(' ')); }
+      described = node;
+    }
+    function findTrigger() {
+      var txt = tip.textContent, list = [];
+      if (pending && pending.isConnected) list.push(pending);
+      var ae = document.activeElement; if (ae && ae.closest) list.push(ae);
+      [].forEach.call(document.querySelectorAll('[data-tip]:hover'), function (n) { list.push(n); });
+      for (var i = 0; i < list.length; i++) {
+        var host = list[i].closest && list[i].closest('[data-tip]');
+        if (host && host.dataset.tip === txt) return host;
+      }
+      return null;
+    }
+    function sync() {
+      if (!visible()) { undescribe(); pending = null; return; }
+      var t = findTrigger();
+      if (t) describe(t);
+    }
+    if (window.MutationObserver) new MutationObserver(sync).observe(tip, { attributes: true, attributeFilter: ['style', 'class'], childList: true, characterData: true, subtree: true });
+    /* 合成事件只是「請頁面自己的 mouseover／mouseout 邏輯照它的位置規則顯示或收起」，shared 不接管位置 */
+    function fire(node, type, rel) { try { node.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, relatedTarget: rel || null })); } catch (err) {} }
+    function hide() {
+      var n = described || pending;
+      if (n && n.isConnected) fire(n, 'mouseout', null);   // 讓頁面把自己的 cur 清掉，之後同一個元件才能再顯示
+      tip.style.display = 'none';
+    }
+    /* 鍵盤 focus 到帶 data-tip 的元件（:focus-visible）也顯示，blur 收起；頁面自己的 focusin（ARL 的 .cnt）照跑，同一元件不會重複顯示 */
+    document.addEventListener('focusin', function (e) {
+      var t = e.target, el = t.closest && t.closest('[data-tip]');
+      if (!el || !t.matches || !t.matches(':focus-visible')) return;
+      pending = el; fire(el, 'mouseover', null); sync();
+    });
+    document.addEventListener('focusout', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && (el === described || el === pending) && !el.contains(e.relatedTarget)) { fire(el, 'mouseout', e.relatedTarget); pending = null; sync(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && visible()) { hide(); return; }
+      if ((e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented) {
+        var t = e.target, b = t.closest && t.closest('[role="button"][data-tip]');
+        if (!b || b !== t || /^(BUTTON|A|INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+        e.preventDefault();
+        if (visible() && tip.textContent === b.dataset.tip) { hide(); return; }
+        pending = b; fire(b, 'mouseover', null); sync();
+      }
+    });
   }
 
   // ===== PUBLIC API =====
@@ -5458,6 +5966,7 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
     var opening = !pop.classList.contains('show');
     pop.classList.toggle('show');
     fab.classList.toggle('popped');
+    fab.setAttribute('aria-expanded', opening ? 'true' : 'false');   /* X-9r1 S6 */
     if (opening && pulse) pulse.style.display = 'none';
   };
 
@@ -5559,6 +6068,12 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
 
 </script>
 <!-- Init: all shared scripts loaded, CurrencyPicker is now available -->
-<script>go('list');</script>
+<script>
+/* 2026-10-27 Kabin：Allocation 頁籤的分組照常用程度排，「已不採用」一律最後（demo-fab 依第一次出現的順序排分組） */
+(function(){const rank=['基本流程','資料狀況','暫緩的設計','設定（切換後停在目前畫面）','已不採用（留著對照）'];const L=window.DEMO_SCENARIOS;if(!L)return;
+  const idx=L.map((s,i)=>i).filter(i=>L[i].tab==='alloc');const items=idx.map(i=>L[i]);
+  const r=g=>{const k=rank.indexOf(g);return k<0?rank.length-1:k};
+  items.map((s,k)=>[s,k]).sort((a,b)=>r(a[0].group)-r(b[0].group)||a[1]-b[1]).forEach(([s],k)=>{L[idx[k]]=s});})();
+go('list');</script>
 </body>
 </html>
