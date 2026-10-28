@@ -901,7 +901,18 @@ tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g20
 .ac-sec{display:flex;flex-direction:column;gap:2px;margin:8px 0}
 .ac-sec-t{font-size:13px;font-weight:700;color:var(--g800)}
 .ac-sec-d{font-size:12px;color:var(--g500)}
-.ac-match{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g700);padding:8px 12px;background:var(--g50);border-radius:var(--r-sm);margin-top:24px} /* 2026-10-28 Kabin：跟 Add Data Source 太近；摘要列是條件與結果的分界，上下各 24 */
+.ac-match{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g700);padding:8px 12px;background:var(--g50);border-radius:var(--r-sm);margin-top:24px}
+/* 2026-10-29 Kabin 想比較：過期時把「計算摘要列＋Split across」框成一個範圍。.ac-split 平常沒有任何樣式（版面與原本相同）；
+   用負 margin 抵掉內距，切換時內容不位移。fill＝整塊琥珀底；line＝白底、左側 4px 琥珀線（同 CMDS Alert 左側色條） */
+.ac-split{display:block}
+body.v10-sw-fill .vc.ac:is(.ac-stale,.ac-recalc) .ac-split,body.v10-sw-line .vc.ac:is(.ac-stale,.ac-recalc) .ac-split{margin:12px -16px -12px;padding:12px 16px 12px}
+body.v10-sw-fill .vc.ac:is(.ac-stale,.ac-recalc) .ac-split>.ac-match,body.v10-sw-line .vc.ac:is(.ac-stale,.ac-recalc) .ac-split>.ac-match{margin-top:0}
+body.v10-sw-fill .vc.ac:is(.ac-stale,.ac-recalc) .ac-split{background:var(--warn-lt,#FEF3E1);border-radius:var(--r-sm,4px)}
+body.v10-sw-line .vc.ac:is(.ac-stale,.ac-recalc) .ac-split{border-left:4px solid var(--lt-color-warning,#FC9A0F);padding-left:12px;border-radius:0}
+/* 10/29 想不打架的線：card＝不多畫線，卡片本來的青色識別線過期時換成琥珀色；outline＝白底、1px 琥珀細框把範圍框起來（像容器，不像第二條並排的線） */
+body.v10-sw-card .vc.ac:is(.ac-stale,.ac-recalc){box-shadow:inset 4px 0 0 var(--lt-color-warning,#FC9A0F)}
+body.v10-sw-outline .vc.ac:is(.ac-stale,.ac-recalc) .ac-split{margin:12px -16px -12px;padding:11px 15px;border:1px solid var(--lt-color-warning,#FC9A0F);border-radius:var(--r-sm,4px)}
+body.v10-sw-outline .vc.ac:is(.ac-stale,.ac-recalc) .ac-split>.ac-match{margin-top:0} /* 2026-10-28 Kabin：跟 Add Data Source 太近；摘要列是條件與結果的分界，上下各 24 */
 .ac-match .material-symbols-outlined{font-size:18px;color:var(--g400)}
 .ac-muted{color:var(--g500)}
 .ac-sample{margin-left:auto;font-size:12px;color:var(--g500);border:1px dashed var(--g300);border-radius:10px;padding:1px 8px;cursor:help}
@@ -2689,15 +2700,18 @@ function v9RmRecip(btn,cid){
  * 所以不自動重算：改了就把這張卡的數字標成過期（變灰、留舊數字），按底部 Recalculate 一次算完所有卡；沒按就按 Next 會先自動算。
  * 過期的判斷：卡片設定（條件＋分給誰）跟上次算的時候不一樣（data-calc-sig）。V10_RECALC_MS 是模擬的 API 時間 */
 const V10_RECALC_MS=1200;
-const v10AcSig=c=>JSON.stringify({b:c.cspBlocks,r:c.recipients});
+/* 2026-10-29：比對用的條件只算「計算真的會用到的」（同 v9Scope 的篩法：沒選值、Label 沒選 key 的條件不算），
+   剛按 Add Condition 還沒填的那一列不會讓數字變成過期 */
+const v10CondSig=blocks=>JSON.stringify((blocks||[]).map(b=>({csp:b.csp,conds:(b.conds||[]).filter(c=>c.f&&(c.v||'').length&&(getFieldOpset(c.f)!=='tag'||c.k))})));
+const v10AcSig=c=>JSON.stringify({b:v10CondSig(c.cspBlocks),r:c.recipients});
 function v10RecalcAll(cid,then){
   const ctn=document.getElementById(cid);if(!ctn)return;const view=ctn.closest('#v-create,#v-edit');
   /* 2026-10-28 後端：不要每次全部重算 → 一顆按鈕，但只送過期的卡（每張卡各打一次 API），沒改過的卡不重算 */
   const acs=[...ctn.querySelectorAll(':scope>.vc.ac.ac-stale')];if(!acs.length){then&&then();return}
-  acs.forEach(a=>{a.classList.remove('ac-stale');a.classList.add('ac-recalc')});view?.classList.add('v10-recalc-busy');v10UpdRecalcBtn(cid);
+  acs.forEach(a=>{a.classList.remove('ac-stale');a.classList.add('ac-recalc');v10StaleTips(a,false)});view?.classList.add('v10-recalc-busy');v10UpdRecalcBtn(cid);
   clearTimeout(ctn._rcT);
   ctn._rcT=setTimeout(()=>{
-    v9ReadCards(cid).forEach(c=>{if(c.type==='alloc'&&acs.includes(c.el)){c.el.dataset.calcSig=v10AcSig(c);c.el.dataset.calcCond=JSON.stringify(c.cspBlocks)}});
+    v9ReadCards(cid).forEach(c=>{if(c.type==='alloc'&&acs.includes(c.el)){c.el.dataset.calcSig=v10AcSig(c);c.el.dataset.calcCond=v10CondSig(c.cspBlocks)}});
     acs.forEach(a=>a.classList.remove('ac-recalc'));view?.classList.remove('v10-recalc-busy');
     clearTimeout(_v9T[cid]);v9UpdAll(cid);then&&then();
   },V10_RECALC_MS);
@@ -2905,7 +2919,7 @@ const V9_BASIS_COPY={
     metaTip:"Shared cost is split by each value's direct cost. For cost in a cluster, only direct cost in that cluster counts.", // 2026-10-27：原句「from value cards」會被讀成上方區塊的整個 tag 金額
     splitDesc:"Shared cost in a cluster is split by direct cost in that cluster. Other shared cost is split by direct cost across this tag.", // 2026-10-27：範圍寫在 Direct cost 欄名，這句只講規則、固定不變
     shareTip:"Calculated day by day, then added up for the last 30 days, so it can differ slightly from the 30-day spend ratio.",
-    noShareHere:n=>`${n} has no direct cost in this cluster, so it receives nothing. Add a ${S._k8sNorm?'Namespace':'k8s-namespace'} condition to the ${n} value card if ${n} runs in this cluster.`,
+    noShareHere:(n,where)=>`${n} has no direct cost in ${where||'this cluster'}, so it receives nothing. Add a ${S._k8sNorm?'Namespace':'k8s-namespace'} condition to the ${n} value card if ${n} runs ${where?'there':'in this cluster'}.`, // 2026-10-29：條件沒寫 cluster 時「this cluster」不知道指哪個，改寫出 cluster 名稱（同 Direct cost 欄名）
     noShareAny:n=>`${n} has no direct cost in this tag, so it receives nothing.`,
     noWeight:(amt,where)=>`${amt} can't be split because none of these values has direct cost in ${where} this period. It stays Untagged.`,
     // 2026-10-16 Kabin：Preview 的數字要對得起來 → 寫出每個 value 分到多少、比例依據哪裡的直接成本（K8s 是 cluster 內，跟 Direct 欄的整個 tag 不同）
@@ -3026,7 +3040,9 @@ function v9ValidateAC(cid){
  * ============================================================ */
 const _v9T={};
 function v9Sched(cid){if(!cid)return;clearTimeout(_v9T[cid]);_v9T[cid]=setTimeout(()=>v9UpdAll(cid),60)}
-['input','change','click'].forEach(ev=>document.addEventListener(ev,e=>{const c=e.target.closest&&e.target.closest('#cr-vals,#ed-vals');if(c)v9Sched(c.id)}));
+/* 2026-10-29 bug：「Remove this Condition」先把自己那一列移除，事件冒泡到這裡時 e.target 已經不在頁面上，closest 找不到卡，
+   改用事件路徑（派發當下就記好的祖先）找，拿掉條件也會觸發過期判斷 */
+['input','change','click'].forEach(ev=>document.addEventListener(ev,e=>{const c=(e.composedPath?e.composedPath():[e.target]).find(n=>n.id==='cr-vals'||n.id==='ed-vals');if(c)v9Sched(c.id)}));
 const _v9Renum=renum;renum=function(cid){
   const crossed=v9EnforceZones(cid);
   _v9Renum(cid);v9Sched(cid);
@@ -3038,6 +3054,7 @@ document.addEventListener('drop',e=>{if(e.target.closest&&e.target.closest('#cr-
 /* 2026-10-27 Q1：Direct cost 欄。欄名寫出範圍（一個 cluster／N 個 cluster／整個 tag key），這樣條件再複雜文案也不會變長。
  * 多個 cluster 時每個 cluster 各自照自己的比例分再加總，加總後的 Direct cost 比例不會剛好等於 Share，所以滑過數字列出每個 cluster 的明細 */
 function v10DcParts(info){return [...(info.usedParts||[])]}
+function v10ZeroWhere(info){const ps=v10DcParts(info).filter(p=>p!=='*');return ps.length===1?v10DcName(ps[0],ps):ps.length>1?`these ${ps.length} clusters`:''}
 function v10DcName(p,all){if(p==='*')return 'Outside clusters (compared across the whole tag)';const [proj,n]=p.split('|');return (all||[]).some(q=>q!==p&&q.split('|')[1]===n)?`${n} (${proj})`:n}
 function v10UpdDcHead(el,info){
   const h=el.querySelector('.ac-dc-h');if(!h)return;const ps=v10DcParts(info);const cl=ps.filter(p=>p!=='*');
@@ -3076,6 +3093,22 @@ function v10GroupZero(el){
   g.querySelector('.ac-zero-badge').innerHTML=S._showParked?v9ParkedBadge('proposal'):'';
   const open=el.dataset.zeroOpen==='1';g.classList.toggle('is-open',open);g.querySelector('.ac-zero-h').setAttribute('aria-expanded',String(open));
 }
+/* 2026-10-29 Kabin：變灰的數字滑過要說「過期了、去重算」。過期時 Share／Allocated／Direct cost（改了條件時連 matched）掛同一句 tooltip；
+   算完由下面一般流程把 tooltip 換回原本的（Direct cost 多 cluster 明細）或拿掉 */
+const V10_STALE_TIP='Out of date. Recalculate to update.',V10_UNCALC_TIP='Not calculated yet. Recalculate to see the amount.';
+function v10StaleTips(el,on){
+  on=on&&!el.classList.contains('ac-recalc'); // 重算中顯示 skeleton，不掛 tooltip
+  const tip=el.dataset.calcSig===''?V10_UNCALC_TIP:V10_STALE_TIP;
+  const nums=[...el.querySelectorAll('.ac-row .ac-w,.ac-row .ac-amt,.ac-row .ac-dc')];
+  const m=el.querySelector('[data-acmatch]>span:not(.material-symbols-outlined):not(.ac-match-status)');
+  if(m)(on&&el.classList.contains('ac-stale-cond')?nums.push(m):(m.dataset.tip===V10_STALE_TIP||m.dataset.tip===V10_UNCALC_TIP)&&(delete m.dataset.tip,m.removeAttribute('tabindex')));
+  nums.forEach(x=>{if(on){x.dataset.tip=tip;x.tabIndex=0}else if(x.dataset.tip===V10_STALE_TIP||x.dataset.tip===V10_UNCALC_TIP){delete x.dataset.tip;x.removeAttribute('tabindex')}});
+}
+function v10EnsureSplit(el){ // 計算摘要列到 Add Value 包成一個 .ac-split（只給 10/29 過期樣式比較用，預設沒有樣式）
+  const body=el.querySelector('.ac-body');const bar=body?.querySelector(':scope>.ac-match');if(!bar)return;
+  const w=document.createElement('div');w.className='ac-split';bar.before(w);let n=bar;
+  while(n){const nx=n.nextElementSibling;w.appendChild(n);if(n.classList.contains('ac-addrow'))break;n=nx}
+}
 function v9UpdAll(cid){
   v9ApplyNameMode();
   document.getElementById(cid)?.querySelectorAll('.vc').forEach(v9NumberBlocks);
@@ -3086,10 +3119,10 @@ function v9UpdAll(cid){
   cards.forEach(c=>{if(c.type!=='alloc')return;c.el.querySelectorAll('.ac-sel').forEach(sel=>{const cur=sel.value;const fresh=v9FromHtml(v9RecipInput(cid,cur&&cur!=='__new__'?cur:''));if(fresh.innerHTML!==sel.innerHTML){sel.innerHTML=fresh.innerHTML;sel.value=cur}})});
   cards.forEach((c,i)=>{
     if(c.type!=='alloc'){v9UpdNameHint(c,cards,i);return}
-    const info=R.cards[i];const el=c.el;
+    const info=R.cards[i];const el=c.el;v10EnsureSplit(el);
     // 2026-10-28：過期判斷。不在第 2 步（卡片看不到）或第一次畫出來時，直接當成已算過
     const sig=v10AcSig(c);
-    const csig=JSON.stringify(c.cspBlocks);
+    const csig=v10CondSig(c.cspBlocks);
     if(!(v10On()&&S._step===2)||el.dataset.calcSig===undefined||el.dataset.keepFresh){el.dataset.calcSig=sig;el.dataset.calcCond=csig}delete el.dataset.keepFresh;
     el.classList.toggle('ac-stale-cond',el.dataset.calcCond!==csig);
     const stale=el.dataset.calcSig!==sig;el.classList.toggle('ac-stale',stale&&!el.classList.contains('ac-recalc'));
@@ -3106,7 +3139,7 @@ function v9UpdAll(cid){
         const bar=el.querySelector('[data-acmatch]');let st=bar.querySelector('.ac-match-status');
         if(!st){st=document.createElement('span');st.className='ac-match-status';st.setAttribute('role','status');bar.appendChild(st)}
         st.innerHTML=`<span class="material-symbols-outlined" aria-hidden="true">update</span><span>${el.dataset.calcSig===''?'Not calculated yet':'Amounts are out of date'}</span><button type="button" class="btn btn-o ac-stale-btn" onclick="v10RecalcAll('${cid}')">Recalculate</button>`;
-        v10UpdRecalcBtn(cid);return;
+        v10StaleTips(el,true);v10UpdRecalcBtn(cid);return;
       }
       el.querySelector('[data-acmatch] .ac-match-status')?.remove();
       let note=el.querySelector('.ac-stale-note');
@@ -3117,7 +3150,7 @@ function v9UpdAll(cid){
       v10UpdRecalcBtn(cid);
       return;
     }
-    el.querySelector('.ac-stale-note')?.remove();v10UpdRecalcBtn(cid);
+    el.querySelector('.ac-stale-note')?.remove();v10StaleTips(el,false);v10UpdRecalcBtn(cid);
     if(S._autoRecip)v9SyncAutoRows(el,c.recipients,info,cid);
     const sample=v9IsSampleData(cid)?`<span class="ac-sample" data-tip="這個 tag 沒有示範帳單，數字借用 cost-owner 的示範帳單計算。">Sample bill</span>`:'';
     el.querySelector('[data-acmatch]').innerHTML=info.matched
@@ -3133,7 +3166,7 @@ function v9UpdAll(cid){
       v10UpdDcCell(r.querySelector('.ac-dc'),n,info);
       const hint=r.querySelector('.ac-row-hint');
       const noDirect=n&&info.matched&&!amt;
-      hint.textContent=noDirect?(R.direct[n]>0?v9Basis().noShareHere(n):v9Basis().noShareAny(n)):'';
+      hint.textContent=noDirect?(R.direct[n]>0?v9Basis().noShareHere(n,v10ZeroWhere(info)):v9Basis().noShareAny(n)):'';
       r.querySelector('.ac-row-basis').textContent=(n&&amt>0&&(info.basis||{})[n])?v9Basis().basis(v9fmt(info.basis[n]),info.basisWhere):'';
       r.classList.toggle('is-zero',!!noDirect);
     });
@@ -3299,7 +3332,7 @@ function v9RenderPreview(t,el){
       :info.reason==='partial'?`<span class="v9-pill ok">Split</span>${v9fmt(info.allocated)} split across ${who}. <span class="v9-warn-t">${v9fmt(info.unallocated)} stays Untagged: no direct cost in ${info.noWeight.map(v9PartLabel).join(', ')}.</span>`
       :`${S._acPillExc?'':'<span class="v9-pill ok">Split</span>'}${v9Basis().previewSplit(v10Amt(info.allocated),v10List((c.recipients||[]).filter(n=>(info.byRecip||{})[n]).map(n=>`${n} (${v10Amt(info.byRecip[n])})`)),v10Where(info))}`;
     const zeroNames=(c.recipients||[]).filter(n=>info.matched&&!(info.byRecip||{})[n]&&R.direct[n]>0&&info.noWeight.length===0);
-    const zeroHtml=zeroNames.length&&info.reason!=='no-match'?`<div class="v9-warn-t" style="margin-top:4px">${zeroNames.map(n=>v9Basis().noShareHere(n)).join(' ')}</div>`:'';
+    const zeroHtml=zeroNames.length&&info.reason!=='no-match'?`<div class="v9-warn-t" style="margin-top:4px">${zeroNames.map(n=>v9Basis().noShareHere(n,v10ZeroWhere(info))).join(' ')}</div>`:'';
     /* 2026-10-05：回應「最後才看到、想改 value 要多走幾步」→ 名字可以點，直接回第 1 步、捲到那張 value card */
     const takenLinks=[...info.takenBy].map(n=>`<a href="#" class="v10-taken-link" data-tip="Edit this value card" onclick="v10EditCardFromPreview('${String(n).replace(/'/g,"\\'")}');return false">${n}</a>`);
     // 2026-10-16 改寫：先給這張卡條件抓到的總數，再說其中多少已是 value card 的直接成本，加減對得起來（100K − 40K = 60K）
@@ -3368,6 +3401,12 @@ window.DEMO_SCENARIOS.push(
   {id:'v9-first-alloc', tab:'alloc',group:'基本流程',label:'在已套用的 key 加第一張 allocation card',icon:'add_circle',tip:'cost-owner 目前只有兩張 value card。用 Add → Allocation card 加一張，再到 Preview 按 Apply，會看到「成員將看不到這個 key」的提醒。'},
   {id:'v9-last-alloc',  tab:'alloc',group:'基本流程',label:'刪掉最後一張 allocation card 再 Apply',icon:'remove_circle',tip:'cost-owner 已套用、有一張 allocation card。刪掉它之後到 Preview 按 Apply，會看到「成員會重新看到這個 key」的提醒（2026-10-01 PM 定調）。'},
   {id:'v9-list',        tab:'alloc',group:'基本流程',label:'List：含 allocation card 的 key',icon:'list',tip:'cost-owner 名稱旁的 icon：成員在 Cost Dashboard 看不到。'},
+  // ── 過期樣式比較（10/29） ──
+  {id:'v10-sw-none',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：只有計算摘要列變黃（10/28 版）',icon:'crop_16_9',tip:'8 個團隊的卡，自動按掉一個 value 停在過期狀態。黃色只在條件與分攤清單中間那條摘要列。'},
+  {id:'v10-sw-fill',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：整塊黃包到整個 Split across',icon:'select_all',tip:'Warning/Light 底（#FEF3E1）從摘要列一路包到 Add Value。過期範圍最清楚，但整張卡最大一塊變黃，灰字在淡黃底上更淡。'},
+  {id:'v10-sw-card',tab:'alloc',group:'資料狀況',label:'數字過期：卡片識別線變黃（預設）',icon:'format_color_fill',tip:'8 個團隊的卡，自動按掉一個 value 停在過期狀態。allocation card 左邊的青色識別線換成琥珀色、計算摘要列變黃，不多畫線。10/29 Kabin 定案。'},
+  {id:'v10-sw-outline',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：1px 琥珀細框框住範圍',icon:'crop_square',tip:'從摘要列到 Add Value 用 1px 琥珀框圍起來。是容器的框，不是跟青色識別線並排的第二條線。'},
+  {id:'v10-sw-line',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：左側 4px 黃線（會跟青色識別線並排打架）',icon:'border_left',tip:'同一個過期狀態，白底不變，從摘要列到 Add Value 左邊一條 4px 琥珀線（同 CMDS Alert 左側色條）。'},
   // ── 資料狀況 ──
   {id:'v9-many-values',tab:'alloc',group:'資料狀況',label:'三個 cluster、8 個團隊（連按 × 看重算）',icon:'groups',tip:'三個 cluster 各自算再加總：兩個 shared-gke 名字一樣、分屬 prd 和 stg。Search 在 prd shared-gke 和 data-gke 都有跑，滑過它的 Direct cost 看兩邊各分多少。連按幾個 ×，最後一下之後 0.5 秒才開始重算（重算模擬 1.5 秒）。'},
   {id:'v9-many-one',tab:'alloc',group:'資料狀況',label:'8 個團隊只分 prd shared-gke（3 個分到 0）',icon:'unfold_less',tip:'Data、ML 只在 data-gke 跑，Growth 只在 stg 的 shared-gke，這三個在 prd shared-gke 分到 0，列下方有灰色說明。'},
@@ -3665,6 +3704,14 @@ const _v10RC=renderCreate;renderCreate=function(){_v10RC();
 /* 從 List 進 Edit／Create 一律從第 1 步開始；Preview 的 Back to Edit 回到原本那一步 */
 const _v10Go=go;go=function(n,p){const from=document.querySelector('.view.active')?.id;if((n==='edit'||n==='create')&&from==='v-list'&&!S._v10Hold)S._step=1;return _v10Go(n,p)};
 const _v10Demo=window.DEMO_APPLY;window.DEMO_APPLY=function(name,btn){S._v10Hold=true;try{return _v10Demo(name,btn)}finally{S._v10Hold=false}};
+/* 2026-10-29 過期樣式比較：三個情境都是 8 個團隊那張卡＋自動按掉一個 value；樣式（body class）切了就留著，回到「現在」才拿掉 */
+(function(){document.body.classList.add('v10-sw-card'); // 10/29 Kabin 定案：預設卡片識別線變黃（整塊黃、細框、左側線留在已不採用）
+  const _d=window.DEMO_APPLY;window.DEMO_APPLY=function(name,btn){
+  const m=/^v10-sw-(none|fill|line|card|outline)$/.exec(name);if(!m)return _d(name,btn);
+  ['fill','line','card','outline'].forEach(k=>document.body.classList.toggle('v10-sw-'+k,m[1]===k));
+  const r=_d('v9-many-values',btn);let n=0;
+  const t=setInterval(()=>{const x=[...document.querySelectorAll('#ed-vals .vc.ac .ac-rm')].find(e=>e.offsetParent);if(x||++n>40){clearInterval(t);if(x)setTimeout(()=>x.click(),150)}},50);
+  return r}})();
 /* 從 allocation card 建 value card → 切到第 1 步；Back to allocation card → 切回第 2 步 */
 const _v10CFA=v9CreateForAC;v9CreateForAC=function(acid,cid){if(v10On()&&S._step!==1){S._step=1;v10Apply(v10Pfx(cid))}_v10CFA(acid,cid)};
 const _v10BTA=v9BackToAC;v9BackToAC=function(acid){const ac=document.querySelector(`[data-acid=${acid}]`);const cid=ac?.closest('[id]')?.id;if(v10On()&&S._step!==2&&cid){S._step=2;v10Apply(v10Pfx(cid))}setTimeout(()=>_v10BTA(acid),60)};
@@ -6070,7 +6117,7 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
 <!-- Init: all shared scripts loaded, CurrencyPicker is now available -->
 <script>
 /* 2026-10-27 Kabin：Allocation 頁籤的分組照常用程度排，「已不採用」一律最後（demo-fab 依第一次出現的順序排分組） */
-(function(){const rank=['基本流程','資料狀況','暫緩的設計','設定（切換後停在目前畫面）','已不採用（留著對照）'];const L=window.DEMO_SCENARIOS;if(!L)return;
+(function(){const rank=['基本流程','過期樣式比較（10/29）','資料狀況','暫緩的設計','設定（切換後停在目前畫面）','已不採用（留著對照）'];const L=window.DEMO_SCENARIOS;if(!L)return;
   const idx=L.map((s,i)=>i).filter(i=>L[i].tab==='alloc');const items=idx.map(i=>L[i]);
   const r=g=>{const k=rank.indexOf(g);return k<0?rank.length-1:k};
   items.map((s,k)=>[s,k]).sort((a,b)=>r(a[0].group)-r(b[0].group)||a[1]-b[1]).forEach(([s],k)=>{L[idx[k]]=s});})();
