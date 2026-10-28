@@ -3404,8 +3404,8 @@ window.DEMO_SCENARIOS.push(
   // ── 過期樣式比較（10/29） ──
   {id:'v10-sw-none',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：只有計算摘要列變黃（10/28 版）',icon:'crop_16_9',tip:'8 個團隊的卡，自動按掉一個 value 停在過期狀態。黃色只在條件與分攤清單中間那條摘要列。'},
   {id:'v10-sw-fill',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：整塊黃包到整個 Split across',icon:'select_all',tip:'Warning/Light 底（#FEF3E1）從摘要列一路包到 Add Value。過期範圍最清楚，但整張卡最大一塊變黃，灰字在淡黃底上更淡。'},
-  {id:'v10-sw-card',tab:'alloc',group:'資料狀況',label:'數字過期：卡片識別線變黃（預設）',icon:'format_color_fill',tip:'8 個團隊的卡，自動按掉一個 value 停在過期狀態。allocation card 左邊的青色識別線換成琥珀色、計算摘要列變黃，不多畫線。10/29 Kabin 定案。'},
-  {id:'v10-sw-outline',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：1px 琥珀細框框住範圍',icon:'crop_square',tip:'從摘要列到 Add Value 用 1px 琥珀框圍起來。是容器的框，不是跟青色識別線並排的第二條線。'},
+  {id:'v10-sw-card',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：卡片識別線變黃',icon:'format_color_fill',tip:'allocation card 左邊的青色識別線換成琥珀色，不多畫線。10/29 試過，太不明顯。'},
+  {id:'v10-sw-outline',tab:'alloc',group:'資料狀況',label:'數字過期：琥珀細框框住範圍（預設）',icon:'crop_square',tip:'8 個團隊的卡，自動按掉一個 value 停在過期狀態。從摘要列到 Add Value 用 1px 琥珀框圍起來，是容器的框，不是跟青色識別線並排的第二條線。10/29 Kabin 定案。'},
   {id:'v10-sw-line',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：左側 4px 黃線（會跟青色識別線並排打架）',icon:'border_left',tip:'同一個過期狀態，白底不變，從摘要列到 Add Value 左邊一條 4px 琥珀線（同 CMDS Alert 左側色條）。'},
   // ── 資料狀況 ──
   {id:'v9-many-values',tab:'alloc',group:'資料狀況',label:'三個 cluster、8 個團隊（連按 × 看重算）',icon:'groups',tip:'三個 cluster 各自算再加總：兩個 shared-gke 名字一樣、分屬 prd 和 stg。Search 在 prd shared-gke 和 data-gke 都有跑，滑過它的 Direct cost 看兩邊各分多少。連按幾個 ×，最後一下之後 0.5 秒才開始重算（重算模擬 1.5 秒）。'},
@@ -3705,7 +3705,7 @@ const _v10RC=renderCreate;renderCreate=function(){_v10RC();
 const _v10Go=go;go=function(n,p){const from=document.querySelector('.view.active')?.id;if((n==='edit'||n==='create')&&from==='v-list'&&!S._v10Hold)S._step=1;return _v10Go(n,p)};
 const _v10Demo=window.DEMO_APPLY;window.DEMO_APPLY=function(name,btn){S._v10Hold=true;try{return _v10Demo(name,btn)}finally{S._v10Hold=false}};
 /* 2026-10-29 過期樣式比較：三個情境都是 8 個團隊那張卡＋自動按掉一個 value；樣式（body class）切了就留著，回到「現在」才拿掉 */
-(function(){document.body.classList.add('v10-sw-card'); // 10/29 Kabin 定案：預設卡片識別線變黃（整塊黃、細框、左側線留在已不採用）
+(function(){document.body.classList.add('v10-sw-outline'); // 10/29 Kabin 定案：預設 1px 琥珀細框把摘要列到 Add Value 框起來（卡片識別線太不明顯；整塊黃、左側線、卡片線留在已不採用）
   const _d=window.DEMO_APPLY;window.DEMO_APPLY=function(name,btn){
   const m=/^v10-sw-(none|fill|line|card|outline)$/.exec(name);if(!m)return _d(name,btn);
   ['fill','line','card','outline'].forEach(k=>document.body.classList.toggle('v10-sw-'+k,m[1]===k));
