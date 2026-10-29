@@ -967,7 +967,33 @@ body #gl-tip{white-space:pre-line} /* shared demo-fab 注入的 #gl-tip 樣式�
 /* 2026-10-28 Kabin：icon 放左邊看起來怪 → 放回文字右邊，但「懸」在欄位外（跟懸掛標點同一招），表頭文字右緣仍跟下面數字的右緣對齊。
    右邊空間：欄距 12＋下一欄的空白（Share、Allocated 標籤靠右，左側本來就空；Allocated 右邊是 × 欄） */
 /* 2026-10-28 Kabin：icon 懸在欄外仍然亂（看起來不屬於任何一欄）→ 表頭不放 icon，說明合併成「Split across」旁一顆 */
-.ac-sec-t{display:inline-flex;align-items:center;gap:4px}.ac-sec-ic{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 1;cursor:help}
+.ac-sec-t{display:inline-flex;align-items:center;gap:4px}
+/* 2026-10-29 團隊討論：Split across 原本是無框的清單，數字擠在左半、右邊空一大塊，不好讀 → 改成表格，沿用 FOCUS／Executive Insights 的 Top 10 小表格：
+   1px 外框、淡藍表頭（Primary/Light 10）、列之間細分隔線、撐滿到右邊。Value 欄給彈性寬度但比例最大 1.6 份，數字欄平均分配、靠右對齊。
+   Bater：常見情境 10 個 value 以內，所以不做表格內捲動 */
+/* 10/29 Kabin：拿掉外框，不然過期時琥珀框裡又一層灰框；靠淡藍表頭＋列分隔線就分得出表格 */
+.ac-tbl{--ac-cols:minmax(160px,1.6fr) minmax(120px,1fr) minmax(80px,.7fr) minmax(120px,1fr) 24px;margin-top:8px}
+.ac-tbl .ac-rows-h{grid-template-columns:var(--ac-cols);gap:16px;align-items:center;height:32px;padding:0 8px;margin:0 0 4px;background:var(--pri-lt10);border-radius:4px;font-size:12px;font-weight:500;color:var(--g500)}
+.ac-tbl .ac-rows{gap:0}
+.ac-tbl .ac-row{padding:6px 8px;border-bottom:1px solid var(--g100);gap:2px}
+.ac-tbl .ac-row:last-child{border-bottom:0}
+.ac-tbl .ac-row:hover{background:var(--g50)}
+.ac-tbl .ac-row-main{grid-template-columns:var(--ac-cols);gap:16px}
+.ac-tbl .ac-row .ac-name{height:28px}
+.ac-tbl .ac-dc,.ac-tbl .ac-amt{font-size:14px;color:var(--g500)}
+.ac-tbl .ac-w{font-size:14px;font-weight:700}
+.ac-tbl .ac-rows-empty{padding:12px 8px}
+.ac-tbl .ac-addrow{margin:8px 0 0 8px}
+.v10-reset-wrap{display:inline-flex;align-items:center;gap:8px;margin-right:16px}
+/* 10/29 Kabin：「一開始一個灰塊、標題又一個藍塊」→ 比較三種：B 表頭不上底色（底線同 Lumiture 表格 #B3B3B3）；C 摘要列平常不上底色（過期才變琥珀）；D 符合金額改成表格 Total 列，摘要列只在過期時出現 */
+.ac-total{display:none}
+body.v10-tb-plainhead .ac-tbl .ac-rows-h{background:transparent;border-radius:0;border-bottom:1px solid var(--g400);margin-bottom:0}
+body.v10-tb-quietbar .vc.ac:not(.ac-stale):not(.ac-recalc) .ac-match,body.v10-tb-total .vc.ac:not(.ac-stale):not(.ac-recalc) .ac-match{background:transparent;padding-left:0;padding-right:0}
+body.v10-tb-total .vc.ac.ac-has-total:not(.ac-stale):not(.ac-recalc) .ac-match{display:none} /* 抓不到錢時沒有 Total 列，摘要列（No cost matches…）照常顯示 */
+body.v10-tb-total .ac-total{display:grid;grid-template-columns:var(--ac-cols);gap:16px;align-items:center;padding:10px 8px;border-top:1px solid var(--g400);font-size:14px;font-weight:700;color:var(--g900)}
+body.v10-tb-total .ac-total:empty{display:none}
+.ac-total-p{font-weight:400;color:var(--g500)}.ac-total-n{text-align:right;font-variant-numeric:tabular-nums}
+body.v10-tb-total .vc.ac:is(.ac-stale,.ac-recalc) .ac-total-n{color:var(--g400)}.ac-sec-ic{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 1;cursor:help}
 .ac-sec-ic:focus-visible{outline:2px solid var(--pri);outline-offset:2px;border-radius:50%}
 .ac-rows-h .material-symbols-outlined{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 1;cursor:help}
 .v9-name-dd{position:absolute;z-index:500;background:var(--wh);border-radius:var(--r-sm);box-shadow:0 4px 16px rgba(0,0,0,.14);padding:4px 0;max-height:240px;overflow:auto;overscroll-behavior:contain}
@@ -2608,12 +2634,14 @@ function v9EvalBlock(row,b){
   return r;
 }
 function v9EvalCard(row,card){return (card.cspBlocks||[]).some(b=>v9EvalBlock(row,b))}
-function v9Part(row){const cl=(row.labels||{})['goog-k8s-cluster-name'];return cl?`${row.project_id}|${cl}`:'*'}
+/* 2026-10-29 RD spec 改寫（PM 確認，strict）：不分 cluster，整個 key 跨雲一起算比例（S._scope='tag'，預設）。
+   10/28 前的決定 4「cluster 內只跟 cluster 比」留在 Demo FAB 已不採用（S._scope='cluster'） */
+function v9Part(row){if(S._scope!=='cluster')return '*';const cl=(row.labels||{})['goog-k8s-cluster-name'];return cl?`${row.project_id}|${cl}`:'*'}
 /* 句子裡要能加減對帳，金額一律寫完整（不套十萬縮寫），不然 100.00K − 40,000.00 很難對 */
 function v10Amt(n){return fmtCurr(Math.round(n*100)/100)}
 function v10List(a){return a.length<2?(a[0]||'—'):a.length===2?`${a[0]} and ${a[1]}`:`${a.slice(0,-1).join(', ')}, and ${a[a.length-1]}`}
-function v10Where(info){const ps=[...(info.usedParts||[])];return ps.length===1?(ps[0]==='*'?'across the tag key':`in ${v9PartLabel(ps[0])}`):'where this shared cost sits'}
-function v9PartLabel(p){return p==='*'?'across the tag key':`cluster ${p.split('|')[1]}`}
+function v10Where(info){const ps=[...(info.usedParts||[])];return ps.length===1?(ps[0]==='*'?'in this tag':`in ${v9PartLabel(ps[0])}`):'where this shared cost sits'}
+function v9PartLabel(p){return p==='*'?'this tag':`cluster ${p.split('|')[1]}`}
 
 function v9Compute(cards,rows){
   const R={direct:{},alloc:{},untagged:0,untaggedRows:[],total:0,cards:[],resByValue:{},resDirect:{},order:[],multi:[]};
@@ -2657,7 +2685,7 @@ function v9Compute(cards,rows){
     });
     // 權重依據：每個 value 在這些範圍裡的直接成本（每個範圍只算一次）
     info.basis={};info.basisByPart={};info.allocByPart=info.allocByPart||{};usedParts.forEach(p=>{const base=p==='*'?R.direct:(directPart[p]||{});info.basisByPart[p]={};recips.forEach(n=>{info.basis[n]=(info.basis[n]||0)+(base[n]||0);info.basisByPart[p][n]=base[n]||0})});
-    info.usedParts=usedParts;info.basisWhere=usedParts.size===1?([...usedParts][0]==='*'?'across the tag key':`in ${[...usedParts][0].split('|')[1]}`):'where this shared cost sits';
+    info.usedParts=usedParts;info.basisWhere=usedParts.size===1?([...usedParts][0]==='*'?'in this tag':`in ${[...usedParts][0].split('|')[1]}`):'where this shared cost sits';
     info.reason=!info.matched?'no-match':!info.allocated?'no-weight':info.unallocated?'partial':'ok';
   });
   return R;
@@ -2722,6 +2750,7 @@ function v10UpdRecalcBtn(cid){
   const busy=!!ctn.querySelector(':scope>.vc.ac.ac-recalc');const stale=!!ctn.querySelector(':scope>.vc.ac.ac-stale');
   ctn.querySelectorAll(':scope>.vc.ac.ac-recalc .ac-stale-btn').forEach(b=>{b.disabled=true;b.innerHTML='<span class="material-symbols-outlined v10-spin" aria-hidden="true">progress_activity</span>Recalculate'});
   const block=stale||busy;const nx=view.querySelector('[data-v10preview]');const wrap=nx?.parentElement;
+  const rsb=view.querySelector('.v10-reset');if(rsb){const pf=v10Pfx(cid);const sv=S._savedSnap&&S._savedSnap[pf];rsb.disabled=busy||!sv||sv===JSON.stringify(v10AcSnap(cid));rsb.parentElement.dataset.tip=rsb.disabled?'Nothing to reset. This step matches its last saved settings.':'Reset this step to its last saved settings.'}
   if(nx){nx.disabled=block;if(wrap?.classList.contains('v10-next-wrap')){if(block)wrap.dataset.tip='Recalculate the amounts above first.';else delete wrap.dataset.tip}}
   const s3=view.querySelectorAll('.v10-stepper .v10-step')[2];
   if(s3){s3.classList.toggle('is-blocked',block);s3.setAttribute('aria-disabled',String(block));if(block)s3.dataset.tip='Recalculate the amounts above first.';else delete s3.dataset.tip}
@@ -2765,6 +2794,8 @@ function v9ParkedBadge(kind){
     proposal:['UX 提案','這是設計端的提案，PRD 沒有或列在「待考慮」，還沒決定要不要做。','lightbulb',' is-proposal'],
     parked:['已設計・PM 尚未安排開發','這個設計已經完成，但 PM 還沒安排開發。先保留在 prototype，之後可以直接拿來用。','pause_circle',''],
     deferred:['這階段不做','團隊討論過，這階段先不做。原因與重啟條件記在 specs/parked-designs.md。','schedule',''],
+    // 2026-10-29：前端評估 Phase 1 做不完、排到 Phase 2 的設計（Reset）
+    phase2:['Phase 2 才開發','前端評估這階段來不及，排到 Phase 2 才開發。設計先畫在 prototype 與設計稿，PRD 要寫進 Phase 2。','schedule',''],
     techlimit:['技術限制','系統目前做不到，設計先保留。原因與重啟條件記在 specs/parked-designs.md。','block',''],
     // 2026-10-15：FOCUS 資料來源 RD 確認目前做不到，設計稿與 prototype 都保留、標暫不開發（parked-designs #22）
     notdev:['暫不開發，請忽略','FOCUS 目前做不到，這階段請忽略。未來跨雲可能改成自建的分類，先保留這個入口與畫面。','block','']
@@ -2916,8 +2947,9 @@ function v9TryAddAC(cid){
 const V9_BASIS_COPY={
   spend:{
     meta:'Split by Spend',
-    metaTip:"Shared cost is split by each value's direct cost. For cost in a cluster, only direct cost in that cluster counts.", // 2026-10-27：原句「from value cards」會被讀成上方區塊的整個 tag 金額
-    splitDesc:"Shared cost in a cluster is split by direct cost in that cluster. Other shared cost is split by direct cost across this tag.", // 2026-10-27：範圍寫在 Direct cost 欄名，這句只講規則、固定不變
+    // 2026-10-29：規則改成整個 key 一起比（不分 cluster），說明跟著改；舊規則的句子留給 Demo FAB 已不採用的 cluster 情境
+    get metaTip(){return S._scope==='cluster'?"Shared cost is split by each value's direct cost. For cost in a cluster, only direct cost in that cluster counts.":"Shared cost is split by each value's direct cost in this tag."},
+    get splitDesc(){return S._scope==='cluster'?"Shared cost in a cluster is split by direct cost in that cluster. Other shared cost is split by direct cost across this tag.":"Shared cost is split by each value's direct cost in this tag."},
     shareTip:"Calculated day by day, then added up for the last 30 days, so it can differ slightly from the 30-day spend ratio.",
     noShareHere:(n,where)=>`${n} has no direct cost in ${where||'this cluster'}, so it receives nothing. Add a ${S._k8sNorm?'Namespace':'k8s-namespace'} condition to the ${n} value card if ${n} runs ${where?'there':'in this cluster'}.`, // 2026-10-29：條件沒寫 cluster 時「this cluster」不知道指哪個，改寫出 cluster 名稱（同 Direct cost 欄名）
     noShareAny:n=>`${n} has no direct cost in this tag, so it receives nothing.`,
@@ -2940,9 +2972,12 @@ function addAC(cid,cfg){
 <div class="csp-blocks-area"></div><div class="add-csp-wrap"><button class="add-csp-btn" onclick="showCspPicker(this)"><span class="material-symbols-outlined">add</span>Add Data Source</button><div class="csp-picker"></div></div>
 <div class="ac-match" data-acmatch></div>
 <div class="ac-sec" style="margin-top:24px"><span class="ac-sec-t">Split across<span class="material-symbols-outlined ac-sec-ic" tabindex="0" data-tip="Amounts are estimated from the last 30 days. Each day is split on its own and then added up, so Share can differ slightly from the 30-day ratio.">info</span></span><span class="ac-sec-d">${v9Basis().splitDesc}</span></div>
+<div class="ac-tbl">
 <div class="ac-rows-h"><span>Value</span><span class="ac-dc-h"><span class="ac-dc-t">Direct cost</span></span><span>Share</span><span>Allocated</span><span></span></div>
 <div class="ac-rows"></div>
+<div class="ac-total"></div>
 <button class="bac ac-addrow" type="button" onclick="v9OpenRecipMenu(this,'${cid}')"><span class="material-symbols-outlined">add_circle</span>Add Value</button>
+</div>
 <div class="ac-alerts"></div>
 </div>`;
   ctn.appendChild(d);
@@ -3107,7 +3142,7 @@ function v10StaleTips(el,on){
 function v10EnsureSplit(el){ // 計算摘要列到 Add Value 包成一個 .ac-split（只給 10/29 過期樣式比較用，預設沒有樣式）
   const body=el.querySelector('.ac-body');const bar=body?.querySelector(':scope>.ac-match');if(!bar)return;
   const w=document.createElement('div');w.className='ac-split';bar.before(w);let n=bar;
-  while(n){const nx=n.nextElementSibling;w.appendChild(n);if(n.classList.contains('ac-addrow'))break;n=nx}
+  while(n){const nx=n.nextElementSibling;w.appendChild(n);if(n.classList.contains('ac-addrow')||n.querySelector?.('.ac-addrow'))break;n=nx}
 }
 function v9UpdAll(cid){
   v9ApplyNameMode();
@@ -3153,8 +3188,11 @@ function v9UpdAll(cid){
     el.querySelector('.ac-stale-note')?.remove();v10StaleTips(el,false);v10UpdRecalcBtn(cid);
     if(S._autoRecip)v9SyncAutoRows(el,c.recipients,info,cid);
     const sample=v9IsSampleData(cid)?`<span class="ac-sample" data-tip="這個 tag 沒有示範帳單，數字借用 cost-owner 的示範帳單計算。">Sample bill</span>`:'';
+    { /* 10/29 表格樣式比較 D：符合金額改成表格最後一列 Total（摘要列平常不出現） */
+      el.classList.toggle('ac-has-total',!!info.matched);const tot=el.querySelector('.ac-total');if(tot){
+        tot.innerHTML=info.matched?`<span class="ac-total-l">Total <span class="ac-total-p">(last 30 days)</span></span><span class="ac-total-n"></span><span class="ac-total-n">${info.allocated?'100.00%':'--'}</span><span class="ac-total-n">${v9fmt(info.matched)}</span><span></span>`:''}}
     el.querySelector('[data-acmatch]').innerHTML=info.matched
-      ?`<span class="material-symbols-outlined">receipt_long</span><span>Last 30 days: <strong>${v9fmt(info.matched)}</strong> matched · ${info.matchedRes.size} resource${info.matchedRes.size>1?'s':''}</span>${sample}`
+      ?`<span class="material-symbols-outlined">receipt_long</span><span>Last 30 days: <strong>${v9fmt(info.matched)}</strong> matched</span>${sample}`
       :`<span class="material-symbols-outlined">receipt_long</span><span class="ac-muted">No cost matches these conditions in the last 30 days.</span>${sample}`;
     v10UpdDcHead(el,info);
     // 權重：⚠ ASSUMPTION（Q-B）顯示最近 30 天合計的比例，每天、每個 cluster 各自算的細節留給 Preview
@@ -3392,7 +3430,7 @@ function v9ShowApply(id,cover,uc,valCount,splitAmt){
 window.DEMO_PAGES.push({id:'alloc',label:'Allocation',icon:'call_split'});
 window.DEMO_SCENARIOS.push(
   // ── 基本流程 ──
-  {id:'v9-default',     tab:'alloc',group:'基本流程',label:'Edit：共用 cluster 分給 Backend、Frontend',icon:'call_split',tip:'Backend 直接 $50K（含 Cloud SQL）＋分到 $45K＝$95K；Frontend 直接 $10K＋分到 $15K＝$25K；Untagged $0。'},
+  {id:'v9-default',     tab:'alloc',group:'基本流程',label:'Edit：共用 cluster 分給 Backend、Frontend',icon:'call_split',tip:'10/29 規則：整個 tag 一起比。Backend 直接 $50K（含 shared-gke 30K 與 Cloud SQL 20K）、Frontend 直接 $10K，所以 shared-gke 的 60K 依 50:10 分：Backend 分到 $50K、Frontend $10K。Backend 因為有 Cloud SQL，分到的 cluster 費用比它在 cluster 裡的用量（75%）多，這是 RD spec 寫明要接受的結果。'},
   {id:'v9-two-groups',   tab:'alloc',group:'基本流程',label:'同一朵雲兩組 WHERE（取代同名卡）',icon:'library_add',tip:'Backend 一張卡裡放兩個 GCP 區塊：(Namespace = backend 且 Region = asia-east1) 或 (team = backend 且 Project = prd-backend-001)。區塊之間是 OR。2026-10-01 會議方向，待 RD 確認資料結構與 20 條上限算法。'},
   {id:'v9-value-only',   tab:'alloc',group:'基本流程',label:'只用 value card（剩下的整筆給一個團隊）',icon:'sell',tip:'不用 allocation card：Backend、Frontend 用 Namespace 抓，最後一張 Infrastructure 用 Cluster 接住剩下的管理費、硬碟與空位，整筆給基礎架構。Infrastructure 要排在最下面，不然會先把整個 cluster 抓走。'},
   {id:'v9-preview',     tab:'alloc',group:'基本流程',label:'Preview：分攤後',icon:'visibility',tip:'Spend Breakdown 每一列拆成 Direct 與 Allocated（Estimated）。'},
@@ -3401,6 +3439,11 @@ window.DEMO_SCENARIOS.push(
   {id:'v9-first-alloc', tab:'alloc',group:'基本流程',label:'在已套用的 key 加第一張 allocation card',icon:'add_circle',tip:'cost-owner 目前只有兩張 value card。用 Add → Allocation card 加一張，再到 Preview 按 Apply，會看到「成員將看不到這個 key」的提醒。'},
   {id:'v9-last-alloc',  tab:'alloc',group:'基本流程',label:'刪掉最後一張 allocation card 再 Apply',icon:'remove_circle',tip:'cost-owner 已套用、有一張 allocation card。刪掉它之後到 Preview 按 Apply，會看到「成員會重新看到這個 key」的提醒（2026-10-01 PM 定調）。'},
   {id:'v9-list',        tab:'alloc',group:'基本流程',label:'List：含 allocation card 的 key',icon:'list',tip:'cost-owner 名稱旁的 icon：成員在 Cost Dashboard 看不到。'},
+  // ── 表格樣式比較（10/29） ──
+  {id:'v10-tb-now',tab:'alloc',group:'已不採用（留著對照）',label:'表格樣式 A：現在：灰色摘要列＋藍色表頭',icon:'view_agenda',tip:'摘要列（Last 30 days … matched）灰底，表格表頭淡藍底，兩塊不同顏色疊在一起。'},
+  {id:'v10-tb-plainhead',tab:'alloc',group:'已不採用（留著對照）',label:'表格樣式 B：表頭不上底色（只留底線）',icon:'border_bottom',tip:'表頭拿掉淡藍底，改成字＋一條 #B3B3B3 底線；只剩摘要列一塊灰。注意 LumiTag 其他表格（List、Preview）表頭都是淡藍底。'},
+  {id:'v10-tb-quietbar',tab:'alloc',group:'已不採用（留著對照）',label:'表格樣式 C：摘要列平常不上底色',icon:'text_fields',tip:'摘要列平常只是一行字，沒有底色；數字過期時才變琥珀底＋Recalculate。表頭維持淡藍底，跟 LumiTag 其他表格一致。按一個 × 看過期的樣子。'},
+  {id:'v10-tb-total',tab:'alloc',group:'資料狀況',label:'表格樣式：符合金額在 Total 列（預設）',icon:'functions',tip:'10/29 Kabin 定案。不放摘要列，符合金額變成表格最後一列 Total（Allocated 加總＝符合金額）；過期時摘要列才出現在表格上方，顯示 Amounts are out of date＋Recalculate。'},
   // ── 過期樣式比較（10/29） ──
   {id:'v10-sw-none',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：只有計算摘要列變黃（10/28 版）',icon:'crop_16_9',tip:'8 個團隊的卡，自動按掉一個 value 停在過期狀態。黃色只在條件與分攤清單中間那條摘要列。'},
   {id:'v10-sw-fill',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：整塊黃包到整個 Split across',icon:'select_all',tip:'Warning/Light 底（#FEF3E1）從摘要列一路包到 Add Value。過期範圍最清楚，但整張卡最大一塊變黃，灰字在淡黃底上更淡。'},
@@ -3408,12 +3451,12 @@ window.DEMO_SCENARIOS.push(
   {id:'v10-sw-outline',tab:'alloc',group:'資料狀況',label:'數字過期：琥珀細框框住範圍（預設）',icon:'crop_square',tip:'8 個團隊的卡，自動按掉一個 value 停在過期狀態。從摘要列到 Add Value 用 1px 琥珀框圍起來，是容器的框，不是跟青色識別線並排的第二條線。10/29 Kabin 定案。'},
   {id:'v10-sw-line',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：左側 4px 黃線（會跟青色識別線並排打架）',icon:'border_left',tip:'同一個過期狀態，白底不變，從摘要列到 Add Value 左邊一條 4px 琥珀線（同 CMDS Alert 左側色條）。'},
   // ── 資料狀況 ──
-  {id:'v9-many-values',tab:'alloc',group:'資料狀況',label:'三個 cluster、8 個團隊（連按 × 看重算）',icon:'groups',tip:'三個 cluster 各自算再加總：兩個 shared-gke 名字一樣、分屬 prd 和 stg。Search 在 prd shared-gke 和 data-gke 都有跑，滑過它的 Direct cost 看兩邊各分多少。連按幾個 ×，最後一下之後 0.5 秒才開始重算（重算模擬 1.5 秒）。'},
-  {id:'v9-many-one',tab:'alloc',group:'資料狀況',label:'8 個團隊只分 prd shared-gke（3 個分到 0）',icon:'unfold_less',tip:'Data、ML 只在 data-gke 跑，Growth 只在 stg 的 shared-gke，這三個在 prd shared-gke 分到 0，列下方有灰色說明。'},
-  {id:'v9-by-ba',tab:'alloc',group:'資料狀況',label:'用 Billing account 抓（cluster 內外混在一起）',icon:'account_balance',tip:'條件不寫 cluster，改寫 Billing account：抓到兩個 cluster 的剩餘費用，加上不在 cluster 的共用 Logging $12K。欄名變成「in 2 clusters + other」。cluster 內照 cluster 內的比例分；cluster 外的 $12K 照整個 tag 的比例（Backend 含 Cloud SQL 是 $50K）分。'},
-  {id:'v9-two-clusters',tab:'alloc',group:'資料狀況',label:'一張卡分兩個 cluster（各自算再加總）',icon:'hub',tip:'shared-gke 照 30K：10K 分 60K；data-gke 只有 Frontend 在跑（5K），20K 全給 Frontend。Direct cost 欄加總是 30K：15K，但 Share 是 56%：44%，滑過金額看每個 cluster。'},
+  {id:'v9-many-values',tab:'alloc',group:'資料狀況',label:'8 個團隊（連按 × 看重算）',icon:'groups',tip:'8 個團隊、三個 cluster 的共用費一起分，比例看各團隊在整個 tag 的直接成本。連按幾個 ×，最後一下之後 0.5 秒才開始重算（重算模擬 1.5 秒）。'},
+  {id:'v9-many-one',tab:'alloc',group:'已不採用（留著對照）',label:'分 cluster 規則：8 個團隊只分 prd shared-gke（3 個分到 0）（10/28，10/29 改成整個 tag 一起比）',icon:'unfold_less',tip:'10/28 以前的決定 4（cluster 內只跟 cluster 比），10/29 RD spec 改成整個 tag 一起比，留著對照。Data、ML 只在 data-gke 跑，Growth 只在 stg 的 shared-gke，這三個在 prd shared-gke 分到 0，列下方有灰色說明。'},
+  {id:'v9-by-ba',tab:'alloc',group:'已不採用（留著對照）',label:'分 cluster 規則：用 Billing account 抓（in 2 clusters + other）（10/28，10/29 改成整個 tag 一起比）',icon:'account_balance',tip:'10/28 以前的決定 4（cluster 內只跟 cluster 比），10/29 RD spec 改成整個 tag 一起比，留著對照。條件不寫 cluster，改寫 Billing account：抓到兩個 cluster 的剩餘費用，加上不在 cluster 的共用 Logging $12K。欄名變成「in 2 clusters + other」。cluster 內照 cluster 內的比例分；cluster 外的 $12K 照整個 tag 的比例（Backend 含 Cloud SQL 是 $50K）分。'},
+  {id:'v9-two-clusters',tab:'alloc',group:'已不採用（留著對照）',label:'分 cluster 規則：一張卡分兩個 cluster（10/28，10/29 改成整個 tag 一起比）',icon:'hub',tip:'10/28 以前的決定 4（cluster 內只跟 cluster 比），10/29 RD spec 改成整個 tag 一起比，留著對照。shared-gke 照 30K：10K 分 60K；data-gke 只有 Frontend 在跑（5K），20K 全給 Frontend。Direct cost 欄加總是 30K：15K，但 Share 是 56%：44%，滑過金額看每個 cluster。'},
   {id:'v9-infra',       tab:'alloc',group:'資料狀況',label:'空位先歸 Infrastructure',icon:'dns',tip:'Infrastructure 先拿走 kube:* 的 $40K，allocation card 只分管理費和磁碟 $20K。'},
-  {id:'v9-mixed-trap',   tab:'alloc',group:'資料狀況',label:'Backend 只用 Project 抓（分不到共用 cluster）',icon:'error',tip:'Backend 的 value card 只寫 Project，在 shared-gke 裡沒有直接成本，所以 allocation card 分給它 0。卡上與 Preview 都會提醒補 Namespace 條件。'},
+  {id:'v9-mixed-trap',   tab:'alloc',group:'已不採用（留著對照）',label:'分 cluster 規則：Backend 只用 Project 抓（分不到共用 cluster）（10/28，10/29 改成整個 tag 一起比）',icon:'error',tip:'10/28 以前的決定 4（cluster 內只跟 cluster 比），10/29 RD spec 改成整個 tag 一起比，留著對照。Backend 的 value card 只寫 Project，在 shared-gke 裡沒有直接成本，所以 allocation card 分給它 0。卡上與 Preview 都會提醒補 Namespace 條件。'},
   {id:'v9-no-match',    tab:'alloc',group:'資料狀況',label:'條件抓不到任何錢（未攤分）',icon:'search_off',tip:'條件寫 data-gke，這份帳單沒有這個 cluster。'},
   {id:'v9-zero',        tab:'alloc',group:'資料狀況',label:'分給沒有 value card 的 value（Data）',icon:'exposure_zero',tip:'Data 沒有任何 value card，直接花費永遠是 0，永遠分不到錢。'},
   // ── 暫緩的設計 ──
@@ -3474,6 +3517,7 @@ function _v9DemoApplyInner(name,btn){
   const settings={'v9-stale-bar':()=>{S._staleStyle='bar'},'v9-stale-alert':()=>{S._staleStyle='alert'},'v9-choose-on':()=>{S._chooseVals=true},'v9-choose-off':()=>{S._chooseVals=false},'v9-zero-group-on':()=>{S._zeroGroup=true},'v9-zero-group-off':()=>{S._zeroGroup=false},'v9-where-group':()=>{S._whereGroup=true;S._multiWhere=false},'v9-multiwhere-on':()=>{S._whereGroup=false;S._multiWhere=true},'v9-multiwhere-off':()=>{S._whereGroup=false;S._multiWhere=false},'v9-k8s-norm':()=>k8sSet('twostep'),'v9-k8s-grouped':()=>k8sSet('grouped'),'v9-k8s-native':()=>k8sSet('native'),'v9-taken-edit':()=>{S._takenInEdit=true},'v9-taken-preview':()=>{S._takenInEdit=false},'v9-name-unique':()=>{S._deptModel=false;S._recipFree=false;S._autoRecip=true},'v9-dept-on':()=>{S._deptModel=true;S._recipFree=false;S._autoRecip=false},'v9-dept-off':()=>{S._deptModel=false;S._recipFree=true;S._autoRecip=false},'v10-or-row-off':()=>{S._orRow=false;S._orSep=false;S._orDash=false},'v10-or-row-on':()=>{S._orRow=true;S._orSep=false;S._orDash=false},'v10-or-dash':()=>{S._orRow=true;S._orSep=false;S._orDash=true;S._orDashAll=false},'v10-ac-pill-all':()=>{S._acPillExc=false},'v10-ac-pill-exc':()=>{S._acPillExc=true},'v10-or-dash-all':()=>{S._orRow=true;S._orSep=false;S._orDash=true;S._orDashAll=true},'v10-or-sep':()=>{S._orRow=true;S._orSep=true;S._orDash=false},'v10-step-static':()=>{S._stepClick=false},'v10-step-click':()=>{S._stepClick=true},'v10-apply-two':()=>{S._applyThree=false},'v10-apply-three':()=>{S._applyThree=true},'v10-recip-auto':()=>{S._autoRecip=true;document.body.classList.remove('v10-recip-select')},'v10-recip-select':()=>{S._autoRecip=false;document.body.classList.add('v10-recip-select')},'v9-parked-on':()=>S._showParked=true,'v9-parked-off':()=>S._showParked=false};
   if(settings[name]){settings[name]();const v=document.querySelector('.view.active')?.id;if(v==='v-edit'&&S._curEdit)go('edit',S._curEdit);else if(v==='v-preview'){const t=S._tmp||S.tags.find(x=>x.id===S._curEdit);if(t)go('preview',t.id)}else go('list');toast('Demo setting updated.');return}
   _demoClean();
+  S._scope=['v9-many-one','v9-by-ba','v9-two-clusters','v9-mixed-trap'].includes(name)?'cluster':'tag'; // 2026-10-29：只有這四個舊規則情境用分 cluster
   // 「已不採用」分組只是對照：看完回到其他情境時，版面自動回到預設 A′
   S._layout='steps';
   // v10：跟 allocation card 有關的情境直接停在第 2 步
@@ -3589,7 +3633,10 @@ function v10Apply(prefix){
     /* 2026-10-28 Kabin：Recalculate 放 Next 左邊（原本 Save as Inactive Tag 的位置），沿用授權頁「Permission Check → Integrate」：
        數字過期時 Recalculate 可按、Next 停用並說明要先算；算完 Recalculate 變停用＋打勾、Next 可按 */
     if(preview){let wrap=preview.parentElement.classList.contains('v10-next-wrap')?preview.parentElement:null;
-      if(!wrap){wrap=document.createElement('span');wrap.className='v10-next-wrap';preview.before(wrap);wrap.appendChild(preview)}}
+      if(!wrap){wrap=document.createElement('span');wrap.className='v10-next-wrap';preview.before(wrap);wrap.appendChild(preview)}
+      /* 2026-10-29 團隊會議：Next 左邊加 Reset，把這一步改亂的設定回到上次儲存的狀態（前端評估 Phase 2 才開發，先畫） */
+      if(S._showParked){const rs=document.createElement('span');rs.className='v10-btn v10-reset-wrap';
+        rs.innerHTML=`${v9ParkedBadge('phase2')}<button type="button" class="btn btn-s v10-reset" disabled onclick="v10ConfirmReset('${prefix}')">Reset</button>`;wrap.before(rs)}}
   }
   v9Sched(cid);
   if(S._step===2&&S._v10NeedLoad){S._v10NeedLoad=false;v10RunLoading(prefix)}else if(S._step!==2){clearTimeout(view._v10LoadT);view.classList.remove('v10-loading')}
@@ -3705,6 +3752,11 @@ const _v10RC=renderCreate;renderCreate=function(){_v10RC();
 const _v10Go=go;go=function(n,p){const from=document.querySelector('.view.active')?.id;if((n==='edit'||n==='create')&&from==='v-list'&&!S._v10Hold)S._step=1;return _v10Go(n,p)};
 const _v10Demo=window.DEMO_APPLY;window.DEMO_APPLY=function(name,btn){S._v10Hold=true;try{return _v10Demo(name,btn)}finally{S._v10Hold=false}};
 /* 2026-10-29 過期樣式比較：三個情境都是 8 個團隊那張卡＋自動按掉一個 value；樣式（body class）切了就留著，回到「現在」才拿掉 */
+document.body.classList.add('v10-tb-total'); // 10/29 Kabin 定案：符合金額改成表格 Total 列，摘要列只在過期時出現
+(function(){const _t=window.DEMO_APPLY;window.DEMO_APPLY=function(name,btn){
+  const m=/^v10-tb-(now|plainhead|quietbar|total)$/.exec(name);if(!m)return _t(name,btn);
+  ['plainhead','quietbar','total'].forEach(k=>document.body.classList.toggle('v10-tb-'+k,m[1]===k));
+  return _t('v9-default',btn)}})();
 (function(){document.body.classList.add('v10-sw-outline'); // 10/29 Kabin 定案：預設 1px 琥珀細框把摘要列到 Add Value 框起來（卡片識別線太不明顯；整塊黃、左側線、卡片線留在已不採用）
   const _d=window.DEMO_APPLY;window.DEMO_APPLY=function(name,btn){
   const m=/^v10-sw-(none|fill|line|card|outline)$/.exec(name);if(!m)return _d(name,btn);
@@ -3713,7 +3765,36 @@ const _v10Demo=window.DEMO_APPLY;window.DEMO_APPLY=function(name,btn){S._v10Hold
   const t=setInterval(()=>{const x=[...document.querySelectorAll('#ed-vals .vc.ac .ac-rm')].find(e=>e.offsetParent);if(x||++n>40){clearInterval(t);if(x)setTimeout(()=>x.click(),150)}},50);
   return r}})();
 /* 從 allocation card 建 value card → 切到第 1 步；Back to allocation card → 切回第 2 步 */
+/* 2026-10-29 團隊會議：
+ * ① 離開第 2 步（Previous、Edit value cards、stepper Step 1、Add Value 裡的 Create Value Card）時，這一步有改動就先確認，確認後捨棄這一步的改動
+ * ② Reset：回到上次儲存的狀態（Phase 2 才開發）
+ * 兩者都是「還原 allocation card 設定」：進第 2 步時存一份（離開用），編輯頁第一次進第 2 步時存一份（Reset 用）。還原沿用版面切換用的 v9CollectAC → addAC */
+S._s2Snap={};S._savedSnap={};
+function v10AcSnap(cid){const ctn=document.getElementById(cid);if(!ctn)return [];return [...ctn.querySelectorAll(':scope>.vc.ac')].map(el=>{const c=v9CollectAC(el);return {cspBlocks:c.cspBlocks,recipients:c.recipients}})}
+function v10S2Dirty(prefix){const sn=S._s2Snap[prefix];return !!sn&&sn!==JSON.stringify(v10AcSnap(prefix+'-vals'))}
+function v10RestoreAcs(prefix,snapStr){const cid=prefix+'-vals';const ctn=document.getElementById(cid);if(!ctn||!snapStr)return;
+  ctn.querySelectorAll(':scope>.vc.ac').forEach(c=>c.remove());
+  JSON.parse(snapStr).forEach(cfg=>{const d=addAC(cid,cfg);d.dataset.keepFresh='1'});
+  renum(cid);v9Sched(cid)}
+function v10ConfirmLeaveS2(prefix,then){
+  window._v10LeaveThen=()=>{v10RestoreAcs(prefix,S._s2Snap[prefix]);delete S._s2Snap[prefix];then()};
+  showModal(`<div class="mh"><div style="display:flex;align-items:center;gap:10px"><span class="material-symbols-outlined" style="font-size:24px;color:var(--err);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24">error</span><span class="mt">Confirmation</span></div><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><p style="margin:16px 0 24px;color:var(--g700)">Your changes on this step will be discarded. Are you sure you want to leave?</p><div class="mf"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="closeModal();window._v10LeaveThen&&window._v10LeaveThen()">Discard Changes</button></div>`)}
+function v10ConfirmReset(prefix){
+  showModal(`<div class="mh"><div style="display:flex;align-items:center;gap:10px"><span class="material-symbols-outlined" style="font-size:24px;color:var(--warn);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24">warning</span><span class="mt">Reset Shared Cost Allocation?</span></div><span class="material-symbols-outlined mx" onclick="closeModal()">close</span></div><p style="margin:16px 0 24px;color:var(--g700)">Conditions and values on this step will go back to their last saved settings. Your changes will be discarded.</p><div class="mf"><button class="btn btn-s" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="closeModal();v10DoReset('${prefix}')">Reset</button></div>`)}
+function v10DoReset(prefix){v10RestoreAcs(prefix,S._savedSnap[prefix]);S._s2Snap[prefix]=S._savedSnap[prefix];toast('Shared cost allocation is reset to the last saved settings.')}
+const _v10ApplyS=v10Apply;v10Apply=function(prefix){_v10ApplyS(prefix);
+  if(v10On()&&S._step===2){const snap=JSON.stringify(v10AcSnap(prefix+'-vals'));if(!S._s2Snap[prefix])S._s2Snap[prefix]=snap;if(!S._savedSnap[prefix])S._savedSnap[prefix]=snap}};
+const _v10GoS=v10Go;v10Go=function(prefix,n){
+  if(v10On()&&S._step===2&&n===1&&v10S2Dirty(prefix)){v10ConfirmLeaveS2(prefix,()=>_v10GoS(prefix,n));return}
+  if(n!==S._step&&n!==3)delete S._s2Snap[prefix];
+  return _v10GoS(prefix,n)};
+const _v10REs=renderEdit;renderEdit=function(id){S._s2Snap={};S._savedSnap={};return _v10REs(id)};
+const _v10RCs=renderCreate;renderCreate=function(){S._s2Snap={};S._savedSnap={};return _v10RCs()};
 const _v10CFA=v9CreateForAC;v9CreateForAC=function(acid,cid){if(v10On()&&S._step!==1){S._step=1;v10Apply(v10Pfx(cid))}_v10CFA(acid,cid)};
+const _v10CFAg=v9CreateForAC;v9CreateForAC=function(acid,cid){const pf=v10Pfx(cid);
+  if(v10On()&&S._step===2&&v10S2Dirty(pf)){v10ConfirmLeaveS2(pf,()=>{const ac=document.querySelector('#'+cid+'>.vc.ac');_v10CFAg(ac?v9AcId(ac):acid,cid)});return}
+  if(v10On()&&S._step===2)delete S._s2Snap[pf];
+  _v10CFAg(acid,cid)};
 const _v10BTA=v9BackToAC;v9BackToAC=function(acid){const ac=document.querySelector(`[data-acid=${acid}]`);const cid=ac?.closest('[id]')?.id;if(v10On()&&S._step!==2&&cid){S._step=2;v10Apply(v10Pfx(cid))}setTimeout(()=>_v10BTA(acid),60)};
 const _v10Kube=v9KubeCreate;v9KubeCreate=function(id){S._step=1;_v10Kube(id)};
 
@@ -6117,7 +6198,7 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
 <!-- Init: all shared scripts loaded, CurrencyPicker is now available -->
 <script>
 /* 2026-10-27 Kabin：Allocation 頁籤的分組照常用程度排，「已不採用」一律最後（demo-fab 依第一次出現的順序排分組） */
-(function(){const rank=['基本流程','過期樣式比較（10/29）','資料狀況','暫緩的設計','設定（切換後停在目前畫面）','已不採用（留著對照）'];const L=window.DEMO_SCENARIOS;if(!L)return;
+(function(){const rank=['基本流程','表格樣式比較（10/29）','過期樣式比較（10/29）','資料狀況','暫緩的設計','設定（切換後停在目前畫面）','已不採用（留著對照）'];const L=window.DEMO_SCENARIOS;if(!L)return;
   const idx=L.map((s,i)=>i).filter(i=>L[i].tab==='alloc');const items=idx.map(i=>L[i]);
   const r=g=>{const k=rank.indexOf(g);return k<0?rank.length-1:k};
   items.map((s,k)=>[s,k]).sort((a,b)=>r(a[0].group)-r(b[0].group)||a[1]-b[1]).forEach(([s],k)=>{L[idx[k]]=s});})();
