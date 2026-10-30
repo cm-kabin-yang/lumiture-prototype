@@ -3214,7 +3214,7 @@ function v9UpdAll(cid){
       v10UpdDcCell(r.querySelector('.ac-dc'),n,info);if(blank&&n)r.querySelector('.ac-dc').textContent=v9fmt(R.direct[n]||0); // 空白卡：整個 tag 的直接成本（#12-2）
       const hint=r.querySelector('.ac-row-hint');
       const noDirect=n&&info.matched&&!amt;
-      hint.textContent=noDirect?(R.direct[n]>0?v9Basis().noShareHere(n,v10ZeroWhere(info)):v9Basis().noShareAny(n)):'';
+      hint.textContent=noDirect&&R.direct[n]>0?v9Basis().noShareHere(n,v10ZeroWhere(info)):''; // 2026-10-30 Kabin：整個 tag 一起算時分到 0＝Direct cost 為 0，同一列看得出來，不另加說明（noShareAny 不再顯示；分 cluster 舊規則情境照舊）
       r.querySelector('.ac-row-basis').textContent=(n&&amt>0&&(info.basis||{})[n])?v9Basis().basis(v9fmt(info.basis[n]),info.basisWhere):'';
       r.classList.toggle('is-zero',!!noDirect);
     });
