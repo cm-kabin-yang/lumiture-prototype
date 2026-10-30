@@ -733,6 +733,8 @@
 .vc.ac.ac-recalc .ac-row-basis,.vc.ac.ac-recalc .ac-row-hint{display:none}
 /* 2026-10-28 過期：保留舊數字但變灰（不用 skeleton，skeleton＝正在算），提示句放在表頭上方 */
 .vc.ac.ac-stale .ac-w,.vc.ac.ac-stale .ac-amt,.vc.ac.ac-stale .ac-dc,.vc.ac.ac-stale.ac-stale-cond .ac-match>span:not(.ac-match-status){color:var(--g400,#B3B3B3)!important} /* matched 只跟條件有關：只改分給誰時維持原色（10/28 設計審查） */
+.cr-invalid .is-err-ctl{border-color:var(--err)!important}.cr-emsg{flex-basis:100%;margin:-4px 0 0;font-size:12px;line-height:18px;color:var(--err)} /* 2026-10-29 條件不合法：欄位紅框＋下方錯誤字（同 Tag key 必填的 .fh.err） */
+.ac-stale-btn-wrap{display:inline-flex}
 .vc.ac.ac-stale.ac-stale-cond .ac-match>.material-symbols-outlined,.vc.ac.ac-stale .ac-match>span:not(.ac-match-status) strong{color:inherit}
 /* 計算摘要列的過期狀態（預設） */
 .vc.ac.ac-stale .ac-match:has(.ac-match-status),.vc.ac.ac-recalc .ac-match:has(.ac-match-status){background:var(--warn-lt,#FEF3E1)}
@@ -2735,7 +2737,7 @@ const v10AcSig=c=>JSON.stringify({b:v10CondSig(c.cspBlocks),r:c.recipients});
 function v10RecalcAll(cid,then){
   const ctn=document.getElementById(cid);if(!ctn)return;const view=ctn.closest('#v-create,#v-edit');
   /* 2026-10-28 後端：不要每次全部重算 → 一顆按鈕，但只送過期的卡（每張卡各打一次 API），沒改過的卡不重算 */
-  const acs=[...ctn.querySelectorAll(':scope>.vc.ac.ac-stale')];if(!acs.length){then&&then();return}
+  const acs=[...ctn.querySelectorAll(':scope>.vc.ac.ac-stale:not(.ac-invalid)')];if(!acs.length){then&&then();return}
   acs.forEach(a=>{a.classList.remove('ac-stale');a.classList.add('ac-recalc');v10StaleTips(a,false)});view?.classList.add('v10-recalc-busy');v10UpdRecalcBtn(cid);
   clearTimeout(ctn._rcT);
   ctn._rcT=setTimeout(()=>{
@@ -2749,11 +2751,12 @@ function v10UpdRecalcBtn(cid){
   const ctn=document.getElementById(cid);const view=ctn?.closest('#v-create,#v-edit');if(!view||!v10On()||S._step!==2)return;
   const busy=!!ctn.querySelector(':scope>.vc.ac.ac-recalc');const stale=!!ctn.querySelector(':scope>.vc.ac.ac-stale');
   ctn.querySelectorAll(':scope>.vc.ac.ac-recalc .ac-stale-btn').forEach(b=>{b.disabled=true;b.innerHTML='<span class="material-symbols-outlined v10-spin" aria-hidden="true">progress_activity</span>Recalculate'});
-  const block=stale||busy;const nx=view.querySelector('[data-v10preview]');const wrap=nx?.parentElement;
+  /* 10/29 Kabin：重算不了（條件不合法）就鎖在第 2 步，Next 停用（同 #12-7「不能執行 Next」）；只是過期則不擋，按 Next 先自動重算 */
+  const inv=S._freeSteps&&!!ctn.querySelector(':scope>.vc.ac.ac-invalid');const block=((stale||busy)&&!S._freeSteps)||inv;const btip=inv?V10_INVALID_BTN_TIP:'Recalculate the amounts above first.';const nx=view.querySelector('[data-v10preview]');const wrap=nx?.parentElement; // 2026-10-29 前端結論：步驟之間不擋（S._freeSteps），舊做法在 Demo FAB 已不採用
   const rsb=view.querySelector('.v10-reset');if(rsb){const pf=v10Pfx(cid);const sv=S._savedSnap&&S._savedSnap[pf];rsb.disabled=busy||!sv||sv===JSON.stringify(v10AcSnap(cid));rsb.parentElement.dataset.tip=rsb.disabled?'Nothing to reset. This step matches its last saved settings.':'Reset this step to its last saved settings.'}
-  if(nx){nx.disabled=block;if(wrap?.classList.contains('v10-next-wrap')){if(block)wrap.dataset.tip='Recalculate the amounts above first.';else delete wrap.dataset.tip}}
+  if(nx){nx.disabled=block;if(wrap?.classList.contains('v10-next-wrap')){if(block)wrap.dataset.tip=btip;else delete wrap.dataset.tip}}
   const s3=view.querySelectorAll('.v10-stepper .v10-step')[2];
-  if(s3){s3.classList.toggle('is-blocked',block);s3.setAttribute('aria-disabled',String(block));if(block)s3.dataset.tip='Recalculate the amounts above first.';else delete s3.dataset.tip}
+  if(s3){s3.classList.toggle('is-blocked',block);s3.setAttribute('aria-disabled',String(block));if(block)s3.dataset.tip=btip;else delete s3.dataset.tip}
 }
 function v9ReAddRecip(acid,name,cid){const ac=document.querySelector(`[data-acid=${acid}]`);if(!ac)return;S._isDirty=true;v9AcSetExcl(ac,v9AcExcl(ac).filter(n=>n!==name));ac.dataset.flash=name;v9Sched(cid)}
 /* 依「Last 30 days」金額由大到小排，同額照 value card 順序；名單或順序變了才重畫 */
@@ -3130,14 +3133,15 @@ function v10GroupZero(el){
 }
 /* 2026-10-29 Kabin：變灰的數字滑過要說「過期了、去重算」。過期時 Share／Allocated／Direct cost（改了條件時連 matched）掛同一句 tooltip；
    算完由下面一般流程把 tooltip 換回原本的（Direct cost 多 cluster 明細）或拿掉 */
-const V10_STALE_TIP='Out of date. Recalculate to update.',V10_UNCALC_TIP='Not calculated yet. Recalculate to see the amount.';
+const V10_STALE_TIP='Out of date. Recalculate to update.',V10_UNCALC_TIP='Not calculated yet. Recalculate to see the amount.',
+  V10_INVALID_TIP='Out of date. Fix the conditions above to recalculate.',V10_INVALID_BTN_TIP='Fix the conditions above first.'; // 2026-10-29 條件不合法（⚠ 設計端暫擬文案）
 function v10StaleTips(el,on){
   on=on&&!el.classList.contains('ac-recalc'); // 重算中顯示 skeleton，不掛 tooltip
-  const tip=el.dataset.calcSig===''?V10_UNCALC_TIP:V10_STALE_TIP;
+  const tip=el.classList.contains('ac-invalid')?V10_INVALID_TIP:el.dataset.calcSig===''?V10_UNCALC_TIP:V10_STALE_TIP;
   const nums=[...el.querySelectorAll('.ac-row .ac-w,.ac-row .ac-amt,.ac-row .ac-dc')];
   const m=el.querySelector('[data-acmatch]>span:not(.material-symbols-outlined):not(.ac-match-status)');
-  if(m)(on&&el.classList.contains('ac-stale-cond')?nums.push(m):(m.dataset.tip===V10_STALE_TIP||m.dataset.tip===V10_UNCALC_TIP)&&(delete m.dataset.tip,m.removeAttribute('tabindex')));
-  nums.forEach(x=>{if(on){x.dataset.tip=tip;x.tabIndex=0}else if(x.dataset.tip===V10_STALE_TIP||x.dataset.tip===V10_UNCALC_TIP){delete x.dataset.tip;x.removeAttribute('tabindex')}});
+  if(m)(on&&el.classList.contains('ac-stale-cond')?nums.push(m):[V10_STALE_TIP,V10_UNCALC_TIP,V10_INVALID_TIP].includes(m.dataset.tip)&&(delete m.dataset.tip,m.removeAttribute('tabindex')));
+  nums.forEach(x=>{if(on){x.dataset.tip=tip;x.tabIndex=0}else if([V10_STALE_TIP,V10_UNCALC_TIP,V10_INVALID_TIP].includes(x.dataset.tip)){delete x.dataset.tip;x.removeAttribute('tabindex')}});
 }
 function v10EnsureSplit(el){ // 計算摘要列到 Add Value 包成一個 .ac-split（只給 10/29 過期樣式比較用，預設沒有樣式）
   const body=el.querySelector('.ac-body');const bar=body?.querySelector(':scope>.ac-match');if(!bar)return;
@@ -3159,8 +3163,9 @@ function v9UpdAll(cid){
     const sig=v10AcSig(c);
     const csig=v10CondSig(c.cspBlocks);
     if(!(v10On()&&S._step===2)||el.dataset.calcSig===undefined||el.dataset.keepFresh){el.dataset.calcSig=sig;el.dataset.calcCond=csig}delete el.dataset.keepFresh;
-    el.classList.toggle('ac-stale-cond',el.dataset.calcCond!==csig);
-    const stale=el.dataset.calcSig!==sig;el.classList.toggle('ac-stale',stale&&!el.classList.contains('ac-recalc'));
+    const inv=el.classList.contains('ac-invalid'); // 2026-10-29 前端結論：條件不合法時一律停在過期狀態、保留舊數字（見檔尾 v10 步驟不擋）
+    el.classList.toggle('ac-stale-cond',el.dataset.calcCond!==csig||inv);
+    const stale=el.dataset.calcSig!==sig||inv;el.classList.toggle('ac-stale',stale&&!el.classList.contains('ac-recalc'));
     if(stale||el.classList.contains('ac-recalc')){ // 過期或重算中：只把剛加回的列先接在最後，數字與排序等算完再更新
       const wrap=el.querySelector('.ac-rows');const have=[...wrap.querySelectorAll('.ac-row')].map(r=>r.dataset.name);
       wrap.querySelectorAll('.ac-row').forEach(r=>{if(r.dataset.name&&!(c.recipients||[]).includes(r.dataset.name))r.remove()}); // Choose Values 取消勾的：跟按 × 一樣立刻拿掉
@@ -3173,7 +3178,7 @@ function v9UpdAll(cid){
         el.querySelector('.ac-stale-note')?.remove();
         const bar=el.querySelector('[data-acmatch]');let st=bar.querySelector('.ac-match-status');
         if(!st){st=document.createElement('span');st.className='ac-match-status';st.setAttribute('role','status');bar.appendChild(st)}
-        st.innerHTML=`<span class="material-symbols-outlined" aria-hidden="true">update</span><span>${el.dataset.calcSig===''?'Not calculated yet':'Amounts are out of date'}</span><button type="button" class="btn btn-o ac-stale-btn" onclick="v10RecalcAll('${cid}')">Recalculate</button>`;
+        st.innerHTML=`<span class="material-symbols-outlined" aria-hidden="true">update</span><span>${el.dataset.calcSig===''?'Not calculated yet':'Amounts are out of date'}</span>${inv?`<span class="ac-stale-btn-wrap" data-tip="${V10_INVALID_BTN_TIP}"><button type="button" class="btn btn-o ac-stale-btn" disabled>Recalculate</button></span>`:`<button type="button" class="btn btn-o ac-stale-btn" onclick="v10RecalcAll('${cid}')">Recalculate</button>`}`;
         v10StaleTips(el,true);v10UpdRecalcBtn(cid);return;
       }
       el.querySelector('[data-acmatch] .ac-match-status')?.remove();
@@ -3478,6 +3483,9 @@ window.DEMO_SCENARIOS.push(
   {id:'v10-or-row-on', tab:'alloc',group:'已不採用（留著對照）',label:'Add OR group：方案 A（移到最後一組下方）',icon:'low_priority',tip:'10/16 會議討論：移出條件動作列，放在最後一組下方的虛線分隔後、前面帶 OR，跟 OR Group 2 標頭同一層，預先標出下一組會出現的位置。'},
   {id:'v10-step-static', tab:'alloc',group:'設定（切換後停在目前畫面）',label:'Stepper 純顯示（10/16，預設）',icon:'linear_scale',tip:'10/16 會議前端回饋：stepper 可點會讓判斷變複雜，改成只顯示目前在第幾步，換步只能用 Next／Previous。'},
   {id:'v10-apply-two', tab:'alloc',group:'設定（切換後停在目前畫面）',label:'Apply 彈窗：有／沒有 allocation card 兩種（10/16，預設）',icon:'call_split',tip:'10/16 會議前端回饋：只要 tag 有 allocation card 就顯示「Managers and Members won\'t see」提醒；沒有就不顯示。刪掉最後一張的「will see again」提醒不做。'},
+  {id:'v10-cond-invalid',tab:'alloc',group:'資料狀況',label:'條件不合法（清掉值，或離開再回來時檢查）',icon:'error',tip:'10/29 前端結論。cost-owner 的 allocation card 把 Cluster 的值清掉：那一列紅框＋錯誤字，下方琥珀框留舊數字，Recalculate 停用。去第 1 步再回來、或按 Next，也是同一個狀態。'},
+  {id:'v10-free-steps',tab:'alloc',group:'設定（切換後停在目前畫面）',label:'步驟之間不擋，改動一直留著（10/29 前端結論，預設）',icon:'swap_horiz',tip:'Previous、Edit value cards、Create Value Card 都直接走，不跳確認；Next 不因數字過期停用（過期就先自動重算）。回到第 2 步會重算一次，條件不合法就顯示錯誤。'},
+  {id:'v10-guard-steps',tab:'alloc',group:'已不採用（留著對照）',label:'離開第 2 步要確認＋過期擋 Next（10/28～10/29 會議）',icon:'block',tip:'有改動時離開第 2 步跳 Confirmation（捨棄改動）；數字過期時 Next 與 Step 3 停用，要先 Recalculate。10/29 前端確認步驟之間可以不擋、改動可以留著，改用回來時重算。'},
   {id:'v9-stale-bar',tab:'alloc',group:'設定（切換後停在目前畫面）',label:'數字過期：計算摘要列（預設）',icon:'update',tip:'條件與分攤清單中間那條 matched 灰條，過期時就地變琥珀底，右側顯示 Amounts are out of date＋Recalculate。'},
   {id:'v9-stale-alert',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：表格上方提醒框（10/28 第一版）',icon:'warning',tip:'CMDS Alert 放在權重清單上方。每次改動都會跳出一個大框、把表格往下推，太重。'},
   {id:'v9-choose-on',tab:'alloc',group:'已不採用（留著對照）',label:'Choose Values 多選清單（10/28 覺得太複雜）',icon:'checklist',tip:'Add Value 改成多選清單：預設全勾、Select all／Clear all、搜尋、每列附這裡的直接成本，Apply 一次套用。只想分給少數幾個團隊時不用一個個按 ×。'},
@@ -3785,18 +3793,94 @@ function v10DoReset(prefix){v10RestoreAcs(prefix,S._savedSnap[prefix]);S._s2Snap
 const _v10ApplyS=v10Apply;v10Apply=function(prefix){_v10ApplyS(prefix);
   if(v10On()&&S._step===2){const snap=JSON.stringify(v10AcSnap(prefix+'-vals'));if(!S._s2Snap[prefix])S._s2Snap[prefix]=snap;if(!S._savedSnap[prefix])S._savedSnap[prefix]=snap}};
 const _v10GoS=v10Go;v10Go=function(prefix,n){
-  if(v10On()&&S._step===2&&n===1&&v10S2Dirty(prefix)){v10ConfirmLeaveS2(prefix,()=>_v10GoS(prefix,n));return}
+  if(!S._freeSteps&&v10On()&&S._step===2&&n===1&&v10S2Dirty(prefix)){v10ConfirmLeaveS2(prefix,()=>_v10GoS(prefix,n));return}
   if(n!==S._step&&n!==3)delete S._s2Snap[prefix];
   return _v10GoS(prefix,n)};
 const _v10REs=renderEdit;renderEdit=function(id){S._s2Snap={};S._savedSnap={};return _v10REs(id)};
 const _v10RCs=renderCreate;renderCreate=function(){S._s2Snap={};S._savedSnap={};return _v10RCs()};
 const _v10CFA=v9CreateForAC;v9CreateForAC=function(acid,cid){if(v10On()&&S._step!==1){S._step=1;v10Apply(v10Pfx(cid))}_v10CFA(acid,cid)};
 const _v10CFAg=v9CreateForAC;v9CreateForAC=function(acid,cid){const pf=v10Pfx(cid);
-  if(v10On()&&S._step===2&&v10S2Dirty(pf)){v10ConfirmLeaveS2(pf,()=>{const ac=document.querySelector('#'+cid+'>.vc.ac');_v10CFAg(ac?v9AcId(ac):acid,cid)});return}
+  if(!S._freeSteps&&v10On()&&S._step===2&&v10S2Dirty(pf)){v10ConfirmLeaveS2(pf,()=>{const ac=document.querySelector('#'+cid+'>.vc.ac');_v10CFAg(ac?v9AcId(ac):acid,cid)});return}
   if(v10On()&&S._step===2)delete S._s2Snap[pf];
   _v10CFAg(acid,cid)};
 const _v10BTA=v9BackToAC;v9BackToAC=function(acid){const ac=document.querySelector(`[data-acid=${acid}]`);const cid=ac?.closest('[id]')?.id;if(v10On()&&S._step!==2&&cid){S._step=2;v10Apply(v10Pfx(cid))}setTimeout(()=>_v10BTA(acid),60)};
 const _v10Kube=v9KubeCreate;v9KubeCreate=function(id){S._step=1;_v10Kube(id)};
+
+/* 2026-10-29 前端結論：第 1、2、3 步之間不擋，第 2 步的改動一直留著。
+ *  - 不再跳離開確認、Next 不再因為數字過期停用（S._freeSteps；舊做法在 Demo FAB 已不採用）
+ *  - 回到第 2 步時前端會重算一次（進第 2 步本來就跑 skeleton）：條件都合法就是新數字；
+ *    有條件不合法（沒選值、Label／Kubernetes 沒選第二段）→ 那一列紅框＋錯誤字，下方琥珀框留舊數字，Recalculate 停用到條件改好
+ *  - 停在第 2 步把原本合法的條件改成不合法，也是同一個狀態；剛按 Add Condition 還沒填的列不算錯，等離開再回來、按 Recalculate 或 Next 才檢查
+ *  - 有不合法的條件（重算不了）時 Next 停用、鎖在第 2 步（10/29 Kabin，同 #12-7「不能執行 Next」）；還沒檢查過的空白列按 Next 時才檢查，有錯就停下並捲到那一列
+ *  - 數字只是過期、條件都合法：Next 不擋，按下先自動重算再進第 3 步
+ * 前端給過三種解法：①按 Previous 當下檢查，有錯就擋著不讓回去 ②（Kabin 記不清，印象是鎖住 Previous）
+ * ③回來時再檢查＝「回來時幫她做一次 Recalculate」（Kabin 提議，前端驗證可行，採用） */
+S._freeSteps=true;S._v10Seen2={};
+function v10RowCheck(row){
+  const block=row.closest('.csp-block');const csp=block?.dataset.csp||'GCP';
+  const f=row.querySelector('.field-sel')?.value||defaultField(csp);const key=row.querySelector('.tag-key-sel');
+  const txt=row.querySelector('.val-txt');const v=txt?txt.value.trim():[...row.querySelectorAll('.ms-chk:checked')].map(c=>c.value).filter(Boolean).join(',');
+  const btnAfter=sel=>sel&&sel.nextElementSibling&&sel.nextElementSibling.classList.contains('nsel-btn')?sel.nextElementSibling:sel;
+  if(getFieldOpset(f)==='tag'&&!(key&&key.value))return {ok:false,ctl:btnAfter(key),msg:f==='k8s'?'Select a dimension.':'Select a label key.'};
+  if(!v.length)return {ok:false,ctl:txt||row.querySelector('.ms-trigger'),msg:txt?'Enter a value.':'Select at least one value.'};
+  return {ok:true};
+}
+function v10MarkConds(cid){ // 每次重畫前更新每一列的錯誤，並標出有錯的卡（.ac-invalid）
+  document.querySelectorAll('#'+cid+'>.vc.ac').forEach(ac=>{let bad=false;
+    ac.querySelectorAll('.cr').forEach(row=>{const r=v10RowCheck(row);
+      if(r.ok)row.dataset.v10Done='1';
+      const show=!r.ok&&(row.dataset.v10Done||row.dataset.v10Chk);
+      row.classList.toggle('cr-invalid',!!show);row.querySelectorAll('.is-err-ctl').forEach(x=>{if(!show||x!==r.ctl)x.classList.remove('is-err-ctl')});
+      let m=row.querySelector(':scope>.cr-emsg');
+      if(show){bad=true;r.ctl?.classList.add('is-err-ctl');if(!m){m=document.createElement('div');m.className='cr-emsg';m.setAttribute('role','alert');row.appendChild(m)}
+        m.textContent=r.msg;const x=r.ctl?.closest('.ms-wrap')||r.ctl;if(x)m.style.paddingLeft=Math.max(0,x.offsetLeft-row.offsetLeft)+'px'}
+      else m?.remove()});
+    ac.classList.toggle('ac-invalid',bad)})}
+function v10ValidateAll(cid){document.querySelectorAll('#'+cid+'>.vc.ac .cr').forEach(r=>r.dataset.v10Chk='1');v10MarkConds(cid)}
+const _v10UA=v9UpdAll;v9UpdAll=function(cid){if(v10On()&&S._freeSteps)v10MarkConds(cid);return _v10UA(cid)};
+/* 回到第 2 步（從第 1 步、或第 3 步的 Previous）＝前端重算一次：合法的卡直接當成新算好，不合法的留舊數字＋錯誤 */
+function v10ReenterS2(prefix,force){const cid=prefix+'-vals';if(!S._freeSteps||!v10On()||S._step!==2)return;
+  if(!force&&!S._v10Seen2[prefix])return; // 第一次進第 2 步不檢查（空白卡還沒開始填）；離開過第 2 步再回來才檢查
+  v10ValidateAll(cid);
+  v9ReadCards(cid).forEach(c=>{if(c.type==='alloc'&&!c.el.classList.contains('ac-invalid')){c.el.dataset.calcSig=v10AcSig(c);c.el.dataset.calcCond=v10CondSig(c.cspBlocks)}});
+  clearTimeout(_v9T[cid]);v9UpdAll(cid)}
+const _v10GoF=v10Go;v10Go=function(prefix,n){const was=S._step;if(was===2&&n!==2)S._v10Seen2[prefix]=1;const r=_v10GoF(prefix,n);if(n===2&&was!==2&&S._step===2)v10ReenterS2(prefix);return r};
+const _v10GoP=go;go=function(n,p){const from=document.querySelector('.view.active')?.id;
+  if(n==='preview')S._v10PvFrom=from;
+  /* 編輯頁從第 3 步按 Previous：原本會用存檔的設定重畫編輯頁，第 1、2 步的改動就不見了。改成直接切回原本的畫面（改動留著） */
+  if(S._freeSteps&&n==='edit'&&from==='v-preview'&&S._v10PvFrom==='v-edit'&&S._curEdit===p&&document.getElementById('ed-vals')){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('v-edit').classList.add('active');window.scrollTo(0,0);
+    if(window.demoFabSwitchTab)window.demoFabSwitchTab('edit');if(S._step===2){S._v10NeedLoad=false;v10RunLoading('ed');setTimeout(()=>v10ReenterS2('ed',true),0)}return}
+  const r=_v10GoP(n,p);
+  if((n==='edit'||n==='create')&&from==='v-preview'&&S._step===2)setTimeout(()=>v10ReenterS2(n==='edit'?'ed':'cr',true),0);return r};
+const _v10CFA2=v9CreateForAC;v9CreateForAC=function(acid,cid){if(S._step===2)S._v10Seen2[v10Pfx(cid)]=1;return _v10CFA2(acid,cid)};
+const _v10BTA2=v9BackToAC;v9BackToAC=function(acid){const ac=document.querySelector(`[data-acid=${acid}]`);const cid=ac?.closest('[id]')?.id;const r=_v10BTA2(acid);if(cid)setTimeout(()=>v10ReenterS2(v10Pfx(cid)),80);return r};
+const _v10RE2=renderEdit;renderEdit=function(id){S._v10Seen2={};return _v10RE2(id)};
+const _v10RC2=renderCreate;renderCreate=function(){if(!S._v10Restore)S._v10Seen2={};return _v10RC2()};
+/* Next（往第 3 步）：有不合法的條件就留在第 2 步；數字過期先重算再走 */
+document.addEventListener('click',e=>{
+  if(!S._freeSteps||!v10On()||S._step!==2)return;const b=e.target.closest&&e.target.closest('[data-v10preview]');if(!b||b._v10Go)return;
+  const view=b.closest('#v-create,#v-edit');if(!view)return;const cid=(view.id==='v-edit'?'ed':'cr')+'-vals';
+  v10ValidateAll(cid);clearTimeout(_v9T[cid]);v9UpdAll(cid);
+  const bad=document.querySelector('#'+cid+'>.vc.ac.ac-invalid .cr.cr-invalid');
+  if(bad){e.preventDefault();e.stopImmediatePropagation();bad.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>bad.querySelector('.is-err-ctl')?.focus?.(),300);return}
+  if(document.querySelector('#'+cid+'>.vc.ac.ac-stale')){e.preventDefault();e.stopImmediatePropagation();
+    v10RecalcAll(cid,()=>{b._v10Go=true;try{b.click()}finally{b._v10Go=false}})}
+},true);
+/* Demo FAB：步驟不擋（預設）／舊的「離開要確認＋過期擋 Next」 */
+(function(){const _d=window.DEMO_APPLY;window.DEMO_APPLY=function(name,btn){
+  if(name==='v10-free-steps'||name==='v10-guard-steps'){S._freeSteps=name==='v10-free-steps';
+    document.querySelectorAll('#ed-vals .cr,#cr-vals .cr').forEach(r=>{delete r.dataset.v10Chk;r.classList.remove('cr-invalid');r.querySelector(':scope>.cr-emsg')?.remove()});
+    document.querySelectorAll('.vc.ac.ac-invalid').forEach(a=>a.classList.remove('ac-invalid'));
+    ['ed-vals','cr-vals'].forEach(c=>document.getElementById(c)&&v9Sched(c));return}
+  if(name!=='v10-cond-invalid')return _d(name,btn);
+  S._freeSteps=true;const r=_d('v9-default',btn);let n=0;
+  const t=setInterval(()=>{const ac=[...document.querySelectorAll('#ed-vals>.vc.ac')].find(e=>e.offsetParent);const row=ac?.querySelector('.cr');
+    if(!(row&&row.querySelector('.ms-chk:checked')&&ac.querySelector('.ac-total')?.textContent.trim())&&++n<80)return;clearInterval(t);if(!row)return; // 等數字算好再清掉值，才看得到「留舊數字」
+    row.dataset.v10Done='1'; // 原本是合法的條件，被清掉值
+    row.querySelectorAll('.ms-chk:checked').forEach(c=>{c.checked=false});const tr=row.querySelector('.ms-trigger'),pn=row.querySelector('.ms-panel');if(tr&&pn)msRefreshTrigger(tr,pn);
+    v9Sched('ed-vals')},50);
+  return r}})();
 
 /* ---------- v10：原生下拉換成自製選單（2026-10-12 Kabin：分享螢幕時看不到原生 select 的選單） ----------
  * 做法：把每個 <select> 藏起來，旁邊放一顆外觀相同的按鈕；選單選了之後寫回原本的 select 並觸發 change，
