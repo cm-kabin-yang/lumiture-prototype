@@ -2754,8 +2754,8 @@ function v10UpdRecalcBtn(cid){
   const ctn=document.getElementById(cid);const view=ctn?.closest('#v-create,#v-edit');if(!view||!v10On()||S._step!==2)return;
   const busy=!!ctn.querySelector(':scope>.vc.ac.ac-recalc');const stale=!!ctn.querySelector(':scope>.vc.ac.ac-stale');
   ctn.querySelectorAll(':scope>.vc.ac.ac-recalc .ac-stale-btn').forEach(b=>{b.disabled=true;b.innerHTML='<span class="material-symbols-outlined v10-spin" aria-hidden="true">progress_activity</span>Recalculate'});
-  /* 10/29 Kabin：重算不了（條件不合法）就鎖在第 2 步，Next 停用（同 #12-7「不能執行 Next」）；只是過期則不擋，按 Next 先自動重算 */
-  const inv=S._freeSteps&&!!ctn.querySelector(':scope>.vc.ac.ac-invalid');const block=((stale||busy)&&!S._freeSteps)||inv;const btip=inv?V10_INVALID_BTN_TIP:'Recalculate the amounts above first.';const nx=view.querySelector('[data-v10preview]');const wrap=nx?.parentElement; // 2026-10-29 前端結論：步驟之間不擋（S._freeSteps），舊做法在 Demo FAB 已不採用
+  /* 10/29 Kabin：重算不了（條件不合法）就鎖在第 2 步，Next 停用（同 #12-7「不能執行 Next」）。10/30 Kabin 更正：數字過期（橘框）時 Next 也停用、hover 提示先按 Recalculate（回到 10/28 定案；10/29 那版「過期不擋、按 Next 自動重算」是 Claude 自行延伸，沒有經過她同意） */
+  const inv=S._freeSteps&&!!ctn.querySelector(':scope>.vc.ac.ac-invalid');const block=stale||busy||inv;const btip=inv?V10_INVALID_BTN_TIP:'Recalculate the amounts above first.';const nx=view.querySelector('[data-v10preview]');const wrap=nx?.parentElement; // 2026-10-29 前端結論：步驟之間不擋（S._freeSteps），舊做法在 Demo FAB 已不採用
   const rsb=view.querySelector('.v10-reset');if(rsb){const pf=v10Pfx(cid);const sv=S._savedSnap&&S._savedSnap[pf];rsb.disabled=busy||!sv||sv===JSON.stringify(v10AcSnap(cid));rsb.parentElement.dataset.tip=rsb.disabled?'Nothing to reset. This step matches its last saved settings.':'Reset this step to its last saved settings.'}
   if(nx){nx.disabled=block;if(wrap?.classList.contains('v10-next-wrap')){if(block)wrap.dataset.tip=btip;else delete wrap.dataset.tip}}
   const s3=view.querySelectorAll('.v10-stepper .v10-step')[2];
@@ -3491,7 +3491,7 @@ window.DEMO_SCENARIOS.push(
   {id:'v10-step-static', tab:'alloc',group:'設定（切換後停在目前畫面）',label:'Stepper 純顯示（10/16，預設）',icon:'linear_scale',tip:'10/16 會議前端回饋：stepper 可點會讓判斷變複雜，改成只顯示目前在第幾步，換步只能用 Next／Previous。'},
   {id:'v10-apply-two', tab:'alloc',group:'設定（切換後停在目前畫面）',label:'Apply 彈窗：有／沒有 allocation card 兩種（10/16，預設）',icon:'call_split',tip:'10/16 會議前端回饋：只要 tag 有 allocation card 就顯示「Managers and Members won\'t see」提醒；沒有就不顯示。刪掉最後一張的「will see again」提醒不做。'},
   {id:'v10-cond-invalid',tab:'alloc',group:'資料狀況',label:'條件不合法（清掉值，或離開再回來時檢查）',icon:'error',tip:'10/29 前端結論。cost-owner 的 allocation card 把 Cluster 的值清掉：那一列紅框＋錯誤字，下方琥珀框留舊數字，Recalculate 停用。去第 1 步再回來、或按 Next，也是同一個狀態。'},
-  {id:'v10-free-steps',tab:'alloc',group:'設定（切換後停在目前畫面）',label:'步驟之間不擋，改動一直留著（10/29 前端結論，預設）',icon:'swap_horiz',tip:'Previous、Edit value cards、Create Value Card 都直接走，不跳確認；Next 不因數字過期停用（過期就先自動重算）。回到第 2 步會重算一次，條件不合法就顯示錯誤。'},
+  {id:'v10-free-steps',tab:'alloc',group:'設定（切換後停在目前畫面）',label:'步驟之間不擋，改動一直留著（10/29 前端結論，預設）',icon:'swap_horiz',tip:'Previous、Edit value cards、Create Value Card 都直接走，不跳確認；數字過期時 Next 停用，hover 提示先按 Recalculate（10/30 更正）。回到第 2 步會重算一次，條件不合法就顯示錯誤。'},
   {id:'v10-guard-steps',tab:'alloc',group:'已不採用（留著對照）',label:'離開第 2 步要確認＋過期擋 Next（10/28～10/29 會議）',icon:'block',tip:'有改動時離開第 2 步跳 Confirmation（捨棄改動）；數字過期時 Next 與 Step 3 停用，要先 Recalculate。10/29 前端確認步驟之間可以不擋、改動可以留著，改用回來時重算。'},
   {id:'v9-stale-bar',tab:'alloc',group:'設定（切換後停在目前畫面）',label:'數字過期：計算摘要列（預設）',icon:'update',tip:'條件與分攤清單中間那條 matched 灰條，過期時就地變琥珀底，右側顯示 Amounts are out of date＋Recalculate。'},
   {id:'v9-stale-alert',tab:'alloc',group:'已不採用（留著對照）',label:'數字過期：表格上方提醒框（10/28 第一版）',icon:'warning',tip:'CMDS Alert 放在權重清單上方。每次改動都會跳出一個大框、把表格往下推，太重。'},
