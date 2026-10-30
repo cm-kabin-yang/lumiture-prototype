@@ -729,6 +729,7 @@
 .v10-loading .ac-w,.v10-loading .ac-amt,.v10-loading .ac-dc{color:transparent!important;background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;height:12px;width:56px;justify-self:end;align-self:center;overflow:hidden}
 .v10-loading .ac-row-basis,.v10-loading .ac-row-hint{display:none}
 /* 2026-10-27 RD：× 拿掉／Add Value 加回後重算（實際 0.5～3 秒）：只有這張卡的 Share、Allocated 變 skeleton，× 仍可連按；算完前 Next／Save 不能按 */
+.vc.ac.ac-blank .ac-match{display:none} /* 2026-10-30：空白卡（還沒有完整條件）不放摘要列，也不出現 Recalculate（#12-2） */
 .vc.ac.ac-recalc .ac-w,.vc.ac.ac-recalc .ac-amt,.vc.ac.ac-recalc .ac-dc{color:transparent!important;background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;height:12px;width:56px;justify-self:end;align-self:center;overflow:hidden}
 .vc.ac.ac-recalc .ac-row-basis,.vc.ac.ac-recalc .ac-row-hint{display:none}
 /* 2026-10-28 過期：保留舊數字但變灰（不用 skeleton，skeleton＝正在算），提示句放在表頭上方 */
@@ -3164,8 +3165,12 @@ function v9UpdAll(cid){
     const csig=v10CondSig(c.cspBlocks);
     if(!(v10On()&&S._step===2)||el.dataset.calcSig===undefined||el.dataset.keepFresh){el.dataset.calcSig=sig;el.dataset.calcCond=csig}delete el.dataset.keepFresh;
     const inv=el.classList.contains('ac-invalid'); // 2026-10-29 前端結論：條件不合法時一律停在過期狀態、保留舊數字（見檔尾 v10 步驟不擋）
-    el.classList.toggle('ac-stale-cond',el.dataset.calcCond!==csig||inv);
-    const stale=el.dataset.calcSig!==sig||inv;el.classList.toggle('ac-stale',stale&&!el.classList.contains('ac-recalc'));
+    /* 2026-10-30 Kabin（與前端 Han 討論 #12-2）：表單一進來不要出現 Recalculate。還沒有任何一條填完整的條件＝空白卡，
+     * 沒有東西可算，不算過期：不顯示 Recalculate，Direct cost 照常顯示、Share／Allocated 維持 --。
+     * 條件填完整、而且跟上次算的不一樣（包含從沒算過）才出現 Recalculate */
+    const blank=!inv&&JSON.parse(csig).every(b=>!b.conds.length);el.classList.toggle('ac-blank',blank);
+    el.classList.toggle('ac-stale-cond',!blank&&(el.dataset.calcCond!==csig||inv));
+    const stale=!blank&&(el.dataset.calcSig!==sig||inv);el.classList.toggle('ac-stale',stale&&!el.classList.contains('ac-recalc'));
     if(stale||el.classList.contains('ac-recalc')){ // 過期或重算中：只把剛加回的列先接在最後，數字與排序等算完再更新
       const wrap=el.querySelector('.ac-rows');const have=[...wrap.querySelectorAll('.ac-row')].map(r=>r.dataset.name);
       wrap.querySelectorAll('.ac-row').forEach(r=>{if(r.dataset.name&&!(c.recipients||[]).includes(r.dataset.name))r.remove()}); // Choose Values 取消勾的：跟按 × 一樣立刻拿掉
@@ -3206,7 +3211,7 @@ function v9UpdAll(cid){
       const amt=info.byRecip[n]||0;const w=info.allocated?amt/info.allocated:0;
       r.querySelector('.ac-w').textContent=n&&info.allocated?(w*100).toFixed(2)+'%':'--';
       r.querySelector('.ac-amt').textContent=n&&info.allocated?v9fmt(amt):'--'; // 10/13 R10：還沒算＝--，不是 0
-      v10UpdDcCell(r.querySelector('.ac-dc'),n,info);
+      v10UpdDcCell(r.querySelector('.ac-dc'),n,info);if(blank&&n)r.querySelector('.ac-dc').textContent=v9fmt(R.direct[n]||0); // 空白卡：整個 tag 的直接成本（#12-2）
       const hint=r.querySelector('.ac-row-hint');
       const noDirect=n&&info.matched&&!amt;
       hint.textContent=noDirect?(R.direct[n]>0?v9Basis().noShareHere(n,v10ZeroWhere(info)):v9Basis().noShareAny(n)):'';
