@@ -894,7 +894,8 @@ tr.dft td{background:#F2F2F2;color:var(--g400);border-bottom:1px solid var(--g20
 .v9-add-menu .material-symbols-outlined{font-size:20px;color:var(--pri);margin-top:1px;font-variation-settings:'FILL' 1}
 .v9-add-menu strong{display:block;font-size:14px;font-weight:600;color:var(--g900)}
 .v9-add-menu em{display:block;font-style:normal;font-size:12px;color:var(--g500);margin-top:2px}
-.vc.ac{border:1px solid var(--pri-lt20);background:var(--wh);box-shadow:inset 4px 0 0 var(--sec)}
+.vc.ac{border:1px solid var(--pri-lt20);background:var(--wh)} /* 2026-10-30 Kabin：設計稿沒有左側青色線（v9 的 allocation card 識別），拿掉；標頭的 Allocation card chip 已足夠 */
+.v10-emsg-src{margin:4px 0 0}.ac-tbl .v10-emsg-val{margin:4px 0 0 8px} /* 2026-10-30 Kabin：錯誤字放在相關控制項正下方 */
 .vc.ac.collapsed .ac-body{display:none}
 .vc.ac.ac-err{border-color:var(--err)}
 .ac-badge{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:12px;background:var(--sec-lt10);color:var(--sec-dk);font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0}.v10-s2 .vc.ac .pn,.v10-s1 .vc.ac .pn{display:none}
@@ -3832,7 +3833,10 @@ function v10RowCheck(row){
   if(!v.length)return {ok:false,ctl:txt||row.querySelector('.ms-trigger'),msg:txt?'Enter a value.':'Select at least one value.'};
   return {ok:true};
 }
+function v10CardMsg(ac,sel,cls,msg){let m=ac.querySelector('.'+cls);if(!msg){m?.remove();return}
+  if(!m){const at=[...ac.querySelectorAll(sel)].find(e=>e.closest('.vc.ac')===ac);if(!at)return;m=document.createElement('div');m.className='cr-emsg '+cls;m.setAttribute('role','alert');at.insertAdjacentElement('afterend',m)}m.textContent=msg}
 function v10MarkConds(cid){ // 每次重畫前更新每一列的錯誤，並標出有錯的卡（.ac-invalid）
+  const cm=new Map(v9ReadCards(cid).filter(c=>c.type==='alloc').map(c=>[c.el,c]));
   document.querySelectorAll('#'+cid+'>.vc.ac').forEach(ac=>{let bad=false;
     ac.querySelectorAll('.cr').forEach(row=>{const r=v10RowCheck(row);
       if(r.ok)row.dataset.v10Done='1';
@@ -3842,8 +3846,12 @@ function v10MarkConds(cid){ // 每次重畫前更新每一列的錯誤，並標�
       if(show){bad=true;r.ctl?.classList.add('is-err-ctl');if(!m){m=document.createElement('div');m.className='cr-emsg';m.setAttribute('role','alert');row.appendChild(m)}
         m.textContent=r.msg;const x=r.ctl?.closest('.ms-wrap')||r.ctl;if(x)m.style.paddingLeft=Math.max(0,x.offsetLeft-row.offsetLeft)+'px'}
       else m?.remove()});
+    /* 2026-10-30 Kabin（#12-7 方案 A）：清單沒有 value、或一個資料來源都沒有，也當成條件不合法：錯誤字放在 Add Value／Add Data Source 正下方，Recalculate 與 Next 停用。新卡還沒動過不報錯（用過才檢查，同列的規則）。⚠ 設計端暫擬文案 */
+    const c=cm.get(ac);if(c){const chk=!!ac.dataset.v10Chk;if(c.recipients.length)ac.dataset.v10HadVals='1';if(c.cspBlocks.length)ac.dataset.v10HadSrc='1';
+      const noV=!c.recipients.length&&!!(ac.dataset.v10HadVals||chk),noS=!c.cspBlocks.length&&!!(ac.dataset.v10HadSrc||chk);
+      v10CardMsg(ac,'.ac-addrow','v10-emsg-val',noV?'Add at least one value.':'');v10CardMsg(ac,'.add-csp-btn','v10-emsg-src',noS?'Add at least one data source.':'');if(noV||noS)bad=true}
     ac.classList.toggle('ac-invalid',bad)})}
-function v10ValidateAll(cid){document.querySelectorAll('#'+cid+'>.vc.ac .cr').forEach(r=>r.dataset.v10Chk='1');v10MarkConds(cid)}
+function v10ValidateAll(cid){document.querySelectorAll('#'+cid+'>.vc.ac .cr').forEach(r=>r.dataset.v10Chk='1');document.querySelectorAll('#'+cid+'>.vc.ac').forEach(a=>a.dataset.v10Chk='1');v10MarkConds(cid)}
 const _v10UA=v9UpdAll;v9UpdAll=function(cid){if(v10On()&&S._freeSteps)v10MarkConds(cid);return _v10UA(cid)};
 /* 回到第 2 步（從第 1 步、或第 3 步的 Previous）＝前端重算一次：合法的卡直接當成新算好，不合法的留舊數字＋錯誤 */
 function v10ReenterS2(prefix,force){const cid=prefix+'-vals';if(!S._freeSteps||!v10On()||S._step!==2)return;
@@ -3869,7 +3877,7 @@ document.addEventListener('click',e=>{
   if(!S._freeSteps||!v10On()||S._step!==2)return;const b=e.target.closest&&e.target.closest('[data-v10preview]');if(!b||b._v10Go)return;
   const view=b.closest('#v-create,#v-edit');if(!view)return;const cid=(view.id==='v-edit'?'ed':'cr')+'-vals';
   v10ValidateAll(cid);clearTimeout(_v9T[cid]);v9UpdAll(cid);
-  const bad=document.querySelector('#'+cid+'>.vc.ac.ac-invalid .cr.cr-invalid');
+  const bad=document.querySelector('#'+cid+'>.vc.ac.ac-invalid :is(.cr.cr-invalid,.v10-emsg-val,.v10-emsg-src)');
   if(bad){e.preventDefault();e.stopImmediatePropagation();bad.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>bad.querySelector('.is-err-ctl')?.focus?.(),300);return}
   if(document.querySelector('#'+cid+'>.vc.ac.ac-stale')){e.preventDefault();e.stopImmediatePropagation();
     v10RecalcAll(cid,()=>{b._v10Go=true;try{b.click()}finally{b._v10Go=false}})}
