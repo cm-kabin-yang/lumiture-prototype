@@ -999,7 +999,8 @@ body.v10-tb-total .vc.ac.ac-has-total:not(.ac-stale):not(.ac-recalc) .ac-match{d
 body.v10-tb-total .ac-total{display:grid;grid-template-columns:var(--ac-cols);gap:16px;align-items:center;padding:10px 8px;border-top:1px solid var(--g400);font-size:14px;font-weight:700;color:var(--g900)}
 body.v10-tb-total .ac-total:empty{display:none}
 .ac-total-p{font-weight:400;color:var(--g500)}.ac-total-n{text-align:right;font-variant-numeric:tabular-nums}
-body.v10-tb-total .vc.ac:is(.ac-stale,.ac-recalc) .ac-total-n{color:var(--g400)}.ac-sec-ic{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 1;cursor:help}
+body.v10-tb-total .vc.ac:is(.ac-stale,.ac-recalc) .ac-total-n{color:var(--g400)}
+.ac-tbl .ac-row{box-sizing:border-box;min-height:40px;justify-content:center;padding-top:0;padding-bottom:0}.ac-tbl .ac-rows-empty{box-sizing:border-box;height:40px;display:flex;align-items:center;padding:0 8px}body.v10-tb-total .ac-total{box-sizing:border-box;height:48px;padding-top:0;padding-bottom:0} /* 2026-10-30 Kabin：列高走 4／8 的倍數：value 列與空清單 40、Total 48（同設計稿） */.ac-sec-ic{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 1;cursor:help}
 .ac-sec-ic:focus-visible{outline:2px solid var(--pri);outline-offset:2px;border-radius:50%}
 .ac-rows-h .material-symbols-outlined{font-size:16px;color:var(--g400);font-variation-settings:'FILL' 1;cursor:help}
 .v9-name-dd{position:absolute;z-index:500;background:var(--wh);border-radius:var(--r-sm);box-shadow:0 4px 16px rgba(0,0,0,.14);padding:4px 0;max-height:240px;overflow:auto;overscroll-behavior:contain}
@@ -3187,7 +3188,9 @@ function v9UpdAll(cid){
         const bar=el.querySelector('[data-acmatch]');let st=bar.querySelector('.ac-match-status');
         if(!st){st=document.createElement('span');st.className='ac-match-status';st.setAttribute('role','status');bar.appendChild(st)}
         st.innerHTML=`<span class="material-symbols-outlined" aria-hidden="true">update</span><span>${el.dataset.calcSig===''?'Not calculated yet':'Amounts are out of date'}</span>${inv?`<span class="ac-stale-btn-wrap" data-tip="${V10_INVALID_BTN_TIP}"><button type="button" class="btn btn-o ac-stale-btn" disabled>Recalculate</button></span>`:`<button type="button" class="btn btn-o ac-stale-btn" onclick="v10RecalcAll('${cid}')">Recalculate</button>`}`;
-        v10StaleTips(el,true);v10UpdRecalcBtn(cid);return;
+        v10StaleTips(el,true);v10UpdRecalcBtn(cid);
+        if(!c.recipients.length)el.querySelectorAll('.ac-total-n').forEach((x,i)=>{if(i)x.textContent='--'}); /* 2026-10-30 Kabin：清單沒有 value 時 Total 不顯示數字 */
+        return;
       }
       el.querySelector('[data-acmatch] .ac-match-status')?.remove();
       let note=el.querySelector('.ac-stale-note');
@@ -3196,6 +3199,7 @@ function v9UpdAll(cid){
       const fresh0=el.dataset.calcSig==='';
       note.innerHTML=`<span class="material-symbols-outlined" aria-hidden="true">update</span><div class="ac-stale-txt"><strong>${fresh0?"Amounts aren't calculated yet":'Amounts are out of date'}</strong><span>${fresh0?'Recalculate to see Share and Allocated for these conditions.':"Your changes aren't reflected in Share and Allocated yet."}</span></div><button type="button" class="btn btn-o ac-stale-btn" onclick="v10RecalcAll('${cid}')">Recalculate</button>`;
       v10UpdRecalcBtn(cid);
+      if(!c.recipients.length)el.querySelectorAll('.ac-total-n').forEach((x,i)=>{if(i)x.textContent='--'}); /* 2026-10-30 Kabin：清單沒有 value 時 Total 不顯示數字 */
       return;
     }
     el.querySelector('.ac-stale-note')?.remove();v10StaleTips(el,false);v10UpdRecalcBtn(cid);
@@ -3203,7 +3207,7 @@ function v9UpdAll(cid){
     const sample=v9IsSampleData(cid)?`<span class="ac-sample" data-tip="這個 tag 沒有示範帳單，數字借用 cost-owner 的示範帳單計算。">Sample bill</span>`:'';
     { /* 10/29 表格樣式比較 D：符合金額改成表格最後一列 Total（摘要列平常不出現） */
       el.classList.toggle('ac-has-total',!!info.matched);const tot=el.querySelector('.ac-total');if(tot){
-        tot.innerHTML=info.matched?`<span class="ac-total-l">Total <span class="ac-total-p">(last 30 days)</span></span><span class="ac-total-n"></span><span class="ac-total-n">${info.allocated?'100.00%':'--'}</span><span class="ac-total-n">${v9fmt(info.matched)}</span><span></span>`:''}}
+        tot.innerHTML=info.matched?`<span class="ac-total-l">Total <span class="ac-total-p">(last 30 days)</span></span><span class="ac-total-n"></span><span class="ac-total-n">${info.allocated&&c.recipients.length?'100.00%':'--'}</span><span class="ac-total-n">${c.recipients.length?v9fmt(info.matched):'--'}</span><span></span>`:''}}
     el.querySelector('[data-acmatch]').innerHTML=info.matched
       ?`<span class="material-symbols-outlined">receipt_long</span><span>Last 30 days: <strong>${v9fmt(info.matched)}</strong> matched</span>${sample}`
       :`<span class="material-symbols-outlined">receipt_long</span><span class="ac-muted">No cost matches these conditions in the last 30 days.</span>${sample}`;
