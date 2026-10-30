@@ -410,8 +410,8 @@ body[data-view="signup"] .au-head,body[data-view="activate"] .au-head{margin-bot
 .fld.sm .lbl{font-size:12px;line-height:17.25px}   /* 對稿修正：FE size small 的 InputLabel 12px（line-height 1.4375em） */
 .ast{color:var(--au-error)}
 .inp{position:relative;display:flex;align-items:center;gap:8px;width:100%;height:44px;padding:8px;background:#fff;color:var(--au-input-text);border:1px solid var(--au-input-border);border-radius:5px;font-size:14px}
-.inp input{flex:1;min-width:0;width:100%;height:100%;padding:0;border:0;outline:0;background:transparent;font-size:14px;line-height:1.4375em;color:var(--au-input-text)}
-.inp input::placeholder{color:var(--lt-color-text-tertiary);opacity:1}
+.inp input{flex:1;min-width:0;width:100%;height:100%;padding:0;border:0;outline:0;background:transparent;font-size:14px;line-height:1.4375em;color:var(--au-input-text);text-overflow:ellipsis}
+.inp input::placeholder{color:var(--lt-color-text-tertiary);opacity:1;text-overflow:ellipsis;overflow:hidden}   /* X-9r6 F5：放不下時尾端「…」（稿 #04 是 MUI 預設的省略號），不是硬切 */
 .inp:hover:not(.dis),.inp:focus-within:not(.dis){border-color:transparent;outline:2px solid var(--au-input-border);outline-offset:-2px}
 .inp.err{border-color:var(--au-error)}
 .inp.err:hover,.inp.err:focus-within{border-color:transparent;outline:2px solid var(--au-error);outline-offset:-2px}
@@ -561,11 +561,11 @@ body.rule-figma .rules li:not(.met) .ck{font-variation-settings:'FILL' 0,'wght' 
  * 5. Toast（FE libs Toaster：左下 sonner，寬 400、padding 8 16、success #008F88／error #BF302E／info #0B6DD7）
  *    Kabin 10/13 裁決：照 FE 成功綠 #008F88（Figma #11 也是這個色；10/13 驗收再確認不用 #00B5A6）＋FE 文案；Figma #02-2／#03-2／#04-2／#05-2 的深藍 toast 列為設計稿問題。
  *    對稿修正：FE Toaster 的 toastOptions.style 是 inline，蓋過 toast.css 的陰影 → 實際是 1px rgba(0,0,0,.12) 框＋MUI shadows[1]，沒有 min-height
- *    ⚠ DEVIATION: FE／Figma toast 距左 24、距底 24；Demo FAB 佔 18–66px，與其他 prototype 一致往右挪到 80；底部再抬高 48，避開 prototype footer
+ *    ⚠ DEVIATION: FE／Figma toast 距左 24、距底 24；Demo FAB 佔 18–66px，與其他 prototype 一致往右挪到 80；底部再抬高到 96（X-9r6 F10），避開 prototype footer 與 Copyright
  * ============================================================ */
 /* 共用 Toast（shared/lumiture-toast.js）：沒有 sidebar 所以 left 自動 24（FE／Figma 的位置）。
- * ⚠ DEVIATION：bottom 抬到 72（稿是 24），避開 Demo FAB（左下）與 prototype footer */
-body .lt-toast-wrap{bottom:72px}
+ * ⚠ DEVIATION：bottom 抬到 96（稿是 24；X-9r6 F10 由 72 改），避開 Demo FAB（左下）、prototype footer 與左下 Copyright（帶展示入口的兩行 toast 高 95，72 時會壓到 Copyright 11px） */
+body .lt-toast-wrap{bottom:96px}
 .lt-toast .lt-toast-msg{white-space:pre-line}
 /* 展示入口（Notification Emails 接回流程，2026-10-14）：Demo FAB 同色系的深藍底＋黃色虛線框，讀得出「這不是產品 UI」；Demo FAB「展示入口」可隱藏。
    ⚠ 設計端暫擬：Kabin 要求 Forgot／Sign Up 寄出成功後有路徑看到那封信，正式產品沒有這顆 */
@@ -594,7 +594,7 @@ body.demo-entries-off .demo-entry,body.demo-entries-off .lt-toast-extra{display:
 </style>
 </head>
 <body>
-<div id="app"></div>
+<main id="app"></main>   <!-- X-9r1 P11：內容區用 <main>（id 不動） -->
 <div class="footer">
   <span class="footer-version">Auth Prototype<span class="ver-tag">v1</span></span>
   <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
@@ -608,7 +608,7 @@ body.demo-entries-off .demo-entry,body.demo-entries-off .lt-toast-extra{display:
  *
  * 規格（FE libs/lumiture-ui/src/Toaster/toast.css＋Toaster.tsx，Figma GB #02-3／GL #18-3／EI #08／RS #06／RO #06 逐值一致）：
  *   成功 #008F88、錯誤 #BF302E、info #0B6DD7、warning #EC6F09｜圓角 4｜寬 400｜最小高 46｜內距 8／16｜icon 20（check_circle／info／warning）
- *   位置：左下，left = var(--lt-toast-left)（sidebar 展開 274／收合 45；沒有 sidebar 的頁面自動改 24），bottom 24｜z-index 4000（高於彈窗 2000、Demo FAB 999）
+ *   位置：左下，left = var(--lt-toast-left)（sidebar 展開 274／收合 45；沒有 sidebar 的頁面自動改 24），bottom = var(--lt-toast-bottom,24px)（X-9r1 S3：有固定底列的頁自己設 calc(底列高 + 16px)）｜z-index 4000（高於彈窗 2000、Demo FAB 999）
  *   5 秒自動消失，點一下立即關閉｜可堆疊（新的在最下面，column-reverse，gap 16）｜字 14／400／行高 24.5
  *
  * 用法（頁面把自己的 toast() 換成這個，不要再各寫一套 CSS）：
@@ -635,7 +635,7 @@ body.demo-entries-off .demo-entry,body.demo-entries-off .lt-toast-extra{display:
     var s = document.createElement('style');
     s.id = 'lt-toast-css';
     s.textContent = [
-      '.lt-toast-wrap{position:fixed;left:var(--lt-toast-left,274px);bottom:24px;z-index:var(--lt-z-toast,4000);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif)}',
+      '.lt-toast-wrap{position:fixed;left:var(--lt-toast-left,274px);bottom:var(--lt-toast-bottom,24px);z-index:var(--lt-z-toast,4000);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif)}',
       '.lt-toast{pointer-events:auto;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:var(--lt-toast-width,400px);max-width:calc(100vw - 96px);min-height:46px;padding:8px 16px;',
       'border-radius:var(--lt-toast-radius,4px);color:#fff;cursor:pointer;',
       'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);',   /* MUI shadows[1]，FE Toaster 的 inline style */
@@ -692,7 +692,17 @@ body.demo-entries-off .demo-entry,body.demo-entries-off .lt-toast-extra{display:
     el.addEventListener('click', close);
     _getWrap().appendChild(el);
     var d = opts.duration == null ? 5000 : opts.duration;
-    if (d > 0) setTimeout(close, d);
+    var timer = null;
+    function arm() { if (d > 0) timer = setTimeout(close, d); }
+    function disarm() { if (timer) { clearTimeout(timer); timer = null; } }
+    arm();
+    /* X-9r1 S7：帶 action（Undo）或 extra 的 toast，滑鼠停上面或焦點進去時暫停計時，離開後重新計 5 秒（WCAG 2.2.1） */
+    if ((opts.action && opts.action.label) || (opts.extra && opts.extra.nodeType === 1)) {
+      el.addEventListener('mouseenter', disarm);
+      el.addEventListener('focusin', disarm);
+      el.addEventListener('mouseleave', function () { if (el.parentNode && !el.contains(document.activeElement)) { disarm(); arm(); } });
+      el.addEventListener('focusout', function (e) { if (el.parentNode && !el.matches(':hover') && !el.contains(e.relatedTarget)) { disarm(); arm(); } });
+    }
     return el;
   }
 
@@ -1027,13 +1037,13 @@ function fieldHtml(view, o) {
   const val = f[o.name] == null ? '' : f[o.name];
   const pk = view + '.' + o.name, show = !!state.showPwd[pk];
   const isPwd = !!o.pwd;
-  const eyeIcon = o.eyeInverted ? (show ? 'visibility' : 'visibility_off') : (show ? 'visibility_off' : 'visibility');   // FE login／reset：顯示中＝VisibilityOff；activate 反過來（FE 不一致）
+  const eyeIcon = show ? 'visibility_off' : 'visibility';   // X-9r6 F6（照推薦，Kabin 未勾）：三頁統一稿 #01／#03／#05 的預設 visibility，點了才換 visibility_off。FE activate 是反過來的（不一致），已記進對稿紀錄附錄 B
   const lbl = o.label + (o.required === false ? '' : '<span class="ast">&thinsp;*</span>');
   return `<div class="fld${o.sm ? ' sm' : ''}" data-fld="${o.name}" ${o.style ? `style="${o.style}"` : ''}>
     <label class="lbl" for="f-${view}-${o.name}">${lbl}</label>
     <div class="inp${err ? ' err' : ''}${o.disabled ? ' dis' : ''}">
       <input id="f-${view}-${o.name}" data-v="${view}" data-f="${o.name}" type="${isPwd && !show ? 'password' : 'text'}" placeholder="${esc(o.ph || '')}" value="${esc(val)}" aria-invalid="${err ? 'true' : 'false'}" aria-describedby="h-${view}-${o.name}" ${o.disabled ? 'disabled' : ''} ${o.autofocus ? 'data-af="1"' : ''}>   <!-- Fable #12：FE 沒設 autoComplete，拿掉 autocomplete="off"；Fable #9：aria-invalid／aria-describedby -->
-      ${isPwd ? `<button type="button" class="eye" data-eye="${pk}" aria-label="toggle-password-visibility"><span class="material-symbols-outlined">${eyeIcon}</span></button>` : ''}
+      ${isPwd ? `<button type="button" class="eye" data-eye="${pk}" aria-label="${show ? 'Hide password' : 'Show password'}" aria-pressed="${show ? 'true' : 'false'}"><span class="material-symbols-outlined" aria-hidden="true">${eyeIcon}</span></button>` : ''}
     </div>
     <p class="help" id="h-${view}-${o.name}">${esc(err)}</p>
   </div>`;
@@ -1136,7 +1146,7 @@ function signupView() {
       ${fieldHtml('signup', { name: 'streetAddress', label: COPY.lbl.addr, ph: COPY.ph.addr, style: full })}
     </div>
     ${submitBtn('signup', COPY.signup.btn, '16px 0 0')}   <!-- ⚠ DEVIATION 間距照稿：最後一欄到按鈕 32、按鈕到說明 8（.agree） -->
-    <p class="cap agree">${COPY.signup.agree1} <a class="lnk plain" href="#terms" style="padding:0 4px">${COPY.signup.tos}</a>${COPY.signup.and} <a class="lnk plain" href="#privacy" style="padding:0 4px">${COPY.signup.privacy}</a>.</p>
+    <p class="cap agree">${COPY.signup.agree1} <a class="lnk plain" href="#terms" style="white-space:nowrap">${COPY.signup.tos}</a> ${COPY.signup.and} <a class="lnk plain" href="#privacy" style="white-space:nowrap">${COPY.signup.privacy}</a>.</p>
     <div class="row-end" style="margin-top:16px"><span class="cap">${COPY.signup.has}</span><a class="lnk b" href="#login">${COPY.signup.login}</a></div>`,
     { head: [COPY.signup.title, COPY.signup.desc] });
 }
@@ -1149,8 +1159,8 @@ function activateView() {
     <div class="g12" style="display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:16px">   <!-- ⚠ DEVIATION 間距照稿：兩欄間距 16（稿 Frame 4338 gap 16）；FE columnSpacing 2＝8 -->   <!-- FE Activate 四格都是 TextField size="small"：標籤 12px（對稿修正） -->
       ${fieldHtml('activate', { name: 'firstName', label: COPY.lbl.first, ph: COPY.ph.first, style: 'grid-column:span 6', disabled: lockF, autofocus: !lockF, sm: true })}
       ${fieldHtml('activate', { name: 'lastName', label: COPY.lbl.last, ph: COPY.ph.last, style: 'grid-column:span 6', disabled: lockL, sm: true })}
-      ${fieldHtml('activate', { name: 'password', label: COPY.activate.pwd, ph: COPY.ph.pwd, pwd: true, eyeInverted: true, style: 'grid-column:span 12', autofocus: lockF, sm: true })}
-      ${fieldHtml('activate', { name: 'passwordConfirm', label: COPY.activate.confirm, ph: COPY.ph.pwd2, pwd: true, eyeInverted: true, style: 'grid-column:span 12', sm: true })}
+      ${fieldHtml('activate', { name: 'password', label: COPY.activate.pwd, ph: COPY.ph.pwd, pwd: true, style: 'grid-column:span 12', autofocus: lockF, sm: true })}
+      ${fieldHtml('activate', { name: 'passwordConfirm', label: COPY.activate.confirm, ph: COPY.ph.pwd2, pwd: true, style: 'grid-column:span 12', sm: true })}
     </div>
     ${rulesHtml()}
     ${submitBtn('activate', COPY.activate.btn, '32px 0 16px')}   <!-- ⚠ DEVIATION 間距照稿：規則清單到按鈕 32、按鈕到連結列 16 -->
@@ -1175,7 +1185,7 @@ function homeView() {
   return `<div class="stage home"><div class="card" style="text-align:center;align-items:center">
     <div style="width:60px;height:60px">${SVG.logoMark.includes('<path') ? `<svg viewBox="0 0 112 80" width="84" height="60">${SVG.logoMark}</svg>` : ''}</div>
     <h3>LumiTure.ai Homepage</h3>
-    <p class="sub">登入成功後導向 Overview。這個 prototype 到這裡為止，Overview 是另一支 prototype。</p>
+    <p class="sub">真實流程登入成功會直接進 Overview prototype；這張卡只給單獨看 toast 設計用。</p>
     <div class="card-actions" style="justify-content:center"><a class="btn pri nocap" href="./overview.html" style="text-decoration:none">Open Overview prototype</a><a class="btn out nocap" href="#login" style="text-decoration:none">Back to Login</a></div>
   </div></div>`;
 }
@@ -1497,7 +1507,7 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('click', e => {
   const t = e.target;
-  const eye = t.closest('[data-eye]'); if (eye) { const k = eye.dataset.eye; state.showPwd[k] = !state.showPwd[k]; const [v, n] = k.split('.'); const input = $(`input[data-v="${v}"][data-f="${n}"]`), inverted = v === 'activate'; input.type = state.showPwd[k] ? 'text' : 'password'; $('.material-symbols-outlined', eye).textContent = inverted ? (state.showPwd[k] ? 'visibility' : 'visibility_off') : (state.showPwd[k] ? 'visibility_off' : 'visibility'); return; }
+  const eye = t.closest('[data-eye]'); if (eye) { const k = eye.dataset.eye; state.showPwd[k] = !state.showPwd[k]; const [v, n] = k.split('.'); const input = $(`input[data-v="${v}"][data-f="${n}"]`); input.type = state.showPwd[k] ? 'text' : 'password'; $('.material-symbols-outlined', eye).textContent = state.showPwd[k] ? 'visibility_off' : 'visibility'; eye.setAttribute('aria-pressed', state.showPwd[k] ? 'true' : 'false'); eye.setAttribute('aria-label', state.showPwd[k] ? 'Hide password' : 'Show password'); return; }
   const sb = t.closest('[data-submit]'); if (sb) { e.preventDefault(); submit(sb.dataset.submit); return; }
   const sso = t.closest('[data-sso]'); if (sso) { startSso(sso.dataset.sso); return; }
   const prov = t.closest('[data-prov]'); if (prov) { if (prov.dataset.prov === 'back') { runSso('fail-generic'); } else runSso(); return; }
@@ -1580,7 +1590,7 @@ window.DEMO_SCENARIOS = [
   S('fg-fmt', 'forgot', '錯誤', 'FE 驗證：email 格式', 'error', '驗證規則照 FE；文案用稿 #04-1 的具體版「Invalid email format. Please enter a valid email address. (e.g., name@example.com)」（Kabin 10/13 裁決全站 email 欄共用，偏離 FE）。'),
   S('fg-nf', 'forgot', '錯誤', '#02-1 找不到使用者', 'person_search', 'USER_NOT_FOUND：email 欄下方「Cannot find this user」（Figma 結尾有句點，⚠ 未確認）。'),
   S('fg-fail', 'forgot', '錯誤', '送出失敗（通用 toast）', 'cloud_off', '⚠ 設計端暫擬。'),
-  S('fg-loading', 'forgot', '狀態', 'Send 轉圈', 'hourglass_top', ''),
+  S('fg-loading', 'forgot', '狀態', 'Send 轉圈', 'hourglass_top', '按下 Send 之後、等寄信結果的轉圈狀態：按鈕顯示轉圈並停用。'),
   S('fg-ok', 'forgot', '成功', '送出成功 → 回 Login＋toast', 'check_circle', '填好 email 並送出，Auto-redirect 回 #01 Login，toast 停 10 秒（FE duration 10000）。'),
   S('fg-toast', 'forgot', '成功', '#02-2 Toast: Email Sent', 'notifications', 'Kabin 10/13 裁決：顏色與文案照 FE（Figma 是深藍 info 樣式、文案少了「to reset your password」，列為設計稿問題）。'),
   /* ---- Reset ---- */
@@ -1592,7 +1602,7 @@ window.DEMO_SCENARIOS = [
   S('rs-fail', 'reset', '錯誤', '送出失敗（通用 toast）', 'cloud_off', '⚠ 設計端暫擬。'),
   S('rs-invalid', 'reset', '錯誤', 'Token 無效（FE ErrorView）', 'link_off', 'FE 有、Figma 沒畫：整頁只剩 Error＋「Please contact your admin or Forgot password」。'),
   S('rs-verify', 'reset', '狀態', 'Token 驗證中（spinner）', 'hourglass_top', 'FE AuthFormWrapper isLoading：中央 50px 轉圈。'),
-  S('rs-loading', 'reset', '狀態', 'Reset password 轉圈', 'hourglass_top', ''),
+  S('rs-loading', 'reset', '狀態', 'Reset password 轉圈', 'hourglass_top', '按下 Reset password 之後、等結果的轉圈狀態：按鈕顯示轉圈並停用。'),
   S('rs-ok', 'reset', '成功', '#03-2 成功 → Login＋toast', 'check_circle', '填好兩格並送出。文案照 FE（Kabin 10/13 裁決；Figma 是兩行）。'),
   S('rs-toast', 'reset', '成功', '#03-2 Toast: Reset Password Successfully', 'notifications', '只看 toast（停在畫面上）。顏色與文案照 FE。'),
   S('rs-rule-fe', 'reset', '樣式切換', '規則清單：FE（圓點）', 'format_list_bulleted', '預設。FE PwdRuleListItem：「•」＋caption。'),
@@ -1603,7 +1613,7 @@ window.DEMO_SCENARIOS = [
   S('su-empty', 'signup', '錯誤', '空白送出（必填全報錯）', 'report', '含 Country／Region 清空後的 cannot be empty。'),
   S('su-dup', 'signup', '錯誤', 'Email 已被使用', 'mark_email_unread', 'DUPLICATE_EMAIL：email 欄下方。'),
   S('su-fail', 'signup', '錯誤', '送出失敗（通用 toast）', 'cloud_off', '⚠ 設計端暫擬。'),
-  S('su-loading', 'signup', '狀態', 'Sign up 轉圈', 'hourglass_top', ''),
+  S('su-loading', 'signup', '狀態', 'Sign up 轉圈', 'hourglass_top', '按下 Sign Up 之後、等結果的轉圈狀態：按鈕顯示轉圈並停用。'),
   S('su-ok', 'signup', '成功', '#04-2 成功 → Login＋toast', 'check_circle', '填好所有欄位送出。toast 停 10 秒。Figma 流程圖：Sign Up →（成功）→ Toast → Auto-Redirect 回 #01。'),
   S('su-toast', 'signup', '成功', '#04-2 Toast: Sign Up Successfully', 'notifications', '只看 toast（停在畫面上）。顏色與文案照 FE（Figma「Account Activation Email has been sent…」）。'),
   S('su-terms', 'signup', '條款', '#06 General Terms and Conditions', 'gavel', '點「Term of Use」開彈窗。只能按 X 或 Confirm 關（FE BaseDialog 沒給 onClose）。內容是 FE 的節錄。'),
@@ -1615,8 +1625,8 @@ window.DEMO_SCENARIOS = [
   S('ac-common', 'activate', '錯誤', '密碼太常見', 'password', '同 Reset。可輸入 Password1! 試。'),
   S('ac-fail', 'activate', '錯誤', '送出失敗（通用 toast）', 'cloud_off', '⚠ 設計端暫擬。'),
   S('ac-invalid', 'activate', '錯誤', 'Token 無效（FE ErrorView）', 'link_off', 'FE 有、Figma 沒畫：Error＋「Please contact your admin or Sign up」。'),
-  S('ac-verify', 'activate', '狀態', 'Token 驗證中（spinner）', 'hourglass_top', ''),
-  S('ac-loading', 'activate', '狀態', 'Activate Account 轉圈', 'hourglass_top', ''),
+  S('ac-verify', 'activate', '狀態', 'Token 驗證中（spinner）', 'hourglass_top', '打開啟用連結時，先驗證 token 的整頁轉圈，驗證完才會出現表單。'),
+  S('ac-loading', 'activate', '狀態', 'Activate Account 轉圈', 'hourglass_top', '按下 Activate Account 之後、等結果的轉圈狀態：按鈕顯示轉圈並停用。'),
   S('ac-ok', 'activate', '成功', '#05-2 成功 → Login＋toast', 'check_circle', '填好密碼送出。'),
   S('ac-toast', 'activate', '成功', '#05-2 Toast: Activate Successfully', 'notifications', '只看 toast（停在畫面上）。顏色照 FE，文案 FE 與 Figma 相同。'),
   S('ac-privacy', 'activate', '條款', '#07 Privacy Policy（Activate 頁）', 'policy', 'Activate 頁左下的連結。'),
@@ -1638,7 +1648,7 @@ window.DEMO_SCENARIOS = [
   S('ob-08-dd', 'onboard', '#08 Select Your Role', '#08-1 下拉展開', 'arrow_drop_down_circle', 'Admin 置頂，其餘依字母排序，尾端接角色。最大高度照共用元件 6.5 列（260px），超過出捲軸；↑↓ 移動、Enter 選取、Esc 關閉。'),
   S('ob-08-search', 'onboard', '#08 Select Your Role', '下拉：搜尋 Group Name', 'search', '輸入 "co"：只剩 Cost Center。'),
   S('ob-08-long', 'onboard', '#08 Select Your Role', '下拉：超長名稱（… ＋ tooltip）', 'more_horiz', 'Figma 註記：超過顯示範圍以 … 取代，懸停顯示 Tooltip。'),
-  S('ob-08-loading', 'onboard', '#08 Select Your Role', 'Continue 轉圈', 'hourglass_top', ''),
+  S('ob-08-loading', 'onboard', '#08 Select Your Role', 'Continue 轉圈', 'hourglass_top', '選好角色按下 Continue 之後、等結果的轉圈狀態：按鈕顯示轉圈並停用。'),
   S('ob-08-ok', 'onboard', '#08 Select Your Role', '選好 Continue → 首頁', 'check_circle', '→ toast「Default user group updated successfully.」（FE usePatchDefaultUserGroup）→ 首頁。'),
   S('ob-10', 'onboard', '#10 One Last Step', '#10 One Last Step（現行：team）', 'support_agent', '「haven\'t been invited to a team yet」。點 Got it、點背景、Esc 都會關（FE onClose）。'),
   S('ob-11', 'onboard', '#11 Toast', '#11 Toast: Submission Feedback', 'notifications', '成功＋失敗兩則並列。'),
@@ -1814,6 +1824,10 @@ window.DEMO_APPLY = function (id) {
     'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);',
     'color:#fff;box-shadow:0 4px 14px rgba(13,27,62,.36);z-index:999;cursor:pointer;',
     'display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;border:0}',
+    /* X-9r6 F11：sidebar 收合時 toast 的 left 是 45（--lt-toast-left 收合值），會蓋住移到 left 54 的 FAB（5 秒內點不到）；
+       收合時把 FAB 與說明面板抬到 toast 上方（toast 預設 bottom 24、高 46、間距 16 → 86）。展開時 toast left 274 不碰到 FAB，位置不變 */
+    'html.lt-sb-collapsed .demo-fab{bottom:86px}',
+    'html.lt-sb-collapsed .demo-popover{bottom:146px;max-height:calc(100vh - 170px)}',   /* X-9r6 R1：視窗 ≤625 高時面板頂端不被切 */
     '.demo-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(13,27,62,.45)}',
     '.demo-fab:active{transform:scale(.96)}',
     '.demo-fab .material-symbols-outlined{font-size:24px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}',
@@ -1920,8 +1934,9 @@ window.DEMO_APPLY = function (id) {
     '.demo-page-tab[data-tip]::after,.demo-cat-tab[data-tip]::after{display:none!important}',
 
     /* #gl-tip — body-level fixed tooltip (auto-injected) */
-    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:12px;line-height:1.4;',
-    'padding:6px 10px;border-radius:4px;max-width:320px;white-space:normal;',
+    /* X-9r1 S1：預設值改稿值（Tooltip 元件 14／24.5、內距 8／16、r4、max-width 600）；各頁 body #gl-tip 覆寫維持有效 */
+    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:14px;line-height:24.5px;',
+    'padding:8px 16px;border-radius:4px;max-width:600px;white-space:normal;',
     'pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25);',
     'font-family:\'Noto Sans\',sans-serif}'
   ].join('');
@@ -2083,6 +2098,9 @@ window.DEMO_APPLY = function (id) {
     fabEl.className = 'demo-fab';
     fabEl.id = 'demo-fab';
     fabEl.setAttribute('data-tip', 'Designer Demo Scenarios');   /* 原生 title 改 data-tip（#gl-tip），B 區 A-15 */
+    fabEl.setAttribute('aria-label', 'Designer Demo Scenarios');   /* X-9r1 S6：原本讀屏只唸 icon 字「science」 */
+    fabEl.setAttribute('aria-expanded', 'false');
+    fabEl.setAttribute('aria-controls', 'demo-popover');
     fabEl.innerHTML =
       '<span class="material-symbols-outlined">science</span>' +
       '<span class="demo-pulse" id="demo-fab-pulse"></span>';
@@ -2092,13 +2110,15 @@ window.DEMO_APPLY = function (id) {
     var popEl = document.createElement('div');
     popEl.className = 'demo-popover';
     popEl.id = 'demo-popover';
+    popEl.setAttribute('role', 'dialog');   /* X-9r1 S6 */
+    popEl.setAttribute('aria-label', 'Demo scenarios');
     popEl.innerHTML =
       '<div class="demo-popover-hdr">' +
         '<div class="demo-popover-title">' +
           '<span class="material-symbols-outlined" style="font-size:16px">science</span>' +
           'Demo Scenarios' +
         '</div>' +
-        '<button class="demo-popover-close" id="demo-pop-close">' +
+        '<button class="demo-popover-close" id="demo-pop-close" aria-label="Close demo scenarios">' +
           '<span class="material-symbols-outlined" style="font-size:18px">close</span>' +
         '</button>' +
       '</div>' +
@@ -2161,7 +2181,21 @@ window.DEMO_APPLY = function (id) {
       if (!pop.contains(e.target) && !fab.contains(e.target) && pop.classList.contains('show')) {
         pop.classList.remove('show');
         fab.classList.remove('popped');
+        fab.setAttribute('aria-expanded', 'false');
       }
+    });
+
+    /* X-9r1 S6：面板開著、焦點在面板或 FAB 上時 Esc 關面板並回 FAB；焦點在別處（頁面自己的彈窗、輸入框）不攔 */
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      var pop = document.getElementById('demo-popover'), fab = document.getElementById('demo-fab');
+      if (!pop || !fab || !pop.classList.contains('show')) return;
+      var ae = document.activeElement;
+      if (!ae || !(pop.contains(ae) || fab.contains(ae))) return;
+      pop.classList.remove('show');
+      fab.classList.remove('popped');
+      fab.setAttribute('aria-expanded', 'false');
+      try { fab.focus({ preventScroll: true }); } catch (err) { fab.focus(); }
     });
 
     _injectGlobalTooltip();
@@ -2169,23 +2203,52 @@ window.DEMO_APPLY = function (id) {
 
   // ===== #gl-tip auto-injection =====
   function _injectGlobalTooltip() {
-    if (document.getElementById('gl-tip')) return; // host page already provides one
+    var hostTip = document.getElementById('gl-tip');
+    if (hostTip) { _enhanceHostTooltip(hostTip); return; } // host page already provides one：X-9r1 S8 只補語意，不接管位置與 hover
     var tip = document.createElement('div');
     tip.id = 'gl-tip';
+    tip.setAttribute('role', 'tooltip');   /* 2026-10-22 X-9r3 R4：讀屏要認得這是 tooltip */
     document.body.appendChild(tip);
-    var cur = null;
+    var cur = null, described = null;
+    /* 2026-10-22 X-9r3 R4：tooltip 顯示時給觸發元件 aria-describedby="gl-tip"（保留它原本的 describedby，只加／移除自己的 token），收起時移除 */
+    function describe(node) {
+      undescribe();
+      if (!node || !node.setAttribute) return;
+      var ids = (node.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+      if (ids.indexOf('gl-tip') === -1) { ids.push('gl-tip'); node.setAttribute('aria-describedby', ids.join(' ')); }
+      described = node;
+    }
+    function undescribe() {
+      if (!described) return;
+      var ids = (described.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (x) { return x && x !== 'gl-tip'; });
+      if (ids.length) described.setAttribute('aria-describedby', ids.join(' ')); else described.removeAttribute('aria-describedby');
+      described = null;
+    }
+    function hideTip() { cur = null; tip.style.display = 'none'; undescribe(); }
+    /* 頁面自己把 #gl-tip 設成 display:none（例：開 Month Picker 時收起）也要跟著移除 describedby */
+    if (window.MutationObserver) new MutationObserver(function () { if (tip.style.display === 'none') undescribe(); }).observe(tip, { attributes: true, attributeFilter: ['style'] });
     // 2026-10-09 Kabin 裁決：全站 tooltip 改成錨在元件上（Figma／MUI 行為），不再跟著游標跑。
     // 規則照 Anomaly Detection #01-3 量到的：預設出現在元件上方 6px、水平靠元件左緣，
     // 右邊放不下就改靠元件右緣 +2；上方放不下改到下方。
     // 可選屬性：data-tip-pos="below"（固定放下方）、data-tip-dy（下方距離，預設 4）、
     // data-tip-anchor（CSS 選擇器，錨在子元素上）、data-tip-align="content-right"（右緣對齊內容右緣 −16）。
+    function minX() {
+      try {
+        var sb = document.querySelector('.lt-sidebar');
+        if (sb && sb.offsetWidth > 0) return (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lt-sb-w')) || sb.offsetWidth) + 8;
+      } catch (err) {}
+      return 8;
+    }
     function place() {
-      if (!cur || !cur.isConnected) { cur = null; tip.style.display = 'none'; return; }
+      if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
+      /* X-9r1 R1：量測前先歸位，不然 tooltip 還停在上一個位置時寬度被視窗右緣擠窄（先 hover 右側短提示、再 hover 長提示，寬只有 440） */
+      tip.style.left = '0px'; tip.style.top = '0px';
       var r = a.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
       var vw = window.innerWidth, vh = window.innerHeight;
       var x = r.left;
-      if (x + tw > vw - 8) x = Math.max(8, Math.min(r.right + 2, vw - 8) - tw);
+      /* X-9r1 S2：放不下改靠右緣時，左緣不能落進 sidebar（600 寬在 1280 中間位置會伸進去）；沒有 sidebar 的頁維持 8，收合時 21＋8 */
+      if (x + tw > vw - 8) x = Math.max(minX(), Math.min(r.right + 2, vw - 8) - tw);
       if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
       var below = cur.dataset.tipPos === 'below';
       var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
@@ -2197,14 +2260,103 @@ window.DEMO_APPLY = function (id) {
     document.addEventListener('mouseover', function (e) {
       var el = e.target.closest && e.target.closest('[data-tip]');
       if (!el || (el === cur && tip.style.display !== 'none')) return;
-      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place();
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place(); describe(el);
     });
     document.addEventListener('mouseout', function (e) {
       var el = e.target.closest && e.target.closest('[data-tip]');
-      if (el && el === cur && !el.contains(e.relatedTarget)) { cur = null; tip.style.display = 'none'; }
+      if (el && el === cur && !el.contains(e.relatedTarget)) hideTip();
+    });
+    /* 2026-10-22 X-9r3 FA23：鍵盤 focus 到帶 data-tip 的元素也顯示、blur／Esc 收起（additive，只吃 :focus-visible，滑鼠點擊不觸發） */
+    /* 2026-10-22 X-9r3 R4：:focus-visible 改判真正拿到焦點的 e.target（不是帶 data-tip 的祖先）；describedby 掛在拿到焦點的那個元素上 */
+    document.addEventListener('focusin', function (e) {
+      var t = e.target, el = t.closest && t.closest('[data-tip]');
+      if (!el || !t.matches || !t.matches(':focus-visible')) return;
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place(); describe(t);
+    });
+    document.addEventListener('focusout', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && el === cur) hideTip();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && cur) { hideTip(); return; }
+      /* role="button" 的 info icon（非原生按鈕）按 Enter／Space 切換 tooltip；滑鼠行為不變 */
+      if ((e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented) {
+        var t = e.target, b = t.closest && t.closest('[role="button"][data-tip]');
+        if (!b || b !== t || /^(BUTTON|A|INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+        e.preventDefault();
+        if (cur === b && tip.style.display !== 'none') hideTip();
+        else { cur = b; tip.textContent = b.dataset.tip; tip.style.display = 'block'; place(); describe(b); }
+      }
     });
     window.addEventListener('scroll', place, true);
     window.addEventListener('resize', place);
+  }
+
+  /* X-9r1 S8：頁面自建 #gl-tip（Anomaly Detection、All Resource List、Audit Log）時，shared 不綁 mouseover／mouseout／scroll／resize，
+     位置與顯示邏輯留給頁面；這裡只補讀屏與鍵盤語意：role="tooltip"、顯示時給觸發元件 aria-describedby="gl-tip"、Esc 收起、
+     role="button" 的 Enter／Space 切換、鍵盤 focus-visible 顯示（兩者都是發合成 mouseover／mouseout 交給頁面自己的邏輯，位置規則不動）。
+     觸發元件靠 :hover／activeElement 與文字比對找，不靠自己綁 mouseover */
+  function _enhanceHostTooltip(tip) {
+    if (tip.getAttribute('role') !== 'tooltip') tip.setAttribute('role', 'tooltip');
+    var described = null, pending = null;
+    function visible() { return tip.style.display !== 'none' && getComputedStyle(tip).display !== 'none'; }
+    function undescribe() {
+      if (!described) return;
+      var ids = (described.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (x) { return x && x !== 'gl-tip'; });
+      if (ids.length) described.setAttribute('aria-describedby', ids.join(' ')); else described.removeAttribute('aria-describedby');
+      described = null;
+    }
+    function describe(node) {
+      if (node === described) return;
+      undescribe();
+      var ids = (node.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+      if (ids.indexOf('gl-tip') === -1) { ids.push('gl-tip'); node.setAttribute('aria-describedby', ids.join(' ')); }
+      described = node;
+    }
+    function findTrigger() {
+      var txt = tip.textContent, list = [];
+      if (pending && pending.isConnected) list.push(pending);
+      var ae = document.activeElement; if (ae && ae.closest) list.push(ae);
+      [].forEach.call(document.querySelectorAll('[data-tip]:hover'), function (n) { list.push(n); });
+      for (var i = 0; i < list.length; i++) {
+        var host = list[i].closest && list[i].closest('[data-tip]');
+        if (host && host.dataset.tip === txt) return host;
+      }
+      return null;
+    }
+    function sync() {
+      if (!visible()) { undescribe(); pending = null; return; }
+      var t = findTrigger();
+      if (t) describe(t);
+    }
+    if (window.MutationObserver) new MutationObserver(sync).observe(tip, { attributes: true, attributeFilter: ['style', 'class'], childList: true, characterData: true, subtree: true });
+    /* 合成事件只是「請頁面自己的 mouseover／mouseout 邏輯照它的位置規則顯示或收起」，shared 不接管位置 */
+    function fire(node, type, rel) { try { node.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, relatedTarget: rel || null })); } catch (err) {} }
+    function hide() {
+      var n = described || pending;
+      if (n && n.isConnected) fire(n, 'mouseout', null);   // 讓頁面把自己的 cur 清掉，之後同一個元件才能再顯示
+      tip.style.display = 'none';
+    }
+    /* 鍵盤 focus 到帶 data-tip 的元件（:focus-visible）也顯示，blur 收起；頁面自己的 focusin（ARL 的 .cnt）照跑，同一元件不會重複顯示 */
+    document.addEventListener('focusin', function (e) {
+      var t = e.target, el = t.closest && t.closest('[data-tip]');
+      if (!el || !t.matches || !t.matches(':focus-visible')) return;
+      pending = el; fire(el, 'mouseover', null); sync();
+    });
+    document.addEventListener('focusout', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && (el === described || el === pending) && !el.contains(e.relatedTarget)) { fire(el, 'mouseout', e.relatedTarget); pending = null; sync(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && visible()) { hide(); return; }
+      if ((e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented) {
+        var t = e.target, b = t.closest && t.closest('[role="button"][data-tip]');
+        if (!b || b !== t || /^(BUTTON|A|INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+        e.preventDefault();
+        if (visible() && tip.textContent === b.dataset.tip) { hide(); return; }
+        pending = b; fire(b, 'mouseover', null); sync();
+      }
+    });
   }
 
   // ===== PUBLIC API =====
@@ -2242,6 +2394,7 @@ window.DEMO_APPLY = function (id) {
     var opening = !pop.classList.contains('show');
     pop.classList.toggle('show');
     fab.classList.toggle('popped');
+    fab.setAttribute('aria-expanded', opening ? 'true' : 'false');   /* X-9r1 S6 */
     if (opening && pulse) pulse.style.display = 'none';
   };
 

@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lumiture.ai — Audit Log v1 (FE Baseline + UX Proposals)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- X-9r5 LB10（C29）：兩支請求合成一支；Material Symbols 拿掉用不到的 GRAD 軸與 wght 100..300（頁面用到 400/500/600/700，維持 400..700 才不會讓 si／is-outline icon 變細）；Noto 去掉沒用的 600 -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400..700,0..1,0&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* === Inlined: shared/tokens.css === */
 /* ============================================================
@@ -348,6 +349,9 @@ input{font-family:inherit}
 .btn:disabled,.btn.is-disabled{background:var(--lt-grey-300)!important;color:#fff!important;border-color:transparent!important;cursor:not-allowed}
 .btn.btn-o:disabled{background:#fff!important;color:var(--lt-grey-300)!important;border-color:var(--lt-grey-300)!important}
 .btn:focus-visible,.lnk:focus-visible,.sel:focus-visible,.dtrig:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring)}
+/* X-9r5 LB5（C12）：原本的光暈環只有 1.18:1，補上 2px 實色外框（#004FB0 對白底 8.6:1），跟 Group List lt-btn-icon 同一套；光暈拿掉免得疊兩層 */
+.sel:focus-visible,.dtrig:focus-visible,#export-btn:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px;box-shadow:none}
+.sel.open:focus-visible,.dtrig.open:focus-visible{box-shadow:none}
 /* Text button（FE `variant="link"`）：hover 底線只套文字，icon 不畫底線 */
 .lnk{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 4px;font-weight:var(--lt-fw-bold);color:var(--lt-color-primary);white-space:nowrap}
 .lnk:hover{color:var(--lt-color-primary-hover)}
@@ -392,7 +396,7 @@ input{font-family:inherit}
 .search:hover{border-color:var(--lt-grey-400)}
 .search:focus-within{border-color:var(--lt-color-border-focus);box-shadow:var(--lt-button-focus-ring)}
 .search.err{border-color:var(--lt-color-error)}
-.search input{border:none;outline:none;background:none;width:100%;min-width:0;font-size:var(--lt-fs-14);color:var(--lt-color-text-primary)}
+.search input{border:none;outline:none;background:none;width:100%;height:100%;min-width:0;font-size:var(--lt-fs-14);color:var(--lt-color-text-primary)}
 .search input::placeholder{color:var(--lt-grey-400)}
 /* ⚠ DEVIATION: FE 搜尋框的 search icon 在右（endAdornment）；CMDS Text Field Search 變體＝icon 在左（同 rightsizing v2 .rs-search，Kabin 2026-10-14 裁決）。篩選列搜尋框與下拉內建搜尋一律 icon 在左、18px */
 .search .material-symbols-outlined{font-size:18px;flex-shrink:0;color:var(--lt-grey-500);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20}
@@ -413,7 +417,11 @@ input{font-family:inherit}
 /* 日期觸發欄（FE `DatePickerCustomInput`：高 36、左右內距 16、圓角 6、calendar icon 20＋兩段日期＋east icon 16）*/
 .dtrig{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 16px;background:#fff;border:1px solid var(--al-field-border);border-radius:var(--lt-input-radius,5px);color:var(--lt-color-text-secondary);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background var(--lt-transition-fast),border-color var(--lt-transition-fast)}   /* B-8：觸發欄 r5（2026-10-16 X-9r1；FE DatePickerCustomInput 是 6，全站觸發欄統一 5） */
 .dtrig:hover{background:var(--lt-grey-50)}
-.dtrig:active{background:var(--lt-grey-200)}   /* FE DatePickerCustomInput：hover gray.hover、active gray.selected */
+.dtrig:active{background:var(--lt-grey-200)}
+/* X-9r5 LB1（A30）：停用的日期觸發欄，icon #CCCCCC、日期字 #B3B3B3（同 Overview／Executive Insights 的停用觸發欄；原本內層 span 的顏色規則把父層的停用色蓋掉了） */
+.dtrig:disabled .material-symbols-outlined{color:var(--lt-grey-300)}
+.dtrig:disabled .dv,.dtrig:disabled .lab{color:var(--lt-grey-400)}
+.dtrig:disabled .tri{border-top-color:var(--lt-grey-300)}   /* FE DatePickerCustomInput：hover gray.hover、active gray.selected */
 .dtrig.open{border-color:var(--lt-color-border-focus);box-shadow:var(--lt-button-focus-ring)}
 .dtrig .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20;color:var(--lt-grey-500)}
 .dtrig .ci{font-size:20px}
@@ -506,7 +514,7 @@ input{font-family:inherit}
 .th-row{position:sticky;top:0;z-index:5}
 .th.sortable{cursor:pointer}
 .th.sortable:hover .si{color:var(--lt-color-text-secondary)}
-.th.sortable:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(0,79,176,.35)}
+.th.sortable:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--lt-color-primary)}   /* X-9r5 LB5：原 .35 透明度只有 1.82:1 */
 .si{font-size:16px;color:var(--lt-grey-300);font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20;flex-shrink:0}
 .th.on .si{color:var(--lt-color-primary)}
 .td .ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
@@ -528,9 +536,9 @@ input{font-family:inherit}
 .moreload i{width:24px;height:24px;border:3px solid var(--lt-blue-20);border-top-color:var(--lt-color-primary);border-radius:50%;animation:rot .8s linear infinite}
 
 /* Skeleton（FE `TableSkeleton rows=5`）*/
-.sk{background:linear-gradient(90deg,#E6E6E6 25%,#F2F2F2 50%,#E6E6E6 75%);background-size:200% 100%;animation:shimmer 1.5s infinite linear;border-radius:4px;height:14px}
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-.sk-t{border:1px solid var(--lt-grey-200);border-radius:4px;overflow:hidden}
+/* ⚠ DEVIATION: FE TableSkeleton（MUI Skeleton）有 shimmer；A-18（Kabin 2026-10-15）全站 skeleton 靜態不動畫，同 X-9r1 P5／LB9 裁決，Audit Log 照全站規則 */
+.sk{background:#E6E6E6;border-radius:4px;height:14px}
+.sk-t{border:1px solid var(--lt-grey-200);border-radius:4px;overflow:hidden;max-height:575px}   /* X-9r5 LB9（C26）：骨架表跟載入後的表同高（Header＋10.5 列＝575），載入完成不再把下面整塊推開 */
 .sk-hd>:first-child,.sk-row>:first-child{position:relative}
 .sk-hd,.sk-row{display:grid;gap:24px;align-items:center;padding:0 16px;height:50px;border-bottom:1px solid var(--lt-grey-200);grid-template-columns:6fr 1.5fr 1.5fr 1.5fr 1.5fr}   /* Review #16：FE TableSkeleton 第一欄佔 50%（Grid size=6）*/
 .sk-hd{background:var(--lt-grey-100)}
@@ -556,6 +564,9 @@ input{font-family:inherit}
 /* ===== Toast：改用 shared/lumiture-toast.js（A-1） ===== */
 body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.5px;padding:8px 16px;border-radius:var(--lt-tooltip-radius);box-shadow:var(--lt-shadow-dialog);text-align:left}
 
+/* X-9r5 LB9（C26）：icon 字型還沒載入時，icon 名稱會先以文字撐寬觸發欄，1280 篩選列先折兩行、字型到了再縮回一行（頁面層 0.2 的位移）。icon 欄位先釘成 1em 寬，字型到了前後版面不變 */
+.dtrig .ci,.dtrig .ar,.search .material-symbols-outlined,.btn .material-symbols-outlined,.stt .material-symbols-outlined,.th .si{width:1em;overflow:hidden;white-space:nowrap}
+
 /* ===== Footer ===== */
 .footer{padding:var(--lt-space-16) var(--lt-space-32);background:var(--lt-color-primary-bg);border-top:1px solid var(--lt-color-border-default);display:flex;align-items:center;justify-content:space-between;font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);flex-wrap:wrap;gap:10px}
 .footer-version{font-weight:var(--lt-fw-medium);color:#262626}
@@ -568,7 +579,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
   <aside id="lt-sidebar"></aside>
   <div class="main">
     <header id="lt-topbar"></header>
-    <div class="content" id="content"></div>
+    <main class="content" id="content"></main>   <!-- X-9r5 LB6（C14）：內容區改 <main> landmark（.content／#content 不變） -->
     <div class="footer">
       <span class="footer-version">Audit Log Prototype<span class="ver-tag">v1</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
@@ -755,7 +766,9 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     '.lt-sb-group{margin-bottom:0}',
     '.lt-sb-group-hdr{display:flex;align-items:center;justify-content:space-between;',
     'padding:8px;min-height:40px;box-sizing:border-box;margin-bottom:8px;font-size:14px;font-weight:500;line-height:24px;color:#fff;border-radius:4px;',
-    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0}',
+    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0;',
+    'width:100%;background:none;border:0;font-family:inherit;text-align:left;appearance:none;-webkit-appearance:none}',   /* X-9r6 F16：div 改 button，樣式 reset 回跟原本一樣 */
+    '.lt-sb-group-hdr:focus-visible{outline:2px solid #fff;outline-offset:-2px}',
     '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
     '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
     '.lt-sb-group-arrow{font-size:24px;transition:transform .18s;flex-shrink:0}',
@@ -873,8 +886,9 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     var tag = useHref ? 'a' : 'div';
     var hrefAttr = useHref ? ' href="' + _esc(item.href) + '"' : '';
     var dataId = ' data-nav-id="' + _esc(item.id) + '"';
-    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + '>' +
-             '<span class="material-symbols-outlined">' + _esc(item.icon || 'circle') + '</span>' +
+    var curAttr = isActive ? ' aria-current="page"' : '';   // X-9r6 F16
+    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + curAttr + '>' +
+             '<span class="material-symbols-outlined" aria-hidden="true">' + _esc(item.icon || 'circle') + '</span>' +
              '<span>' + _esc(item.label) + '</span>' +
            '</' + tag + '>';
   }
@@ -885,17 +899,17 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
       return _renderItem(item, true);
     }).join('');
     return '<div class="lt-sb-group' + collapsed + '" data-group-id="' + _esc(grp.id) + '">' +
-             '<div class="lt-sb-group-hdr">' +
+             '<button type="button" class="lt-sb-group-hdr" aria-expanded="' + (grp.collapsed ? 'false' : 'true') + '">' +
                '<span>' + _esc(grp.label) + '</span>' +
-               '<span class="material-symbols-outlined lt-sb-group-arrow">keyboard_arrow_up</span>' +
-             '</div>' +
+               '<span class="material-symbols-outlined lt-sb-group-arrow" aria-hidden="true">keyboard_arrow_up</span>' +
+             '</button>' +
              '<div class="lt-sb-group-children">' + children + '</div>' +
            '</div>';
   }
 
   function _renderNav() {
     var nav = window.LUMITURE_NAV || [];
-    var html = '<div class="lt-sb-nav">';
+    var html = '<nav class="lt-sb-nav" aria-label="Main">';
     nav.forEach(function (entry) {
       if (entry.type === 'group') {
         html += _renderGroup(entry);
@@ -904,7 +918,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
       }
     });
     html += '<div class="lt-sb-skel" aria-hidden="true">' + '<span class="lt-sb-skel-bar"></span>'.repeat(5) + '</div>';
-    html += '</div>';
+    html += '</nav>';
     return html;
   }
 
@@ -998,7 +1012,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
       hdr.addEventListener('click', function () {
         var grp = hdr.parentElement;
-        if (grp) grp.classList.toggle('lt-collapsed');
+        if (grp) { grp.classList.toggle('lt-collapsed'); hdr.setAttribute('aria-expanded', grp.classList.contains('lt-collapsed') ? 'false' : 'true'); }
       });
     });
     // Collapse the whole sidebar
@@ -1014,7 +1028,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
   window.LumitureSidebar = {
     toggleGroup: function (groupId) {
       var grp = document.querySelector('[data-group-id="' + groupId + '"]');
-      if (grp) grp.classList.toggle('lt-collapsed');
+      if (grp) { grp.classList.toggle('lt-collapsed'); var h = grp.querySelector('.lt-sb-group-hdr'); if (h) h.setAttribute('aria-expanded', grp.classList.contains('lt-collapsed') ? 'false' : 'true'); }
     },
     toggleCollapse: function (opts) { _setCollapsed(!_collapsed, opts); },
     setCollapsed: function (on, opts) { _setCollapsed(on, opts); },
@@ -1025,6 +1039,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
       window.LUMITURE_ACTIVE = itemId;
       document.querySelectorAll('.lt-sb-item, .lt-sb-subitem').forEach(function (el) {
         el.classList.toggle('lt-active', el.dataset.navId === itemId);
+        if (el.dataset.navId === itemId) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
       });
     },
     setLoading: function (on) { _loading = !!on; _applyLoading(); },
@@ -1187,7 +1202,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     '.lt-tb-user:hover{opacity:.92}',
     '.lt-tb-avatar-ic{font-size:34px;color:#fff;flex-shrink:0;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 34}',
     '.lt-tb-user-text{display:flex;flex-direction:column;font-size:12px;line-height:1.3;min-width:0;font-family:\'Noto Sans\',sans-serif;text-align:left}',
-    '.lt-tb-user-name{font-weight:600;color:#fff;white-space:nowrap}',
+    '.lt-tb-user-name{font-weight:500;color:#fff;white-space:nowrap}',   /* X-9r6 R3：稿 #01-3 使用者姓名 500；原 600 不在字重表，沒載 600 的頁會退成 700 */
     '.lt-tb-user-role{color:rgba(255,255,255,.6);font-size:11px;white-space:nowrap}',
     '.lt-tb-chev{color:rgba(255,255,255,.6);font-size:20px;transition:transform .18s}',
     '.lt-tb-user.is-open .lt-tb-chev{transform:rotate(180deg)}',
@@ -1311,22 +1326,22 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
 
   // ===== Renderers =====
   function _renderIcon(item) {
-    var attrs = ' class="lt-tb-ic" data-tip="' + _esc(item.title || '') + '" data-tip-pos="below" aria-label="' + _esc(item.title || '') + '"';   /* 原生 title 改 data-tip（#gl-tip） */
+    var attrs = ' class="lt-tb-ic" data-tip="' + _esc(item.title || '') + '" data-tip-pos="below" aria-label="' + _esc((item.title || '') + (item.badge ? ', 1 unread' : '')) + '"';   /* X-9r6 F17：紅點只有 CSS，讀屏要有字（aria-label 會蓋掉內部文字，所以未讀訊息寫進 label） */   /* 原生 title 改 data-tip（#gl-tip） */
     if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
     var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
     return '<button type="button"' + attrs + '>' +
-             '<span class="material-symbols-outlined">' + _esc(item.icon) + '</span>' + badge +
+             '<span class="material-symbols-outlined" aria-hidden="true">' + _esc(item.icon) + '</span>' + badge +
            '</button>';
   }
 
   function _renderUserChip(u) {
     return '<button type="button" class="lt-tb-user" id="lt-tb-user" aria-haspopup="true" aria-expanded="false">' +
-             '<span class="material-symbols-outlined lt-tb-avatar-ic">account_circle</span>' +
+             '<span class="material-symbols-outlined lt-tb-avatar-ic" aria-hidden="true">account_circle</span>' +
              '<div class="lt-tb-user-text">' +
                '<span class="lt-tb-user-name">' + _esc(u.name) + '</span>' +
                '<span class="lt-tb-user-role" id="lt-tb-user-role">' + _esc(u.role) + '</span>' +
              '</div>' +
-             '<span class="material-symbols-outlined lt-tb-chev">keyboard_arrow_down</span>' +
+             '<span class="material-symbols-outlined lt-tb-chev" aria-hidden="true">keyboard_arrow_down</span>' +
            '</button>';
   }
 
@@ -1377,7 +1392,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     if (u.quota.state === 'error') {
       var headErr = '<div class="lt-q-head"><span class="lt-q-title">AI Quota</span><span class="lt-q-sub">Org-wide</span></div>';
       return '<div class="lt-q">' + headErr +
-               '<div class="lt-q-err"><span class="material-symbols-outlined">help</span>' +
+               '<div class="lt-q-err"><span class="material-symbols-outlined" aria-hidden="true">help</span>' +
                '<span class="lt-q-err-msg">Couldn\'t load quota</span>' +
                '<a role="menuitem" tabindex="0" onclick="window.LumitureTopbar._retryQuota()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.LumitureTopbar._retryQuota()}">Retry</a></div>' +
              '</div>';
@@ -1385,7 +1400,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     var rows = items.map(function (k) { return _renderQuotaItem(k, u.quota[k] || {}); }).join('');
     // add-on 行（packs>0，Premium 不適用）；naming 對齊 PRD：單數 "AI Quota Add-on × N"
     var addon = (!isPremium && (u.addonPacks || 0) > 0)
-      ? '<div class="lt-q-addon"><span class="material-symbols-outlined">auto_awesome</span>' +
+      ? '<div class="lt-q-addon"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>' +
           u.addonPacks + ' × AI Quota Add-ons Activated</div>'
       : '';
     return '<div class="lt-q">' + head + rows + addon + '</div>';
@@ -1397,12 +1412,12 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     var viewAs = u.canSwitchRole
       ? '<div class="lt-am-grp">' +
           '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar.openRoleDialog()">' +
-            '<span class="material-symbols-outlined">sync_alt</span>View as Another Role</button></div>' +
+            '<span class="material-symbols-outlined" aria-hidden="true">sync_alt</span>View as Another Role</button></div>' +
         '<div class="lt-am-div"></div>'
       : '';
     var box = _renderQuotaBox(u);
     return '<div class="lt-am-backdrop" id="lt-am-backdrop" onclick="window.LumitureTopbar.closeMenu()"></div>' +
-           '<div class="lt-am" id="lt-am" role="menu">' +
+           '<div class="lt-am" id="lt-am" role="menu" aria-label="Account menu">' +
              '<div class="lt-am-plan" style="' + bannerStyle + '">' +
                '<span class="lt-am-plan-name">' + planName + '</span>' +
                '<span class="lt-am-plan-date">' + _esc(u.planDateRange) + '</span>' +
@@ -1412,21 +1427,21 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
                  '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
                  '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
                '</div>' +
-               '<span class="lt-am-chip"><span class="material-symbols-outlined">' + _roleIcon(u.role) + '</span>' + _esc(u.role) + '</span>' +
+               '<span class="lt-am-chip"><span class="material-symbols-outlined" aria-hidden="true">' + _roleIcon(u.role) + '</span>' + _esc(u.role) + '</span>' +
              '</div>' +
              '<div class="lt-am-div"></div>' +
              (box ? box + '<div class="lt-am-div"></div>' : '') +
              viewAs +
              '<div class="lt-am-grp">' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Profile\')">' +
-                 '<span class="material-symbols-outlined">manage_accounts</span>Profile</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">manage_accounts</span>Profile</button>' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Settings\')">' +
-                 '<span class="material-symbols-outlined">settings</span>Settings</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">settings</span>Settings</button>' +
              '</div>' +
              '<div class="lt-am-div"></div>' +
              '<div class="lt-am-grp">' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar.logout()">' +
-                 '<span class="material-symbols-outlined">logout</span>Log out</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">logout</span>Log out</button>' +
              '</div>' +
            '</div>';
   }
@@ -1641,7 +1656,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
         '<div class="lt-rd-desc">' + ROLE_COPY.desc.map(function (l) { return '<p>' + _esc(l) + '</p>'; }).join('') + '</div></div>' +
       '<div class="lt-rd-body"><div class="lt-rd-sel" id="lt-rd-sel" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="' + (r.ddOpen ? 'true' : 'false') +
         '" aria-controls="lt-rd-list" aria-labelledby="lt-rd-t"><span class="lt-rd-v">' + _esc(sel.name) + '</span><span class="lt-rd-chip">' + _esc(sel.role) +
-        '</span><span class="material-symbols-outlined lt-rd-arr">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
+        '</span><span class="material-symbols-outlined lt-rd-arr" aria-hidden="true">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
       '<div class="lt-rd-act"><button type="button" class="lt-rd-btn out" id="lt-rd-keep"' + (r.loading ? ' disabled' : '') + '>' + ROLE_COPY.keep + '</button>' +
         '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') + '>' +
         (r.loading ? '<span class="lt-rd-spin" role="status" aria-label="Loading"></span>' : ROLE_COPY.cont) + '</button></div>' +
@@ -1688,7 +1703,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     _rd.ddOpen = true; s.setAttribute('aria-expanded', 'true'); s.querySelector('.lt-rd-arr').textContent = 'arrow_drop_up';
     var host = _rdPopHost();
     host.innerHTML = '<div class="lt-rd-pop" id="lt-rd-popbox"><div class="lt-rd-pop-in"><div class="lt-rd-search"><input id="lt-rd-q" placeholder="' + ROLE_COPY.search +
-      '" autocomplete="off" role="combobox" aria-label="' + ROLE_COPY.search + '" aria-controls="lt-rd-list" aria-expanded="true" aria-autocomplete="list"><span class="material-symbols-outlined">search</span></div><hr>' +
+      '" autocomplete="off" role="combobox" aria-label="' + ROLE_COPY.search + '" aria-controls="lt-rd-list" aria-expanded="true" aria-autocomplete="list"><span class="material-symbols-outlined" aria-hidden="true">search</span></div><hr>' +
       '<div class="lt-rd-list" id="lt-rd-list" role="listbox" aria-label="Roles">' + _rdOptsHtml('') + '</div></div></div>';
     var el = document.getElementById('lt-rd-popbox'), rc = s.getBoundingClientRect();
     el.style.width = rc.width + 'px'; el.style.left = rc.left + 'px';
@@ -1810,6 +1825,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
       window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, user || {});
       _render(); if (_menuOpen) _openMenu();
     },
+    roleIcon: _roleIcon,   /* 角色 chip icon 對應公開給頁面用（X-9r6 F1：GBH Role view 卡） */
     setRole: function (role) {
       var el = document.getElementById('lt-tb-user-role');
       if (el) el.textContent = role;
@@ -2048,6 +2064,9 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     '.checkbox__input:focus-visible~.checkbox__box,',
     '.checkbox:focus-visible .checkbox__box{border-color:var(--lt-color-primary,#004FB0);box-shadow:0 0 0 3px rgba(0,79,176,.1);outline:none}',
     '.checkbox:focus-visible{outline:none}',
+    /* X-9r1 S5：光暈對白底只有 1.18:1，鍵盤 focus 另補 2px 實線外框（跟 .lt-btn-icon、.lt-link 同一套）；滑鼠不受影響 */
+    '.checkbox__input:focus-visible~.checkbox__box,',
+    '.checkbox:focus-visible .checkbox__box{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:2px}',
 
     /* disabled 最後宣告，蓋掉上面所有狀態 */
     '.checkbox__input:disabled~.checkbox__box,',
@@ -2227,7 +2246,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
  *
  * 規格（FE libs/lumiture-ui/src/Toaster/toast.css＋Toaster.tsx，Figma GB #02-3／GL #18-3／EI #08／RS #06／RO #06 逐值一致）：
  *   成功 #008F88、錯誤 #BF302E、info #0B6DD7、warning #EC6F09｜圓角 4｜寬 400｜最小高 46｜內距 8／16｜icon 20（check_circle／info／warning）
- *   位置：左下，left = var(--lt-toast-left)（sidebar 展開 274／收合 45；沒有 sidebar 的頁面自動改 24），bottom 24｜z-index 4000（高於彈窗 2000、Demo FAB 999）
+ *   位置：左下，left = var(--lt-toast-left)（sidebar 展開 274／收合 45；沒有 sidebar 的頁面自動改 24），bottom = var(--lt-toast-bottom,24px)（X-9r1 S3：有固定底列的頁自己設 calc(底列高 + 16px)）｜z-index 4000（高於彈窗 2000、Demo FAB 999）
  *   5 秒自動消失，點一下立即關閉｜可堆疊（新的在最下面，column-reverse，gap 16）｜字 14／400／行高 24.5
  *
  * 用法（頁面把自己的 toast() 換成這個，不要再各寫一套 CSS）：
@@ -2254,7 +2273,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     var s = document.createElement('style');
     s.id = 'lt-toast-css';
     s.textContent = [
-      '.lt-toast-wrap{position:fixed;left:var(--lt-toast-left,274px);bottom:24px;z-index:var(--lt-z-toast,4000);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif)}',
+      '.lt-toast-wrap{position:fixed;left:var(--lt-toast-left,274px);bottom:var(--lt-toast-bottom,24px);z-index:var(--lt-z-toast,4000);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif)}',
       '.lt-toast{pointer-events:auto;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:var(--lt-toast-width,400px);max-width:calc(100vw - 96px);min-height:46px;padding:8px 16px;',
       'border-radius:var(--lt-toast-radius,4px);color:#fff;cursor:pointer;',
       'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);',   /* MUI shadows[1]，FE Toaster 的 inline style */
@@ -2311,7 +2330,17 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     el.addEventListener('click', close);
     _getWrap().appendChild(el);
     var d = opts.duration == null ? 5000 : opts.duration;
-    if (d > 0) setTimeout(close, d);
+    var timer = null;
+    function arm() { if (d > 0) timer = setTimeout(close, d); }
+    function disarm() { if (timer) { clearTimeout(timer); timer = null; } }
+    arm();
+    /* X-9r1 S7：帶 action（Undo）或 extra 的 toast，滑鼠停上面或焦點進去時暫停計時，離開後重新計 5 秒（WCAG 2.2.1） */
+    if ((opts.action && opts.action.label) || (opts.extra && opts.extra.nodeType === 1)) {
+      el.addEventListener('mouseenter', disarm);
+      el.addEventListener('focusin', disarm);
+      el.addEventListener('mouseleave', function () { if (el.parentNode && !el.contains(document.activeElement)) { disarm(); arm(); } });
+      el.addEventListener('focusout', function (e) { if (el.parentNode && !el.matches(':hover') && !el.contains(e.relatedTarget)) { disarm(); arm(); } });
+    }
     return el;
   }
 
@@ -2357,7 +2386,7 @@ const COPY = {
     p1: '點 1・篩選列（方案 A）：日期觸發欄在快捷範圍時只顯示標籤（All Time），Clear filter 只在有篩選時出現，搜尋框一律靠右（1024 以下換行也靠右）。FE 現況：兩個完整日期＋Reset 永遠顯示，1280 展開 sidebar 時搜尋框會掉到第二行左邊。',
     p2: '點 2・失敗登入（方案 B）：新增 Status 欄，icon＋文字承擔語意；整列只留 CMDS Error BG 淡底，其他格文字不變紅。FE 現況：沒有 Status 欄、失敗列看不出來。',
     p3: '點 3・User 篩選（方案 A）：沿用 GroupedMultiSelect，placeholder 改 User、搜尋改 Search role or email、預設收合。「分組依現在角色還是事件當下角色」要問 BE。',
-    p4: '點 4・自訂時間（方案 A）：行內 popover 補 Reset／Cancel／Apply；快捷立即套用、自訂才要 Apply；觸發欄顯示標籤；開在下方。Last Month 改 Previous Month。FE 現況：沒有 Apply，點外面才套用，只點起日就點外面不會有任何反應。',
+    p4: '點 4・自訂時間（方案 A）：行內 popover 補 Reset／Cancel／Apply；快捷立即套用、自訂才要 Apply；觸發欄顯示標籤；開在下方。Last Month 改 Previous Month。自訂單日：點一下起日，迄日預設同起日、Apply 立即可按，再點另一天延伸成範圍（X-9r5 Q4，Kabin 裁決）。FE 現況：沒有 Apply，點外面才套用，只點起日就點外面不會有任何反應；選單日要點同一天兩次。',
     p6: '點 6・Status 篩選（只在 Login Activity）：多選 Success／Failed／Account Locked，行為同 Type／Country（選完關閉才套用）。PRD 有 Status 篩選器、FE 沒有。FE 現況：沒有。',
     p7: '點 7・Timestamp 標時區：兩個 tab 的表頭寫成 Timestamp (UTC+8)（時區照瀏覽器算，不寫死），匯出 CSV 的欄名同樣帶時區。稽核紀錄要能跟別地區的同事對時間。FE 現況：表頭只寫 Timestamp，沒有標時區。',
     p5: '點 5・欄位順序（方案 A）：Timestamp 第一欄，之後 User → Type（Login 加 Status）→ IP／Location 兩行格；User Activity 的 Description 放 Type 後面。FE 現況：Email 第一欄、Country 與 IP 各一欄。'
@@ -2520,15 +2549,15 @@ const PROJECTS = ['prod-core', 'data-lake', 'ml-training', 'analytics-eu', 'stag
 const num = (a, b) => Math.round((a + R() * (b - a)) / 100) * 100;
 const usd = n => 'USD ' + n.toLocaleString('en-US');
 const TPL = {
-  1: [[2, () => { const a = num(900000, 1400000); return `Update general budget "FY2026 Total" — limit ${usd(a)} → ${usd(a + num(40000, 150000))}`; }], [1, () => `Create general budget "FY2027 Total" — limit ${usd(num(1200000, 1800000))}`], [2, () => `Update general budget "FY2026 Total" — alert recipients added: Admin, Owner`]],
-  2: [[1, () => `Create budget "${pick(BUDGETS)}" — limit ${usd(num(2000, 9000))}, alert at 80%`], [2, () => { const a = num(3000, 7000); return `Update budget "${pick(BUDGETS)}" — raised limit ${usd(a)} → ${usd(a + num(1000, 4000))}`; }], [2, () => `Update budget "${pick(BUDGETS)}" — alert threshold 80% → 90%`], [3, () => `Delete budget "${pick(BUDGETS)}" — was limit ${usd(num(1000, 6000))}`]],
-  3: [[2, () => `Update anomaly detection — sensitivity ${pick(['Low → Medium', 'Medium → High', 'High → Medium'])}`], [2, () => `Update anomaly alert — pinned ${pick(PROJECTS)}`], [2, () => `Update anomaly detection — notification recipients added: ${pick(['T1 Manager', 'T2 Manager', 'T1 Member'])}`]],
-  4: [[1, () => `Create group "${pick(GROUPS)}" — Tier ${pick([1, 2])}`], [2, () => `Update group "${pick(GROUPS)}" — renamed to "${pick(GROUPS)} 2"`], [2, () => `Update group "${pick(GROUPS)}" — added member ${pick(USERS).email}`], [3, () => `Delete group "${pick(GROUPS)}" — ${num(100, 600) / 100 | 0} members, ${num(300, 1200) / 100 | 0} resources unlinked`]],
-  5: [[1, () => `Create user "${pick(['oscar', 'paula', 'quinn', 'rita'])}@ntu.edu.tw" — invited as ${pick(['Member', 'Manager'])}`], [2, () => `Update user "${pick(USERS).email}" — role ${pick(['Member → Admin', 'Member → Manager', 'Manager → Admin', 'Admin → Member'])}`], [3, () => `Delete user "${pick(['dave', 'leo', 'nick'])}@ntu.edu.tw" — removed from group "${pick(GROUPS)}"`], [2, () => `Update user "${pick(USERS).email}" — deactivated`]],
-  6: [[2, () => `Update rightsizing scope — added GCP project "${pick(PROJECTS)}"`], [2, () => `Update criteria — CPU utilization ${pick(['40% → 30%', '30% → 25%'])}`], [2, () => `Update recommendation — marked ${num(100, 900) / 100 | 0} items as Reviewed`], [3, () => `Delete rightsizing scope "${pick(PROJECTS)}"`]],
-  7: [[1, () => `Create authorization — GCP billing account "012345-ABCDEF-6789${pick(['01', '02', '03'])}"`], [2, () => `Update authorization — AWS usage data role ARN changed`], [3, () => `Delete authorization — Azure subscription "${pick(['Corp-Prod', 'Corp-Dev'])}"`]],
-  8: [[2, () => `Update fiscal year — start month ${pick(['Feb → Apr', 'Jan → Feb'])}`], [2, () => `Update FY2026 — financial budget ${usd(num(1800000, 2600000))}`], [1, () => `Create fiscal year "FY2027"`], [2, () => `Update FY2026 — expected ROI 1.2 → 1.5`]],
-  9: [[1, () => `Create tag key "cost-owner" — 3 value cards`], [2, () => `Update tag "cost-owner" — added allocation card "Shared services"`], [2, () => `Update tag "cost-owner" — set Inactive`], [3, () => `Delete tag key "${pick(['legacy-team', 'tmp-owner'])}"`]]
+  1: [[2, () => { const a = num(900000, 1400000); return `Update general budget "FY2026 Total": limit ${usd(a)} → ${usd(a + num(40000, 150000))}`; }], [1, () => `Create general budget "FY2027 Total": limit ${usd(num(1200000, 1800000))}`], [2, () => `Update general budget "FY2026 Total": alert recipients added: Admin, Owner`]],
+  2: [[1, () => `Create budget "${pick(BUDGETS)}": limit ${usd(num(2000, 9000))}, alert at 80%`], [2, () => { const a = num(3000, 7000); return `Update budget "${pick(BUDGETS)}": raised limit ${usd(a)} → ${usd(a + num(1000, 4000))}`; }], [2, () => `Update budget "${pick(BUDGETS)}": alert threshold 80% → 90%`], [3, () => `Delete budget "${pick(BUDGETS)}": was limit ${usd(num(1000, 6000))}`]],
+  3: [[2, () => `Update anomaly detection: sensitivity ${pick(['Low → Medium', 'Medium → High', 'High → Medium'])}`], [2, () => `Update anomaly alert: pinned ${pick(PROJECTS)}`], [2, () => `Update anomaly detection: notification recipients added: ${pick(['T1 Manager', 'T2 Manager', 'T1 Member'])}`]],
+  4: [[1, () => `Create group "${pick(GROUPS)}": Tier ${pick([1, 2])}`], [2, () => `Update group "${pick(GROUPS)}": renamed to "${pick(GROUPS)} 2"`], [2, () => `Update group "${pick(GROUPS)}": added member ${pick(USERS).email}`], [3, () => `Delete group "${pick(GROUPS)}": ${num(100, 600) / 100 | 0} members, ${num(300, 1200) / 100 | 0} resources unlinked`]],
+  5: [[1, () => `Create user "${pick(['oscar', 'paula', 'quinn', 'rita'])}@ntu.edu.tw": invited as ${pick(['Member', 'Manager'])}`], [2, () => `Update user "${pick(USERS).email}": role ${pick(['Member → Admin', 'Member → Manager', 'Manager → Admin', 'Admin → Member'])}`], [3, () => `Delete user "${pick(['dave', 'leo', 'nick'])}@ntu.edu.tw": removed from group "${pick(GROUPS)}"`], [2, () => `Update user "${pick(USERS).email}": deactivated`]],
+  6: [[2, () => `Update rightsizing scope: added GCP project "${pick(PROJECTS)}"`], [2, () => `Update criteria: CPU utilization ${pick(['40% → 30%', '30% → 25%'])}`], [2, () => `Update recommendation: marked ${num(100, 900) / 100 | 0} items as Reviewed`], [3, () => `Delete rightsizing scope "${pick(PROJECTS)}"`]],
+  7: [[1, () => `Create authorization: GCP billing account "012345-ABCDEF-6789${pick(['01', '02', '03'])}"`], [2, () => `Update authorization: AWS usage data role ARN changed`], [3, () => `Delete authorization: Azure subscription "${pick(['Corp-Prod', 'Corp-Dev'])}"`]],
+  8: [[2, () => `Update fiscal year: start month ${pick(['Feb → Apr', 'Jan → Feb'])}`], [2, () => `Update FY2026: financial budget ${usd(num(1800000, 2600000))}`], [1, () => `Create fiscal year "FY2027"`], [2, () => `Update FY2026: expected ROI 1.2 → 1.5`]],
+  9: [[1, () => `Create tag key "cost-owner": 3 value cards`], [2, () => `Update tag "cost-owner": added allocation card "Shared services"`], [2, () => `Update tag "cost-owner": set Inactive`], [3, () => `Delete tag key "${pick(['legacy-team', 'tmp-owner'])}"`]]
 };
 function buildUser() {
   const rows = [];
@@ -2541,12 +2570,12 @@ function buildUser() {
   }
   // PRD 場景 3：carol 改 Budget、bob 升 Admin
   const c = USERS.find(u => u.email === 'carol@ntu.edu.tw'), t1 = new Date(NOW.getTime() - 5 * DAY); t1.setHours(14, 22, 31, 0);
-  rows.push({ email: c.email, role: 'Admin', action: 2, domain: 2, description: 'Update budget "Q1 Marketing" — raised limit USD 5,000 → 8,000', ip: '140.112.8.116', city: 'Taipei', country: 'Taiwan', ts: t1 });
+  rows.push({ email: c.email, role: 'Admin', action: 2, domain: 2, description: 'Update budget "Q1 Marketing": raised limit USD 5,000 → 8,000', ip: '140.112.8.116', city: 'Taipei', country: 'Taiwan', ts: t1 });
   const t2 = new Date(NOW.getTime() - 9 * DAY); t2.setHours(10, 5, 12, 0);
-  rows.push({ email: c.email, role: 'Admin', action: 2, domain: 5, description: 'Update user "bob@ntu.edu.tw" — role Member → Admin', ip: '140.112.8.116', city: 'Taipei', country: 'Taiwan', ts: t2 });
+  rows.push({ email: c.email, role: 'Admin', action: 2, domain: 5, description: 'Update user "bob@ntu.edu.tw": role Member → Admin', ip: '140.112.8.116', city: 'Taipei', country: 'Taiwan', ts: t2 });
   // 一則刻意很長的描述（單行省略＋tooltip）
   const t3 = new Date(NOW.getTime() - 1 * DAY); t3.setHours(16, 48, 2, 0);
-  rows.push({ email: 'alice@ntu.edu.tw', role: 'Owner', action: 2, domain: 4, description: 'Update group "Platform Team" — added 14 resources (GCP projects prod-core, data-lake, ml-training, analytics-eu, staging-web and 9 more) and removed member nick@ntu.edu.tw', ip: '140.112.8.142', city: 'Taipei', country: 'Taiwan', ts: t3 });
+  rows.push({ email: 'alice@ntu.edu.tw', role: 'Owner', action: 2, domain: 4, description: 'Update group "Platform Team": added 14 resources (GCP projects prod-core, data-lake, ml-training, analytics-eu, staging-web and 9 more) and removed member nick@ntu.edu.tw', ip: '140.112.8.142', city: 'Taipei', country: 'Taiwan', ts: t3 });
   rows.sort((a, b) => a.ts - b.ts); rows.forEach((r, i) => { r.id = i + 1; });
   return rows.reverse();
 }
@@ -2623,7 +2652,7 @@ function querySorted(tab) {
 /* ============================================================
  * 5. Render — 頁面骨架
  * ============================================================ */
-const pkBadge = (k, extra) => `<span class="pk-badge ${extra || ''}" data-tip="${esc(COPY.pk[k])}"${extra && extra.includes('mini') ? ' aria-label="UX 提案" role="img"' : ''}><span class="material-symbols-outlined">lightbulb</span>${extra && extra.includes('mini') ? '' : 'UX 提案'}</span>`;   /* mini＝只有燈泡 icon：Timestamp 表頭放不下完整 badge（固定欄寬、標時區之後表頭已經佔滿），tooltip 與完整版相同 */   // ⏸ PARKED：chip 只寫四個字，說明放 tooltip（parked-designs.md 標示規則）
+const pkBadge = (k, extra) => `<span class="pk-badge ${extra || ''}" data-tip="${esc(COPY.pk[k])}"${extra && extra.includes('mini') ? ' aria-label="UX 提案" role="img"' : ''}><span aria-hidden="true" class="material-symbols-outlined">lightbulb</span>${extra && extra.includes('mini') ? '' : 'UX 提案'}</span>`;   /* mini＝只有燈泡 icon：Timestamp 表頭放不下完整 badge（固定欄寬、標時區之後表頭已經佔滿），tooltip 與完整版相同 */   // ⏸ PARKED：chip 只寫四個字，說明放 tooltip（parked-designs.md 標示規則）
 function setRole(id) { state.role = id; if (window.LumitureTopbar) LumitureTopbar.setRole(ROLES[id].chip); }
 
 function headerHtml() { return `<div class="hdr-block"><h1 class="pg-title">${COPY.title}</h1><p class="pg-desc">${COPY.subtitle}</p></div>`; }
@@ -2632,14 +2661,14 @@ function tabsHtml(disabled) {
   const btn = k => `<button class="tgb ${state.tab === k ? 'on' : ''}" data-a="tab" data-v="${k}" role="tab" id="tab-${k}" aria-controls="card" tabindex="${state.tab === k ? 0 : -1}" aria-selected="${state.tab === k}" ${dis ? 'disabled' : ''}>${COPY.tabs[k]}</button>`;   // Kabin 2026-10-14：tab 不放筆數 badge（照 FE ToggleGroup；PRD 的 tab pill counts 不採用）
   const exDis = dis || state.exporting || state.tab === 'ai' || state.pageState === 'error';
   return `<div class="tabrow"><div class="tg ${dis ? 'is-disabled' : ''}" role="tablist" aria-label="Audit log views">${btn('login')}${btn('user')}${btn('ai')}</div>
-    <button class="btn btn-p" id="export-btn" data-a="export" ${exDis ? 'disabled' : ''}>${state.exporting ? '<span class="spin"></span>' : '<span class="material-symbols-outlined">download</span>'}${COPY.exportCsv}</button></div>`;
+    <button class="btn btn-p" id="export-btn" data-a="export" ${exDis ? 'disabled' : ''} ${state.exporting ? 'aria-busy="true"' : ''}>${state.exporting ? '<span class="spin" aria-hidden="true"></span>' : '<span aria-hidden="true" class="material-symbols-outlined">download</span>'}${COPY.exportCsv}</button></div>`;
 }
 
 function render() {
   closePop(false);
   const root = $('#content');
   if (!ROLES[state.role].canView) {
-    root.innerHTML = headerHtml() + `<div class="card is-full"><div class="es"><span class="material-symbols-outlined es-ic" style="font-size:64px;line-height:64px;width:64px;height:64px;font-variation-settings:'FILL' 0,'wght' 600,'GRAD' 0,'opsz' 48">lock</span><div class="es-title">${COPY.noAccess.title}</div><div class="es-desc">${esc(COPY.noAccess.desc)}</div><a class="btn btn-p" href="./overview.html">${COPY.noAccess.btn}</a></div></div>`;
+    root.innerHTML = headerHtml() + `<div class="card is-full"><div class="es"><span aria-hidden="true" class="material-symbols-outlined es-ic" style="font-size:64px;line-height:64px;width:64px;height:64px;font-variation-settings:'FILL' 0,'wght' 600,'GRAD' 0,'opsz' 48">lock</span><div class="es-title">${COPY.noAccess.title}</div><div class="es-desc">${esc(COPY.noAccess.desc)}</div><a class="btn btn-p" href="./overview.html">${COPY.noAccess.btn}</a></div></div>`;
     return;
   }
   root.innerHTML = headerHtml() + `<div id="tabrow-root">${tabsHtml()}</div><div class="card is-full ${isUx('p1') ? 'ux-p1' : ''}" id="card" role="tabpanel" aria-labelledby="tab-${state.tab}"></div>`;
@@ -2652,15 +2681,16 @@ function renderCard() {
   card.classList.toggle('ux-p1', isUx('p1'));
   card.setAttribute('aria-labelledby', 'tab-' + state.tab);
   if (state.tab === 'ai') {
-    card.innerHTML = `<div class="es"><span class="material-symbols-outlined es-ic is-outline">token</span><div class="es-title">${COPY.ai.title}</div><div class="es-desc">${esc(COPY.ai.desc)}</div></div>`;
+    card.innerHTML = `<div class="es"><span aria-hidden="true" class="material-symbols-outlined es-ic is-outline">token</span><div class="es-title">${COPY.ai.title}</div><div class="es-desc">${esc(COPY.ai.desc)}</div></div>`;
     return;
   }
   if (state.pageState === 'loading') {       // FE AuditLogSkeleton：控制項 disabled、TableSkeleton rows=5
-    card.innerHTML = `<div class="fwrap"><div class="fbar"><div class="fl"><div class="fsel">${['user', 'type', 'country'].concat(isUx('p6') && state.tab === 'login' ? ['status'] : []).map(k => `<button class="sel" disabled><span class="tx ph">${COPY.ph[k]}</span><span class="tri"></span></button>`).join('')}</div><button class="dtrig" disabled><span class="material-symbols-outlined ci">event</span><span class="dv">${fmtDay(new Date())}</span><span class="material-symbols-outlined ar">east</span><span class="dv">${fmtDay(new Date())}</span></button></div><div class="fs"><div class="search is-disabled"><span class="material-symbols-outlined">search</span><input disabled placeholder="${COPY.ph.search}"></div></div></div></div><div class="tblwrap">${skeletonHtml()}</div>`;
+    /* X-9r5 LB3（B7）：骨架的觸發欄文字沿用當下 state（UX 提案開著是 User／All Time，#fe 現況是 Select Email＋兩個日期），載入完成不再換字 */
+    card.innerHTML = `<div class="fwrap"><div class="fbar"><div class="fl"><div class="fsel">${['users', 'types', 'countries'].concat(isUx('p6') && state.tab === 'login' ? ['statuses'] : []).map(k => `<button class="sel" disabled>${selText(k)}<span class="tri"></span></button>`).join('')}</div><button class="dtrig" disabled>${dateTrigInner()}</button></div><div class="fs"><div class="search is-disabled"><span aria-hidden="true" class="material-symbols-outlined">search</span><input disabled placeholder="${COPY.ph.search}"></div></div></div></div><div class="tblwrap" aria-busy="true">${skeletonHtml()}</div>`;
     return;
   }
   const t = tabState();
-  card.innerHTML = `<div class="fwrap" id="fwrap"><div class="fbar"><div class="fl" id="fl"></div><div class="fs" id="fs"><div class="search" id="search"><span class="material-symbols-outlined">search</span><input id="search-in" type="text" autocomplete="off" placeholder="${COPY.ph.search}" value="${esc(t.search)}" aria-label="Search" aria-describedby="search-help"></div><div class="help-err" id="search-help" hidden>${COPY.minSearch}</div></div></div></div><div class="tblwrap" id="tblwrap"></div>`;
+  card.innerHTML = `<div class="fwrap" id="fwrap"><div class="fbar"><div class="fl" id="fl"></div><div class="fs" id="fs"><div class="search" id="search"><span aria-hidden="true" class="material-symbols-outlined">search</span><input id="search-in" type="text" autocomplete="off" placeholder="${COPY.ph.search}" value="${esc(t.search)}" aria-label="Search" aria-describedby="search-help"></div><div class="help-err" id="search-help" hidden>${COPY.minSearch}</div></div></div></div><div class="tblwrap" id="tblwrap"></div>`;
   renderFilters(); renderTable();
 }
 
@@ -2688,8 +2718,8 @@ function dateTrigInner() {
   const t = tabState(); let s = t.start, e = t.end, key = t.rangeKey;
   if (DP && !isUx('p4')) { s = DP.start; e = DP.end; key = DP.key; }     // FE：開著時顯示暫存日期；點 4（Review #15）：有 Apply 之後觸發欄只代表已套用的值，草稿只在 popover 內
   const useLab = isUx('p1') || isUx('p4');     // 點 1／點 4：快捷範圍只顯示標籤（兩點共用這個前提）
-  if (useLab && key !== 'custom' && labelOf(key)) return `<span class="material-symbols-outlined ci">event</span><span class="lab">${esc(labelOf(key))}</span><span class="tri"></span>`;
-  return `<span class="material-symbols-outlined ci">event</span><span class="dv ${s ? '' : 'empty'}">${s ? fmtDay(s) : '—'}</span><span class="material-symbols-outlined ar">east</span><span class="dv ${e ? '' : 'empty'}">${e ? fmtDay(e) : '—'}</span>`;
+  if (useLab && key !== 'custom' && labelOf(key)) return `<span aria-hidden="true" class="material-symbols-outlined ci">event</span><span class="lab">${esc(labelOf(key))}</span><span class="tri"></span>`;
+  return `<span aria-hidden="true" class="material-symbols-outlined ci">event</span><span class="dv ${s ? '' : 'empty'}">${s ? fmtDay(s) : '—'}</span><span aria-hidden="true" class="material-symbols-outlined ar">east</span><span class="dv ${e ? '' : 'empty'}">${e ? fmtDay(e) : '—'}</span>`;
 }
 function renderFilters() {
   const fl = $('#fl'); if (!fl || state.tab === 'ai') return;
@@ -2750,7 +2780,7 @@ function openMulti(kind, anchor) {
   $('#pop-root').insertAdjacentHTML('beforeend', `<div class="mm" id="mm" role="listbox" aria-multiselectable="true" aria-label="${FNAME[kind]} options"></div>`);
   const mm = $('#mm');
   const ph = kind === 'users' ? (isUx('p3') ? 'Search role or email' : 'Search email') : kind === 'types' ? 'Search type' : kind === 'statuses' ? 'Search status' : 'Search country';   // ⚠ 未確認：FE 預設 `Search ${label.toLowerCase()}`，label 的實際值沒讀到
-  mm.innerHTML = `${kind === 'users' && isUx('p3') ? `<div class="mm-note">${pkBadge('p3')}</div>` : ''}<div class="mm-s"><div class="search"><span class="material-symbols-outlined">search</span><input id="mm-q" type="text" autocomplete="off" placeholder="${ph}" aria-label="${ph}"></div></div><div id="mm-body" style="display:flex;flex-direction:column;min-height:0;flex:1"></div>`;
+  mm.innerHTML = `${kind === 'users' && isUx('p3') ? `<div class="mm-note">${pkBadge('p3')}</div>` : ''}<div class="mm-s"><div class="search"><span aria-hidden="true" class="material-symbols-outlined">search</span><input id="mm-q" type="text" autocomplete="off" placeholder="${ph}" aria-label="${ph}"></div></div><div id="mm-body" style="display:flex;flex-direction:column;min-height:0;flex:1"></div>`;
   renderMultiBody();
   mm.style.width = '400px';     // Review #18：FE MultiSelect／GroupedMultiSelect 的選單最小寬都是 400
   placePop();                   // ⚠ DEVIATION：FE Popper 是 bottom-end（右緣對齊），這裡左緣對齊
@@ -2787,7 +2817,7 @@ function multiBody() {
       if (!vals.length) return;
       all = all.concat(vals);
       const sel = vals.filter(v => p.temp.includes(v)).length, open = q ? true : p.exp.has(g.key);
-      rows += `<div class="mm-row mm-g ${open ? 'open' : ''}" data-a="mm-g" data-k="${g.key}" data-fk="g:${g.key}" role="option" tabindex="-1" aria-selected="${sel === vals.length}" aria-expanded="${open}">${cb(sel === vals.length, sel > 0 && sel < vals.length)}<span class="lb">${g.key} (${vals.length})</span><span class="material-symbols-outlined chev" data-a="mm-exp" data-k="${g.key}" role="button" aria-label="Toggle ${g.key}">expand_more</span></div>`;
+      rows += `<div class="mm-row mm-g ${open ? 'open' : ''}" data-a="mm-g" data-k="${g.key}" data-fk="g:${g.key}" role="option" tabindex="-1" aria-selected="${sel === vals.length}" aria-expanded="${open}">${cb(sel === vals.length, sel > 0 && sel < vals.length)}<span class="lb">${g.key} (${vals.length})</span><span aria-hidden="true" class="material-symbols-outlined chev" data-a="mm-exp" data-k="${g.key}" role="button" aria-label="Toggle ${g.key}">expand_more</span></div>`;
       if (open) vals.forEach(v => { rows += `<div class="mm-row mm-i" data-a="mm-i" data-v="${esc(v)}" data-fk="i:${esc(v)}" role="option" tabindex="-1" aria-selected="${p.temp.includes(v)}">${cb(p.temp.includes(v))}<span class="lb" data-tip="${esc(v)}" data-tip-trunc>${esc(v)}</span></div>`; });
     });
   } else {
@@ -2820,7 +2850,7 @@ function openDate(anchor) {
   anchor = $('#dtrig') || anchor;
   /* FE 的 LoginActivityDateFilter 在 filters 日期一變就把快捷清單的選中項 reset 回 All Time（useEffect），
    * 所以套用 Last 7 Days 之後再開 popover，右側清單選中的是 All Time，但月曆上標的是 7 天。點 4 的 UX 版直接記住真正的範圍 */
-  DP = { anchor, start: t.start, end: t.end, key: isUx('p4') ? t.rangeKey : 'allTime', view: new Date(t.end.getFullYear(), t.end.getMonth(), 1), dirty: false, fday: clampDay(t.end) };
+  DP = { anchor, start: t.start, end: t.end, key: isUx('p4') ? t.rangeKey : 'allTime', view: new Date(t.end.getFullYear(), t.end.getMonth(), 1), dirty: false, pending: false, fday: clampDay(t.end) };
   anchor.classList.add('open'); anchor.setAttribute('aria-expanded', 'true');
   $('#pop-root').insertAdjacentHTML('beforeend', `<div class="dp" id="dp" role="dialog" aria-label="Select date range"></div>`);
   renderDate(); placeDate();
@@ -2848,17 +2878,17 @@ function calClasses(dt, col, s, e, dis) {
   }
   return c.join(' ');
 }
-function previewRange(hoverD) {      // 只選了起日：游標停在別天時預覽範圍（FE react-datepicker in-selecting-range）
-  if (!DP || !DP.start || DP.end) return;
+function previewRange(hoverD) {      // 只選了起日：游標停在別天時預覽範圍（FE react-datepicker in-selecting-range）；點 4（X-9r5 Q4）：起日已點、迄日暫同起日（DP.pending）也預覽
+  if (!DP || !DP.start || (DP.end && !DP.pending)) return;
   let s = DP.start, e = hoverD;
   if (hoverD && hoverD < s) { e = s; s = hoverD; }
   $$('.cal-d[data-d]', $('#dp')).forEach(el => {
     const dt = parseD(el.dataset.d), dis = false;
-    el.className = !hoverD || sameDay(hoverD, DP.start) ? calClasses(dt, +el.dataset.col, DP.start, null, dis) : calClasses(dt, +el.dataset.col, s, e, dis);
+    el.className = !hoverD || sameDay(hoverD, DP.start) ? calClasses(dt, +el.dataset.col, DP.start, DP.pending ? DP.end : null, dis) : calClasses(dt, +el.dataset.col, s, e, dis);
   });
 }
-document.addEventListener('mouseover', e => { const b = e.target.closest && e.target.closest('#dp .cal-d[data-d]'); if (b && DP && DP.start && !DP.end) previewRange(parseD(b.dataset.d)); });
-document.addEventListener('mouseout', e => { if (DP && DP.start && !DP.end && e.target.closest && e.target.closest('#dp .cal-g') && !(e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('#dp .cal-d[data-d]'))) previewRange(null); });
+document.addEventListener('mouseover', e => { const b = e.target.closest && e.target.closest('#dp .cal-d[data-d]'); if (b && DP && DP.start && (!DP.end || DP.pending)) previewRange(parseD(b.dataset.d)); });
+document.addEventListener('mouseout', e => { if (DP && DP.start && (!DP.end || DP.pending) && e.target.closest && e.target.closest('#dp .cal-g') && !(e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('#dp .cal-d[data-d]'))) previewRange(null); });
 function renderDate() {
   const dp = $('#dp'); if (!dp) return;
   const ae = document.activeElement; let fd = null;      // 重繪前記住焦點在哪，重繪後還回去
@@ -2883,7 +2913,7 @@ function renderDate() {
   }
   const ql = QUICK.map(q => `<button class="qi ${DP.key === q.key ? 'on' : ''}" data-a="dp-quick" data-k="${q.key}" aria-pressed="${DP.key === q.key}">${ux ? q.ux : q.fe}</button>`).join('');
   const ready = DP.start && DP.end;
-  const nav = (a, ic, off, label) => `<button class="cal-nav" data-a="${a}" ${off ? 'disabled' : ''} aria-label="${label}"><span class="material-symbols-outlined">${ic}</span></button>`;
+  const nav = (a, ic, off, label) => `<button class="cal-nav" data-a="${a}" ${off ? 'disabled' : ''} aria-label="${label}"><span aria-hidden="true" class="material-symbols-outlined">${ic}</span></button>`;
   /* 標題「MMM yyyy」（FE CustomHeader format(monthDate, 'MMM yyyy')）；左：雙箭頭（±1 年）＋單箭頭（±1 月）；右：單箭頭＋雙箭頭 */
   dp.innerHTML = `${ux ? `<div class="dp-hd">${pkBadge('p4')}</div>` : ''}<div class="dp-main"><div class="cal"><div class="cal-h"><div style="display:flex">${nav('dp-prev12', 'keyboard_double_arrow_left', prev12Off, 'Previous year')}${nav('dp-prev', 'keyboard_arrow_left', prevOff, 'Previous month')}</div><div class="cal-t" aria-live="polite">${MONTHS_S[m]} ${y}</div><div style="display:flex">${nav('dp-next', 'keyboard_arrow_right', nextOff, 'Next month')}${nav('dp-next12', 'keyboard_double_arrow_right', next12Off, 'Next year')}</div></div><div class="cal-wk">${wk}</div><div class="cal-g" role="group" aria-label="Calendar">${cells}</div></div><div class="ql">${ql}</div></div>${ux ? `<div class="dp-f"><button class="lnk" data-a="dp-reset"><span class="t">Reset</span></button><div class="r"><button class="btn btn-o" data-a="dp-cancel">Cancel</button><button class="btn btn-p" data-a="dp-apply" ${ready ? '' : 'disabled'}>Apply</button></div></div>` : ''}`;
   const tr = $('#dtrig'); if (tr) tr.innerHTML = dateTrigInner();
@@ -2956,7 +2986,7 @@ function columns(tab) {
     type: mk('type', p5 ? 'Type' : 'Activity Type', ua ? (p5 ? 222 : 150) : (p5 ? 150 : 120), ua ? (p5 ? 0 : 1) : .8, { badge: p5 ? pkBadge('p5') : '', cell: r => ell(typeText(tab, r), hl(typeText(tab, r), q)) }),
     /* ⚠ 設計端暫擬：Failed 用 CMDS Status Icons 的 Failure＝圓圈叉（cancel）；Account Locked 的 lock 沒有 CMDS 對應（Review #21）*/
     status: mk('status', 'Status', 164, .9, { badge: pkBadge('p2'),
-      cell: r => r.status === 'Success' ? `<span class="stt ok"><span class="material-symbols-outlined">check_circle</span>${hl('Success', q)}</span>` : `<span class="stt bad"><span class="material-symbols-outlined">${r.status === 'Locked' ? 'lock' : 'cancel'}</span>${hl(statusText(r), q)}</span>` }),
+      cell: r => r.status === 'Success' ? `<span class="stt ok"><span aria-hidden="true" class="material-symbols-outlined">check_circle</span>${hl('Success', q)}</span>` : `<span class="stt bad"><span aria-hidden="true" class="material-symbols-outlined">${r.status === 'Locked' ? 'lock' : 'cancel'}</span>${hl(statusText(r), q)}</span>` }),
     desc: mk('desc', 'Description', p5 ? Math.max(100, 153 - (tsMin() - 176)) : 250, p5 ? 3 : 1.6, { cell: r => ell(r.description, hl(r.description, q)) }),
     country: mk('country', 'Country', 130, .8, { sort: can('country') ? 'country' : null, cell: r => ell(r.country, hl(r.country, q)) }),
     ip: mk('ip', 'IP Address', 150, .9, { sort: can('ip') ? 'ip' : null, cell: r => ell(r.ip, hl(r.ip, q)) }),
@@ -2969,17 +2999,18 @@ function columns(tab) {
 }
 function effSort(t) { return t.sort || (isUx('p5') ? { key: 'ts', dir: 'desc' } : null); }
 function skeletonHtml() {
-  const cols = 5;          // FE TableSkeleton rows=5 columns=5；第一欄佔 50%（Review #16，樣式在 .sk-hd／.sk-row）
+  const cols = 5;          // FE TableSkeleton columns=5（列數見下方 LB9）；第一欄佔 50%（Review #16，樣式在 .sk-hd／.sk-row）
   const g = '';
   const row = `<div class="sk-row" style="${g}">${Array.from({ length: cols }, () => `<div class="sk" style="width:${50 + Math.floor(R() * 40)}%"></div>`).join('')}</div>`;
-  return `<div class="sk-t" aria-busy="true"><div class="sk-hd" style="${g}">${Array.from({ length: cols }, () => `<div class="sk" style="width:60%"></div>`).join('')}</div>${row.repeat(5)}</div>`;
+  return `<div class="sk-t" aria-busy="true"><div class="sk-hd" style="${g}">${Array.from({ length: cols }, () => `<div class="sk" style="width:60%"></div>`).join('')}</div>${row.repeat(11)}</div>`;   // X-9r5 LB9：11 列由 .sk-t 的 max-height:575 裁成 10.5 列，跟載入後的表同高（⚠ DEVIATION: FE TableSkeleton rows=5）
 }
 const rowHtml = (cols, r, tab) => `<div class="tr ${isUx('p2') && tab === 'login' && r.status !== 'Success' ? 'fail' : ''}" role="row">${cols.map(c => `<div class="td" role="cell">${c.cell(r)}</div>`).join('')}</div>`;
 function renderTable() {
   const wrap = $('#tblwrap'); if (!wrap) return;
   const tab = state.tab, t = tabState();
-  const esBlock = (ic, title, desc, btn) => `<div class="es"><span class="material-symbols-outlined es-ic ${ic.o ? 'is-outline' : ''}">${ic.n}</span><div class="es-title">${title}</div><div class="es-desc">${esc(desc)}</div>${btn || ''}</div>`;
+  const esBlock = (ic, title, desc, btn) => `<div class="es"><span aria-hidden="true" class="material-symbols-outlined es-ic ${ic.o ? 'is-outline' : ''}">${ic.n}</span><div class="es-title">${title}</div><div class="es-desc">${esc(desc)}</div>${btn || ''}</div>`;
   if (state.pageState === 'error') { wrap.innerHTML = esBlock({ n: 'error_outline', o: 1 }, COPY.error.title, COPY.error.desc, `<button class="btn btn-p" data-a="retry">${COPY.error.btn}</button>`); return; }
+  wrap.setAttribute('aria-busy', state.pageState === 'loading' || state.loadingRows ? 'true' : 'false');   // X-9r5 LB7（C21）：讀取中讓讀屏知道表格正在更新
   if (state.pageState === 'loading' || state.loadingRows) { wrap.innerHTML = skeletonHtml(); return; }
   const rows = state.pageState === 'empty' ? [] : querySorted(tab);
   if (!rows.length) {
@@ -2991,7 +3022,7 @@ function renderTable() {
   const cols = columns(tab), so = effSort(t), minw = cols.reduce((a, c) => a + c.min, 0);
   const ths = cols.map(c => {
     const on = so && so.key === c.sort, arrow = on && so.dir === 'asc' ? 'arrow_upward' : on ? 'arrow_downward' : 'arrow_upward';
-    return `<div class="th ${c.sort ? 'sortable' : ''} ${on ? 'on' : ''}" role="columnheader" ${c.sort ? `data-a="sort" data-k="${c.sort}" tabindex="0" aria-sort="${on ? (so.dir === 'asc' ? 'ascending' : 'descending') : 'none'}"` : ''}>${c.label}${c.badge || ''}${c.sort ? `<span class="material-symbols-outlined si">${arrow}</span>` : ''}</div>`;
+    return `<div class="th ${c.sort ? 'sortable' : ''} ${on ? 'on' : ''}" role="columnheader" ${c.sort ? `data-a="sort" data-k="${c.sort}" tabindex="0" aria-sort="${on ? (so.dir === 'asc' ? 'ascending' : 'descending') : 'none'}"` : ''}>${c.label}${c.badge || ''}${c.sort ? `<span aria-hidden="true" class="material-symbols-outlined si">${arrow}</span>` : ''}</div>`;
   }).join('');
   const shown = rows.slice(0, t.pages * PAGE);
   wrap.innerHTML = `<div class="tbl-scroll" id="tscroll" role="table" aria-label="${COPY.tabs[tab]}" style="--cols:${cols.map(c => c.w).join(' ')};--minw:${minw}px"><div class="tr th-row" role="row">${ths}</div><div class="tbody" id="tbody" role="rowgroup">${shown.map(r => rowHtml(cols, r, tab)).join('')}</div></div>`;
@@ -3004,7 +3035,7 @@ function renderTable() {
 function loadMore(rows, cols) {
   const t = tabState(), body = $('#tbody'); if (!body) return;
   state.moreLoading = true;
-  body.insertAdjacentHTML('beforeend', `<div class="moreload" id="moreload" style="min-width:var(--minw)"><i></i></div>`);   // FE：isFetchingNextPage → CircularProgress 24
+  body.insertAdjacentHTML('beforeend', `<div class="moreload" id="moreload" role="status" aria-label="Loading more rows" style="min-width:var(--minw)"><i aria-hidden="true"></i></div>`);   // FE：isFetchingNextPage → CircularProgress 24
   const sc = $('#tscroll'); sc.scrollTop = sc.scrollHeight;
   setTimeout(() => {
     state.moreLoading = false;
@@ -3054,11 +3085,20 @@ const ACT = {
   'mm-all'() { const vis = POP.visible || [], all = vis.every(v => POP.temp.includes(v)); vis.forEach(v => { const i = POP.temp.indexOf(v); if (all) POP.temp.splice(i, 1); else if (i < 0) POP.temp.push(v); }); renderMultiBody(); },
   'dp-day'(el) {
     const d = parseD(el.dataset.d);
-    if (!DP.start || (DP.start && DP.end)) { DP.start = d; DP.end = null; } else if (d < DP.start) DP.start = d; else DP.end = d;
+    if (isUx('p4')) {
+      /* ⏸ PARKED（UX 提案 點 4）・X-9r5 Q4（Kabin 裁決）：第一下選起日，迄日預設同起日（單日 range 成立、Apply 立即可按）；
+       * 再點另一天＝延伸成 range（早於起日則往前延伸）；再點一次重新開始。FE 現況（下面 else）要點同一天兩次才有單日。 */
+      if (DP.pending) {
+        if (d < DP.start) DP.start = d; else DP.end = d;
+        DP.pending = false;
+      } else { DP.start = d; DP.end = d; DP.pending = true; }
+    } else {
+      if (!DP.start || (DP.start && DP.end)) { DP.start = d; DP.end = null; } else if (d < DP.start) DP.start = d; else DP.end = d;
+    }
     DP.key = 'custom'; DP.dirty = true; DP.fday = d; renderDate();
   },
   'dp-quick'(el) {
-    const [s, e] = rangeOf(el.dataset.k); DP.start = s; DP.end = e; DP.key = el.dataset.k; DP.dirty = true; DP.view = new Date(e.getFullYear(), e.getMonth(), 1); DP.fday = clampDay(e);
+    const [s, e] = rangeOf(el.dataset.k); DP.start = s; DP.end = e; DP.key = el.dataset.k; DP.pending = false; DP.dirty = true; DP.view = new Date(e.getFullYear(), e.getMonth(), 1); DP.fday = clampDay(e);
     if (isUx('p4')) { closeDateDone(commitDate()); return; }   // 點 4：快捷立即套用並關閉（Guideline Date Picker）
     renderDate();
   },
@@ -3066,7 +3106,7 @@ const ACT = {
   'dp-next'() { DP.view = new Date(DP.view.getFullYear(), DP.view.getMonth() + 1, 1); DP.fday = clampDay(new Date(DP.view.getFullYear(), DP.view.getMonth(), Math.min(DP.fday.getDate(), 28))); renderDate(); },
   'dp-prev12'() { DP.view = new Date(DP.view.getFullYear(), DP.view.getMonth() - 12, 1); DP.fday = clampDay(new Date(DP.view.getFullYear(), DP.view.getMonth(), Math.min(DP.fday.getDate(), 28))); renderDate(); },
   'dp-next12'() { DP.view = new Date(DP.view.getFullYear(), DP.view.getMonth() + 12, 1); DP.fday = clampDay(new Date(DP.view.getFullYear(), DP.view.getMonth(), Math.min(DP.fday.getDate(), 28))); renderDate(); },
-  'dp-reset'() { const [s, e] = rangeOf('allTime'); DP.start = s; DP.end = e; DP.key = 'allTime'; DP.dirty = true; DP.view = new Date(e.getFullYear(), e.getMonth(), 1); DP.fday = clampDay(e); renderDate(); },
+  'dp-reset'() { const [s, e] = rangeOf('allTime'); DP.start = s; DP.end = e; DP.key = 'allTime'; DP.pending = false; DP.dirty = true; DP.view = new Date(e.getFullYear(), e.getMonth(), 1); DP.fday = clampDay(e); renderDate(); },
   'dp-cancel'() { closePop(false, true); },
   'dp-apply'() { if (!(DP.start && DP.end)) return; closeDateDone(commitDate()); },
   reset() {
@@ -3190,7 +3230,7 @@ window.DEMO_SCENARIOS = [
   { id: 'f-countries', page: 'filters', group: '下拉選單', label: 'Country 篩選：展開', icon: 'flag' },
   { id: 'f-date', page: 'filters', group: '時間範圍', label: '日期 popover：展開', icon: 'event', tip: 'FE：左月曆、右快捷清單，沒有 Apply，點外面才套用。UX 提案點 4：補 Reset／Cancel／Apply，快捷立即套用。' },
   { id: 'f-date-draft', page: 'filters', group: '時間範圍', label: '自訂：選好起訖、尚未套用', icon: 'date_range', tip: 'UX 提案：要按 Apply 才生效；FE：點外面就套用。' },
-  { id: 'f-date-start', page: 'filters', group: '時間範圍', label: '自訂：只點了起日', icon: 'start', tip: 'FE：這時點外面什麼都不會發生、也沒有提示（Fable §4 第 8 點）。UX 提案：Apply 保持 disabled。' },
+  { id: 'f-date-start', page: 'filters', group: '時間範圍', label: '自訂：只點了起日', icon: 'start', tip: 'FE：這時點外面什麼都不會發生、也沒有提示（Fable §4 第 8 點）。UX 提案點 4（X-9r5 Q4）：迄日預設同起日，Apply 立即可按（單日 range）；再點另一天延伸成範圍。' },
   { id: 'f-date-7d', page: 'filters', group: '時間範圍', label: '已套用：Last 7 Days', icon: 'today', tip: 'FE：觸發欄顯示兩個完整日期。UX 提案：只顯示標籤。' },
   { id: 'f-date-custom', page: 'filters', group: '時間範圍', label: '已套用：自訂範圍', icon: 'event_available' },
   { id: 'f-search-short', page: 'filters', group: '搜尋與清除', label: '搜尋：只打 2 個字', icon: 'warning', tip: '至少 3 字，提示 Enter at least 3 characters（FE 原文）。' },
@@ -3221,8 +3261,8 @@ window.DEMO_SCENARIOS = [
   { id: 'ux-p2-off', page: 'ux', group: '點 2：失敗登入', label: 'FE 現況', icon: 'undo', tip: '沒有 Status 欄、失敗列跟成功列長一樣。' },
   { id: 'ux-p3-on', page: 'ux', group: '點 3：User 篩選', label: '方案 A：沿用元件改文案', icon: 'group', tip: 'placeholder User、搜尋 Search role or email、預設收合。' },
   { id: 'ux-p3-off', page: 'ux', group: '點 3：User 篩選', label: 'FE 現況', icon: 'undo', tip: 'placeholder Select Email、預設全部展開。' },
-  { id: 'ux-p4-on', page: 'ux', group: '點 4：自訂時間', label: '方案 A：popover 補 Apply', icon: 'event', tip: 'Reset／Cancel／Apply footer、快捷立即套用、觸發欄顯示標籤、開在下方、Last Month → Previous Month。' },
-  { id: 'ux-p4-off', page: 'ux', group: '點 4：自訂時間', label: 'FE 現況', icon: 'undo', tip: '沒有 footer，點外面才套用。' },
+  { id: 'ux-p4-on', page: 'ux', group: '點 4：自訂時間', label: '方案 A：popover 補 Apply', icon: 'event', tip: 'Reset／Cancel／Apply footer、快捷立即套用、觸發欄顯示標籤、開在下方、Last Month → Previous Month。自訂時間點一下起日，迄日預設同起日、Apply 立即可按（X-9r5 Q4），再點另一天延伸成範圍。' },
+  { id: 'ux-p4-off', page: 'ux', group: '點 4：自訂時間', label: 'FE 現況', icon: 'undo', tip: '沒有 footer，點外面才套用。選單日要點同一天兩次。' },
   { id: 'ux-p5-on', page: 'ux', group: '點 5：欄位順序', label: '方案 A：Timestamp 第一欄', icon: 'swap_horiz', tip: 'Timestamp → User → Type（Login 加 Status）→（User Activity：Description）→ IP／Location 兩行格。' },
   { id: 'ux-p5-off', page: 'ux', group: '點 5：欄位順序', label: 'FE 現況', icon: 'undo', tip: 'Login：Email／Activity Type／Country／IP Address／Timestamp。User Activity：Email／Activity Type／Description／Country／IP Address／Timestamp。' },
   { id: 'ux-p6-on', page: 'ux', group: '點 6：Status 篩選', label: '加 Status 篩選（Login Activity）', icon: 'filter_alt', tip: '多選 Success／Failed／Account Locked，行為同 Type／Country。只在 Login Activity。' },
@@ -3296,7 +3336,7 @@ window.DEMO_APPLY = function (id) {
       const a = $('#dtrig'); if (!a) return; openDate(a);
       if (id === 'f-date') return;
       const e = addDays(TODAY, -12), s = addDays(TODAY, -40);
-      DP.start = s; DP.end = id === 'f-date-start' ? null : e; DP.key = 'custom'; DP.dirty = true; DP.view = new Date(s.getFullYear(), s.getMonth(), 1);
+      DP.start = s; DP.end = id === 'f-date-start' ? (isUx('p4') ? s : null) : e; DP.pending = id === 'f-date-start' && isUx('p4'); DP.key = 'custom'; DP.dirty = true; DP.view = new Date(s.getFullYear(), s.getMonth(), 1);
       renderDate(); placeDate();
     });
     return;
@@ -3419,6 +3459,10 @@ window.DEMO_APPLY = function (id) {
     'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);',
     'color:#fff;box-shadow:0 4px 14px rgba(13,27,62,.36);z-index:999;cursor:pointer;',
     'display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;border:0}',
+    /* X-9r6 F11：sidebar 收合時 toast 的 left 是 45（--lt-toast-left 收合值），會蓋住移到 left 54 的 FAB（5 秒內點不到）；
+       收合時把 FAB 與說明面板抬到 toast 上方（toast 預設 bottom 24、高 46、間距 16 → 86）。展開時 toast left 274 不碰到 FAB，位置不變 */
+    'html.lt-sb-collapsed .demo-fab{bottom:86px}',
+    'html.lt-sb-collapsed .demo-popover{bottom:146px;max-height:calc(100vh - 170px)}',   /* X-9r6 R1：視窗 ≤625 高時面板頂端不被切 */
     '.demo-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(13,27,62,.45)}',
     '.demo-fab:active{transform:scale(.96)}',
     '.demo-fab .material-symbols-outlined{font-size:24px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}',
@@ -3525,8 +3569,9 @@ window.DEMO_APPLY = function (id) {
     '.demo-page-tab[data-tip]::after,.demo-cat-tab[data-tip]::after{display:none!important}',
 
     /* #gl-tip — body-level fixed tooltip (auto-injected) */
-    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:12px;line-height:1.4;',
-    'padding:6px 10px;border-radius:4px;max-width:320px;white-space:normal;',
+    /* X-9r1 S1：預設值改稿值（Tooltip 元件 14／24.5、內距 8／16、r4、max-width 600）；各頁 body #gl-tip 覆寫維持有效 */
+    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:14px;line-height:24.5px;',
+    'padding:8px 16px;border-radius:4px;max-width:600px;white-space:normal;',
     'pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25);',
     'font-family:\'Noto Sans\',sans-serif}'
   ].join('');
@@ -3688,6 +3733,9 @@ window.DEMO_APPLY = function (id) {
     fabEl.className = 'demo-fab';
     fabEl.id = 'demo-fab';
     fabEl.setAttribute('data-tip', 'Designer Demo Scenarios');   /* 原生 title 改 data-tip（#gl-tip），B 區 A-15 */
+    fabEl.setAttribute('aria-label', 'Designer Demo Scenarios');   /* X-9r1 S6：原本讀屏只唸 icon 字「science」 */
+    fabEl.setAttribute('aria-expanded', 'false');
+    fabEl.setAttribute('aria-controls', 'demo-popover');
     fabEl.innerHTML =
       '<span class="material-symbols-outlined">science</span>' +
       '<span class="demo-pulse" id="demo-fab-pulse"></span>';
@@ -3697,13 +3745,15 @@ window.DEMO_APPLY = function (id) {
     var popEl = document.createElement('div');
     popEl.className = 'demo-popover';
     popEl.id = 'demo-popover';
+    popEl.setAttribute('role', 'dialog');   /* X-9r1 S6 */
+    popEl.setAttribute('aria-label', 'Demo scenarios');
     popEl.innerHTML =
       '<div class="demo-popover-hdr">' +
         '<div class="demo-popover-title">' +
           '<span class="material-symbols-outlined" style="font-size:16px">science</span>' +
           'Demo Scenarios' +
         '</div>' +
-        '<button class="demo-popover-close" id="demo-pop-close">' +
+        '<button class="demo-popover-close" id="demo-pop-close" aria-label="Close demo scenarios">' +
           '<span class="material-symbols-outlined" style="font-size:18px">close</span>' +
         '</button>' +
       '</div>' +
@@ -3766,7 +3816,21 @@ window.DEMO_APPLY = function (id) {
       if (!pop.contains(e.target) && !fab.contains(e.target) && pop.classList.contains('show')) {
         pop.classList.remove('show');
         fab.classList.remove('popped');
+        fab.setAttribute('aria-expanded', 'false');
       }
+    });
+
+    /* X-9r1 S6：面板開著、焦點在面板或 FAB 上時 Esc 關面板並回 FAB；焦點在別處（頁面自己的彈窗、輸入框）不攔 */
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      var pop = document.getElementById('demo-popover'), fab = document.getElementById('demo-fab');
+      if (!pop || !fab || !pop.classList.contains('show')) return;
+      var ae = document.activeElement;
+      if (!ae || !(pop.contains(ae) || fab.contains(ae))) return;
+      pop.classList.remove('show');
+      fab.classList.remove('popped');
+      fab.setAttribute('aria-expanded', 'false');
+      try { fab.focus({ preventScroll: true }); } catch (err) { fab.focus(); }
     });
 
     _injectGlobalTooltip();
@@ -3774,23 +3838,52 @@ window.DEMO_APPLY = function (id) {
 
   // ===== #gl-tip auto-injection =====
   function _injectGlobalTooltip() {
-    if (document.getElementById('gl-tip')) return; // host page already provides one
+    var hostTip = document.getElementById('gl-tip');
+    if (hostTip) { _enhanceHostTooltip(hostTip); return; } // host page already provides one：X-9r1 S8 只補語意，不接管位置與 hover
     var tip = document.createElement('div');
     tip.id = 'gl-tip';
+    tip.setAttribute('role', 'tooltip');   /* 2026-10-22 X-9r3 R4：讀屏要認得這是 tooltip */
     document.body.appendChild(tip);
-    var cur = null;
+    var cur = null, described = null;
+    /* 2026-10-22 X-9r3 R4：tooltip 顯示時給觸發元件 aria-describedby="gl-tip"（保留它原本的 describedby，只加／移除自己的 token），收起時移除 */
+    function describe(node) {
+      undescribe();
+      if (!node || !node.setAttribute) return;
+      var ids = (node.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+      if (ids.indexOf('gl-tip') === -1) { ids.push('gl-tip'); node.setAttribute('aria-describedby', ids.join(' ')); }
+      described = node;
+    }
+    function undescribe() {
+      if (!described) return;
+      var ids = (described.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (x) { return x && x !== 'gl-tip'; });
+      if (ids.length) described.setAttribute('aria-describedby', ids.join(' ')); else described.removeAttribute('aria-describedby');
+      described = null;
+    }
+    function hideTip() { cur = null; tip.style.display = 'none'; undescribe(); }
+    /* 頁面自己把 #gl-tip 設成 display:none（例：開 Month Picker 時收起）也要跟著移除 describedby */
+    if (window.MutationObserver) new MutationObserver(function () { if (tip.style.display === 'none') undescribe(); }).observe(tip, { attributes: true, attributeFilter: ['style'] });
     // 2026-10-09 Kabin 裁決：全站 tooltip 改成錨在元件上（Figma／MUI 行為），不再跟著游標跑。
     // 規則照 Anomaly Detection #01-3 量到的：預設出現在元件上方 6px、水平靠元件左緣，
     // 右邊放不下就改靠元件右緣 +2；上方放不下改到下方。
     // 可選屬性：data-tip-pos="below"（固定放下方）、data-tip-dy（下方距離，預設 4）、
     // data-tip-anchor（CSS 選擇器，錨在子元素上）、data-tip-align="content-right"（右緣對齊內容右緣 −16）。
+    function minX() {
+      try {
+        var sb = document.querySelector('.lt-sidebar');
+        if (sb && sb.offsetWidth > 0) return (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lt-sb-w')) || sb.offsetWidth) + 8;
+      } catch (err) {}
+      return 8;
+    }
     function place() {
-      if (!cur || !cur.isConnected) { cur = null; tip.style.display = 'none'; return; }
+      if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
+      /* X-9r1 R1：量測前先歸位，不然 tooltip 還停在上一個位置時寬度被視窗右緣擠窄（先 hover 右側短提示、再 hover 長提示，寬只有 440） */
+      tip.style.left = '0px'; tip.style.top = '0px';
       var r = a.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
       var vw = window.innerWidth, vh = window.innerHeight;
       var x = r.left;
-      if (x + tw > vw - 8) x = Math.max(8, Math.min(r.right + 2, vw - 8) - tw);
+      /* X-9r1 S2：放不下改靠右緣時，左緣不能落進 sidebar（600 寬在 1280 中間位置會伸進去）；沒有 sidebar 的頁維持 8，收合時 21＋8 */
+      if (x + tw > vw - 8) x = Math.max(minX(), Math.min(r.right + 2, vw - 8) - tw);
       if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
       var below = cur.dataset.tipPos === 'below';
       var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
@@ -3802,14 +3895,103 @@ window.DEMO_APPLY = function (id) {
     document.addEventListener('mouseover', function (e) {
       var el = e.target.closest && e.target.closest('[data-tip]');
       if (!el || (el === cur && tip.style.display !== 'none')) return;
-      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place();
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place(); describe(el);
     });
     document.addEventListener('mouseout', function (e) {
       var el = e.target.closest && e.target.closest('[data-tip]');
-      if (el && el === cur && !el.contains(e.relatedTarget)) { cur = null; tip.style.display = 'none'; }
+      if (el && el === cur && !el.contains(e.relatedTarget)) hideTip();
+    });
+    /* 2026-10-22 X-9r3 FA23：鍵盤 focus 到帶 data-tip 的元素也顯示、blur／Esc 收起（additive，只吃 :focus-visible，滑鼠點擊不觸發） */
+    /* 2026-10-22 X-9r3 R4：:focus-visible 改判真正拿到焦點的 e.target（不是帶 data-tip 的祖先）；describedby 掛在拿到焦點的那個元素上 */
+    document.addEventListener('focusin', function (e) {
+      var t = e.target, el = t.closest && t.closest('[data-tip]');
+      if (!el || !t.matches || !t.matches(':focus-visible')) return;
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place(); describe(t);
+    });
+    document.addEventListener('focusout', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && el === cur) hideTip();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && cur) { hideTip(); return; }
+      /* role="button" 的 info icon（非原生按鈕）按 Enter／Space 切換 tooltip；滑鼠行為不變 */
+      if ((e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented) {
+        var t = e.target, b = t.closest && t.closest('[role="button"][data-tip]');
+        if (!b || b !== t || /^(BUTTON|A|INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+        e.preventDefault();
+        if (cur === b && tip.style.display !== 'none') hideTip();
+        else { cur = b; tip.textContent = b.dataset.tip; tip.style.display = 'block'; place(); describe(b); }
+      }
     });
     window.addEventListener('scroll', place, true);
     window.addEventListener('resize', place);
+  }
+
+  /* X-9r1 S8：頁面自建 #gl-tip（Anomaly Detection、All Resource List、Audit Log）時，shared 不綁 mouseover／mouseout／scroll／resize，
+     位置與顯示邏輯留給頁面；這裡只補讀屏與鍵盤語意：role="tooltip"、顯示時給觸發元件 aria-describedby="gl-tip"、Esc 收起、
+     role="button" 的 Enter／Space 切換、鍵盤 focus-visible 顯示（兩者都是發合成 mouseover／mouseout 交給頁面自己的邏輯，位置規則不動）。
+     觸發元件靠 :hover／activeElement 與文字比對找，不靠自己綁 mouseover */
+  function _enhanceHostTooltip(tip) {
+    if (tip.getAttribute('role') !== 'tooltip') tip.setAttribute('role', 'tooltip');
+    var described = null, pending = null;
+    function visible() { return tip.style.display !== 'none' && getComputedStyle(tip).display !== 'none'; }
+    function undescribe() {
+      if (!described) return;
+      var ids = (described.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (x) { return x && x !== 'gl-tip'; });
+      if (ids.length) described.setAttribute('aria-describedby', ids.join(' ')); else described.removeAttribute('aria-describedby');
+      described = null;
+    }
+    function describe(node) {
+      if (node === described) return;
+      undescribe();
+      var ids = (node.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+      if (ids.indexOf('gl-tip') === -1) { ids.push('gl-tip'); node.setAttribute('aria-describedby', ids.join(' ')); }
+      described = node;
+    }
+    function findTrigger() {
+      var txt = tip.textContent, list = [];
+      if (pending && pending.isConnected) list.push(pending);
+      var ae = document.activeElement; if (ae && ae.closest) list.push(ae);
+      [].forEach.call(document.querySelectorAll('[data-tip]:hover'), function (n) { list.push(n); });
+      for (var i = 0; i < list.length; i++) {
+        var host = list[i].closest && list[i].closest('[data-tip]');
+        if (host && host.dataset.tip === txt) return host;
+      }
+      return null;
+    }
+    function sync() {
+      if (!visible()) { undescribe(); pending = null; return; }
+      var t = findTrigger();
+      if (t) describe(t);
+    }
+    if (window.MutationObserver) new MutationObserver(sync).observe(tip, { attributes: true, attributeFilter: ['style', 'class'], childList: true, characterData: true, subtree: true });
+    /* 合成事件只是「請頁面自己的 mouseover／mouseout 邏輯照它的位置規則顯示或收起」，shared 不接管位置 */
+    function fire(node, type, rel) { try { node.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, relatedTarget: rel || null })); } catch (err) {} }
+    function hide() {
+      var n = described || pending;
+      if (n && n.isConnected) fire(n, 'mouseout', null);   // 讓頁面把自己的 cur 清掉，之後同一個元件才能再顯示
+      tip.style.display = 'none';
+    }
+    /* 鍵盤 focus 到帶 data-tip 的元件（:focus-visible）也顯示，blur 收起；頁面自己的 focusin（ARL 的 .cnt）照跑，同一元件不會重複顯示 */
+    document.addEventListener('focusin', function (e) {
+      var t = e.target, el = t.closest && t.closest('[data-tip]');
+      if (!el || !t.matches || !t.matches(':focus-visible')) return;
+      pending = el; fire(el, 'mouseover', null); sync();
+    });
+    document.addEventListener('focusout', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && (el === described || el === pending) && !el.contains(e.relatedTarget)) { fire(el, 'mouseout', e.relatedTarget); pending = null; sync(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && visible()) { hide(); return; }
+      if ((e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented) {
+        var t = e.target, b = t.closest && t.closest('[role="button"][data-tip]');
+        if (!b || b !== t || /^(BUTTON|A|INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+        e.preventDefault();
+        if (visible() && tip.textContent === b.dataset.tip) { hide(); return; }
+        pending = b; fire(b, 'mouseover', null); sync();
+      }
+    });
   }
 
   // ===== PUBLIC API =====
@@ -3847,6 +4029,7 @@ window.DEMO_APPLY = function (id) {
     var opening = !pop.classList.contains('show');
     pop.classList.toggle('show');
     fab.classList.toggle('popped');
+    fab.setAttribute('aria-expanded', opening ? 'true' : 'false');   /* X-9r1 S6 */
     if (opening && pulse) pulse.style.display = 'none';
   };
 

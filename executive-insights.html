@@ -392,7 +392,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 /* ===== App layout ===== */
 .app{display:flex;min-height:100vh}
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
-.content{padding:24px 32px;flex:1}
+.content{padding:32px;flex:1}   /* X-9r1 Q2（Kabin 裁決，F122）：內容區頂部內距 24→32，跟 General Budget／Customized Budget 同，換頁標題不跳 8px */
 /* Topbar styles 已抽到 shared/lumiture-topbar.js（注入 .lt-topbar / .lt-tb-* classes） */
 
 /* ===== Page header — Figma node 5425-107659 對齊 =====
@@ -807,6 +807,7 @@ body.state-settings.role-admin .savebar{display:flex}
 /* B-4：表單彈窗圓角 15、確認彈窗 10，陰影 0 0 6px .2。B-11：確認彈窗寬照稿 #12（655），不是 440 */
 .modal{background:#fff;border-radius:var(--lt-modal-radius,15px);padding:24px 32px;/* X-9r1：稿 #09／#12 Modal 內距 24／32（全站彈窗同值；原 28） */width:660px;max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:var(--lt-modal-shadow,0 0 6px 0 rgba(0,0,0,.2))}
 .modal-sm{width:655px;border-radius:var(--lt-modal-radius-sm,10px)}
+#modal-fsm .modal{width:655px}   /* X-9r1 Q1（Kabin 裁決，F122）：Edit Start Month 660→655，跟 General Budget 與稿 #11 同寬；其他表單彈窗維持 660 */
 .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .mt{font-size:20px;font-weight:700;color:var(--g900)}
 .mt-err{color:#FF403D;font-size:30px;width:30px;height:30px;line-height:30px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;flex-shrink:0}   /* X-9r3 FB8：稿 #12 紅 error icon 30，與標題間距 15（同 Customized Budget .m-hd） */
@@ -3099,7 +3100,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
  *
  * 規格（FE libs/lumiture-ui/src/Toaster/toast.css＋Toaster.tsx，Figma GB #02-3／GL #18-3／EI #08／RS #06／RO #06 逐值一致）：
  *   成功 #008F88、錯誤 #BF302E、info #0B6DD7、warning #EC6F09｜圓角 4｜寬 400｜最小高 46｜內距 8／16｜icon 20（check_circle／info／warning）
- *   位置：左下，left = var(--lt-toast-left)（sidebar 展開 274／收合 45；沒有 sidebar 的頁面自動改 24），bottom 24｜z-index 4000（高於彈窗 2000、Demo FAB 999）
+ *   位置：左下，left = var(--lt-toast-left)（sidebar 展開 274／收合 45；沒有 sidebar 的頁面自動改 24），bottom = var(--lt-toast-bottom,24px)（X-9r1 S3：有固定底列的頁自己設 calc(底列高 + 16px)）｜z-index 4000（高於彈窗 2000、Demo FAB 999）
  *   5 秒自動消失，點一下立即關閉｜可堆疊（新的在最下面，column-reverse，gap 16）｜字 14／400／行高 24.5
  *
  * 用法（頁面把自己的 toast() 換成這個，不要再各寫一套 CSS）：
@@ -3126,7 +3127,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     var s = document.createElement('style');
     s.id = 'lt-toast-css';
     s.textContent = [
-      '.lt-toast-wrap{position:fixed;left:var(--lt-toast-left,274px);bottom:24px;z-index:var(--lt-z-toast,4000);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif)}',
+      '.lt-toast-wrap{position:fixed;left:var(--lt-toast-left,274px);bottom:var(--lt-toast-bottom,24px);z-index:var(--lt-z-toast,4000);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif)}',
       '.lt-toast{pointer-events:auto;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:var(--lt-toast-width,400px);max-width:calc(100vw - 96px);min-height:46px;padding:8px 16px;',
       'border-radius:var(--lt-toast-radius,4px);color:#fff;cursor:pointer;',
       'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);',   /* MUI shadows[1]，FE Toaster 的 inline style */
@@ -3183,7 +3184,17 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     el.addEventListener('click', close);
     _getWrap().appendChild(el);
     var d = opts.duration == null ? 5000 : opts.duration;
-    if (d > 0) setTimeout(close, d);
+    var timer = null;
+    function arm() { if (d > 0) timer = setTimeout(close, d); }
+    function disarm() { if (timer) { clearTimeout(timer); timer = null; } }
+    arm();
+    /* X-9r1 S7：帶 action（Undo）或 extra 的 toast，滑鼠停上面或焦點進去時暫停計時，離開後重新計 5 秒（WCAG 2.2.1） */
+    if ((opts.action && opts.action.label) || (opts.extra && opts.extra.nodeType === 1)) {
+      el.addEventListener('mouseenter', disarm);
+      el.addEventListener('focusin', disarm);
+      el.addEventListener('mouseleave', function () { if (el.parentNode && !el.contains(document.activeElement)) { disarm(); arm(); } });
+      el.addEventListener('focusout', function (e) { if (el.parentNode && !el.matches(':hover') && !el.contains(e.relatedTarget)) { disarm(); arm(); } });
+    }
     return el;
   }
 
@@ -3399,6 +3410,8 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     'transition:background .1s;line-height:24.5px;white-space:nowrap}',
     '.curr-dd-item:hover{background:#F6F6F6}',
     '.curr-dd-item.cp-active{background:#E6E6E6}',
+    /* X-9r1 S4：鍵盤焦點框（項目本來就是 button；滑鼠不受影響） */
+    '.curr-dd-item:focus-visible{outline:2px solid #004FB0;outline-offset:-2px}',
   ].join('');
 
   var style = document.createElement('style');
@@ -3407,13 +3420,16 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
 
   /* ===== STATE ===== */
   var _activeTrigger = null;
+  var _kbd = null;   /* X-9r1 S4：開啟期間的鍵盤／焦點監聽，_close 時移除 */
 
   /* ===== INTERNAL ===== */
   function _close() {
     var dd = document.getElementById('_curr-dd');
     if (dd) dd.remove();
+    if (_kbd) { document.removeEventListener('keydown', _kbd.key, true); document.removeEventListener('focusin', _kbd.focus, true); _kbd = null; }
     if (_activeTrigger) {
       _activeTrigger.classList.remove('cp-open');
+      _activeTrigger.setAttribute('aria-expanded', 'false');
       if (_activeTrigger.hasAttribute('data-cp-tip')) { _activeTrigger.setAttribute('data-tip', _activeTrigger.getAttribute('data-cp-tip')); _activeTrigger.removeAttribute('data-cp-tip'); }
       _activeTrigger = null;
     }
@@ -3433,17 +3449,31 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     var dd = document.createElement('div');
     dd.className = 'curr-dd';
     dd.id = '_curr-dd';
+    dd.setAttribute('role', 'listbox');   /* X-9r1 S4 */
+    dd.setAttribute('aria-label', 'Currency');
+    triggerEl.setAttribute('aria-haspopup', 'listbox');
+    triggerEl.setAttribute('aria-expanded', 'true');
     dd.innerHTML = CURRENCIES.map(function (c) {
       var isActive = c.code === currentCode;
-      return '<button class="curr-dd-item' + (isActive ? ' cp-active' : '') + '">' +
+      return '<button type="button" role="option" tabindex="-1" aria-selected="' + (isActive ? 'true' : 'false') + '" class="curr-dd-item' + (isActive ? ' cp-active' : '') + '">' +
         c.name + ' (' + c.code + ')' +
         '</button>';
     }).join('');
 
     dd.querySelectorAll('.curr-dd-item').forEach(function (btn, i) {
       btn.addEventListener('click', function () {
+        var idx = [].indexOf.call(document.querySelectorAll('.curr-btn'), triggerEl);
         _close();
+        try { triggerEl.focus({ preventScroll: true }); } catch (e) {}   /* X-9r1 S4：選完焦點回按鈕 */
         onChange(CURRENCIES[i].code);
+        /* 頁面常把整塊工具列重畫（舊按鈕被換掉），焦點會掉到 body；換掉的話回到同一位置的新按鈕 */
+        function refocus() {
+          var ae = document.activeElement;
+          if (ae && ae !== document.body && ae.isConnected) return;
+          var all = document.querySelectorAll('.curr-btn'), nb = idx > -1 ? all[idx] : null;
+          if (nb && nb !== triggerEl) { try { nb.focus({ preventScroll: true }); } catch (e) {} }
+        }
+        refocus(); setTimeout(refocus, 60);
       });
     });
 
@@ -3455,6 +3485,32 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
       /* 按鈕寫 data-dd-align="left" 的改成左緣對齊（General Budget #01-7） */
       if (triggerEl.dataset.ddAlign === 'left') { dd.style.right = 'auto'; dd.style.left = triggerEl.offsetLeft + 'px'; }
     }
+
+    /* X-9r1 S4：鍵盤。開啟後焦點進選中項；↑↓／Home／End 移動、Enter／Space 選（原生 button 的 click）、Esc 關並回按鈕、Tab 離開即關 */
+    var items = [].slice.call(dd.querySelectorAll('.curr-dd-item'));
+    var sel = dd.querySelector('.cp-active') || items[0];
+    try { if (sel) sel.focus({ preventScroll: true }); } catch (e) {}
+    var kd = function (e) {
+      var ae = document.activeElement, inDd = dd.contains(ae);
+      if (e.key === 'Escape') {
+        if (!inDd && ae !== triggerEl) return;
+        e.preventDefault(); _close(); try { triggerEl.focus({ preventScroll: true }); } catch (err) {}
+        return;
+      }
+      if (!inDd) return;
+      var i = items.indexOf(ae);
+      if (e.key === 'ArrowDown') { e.preventDefault(); items[Math.min(items.length - 1, i + 1)].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); items[Math.max(0, i - 1)].focus(); }
+      else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+      else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (e.key === 'Tab') { try { triggerEl.focus({ preventScroll: true }); } catch (err) {} }   /* 焦點先回按鈕，預設的 Tab 再從按鈕往前／往後走，離開後 focusin 監聽會關掉選單 */
+    };
+    var fi = function (e) {
+      if (!dd.contains(e.target) && e.target !== triggerEl) _close();
+    };
+    _kbd = { key: kd, focus: fi };
+    document.addEventListener('keydown', kd, true);
+    document.addEventListener('focusin', fi, true);
 
     /* Outside click to close */
     setTimeout(function () {
@@ -3474,6 +3530,14 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     if (!b || b.classList.contains('cp-open') || b.disabled) return;
     if (!b.hasAttribute('data-tip') && !b.hasAttribute('data-tip-tip') && !b.hasAttribute('data-no-tip')) b.setAttribute('data-tip', TIP);
   }, true);
+
+  /* X-9r1 S4：幣別鈕預設帶 aria-haspopup／aria-expanded（還沒打開過也要讓讀屏知道這是下拉）；hover／聚焦時補，不動頁面 markup */
+  function _markBtn(e) {
+    var b = e.target.closest && e.target.closest('.curr-btn');
+    if (b && !b.hasAttribute('aria-haspopup')) { b.setAttribute('aria-haspopup', 'listbox'); b.setAttribute('aria-expanded', b.classList.contains('cp-open') ? 'true' : 'false'); }
+  }
+  document.addEventListener('focusin', _markBtn, true);
+  document.addEventListener('mouseover', _markBtn, true);
 
   window.CurrencyPicker = {
     CURRENCIES: CURRENCIES,
@@ -5526,8 +5590,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     '.demo-page-tab[data-tip]::after,.demo-cat-tab[data-tip]::after{display:none!important}',
 
     /* #gl-tip — body-level fixed tooltip (auto-injected) */
-    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:12px;line-height:1.4;',
-    'padding:6px 10px;border-radius:4px;max-width:320px;white-space:normal;',
+    /* X-9r1 S1：預設值改稿值（Tooltip 元件 14／24.5、內距 8／16、r4、max-width 600）；各頁 body #gl-tip 覆寫維持有效 */
+    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:14px;line-height:24.5px;',
+    'padding:8px 16px;border-radius:4px;max-width:600px;white-space:normal;',
     'pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25);',
     'font-family:\'Noto Sans\',sans-serif}'
   ].join('');
@@ -5689,6 +5754,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     fabEl.className = 'demo-fab';
     fabEl.id = 'demo-fab';
     fabEl.setAttribute('data-tip', 'Designer Demo Scenarios');   /* 原生 title 改 data-tip（#gl-tip），B 區 A-15 */
+    fabEl.setAttribute('aria-label', 'Designer Demo Scenarios');   /* X-9r1 S6：原本讀屏只唸 icon 字「science」 */
+    fabEl.setAttribute('aria-expanded', 'false');
+    fabEl.setAttribute('aria-controls', 'demo-popover');
     fabEl.innerHTML =
       '<span class="material-symbols-outlined">science</span>' +
       '<span class="demo-pulse" id="demo-fab-pulse"></span>';
@@ -5698,13 +5766,15 @@ document.addEventListener('DOMContentLoaded',()=>{
     var popEl = document.createElement('div');
     popEl.className = 'demo-popover';
     popEl.id = 'demo-popover';
+    popEl.setAttribute('role', 'dialog');   /* X-9r1 S6 */
+    popEl.setAttribute('aria-label', 'Demo scenarios');
     popEl.innerHTML =
       '<div class="demo-popover-hdr">' +
         '<div class="demo-popover-title">' +
           '<span class="material-symbols-outlined" style="font-size:16px">science</span>' +
           'Demo Scenarios' +
         '</div>' +
-        '<button class="demo-popover-close" id="demo-pop-close">' +
+        '<button class="demo-popover-close" id="demo-pop-close" aria-label="Close demo scenarios">' +
           '<span class="material-symbols-outlined" style="font-size:18px">close</span>' +
         '</button>' +
       '</div>' +
@@ -5767,7 +5837,21 @@ document.addEventListener('DOMContentLoaded',()=>{
       if (!pop.contains(e.target) && !fab.contains(e.target) && pop.classList.contains('show')) {
         pop.classList.remove('show');
         fab.classList.remove('popped');
+        fab.setAttribute('aria-expanded', 'false');
       }
+    });
+
+    /* X-9r1 S6：面板開著、焦點在面板或 FAB 上時 Esc 關面板並回 FAB；焦點在別處（頁面自己的彈窗、輸入框）不攔 */
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      var pop = document.getElementById('demo-popover'), fab = document.getElementById('demo-fab');
+      if (!pop || !fab || !pop.classList.contains('show')) return;
+      var ae = document.activeElement;
+      if (!ae || !(pop.contains(ae) || fab.contains(ae))) return;
+      pop.classList.remove('show');
+      fab.classList.remove('popped');
+      fab.setAttribute('aria-expanded', 'false');
+      try { fab.focus({ preventScroll: true }); } catch (err) { fab.focus(); }
     });
 
     _injectGlobalTooltip();
@@ -5775,7 +5859,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   // ===== #gl-tip auto-injection =====
   function _injectGlobalTooltip() {
-    if (document.getElementById('gl-tip')) return; // host page already provides one
+    var hostTip = document.getElementById('gl-tip');
+    if (hostTip) { _enhanceHostTooltip(hostTip); return; } // host page already provides one：X-9r1 S8 只補語意，不接管位置與 hover
     var tip = document.createElement('div');
     tip.id = 'gl-tip';
     tip.setAttribute('role', 'tooltip');   /* 2026-10-22 X-9r3 R4：讀屏要認得這是 tooltip */
@@ -5803,13 +5888,23 @@ document.addEventListener('DOMContentLoaded',()=>{
     // 右邊放不下就改靠元件右緣 +2；上方放不下改到下方。
     // 可選屬性：data-tip-pos="below"（固定放下方）、data-tip-dy（下方距離，預設 4）、
     // data-tip-anchor（CSS 選擇器，錨在子元素上）、data-tip-align="content-right"（右緣對齊內容右緣 −16）。
+    function minX() {
+      try {
+        var sb = document.querySelector('.lt-sidebar');
+        if (sb && sb.offsetWidth > 0) return (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lt-sb-w')) || sb.offsetWidth) + 8;
+      } catch (err) {}
+      return 8;
+    }
     function place() {
       if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
+      /* X-9r1 R1：量測前先歸位，不然 tooltip 還停在上一個位置時寬度被視窗右緣擠窄（先 hover 右側短提示、再 hover 長提示，寬只有 440） */
+      tip.style.left = '0px'; tip.style.top = '0px';
       var r = a.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
       var vw = window.innerWidth, vh = window.innerHeight;
       var x = r.left;
-      if (x + tw > vw - 8) x = Math.max(8, Math.min(r.right + 2, vw - 8) - tw);
+      /* X-9r1 S2：放不下改靠右緣時，左緣不能落進 sidebar（600 寬在 1280 中間位置會伸進去）；沒有 sidebar 的頁維持 8，收合時 21＋8 */
+      if (x + tw > vw - 8) x = Math.max(minX(), Math.min(r.right + 2, vw - 8) - tw);
       if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
       var below = cur.dataset.tipPos === 'below';
       var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
@@ -5853,6 +5948,73 @@ document.addEventListener('DOMContentLoaded',()=>{
     window.addEventListener('resize', place);
   }
 
+  /* X-9r1 S8：頁面自建 #gl-tip（Anomaly Detection、All Resource List、Audit Log）時，shared 不綁 mouseover／mouseout／scroll／resize，
+     位置與顯示邏輯留給頁面；這裡只補讀屏與鍵盤語意：role="tooltip"、顯示時給觸發元件 aria-describedby="gl-tip"、Esc 收起、
+     role="button" 的 Enter／Space 切換、鍵盤 focus-visible 顯示（兩者都是發合成 mouseover／mouseout 交給頁面自己的邏輯，位置規則不動）。
+     觸發元件靠 :hover／activeElement 與文字比對找，不靠自己綁 mouseover */
+  function _enhanceHostTooltip(tip) {
+    if (tip.getAttribute('role') !== 'tooltip') tip.setAttribute('role', 'tooltip');
+    var described = null, pending = null;
+    function visible() { return tip.style.display !== 'none' && getComputedStyle(tip).display !== 'none'; }
+    function undescribe() {
+      if (!described) return;
+      var ids = (described.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (x) { return x && x !== 'gl-tip'; });
+      if (ids.length) described.setAttribute('aria-describedby', ids.join(' ')); else described.removeAttribute('aria-describedby');
+      described = null;
+    }
+    function describe(node) {
+      if (node === described) return;
+      undescribe();
+      var ids = (node.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+      if (ids.indexOf('gl-tip') === -1) { ids.push('gl-tip'); node.setAttribute('aria-describedby', ids.join(' ')); }
+      described = node;
+    }
+    function findTrigger() {
+      var txt = tip.textContent, list = [];
+      if (pending && pending.isConnected) list.push(pending);
+      var ae = document.activeElement; if (ae && ae.closest) list.push(ae);
+      [].forEach.call(document.querySelectorAll('[data-tip]:hover'), function (n) { list.push(n); });
+      for (var i = 0; i < list.length; i++) {
+        var host = list[i].closest && list[i].closest('[data-tip]');
+        if (host && host.dataset.tip === txt) return host;
+      }
+      return null;
+    }
+    function sync() {
+      if (!visible()) { undescribe(); pending = null; return; }
+      var t = findTrigger();
+      if (t) describe(t);
+    }
+    if (window.MutationObserver) new MutationObserver(sync).observe(tip, { attributes: true, attributeFilter: ['style', 'class'], childList: true, characterData: true, subtree: true });
+    /* 合成事件只是「請頁面自己的 mouseover／mouseout 邏輯照它的位置規則顯示或收起」，shared 不接管位置 */
+    function fire(node, type, rel) { try { node.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, relatedTarget: rel || null })); } catch (err) {} }
+    function hide() {
+      var n = described || pending;
+      if (n && n.isConnected) fire(n, 'mouseout', null);   // 讓頁面把自己的 cur 清掉，之後同一個元件才能再顯示
+      tip.style.display = 'none';
+    }
+    /* 鍵盤 focus 到帶 data-tip 的元件（:focus-visible）也顯示，blur 收起；頁面自己的 focusin（ARL 的 .cnt）照跑，同一元件不會重複顯示 */
+    document.addEventListener('focusin', function (e) {
+      var t = e.target, el = t.closest && t.closest('[data-tip]');
+      if (!el || !t.matches || !t.matches(':focus-visible')) return;
+      pending = el; fire(el, 'mouseover', null); sync();
+    });
+    document.addEventListener('focusout', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && (el === described || el === pending) && !el.contains(e.relatedTarget)) { fire(el, 'mouseout', e.relatedTarget); pending = null; sync(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && visible()) { hide(); return; }
+      if ((e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented) {
+        var t = e.target, b = t.closest && t.closest('[role="button"][data-tip]');
+        if (!b || b !== t || /^(BUTTON|A|INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+        e.preventDefault();
+        if (visible() && tip.textContent === b.dataset.tip) { hide(); return; }
+        pending = b; fire(b, 'mouseover', null); sync();
+      }
+    });
+  }
+
   // ===== PUBLIC API =====
   function _refreshScrollArea() {
     var scroll = document.getElementById('demo-popover-scroll');
@@ -5888,6 +6050,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     var opening = !pop.classList.contains('show');
     pop.classList.toggle('show');
     fab.classList.toggle('popped');
+    fab.setAttribute('aria-expanded', opening ? 'true' : 'false');   /* X-9r1 S6 */
     if (opening && pulse) pulse.style.display = 'none';
   };
 

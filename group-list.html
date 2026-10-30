@@ -378,8 +378,8 @@ button,input{font:inherit}
 .main{width:min(100%,1366px);margin:0 auto;padding:32px 32px 96px;flex:1;width:100%}
 
 /* ---- go-back / breadcrumb ---- */
-.go-back{display:inline-flex;align-items:center;gap:4px;border:0;background:transparent;color:var(--lt-color-primary);font-weight:700;font-size:14px;padding:0 0 24px;cursor:pointer}
-.go-back .material-symbols-outlined{font-size:20px}
+.go-back{display:inline-flex;align-items:center;gap:4px;border:0;background:transparent;color:var(--lt-color-primary);font-weight:700;font-size:16px;padding:0 0 24px;cursor:pointer}   /* X-9r5 GA5：稿 #02 secondary/link/borderless 16／700、icon arrow_circle_left 16 */
+.go-back .material-symbols-outlined{font-size:16px}
 .go-back:hover .go-back-label{text-decoration:underline}
 .crumb{font-size:12px;color:var(--lt-color-text-secondary);margin-bottom:4px}
 
@@ -389,7 +389,10 @@ button,input{font:inherit}
 /* ---- list page header (type scale read off Figma text-node heights:
  * CloudMile 36px→H3 24, "Tier 1 Group List (13)" 24px→H6 16, description 18px→Caption 12) ---- */
 .org-title{font-size:var(--lt-fs-24);font-weight:var(--lt-fw-bold);color:var(--lt-color-text-heading);margin:0 0 20px}
+h1[tabindex="-1"]:focus{outline:none}
+.org-title.is-list{line-height:36px;margin-bottom:32px}   /* X-9r5 GA16：稿 #01 CloudMile 行高 36、距 Tier 1 Group List 32 */
 .section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.section-head.is-list{align-items:flex-end;margin-bottom:24px}   /* X-9r5 GA16：Create Group 與兩行標題區底對齊，表頭落在 y262（稿 #01） */
 .section-head h2{font-size:var(--lt-fs-16);font-weight:700;line-height:var(--lt-leading-tight);margin:0 0 8px;color:var(--lt-color-text-heading)}
 .section-head p{margin:0;color:var(--lt-color-text-secondary);font-size:var(--lt-fs-12);line-height:var(--lt-leading-tight)}
 .section-copy{margin:0;color:var(--lt-color-text-secondary);font-size:var(--lt-fs-12);line-height:var(--lt-leading-tight)}
@@ -401,7 +404,9 @@ button,input{font:inherit}
 .btn-pri:disabled{background:var(--lt-button-disabled-bg);color:var(--lt-button-disabled-text);cursor:not-allowed;box-shadow:none}   /* B-1：FE 版 #CCCCCC 底白字 */
 .btn-out{border:1px solid var(--lt-color-primary);background:#fff;color:var(--lt-color-primary)}
 .btn-out:hover{background:var(--lt-color-primary-bg)}
-.btn-out:disabled{border-color:var(--lt-grey-200);color:var(--lt-grey-300);cursor:not-allowed}
+.btn-out:disabled{border-color:var(--lt-grey-300);color:var(--lt-grey-300);background:#fff;cursor:not-allowed}   /* X-9r5 GA19：外框鈕停用＝白底、框與字都 #CCCCCC（同 General Budget X-9r2） */
+.btn.btn-s{height:30px;padding:0 12px;min-width:0}   /* X-9r5 GA4：稿 #02 Button / S 高 30、內距 0 12、icon 16 */
+.btn.btn-s .material-symbols-outlined{font-size:16px}
 .btn-out.danger{border-color:var(--lt-color-error);color:var(--lt-color-error)}
 .btn-out.danger:hover{background:var(--lt-color-error-light)}
 /* A-5／B-6：表格 Action icon 改用 shared/lumiture-ui.css 的 .lt-btn-icon（20 box／16 icon／FILL 1／primary／hover #D1EEFF），本頁不再自己定義 */
@@ -414,6 +419,8 @@ table{border-collapse:collapse;width:100%;min-width:760px;text-align:left;table-
 thead th{position:sticky;top:0;z-index:2;height:50px;padding:7px 16px 8px;background:var(--lt-color-primary-bg);border-bottom:1px solid var(--lt-grey-400);color:var(--lt-color-text-heading);font-size:var(--lt-fs-14);font-weight:700;white-space:nowrap}   /* A-12：表頭底線 #B3B3B3 */
 th.center,td.center{text-align:center}
 th.sortable{cursor:pointer;user-select:none}
+th.sortable .th-sort{min-height:24px;border:0;background:none;padding:0;margin:0;color:inherit;font:inherit;cursor:pointer;text-align:inherit}   /* X-9r5 GA28：排序改 th 內真 button，外觀不動 */
+th.sortable .th-sort:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px;border-radius:2px}
 /* 表頭不做整格灰底 hover（Kabin 2026-09-11）：那是一整片色塊，比它要表達的
  * 「這欄可排序」重太多，而且表頭是標籤列、不是清單項目。排序的常駐線索是那顆
  * 箭頭（未選中灰、選中藍）＋ cursor:pointer，hover 只需要把箭頭加深就夠。 */
@@ -424,14 +431,17 @@ th.sortable.center .th-sort{justify-content:center;width:100%}
 tbody td{height:50px;padding:8px 16px;border-bottom:1px solid var(--lt-color-border-default);vertical-align:middle;font-size:14px;overflow:hidden;text-overflow:ellipsis}
 tbody tr:last-child td{border-bottom:0}
 tbody tr.clickable{cursor:pointer}
-tbody tr.clickable:hover td{background:var(--lt-color-primary-bg)}
-tbody tr.selected td{background:var(--lt-blue-20)}
-tbody tr.selected:hover td{background:var(--lt-blue-30)}
+tbody tr.clickable:hover td{background:var(--lt-grey-50)}   /* X-9r5 GA2：稿 #01-1 hovered 列 #F6F6F6（同 Audit Log） */
+tbody tr.clickable:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:-2px}   /* X-9r5 GA28：列可 Tab、Enter 進詳情 */
+/* X-9r5 GA22：Resources 多選不再鋪選取列底色（稿 #03-5 只有 checkbox 變實心，跟 All Resource List 一致）；tr.selected class 保留給 sweep */
 tbody tr.pending td{background:var(--lt-grey-100);color:var(--lt-grey-400)}
 .cell-ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell-nowrap{white-space:nowrap}   /* X-9r5 GA9：1280 下 Last Updated 不換行 */
+.sr-only{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}   /* X-9r5 GA27／GA33：視覺隱藏 */
+.cell-name-id .idg{color:var(--lt-color-text-secondary)}   /* X-9r5 Q1（Kabin 裁決）：Resources 表 Project／Account／Billing Account／Organization 欄改單行 `name (ID)`，ID 用次要灰，列高 50；截斷時 markTruncated 掛完整字串 tooltip（同 All Resource List、Organization Settings） */
 .cell-double .l1{color:var(--lt-color-text-primary)}
 .cell-double .l2{color:var(--lt-color-text-secondary);font-size:12px;margin-top:2px;overflow-wrap:anywhere}
-.link-btn{border:0;background:transparent;color:var(--lt-color-text-link);font-weight:500;font-size:14px;padding:0;cursor:pointer;text-decoration:underline;font-family:inherit}   /* A-28／B-14：#004FB0／500／底線（稿 cell、FE ResourceButton） */
+.link-btn{position:relative;white-space:nowrap;border:0;background:transparent;color:var(--lt-color-text-link);font-weight:500;font-size:14px;padding:0;cursor:pointer;text-decoration:underline;font-family:inherit}   /* A-28／B-14：#004FB0／500／底線（稿 cell、FE ResourceButton） */
 .link-btn:hover{color:var(--lt-color-text-link-hover)}
 .actions-cell{display:flex;align-items:center;gap:4px}
 td.center .actions-cell{justify-content:center}
@@ -440,12 +450,15 @@ td.center .actions-cell{justify-content:center}
 /* Checkbox 已抽成共用元件 → shared/lumiture-checkbox.js（CSS 由該檔自我注入）。 */
 
 /* ---- tabs (primary, underline) ---- */
-.tabs-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:1px solid var(--lt-color-border-default);margin-bottom:20px}
-.tabs{display:flex;gap:4px}
-.tab{padding:8px 16px;height:36px;font-size:14px;font-weight:400;/* X-9r1：未選 400、選中 700（CMDS Tab，同 General Budget #01、All Resource List；原 500） */color:var(--lt-color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:var(--lt-transition-fast);background:none;border-left:none;border-right:none;border-top:none;font-family:inherit;white-space:nowrap}
-.tab:hover{color:var(--lt-color-text-heading);border-bottom-color:var(--lt-grey-200)}
-.tab.active{color:var(--lt-color-primary);font-weight:700;border-bottom-color:var(--lt-color-primary)}
+/* X-9r5 GA3：CMDS Tab（稿 #02／#03；同 General Budget C-1、Cost Dashboard）。無內距、間距 32、字 14／行高 21，底軌 2px #E6E6E6，選中底線 4px r10 */
+.tabs-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:2px solid var(--lt-grey-200);margin-bottom:17px}
+.tabs{display:flex;gap:32px}
+.tab{position:relative;padding:0 0 8px;font-size:14px;font-weight:400;line-height:21px;color:var(--lt-color-text-secondary);cursor:pointer;margin-bottom:-2px;display:flex;align-items:center;gap:4px;background:none;border:none;font-family:inherit;white-space:nowrap}   /* X-9r1：未選 400、選中 700 */
+.tab:hover{color:var(--lt-color-text-heading)}
+.tab.active{color:var(--lt-color-primary);font-weight:700}
+.tab.active::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:4px;border-radius:10px;background:var(--lt-color-primary)}
 .tab:disabled{color:var(--lt-grey-300);cursor:not-allowed}
+.tab:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px;border-radius:2px}
 
 /* ---- cloud sub-tabs (pill) ---- */
 .pill-tabs{display:inline-flex;gap:4px;background:var(--lt-grey-100);border-radius:5px;padding:4px;margin-bottom:16px}
@@ -460,6 +473,9 @@ td.center .actions-cell{justify-content:center}
 /* ---- search ---- */
 .search-box{position:relative;width:280px}
 .search-box input{width:100%;height:36px;border:1px solid var(--lt-color-border-input);border-radius:5px;padding:0 12px 0 36px;font-size:14px}
+.search-box input{color:var(--lt-color-text-primary)}   /* X-9r5 GA7：輸入字 #262626（瀏覽器預設是 #000） */
+.search-box input::placeholder{color:var(--lt-grey-400)}   /* placeholder #B3B3B3（稿 #03／#18-1） */
+.search-box input:disabled{background:var(--lt-color-bg-disabled);color:var(--lt-grey-400)}   /* 停用＝欄位停用底（不是 UA 預設） */
 .search-box input:focus{outline:none;border-color:var(--lt-color-primary)}
 .search-box .material-symbols-outlined{position:absolute;left:9px;top:8px;font-size:20px;color:var(--lt-color-text-secondary)}
 .res-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
@@ -469,7 +485,7 @@ td.center .actions-cell{justify-content:center}
 .empty-state{min-height:280px;display:grid;place-items:center;padding:32px;text-align:center}
 .empty-state.small{min-height:180px}
 .empty-state .material-symbols-outlined{font-size:64px;color:var(--lt-blue-30);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 48;margin-bottom:12px}
-.empty-title{font-size:16px;font-weight:700;margin:0 0 4px;color:var(--lt-color-text-heading)}
+.empty-title{font-size:16px;font-weight:700;margin:0 0 4px;color:var(--lt-color-text-secondary)}   /* X-9r5 GA1：空狀態標題 #676767（稿 #01-2；X-9r1 #30 全站裁決） */
 .empty-copy{margin:0;color:var(--lt-color-text-secondary);line-height:1.65;white-space:pre-line}   /* v3：拿掉 v2 的 max-width:420px，#01-2 / #05-1 的兩行文案被它擠成三行（不要加設計稿沒有的 max-width） */
 /* A-19：error 變體不再用紅色實心 icon，全站空狀態／無權限一律 FILL 0、#9ED7FF（見 shared/lumiture-empty.js） */
 .empty-state .btn{margin-top:16px}
@@ -489,8 +505,10 @@ td.center .actions-cell{justify-content:center}
 .dlg-backdrop{position:fixed;inset:0;z-index:2000;background:var(--lt-modal-backdrop);display:grid;place-items:center;padding:24px}
 .dlg{width:min(440px,100%);background:#fff;border-radius:var(--lt-modal-radius-sm);box-shadow:var(--lt-modal-shadow);padding:24px}   /* B-4：確認類彈窗圓角 10 */
 .dlg-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.dlg-head .rmodal-close{margin-left:auto}
+.dlg-head .rmodal-close .material-symbols-outlined{color:var(--lt-color-text-secondary);font-size:24px}   /* 關閉 × #676767（不吃上面標題 icon 的紅色與 30px） */
 .dlg-head .material-symbols-outlined{color:var(--lt-color-error);font-size:30px}   /* B-12：危險確認彈窗標題 icon 用 CB 版紅 error 圓（稿 #20 也是） */
-.dlg-head h3{margin:0;font-size:18px}
+.dlg-head h3{margin:0;font-size:var(--lt-fs-20);font-weight:var(--lt-fw-bold)}   /* X-9r5 GA11：標題 20／700（稿 #20、#18-2、BackUp #18-2） */
 .dlg-body{color:var(--lt-color-text-primary);line-height:1.65;margin-bottom:20px}
 .dlg-body b{font-weight:700}
 .dlg-actions{display:flex;justify-content:flex-end;gap:8px}
@@ -503,6 +521,8 @@ td.center .actions-cell{justify-content:center}
 .rmodal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:24px 24px 0}
 .rmodal-head h3{margin:0 0 4px;font-size:var(--lt-fs-18);line-height:var(--lt-leading-tight)}
 .rmodal-head p{margin:0;font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);line-height:var(--lt-leading-tight)}
+.assign-picker .rmodal-head h3{font-size:var(--lt-fs-20);font-weight:var(--lt-fw-bold)}   /* X-9r5 GA8：稿 #18 標題 20／700、說明 14／400 #262626（版面不動） */
+.assign-picker .rmodal-head p{font-size:var(--lt-fs-14);font-weight:400;color:var(--lt-color-text-primary)}
 .rmodal-close{border:0;background:transparent;color:var(--lt-color-text-secondary);cursor:pointer;display:flex;padding:2px}
 .rmodal-tools{display:flex;align-items:center;gap:8px;padding:16px 24px 12px}
 .rmodal-tools .search-box{flex:1;width:auto}
@@ -686,7 +706,7 @@ td.has-fptip:focus-visible{outline:2px solid var(--lt-color-primary);outline-off
 .wz{width:min(800px,100%);height:min(720px,calc(100vh - 48px));display:flex;background:#fff;border-radius:var(--lt-modal-radius);box-shadow:var(--lt-modal-shadow);overflow:hidden}   /* Figma: rounded-[15px]，不對應任何既有 --lt-radius-* token（get_design_context 核對） */
 /* 左側垂直 stepper：done / active 都是藍色實心勾（#30 第一、二步同時是勾），
  * 未到的步驟是灰色空心圓 + 灰字。步驟之間一條 2px 直線接在圓心下方。 */
-.wz-steps{flex:0 0 200px;padding:32px 8px 32px 24px;display:flex;flex-direction:column;border-right:1px solid transparent}
+.wz-steps{flex:0 0 200px;padding:32px 8px 32px 24px;display:flex;flex-direction:column;border-right:1px solid var(--lt-grey-200)}   /* X-9r5 GA21：稿 #08 stepper 欄右緣分隔線 #E6E6E6 */
 .wz-step{display:flex;align-items:flex-start;gap:10px;font-size:14px;font-weight:700;line-height:24.5px;color:var(--lt-grey-400)}   /* get_design_context：Body Bold 14px、icon-text gap 10px，不是 13px/600/18px/8px */
 .wz-step .wz-dot{width:20px;height:20px;flex:0 0 20px;border-radius:50%;border:2px solid var(--lt-grey-300);background:#fff;display:grid;place-items:center;margin-top:-1px}
 .wz-step .wz-dot .material-symbols-outlined{display:none;font-size:14px;color:#fff;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 20}
@@ -702,7 +722,7 @@ td.has-fptip:focus-visible{outline:2px solid var(--lt-color-primary);outline-off
 .wz-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:16px}
 .wz-foot .btn{min-width:100px}
 .wz-foot-right{display:flex;gap:8px;margin-left:auto}
-.wz-skip{font-size:13px}
+.wz-skip{font-size:12px;font-weight:700}   /* X-9r5 GA13：稿 #08 12／700（底線保留） */
 /* 內嵌的資源選單：#31 / #37 把清單裝在一個帶框線的容器裡，這裡復用 v2 的
  * picker（工具列 + 提示條 + 清單），只換外殼。 */
 .wz-picker{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--lt-color-border-default);border-radius:5px;overflow:hidden}
@@ -717,7 +737,7 @@ td.has-fptip:focus-visible{outline:2px solid var(--lt-color-primary);outline-off
 /* ---- form fields（#08 / #30 / #11：藍色粗體小標籤 + 36px 輸入框 + 12px 灰色說明） ---- */
 .fld{margin-bottom:32px}   /* 同上：Content 內每個區塊（欄位、欄位群組）之間固定 gap-32，不是 20（get_design_context 核對 #08 / #09 皆同） */
 .fld-lbl{display:block;font-size:var(--lt-fs-12);font-weight:700;color:var(--lt-color-primary);margin-bottom:4px;line-height:1.4}   /* Text Field 元件內建 label→input gap 是 4px，不是 6（get_design_context 核對） */
-.fld-lbl .req{color:var(--lt-color-error);margin-left:2px}
+.fld-lbl .req{color:var(--lt-color-error);font-size:var(--lt-fs-12);font-weight:400}   /* X-9r5 GA14：稿 #08／#07-1 星號前空一格、12／400 */
 .ipt{width:100%;height:36px;border:1px solid var(--lt-grey-300);border-radius:5px;padding:0 8px;font-size:14px;background:#fff;color:var(--lt-color-text-primary)}   /* Figma: State/Border Main #CCCCCC + 8px 水平內距（get_design_context 核對，原本邊框 12px 內距都是猜的） */
 .ipt::placeholder{color:var(--lt-grey-400)}
 .ipt-lg{height:44px}   /* #09 Edit Group 用的是 Text Field / Large（44px），不是其餘表單共用的 Medium（36px）（get_design_context 核對，只在這一個彈窗看到 Large，範圍縮到只有這裡） */
@@ -732,24 +752,27 @@ td.has-fptip:focus-visible{outline:2px solid var(--lt-color-primary);outline-off
 /* Error Details 折疊區（#08-2、#11-1）：預設展開、內容過高才出捲軸、點標題可收合
  * 只剩標題。註記說樣式參考 CMDS，這裡照截圖：外框 + 紅色警示 icon + 粗體標題 +
  * 右側 chevron。 */
-.errbox{border:1px solid var(--lt-color-border-default);border-radius:5px;margin-top:8px;overflow:hidden;background:#fff}
-.errbox-head{display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;border:0;background:#fff;font:inherit;font-size:13px;font-weight:700;color:var(--lt-color-text-primary);cursor:pointer;text-align:left}
+.errbox{border:1px solid var(--lt-grey-300);border-radius:0;margin-top:8px;overflow:hidden;background:#fff}   /* X-9r5 GA15：稿 #08-2／#11-1 框 #CCCCCC、直角 */
+.errbox-head{display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px 8px 20px;border:0;background:#fff;font:inherit;font-size:13px;font-weight:700;color:var(--lt-color-text-primary);cursor:pointer;text-align:left}
 .errbox-head .warn{color:var(--lt-color-error);font-size:18px}
 .errbox-head .chev{margin-left:auto;font-size:20px;color:var(--lt-color-text-secondary);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20}
-.errbox-body{border-top:1px solid var(--lt-color-border-default);padding:12px 16px;font-size:var(--lt-fs-12);line-height:1.6;max-height:132px;overflow:auto;overscroll-behavior:contain;color:var(--lt-color-text-primary)}
+.errbox-body{border-top:1px solid var(--lt-color-border-default);padding:12px 16px 12px 20px;font-size:var(--lt-fs-12);line-height:1.6;max-height:132px;overflow:auto;overscroll-behavior:contain;color:var(--lt-color-text-primary)}
 .errbox-body ul{margin:8px 0 0;padding-left:18px}
 .errbox-body::-webkit-scrollbar{width:6px}
 .errbox-body::-webkit-scrollbar-thumb{background:var(--lt-grey-300);border-radius:3px}
 
 /* ---- Resources 子分頁 segmented control（#03-3 / #03-4）：Project|Label、Account|Tag。
  * 選中的那格淺藍底 + 藍字 + 深藍計數 pill；未選白底灰字 + 灰計數 pill。 ---- */
-.seg{display:inline-flex;border:1px solid var(--lt-color-border-default);border-radius:5px;overflow:hidden;flex:0 0 auto}
-.seg-btn{height:36px;padding:0 12px;border:0;background:#fff;font-size:13px;font-weight:600;color:var(--lt-color-text-secondary);cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:inherit}
-.seg-btn+.seg-btn{border-left:1px solid var(--lt-color-border-default)}
+/* X-9r5 GA6：CMDS Toggle Group（稿 #03；同 Audit Log .tg）。白底、框 #CCCCCC、r6、選中 #D1EEFF／#002663 14／400；計數 20×20 r5 方塊，選中 #004FB0、未選 #676767，白字 14／700 */
+.seg{display:inline-flex;height:36px;border:1px solid var(--lt-grey-300);border-radius:6px;overflow:hidden;background:#fff;flex:0 0 auto}
+.seg-btn{height:34px;padding:0 16px;border:0;background:#fff;font-size:14px;font-weight:400;color:var(--lt-color-text-secondary);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;white-space:nowrap;transition:background var(--lt-transition-fast)}
+.seg-btn+.seg-btn{border-left:1px solid var(--lt-grey-300)}
 .seg-btn:hover{background:var(--lt-grey-50)}
-.seg-btn.active{background:var(--lt-color-primary-bg);color:var(--lt-color-primary)}
-.seg-cnt{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;border-radius:10px;padding:0 6px;font-size:11px;font-weight:700;background:var(--lt-grey-200);color:var(--lt-color-text-secondary);font-variant-numeric:tabular-nums}
-.seg-btn.active .seg-cnt{background:var(--lt-blue-90);color:#fff}
+.seg-btn.active{background:var(--lt-blue-20);color:var(--lt-blue-90)}
+.seg-btn.active:hover{background:var(--lt-blue-20)}
+.seg-btn:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(0,79,176,.35)}
+.seg-cnt{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;border-radius:5px;padding:0 4px;font-size:14px;font-weight:700;background:var(--lt-grey-500);color:#fff;font-variant-numeric:tabular-nums}
+.seg-btn.active .seg-cnt{background:var(--lt-color-primary);color:#fff}
 .res-toolbar-left{display:flex;align-items:center;gap:12px;min-width:0}
 .res-toolbar-left .search-box{width:240px}
 
@@ -765,13 +788,13 @@ td.has-fptip:focus-visible{outline:2px solid var(--lt-color-primary);outline-off
 .dd.is-open .dd-trigger{border-color:var(--lt-color-primary)}
 .dd-trigger:disabled{background:var(--lt-grey-50);color:var(--lt-grey-300);cursor:not-allowed}
 .dd-caret{position:absolute;right:8px;top:6px;font-size:22px;color:var(--lt-color-text-secondary);pointer-events:none;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
-.dd-panel{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:60;background:#fff;border:1px solid var(--lt-color-border-default);border-radius:6px;box-shadow:var(--lt-shadow-dialog);padding:10px;max-height:360px;display:flex;flex-direction:column;overflow:hidden}   /* 上一版猜 elevation/1（MUI Paper 陰影）是錯的——get_design_context 直接讀到這個元件自己的 shadow-[0px_0px_6px_...rgba(0,0,0,0.2)]，就是站台既有的扁平 Dialog/Card/Dropdown 陰影 --lt-shadow-dialog。get_variable_defs 那次抓到的 elevation/1 屬於同一個畫布範圍內的別的東西，不是這個下拉本身。順帶核對：外距 10px、圓角 6px、清單列 40px（見下） */
+.dd-panel{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:60;background:#fff;border:1px solid var(--lt-color-border-default);border-radius:6px;box-shadow:var(--lt-shadow-dialog);padding:10px;display:flex;flex-direction:column;overflow:hidden}   /* 上一版猜 elevation/1（MUI Paper 陰影）是錯的——get_design_context 直接讀到這個元件自己的 shadow-[0px_0px_6px_...rgba(0,0,0,0.2)]，就是站台既有的扁平 Dialog/Card/Dropdown 陰影 --lt-shadow-dialog。get_variable_defs 那次抓到的 elevation/1 屬於同一個畫布範圍內的別的東西，不是這個下拉本身。順帶核對：外距 10px、圓角 6px、清單列 40px（見下） */
 .dd-search{padding:0 0 8px;border-bottom:1px solid var(--lt-color-border-default);margin-bottom:8px}   /* .dd-panel 已經有 10px 外距，搜尋框不用再自己內縮；改成搜尋列跟清單之間畫一條分隔線（get_design_context：Line 73） */
 .dd-search .search-box{width:100%}
 /* #56-1／#57-1 稿的搜尋 icon 在右邊，B-9 裁決全站統一放左（見下方 DEVIATION） */
 .dd-search .search-box input{padding:0 12px 0 36px;height:32px}   /* ⚠ DEVIATION（B-9 全站統一放左，稿 #56-1／#57-1 是右，Figma 待回改） */
 .dd-search .search-box .material-symbols-outlined{left:9px;right:auto;top:6px}
-.dd-list{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding-bottom:4px}
+.dd-list{flex:1;min-height:0;max-height:280px;overflow:auto;overscroll-behavior:contain}   /* X-9r5 GA24：正好 7 整列（40×7，拿掉原本的底內距 4，那 4px 會露出下一列群組標頭的頂端），面板底不停在半截群組標頭上 */
 .dd-list::-webkit-scrollbar{width:6px}
 .dd-list::-webkit-scrollbar-thumb{background:var(--lt-grey-300);border-radius:3px}
 .dd-row{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 8px;border-radius:5px;cursor:pointer;font-size:14px;color:var(--lt-color-text-primary)}   /* get_design_context：40px 列高、8px gap、14px 字（原本 30px/10px/13px 都是猜的） */
@@ -815,7 +838,7 @@ td.has-fptip:focus-visible{outline:2px solid var(--lt-color-primary);outline-off
 .crumb-item{display:inline-block;max-width:135px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 /* Learn More 連結（#01 / #02 / #07）：問號 icon + 深灰底線粗體小字，放在卡片內表格下方 */
 .learn-more{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:20px}   /* R2：align-items:flex-start，按鈕寬度只吃文字＋icon，不再整行可點 */
-.learn{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;padding:0;cursor:pointer;font:inherit;font-size:var(--lt-fs-12);font-weight:700;color:var(--lt-color-text-primary);text-decoration:underline}
+.learn{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;padding:0;cursor:pointer;font:inherit;font-size:var(--lt-fs-12);font-weight:700;color:var(--lt-color-text-secondary);text-decoration:underline;position:relative}   /* X-9r5 GA18：Learn More 文字 #676767（稿 #01；同 Organization Settings C-6 #32） */
 .learn .material-symbols-outlined{font-size:16px;color:var(--lt-color-text-secondary);text-decoration:none}
 .learn:hover{color:var(--lt-color-primary)}
 /* Skeleton 表頭（#32–#35）：表頭是一條灰色 band 裡放灰條，沒有欄位文字 */
@@ -827,13 +850,27 @@ thead th.skel-th{background:var(--lt-grey-100)}
 /* ---- toast：改用 shared/lumiture-toast.js（A-1） ---- */
 
 
+/* X-9r5 GA32：點擊目標補到 24（WCAG 2.5.8），外觀不動，只加透明偽元素 */
+.lt-btn-icon{position:relative}
+.lt-btn-icon::before,.link-btn::before,.learn::before,.wz-skip::before{content:'';position:absolute;left:-2px;right:-2px;top:-4px;bottom:-4px}
+.lt-btn-icon::before{left:-2px;right:-2px;top:-2px;bottom:-2px}
+.tnode .tchev{position:relative}
+.tnode .tchev::before,.tnode .checkbox::before,td .checkbox::before,th .checkbox::before{content:'';position:absolute;left:-4px;right:-4px;top:-4px;bottom:-4px}
+.tnode .tchev::before{left:-2px;right:-2px;top:-2px;bottom:-2px}
+
 /* ---- footer ---- */
-.footer{display:flex;justify-content:space-between;gap:16px;padding:20px 32px;margin-top:auto;font-size:12px;background:#fff;border-top:1px solid var(--lt-color-border-default)}
-.footer-version{color:var(--lt-color-text-primary);font-weight:600}
+.footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:16px 32px;margin-top:auto;font-size:12px;color:#676767;background:var(--lt-color-primary-bg);border-top:1px solid var(--lt-color-border-default)}
+.footer-version{color:#262626;font-weight:500}
 .ver-tag{background:#34B5D9;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}   /* A-41：同其他頁 r10／高 18／10px／700 */
 .footer-credit{color:#676767}
 
 @media(max-width:800px){.main{padding:24px 16px 96px}.section-head{flex-direction:column}.res-toolbar{flex-direction:column;align-items:flex-start}.search-box{width:100%}}
+/* 展示入口（X-9r6 F2；寫法同 Auth）：Invite User 成功 toast 第二行的「Open this email (prototype)」，連到 Notification Emails 的 Activate 信。prototype 專用元素不是產品 UI，Demo FAB「CRUD」可整批隱藏 */
+.lt-toast .demo-entry{pointer-events:auto;display:inline-flex;align-items:center;gap:4px;flex-shrink:0;margin-left:0;height:22px;padding:0 8px;border-radius:11px;background:#0D1B3E;color:#fff;border:1px dashed #D9CC4A;font-size:12px;line-height:18px;font-weight:700;white-space:nowrap;text-decoration:none}
+.lt-toast .demo-entry:hover{background:#0E3A82}
+.lt-toast .demo-entry:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.lt-toast .demo-entry .material-symbols-outlined{font-size:14px}
+body.demo-entries-off .demo-entry,body.demo-entries-off .lt-toast-extra{display:none}
 </style>
 </head>
 <body>
@@ -842,7 +879,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
   <div class="workspace">
     <header id="lt-topbar"></header>
     <main class="main">
-      <section id="app" aria-live="polite"></section>
+      <section id="app"></section>
     </main>
     <div class="footer">
       <span class="footer-version">Group List Prototype<span class="ver-tag">v3 · Full Design Coverage</span></span>
@@ -856,6 +893,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
 <div id="tag-root"></div>
 <div id="wizard-root"></div>
 <div id="form-root"></div>
+<div id="sr-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
 
 <script>window.LUMITURE_ACTIVE = location.hash==='#admin' ? 'admin-list' : 'group-list';   // v3：Admin List 也在這支檔案裡（#admin） window.LUMITURE_USER={role:'Admin',plan:'Standard',quota:{analyses:{used:32,total:80},rightsizing:{used:410,total:1000},refreshDate:'2 Jul. 2026'}};</script>
@@ -993,6 +1031,9 @@ thead th.skel-th{background:var(--lt-grey-100)}
     '.checkbox__input:focus-visible~.checkbox__box,',
     '.checkbox:focus-visible .checkbox__box{border-color:var(--lt-color-primary,#004FB0);box-shadow:0 0 0 3px rgba(0,79,176,.1);outline:none}',
     '.checkbox:focus-visible{outline:none}',
+    /* X-9r1 S5：光暈對白底只有 1.18:1，鍵盤 focus 另補 2px 實線外框（跟 .lt-btn-icon、.lt-link 同一套）；滑鼠不受影響 */
+    '.checkbox__input:focus-visible~.checkbox__box,',
+    '.checkbox:focus-visible .checkbox__box{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:2px}',
 
     /* disabled 最後宣告，蓋掉上面所有狀態 */
     '.checkbox__input:disabled~.checkbox__box,',
@@ -1339,7 +1380,9 @@ thead th.skel-th{background:var(--lt-grey-100)}
     '.lt-sb-group{margin-bottom:0}',
     '.lt-sb-group-hdr{display:flex;align-items:center;justify-content:space-between;',
     'padding:8px;min-height:40px;box-sizing:border-box;margin-bottom:8px;font-size:14px;font-weight:500;line-height:24px;color:#fff;border-radius:4px;',
-    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0}',
+    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0;',
+    'width:100%;background:none;border:0;font-family:inherit;text-align:left;appearance:none;-webkit-appearance:none}',   /* X-9r6 F16：div 改 button，樣式 reset 回跟原本一樣 */
+    '.lt-sb-group-hdr:focus-visible{outline:2px solid #fff;outline-offset:-2px}',
     '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
     '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
     '.lt-sb-group-arrow{font-size:24px;transition:transform .18s;flex-shrink:0}',
@@ -1457,8 +1500,9 @@ thead th.skel-th{background:var(--lt-grey-100)}
     var tag = useHref ? 'a' : 'div';
     var hrefAttr = useHref ? ' href="' + _esc(item.href) + '"' : '';
     var dataId = ' data-nav-id="' + _esc(item.id) + '"';
-    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + '>' +
-             '<span class="material-symbols-outlined">' + _esc(item.icon || 'circle') + '</span>' +
+    var curAttr = isActive ? ' aria-current="page"' : '';   // X-9r6 F16
+    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + curAttr + '>' +
+             '<span class="material-symbols-outlined" aria-hidden="true">' + _esc(item.icon || 'circle') + '</span>' +
              '<span>' + _esc(item.label) + '</span>' +
            '</' + tag + '>';
   }
@@ -1469,17 +1513,17 @@ thead th.skel-th{background:var(--lt-grey-100)}
       return _renderItem(item, true);
     }).join('');
     return '<div class="lt-sb-group' + collapsed + '" data-group-id="' + _esc(grp.id) + '">' +
-             '<div class="lt-sb-group-hdr">' +
+             '<button type="button" class="lt-sb-group-hdr" aria-expanded="' + (grp.collapsed ? 'false' : 'true') + '">' +
                '<span>' + _esc(grp.label) + '</span>' +
-               '<span class="material-symbols-outlined lt-sb-group-arrow">keyboard_arrow_up</span>' +
-             '</div>' +
+               '<span class="material-symbols-outlined lt-sb-group-arrow" aria-hidden="true">keyboard_arrow_up</span>' +
+             '</button>' +
              '<div class="lt-sb-group-children">' + children + '</div>' +
            '</div>';
   }
 
   function _renderNav() {
     var nav = window.LUMITURE_NAV || [];
-    var html = '<div class="lt-sb-nav">';
+    var html = '<nav class="lt-sb-nav" aria-label="Main">';
     nav.forEach(function (entry) {
       if (entry.type === 'group') {
         html += _renderGroup(entry);
@@ -1488,7 +1532,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
       }
     });
     html += '<div class="lt-sb-skel" aria-hidden="true">' + '<span class="lt-sb-skel-bar"></span>'.repeat(5) + '</div>';
-    html += '</div>';
+    html += '</nav>';
     return html;
   }
 
@@ -1582,7 +1626,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
     mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
       hdr.addEventListener('click', function () {
         var grp = hdr.parentElement;
-        if (grp) grp.classList.toggle('lt-collapsed');
+        if (grp) { grp.classList.toggle('lt-collapsed'); hdr.setAttribute('aria-expanded', grp.classList.contains('lt-collapsed') ? 'false' : 'true'); }
       });
     });
     // Collapse the whole sidebar
@@ -1598,7 +1642,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
   window.LumitureSidebar = {
     toggleGroup: function (groupId) {
       var grp = document.querySelector('[data-group-id="' + groupId + '"]');
-      if (grp) grp.classList.toggle('lt-collapsed');
+      if (grp) { grp.classList.toggle('lt-collapsed'); var h = grp.querySelector('.lt-sb-group-hdr'); if (h) h.setAttribute('aria-expanded', grp.classList.contains('lt-collapsed') ? 'false' : 'true'); }
     },
     toggleCollapse: function (opts) { _setCollapsed(!_collapsed, opts); },
     setCollapsed: function (on, opts) { _setCollapsed(on, opts); },
@@ -1609,6 +1653,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
       window.LUMITURE_ACTIVE = itemId;
       document.querySelectorAll('.lt-sb-item, .lt-sb-subitem').forEach(function (el) {
         el.classList.toggle('lt-active', el.dataset.navId === itemId);
+        if (el.dataset.navId === itemId) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
       });
     },
     setLoading: function (on) { _loading = !!on; _applyLoading(); },
@@ -1771,7 +1816,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
     '.lt-tb-user:hover{opacity:.92}',
     '.lt-tb-avatar-ic{font-size:34px;color:#fff;flex-shrink:0;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 34}',
     '.lt-tb-user-text{display:flex;flex-direction:column;font-size:12px;line-height:1.3;min-width:0;font-family:\'Noto Sans\',sans-serif;text-align:left}',
-    '.lt-tb-user-name{font-weight:600;color:#fff;white-space:nowrap}',
+    '.lt-tb-user-name{font-weight:500;color:#fff;white-space:nowrap}',   /* X-9r6 R3：稿 #01-3 使用者姓名 500；原 600 不在字重表，沒載 600 的頁會退成 700 */
     '.lt-tb-user-role{color:rgba(255,255,255,.6);font-size:11px;white-space:nowrap}',
     '.lt-tb-chev{color:rgba(255,255,255,.6);font-size:20px;transition:transform .18s}',
     '.lt-tb-user.is-open .lt-tb-chev{transform:rotate(180deg)}',
@@ -1895,22 +1940,22 @@ thead th.skel-th{background:var(--lt-grey-100)}
 
   // ===== Renderers =====
   function _renderIcon(item) {
-    var attrs = ' class="lt-tb-ic" data-tip="' + _esc(item.title || '') + '" data-tip-pos="below" aria-label="' + _esc(item.title || '') + '"';   /* 原生 title 改 data-tip（#gl-tip） */
+    var attrs = ' class="lt-tb-ic" data-tip="' + _esc(item.title || '') + '" data-tip-pos="below" aria-label="' + _esc((item.title || '') + (item.badge ? ', 1 unread' : '')) + '"';   /* X-9r6 F17：紅點只有 CSS，讀屏要有字（aria-label 會蓋掉內部文字，所以未讀訊息寫進 label） */   /* 原生 title 改 data-tip（#gl-tip） */
     if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
     var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
     return '<button type="button"' + attrs + '>' +
-             '<span class="material-symbols-outlined">' + _esc(item.icon) + '</span>' + badge +
+             '<span class="material-symbols-outlined" aria-hidden="true">' + _esc(item.icon) + '</span>' + badge +
            '</button>';
   }
 
   function _renderUserChip(u) {
     return '<button type="button" class="lt-tb-user" id="lt-tb-user" aria-haspopup="true" aria-expanded="false">' +
-             '<span class="material-symbols-outlined lt-tb-avatar-ic">account_circle</span>' +
+             '<span class="material-symbols-outlined lt-tb-avatar-ic" aria-hidden="true">account_circle</span>' +
              '<div class="lt-tb-user-text">' +
                '<span class="lt-tb-user-name">' + _esc(u.name) + '</span>' +
                '<span class="lt-tb-user-role" id="lt-tb-user-role">' + _esc(u.role) + '</span>' +
              '</div>' +
-             '<span class="material-symbols-outlined lt-tb-chev">keyboard_arrow_down</span>' +
+             '<span class="material-symbols-outlined lt-tb-chev" aria-hidden="true">keyboard_arrow_down</span>' +
            '</button>';
   }
 
@@ -1961,7 +2006,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
     if (u.quota.state === 'error') {
       var headErr = '<div class="lt-q-head"><span class="lt-q-title">AI Quota</span><span class="lt-q-sub">Org-wide</span></div>';
       return '<div class="lt-q">' + headErr +
-               '<div class="lt-q-err"><span class="material-symbols-outlined">help</span>' +
+               '<div class="lt-q-err"><span class="material-symbols-outlined" aria-hidden="true">help</span>' +
                '<span class="lt-q-err-msg">Couldn\'t load quota</span>' +
                '<a role="menuitem" tabindex="0" onclick="window.LumitureTopbar._retryQuota()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.LumitureTopbar._retryQuota()}">Retry</a></div>' +
              '</div>';
@@ -1969,7 +2014,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
     var rows = items.map(function (k) { return _renderQuotaItem(k, u.quota[k] || {}); }).join('');
     // add-on 行（packs>0，Premium 不適用）；naming 對齊 PRD：單數 "AI Quota Add-on × N"
     var addon = (!isPremium && (u.addonPacks || 0) > 0)
-      ? '<div class="lt-q-addon"><span class="material-symbols-outlined">auto_awesome</span>' +
+      ? '<div class="lt-q-addon"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>' +
           u.addonPacks + ' × AI Quota Add-ons Activated</div>'
       : '';
     return '<div class="lt-q">' + head + rows + addon + '</div>';
@@ -1981,12 +2026,12 @@ thead th.skel-th{background:var(--lt-grey-100)}
     var viewAs = u.canSwitchRole
       ? '<div class="lt-am-grp">' +
           '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar.openRoleDialog()">' +
-            '<span class="material-symbols-outlined">sync_alt</span>View as Another Role</button></div>' +
+            '<span class="material-symbols-outlined" aria-hidden="true">sync_alt</span>View as Another Role</button></div>' +
         '<div class="lt-am-div"></div>'
       : '';
     var box = _renderQuotaBox(u);
     return '<div class="lt-am-backdrop" id="lt-am-backdrop" onclick="window.LumitureTopbar.closeMenu()"></div>' +
-           '<div class="lt-am" id="lt-am" role="menu">' +
+           '<div class="lt-am" id="lt-am" role="menu" aria-label="Account menu">' +
              '<div class="lt-am-plan" style="' + bannerStyle + '">' +
                '<span class="lt-am-plan-name">' + planName + '</span>' +
                '<span class="lt-am-plan-date">' + _esc(u.planDateRange) + '</span>' +
@@ -1996,21 +2041,21 @@ thead th.skel-th{background:var(--lt-grey-100)}
                  '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
                  '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
                '</div>' +
-               '<span class="lt-am-chip"><span class="material-symbols-outlined">' + _roleIcon(u.role) + '</span>' + _esc(u.role) + '</span>' +
+               '<span class="lt-am-chip"><span class="material-symbols-outlined" aria-hidden="true">' + _roleIcon(u.role) + '</span>' + _esc(u.role) + '</span>' +
              '</div>' +
              '<div class="lt-am-div"></div>' +
              (box ? box + '<div class="lt-am-div"></div>' : '') +
              viewAs +
              '<div class="lt-am-grp">' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Profile\')">' +
-                 '<span class="material-symbols-outlined">manage_accounts</span>Profile</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">manage_accounts</span>Profile</button>' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Settings\')">' +
-                 '<span class="material-symbols-outlined">settings</span>Settings</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">settings</span>Settings</button>' +
              '</div>' +
              '<div class="lt-am-div"></div>' +
              '<div class="lt-am-grp">' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar.logout()">' +
-                 '<span class="material-symbols-outlined">logout</span>Log out</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">logout</span>Log out</button>' +
              '</div>' +
            '</div>';
   }
@@ -2225,7 +2270,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
         '<div class="lt-rd-desc">' + ROLE_COPY.desc.map(function (l) { return '<p>' + _esc(l) + '</p>'; }).join('') + '</div></div>' +
       '<div class="lt-rd-body"><div class="lt-rd-sel" id="lt-rd-sel" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="' + (r.ddOpen ? 'true' : 'false') +
         '" aria-controls="lt-rd-list" aria-labelledby="lt-rd-t"><span class="lt-rd-v">' + _esc(sel.name) + '</span><span class="lt-rd-chip">' + _esc(sel.role) +
-        '</span><span class="material-symbols-outlined lt-rd-arr">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
+        '</span><span class="material-symbols-outlined lt-rd-arr" aria-hidden="true">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
       '<div class="lt-rd-act"><button type="button" class="lt-rd-btn out" id="lt-rd-keep"' + (r.loading ? ' disabled' : '') + '>' + ROLE_COPY.keep + '</button>' +
         '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') + '>' +
         (r.loading ? '<span class="lt-rd-spin" role="status" aria-label="Loading"></span>' : ROLE_COPY.cont) + '</button></div>' +
@@ -2272,7 +2317,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
     _rd.ddOpen = true; s.setAttribute('aria-expanded', 'true'); s.querySelector('.lt-rd-arr').textContent = 'arrow_drop_up';
     var host = _rdPopHost();
     host.innerHTML = '<div class="lt-rd-pop" id="lt-rd-popbox"><div class="lt-rd-pop-in"><div class="lt-rd-search"><input id="lt-rd-q" placeholder="' + ROLE_COPY.search +
-      '" autocomplete="off" role="combobox" aria-label="' + ROLE_COPY.search + '" aria-controls="lt-rd-list" aria-expanded="true" aria-autocomplete="list"><span class="material-symbols-outlined">search</span></div><hr>' +
+      '" autocomplete="off" role="combobox" aria-label="' + ROLE_COPY.search + '" aria-controls="lt-rd-list" aria-expanded="true" aria-autocomplete="list"><span class="material-symbols-outlined" aria-hidden="true">search</span></div><hr>' +
       '<div class="lt-rd-list" id="lt-rd-list" role="listbox" aria-label="Roles">' + _rdOptsHtml('') + '</div></div></div>';
     var el = document.getElementById('lt-rd-popbox'), rc = s.getBoundingClientRect();
     el.style.width = rc.width + 'px'; el.style.left = rc.left + 'px';
@@ -2394,6 +2439,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
       window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, user || {});
       _render(); if (_menuOpen) _openMenu();
     },
+    roleIcon: _roleIcon,   /* 角色 chip icon 對應公開給頁面用（X-9r6 F1：GBH Role view 卡） */
     setRole: function (role) {
       var el = document.getElementById('lt-tb-user-role');
       if (el) el.textContent = role;
@@ -2505,7 +2551,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
  *
  * 規格（FE libs/lumiture-ui/src/Toaster/toast.css＋Toaster.tsx，Figma GB #02-3／GL #18-3／EI #08／RS #06／RO #06 逐值一致）：
  *   成功 #008F88、錯誤 #BF302E、info #0B6DD7、warning #EC6F09｜圓角 4｜寬 400｜最小高 46｜內距 8／16｜icon 20（check_circle／info／warning）
- *   位置：左下，left = var(--lt-toast-left)（sidebar 展開 274／收合 45；沒有 sidebar 的頁面自動改 24），bottom 24｜z-index 4000（高於彈窗 2000、Demo FAB 999）
+ *   位置：左下，left = var(--lt-toast-left)（sidebar 展開 274／收合 45；沒有 sidebar 的頁面自動改 24），bottom = var(--lt-toast-bottom,24px)（X-9r1 S3：有固定底列的頁自己設 calc(底列高 + 16px)）｜z-index 4000（高於彈窗 2000、Demo FAB 999）
  *   5 秒自動消失，點一下立即關閉｜可堆疊（新的在最下面，column-reverse，gap 16）｜字 14／400／行高 24.5
  *
  * 用法（頁面把自己的 toast() 換成這個，不要再各寫一套 CSS）：
@@ -2532,7 +2578,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
     var s = document.createElement('style');
     s.id = 'lt-toast-css';
     s.textContent = [
-      '.lt-toast-wrap{position:fixed;left:var(--lt-toast-left,274px);bottom:24px;z-index:var(--lt-z-toast,4000);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif)}',
+      '.lt-toast-wrap{position:fixed;left:var(--lt-toast-left,274px);bottom:var(--lt-toast-bottom,24px);z-index:var(--lt-z-toast,4000);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif)}',
       '.lt-toast{pointer-events:auto;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:var(--lt-toast-width,400px);max-width:calc(100vw - 96px);min-height:46px;padding:8px 16px;',
       'border-radius:var(--lt-toast-radius,4px);color:#fff;cursor:pointer;',
       'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);',   /* MUI shadows[1]，FE Toaster 的 inline style */
@@ -2589,7 +2635,17 @@ thead th.skel-th{background:var(--lt-grey-100)}
     el.addEventListener('click', close);
     _getWrap().appendChild(el);
     var d = opts.duration == null ? 5000 : opts.duration;
-    if (d > 0) setTimeout(close, d);
+    var timer = null;
+    function arm() { if (d > 0) timer = setTimeout(close, d); }
+    function disarm() { if (timer) { clearTimeout(timer); timer = null; } }
+    arm();
+    /* X-9r1 S7：帶 action（Undo）或 extra 的 toast，滑鼠停上面或焦點進去時暫停計時，離開後重新計 5 秒（WCAG 2.2.1） */
+    if ((opts.action && opts.action.label) || (opts.extra && opts.extra.nodeType === 1)) {
+      el.addEventListener('mouseenter', disarm);
+      el.addEventListener('focusin', disarm);
+      el.addEventListener('mouseleave', function () { if (el.parentNode && !el.contains(document.activeElement)) { disarm(); arm(); } });
+      el.addEventListener('focusout', function (e) { if (el.parentNode && !el.matches(':hover') && !el.contains(e.relatedTarget)) { disarm(); arm(); } });
+    }
     return el;
   }
 
@@ -2622,7 +2678,8 @@ thead th.skel-th{background:var(--lt-grey-100)}
  *   預設內容：
  *   LumitureEmpty.noAccess({ href })     // 整頁無權限：lock／「You do not have access to this page」／「Please contact your organization's administrator if you believe this is a mistake.」／Back to Overview（href 預設 ./overview.html）。回傳含卡片外框的 HTML，放在頁標題下方
  *   LumitureEmpty.error({ size, onclick }) // 「Something Went Wrong」／「Please ensure you have a stable internet connection\nand try refreshing the page.」（FE EmptyState constants），按鈕 Retry（有給 onclick 才出）
- *   LumitureEmpty.noData({ size, title, desc, icon })  // 「No Data Available」
+ *   LumitureEmpty.noData({ size, title, desc, icon, iconHtml })  // 「No Data Available」
+ *   html()／noData() 的 iconHtml（2026-10-22 X-9r3 FA17，選用）：直接給一段 <svg>（呼叫端自己保證內容可信），會取代 icon；沒給時行為完全不變。
  * 文字一律 escape；desc 的 \n 轉成換行。不要自己加 max-width（全站規則：段落不設 max-width，寬度交給外層）。
  */
 (function () {
@@ -2638,6 +2695,9 @@ thead th.skel-th{background:var(--lt-grey-100)}
       '.lt-empty .lt-empty__ic{font-family:\'Material Symbols Outlined\';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;-webkit-font-feature-settings:\'liga\';font-feature-settings:\'liga\';',
       'color:#9ED7FF;font-variation-settings:\'FILL\' 0,\'wght\' 400,\'GRAD\' 0,\'opsz\' 48;width:1em;height:1em;display:block;overflow:hidden}',
       '.lt-empty--s .lt-empty__ic{font-size:48px}.lt-empty--m .lt-empty__ic,.lt-empty--page .lt-empty__ic{font-size:64px}.lt-empty--l .lt-empty__ic{font-size:80px}',
+      /* 2026-10-22 X-9r3 FA17：iconHtml（自帶 SVG 的圖示，additive）。尺寸跟著 S 48／M 64／L 80／page 64，SVG 自己 viewBox 縮放 */
+      '.lt-empty__ic-svg{display:block;line-height:0}.lt-empty__ic-svg svg{display:block;width:64px;height:64px}',
+      '.lt-empty--s .lt-empty__ic-svg svg{width:48px;height:48px}.lt-empty--l .lt-empty__ic-svg svg{width:80px;height:80px}',
       '.lt-empty__t{margin:12px 0 0;font-weight:700;line-height:1.5;color:var(--lt-color-text-secondary,#676767)}',
       '.lt-empty--s .lt-empty__t{font-size:14px}.lt-empty--m .lt-empty__t{font-size:16px}.lt-empty--l .lt-empty__t{font-size:20px}.lt-empty--page .lt-empty__t{font-size:18px;margin-top:16px}',
       '.lt-empty__d{margin:8px 0 0;font-size:14px;line-height:24.5px;color:var(--lt-color-text-secondary,#676767);white-space:pre-line}',
@@ -2664,7 +2724,8 @@ thead th.skel-th{background:var(--lt-grey-100)}
         : '<button type="button" class="' + esc(cls) + '"' + (o.action.onclick ? ' onclick="' + esc(o.action.onclick) + '"' : '') + '>' + esc(o.action.label) + '</button>') + '</div>';
     }
     return '<div class="lt-empty lt-empty--' + size + '">' +
-      (o.icon ? '<span class="lt-empty__ic material-symbols-outlined" aria-hidden="true">' + esc(o.icon) + '</span>' : '') +
+      (o.iconHtml ? '<span class="lt-empty__ic-svg" aria-hidden="true">' + o.iconHtml + '</span>'
+        : (o.icon ? '<span class="lt-empty__ic material-symbols-outlined" aria-hidden="true">' + esc(o.icon) + '</span>' : '')) +
       (o.title ? '<h3 class="lt-empty__t">' + esc(o.title) + '</h3>' : '') +
       (o.desc ? '<p class="lt-empty__d">' + esc(o.desc) + '</p>' : '') + a + '</div>';
   }
@@ -2689,7 +2750,7 @@ thead th.skel-th{background:var(--lt-grey-100)}
     },
     noData: function (o) {
       o = o || {};
-      return html({ size: o.size || 'm', icon: o.icon || 'table_view', title: o.title || 'No Data Available', desc: o.desc, action: o.action });
+      return html({ size: o.size || 'm', icon: o.icon || 'table_view', iconHtml: o.iconHtml, title: o.title || 'No Data Available', desc: o.desc, action: o.action });
     }
   };
 })();
@@ -2841,7 +2902,7 @@ function folderColumnHtml(node, cloud, q){
 /* 多 org 時第一行是 org（domain icon＋名稱），對應彈窗裡的 org 區段標頭：
  * 它是區段不是樹的一層，所以資料夾不因為它多縮一層，跟彈窗一樣 */
 function fpathTipHtml(segs, org){
-  const head = org ? `<div class="fptip-org"><span class="material-symbols-outlined">domain</span>${esc(org)}</div>` : '';
+  const head = org ? `<div class="fptip-org"><span aria-hidden="true" class="material-symbols-outlined">domain</span>${esc(org)}</div>` : '';
   return head + segs.map((seg, level)=>{
     let rails = '';
     for(let l=0; l<level; l++) rails += `<span class="fptip-rail" style="left:${l*16 + 5}px"></span>`;
@@ -2958,8 +3019,18 @@ function showcaseRows(cloud){
       folderNode:node, orgName:org && org.name, orgId:org && org.orgId, canRemove:true};
   });
 }
+/* X-9r5 GA17：群組的 resource 計數是 0 就真的沒有資源（稿 #03-2／#06-1 的 No Resources Yet 才到得了）；
+ * 其餘群組維持原本的策展列數（計數是三朵雲合計、這裡只展示 GCP／AWS／Azure 各幾列，Engineering 142 那種已列排除清單） */
+function groupById(id){
+  const t1 = T1_GROUPS.find(g=>g.id===id);
+  if(t1) return t1;
+  for(const g of T1_GROUPS){ const hit = tier2GroupsFor(g).find(x=>x.id===id); if(hit) return hit; }
+  return null;
+}
 function resourcesFor(groupId, cloud){
   if(state.hierShowcase) return showcaseRows(cloud);
+  const grp = groupById(groupId);
+  if(grp && grp.resource === 0) return [];
   const seedBase = groupId.length + (cloud==='aws'?1:cloud==='azure'?2:0);
   const count = 1 + (seedBase % 4);
   const out=[];
@@ -3363,8 +3434,8 @@ function findT1(id){return T1_GROUPS.find(g=>g.id===id)}
 function findT2(t1id,t2id){return tier2GroupsFor(findT1(t1id)).find(g=>g.id===t2id)}
 
 /* ---------- toast ---------- */
-function showToast(text,type='success'){   /* A-1：改走 shared/lumiture-toast.js（#008F88／#BF302E、寬 400、r4、left 跟 sidebar） */
-  LumitureToast.show({kind: type==='error'?'error':type==='info'?'info':'success', message: text});   // X-9r1：Demo 說明用 info（藍），跟其他頁一致，不冒充成功 toast
+function showToast(text,type='success',extra){   /* A-1：改走 shared/lumiture-toast.js（#008F88／#BF302E、寬 400、r4、left 跟 sidebar） */
+  LumitureToast.show({kind: type==='error'?'error':type==='info'?'info':'success', message: text, extra});   // X-9r1：Demo 說明用 info（藍），跟其他頁一致，不冒充成功 toast
 }
 function deferredAction(label){ LumitureToast.info(label+'：設計稿尚無這張畫面或內容待確認，本版留佔位（見 CLAUDE.md Group List v3 段落）'); }
 
@@ -3378,17 +3449,19 @@ function openUnlinkDialog(groupId, cloud, ids, bucket){
     : resourcesFor(groupId,cloud).filter(r=>ids.includes(r.id)).map(r=>r.name);
   state.pendingUnlink = {ids, bucket};
   root.innerHTML = `<div class="dlg-backdrop" onclick="if(event.target===this)closeDialog()">
-    <div class="dlg">
-      <div class="dlg-head"><span class="material-symbols-outlined">error</span><h3>Unlink Resource</h3></div>
-      <div class="dlg-body">Do you confirm that you want to unlink this resource from the group?<br><br>${names.map(n=>'<b>'+esc(n)+'</b>').join('<br>')}</div>
+    <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="dlg-title" aria-describedby="dlg-desc">
+      <div class="dlg-head"><span aria-hidden="true" class="material-symbols-outlined">error</span><h3 id="dlg-title">Unlink Resource</h3><button class="rmodal-close" onclick="closeDialog()" aria-label="Close"><span aria-hidden="true" class="material-symbols-outlined">close</span></button></div>
+      <div class="dlg-body" id="dlg-desc">Do you confirm that you want to unlink this resource from the group?<br><br>${names.map(n=>'<b>'+esc(n)+'</b>').join('<br>')}</div>
       <div class="dlg-actions">
         <button class="btn btn-out" onclick="closeDialog()">Cancel</button>
-        <button class="btn btn-pri" style="background:var(--lt-color-error)" onclick="confirmUnlink('${groupId}','${cloud}')">Unlink</button>
+        <button class="btn btn-pri" onclick="confirmUnlink('${groupId}','${cloud}')">Unlink</button>
       </div>
     </div>
   </div>`;
+  /* X-9r5 GA11（照推薦，Kabin 未勾）：主鈕改 primary 藍（稿 #18-2／#20／BackUp 三版都是藍；同頁 Remove Group／Remove User 也是藍鈕＋紅 icon，B-12）、標題 20／700、補關閉 ×。寬 440 與版本維持 10-15 裁決 */
+  dialogSync('dialog-root');
 }
-function closeDialog(){document.getElementById('dialog-root').innerHTML='';}
+function closeDialog(){document.getElementById('dialog-root').innerHTML=''; dialogSync('dialog-root');}
 function confirmUnlink(groupId,cloud){
   const pending = state.pendingUnlink || {ids:[], bucket:cloud};
   state.selectedResources[pending.bucket]={};
@@ -3425,10 +3498,15 @@ function sortIconHtml(tableKey,colKey){
   const active = s.key===colKey;
   const color = active ? 'var(--lt-color-primary)' : 'var(--lt-grey-300)';
   const name = (active && s.dir===-1) ? 'arrow_downward' : 'arrow_upward';
-  return `<span class="material-symbols-outlined sort-ic" style="color:${color}">${name}</span>`;
+  return `<span aria-hidden="true" class="material-symbols-outlined sort-ic" style="color:${color}">${name}</span>`;
 }
+const SORT_LABELS = {};
 function sortHeader(label, tableKey, colKey, centered){
-  return `<th class="sortable${centered?' center':''}" onclick="toggleSort('${tableKey}','${colKey}')"><span class="th-sort">${label}${sortIconHtml(tableKey,colKey)}</span></th>`;
+  /* X-9r5 GA28：th scope／aria-sort，排序改 th 內真 button（.th-sort 外觀同前；th.sortable、.sort-ic、toggleSort 保留） */
+  const s = state.sort[tableKey];
+  const dir = s.key===colKey ? (s.dir===1 ? 'ascending' : 'descending') : 'none';
+  SORT_LABELS[tableKey+':'+colKey] = label;
+  return `<th class="sortable${centered?' center':''}" scope="col" aria-sort="${dir}" onclick="toggleSort('${tableKey}','${colKey}')"><button type="button" class="th-sort">${label}${sortIconHtml(tableKey,colKey)}</button></th>`;
 }
 function toggleSort(tableKey,colKey){
   const s = state.sort[tableKey];
@@ -3436,6 +3514,8 @@ function toggleSort(tableKey,colKey){
   else if(s.dir===1){ s.dir=-1; }
   else { s.key=null; s.dir=0; }
   render();
+  const lbl = SORT_LABELS[tableKey+':'+colKey] || colKey;
+  announce(s.key===colKey ? `Sorted by ${lbl}, ${s.dir===1?'ascending':'descending'}` : `Sorting by ${lbl} cleared`);   // X-9r5 GA27
 }
 function sortRows(rows, tableKey, accessors){
   const s = state.sort[tableKey];
@@ -3453,7 +3533,7 @@ function sortRows(rows, tableKey, accessors){
  * fills the card exactly instead of auto-sizing past it. */
 function groupCols(showTier2, showAction){
   const widths = showTier2
-    ? (showAction ? [18.5,14,14.5,13.5,16.5,14,9] : [20,15.5,16,15,18,15.5])
+    ? (showAction ? [20.2,11.4,14,14.3,16.7,14.4,9] : [20,15.5,16,15,18,15.5])   /* X-9r5 GA9／R3：1280 下 Resource／Last Updated 放得下、排序 icon 不出 th，Group Name 與 Creator 不亂截 */
     : (showAction ? [22,15,15,22,15,11]           : [24,17,17,25,17]);
   return '<colgroup>'+widths.map(w=>'<col style="width:'+w+'%">').join('')+'</colgroup>';
 }
@@ -3476,7 +3556,7 @@ function groupTable(groups, opts){
   if(!groups.length){
     /* #01-2 / #02-2：清單 icon 淺藍（不是錯誤紅）、空狀態裡沒有第二顆 Create Group（右上那顆就是入口）。
      * v2 照 FE EmptyState type="error" 做成紅 icon + 內嵌按鈕，這裡改回設計稿。 */
-    return `<div class="empty-state"><div><span class="material-symbols-outlined">list_alt</span>
+    return `<div class="empty-state"><div><span aria-hidden="true" class="material-symbols-outlined">list_alt</span>
       <p class="empty-title">No Groups Yet</p>
       <p class="empty-copy">It seems like there are no groups created yet.
 Please create a new group or contact your administrator for assistance.</p>
@@ -3488,11 +3568,11 @@ Please create a new group or contact your administrator for assistance.</p>
       `<td><button class="link-btn" onclick="event.stopPropagation();goToTab('${opts.tier===2?'t2':'t1'}','${opts.t1IdForRow||g.id}','${opts.tier===2?g.id:''}','resources')">${g.resource} Resource${g.resource===1?'':'s'}</button></td>`,
     ];
     if(opts.showTier2) tds.push(`<td><button class="link-btn" onclick="event.stopPropagation();openDetail(1,'${g.id}','tier-2-groups')">${g.tier2} Group${g.tier2===1?'':'s'}</button></td>`);
-    tds.push(`<td>${esc(g.lastUpdated)}</td>`, `<td class="cell-ellipsis">${esc(g.creator)}</td>`, `<td>${esc(g.created)}</td>`);
+    tds.push(`<td class="cell-nowrap">${esc(g.lastUpdated)}</td>`, `<td class="cell-ellipsis">${esc(g.creator)}</td>`, `<td>${esc(g.created)}</td>`);
     if(showAction){
       tds.push(`<td><div class="actions-cell">
-        <button class="lt-btn-icon" data-testid="edit-group-button" onclick="event.stopPropagation();openEditGroup('${g.id}',${opts.tier===2?`'${opts.t1IdForRow}'`:'null'})"data-tip="Edit Group" aria-label="Edit Group"><span class="material-symbols-outlined">edit</span></button>
-        ${actions().removeGroup?`<button class="lt-btn-icon" data-testid="remove-group-button" onclick="event.stopPropagation();openRemoveGroup('${g.id}',${opts.tier===2?`'${opts.t1IdForRow}'`:'null'})"data-tip="Remove Group" aria-label="Remove Group"><span class="material-symbols-outlined">delete</span></button>`:''}
+        <button class="lt-btn-icon" data-testid="edit-group-button" onclick="event.stopPropagation();openEditGroup('${g.id}',${opts.tier===2?`'${opts.t1IdForRow}'`:'null'})"data-tip="Edit Group" aria-label="Edit Group"><span aria-hidden="true" class="material-symbols-outlined">edit</span></button>
+        ${actions().removeGroup?`<button class="lt-btn-icon" data-testid="remove-group-button" onclick="event.stopPropagation();openRemoveGroup('${g.id}',${opts.tier===2?`'${opts.t1IdForRow}'`:'null'})"data-tip="Remove Group" aria-label="Remove Group"><span aria-hidden="true" class="material-symbols-outlined">delete</span></button>`:''}
         </div></td>`);
     }
     const clickTarget = opts.tier===2 ? `openDetail(2,'${opts.t1IdForRow}','${g.id}')` : `openDetail(1,'${g.id}')`;
@@ -3505,7 +3585,7 @@ Please create a new group or contact your administrator for assistance.</p>
 function renderList(){
   if(state.pageState==='nodata'){
     /* A-19／A-34⑤：改用共用 LumitureEmpty.error（FE EmptyState 統一文案 Something Went Wrong） */
-    return `<div class="card"><h1 class="org-title">${ORG_NAME}</h1>${LumitureEmpty.error({size:'m', onclick:"state.pageState='set';render()"})}</div>`;
+    return `<div class="card"><h1 class="org-title" tabindex="-1">${ORG_NAME}</h1>${LumitureEmpty.error({size:'m', onclick:"state.pageState='set';render()"})}</div>`;
   }
   /* A-26：僅有 T2 權限者直接看到 Tier 2 Group List、不顯示下層群組欄（稿 #58）。
    * mock：T2 使用者屬於 Business Development 底下的 T2 群組 */
@@ -3518,13 +3598,13 @@ function renderList(){
   const tableOpts = isT2User ? {showTier2:false, editable:actions().editGroup, tier:2, t1IdForRow:t2Owner.id, sortTable:'tier2'} : {showTier2:true, editable:actions().editGroup, tier:1, sortTable:'t1'};
   /* A-27：頁標題 CloudMile 在卡片內第一行（稿 #01、FE tier-one-groups/page.tsx 的 Paper 內） */
   return `<div class="card">
-      <h1 class="org-title">${ORG_NAME}</h1>
-      <div class="section-head">
+      <h1 class="org-title is-list" tabindex="-1">${ORG_NAME}</h1>
+      <div class="section-head is-list">
         <div>
           <h2>Tier ${tierNo} Group List (${titleCount})</h2>
           <p>You can quickly view the Tier ${tierNo} group information here, and click on each group to check details such as group members.</p>
         </div>
-        ${actions().createGroup ? `<button class="btn btn-pri" ${state.pageState==='loading'?'disabled':''} onclick="openCreateGroup(1)"><span class="material-symbols-outlined">add</span>Create Group</button>` : ''}
+        ${actions().createGroup ? `<button class="btn btn-pri" ${state.pageState==='loading'?'disabled':''} onclick="openCreateGroup(1)"><span aria-hidden="true" class="material-symbols-outlined">add</span>Create Group</button>` : ''}
       </div>
       ${groupTable(groups, tableOpts)}
       ${learnMoreHtml(true)}
@@ -3536,12 +3616,14 @@ function goToTab(tier,t1id,t2id,tab){
   openDetail(tier==='t2'?2:1, t1id, t2id||null);
   state.tab = tab; render();
 }
+let _navFocus = false, _demoApplying = false;
 function openDetail(tier, t1id, t2id){
+  _navFocus = !_demoApplying;
   state.view='detail'; state.tier=tier; state.t1Id=t1id; state.t2Id=t2id||null;
   state.tab = arguments[3] || 'group-members'; state.cloud='gcp'; state.selectedResources={}; state.resSub={gcp:'primary', aws:'primary', azure:'primary'};
   render();
 }
-function backToList(){ state.view='list'; render(); }
+function backToList(){ _navFocus = !_demoApplying; state.view='list'; render(); }
 
 function tabsHeader(group, tier){
   const memberCount = usersFor(group.id).length;
@@ -3557,16 +3639,16 @@ function tabsHeader(group, tier){
 function membersTab(group){
   if(state.pageState==='loading'){
     /* #33：說明文字與 Invite User 按鈕（disabled）照常出現，表格整個 skeleton */
-    return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px">
+    return `<h2 class="sr-only">Group Members</h2><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px">
       <p class="section-copy">You can explore the details of this group here, including members, resources, and subgroups belonging to this group.</p>
-      ${actions().inviteUser?'<button class="btn btn-pri" disabled><span class="material-symbols-outlined">add</span>Invite User</button>':''}
+      ${actions().inviteUser?'<button class="btn btn-pri" disabled><span aria-hidden="true" class="material-symbols-outlined">add</span>Invite User</button>':''}
     </div>${skeletonTable(6)}`;
   }
   const users = usersFor(group.id);
   const showAction = actions().editUser || actions().removeUser;
   if(!users.length){
     /* #05-1：人像 icon 淺藍，通用文案 */
-    return `<div class="empty-state"><div><span class="material-symbols-outlined">group</span>
+    return `<div class="empty-state"><div><span aria-hidden="true" class="material-symbols-outlined">group</span>
       <p class="empty-title">No Users Yet</p>
       <p class="empty-copy">There are currently no users assigned to this group.
 Invite users to the group or check with your administrator if assistance is needed.</p></div></div>`;
@@ -3580,17 +3662,17 @@ Invite users to the group or check with your administrator if assistance is need
       <td class="center"><span class="status-text ${u.active?'':'inactive'}">${u.active?'Active':'Inactive'}</span></td>
       <td class="center">${esc(u.lastLogin)}</td>
       ${showAction?`<td class="center"><div class="actions-cell">
-        ${actions().editUser?`<button class="lt-btn-icon" data-testid="edit-user-button" onclick="openEditUser('${group.id}','${u.id}')"data-tip="Edit" aria-label="Edit"><span class="material-symbols-outlined">edit</span></button>`:''}
-        ${actions().removeUser?`<button class="lt-btn-icon" data-testid="delete-user-button" ${u.email===CURRENT_USER_EMAIL?'disabled':''} onclick="openRemoveUser('${group.id}','${u.id}')"data-tip="Remove" aria-label="Remove"><span class="material-symbols-outlined">delete</span></button>`:''}
+        ${actions().editUser?`<button class="lt-btn-icon" data-testid="edit-user-button" onclick="openEditUser('${group.id}','${u.id}')"data-tip="Edit" aria-label="Edit"><span aria-hidden="true" class="material-symbols-outlined">edit</span></button>`:''}
+        ${actions().removeUser?`<button class="lt-btn-icon" data-testid="delete-user-button" ${u.email===CURRENT_USER_EMAIL?'disabled':''} onclick="openRemoveUser('${group.id}','${u.id}')"data-tip="Remove" aria-label="Remove"><span aria-hidden="true" class="material-symbols-outlined">delete</span></button>`:''}
         </div></td>`:''}
     </tr>`).join('');
   const headCells = colDefs.map(([label,key,centered])=>sortHeader(label,'members',key,centered)).join('') + (showAction?'<th class="center">Action</th>':'');
   const memberCols = showAction
     ? '<colgroup><col style="width:22%"><col style="width:26%"><col style="width:12%"><col style="width:14%"><col style="width:15%"><col style="width:11%"></colgroup>'
     : '<colgroup><col style="width:25%"><col style="width:30%"><col style="width:13%"><col style="width:16%"><col style="width:16%"></colgroup>';
-  return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px">
+  return `<h2 class="sr-only">Group Members</h2><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px">
       <p class="section-copy">You can explore the details of this group here, including members, resources, and subgroups belonging to this group.</p>
-      ${actions().inviteUser?`<button class="btn btn-pri" onclick="openInviteUser('${group.id}')"><span class="material-symbols-outlined">add</span>Invite User</button>`:''}
+      ${actions().inviteUser?`<button class="btn btn-pri" onclick="openInviteUser('${group.id}')"><span aria-hidden="true" class="material-symbols-outlined">add</span>Invite User</button>`:''}
     </div>
     <div class="table-wrap"><table>${memberCols}<thead><tr>${headCells}</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
@@ -3610,6 +3692,10 @@ const CLOUD_META = {
  *   ① 階層位置的完整路徑（每一層都算，所以搜 platform 會列出它整棵子樹的專案）
  *   ② Organization（多 org 時才有這欄）
  * ⚠ 這兩個欄位 FE 的 /resources/assigned 回傳目前沒有，要先請後端補。 */
+/* X-9r5 Q1（Kabin 裁決）：單行 `name (ID)`，ID 次要灰；回傳整格 <td>，截斷由 markTruncated 掛 tooltip（textContent＝"name (ID)"） */
+function nameIdTd(name, id, q){
+  return `<td class="cell-ellipsis cell-name-id">${hlq(name,q)}${id!=null&&id!==''?` <span class="idg">(${hlq(id,q)})</span>`:''}</td>`;
+}
 function resQuery(){ return (state.resSearch[state.cloud] || '').trim().toLowerCase(); }
 function hlq(text, q){
   const str = String(text == null ? '' : text);
@@ -3638,6 +3724,7 @@ function onResSearch(input){
     state.resSearch[state.cloud] = value;
     const caret = input.selectionStart;
     render();
+    if(value.trim()){ const n = resourcesFor(currentGroupId(), state.cloud).filter(r=>resourceMatches(r, resQuery())).length; announce(n ? `${n} result${n===1?'':'s'}` : 'No matching resources'); }   // X-9r5 GA27
     /* render() 整頁重建，輸入框會失焦；照彈窗那套把焦點與游標還回去 */
     const el = document.getElementById('res-search');
     if(el){ el.focus(); try{ el.setSelectionRange(caret, caret); }catch(_){} }
@@ -3657,9 +3744,9 @@ function resourcesTab(group){
         <div class="res-toolbar">
           <div class="res-toolbar-left">
             <div class="seg is-loading-ui"><button class="seg-btn ${subL==='primary'?'active':''}">${CLOUD_META[state.cloud].col1}<span class="seg-cnt">${resourcesFor(group.id, state.cloud).length}</span></button><button class="seg-btn ${subL==='tag'?'active':''}">${esc(termsL.tab)}<span class="seg-cnt">${assignedTagsFor(group.id, state.cloud).length}</span></button></div>
-            <div class="search-box"><span class="material-symbols-outlined">search</span><input disabled placeholder="Search resources"></div>
+            <div class="search-box"><span aria-hidden="true" class="material-symbols-outlined">search</span><input disabled placeholder="Search resources" aria-label="Search resources"></div>
           </div>
-          <div class="res-toolbar-actions">${actions().assignResource?'<button class="btn btn-pri" disabled><span class="material-symbols-outlined">add_link</span>Assign Resource</button>':''}</div>
+          <div class="res-toolbar-actions">${actions().assignResource?'<button class="btn btn-pri" disabled><span aria-hidden="true" class="material-symbols-outlined">add_link</span>Assign Resource</button>':''}</div>
         </div>
         ${skeletonTable(4, '<colgroup><col style="width:48px"><col style="width:42%"><col><col style="width:80px"></colgroup>')}`;
     }
@@ -3667,10 +3754,10 @@ function resourcesTab(group){
       const isAdmin = state.role==='admin';
       return pillTabs(true) + `
         <div class="empty-state error"><div>
-          <span class="material-symbols-outlined">${isAdmin?'lock_open':'lock'}</span>
+          <span aria-hidden="true" class="material-symbols-outlined">${isAdmin?'lock_open':'lock'}</span>
           <p class="empty-title">${CLOUD_META[state.cloud].label} is not authorized</p>
           <p class="empty-copy">${isAdmin?`Authorize ${CLOUD_META[state.cloud].label} in Authorization List before assigning resources from this provider.`:'Please reach out to your administrator to authorize this cloud provider.'}</p>
-          ${isAdmin?'<a class="btn btn-pri" href="./organization-settings.html" style="text-decoration:none"><span class="material-symbols-outlined">link</span>Go to Authorization List</a>':''}
+          ${isAdmin?'<a class="btn btn-pri" href="./organization-settings.html" style="text-decoration:none"><span aria-hidden="true" class="material-symbols-outlined">link</span>Go to Authorization List</a>':''}
         </div></div>`;
     }
     /* v3：每朵雲的 Resources 分成兩個子分頁（#03-3 / #03-4）——
@@ -3697,26 +3784,26 @@ function resourcesTab(group){
     let tableBlock;
     if(!rowsData.length && q){
       /* 搜尋沒結果 ≠ 沒有資源，不能沿用 No Resources Yet（那會讓人以為指派被清空了） */
-      tableBlock = `<div class="empty-state"><div><span class="material-symbols-outlined">search_off</span>
+      tableBlock = `<div class="empty-state"><div><span aria-hidden="true" class="material-symbols-outlined">search_off</span>
         <p class="empty-title">No Matching Resources</p>
         <p class="empty-copy">No resources match “${esc(state.resSearch[state.cloud].trim())}”. Try a different name, ID, or ${esc(CLOUD_META[state.cloud].hierCol ? CLOUD_META[state.cloud].hierCol.toLowerCase() : 'parent')}.</p></div></div>`;
     } else if(!rowsData.length){
-      tableBlock = `<div class="empty-state"><div><span class="material-symbols-outlined">add_link</span>
+      tableBlock = `<div class="empty-state"><div><span aria-hidden="true" class="material-symbols-outlined">add_link</span>
         <p class="empty-title">No Resources Yet</p>
         <p class="empty-copy">No resources have been assigned to this group yet.
 Please assign new resources or reach out to your administrator for help.</p></div></div>`;
     } else if(sub==='tag'){
       const tagAccessors = {key:r=>r.key.toLowerCase(), value:r=>r.value.toLowerCase(), parent:r=>r.parent.name.toLowerCase()};
       const rows = sortRows(tags, 'resources', tagAccessors).map(r=>`<tr class="${selected[r.id]?'selected':''}">
-          <td>${canRemove?checkboxHtml(!!selected[r.id], `toggleResource('${r.id}','${bucketKey}')`):''}</td>
+          <td>${canRemove?checkboxHtml(!!selected[r.id], `toggleResource('${r.id}','${bucketKey}')`, false, false, 'Select ' + (sub==='tag' ? `${r.key} = ${r.value}` : r.name)):''}</td>
           <td class="cell-ellipsis">${esc(r.key)}</td>
           <td class="cell-ellipsis">${esc(r.value)}</td>
-          <td class="cell-double"><div class="l1">${esc(r.parent.name)}</div><div class="l2">${esc(r.parent.id)}</div></td>
-          <td><button class="lt-btn-icon" ${canRemove?'':'disabled'} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'],'${bucketKey}')"data-tip="Unlink Resource" aria-label="Unlink Resource"><span class="material-symbols-outlined">link_off</span></button></td>
+          ${nameIdTd(r.parent.name, r.parent.id, '')}
+          <td><button class="lt-btn-icon" ${canRemove?'':'disabled'} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'],'${bucketKey}')"data-tip="Unlink Resource" aria-label="Unlink Resource"><span aria-hidden="true" class="material-symbols-outlined">link_off</span></button></td>
         </tr>`).join('');
       /* #03-5：表頭第一格是全選 checkbox（部分勾選時顯示 mixed） */
       tableBlock = `<div class="table-wrap"><table><colgroup><col style="width:48px"><col style="width:22%"><col style="width:22%"><col><col style="width:80px"></colgroup><thead><tr>
-          <th>${canRemove?checkboxHtml(allOn, `toggleAllResources('${bucketKey}',[${idsCsv}])`, someOn):''}</th>
+          <th>${canRemove?checkboxHtml(allOn, `toggleAllResources('${bucketKey}',[${idsCsv}])`, someOn, false, 'Select all resources'):''}</th>
           ${sortHeader(terms.colKey,'resources','key')}${sortHeader(terms.colValue,'resources','value')}${sortHeader(terms.colParent,'resources','parent')}<th>Action</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     } else {
       /* Folder 欄只有 GCP 有。這不是 GCP 特例——這張表的欄位本來就隨雲不同
@@ -3740,12 +3827,12 @@ Please assign new resources or reach out to your administrator for help.</p></di
       const resAccessors = {col1:r=>r.name.toLowerCase(), col2:r=>r.parentName.toLowerCase(),
         folder:r=>r.folderNode ? folderSortKey(r.folderNode, state.cloud) : '\uffff', org:r=>(r.orgName||'').toLowerCase()};
       const rows = sortRows(projects, 'resources', resAccessors).map(r=>`<tr class="${selected[r.id]?'selected':''}">
-          <td>${canRemove?checkboxHtml(!!selected[r.id], `toggleResource('${r.id}','${bucketKey}')`):''}</td>
-          <td class="cell-double"><div class="l1">${hlq(r.name,q)}</div><div class="l2">${hlq(r.subId,q)}</div></td>
-          <td class="cell-double"><div class="l1">${hlq(r.parentName,q)}</div><div class="l2">${hlq(r.parentId,q)}</div></td>
-          ${hasOrgCol?`<td class="cell-double"><div class="l1">${hlq(r.orgName||'',q)}</div><div class="l2">${hlq(r.orgId||'',q)}</div></td>`:''}
+          <td>${canRemove?checkboxHtml(!!selected[r.id], `toggleResource('${r.id}','${bucketKey}')`, false, false, 'Select ' + (sub==='tag' ? `${r.key} = ${r.value}` : r.name)):''}</td>
+          ${nameIdTd(r.name, r.subId, q)}
+          ${nameIdTd(r.parentName, r.parentId, q)}
+          ${hasOrgCol?nameIdTd(r.orgName||'', r.orgId||'', q):''}
           ${hasFolderCol?`<td class="cell-ellipsis${r.folderNode?' has-fptip':' is-nofolder'}"${r.folderNode?` tabindex="0"${hasOrgCol&&r.orgName?` data-forg="${esc(r.orgName)}"`:''} data-fpath="${esc(folderColumnSegmentsFull(r.folderNode, state.cloud).join('\n'))}" aria-label="${esc(folderColumnFullPath(r.folderNode, state.cloud))}"`:''}>${r.folderNode?folderColumnHtml(r.folderNode, state.cloud, q):esc(noHierLabel)}</td>`:''}
-          <td><button class="lt-btn-icon" ${!(r.canRemove&&canRemove)?'disabled':''} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'],'${bucketKey}')"data-tip="Unlink Resource" aria-label="Unlink Resource"><span class="material-symbols-outlined">link_off</span></button></td>
+          <td><button class="lt-btn-icon" ${!(r.canRemove&&canRemove)?'disabled':''} onclick="openUnlinkDialog('${group.id}','${state.cloud}',['${r.id}'],'${bucketKey}')"data-tip="Unlink Resource" aria-label="Unlink Resource"><span aria-hidden="true" class="material-symbols-outlined">link_off</span></button></td>
         </tr>`).join('');
       /* 欄位順序（2026-09-24 第二次調整）：Project → Billing Account → (Organization) → Folder → Action。
        * ①跟彈窗 Group by 切換器同一個順序（Billing account → Folder）
@@ -3753,13 +3840,15 @@ Please assign new resources or reach out to your administrator for help.</p></di
        * ③長度不固定的路徑放最後，吃剩下的寬度；Organization 緊貼在它前面，先讀範圍再讀路徑
        * 欄寬：Billing Account 固定 240px（真實 GCP BA ID 20 字元，22% 在 1024px 只剩 167px 放不下），
        * 多 org 時欄位變多，表格最小寬度拉到 960px，窄螢幕改橫向捲動，不讓路徑被擠到剩幾個字。 */
+      /* X-9r5 Q1（Kabin 裁決）：Project／Org 改單行 `name (ID)` 後字串變長，Project 22→28%（有 Organization 欄時 24%）、Organization 18→20%，
+       * 多出來的寬度由吃剩下的 Folder 欄讓出（Folder 有 .fcell 中段截斷＋tooltip）；仍放不下的格子 ellipsis＋完整字串 tooltip */
       const resCols = hasOrgCol
-        ? `<col style="width:48px"><col style="width:22%"><col style="width:240px"><col style="width:18%"><col><col style="width:80px">`
+        ? `<col style="width:48px"><col style="width:24%"><col style="width:240px"><col style="width:20%"><col><col style="width:80px">`
         : hasFolderCol
-        ? `<col style="width:48px"><col style="width:22%"><col style="width:240px"><col><col style="width:80px">`
+        ? `<col style="width:48px"><col style="width:28%"><col style="width:240px"><col><col style="width:80px">`
         : `<col style="width:48px"><col style="width:42%"><col><col style="width:80px">`;
       tableBlock = `<div class="table-wrap"><table${hasOrgCol?' style="min-width:960px"':''}><colgroup>${resCols}</colgroup><thead><tr>
-          <th>${canRemove?checkboxHtml(allOn, `toggleAllResources('${bucketKey}',[${idsCsv}])`, someOn):''}</th>
+          <th>${canRemove?checkboxHtml(allOn, `toggleAllResources('${bucketKey}',[${idsCsv}])`, someOn, false, 'Select all resources'):''}</th>
           ${sortHeader(CLOUD_META[state.cloud].col1,'resources','col1')}${sortHeader(CLOUD_META[state.cloud].col2,'resources','col2')}${hasOrgCol?sortHeader(CLOUD_META[state.cloud].orgCol,'resources','org'):''}${hasFolderCol?sortHeader(CLOUD_META[state.cloud].hierCol,'resources','folder'):''}<th>Action</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     }
     const seg = `<div class="seg" role="tablist">
@@ -3772,18 +3861,18 @@ Please assign new resources or reach out to your administrator for help.</p></di
     return pillTabs(true) + `
       <div class="res-toolbar">
         <div class="res-toolbar-left">${seg}
-          <div class="search-box"><span class="material-symbols-outlined">search</span>${sub==='primary'
-            ? `<input id="res-search" placeholder="Search resources" value="${esc(state.resSearch[state.cloud]||'')}" oninput="onResSearch(this)">`
-            : `<input placeholder="Search resources" oninput="showToast('Filtering… (prototype does not filter mock data)','info')">`}</div>
+          <div class="search-box"><span aria-hidden="true" class="material-symbols-outlined">search</span>${sub==='primary'
+            ? `<input id="res-search" aria-label="Search resources" placeholder="Search resources" value="${esc(state.resSearch[state.cloud]||'')}" oninput="onResSearch(this)">`
+            : `<input aria-label="Search resources" placeholder="Search resources" oninput="showToast('Filtering… (prototype does not filter mock data)','info')">`}</div>
         </div>
         <div class="res-toolbar-actions">
-          ${(canRemove && selectedIds.length)?`<button class="btn btn-out" onclick="openUnlinkDialog('${group.id}','${state.cloud}',[${selectedIds.map(id=>"'"+id+"'").join(',')}],'${bucketKey}')"><span class="material-symbols-outlined">link_off</span>Unlink Resource</button>`:''}
-          ${canAssign?`<button class="btn btn-pri" data-testid="assign-resource-button" onclick="${assignClick}"><span class="material-symbols-outlined">add_link</span>Assign Resource</button>`:''}
+          ${(canRemove && selectedIds.length)?`<button class="btn btn-out" onclick="openUnlinkDialog('${group.id}','${state.cloud}',[${selectedIds.map(id=>"'"+id+"'").join(',')}],'${bucketKey}')"><span aria-hidden="true" class="material-symbols-outlined">link_off</span>Unlink Resource</button>`:''}
+          ${canAssign?`<button class="btn btn-pri" data-testid="assign-resource-button" onclick="${assignClick}"><span aria-hidden="true" class="material-symbols-outlined">add_link</span>Assign Resource</button>`:''}
         </div>
       </div>
       ${tableBlock}`;
   };
-  return `<p class="section-copy" style="margin-bottom:16px">You can assign cloud resources to this group here.</p>${body()}`;
+  return `<h2 class="sr-only">Resources</h2><p class="section-copy" style="margin-bottom:16px">You can assign cloud resources to this group here.</p>${body()}`;
 }
 
 function renderDetail(){
@@ -3805,14 +3894,14 @@ function renderDetail(){
     const list = tier2GroupsFor(t1);
     return groupTable(list, {showTier2:false, editable:actions().editGroup, tier:2, resourceCenter:true, t1IdForRow:t1.id, sortTable:'tier2'});
   }
-  return `<button class="go-back" onclick="backToList()"><span class="material-symbols-outlined">arrow_back</span><span class="go-back-label">Back to Group List</span></button>
+  return `<button class="go-back" onclick="backToList()"><span aria-hidden="true" class="material-symbols-outlined">arrow_circle_left</span><span class="go-back-label">Back to Group List</span></button>
     <div class="card">
       <div class="crumb">${crumb}</div>
       <div class="section-head" style="align-items:center;margin-bottom:20px">
-        <h1 style="font-size:24px;font-weight:700;margin:0">${esc(group.name)}</h1>
+        <h1 style="font-size:24px;font-weight:700;margin:0" tabindex="-1">${esc(group.name)}</h1>
         <div style="display:flex;gap:8px">
-          ${actions().editGroup?`<button class="btn btn-out" ${loading?'disabled':''} onclick="openEditGroup('${group.id}',${isT2?`'${t1.id}'`:'null'})"><span class="material-symbols-outlined">edit</span>Edit Group</button>`:''}
-          ${actions().removeGroup?`<button class="btn btn-out" ${loading?'disabled':''} onclick="openRemoveGroup('${group.id}',${isT2?`'${t1.id}'`:'null'})"><span class="material-symbols-outlined">delete</span>Remove Group</button>`:''}
+          ${actions().editGroup?`<button class="btn btn-out btn-s" ${loading?'disabled':''} onclick="openEditGroup('${group.id}',${isT2?`'${t1.id}'`:'null'})"><span aria-hidden="true" class="material-symbols-outlined">edit</span>Edit Group</button>`:''}
+          ${actions().removeGroup?`<button class="btn btn-out btn-s" ${loading?'disabled':''} onclick="openRemoveGroup('${group.id}',${isT2?`'${t1.id}'`:'null'})"><span aria-hidden="true" class="material-symbols-outlined">delete</span>Remove Group</button>`:''}
         </div>
       </div>
       ${tabsHeader(group, isT2?2:1)}
@@ -3821,7 +3910,7 @@ function renderDetail(){
           <h2>Tier 2 Group List (${t1.tier2})</h2>
           <p>You can quickly view the Tier 2 group information here, and click on each group to check details such as group members.</p>
         </div>
-        ${actions().createGroup?`<button class="btn btn-pri" ${loading?'disabled':''} onclick="openCreateGroup(2)"><span class="material-symbols-outlined">add</span>Create Group</button>`:''}
+        ${actions().createGroup?`<button class="btn btn-pri" ${loading?'disabled':''} onclick="openCreateGroup(2)"><span aria-hidden="true" class="material-symbols-outlined">add</span>Create Group</button>`:''}
       </div>` : ''}
       ${body}
       ${learnMoreHtml(true)}
@@ -3917,6 +4006,7 @@ let assignFetchTimer;
  *   wizard = Create Group 第 3 / 4 步（#31 / #37）內嵌同一個選單
  * renderAssign() 依 assign.host 決定重畫哪一個外殼，選取 / 搜尋 / 分組邏輯完全共用。 */
 function startAssignPicker(cloud){
+  assign._resetScroll = true;
   assign.cloud = cloud || state.cloud || 'gcp';
   assign.loading = true;
   assign.searching = false;
@@ -4093,6 +4183,7 @@ function onAssignSearch(value){
       assign.search = term;
       assign.typed = null;
       assign.searching = false;
+      assign._resetScroll = true;
       renderAssign();
     }, SEARCH_FETCH_MS);
   }, ASSIGN_DEBOUNCE_MS);
@@ -4115,6 +4206,7 @@ function setGroupBy(mode){
     }
   }
   assign.groupBy = mode;
+  assign._resetScroll = true;
   assign.expanded = {};
   /* 兩個視角的搜尋範圍不一樣（見 projectVisible），還沒送出的查詢跨過去會用
    * 錯的規則跑，連 skeleton 一起收掉。 */
@@ -4135,8 +4227,8 @@ function hl(text){
 /* 薄包裝 → shared/lumiture-checkbox.js。這支檔案全程是重繪模型（caller 持有
  * assign.selected 等狀態、改變後重繪整塊），所以走共用元件的 class 路徑，
  * 不產生真的 input。簽名維持不變，呼叫端一處都不用改。 */
-function checkboxHtml(checked, onclick, mixed, disabled){
-  return LumiCheckbox.html({checked:checked, mixed:mixed, disabled:disabled, onclick:onclick});
+function checkboxHtml(checked, onclick, mixed, disabled, ariaLabel){
+  return LumiCheckbox.html({checked:checked, mixed:mixed, disabled:disabled, onclick:onclick, ariaLabel:ariaLabel});
 }
 /* GCP 允許 10 層。樹狀版把步進縮小讓縮排一路撐到底：16px × 10 層 = 160px，
  * 660px 的彈窗放得下、階層全程看得見。
@@ -4221,7 +4313,9 @@ function orgChipHtml(project){
   if(!isMultiOrg() || showFolderView() || !project.orgName) return '';
   return `<span class="ba-chip is-org-chip">${esc(project.orgName)}</span>`;
 }
-function projectRow(project, depth, ancIds = []){
+/* X-9r5 GA29：樹的 aria-level（多 org 的資料夾視角多一層 org 標頭） */
+function treeLevel(depth){ return depth + 1 + ((isMultiOrg() && showFolderView()) ? 1 : 0); }
+function projectRow(project, depth, ancIds = [], level){
   /* 元件版：GroupedMultiSelectOptionItem 是單行 `name (desc)`，desc 用 hint 色，
    * 所以資源 ID 走 desc 的位置、跟名稱同一行（元件的 row height 是固定 40px，
    * 容不下兩行）。樹狀版維持兩行 Name / ID，對齊 Resources 表格的既有慣例。 */
@@ -4229,10 +4323,11 @@ function projectRow(project, depth, ancIds = []){
   const body = isComponentStyle()
     ? `${label}<span class="tdesc">(${hl(project.resId)})</span>`
     : `${label}<span class="tsub">${hl(project.resId)}</span>`;
-  return `<div class="tnode is-project"${ancIds.length?` data-parent="${ancIds[ancIds.length-1]}"`:''} style="padding-left:${indentPx(depth)}px" onclick="toggleProject('${project.id}')">${railsHtml(depth, ancIds)}${hoverGuidesHtml(ancIds)}
+  const pname = projectLabel(project);
+  return `<div class="tnode is-project" role="treeitem" aria-level="${level || treeLevel(depth)}" aria-checked="${!!assign.selected[project.id]}" aria-label="${esc(pname)} (${esc(project.resId)})" data-fk="node:${esc(project.id)}" tabindex="-1"${ancIds.length?` data-parent="${ancIds[ancIds.length-1]}"`:''} style="padding-left:${indentPx(depth)}px" onclick="toggleProject('${project.id}')">${railsHtml(depth, ancIds)}${hoverGuidesHtml(ancIds)}
     <span class="tchev ghost"></span>
-    ${checkboxHtml(!!assign.selected[project.id], `toggleProject('${project.id}')`)}
-    <span class="material-symbols-outlined ticon ghost">folder</span>
+    ${checkboxHtml(!!assign.selected[project.id], `toggleProject('${project.id}')`, false, false, `Select ${pname}`)}
+    <span aria-hidden="true" class="material-symbols-outlined ticon ghost">folder</span>
     <div class="tlabel">${body}</div>
     ${orgChipHtml(project)}${(showFolderView() && !project.parent.none)?`<span class="ba-chip">${esc(project.parent.name)}</span>`:''}
   </div>`;
@@ -4354,11 +4449,12 @@ function folderRow(node, depth, ancestors = [], ancIds = []){
        * 已指派的專案會冒出來，跟旁邊的計數對不起來。用 inFolderScope 一起擋掉。 */
       node.projects.filter(project => folderMatches(node) ? inFolderScope(project) : projectVisible(project)).map(project=>projectRow(project, depth+1, ancIds.concat(node.id))).join('')
     ) : '';
+  const nounN = `${selectable.length} ${selectable.length===1?cfg().noun:cfg().nounPlural}`;
   return `<div class="tbranch">
-      <div class="tnode is-folder" data-depth="${depth}"${ancIds.length?` data-parent="${ancIds[ancIds.length-1]}"`:''} style="padding-left:${indentPx(depth)}px;top:${folderStickyTop()}px;z-index:${30+depth}"${node.folderId?` data-tip="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth, ancIds)}${hoverGuidesHtml(ancIds)}
-        <button class="tchev" onclick="event.stopPropagation();toggleExpand('${node.id}')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
-        ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome)}
-        <span class="material-symbols-outlined ticon">folder</span>
+      <div class="tnode is-folder" role="treeitem" aria-level="${treeLevel(depth)}" aria-expanded="${expanded}" aria-checked="${isAll?'true':isSome?'mixed':'false'}" aria-label="${esc(node.name)}, ${nounN}" data-fk="node:${esc(node.id)}" tabindex="-1" data-depth="${depth}"${ancIds.length?` data-parent="${ancIds[ancIds.length-1]}"`:''} style="padding-left:${indentPx(depth)}px;top:${folderStickyTop()}px;z-index:${30+depth}"${node.folderId?` data-tip="Folder ID: ${esc(node.folderId)}"`:''} onclick="toggleExpand('${node.id}')">${railsHtml(depth, ancIds)}${hoverGuidesHtml(ancIds)}
+        <button class="tchev" data-fk="chev:${esc(node.id)}" aria-expanded="${expanded}" onclick="event.stopPropagation();toggleExpand('${node.id}')" aria-label="${expanded?'Collapse':'Expand'} ${esc(node.name)}"><span aria-hidden="true" class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
+        ${checkboxHtml(isAll, `toggleFolder('${node.id}')`, isSome, false, `Select ${node.name} (${nounN})`)}
+        <span aria-hidden="true" class="material-symbols-outlined ticon">folder</span>
         <div class="tlabel"><span class="tname">${pathPrefix(depth, node)}${hl(node.name)} <span class="tcount ${selectable.length!==unassigned.length?'partial':''}">${countText}</span></span></div>
       </div>${kids}
     </div>`;
@@ -4382,7 +4478,7 @@ function clearedNoticeHtml(){
   if(!assign.clearedCount) return '';
   const noun = assign.clearedCount === 1 ? cfg().noun : cfg().nounPlural;
   return `<div class="tnotice">
-    <span class="material-symbols-outlined">info</span>
+    <span aria-hidden="true" class="material-symbols-outlined">info</span>
     <span>Switching views cleared ${assign.clearedCount} selected ${esc(noun)}.</span>
     <button class="tnotice-act" onclick="undoClearedSelection()">Undo</button>
   </div>`;
@@ -4399,11 +4495,12 @@ function unassignedRow(){
   const countText = visible.length===inFilter.length ? `(${inFilter.length})` : `(${visible.length} / ${inFilter.length})`;
   const expanded = !!assign.expanded['unassigned'] || !!assign.search;
   const kids = expanded ? visible.map(project=>projectRow(project,1)).join('') : '';
+  const nounN = `${visible.length} ${visible.length===1?cfg().noun:cfg().nounPlural}`;
   return `<div class="tbranch">
-      <div class="tnode is-folder is-unassigned" style="padding-left:24px;top:${folderStickyTop()}px;z-index:30" onclick="toggleExpand('unassigned')">
-        <button class="tchev" onclick="event.stopPropagation();toggleExpand('unassigned')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
-        ${checkboxHtml(isAll, `toggleUnassigned()`, isSome)}
-        <span class="material-symbols-outlined ticon">folder_off</span>
+      <div class="tnode is-folder is-unassigned" role="treeitem" aria-level="${treeLevel(0)}" aria-expanded="${expanded}" aria-checked="${isAll?'true':isSome?'mixed':'false'}" aria-label="No folder, ${nounN}" data-fk="node:unassigned" tabindex="-1" style="padding-left:24px;top:${folderStickyTop()}px;z-index:30" onclick="toggleExpand('unassigned')">
+        <button class="tchev" data-fk="chev:unassigned" aria-expanded="${expanded}" aria-label="${expanded?'Collapse':'Expand'} No folder" onclick="event.stopPropagation();toggleExpand('unassigned')"><span aria-hidden="true" class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
+        ${checkboxHtml(isAll, `toggleUnassigned()`, isSome, false, `Select No folder (${nounN})`)}
+        <span aria-hidden="true" class="material-symbols-outlined ticon">folder_off</span>
         <div class="tlabel"><span class="tname">No folder <span class="tcount ${visible.length!==inFilter.length?'partial':''}">${countText}</span></span>
         <span class="tsub">Projects sitting directly under ${esc(activeOrgs()[0].name)}</span></div>
       </div>${kids}
@@ -4427,12 +4524,13 @@ function noBaRow(){
   const isSome = picked>0 && !isAll;
   const countText = visible.length===inScope.length ? `(${inScope.length})` : `(${visible.length} / ${inScope.length})`;
   const expanded = !!assign.expanded['no-ba'] || !!assign.search;
-  const kids = expanded ? visible.map(project=>projectRow(project,1)).join('') : '';
+  const kids = expanded ? visible.map(project=>projectRow(project,1,[],2)).join('') : '';
+  const nounN = `${visible.length} ${visible.length===1?cfg().noun:cfg().nounPlural}`;
   return `<div class="tbranch">
-      <div class="tnode is-folder is-unassigned${isMultiOrg()?' is-cross-org':''}" style="padding-left:24px;top:${folderStickyTop()}px;z-index:30" onclick="toggleExpand('no-ba')">
-        <button class="tchev" onclick="event.stopPropagation();toggleExpand('no-ba')" aria-label="${expanded?'Collapse':'Expand'}"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
-        ${checkboxHtml(isAll, `toggleNoBa()`, isSome)}
-        <span class="material-symbols-outlined ticon">money_off</span>
+      <div class="tnode is-folder is-unassigned${isMultiOrg()?' is-cross-org':''}" role="treeitem" aria-level="1" aria-expanded="${expanded}" aria-checked="${isAll?'true':isSome?'mixed':'false'}" aria-label="Projects without Billing Account, ${nounN}" data-fk="node:no-ba" tabindex="-1" style="padding-left:24px;top:${folderStickyTop()}px;z-index:30" onclick="toggleExpand('no-ba')">
+        <button class="tchev" data-fk="chev:no-ba" aria-expanded="${expanded}" aria-label="${expanded?'Collapse':'Expand'} Projects without Billing Account" onclick="event.stopPropagation();toggleExpand('no-ba')"><span aria-hidden="true" class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
+        ${checkboxHtml(isAll, `toggleNoBa()`, isSome, false, `Select Projects without Billing Account (${nounN})`)}
+        <span aria-hidden="true" class="material-symbols-outlined ticon">money_off</span>
         <div class="tlabel"><span class="tname">Projects without Billing Account <span class="tcount ${visible.length!==inScope.length?'partial':''}">${countText}</span></span></div>
       </div>${kids}
     </div>`;
@@ -4458,8 +4556,8 @@ function toggleSelectAll(){ forgetClearedNotice(); toggleScope(allVisibleSelecta
  * 字級小一階。四個線索同時在講「這不是資料夾」，不是只靠顏色。
  * 明度往上加深（org blue-20 > folder blue-10 > project 白底），層級一眼讀得出來。 */
 function orgHeaderRow(org){
-  return `<div class="tnode is-org" style="top:${SELECT_ALL_H}px" data-tip="Organization ID: ${esc(org.orgId)}">
-      <span class="material-symbols-outlined org-icon">domain</span>
+  return `<div class="tnode is-org" role="treeitem" aria-level="1" aria-disabled="true" aria-label="Organization ${esc(org.name)}" data-fk="node:org-${esc(org.orgId)}" tabindex="-1" style="top:${SELECT_ALL_H}px" data-tip="Organization ID: ${esc(org.orgId)}">
+      <span aria-hidden="true" class="material-symbols-outlined org-icon">domain</span>
       <span class="org-name">${hl(org.name)}</span>
     </div>`;
 }
@@ -4470,10 +4568,10 @@ function selectAllRow(){
   const isAll = picked===scope.length;
   const isSome = picked>0 && !isAll;
   /* 左邊距跟第一層資料夾同一個 indentPx(0)：元件版沒有箭頭佔位，沒給的話 checkbox 會貼齊彈窗左緣 */
-  return `<div class="tnode is-selectall" style="padding-left:${indentPx(0)}px">
+  return `<div class="tnode is-selectall" role="treeitem" aria-level="1" aria-checked="${isAll?'true':isSome?'mixed':'false'}" aria-label="Select all (${scope.length})" data-fk="node:select-all" tabindex="-1" style="padding-left:${indentPx(0)}px" onclick="toggleSelectAll()">
       <span class="tchev ghost"></span>
-      ${checkboxHtml(isAll, `toggleSelectAll()`, isSome)}
-      <span class="material-symbols-outlined ticon ghost">folder</span>
+      ${checkboxHtml(isAll, `toggleSelectAll()`, isSome, false, `Select all (${scope.length})`)}
+      <span aria-hidden="true" class="material-symbols-outlined ticon ghost">folder</span>
       <div class="tlabel"><span class="tname">Select all <span class="tcount">(${scope.length})</span></span></div>
     </div>`;
 }
@@ -4490,13 +4588,14 @@ function flatBaTree(){
     const isAll = projects.length>0 && picked===projects.length;
     const isSome = picked>0 && !isAll;
     const countText = projects.length===all.length ? `(${all.length})` : `(${projects.length} / ${all.length})`;
+    const nounN = `${projects.length} ${projects.length===1?cfg().noun:cfg().nounPlural}`;
     return `<div class="tbranch">
-        <div class="tnode is-folder" data-depth="0" style="padding-left:24px;top:${folderStickyTop()}px;z-index:30" onclick="toggleExpand('${group.id}')">
-          <button class="tchev" onclick="event.stopPropagation();toggleExpand('${group.id}')"><span class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
-          ${checkboxHtml(isAll, `toggleBa('${group.id}')`, isSome)}
-          <span class="material-symbols-outlined ticon">${cfg().parentIcon}</span>
+        <div class="tnode is-folder" role="treeitem" aria-level="1" aria-expanded="${expanded}" aria-checked="${isAll?'true':isSome?'mixed':'false'}" aria-label="${esc(group.name)}, ${nounN}" data-fk="node:${esc(group.id)}" tabindex="-1" data-depth="0" style="padding-left:24px;top:${folderStickyTop()}px;z-index:30" onclick="toggleExpand('${group.id}')">
+          <button class="tchev" data-fk="chev:${esc(group.id)}" aria-expanded="${expanded}" aria-label="${expanded?'Collapse':'Expand'} ${esc(group.name)}" onclick="event.stopPropagation();toggleExpand('${group.id}')"><span aria-hidden="true" class="material-symbols-outlined">${expanded?'expand_more':'chevron_right'}</span></button>
+          ${checkboxHtml(isAll, `toggleBa('${group.id}')`, isSome, false, `Select ${group.name} (${nounN})`)}
+          <span aria-hidden="true" class="material-symbols-outlined ticon">${cfg().parentIcon}</span>
           <div class="tlabel"><span class="tname">${hl(group.name)} <span class="tcount ${projects.length!==all.length?'partial':''}">${countText}</span></span></div>
-        </div>${expanded ? projects.map(project=>projectRow(project,1)).join('') : ''}
+        </div>${expanded ? projects.map(project=>projectRow(project,1,[],2)).join('') : ''}
       </div>`;
   }).join('');
 }
@@ -4537,25 +4636,26 @@ function assignPickerParts(){
   const assignable = everyUnassigned().length;
   const picked = Object.keys(assign.selected).length;
 
-  let body;
+  let body, treeMode = false;
   if(assign.loading || assign.searching){
     body = `<div class="tskel">${Array.from({length:7}).map(()=>'<div class="skel"></div>').join('')}</div>`;
   } else if(!everyUnassigned().length){
     /* 全部都指派過就沒東西可加了。這裡刻意不用 No Data 那種語彙——
      * 這不是出錯，是這個群組已經設定完了，而且要移除的話得去表格。 */
-    body = `<div class="tempty"><span class="material-symbols-outlined tempty-icon is-success">check_circle</span>
+    body = `<div class="tempty"><span aria-hidden="true" class="material-symbols-outlined tempty-icon is-success">check_circle</span>
       <div class="tempty-title">Everything is already assigned</div>
       <div>All authorized ${esc(cfg().cloudLabel)} resources are assigned to this group. To remove one, select it in the Resources table and use Unlink Resource.</div></div>`;
   } else if(cfg().supportsFolders && assign.groupBy==='folder' && !assign.hasFolders){
     /* 使用者主動點了 Folder 分頁，這個 org 才真的沒有資料夾可看。跟
      * cloud pill tabs 的 not-authorized 空狀態同一個視覺語言（icon +
      * 標題 + 說明），不是常駐警語。 */
-    body = `<div class="tempty"><span class="material-symbols-outlined tempty-icon">folder_off</span>
+    body = `<div class="tempty"><span aria-hidden="true" class="material-symbols-outlined tempty-icon">folder_off</span>
       <div class="tempty-title">No folders in this organization</div>
       <div>Projects here aren't organized into folders. Switch to ${esc(cfg().parentLabel)} to browse and assign resources.</div></div>`;
   } else if(!showFolderView()){
     const tree = flatBaTree() + noBaRow();
     body = tree ? selectAllRow() + tree : `<div class="tempty">No resources match your search.</div>`;
+    treeMode = !!tree;
   } else {
     /* 多 org：每個 org 一段，標頭 + 該 org 底下有內容的資料夾。
      * 單一 org：完全不出現標頭，跟改版前一模一樣。 */
@@ -4573,6 +4673,7 @@ function assignPickerParts(){
       return (multi ? orgHeaderRow(org) : '') + rows;
     }).join('') + noBaRow();
     body = tree ? selectAllRow() + tree : `<div class="tempty">No resources match your search.</div>`;
+    treeMode = !!tree;
   }
 
   /* 原本這裡有一塊藍底常駐說明，收掉了（Kabin 2026-09-09 決定）。三件事
@@ -4585,41 +4686,49 @@ function assignPickerParts(){
    * 解釋為什麼看不到。所以 Group by 的 Folder 分頁永遠在，這個 org 真的
    * 沒有資料夾時，點進 Folder 才在 rmodal-body 出現對應空狀態。 */
   const tools = `<div class="rmodal-tools">
-        <div class="search-box"><span class="material-symbols-outlined">search</span><input placeholder="${searchPlaceholder()}" value="${esc(assign.typed != null ? assign.typed : assign.search)}" oninput="onAssignSearch(this.value)"></div>
+        <div class="search-box"><span aria-hidden="true" class="material-symbols-outlined">search</span><input aria-label="${searchPlaceholder()}" placeholder="${searchPlaceholder()}" value="${esc(assign.typed != null ? assign.typed : assign.search)}" oninput="onAssignSearch(this.value)"></div>
         ${showGroupByToggle() ? `<div class="groupby-toggle">
           <span class="lbl">Group by</span>
-          <span class="material-symbols-outlined gb-info" data-tip="${esc(GROUPBY_HELP)}" tabindex="0">info</span>
+          <span aria-hidden="true" class="material-symbols-outlined gb-info" data-tip="${esc(GROUPBY_HELP)}" tabindex="0">info</span>
           <div class="pill-tabs">
-            <button class="pill-tab ${assign.groupBy==='ba'?'active':''}" onclick="setGroupBy('ba')"><span class="material-symbols-outlined" style="font-size:16px">${cfg().parentIcon}</span>${esc(cfg().parentLabel)}</button>
-            <button class="pill-tab ${assign.groupBy==='folder'?'active':''}" onclick="setGroupBy('folder')"><span class="material-symbols-outlined" style="font-size:16px">folder</span>Folder</button>
+            <button class="pill-tab ${assign.groupBy==='ba'?'active':''}" aria-pressed="${assign.groupBy==='ba'}" onclick="setGroupBy('ba')"><span aria-hidden="true" class="material-symbols-outlined" style="font-size:16px">${cfg().parentIcon}</span>${esc(cfg().parentLabel)}</button>
+            <button class="pill-tab ${assign.groupBy==='folder'?'active':''}" aria-pressed="${assign.groupBy==='folder'}" onclick="setGroupBy('folder')"><span aria-hidden="true" class="material-symbols-outlined" style="font-size:16px">folder</span>Folder</button>
           </div>
         </div>` : ''}
       </div>`;
   const bodyCls = `rmodal-body ${isComponentStyle()?'is-component':'is-tree'}${isComponentFixed()?' is-component-fixed':''}${isTinted()?' is-tinted':''}${railsOnHover()?' is-rails-onhover':''}`;
   const count = assignable ? `<b>${picked}</b> of ${assignable} unassigned ${assignable===1?cfg().noun:cfg().nounPlural} selected` : '';
-  return {tools, notice:clearedNoticeHtml(), body, bodyCls, count, picked, assignable};
+  /* X-9r5 GA27：搜尋結果數播給讀屏（同一句不重播） */
+  if(assign.search && !assign.loading && !assign.searching){
+    const n = allVisibleSelectable().length;
+    announce(n ? `${n} ${n===1?cfg().noun:cfg().nounPlural} found` : 'No resources match your search');
+  }
+  const bodyAttrs = treeMode ? ` role="tree" aria-multiselectable="true" aria-label="${esc(cfg().cloudLabel)} resources"` : '';
+  return {tools, notice:clearedNoticeHtml(), body, bodyCls, bodyAttrs, count, picked, assignable};
 }
 function renderAssign(){
   if(assign.host==='wizard'){ renderWizard(); return; }
   const root = document.getElementById('assign-root');
-  if(!assign.open){ root.innerHTML=''; return; }
+  if(!assign.open){ root.innerHTML=''; dialogSync('assign-root'); return; }
   /* renderAssign 重建整個彈窗的 innerHTML，搜尋框會被換掉，游標就跑了——
    * debounce 一送出就打不下去，得再點回輸入框。渲染前記住焦點跟游標位置，
    * 渲染後補回去。（不是這輪的回饋，是順手修掉的既有問題。） */
-  const focus = captureFocus();
+  const focus = captureFocus(root);
+  const keepTop = (!assign._resetScroll && root.querySelector('.rmodal-body')) ? root.querySelector('.rmodal-body').scrollTop : 0;
+  assign._resetScroll = false;
   const parts = assignPickerParts();
   root.innerHTML = `<div class="rmodal-backdrop" onclick="if(event.target===this)closeAssign()">
-    <div class="rmodal assign-picker" role="dialog" aria-label="Assign Resource">
+    <div class="rmodal assign-picker" role="dialog" aria-modal="true" aria-labelledby="assign-title">
       <div class="rmodal-head">
         <div>
-          <h3>Assign Resource: ${esc(cfg().cloudLabel)}</h3>
+          <h3 id="assign-title">Assign Resource: ${esc(cfg().cloudLabel)}</h3>
           <p>Select the ${esc(cfg().cloudLabel)} resources you want to assign to this group.</p>
         </div>
-        <button class="rmodal-close" onclick="closeAssign()" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
+        <button class="rmodal-close" onclick="closeAssign()" aria-label="Close"><span aria-hidden="true" class="material-symbols-outlined">close</span></button>
       </div>
       ${parts.tools}
       ${parts.notice}
-      <div class="${parts.bodyCls}">${parts.body}</div>
+      <div class="${parts.bodyCls}"${parts.bodyAttrs}>${parts.body}</div>
       <div class="rmodal-foot">
         <span class="rmodal-count">${parts.count}</span>
         <div style="display:flex;gap:8px">
@@ -4629,7 +4738,9 @@ function renderAssign(){
       </div>
     </div>
   </div>`;
+  treePass(root, keepTop);
   restoreFocus(root, focus);
+  dialogSync('assign-root');
 }
 /* Demo 用：整條 10 層一次全展開，方便截圖。平常點資料夾也會展開整條子樹。 */
 function showDeepTree(){
@@ -4826,7 +4937,7 @@ function ddPanelHtml(kind){
       + group.items.map(item=>`<div class="dd-row child" onclick="ddToggle('${kind}','${esc(item.id)}')">${checkboxHtml(!!bucket[item.id], `ddToggle('${kind}','${esc(item.id)}')`)}<span class="dd-lbl">${hlTag(item.label)}${item.sub?` <span class="dd-id">(${esc(item.sub)})</span>`:''}</span></div>`).join('');
   }).join('');
   return `<div class="dd-panel" onclick="event.stopPropagation()">
-    <div class="dd-search"><div class="search-box"><input data-f="dd-search" placeholder="${esc(kind==='keys'?tagTerms().searchKeys:tagTerms().searchValues)}" value="${esc(tagPick.search)}" oninput="tagPick.search=this.value;renderTagAssign()"><span class="material-symbols-outlined">search</span></div></div>
+    <div class="dd-search"><div class="search-box"><input data-f="dd-search" aria-label="${esc(kind==='keys'?tagTerms().searchKeys:tagTerms().searchValues)}" placeholder="${esc(kind==='keys'?tagTerms().searchKeys:tagTerms().searchValues)}" value="${esc(tagPick.search)}" oninput="tagPick.search=this.value;renderTagAssign()"><span aria-hidden="true" class="material-symbols-outlined">search</span></div></div>
     <div class="dd-list">
       ${all.length?`<div class="dd-row" onclick="ddToggleAll('${kind}')">${checkboxHtml(allOn, `ddToggleAll('${kind}')`, someOn)}<span class="dd-lbl">Select All</span></div>`:''}
       ${rows}
@@ -4842,8 +4953,8 @@ function tagTriggerText(kind){
 }
 function renderTagAssign(){
   const root = document.getElementById('tag-root');
-  if(!tagPick.open){ root.innerHTML=''; return; }
-  const focus = captureFocus();
+  if(!tagPick.open){ root.innerHTML=''; dialogSync('tag-root'); return; }
+  const focus = captureFocus(root);
   const terms = tagTerms();
   const cloudLabel = CLOUD_META[tagPick.cloud].label;
   const keyCount = Object.keys(tagPick.keys).length;
@@ -4855,24 +4966,24 @@ function renderTagAssign(){
       <div class="fld"><div class="skel" style="height:14px;width:90px;margin-bottom:8px"></div><div class="skel" style="height:36px"></div></div>`;
   } else if(!tagPool().length){
     /* 全部指派過：沿用 v2 專案選單的空狀態語彙，不是 No Data */
-    fields = `<div class="tempty" style="min-height:160px"><span class="material-symbols-outlined tempty-icon is-success">check_circle</span>
+    fields = `<div class="tempty" style="min-height:160px"><span aria-hidden="true" class="material-symbols-outlined tempty-icon is-success">check_circle</span>
       <div class="tempty-title">Everything is already assigned</div>
       <div>All ${esc(cloudLabel)} ${esc(terms.tab.toLowerCase())}s are assigned to this group. To remove one, select it in the Resources table and use Unlink Resource.</div></div>`;
   } else {
-    fields = `<div class="fld dd ${tagPick.dd==='keys'?'is-open':''}"><label class="fld-lbl">${esc(terms.keys)}</label>
-        <button class="dd-trigger ${keyText?'':'placeholder'}" onclick="event.stopPropagation();ddOpen('keys')">${keyText?esc(keyText):esc(terms.keyPh)}</button><span class="material-symbols-outlined dd-caret" style="top:30px">arrow_drop_down</span>
+    fields = `<div class="fld dd ${tagPick.dd==='keys'?'is-open':''}"><label class="fld-lbl" id="tag-keys-lbl">${esc(terms.keys)}</label>
+        <button class="dd-trigger ${keyText?'':'placeholder'}" aria-labelledby="tag-keys-lbl" aria-haspopup="true" aria-expanded="${tagPick.dd==='keys'}" onclick="event.stopPropagation();ddOpen('keys')">${keyText?esc(keyText):esc(terms.keyPh)}</button><span aria-hidden="true" class="material-symbols-outlined dd-caret" style="top:30px">arrow_drop_down</span>
         ${tagPick.dd==='keys'?ddPanelHtml('keys'):''}</div>
       <!-- Values 在還沒選任何 Key 之前 disabled：value 的上層是 key（#56-1 註記），沒有 key 就沒有可分組的 value。
            這個 disabled 是設計端暫擬，設計稿只畫了兩個欄位都是 placeholder 的樣子。 -->
-      <div class="fld dd ${tagPick.dd==='values'?'is-open':''}"><label class="fld-lbl">${esc(terms.values)}</label>
-        <button class="dd-trigger ${valueText?'':'placeholder'}" ${keyCount?'':'disabled'} onclick="event.stopPropagation();ddOpen('values')">${valueText?esc(valueText):esc(terms.valuePh)}</button><span class="material-symbols-outlined dd-caret" style="top:30px">arrow_drop_down</span>
+      <div class="fld dd ${tagPick.dd==='values'?'is-open':''}"><label class="fld-lbl" id="tag-values-lbl">${esc(terms.values)}</label>
+        <button class="dd-trigger ${valueText?'':'placeholder'}" aria-labelledby="tag-values-lbl" aria-haspopup="true" aria-expanded="${tagPick.dd==='values'}" ${keyCount?'':'disabled'} onclick="event.stopPropagation();ddOpen('values')">${valueText?esc(valueText):esc(terms.valuePh)}</button><span aria-hidden="true" class="material-symbols-outlined dd-caret" style="top:30px">arrow_drop_down</span>
         ${tagPick.dd==='values'?ddPanelHtml('values'):''}</div>`;
   }
   root.innerHTML = `<div class="rmodal-backdrop" onclick="if(event.target===this)closeTagAssign()">
-    <div class="lmodal" role="dialog" aria-label="Assign Resource" onclick="ddCloseAll()">
+    <div class="lmodal" role="dialog" aria-modal="true" aria-labelledby="tag-title" onclick="ddCloseAll()">
       <div class="rmodal-head">
-        <div><h3>Assign Resource: ${esc(cloudLabel)}</h3><p>Select the ${esc(cloudLabel)} resources you want to assign to this group.</p></div>
-        <button class="rmodal-close" onclick="closeTagAssign()" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
+        <div><h3 id="tag-title">Assign Resource: ${esc(cloudLabel)}</h3><p>Select the ${esc(cloudLabel)} resources you want to assign to this group.</p></div>
+        <button class="rmodal-close" onclick="closeTagAssign()" aria-label="Close"><span aria-hidden="true" class="material-symbols-outlined">close</span></button>
       </div>
       ${fields}
       <div class="dlg-actions" style="margin-top:4px">
@@ -4881,6 +4992,7 @@ function renderTagAssign(){
       </div>
     </div></div>`;
   restoreFocus(root, focus);
+  dialogSync('tag-root');
 }
 /* #56 註記：「[Assign] submit 成功與否則透過 toast 回饋，參照 #18-3」→ 沿用 ASSIGN_TOAST */
 function confirmTagAssign(){
@@ -4897,22 +5009,29 @@ function confirmTagAssign(){
 
 /* 重繪 innerHTML 會弄掉輸入框的焦點與游標（v2 在 assign 搜尋框就踩過）。
  * 這裡做成通用版：帶 data-f 的輸入框、或 .assign-picker 裡的搜尋框，渲染前記住、渲染後補回。 */
-function captureFocus(){
+function captureFocus(root){
   const active = document.activeElement;
   if(!active || !active.matches) return null;
   let selector = null;
   if(active.dataset && active.dataset.f) selector = `[data-f="${active.dataset.f}"]`;
   else if(active.matches('.assign-picker .search-box input')) selector = '.assign-picker .search-box input';
-  if(!selector) return null;
-  let caret = null;
-  try { caret = active.selectionStart; } catch(_) { caret = null; }
-  return {selector, caret};
+  if(selector){
+    let caret = null;
+    try { caret = active.selectionStart; } catch(_) { caret = null; }
+    return {selector, caret};
+  }
+  /* X-9r5 GA26：沒有 data-f 的控制項（tab、勾選框、chevron、按鈕）用穩定鍵找回（data-fk 優先，否則「名稱＋第 n 個同名」） */
+  if(root && root.contains && root !== active && root.contains(active)){
+    const key = ctrlKey(active, root);
+    if(key) return {key};
+  }
+  return null;
 }
 function restoreFocus(root, focus){
   if(!focus) return;
-  const el = root.querySelector(focus.selector);
+  const el = focus.selector ? root.querySelector(focus.selector) : findByKey(root, focus.key);
   if(!el) return;
-  el.focus();
+  el.focus({preventScroll:true});
   if(focus.caret != null){ try { el.setSelectionRange(focus.caret, focus.caret); } catch(_) {} }
 }
 
@@ -4947,6 +5066,7 @@ const wizard = {open:false, tier:1, step:0, name:'', managers:'', role:'member',
 const EMAIL_RE = /^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/;
 const EMAIL_ERR = 'Some email addresses are invalid or duplicated.';          // #08-1 / #11-1 原文
 const NAME_EMPTY_ERR = 'Group name cannot be empty.';                         // #08-1 原文
+const EMAIL_EMPTY_ERR = 'Email cannot be empty.';                             // 設計端暫擬（X-9r5 GA23）：稿沒畫空白態，比照 #08-1 句型
 const API_FIELD_ERR = 'Error encountered. Please check the details below.';   // #08-2 原文
 const API_DETAIL_COPY = 'You need to remove the users below; they are already in other groups.'; // #08-2 / #11-1 原文
 const CREATE_TOAST = {success:'Group created successfully.', error:'Unable to create group. Please try again later.'}; // #08-3 原文
@@ -4993,6 +5113,7 @@ function wizardValidateInfo(){
   if(!wizard.name.trim()) wizard.errors.name = NAME_EMPTY_ERR;
   const emailErr = emailListError(wizard.managers);
   if(emailErr) wizard.errors.managers = emailErr;
+  if(Object.keys(wizard.errors).length) wizard._focusErr = true;
   renderWizard();
   return !Object.keys(wizard.errors).length;
 }
@@ -5000,6 +5121,7 @@ function wizardValidateInvite(){
   wizard.errors = {};
   const emailErr = emailListError(wizard.emails);
   if(emailErr) wizard.errors.emails = emailErr;
+  if(emailErr) wizard._focusErr = true;
   renderWizard();
   return !Object.keys(wizard.errors).length;
 }
@@ -5070,6 +5192,7 @@ function wizardSubmit(){
     closeWizard();
     showToast(failed ? CREATE_TOAST.error : CREATE_TOAST.success, failed ? 'error' : 'success');
     render();
+    announce(failed ? 'Unable to create group' : 'Group created');   // X-9r5 GA27
   }, 800);
 }
 /* 建好的群組直接長進清單，讓 demo 看得到結果。creator 用 mock 名單第一位代表「目前登入者」。 */
@@ -5092,8 +5215,8 @@ function errBoxHtml(ctx, rerender){
   const owner = ctx===wizard ? 'wizard' : 'fm';
   return `<div class="errbox">
     <button class="errbox-head" type="button" onclick="${owner}.errOpen=!${owner}.errOpen;${rerender}()" aria-expanded="${ctx.errOpen}">
-      <span class="material-symbols-outlined warn">warning</span>Error Details
-      <span class="material-symbols-outlined chev">${ctx.errOpen?'expand_less':'expand_more'}</span>
+      <span aria-hidden="true" class="material-symbols-outlined warn">warning</span>Error Details
+      <span aria-hidden="true" class="material-symbols-outlined chev">${ctx.errOpen?'expand_less':'expand_more'}</span>
     </button>
     ${ctx.errOpen?`<div class="errbox-body">${API_DETAIL_COPY}<ul>${ctx.apiError.emails.map(email=>`<li>${esc(email)}</li>`).join('')}</ul></div>`:''}
   </div>`;
@@ -5101,27 +5224,27 @@ function errBoxHtml(ctx, rerender){
 function wizardInfoStep(){
   const errors = wizard.errors;
   return `<p class="wz-desc">Name your group and assign manager.</p>
-    <div class="fld ${errors.name?'has-error':''}"><label class="fld-lbl">Group Name<span class="req">*</span></label>
-      <input class="ipt" data-f="wz-name" placeholder="Please enter the group name" value="${esc(wizard.name)}" oninput="wizard.name=this.value;wizardLiveValidate('name')">
-      ${errors.name?`<div class="fld-err">${esc(errors.name)}</div>`:''}</div>
+    <div class="fld ${errors.name?'has-error':''}"><label class="fld-lbl" for="wz-name">Group Name<span class="req" aria-hidden="true"> *</span></label>
+      <input class="ipt" data-f="wz-name"${errAttrs('wz-name', errors.name, true)} placeholder="Please enter the group name" value="${esc(wizard.name)}" oninput="wizard.name=this.value;wizardLiveValidate('name')">
+      ${errEl('wz-name', errors.name)}</div>
     <!-- Add Manager 非必填（#08 便利貼「PM 決策此欄位非必填」） -->
-    <div class="fld ${errors.managers?'has-error':''}"><label class="fld-lbl">Add Manager</label>
-      <input class="ipt" data-f="wz-managers" placeholder="Please enter the manager's email address" value="${esc(wizard.managers)}" oninput="wizard.managers=this.value;wizardLiveValidate('managers')">
-      ${errors.managers?`<div class="fld-err">${esc(errors.managers)}</div>`:''}
+    <div class="fld ${errors.managers?'has-error':''}"><label class="fld-lbl" for="wz-managers">Add Manager</label>
+      <input class="ipt" data-f="wz-managers"${errAttrs('wz-managers', errors.managers, false)} placeholder="Please enter the manager's email address" value="${esc(wizard.managers)}" oninput="wizard.managers=this.value;wizardLiveValidate('managers')">
+      ${errEl('wz-managers', errors.managers)}
       ${wizard.apiError && wizard.apiError.field==='managers' ? errBoxHtml() : ''}
       <div class="fld-help">${EMAIL_HELP}</div></div>`;
 }
 function wizardInviteStep(){
   const errors = wizard.errors;
   return `<p class="wz-desc">Invite members and assign their roles within the group.</p>
-    <div class="fld"><label class="fld-lbl">Role</label>
-      <div class="sel"><select class="ipt" data-f="wz-role" onchange="wizard.role=this.value">
+    <div class="fld"><label class="fld-lbl" for="wz-role">Role</label>
+      <div class="sel"><select class="ipt" id="wz-role" data-f="wz-role" onchange="wizard.role=this.value">
         <option value="member" ${wizard.role==='member'?'selected':''}>Member</option>
         <option value="manager" ${wizard.role==='manager'?'selected':''}>Manager</option>
       </select></div></div>
-    <div class="fld ${errors.emails?'has-error':''}"><label class="fld-lbl">Email</label>
-      <input class="ipt" data-f="wz-emails" placeholder="Please enter the user's email address" value="${esc(wizard.emails)}" oninput="wizard.emails=this.value;wizardLiveValidate('emails')">
-      ${errors.emails?`<div class="fld-err">${esc(errors.emails)}</div>`:''}
+    <div class="fld ${errors.emails?'has-error':''}"><label class="fld-lbl" for="wz-emails">Email</label>
+      <input class="ipt" data-f="wz-emails"${errAttrs('wz-emails', errors.emails, false)} placeholder="Please enter the user's email address" value="${esc(wizard.emails)}" oninput="wizard.emails=this.value;wizardLiveValidate('emails')">
+      ${errEl('wz-emails', errors.emails)}
       ${wizard.apiError && wizard.apiError.field==='emails' ? errBoxHtml() : ''}
       <div class="fld-help">${EMAIL_HELP}</div></div>`;
 }
@@ -5136,30 +5259,32 @@ function wizardPickerStep(cloud){
   if(notAuthorized){
     const isAdmin = state.role==='admin';
     return desc + `<div class="wz-picker"><div class="empty-state error" style="min-height:100%"><div>
-      <span class="material-symbols-outlined">${isAdmin?'lock_open':'lock'}</span>
+      <span aria-hidden="true" class="material-symbols-outlined">${isAdmin?'lock_open':'lock'}</span>
       <p class="empty-title">${esc(label)} is not authorized</p>
       <p class="empty-copy">${isAdmin?`Authorize ${esc(label)} in Authorization List before assigning resources from this provider.`:'Please reach out to your administrator to authorize this cloud provider.'}</p>
     </div></div></div>`;
   }
   const parts = assignPickerParts();
-  return desc + `<div class="wz-picker assign-picker">${parts.tools}${parts.notice}<div class="${parts.bodyCls}">${parts.body}</div></div>
+  return desc + `<div class="wz-picker assign-picker">${parts.tools}${parts.notice}<div class="${parts.bodyCls}"${parts.bodyAttrs}>${parts.body}</div></div>
     <div class="wz-count rmodal-count">${parts.count}</div>`;
 }
 function renderWizard(){
   const root = document.getElementById('wizard-root');
-  if(!wizard.open){ root.innerHTML=''; return; }
-  const focus = captureFocus();
+  if(!wizard.open){ root.innerHTML=''; dialogSync('wizard-root'); return; }
+  const focus = captureFocus(root);
+  const keepTop = (!assign._resetScroll && root.querySelector('.rmodal-body')) ? root.querySelector('.rmodal-body').scrollTop : 0;
+  assign._resetScroll = false;
   const step = WZ_STEPS[wizard.step];
   const busy = wizard.checking || wizard.submitting;
   const steps = WZ_STEPS.map((item, index)=>{
     const cls = index<wizard.step ? 'done' : index===wizard.step ? 'active' : '';
-    return `<div class="wz-step ${cls}"><span class="wz-dot"><span class="material-symbols-outlined">check</span></span><span>${item.label}</span></div>` + (index<WZ_STEPS.length-1?'<div class="wz-line"></div>':'');
+    return `<div class="wz-step ${cls}"${cls==='active'?' aria-current="step"':''}><span class="wz-dot"><span aria-hidden="true" class="material-symbols-outlined">check</span></span><span>${item.label}</span></div>` + (index<WZ_STEPS.length-1?'<div class="wz-line"></div>':'');
   }).join('');
   let body = '';
   if(step.id==='info') body = wizardInfoStep();
   else if(step.id==='invite') body = wizardInviteStep();
   else if(step.id==='gcp' || step.id==='aws') body = wizardPickerStep(step.id);
-  const spinner = `<span class="material-symbols-outlined spin">progress_activity</span>`;
+  const spinner = `<span aria-hidden="true" class="material-symbols-outlined spin">progress_activity</span>`;
   const left = step.id==='aws' ? '' : `<button class="link-btn wz-skip" ${busy?'disabled':''} onclick="wizardSkipAndCreate()">Skip Steps and Create Group</button>`;
   const back = wizard.step===0
     ? `<button class="btn btn-out" ${busy?'disabled':''} onclick="closeWizard()">Cancel</button>`
@@ -5169,15 +5294,18 @@ function renderWizard(){
     : `<button class="btn btn-pri" ${busy?'disabled':''} onclick="wizardNext()">${wizard.checking||wizard.submitting?spinner:''}Next</button>`;
   /* 點背景不關閉：這是多步表單，誤觸就會把填了一半的東西弄掉。設計稿沒定義，設計端暫定。 */
   root.innerHTML = `<div class="wz-backdrop">
-    <div class="wz" role="dialog" aria-label="Create Group">
+    <div class="wz" role="dialog" aria-modal="true" aria-labelledby="wz-title">
       <aside class="wz-steps">${steps}</aside>
       <div class="wz-pane">
-        <div class="wz-head"><h3>${step.title}</h3><button class="rmodal-close" onclick="closeWizard()" aria-label="Close"><span class="material-symbols-outlined">close</span></button></div>
+        <div class="wz-head"><h3 id="wz-title">${step.title}</h3><button class="rmodal-close" onclick="closeWizard()" aria-label="Close"><span aria-hidden="true" class="material-symbols-outlined">close</span></button></div>
         <div class="wz-body">${body}</div>
         <div class="wz-foot">${left}<div class="wz-foot-right">${back}${forward}</div></div>
       </div>
     </div></div>`;
+  treePass(root, keepTop);
   restoreFocus(root, focus);
+  if(wizard._focusErr){ wizard._focusErr = false; const bad = root.querySelector('[aria-invalid="true"]'); if(bad) bad.focus({preventScroll:true}); }
+  dialogSync('wizard-root');
 }
 
 
@@ -5245,8 +5373,12 @@ function fmLiveEmail(){
 }
 function fmSubmit(){
   if(fm.busy) return;
-  if(fm.kind==='editGroup' && !fm.name.trim()){ fm.errors.name = NAME_EMPTY_ERR; renderFm(); return; }   // 沿用 #08-1 文案（#09 沒畫錯誤態，設計端暫擬）
-  if(fm.kind==='inviteUser' || fm.kind==='inviteAdmin'){ const err = emailListError(fm.emails); if(err){ fm.errors.emails = err; renderFm(); return; } }
+  if(fm.kind==='editGroup' && !fm.name.trim()){ fm.errors.name = NAME_EMPTY_ERR; fm._focusErr = true; renderFm(); return; }   // 沿用 #08-1 文案（#09 沒畫錯誤態，設計端暫擬）
+  if(fm.kind==='inviteUser' || fm.kind==='inviteAdmin'){
+    /* X-9r5 GA23：空白時按下去才顯示錯誤。⚠ 設計端暫擬：稿 #07-2／#11-1 只畫了格式錯誤，空白沿用 #08-1 的「X cannot be empty.」句型 */
+    const err = splitEmails(fm.emails).length ? emailListError(fm.emails) : EMAIL_EMPTY_ERR;
+    if(err){ fm.errors.emails = err; fm._focusErr = true; renderFm(); return; }   // 驗證失敗焦點移到第一個錯誤欄位
+  }
   fm.busy = true; renderFm();
   /* 每次送出帶一個序號：timer 回來時彈窗若已關掉或換成別的 kind，就當這次送出作廢。
    * 否則連續操作（或 Demo FAB 連點）時，上一個彈窗的 timer 會拿新彈窗的狀態去跑。 */
@@ -5266,9 +5398,16 @@ function fmSubmit(){
     const toast = FM_TOAST[fm.kind];
     if(!failed) fmApply();
     closeFm();
-    showToast(failed ? toast.err : toast.ok, failed ? 'error' : 'success');
+    /* X-9r6 F2：邀請信就是 Activate（Notification Emails 對稿紀錄 §6 #8），成功 toast 下面第二行放展示入口，寫法同 Auth */
+    showToast(failed ? toast.err : toast.ok, failed ? 'error' : 'success', (!failed && kind==='inviteUser') ? demoEmailEntry() : undefined);
     render();
   }, 600);
+}
+function demoEmailEntry(){
+  const a = document.createElement('a'); a.className = 'demo-entry'; a.href = './notification-emails.html#activate'; a.target = '_blank'; a.rel = 'noopener';
+  a.setAttribute('data-tip', 'Prototype 展示入口，不是產品 UI');
+  a.innerHTML = '<span class="material-symbols-outlined" aria-hidden="true">mail</span>Open this email (prototype)';
+  return a;
 }
 function fmApply(){
   const group = fmGroup();
@@ -5300,25 +5439,26 @@ function fmApply(){
 }
 function renderFm(){
   const root = document.getElementById('form-root');
-  if(!fm.kind){ root.innerHTML=''; return; }
-  const focus = captureFocus();
+  if(!fm.kind){ root.innerHTML=''; dialogSync('form-root'); return; }
+  const focus = captureFocus(root);
   const busy = fm.busy;
-  const spinner = `<span class="material-symbols-outlined spin">progress_activity</span>`;
-  const closeBtn = `<button class="rmodal-close" onclick="closeFm()" aria-label="Close"><span class="material-symbols-outlined">close</span></button>`;
+  const spinner = `<span aria-hidden="true" class="material-symbols-outlined spin">progress_activity</span>`;
+  const closeBtn = `<button class="rmodal-close" onclick="closeFm()" aria-label="Close"><span aria-hidden="true" class="material-symbols-outlined">close</span></button>`;
   const cancel = `<button class="btn btn-out" ${busy?'disabled':''} onclick="closeFm()">Cancel</button>`;
   const primary = (label, disabled) => `<button class="btn btn-pri" ${busy||disabled?'disabled':''} onclick="fmSubmit()">${busy?spinner:''}${label}</button>`;
   let width = 640, html = '';
   if(fm.kind==='editGroup'){
     html = `<div class="fm-head"><h3>Edit Group</h3>${closeBtn}</div>
-      <div class="fld ${fm.errors.name?'has-error':''}"><label class="fld-lbl">Group Name</label>
-        <input class="ipt ipt-lg" data-f="fm-name" value="${esc(fm.name)}" oninput="fm.name=this.value;if(fm.errors.name&&this.value.trim()){delete fm.errors.name;renderFm()}">
-        ${fm.errors.name?`<div class="fld-err">${esc(fm.errors.name)}</div>`:''}</div>
+      <div class="fld ${fm.errors.name?'has-error':''}"><label class="fld-lbl" for="fm-name">Group Name</label>
+        <input class="ipt ipt-lg" data-f="fm-name"${errAttrs('fm-name', fm.errors.name, true)} value="${esc(fm.name)}" oninput="fm.name=this.value;if(fm.errors.name&&this.value.trim()){delete fm.errors.name;renderFm()}">
+        ${errEl('fm-name', fm.errors.name)}</div>
       <div class="dlg-actions">${cancel}${primary('Edit Group')}</div>`;
   } else if(fm.kind==='editUser'){
     const user = fmUser();
+    width = 655;   // X-9r5 GA12：稿 #12 彈窗寬 655
     html = `<div class="fm-head"><h3>Edit User</h3>${closeBtn}</div>
       <div class="fld"><div class="fld-lbl">User Name</div><div class="fld-static">${esc(user ? (user.name.trim() || user.email) : '')}</div></div>
-      <div class="fld"><label class="fld-lbl">Role</label><div class="sel"><select class="ipt" data-f="fm-role" onchange="fm.role=this.value">
+      <div class="fld"><label class="fld-lbl" for="fm-role">Role</label><div class="sel"><select class="ipt" id="fm-role" data-f="fm-role" onchange="fm.role=this.value">
         <option value="manager" ${fm.role==='manager'?'selected':''}>Manager</option>
         <option value="member" ${fm.role==='member'?'selected':''}>Member</option>
       </select></div></div>
@@ -5328,48 +5468,50 @@ function renderFm(){
     const hasEmails = splitEmails(fm.emails).length>0;
     html = `<div class="fm-head"><h3>Invite User</h3>${closeBtn}</div>
       <p class="wz-desc">Invite members and assign their roles within the group.</p>
-      <div class="fld"><label class="fld-lbl">Role</label><div class="sel"><select class="ipt" data-f="fm-role" onchange="fm.role=this.value">
+      <div class="fld"><label class="fld-lbl" for="fm-role">Role</label><div class="sel"><select class="ipt" id="fm-role" data-f="fm-role" onchange="fm.role=this.value">
         <option value="member" ${fm.role==='member'?'selected':''}>Member</option>
         <option value="manager" ${fm.role==='manager'?'selected':''}>Manager</option>
       </select></div></div>
-      <div class="fld ${fm.errors.emails?'has-error':''}"><label class="fld-lbl">Email</label>
-        <input class="ipt" data-f="fm-emails" placeholder="Please enter the user's email address" value="${esc(fm.emails)}" oninput="fm.emails=this.value;fmLiveEmail()">
-        ${fm.errors.emails?`<div class="fld-err">${esc(fm.errors.emails)}</div>`:''}
+      <div class="fld ${fm.errors.emails?'has-error':''}"><label class="fld-lbl" for="fm-emails">Email</label>
+        <input class="ipt" data-f="fm-emails"${errAttrs('fm-emails', fm.errors.emails, false)} placeholder="Please enter the user's email address" value="${esc(fm.emails)}" oninput="fm.emails=this.value;fmLiveEmail()">
+        ${errEl('fm-emails', fm.errors.emails)}
         ${fm.apiError ? errBoxHtml(fm, 'renderFm') : ''}
         <div class="fld-help">${EMAIL_HELP}</div></div>
-      <div class="dlg-actions">${cancel}${primary('Invite User', !hasEmails)}</div>`;
+      <div class="dlg-actions">${cancel}${primary('Invite User')}</div>`;   /* X-9r5 GA23：主鈕常駐可按，按下才顯示錯誤（稿 #11-1；同 wizard Next） */
   } else if(fm.kind==='inviteAdmin'){
     /* #07-1：只有 Email（必填），沒有 Role；placeholder 與說明文字同 #11。寬度未量到，比照 #09 用 640。 */
-    const hasEmails = splitEmails(fm.emails).length>0;
+    width = 655;   // X-9r5 GA12：稿 #07-1 彈窗寬 655
     html = `<div class="fm-head"><h3>Invite Admin</h3>${closeBtn}</div>
-      <div class="fld ${fm.errors.emails?'has-error':''}"><label class="fld-lbl">Email<span class="req">*</span></label>
-        <input class="ipt" data-f="fm-emails" placeholder="Please enter the user's email address" value="${esc(fm.emails)}" oninput="fm.emails=this.value;fmLiveEmail()">
-        ${fm.errors.emails?`<div class="fld-err">${esc(fm.errors.emails)}</div>`:''}
+      <div class="fld ${fm.errors.emails?'has-error':''}"><label class="fld-lbl" for="fm-emails">Email<span class="req" aria-hidden="true"> *</span></label>
+        <input class="ipt" data-f="fm-emails"${errAttrs('fm-emails', fm.errors.emails, true)} placeholder="Please enter the user's email address" value="${esc(fm.emails)}" oninput="fm.emails=this.value;fmLiveEmail()">
+        ${errEl('fm-emails', fm.errors.emails)}
         ${fm.apiError ? errBoxHtml(fm, 'renderFm') : ''}
         <div class="fld-help">${EMAIL_HELP}</div></div>
-      <div class="dlg-actions">${cancel}${primary('Invite Admin', !hasEmails)}</div>`;
+      <div class="dlg-actions">${cancel}${primary('Invite Admin')}</div>`;   /* X-9r5 GA23：同 Invite User */
   } else if(fm.kind==='removeGroup'){
     const group = fmGroup();
     /* #10 的主按鈕在稿上寫「Remove user」，是複製 #13 留下的錯字；這裡改成 Remove group
      * （沿用稿上小寫第二個字的寫法），已列入設計稿問題。 */
-    html = `<div class="fm-head"><span class="material-symbols-outlined fm-err">error</span><h3>Remove Group</h3>${closeBtn}</div>
+    html = `<div class="fm-head"><span aria-hidden="true" class="material-symbols-outlined fm-err">error</span><h3>Remove Group</h3>${closeBtn}</div>
       <div class="dlg-body">Are you sure you want to remove this group: <span class="fm-name">${esc(group?group.name:'')}</span>?</div>
       <div class="dlg-actions">${cancel}${primary('Remove group')}</div>`;
   } else if(fm.kind==='deletionNotAllowed'){
     width = 655;
-    html = `<div class="fm-head"><span class="material-symbols-outlined fm-warn">warning</span><h3>Group Deletion Not Allowed</h3>${closeBtn}</div>
+    html = `<div class="fm-head"><span aria-hidden="true" class="material-symbols-outlined fm-warn">warning</span><h3>Group Deletion Not Allowed</h3>${closeBtn}</div>
       <div class="dlg-body">To delete this group, you must first remove all members from this group and any of its subgroups.</div>
       <div class="dlg-actions"><button class="btn btn-pri" onclick="closeFm()">Got it</button></div>`;
   } else if(fm.kind==='removeUser'){
     const user = fmUser();
-    html = `<div class="fm-head"><span class="material-symbols-outlined fm-err">error</span><h3>Remove User</h3>${closeBtn}</div>
+    html = `<div class="fm-head"><span aria-hidden="true" class="material-symbols-outlined fm-err">error</span><h3>Remove User</h3>${closeBtn}</div>
       <div class="dlg-body">Are you sure you want to remove: <span class="fm-name">${esc(user ? (user.name.trim() || user.email) : '')}</span>?<br>This action is irreversible. Data belonging to the member will also be cleared.</div>
       <div class="dlg-actions">${cancel}${primary('Remove user')}</div>`;
   }
   const isWarn = ['removeGroup','deletionNotAllowed','removeUser'].includes(fm.kind);   // 「Modal / Left Aligned / Normal」變體，圓角跟 Field 變體不同
   root.innerHTML = `<div class="dlg-backdrop" onclick="if(event.target===this&&!fm.busy)closeFm()">
-    <div class="dlg fm${isWarn?' is-warn':''}" style="width:min(${width}px,100%)" role="dialog">${html}</div></div>`;
+    <div class="dlg fm${isWarn?' is-warn':''}" style="width:min(${width}px,100%)" role="dialog" aria-modal="true" aria-labelledby="fm-title">${html.replace(/<h3>/, '<h3 id="fm-title">')}</div></div>`;
   restoreFocus(root, focus);
+  if(fm._focusErr){ fm._focusErr = false; const bad = root.querySelector('[aria-invalid="true"]'); if(bad) bad.focus({preventScroll:true}); }
+  dialogSync('form-root');
 }
 
 
@@ -5391,8 +5533,8 @@ const ADMINS = [
 const ADMIN_TOAST = {ok:'Admin invited successfully.', err:'Unable to invite admin. Please try again later.'};   // 設計端暫擬：#07 系列沒畫 toast，比照 #11-2 / #11-3 造句
 function learnMoreHtml(both){
   return `<div class="learn-more">
-    <button class="learn" onclick="deferredAction('Learn More About Organization and Role')"><span class="material-symbols-outlined">help</span>Learn More About Organization and Role</button>
-    ${both?`<button class="learn" onclick="deferredAction('Learn More About Authorization and Resource Assignment')"><span class="material-symbols-outlined">help</span>Learn More About Authorization and Resource Assignment</button>`:''}
+    <button class="learn" onclick="deferredAction('Learn More About Organization and Role')"><span aria-hidden="true" class="material-symbols-outlined">help</span>Learn More About Organization and Role</button>
+    ${both?`<button class="learn" onclick="deferredAction('Learn More About Authorization and Resource Assignment')"><span aria-hidden="true" class="material-symbols-outlined">help</span>Learn More About Authorization and Resource Assignment</button>`:''}
   </div>`;
 }
 /* #32–#35 的 skeleton：表頭是灰 band 裡的灰條、不顯示欄位文字 */
@@ -5400,7 +5542,7 @@ function skeletonTable(cols, colgroup){
   const head = Array.from({length:cols}).map(()=>'<th class="skel-th"><div class="skel"></div></th>').join('');
   return `<div class="table-wrap"><table>${colgroup||''}<thead><tr>${head}</tr></thead><tbody>${skeletonRows(cols)}</tbody></table></div>`;
 }
-function openAdminList(){ state.view = 'admin'; render(); }
+function openAdminList(){ _navFocus = !_demoApplying; state.view = 'admin'; render(); }
 function renderAdmin(){
   const loading = state.pageState==='loading';
   const canSee = state.role==='admin';
@@ -5409,7 +5551,7 @@ function renderAdmin(){
   if(!canSee){
     /* 註記「只有權限在 Admin 以上層級者可看見此頁面」，沒畫非 Admin 看到什麼。
      * A-19：沿用 ARL 10/09 裁決的整頁無權限（共用 LumitureEmpty.noAccess），標題留在卡片外 */
-    return `<h1 class="org-title">Admin List</h1>${LumitureEmpty.noAccess()}`;
+    return `<h1 class="org-title" tabindex="-1">Admin List</h1>${LumitureEmpty.noAccess()}`;
   } else if(loading){
     body = skeletonTable(6, cols);
   } else if(state.pageState==='nodata'){
@@ -5424,16 +5566,16 @@ function renderAdmin(){
         <td class="center">${admin.role==='owner'?'Owner':'Admin'}</td>
         <td class="center"><span class="status-text ${admin.active?'':'inactive'}">${admin.active?'Active':'Inactive'}</span></td>
         <td class="center">${esc(admin.lastLogin)}</td>
-        <td class="center"><div class="actions-cell"><button class="lt-btn-icon" ${locked?'disabled':''} onclick="deferredAction('Remove Admin')"data-tip="Remove" aria-label="Remove"><span class="material-symbols-outlined">delete</span></button></div></td>
+        <td class="center"><div class="actions-cell"><button class="lt-btn-icon" ${locked?'disabled':''} onclick="deferredAction('Remove Admin')"data-tip="Remove" aria-label="Remove"><span aria-hidden="true" class="material-symbols-outlined">delete</span></button></div></td>
       </tr>`;
     }).join('');
     body = `<div class="table-wrap"><table>${cols}<thead><tr><th>User Name</th><th>Email</th><th class="center">Role</th><th class="center">Active Status</th><th class="center">Last Login</th><th class="center">Action</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
   return `<div class="card">
-    <h1 class="org-title">Admin List</h1>
+    <h1 class="org-title" tabindex="-1">Admin List</h1>
     <div class="section-head" style="align-items:center">
       <p class="section-copy">This page provides detailed information on all users who share admin privileges with you and their account activity.</p>
-      ${canSee?`<button class="btn btn-pri" ${loading?'disabled':''} onclick="openInviteAdmin()"><span class="material-symbols-outlined">add</span>Invite Admin</button>`:''}
+      ${canSee?`<button class="btn btn-pri" ${loading?'disabled':''} onclick="openInviteAdmin()"><span aria-hidden="true" class="material-symbols-outlined">add</span>Invite Admin</button>`:''}
     </div>
     ${body}
     ${learnMoreHtml(false)}
@@ -5441,18 +5583,223 @@ function renderAdmin(){
 }
 function openInviteAdmin(){ openFm('inviteAdmin', {}); }
 
+/* ============================================================
+ * X-9r5 FX-A（GA25～GA29、GA10、GA26～GA28）：鍵盤與讀屏基礎
+ *   - 彈窗：aria-modal、開啟聚焦、focus trap＋背景 inert（只蓋 .shell，不蓋彈窗 root 與 Demo FAB）、Esc 關、關閉還焦點
+ *   - 重繪保焦點：穩定鍵（data-fk，或「名稱＋第 n 個同名」）
+ *   - #sr-status：視覺隱藏 role="status"，只播短句（排序、N results、Group created）
+ *   - picker：role=tree／treeitem、roving tabindex、方向鍵
+ * ============================================================ */
+function announce(text){
+  const el = document.getElementById('sr-status');
+  if(!el) return;
+  el.textContent = '';
+  setTimeout(()=>{ el.textContent = text; }, 40);
+}
+function errAttrs(id, err, required){
+  return ` id="${id}"${required?' aria-required="true"':''}${err?` aria-invalid="true" aria-describedby="${id}-err"`:''}`;
+}
+function errEl(id, err){ return err ? `<div class="fld-err" id="${id}-err" role="alert">${esc(err)}</div>` : ''; }
+
+/* ---- 穩定鍵 ---- */
+const CTRL_ALL = 'button,a[href],input,select,textarea,[tabindex],[role="checkbox"],[role="treeitem"]';
+function ctrlLabel(el){
+  const a = el.getAttribute && el.getAttribute('aria-label');
+  if(a) return a;
+  const c = el.cloneNode(true);
+  c.querySelectorAll('.material-symbols-outlined').forEach(n=>n.remove());
+  return (c.textContent || '').replace(/\s+/g,' ').trim();
+}
+function ctrlKey(el, scope){
+  if(el.dataset && el.dataset.fk) return {fk: el.dataset.fk};
+  const label = ctrlLabel(el);
+  if(!label) return null;
+  const same = [...scope.querySelectorAll(CTRL_ALL)].filter(n=>ctrlLabel(n)===label);
+  return {label, n: Math.max(0, same.indexOf(el))};
+}
+function findByKey(scope, key){
+  if(!key) return null;
+  if(key.fk) return scope.querySelector(`[data-fk="${CSS.escape(key.fk)}"]`);
+  const same = [...scope.querySelectorAll(CTRL_ALL)].filter(n=>ctrlLabel(n)===key.label);
+  return same[key.n] || same[same.length-1] || null;
+}
+let _pendingFocus = null;
+function applyPendingFocus(){
+  if(!_pendingFocus) return;
+  const app = document.getElementById('app');
+  const el = findByKey(app, _pendingFocus);
+  _pendingFocus = null;
+  if(el && !el.disabled && !el.closest('[inert]')) el.focus({preventScroll:true});
+}
+
+/* ---- 表格與截斷提示 ---- */
+function a11yPass(app){
+  const label = state.view==='admin' ? 'Admin List'
+    : state.view==='list' ? (state.role.startsWith('t2') ? 'Tier 2 Group List' : 'Tier 1 Group List')
+    : state.tab==='group-members' ? 'Group Members' : state.tab==='resources' ? 'Resources' : 'Tier 2 Group List';
+  app.querySelectorAll('table').forEach(t=>{
+    t.setAttribute('aria-label', label);
+    if(state.pageState==='loading') t.setAttribute('aria-busy','true');
+  });
+  app.querySelectorAll('th:not([scope])').forEach(th=>th.setAttribute('scope','col'));
+  app.querySelectorAll('tbody tr.clickable').forEach(tr=>tr.setAttribute('tabindex','0'));   // GA28：列可 Tab、Enter 進詳情
+  markTruncated(app);
+}
+/* GA10：截斷的儲存格才掛 tooltip（同 Audit Log／X-9r6） */
+function markTruncated(root){
+  (root || document).querySelectorAll('td.cell-ellipsis:not(.has-fptip)').forEach(td=>{
+    if(td.scrollWidth > td.clientWidth + 1) td.setAttribute('data-tip', td.textContent.trim());
+    else td.removeAttribute('data-tip');
+  });
+}
+window.addEventListener('resize', ()=>markTruncated(document.getElementById('app')));
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>markTruncated(document.getElementById('app')));
+document.addEventListener('keydown', e=>{
+  if((e.key==='Enter' || e.key===' ') && e.target && e.target.matches && e.target.matches('tr.clickable')){ e.preventDefault(); e.target.click(); }
+});
+
+/* ---- 彈窗（GA25） ---- */
+const DLG_ROOTS = ['dialog-root','assign-root','tag-root','wizard-root','form-root'];   // DOM 順序＝疊放順序（同 z-index，後面的在上）
+const _dlgWas = {}, _dlgReturn = {};
+function openDlgRoots(){ return DLG_ROOTS.map(id=>document.getElementById(id)).filter(r=>r && r.firstElementChild); }
+function dlgFocusables(dlg){
+  return [...dlg.querySelectorAll('button,a[href],input,select,textarea,[tabindex]')].filter(n=>{
+    if(n.disabled || n.tabIndex < 0) return false;
+    if(n.closest('[hidden],[inert]')) return false;
+    const st = getComputedStyle(n);
+    return st.visibility !== 'hidden' && st.display !== 'none' && n.getClientRects().length > 0;
+  });
+}
+function focusInitial(root){
+  const dlg = root.querySelector('[role="dialog"]') || root;
+  const f = dlgFocusables(dlg);
+  const field = f.find(n=>/^(INPUT|SELECT|TEXTAREA)$/.test(n.tagName) || n.classList.contains('dd-trigger'));
+  /* 確認類：有 Cancel 的破壞性確認（Remove Group／Remove User／Unlink）聚焦 Cancel（WAI-ARIA APG alertdialog，X-9r5 R5）；只有一顆 Got it 的聚焦主按鈕 */
+  const cancelBtn = dlg.classList.contains('dlg') ? f.find(n=>n.classList.contains('btn-out') && /^Cancel$/.test(n.textContent.trim())) : null;
+  let target = field || cancelBtn || (dlg.classList.contains('dlg') ? f.find(n=>n.classList.contains('btn-pri')) : null);
+  if(!target){ dlg.setAttribute('tabindex','-1'); target = dlg; }
+  target.focus({preventScroll:true});
+}
+function dialogSync(rootId){
+  const root = document.getElementById(rootId);
+  if(!root) return;
+  const open = !!root.firstElementChild, was = !!_dlgWas[rootId];
+  _dlgWas[rootId] = open;
+  const shell = document.querySelector('.shell');
+  if(shell){ if(openDlgRoots().length) shell.setAttribute('inert',''); else shell.removeAttribute('inert'); }
+  if(open && !was){
+    const a = document.activeElement;
+    _dlgReturn[rootId] = (a && a !== document.body && !root.contains(a)) ? {el:a, key: document.getElementById('app').contains(a) ? ctrlKey(a, document.getElementById('app')) : null} : null;
+    focusInitial(root);
+  } else if(open && was){
+    if(!document.activeElement || document.activeElement === document.body) focusInitial(root);
+  } else if(!open && was){
+    const r = _dlgReturn[rootId]; _dlgReturn[rootId] = null;
+    const app = document.getElementById('app');
+    if(r){
+      let el = r.el;
+      if(!(el && el.isConnected && !el.closest('[inert]'))) el = r.key ? findByKey(app, r.key) : null;
+      if(el && !el.disabled) el.focus({preventScroll:true});
+      if(r.key){ _pendingFocus = r.key; setTimeout(applyPendingFocus, 30); }   // 之後緊接的 render() 會重建列，焦點在那之後再找回
+      else if(!el) { const h1 = app.querySelector('h1[tabindex="-1"]'); if(h1) h1.focus({preventScroll:true}); }
+    }
+  }
+}
+document.addEventListener('keydown', e=>{
+  const roots = openDlgRoots();
+  if(!roots.length) return;
+  const top = roots[roots.length-1];
+  if(e.key === 'Escape'){
+    if(e.defaultPrevented) return;
+    e.preventDefault(); e.stopPropagation();
+    const id = top.id;
+    if(id === 'tag-root' && tagPick.dd){ ddCloseAll(); return; }   // 下拉開著先收下拉
+    if(id === 'form-root'){ if(!fm.busy) closeFm(); }
+    else if(id === 'wizard-root') closeWizard();   // 比照 ×，不另外加確認
+    else if(id === 'tag-root') closeTagAssign();
+    else if(id === 'assign-root') closeAssign();
+    else if(id === 'dialog-root') closeDialog();
+    return;
+  }
+  if(e.key === 'Tab'){
+    const dlg = top.querySelector('[role="dialog"]') || top;
+    const f = dlgFocusables(dlg);
+    if(!f.length){ e.preventDefault(); dlg.focus(); return; }
+    const first = f[0], last = f[f.length-1], a = document.activeElement;
+    if(!dlg.contains(a)){ e.preventDefault(); first.focus(); }
+    else if(e.shiftKey && (a === first || a === dlg)){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && a === last){ e.preventDefault(); first.focus(); }
+  }
+}, true);
+
+/* ---- picker 樹（GA29） ---- */
+function treePass(root, keepTop){
+  const body = root.querySelector('.rmodal-body');
+  if(body && keepTop) body.scrollTop = keepTop;
+  const tree = root.querySelector('.rmodal-body[role="tree"]');
+  if(!tree) return;
+  const items = [...tree.querySelectorAll('[role="treeitem"]')];
+  items.forEach(i=>{ i.tabIndex = -1; });
+  tree.querySelectorAll('[role="treeitem"] .checkbox[tabindex], [role="treeitem"] .tchev').forEach(n=>{ n.tabIndex = -1; });   // 樹內用方向鍵移動，勾選框與箭頭不佔 Tab 停靠點
+  const usable = items.filter(i=>!i.hasAttribute('aria-disabled'));
+  const cur = usable.find(i=>i.dataset.fk === 'node:' + assign.rovingId) || usable[0];
+  if(cur) cur.tabIndex = 0;
+}
+document.addEventListener('focusin', e=>{
+  const it = e.target.closest && e.target.closest('.rmodal-body[role="tree"] [role="treeitem"]');
+  if(!it || it.hasAttribute('aria-disabled')) return;
+  it.closest('[role="tree"]').querySelectorAll('[role="treeitem"][tabindex="0"]').forEach(n=>{ if(n !== it) n.tabIndex = -1; });
+  it.tabIndex = 0;
+  assign.rovingId = (it.dataset.fk || '').replace(/^node:/, '');
+});
+document.addEventListener('keydown', e=>{
+  const it = e.target && e.target.matches && e.target.matches('.rmodal-body[role="tree"] [role="treeitem"]') ? e.target : null;
+  if(!it) return;
+  const tree = it.closest('[role="tree"]');
+  const items = [...tree.querySelectorAll('[role="treeitem"]')].filter(n=>!n.hasAttribute('aria-disabled'));
+  const i = items.indexOf(it), k = e.key;
+  const go = n => { if(n){ n.focus({preventScroll:true}); n.scrollIntoView({block:'nearest'}); } };
+  const lvl = n => +n.getAttribute('aria-level');
+  const id = (it.dataset.fk || '').replace(/^node:/, '');
+  const ex = it.getAttribute('aria-expanded');
+  if(k === 'ArrowDown'){ e.preventDefault(); go(items[i+1]); }
+  else if(k === 'ArrowUp'){ e.preventDefault(); go(items[i-1]); }
+  else if(k === 'Home'){ e.preventDefault(); go(items[0]); }
+  else if(k === 'End'){ e.preventDefault(); go(items[items.length-1]); }
+  else if(k === 'ArrowRight'){
+    if(ex === 'false'){ e.preventDefault(); toggleExpand(id); }
+    else if(ex === 'true'){ e.preventDefault(); const nx = items[i+1]; if(nx && lvl(nx) > lvl(it)) go(nx); }
+  }
+  else if(k === 'ArrowLeft'){
+    if(ex === 'true'){ e.preventDefault(); toggleExpand(id); }
+    else { e.preventDefault(); for(let j=i-1; j>=0; j--){ if(lvl(items[j]) < lvl(it)){ go(items[j]); break; } } }
+  }
+  else if(k === ' '){ e.preventDefault(); const cb = it.querySelector('.checkbox'); if(cb) cb.click(); }
+  else if(k === 'Enter'){ e.preventDefault(); it.click(); }
+});
+
 /* ---------- top-level render ---------- */
 /* A-20①：Demo 切角色時 topbar 帳號 chip 跟著變（ARL／AL 同做法）。第一次 render 不動，
  * 免得蓋掉 topbar 從 sessionStorage 還原的「View as Another Role」群組 chip */
 const GL_CHIP = {admin:'Admin', 't1-manager':'Manager - Cost Center', 't1-member':'Member - Cost Center', 't2-manager':'Manager - Platform Team', 't2-member':'Member - Platform Team'};
 let _chipRole = null;
+let _rendered = false;
 function render(){
   const app = document.getElementById('app');
+  const focus = captureFocus(app);   // X-9r5 GA26：重繪前記穩定鍵，重繪後找回
   app.innerHTML = state.view==='admin' ? renderAdmin() : state.view==='list' ? renderList() : renderDetail();
   /* A-34④：Demo 情境切到 Admin List 不會改 hash（改了會 reload 掉狀態），sidebar 選中項這裡手動跟 */
   if(window.LumitureSidebar && LumitureSidebar.setActive) LumitureSidebar.setActive(state.view==='admin' ? 'admin-list' : 'group-list');
   if(_chipRole !== null && _chipRole !== state.role && window.LumitureTopbar && GL_CHIP[state.role]) LumitureTopbar.setRole(GL_CHIP[state.role]);
   _chipRole = state.role;
+  a11yPass(app);
+  if(_navFocus && _rendered){
+    const h1 = app.querySelector('h1[tabindex="-1"]');   // 換頁（進詳情、回列表）聚焦 h1
+    if(h1) h1.focus({preventScroll:true});
+  } else if(focus) restoreFocus(app, focus);
+  _navFocus = false;
+  applyPendingFocus();
+  _rendered = true;
 }
 /* sidebar 的 Group List / Admin List 都指向這支檔案（差一個 #admin），點了只會改 hash，
  * 直接 reload 讓 LUMITURE_ACTIVE 與 view 重新算，不用另外同步 sidebar 的 active 樣式。 */
@@ -5512,12 +5859,12 @@ window.DEMO_SCENARIOS = [
   {id:'org-single',     category:'assign', label:'彈窗：單一 Organization（預設）', icon:'business_center', tip:'常態。org 區段標頭整條不 render，畫面跟加 org 之前一模一樣，資料夾仍釘在 Select all 底下'},
   {id:'assign-ba',     category:'assign', label:'預設：Billing account 視角',   icon:'account_balance_wallet', tip:'既有客戶的現況，開啟選單的預設分組'},
   {id:'assign-folder', category:'assign', label:'切換到 Folder 視角', icon:'account_tree', tip:'10 個資料夾、2 層巢狀、88 個專案、10 個未分類，結構取自工程調查的實查結果'},
-  {id:'assign-nofld',  category:'assign', label:'Org 沒有資料夾',               icon:'folder_off', tip:'報告沒涵蓋的 case。Folder 分頁仍然存在，點進去才看到「No folders in this organization」空狀態——跟雲端 pill tabs 的 not-authorized 是同一套語言，不預先把選項藏起來'},
+  {id:'assign-nofld',  category:'assign', label:'Org 沒有資料夾',               icon:'folder_off', tip:'報告沒涵蓋的 case。Folder 分頁仍然存在，點進去才看到「No folders in this organization」空狀態，跟雲端 pill tabs 的 not-authorized 是同一套語言，不預先把選項藏起來'},
   {id:'assign-deep',   category:'assign', label:'極端深度（10 層，GCP 上限）', icon:'unfold_more', tip:'合成資料，真實客戶只有 2 層；用來確認縮排在官方上限下不會壞版'},
   {id:'assign-first',  category:'assign', label:'第一次指派（全部都還沒指派）', icon:'playlist_add', tip:`全新群組，${DEMO_TOTAL} 個專案全部在選單裡（含 2 個沒有帳單帳戶的，以及深度情境那棵 10 層樹）`},
   {id:'assign-drift',  category:'assign', label:`回訪：只剩沒指派的 ${DEMO_DRIFT} 個`,     icon:'new_releases', tip:`指派過之後客戶又在 console 新增專案。依設計稿註記，選單只列尚未指派的，所以整個選單本身就是差異報告：${DEMO_TOTAL} → ${DEMO_DRIFT} 列，沒有未指派專案的資料夾整個不出現。用 API 既有的 projects[].assigned 過濾`},
   {id:'assign-synced', category:'assign', label:'全部都已指派（選單空的）',       icon:'done_all', tip:'沒有東西可以加了，走空狀態並指向表格的 Unlink Resource。刻意不用 No Data 語彙，這不是出錯'},
-  {id:'sel-clear',     category:'assign', label:'切視角清掉勾選（開發現況）', icon:'layers_clear', tip:'RD 出兩支獨立 API，開發團隊目前想要切視角就清空。不保留可以，靜默清空不行——所以清掉時在彈窗裡講出來並給 Undo，成本只是把陣列留著。先在帳單帳戶視角勾幾個再切 Folder'},
+  {id:'sel-clear',     category:'assign', label:'切視角清掉勾選（開發現況）', icon:'layers_clear', tip:'RD 出兩支獨立 API，開發團隊目前想要切視角就清空。不保留可以，靜默清空不行。所以清掉時在彈窗裡講出來並給 Undo，成本只是把陣列留著。先在帳單帳戶視角勾幾個再切 Folder'},
   {id:'sel-keep',      category:'assign', label:'切視角保留勾選（UX 建議）',   icon:'checklist', tip:'勾選存的是專案 ID 集合、跟清單由哪支 API 給無關。已知代價：切過去之後那些勾選散在收合的資料夾裡，底部計數說 3 個但畫面上看不到，所以完整版該搭配一個「看目前選了什麼」的檢視'},
   {id:'assign-fail',   category:'assign', label:'Assign 失敗（toast）',           icon:'error', tip:'設計稿 #18-3 定義了成功與失敗兩種 toast，失敗也是關閉彈窗 + 左下角 toast。勾幾個再按 Assign 就會走失敗分支'},
 
@@ -5548,6 +5895,8 @@ window.DEMO_SCENARIOS = [
   {id:'crud-edit-user',    category:'crud', label:'Edit User（#12，frame 名寫錯）',    icon:'manage_accounts', tip:'frame 名稱是「Popup: Edit Group」但畫面是 Edit User：User Name 唯讀、只有 Role 可改。所以「#09/#12 同名」跟「Edit User 沒編號彈窗」是同一個命名錯誤'},
   {id:'crud-remove-user',  category:'crud', label:'Remove User（#13）',                icon:'person_remove', tip:'「This action is irreversible…」，主按鈕照稿寫小寫的 Remove user。表格裡 mock 的目前登入者（Alfonso Vetrovs）那列刪除鈕 disabled，對應 #02 註記「不能刪自己」'},
   {id:'crud-fail',         category:'crud', label:'下一個 CRUD 動作失敗（toast）',     icon:'cloud_off',     tip:'把 forceFail 打開，接下來任何一個 Edit / Remove / Invite 送出都走失敗 toast，看完自動關掉'},
+  {id:'crud-entries-on',  category:'crud', label:'展示入口：顯示（預設）',            icon:'mail',          tip:'Invite User 成功的 toast 下面第二行，有一顆深藍底黃虛線框的展示入口，連到 Notification Emails 的 Activate 信。不是產品 UI。'},
+  {id:'crud-entries-off', category:'crud', label:'展示入口：隱藏',                    icon:'mail_off',      tip:'把展示入口整批藏起來（看產品 UI 本身時用）。'},
   {id:'members-empty',     category:'crud', label:'Group Members 空狀態（#05-1）',     icon:'person_off',    tip:'把 Legal 的成員清空：Tab 顯示 (0)、表格換成 No Users Yet 通用文案'},
 
   {id:'admin-list',    category:'p3', label:'Admin List（#07）',              icon:'manage_accounts', tip:'sidebar 的 Admin List 也指到這支檔案（#admin）。Owner 固定第一列、刪除鈕 disabled（不可移除 Owner 與自己）。Remove Admin 沒有對應彈窗，留佔位'},
@@ -5558,6 +5907,9 @@ window.DEMO_SCENARIOS = [
   {id:'load-res',      category:'p3', label:'Resource List 讀取中（#34）',    icon:'hourglass_top',   tip:'雲端分頁與 Project|Label 子分頁維持原樣但不可點、搜尋框 disabled、Assign Resource disabled'},
   {id:'load-list',     category:'p3', label:'Group List 讀取中（#32）',       icon:'hourglass_top',   tip:'標題計數照常顯示（註記：需讀取的數量可先按上圖呈現）、Create Group disabled、表頭灰條'},
   {id:'no-group',      category:'p3', label:'No Group（#01-2 / #02-2）',      icon:'list_alt',        tip:'清單 icon 淺藍、通用文案、空狀態內不再放第二顆 Create Group（右上那顆就是入口）'},
+  {id:'res-empty',     category:'p3', label:'Resources 空狀態（#03-2）',      icon:'add_link',        tip:'T1 Data Analytics 的 resource 計數是 0，Resources 分頁顯示 No Resources Yet，tab 計數與表格一致'},
+  {id:'res-empty-t2',  category:'p3', label:'T2 Resources 空（#06-1）',       icon:'add_link',        tip:'Business Development 底下的 Employee Safety Officer（T2，resource 計數 0），同樣顯示 No Resources Yet'},
+  {id:'no-tier2',      category:'p3', label:'Tier 2 Group 分頁 No Group（#02-2）', icon:'list_alt',   tip:'Human Resources 沒有 Tier 2 Group，分頁內顯示 No Groups Yet，右上 Create Group 是入口'},
 ];
 /* List 分類共用：停在外層 Resources 表格，維持當下看的那朵雲（方便切雲對照） */
 function gotoResourcesTable(groupId){
@@ -5574,10 +5926,18 @@ window.DEMO_ON_LEAVE = function (prevId, nextId) {
   if (tagPick.open) closeTagAssign();
   closeDialog();
   if (assign.open && !/^(assign-|style-|sel-|org-multi$|org-single$)/.test(String(nextId))) closeAssign();
+  DLG_ROOTS.forEach(dialogSync);   // X-9r5 GA25：切情境先解除 inert 與 trap（沒有彈窗開著就拿掉 inert）
 };
 window.DEMO_APPLY = function (id) {
+  _demoApplying = true;   // Demo 切情境不搶焦點到 h1
+  try { return _demoApply(id); } finally { _demoApplying = false; }
+};
+function _demoApply(id) {
   /* 策展列是 List 分類專用，切到別的情境一律關掉，不然會黏在畫面上 */
   if (id !== 'list-hier') state.hierShowcase = false;
+  /* X-9r5 Q1 後續：Data Analytics 預設 resource 0（#03-2 空狀態用），但 list-single-org／org-multi-table
+   * 要看的是它那幾列（同時指派到兩個 org 的 platform 資料夾），這兩個情境暫時給它 3 筆，其他情境還原成 0，tab 計數與表格一致 */
+  { const _da = groupById('data-analytics'); if (_da) _da.resource = (id === 'list-single-org' || id === 'org-multi-table') ? 3 : 0; }
   if (['admin','t1-manager','t1-member','t2-manager','t2-member'].includes(id)) {
     state.role = id; state.selectedResources = {}; render(); return;
   }
@@ -5632,6 +5992,8 @@ window.DEMO_APPLY = function (id) {
   if (id === 'crud-invite-err')   { toMembers('biz-dev'); openInviteUser('biz-dev'); fm.forceApiError=true; fm.role='manager'; fm.emails='cameron.cooper@five9.com, geole.chan@five9.com, halweo.ieation@five9.com'; renderFm(); showToast('按 Invite User 就會看到 Error Details（這個情境把所有 email 都當成已在其他群組）', 'info'); return; }
   if (id === 'crud-edit-user')    { toMembers('biz-dev'); openEditUser('biz-dev', usersFor('biz-dev')[1].id); return; }
   if (id === 'crud-remove-user')  { toMembers('partnerships'); openRemoveUser('partnerships', usersFor('partnerships')[1].id); return; }   // partnerships 的第 4 位是 mock 的目前登入者，刪除鈕會是 disabled
+  if (id === 'crud-entries-on')   { document.body.classList.remove('demo-entries-off'); showToast('展示入口已顯示：Invite User 成功時，toast 下面會有 Open this email', 'info'); return; }
+  if (id === 'crud-entries-off')  { document.body.classList.add('demo-entries-off'); showToast('展示入口已隱藏', 'info'); return; }
   if (id === 'crud-fail')         { fm.forceFail = true; showToast('下一個 Edit / Remove / Invite 送出會走失敗 toast', 'info'); return; }
   if (id === 'members-empty')     { USERS_CACHE.set('legal', []); toMembers('legal'); return; }
 
@@ -5644,7 +6006,11 @@ window.DEMO_APPLY = function (id) {
   if (id === 'load-res')       { openDetail(1,'biz-dev',null,'resources'); state.pageState='loading'; render(); return; }
   if (id === 'load-list')      { state.view='list'; state.pageState='loading'; render(); return; }
   if (id === 'no-group')       { state.view='list'; state.pageState='empty'; render(); return; }
-};
+  /* X-9r5 GA17：稿有、但原本沒有資料到得了的三張空狀態 */
+  if (id === 'res-empty')      { state.pageState='set'; state.role='admin'; openDetail(1,'data-analytics',null,'resources'); return; }
+  if (id === 'res-empty-t2')   { state.pageState='set'; state.role='admin'; openDetail(2,'biz-dev','emp-safety','resources'); return; }
+  if (id === 'no-tier2')       { state.pageState='set'; state.role='admin'; openDetail(1,'hr',null,'tier-2-groups'); return; }
+}
 </script>
 <script>
 /* === Inlined: shared/demo-fab.js === */
@@ -5708,6 +6074,10 @@ window.DEMO_APPLY = function (id) {
     'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);',
     'color:#fff;box-shadow:0 4px 14px rgba(13,27,62,.36);z-index:999;cursor:pointer;',
     'display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;border:0}',
+    /* X-9r6 F11：sidebar 收合時 toast 的 left 是 45（--lt-toast-left 收合值），會蓋住移到 left 54 的 FAB（5 秒內點不到）；
+       收合時把 FAB 與說明面板抬到 toast 上方（toast 預設 bottom 24、高 46、間距 16 → 86）。展開時 toast left 274 不碰到 FAB，位置不變 */
+    'html.lt-sb-collapsed .demo-fab{bottom:86px}',
+    'html.lt-sb-collapsed .demo-popover{bottom:146px;max-height:calc(100vh - 170px)}',   /* X-9r6 R1：視窗 ≤625 高時面板頂端不被切 */
     '.demo-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(13,27,62,.45)}',
     '.demo-fab:active{transform:scale(.96)}',
     '.demo-fab .material-symbols-outlined{font-size:24px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}',
@@ -5814,8 +6184,9 @@ window.DEMO_APPLY = function (id) {
     '.demo-page-tab[data-tip]::after,.demo-cat-tab[data-tip]::after{display:none!important}',
 
     /* #gl-tip — body-level fixed tooltip (auto-injected) */
-    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:12px;line-height:1.4;',
-    'padding:6px 10px;border-radius:4px;max-width:320px;white-space:normal;',
+    /* X-9r1 S1：預設值改稿值（Tooltip 元件 14／24.5、內距 8／16、r4、max-width 600）；各頁 body #gl-tip 覆寫維持有效 */
+    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:14px;line-height:24.5px;',
+    'padding:8px 16px;border-radius:4px;max-width:600px;white-space:normal;',
     'pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25);',
     'font-family:\'Noto Sans\',sans-serif}'
   ].join('');
@@ -5977,6 +6348,9 @@ window.DEMO_APPLY = function (id) {
     fabEl.className = 'demo-fab';
     fabEl.id = 'demo-fab';
     fabEl.setAttribute('data-tip', 'Designer Demo Scenarios');   /* 原生 title 改 data-tip（#gl-tip），B 區 A-15 */
+    fabEl.setAttribute('aria-label', 'Designer Demo Scenarios');   /* X-9r1 S6：原本讀屏只唸 icon 字「science」 */
+    fabEl.setAttribute('aria-expanded', 'false');
+    fabEl.setAttribute('aria-controls', 'demo-popover');
     fabEl.innerHTML =
       '<span class="material-symbols-outlined">science</span>' +
       '<span class="demo-pulse" id="demo-fab-pulse"></span>';
@@ -5986,13 +6360,15 @@ window.DEMO_APPLY = function (id) {
     var popEl = document.createElement('div');
     popEl.className = 'demo-popover';
     popEl.id = 'demo-popover';
+    popEl.setAttribute('role', 'dialog');   /* X-9r1 S6 */
+    popEl.setAttribute('aria-label', 'Demo scenarios');
     popEl.innerHTML =
       '<div class="demo-popover-hdr">' +
         '<div class="demo-popover-title">' +
           '<span class="material-symbols-outlined" style="font-size:16px">science</span>' +
           'Demo Scenarios' +
         '</div>' +
-        '<button class="demo-popover-close" id="demo-pop-close">' +
+        '<button class="demo-popover-close" id="demo-pop-close" aria-label="Close demo scenarios">' +
           '<span class="material-symbols-outlined" style="font-size:18px">close</span>' +
         '</button>' +
       '</div>' +
@@ -6055,7 +6431,21 @@ window.DEMO_APPLY = function (id) {
       if (!pop.contains(e.target) && !fab.contains(e.target) && pop.classList.contains('show')) {
         pop.classList.remove('show');
         fab.classList.remove('popped');
+        fab.setAttribute('aria-expanded', 'false');
       }
+    });
+
+    /* X-9r1 S6：面板開著、焦點在面板或 FAB 上時 Esc 關面板並回 FAB；焦點在別處（頁面自己的彈窗、輸入框）不攔 */
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      var pop = document.getElementById('demo-popover'), fab = document.getElementById('demo-fab');
+      if (!pop || !fab || !pop.classList.contains('show')) return;
+      var ae = document.activeElement;
+      if (!ae || !(pop.contains(ae) || fab.contains(ae))) return;
+      pop.classList.remove('show');
+      fab.classList.remove('popped');
+      fab.setAttribute('aria-expanded', 'false');
+      try { fab.focus({ preventScroll: true }); } catch (err) { fab.focus(); }
     });
 
     _injectGlobalTooltip();
@@ -6063,23 +6453,52 @@ window.DEMO_APPLY = function (id) {
 
   // ===== #gl-tip auto-injection =====
   function _injectGlobalTooltip() {
-    if (document.getElementById('gl-tip')) return; // host page already provides one
+    var hostTip = document.getElementById('gl-tip');
+    if (hostTip) { _enhanceHostTooltip(hostTip); return; } // host page already provides one：X-9r1 S8 只補語意，不接管位置與 hover
     var tip = document.createElement('div');
     tip.id = 'gl-tip';
+    tip.setAttribute('role', 'tooltip');   /* 2026-10-22 X-9r3 R4：讀屏要認得這是 tooltip */
     document.body.appendChild(tip);
-    var cur = null;
+    var cur = null, described = null;
+    /* 2026-10-22 X-9r3 R4：tooltip 顯示時給觸發元件 aria-describedby="gl-tip"（保留它原本的 describedby，只加／移除自己的 token），收起時移除 */
+    function describe(node) {
+      undescribe();
+      if (!node || !node.setAttribute) return;
+      var ids = (node.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+      if (ids.indexOf('gl-tip') === -1) { ids.push('gl-tip'); node.setAttribute('aria-describedby', ids.join(' ')); }
+      described = node;
+    }
+    function undescribe() {
+      if (!described) return;
+      var ids = (described.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (x) { return x && x !== 'gl-tip'; });
+      if (ids.length) described.setAttribute('aria-describedby', ids.join(' ')); else described.removeAttribute('aria-describedby');
+      described = null;
+    }
+    function hideTip() { cur = null; tip.style.display = 'none'; undescribe(); }
+    /* 頁面自己把 #gl-tip 設成 display:none（例：開 Month Picker 時收起）也要跟著移除 describedby */
+    if (window.MutationObserver) new MutationObserver(function () { if (tip.style.display === 'none') undescribe(); }).observe(tip, { attributes: true, attributeFilter: ['style'] });
     // 2026-10-09 Kabin 裁決：全站 tooltip 改成錨在元件上（Figma／MUI 行為），不再跟著游標跑。
     // 規則照 Anomaly Detection #01-3 量到的：預設出現在元件上方 6px、水平靠元件左緣，
     // 右邊放不下就改靠元件右緣 +2；上方放不下改到下方。
     // 可選屬性：data-tip-pos="below"（固定放下方）、data-tip-dy（下方距離，預設 4）、
     // data-tip-anchor（CSS 選擇器，錨在子元素上）、data-tip-align="content-right"（右緣對齊內容右緣 −16）。
+    function minX() {
+      try {
+        var sb = document.querySelector('.lt-sidebar');
+        if (sb && sb.offsetWidth > 0) return (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lt-sb-w')) || sb.offsetWidth) + 8;
+      } catch (err) {}
+      return 8;
+    }
     function place() {
-      if (!cur || !cur.isConnected) { cur = null; tip.style.display = 'none'; return; }
+      if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
+      /* X-9r1 R1：量測前先歸位，不然 tooltip 還停在上一個位置時寬度被視窗右緣擠窄（先 hover 右側短提示、再 hover 長提示，寬只有 440） */
+      tip.style.left = '0px'; tip.style.top = '0px';
       var r = a.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
       var vw = window.innerWidth, vh = window.innerHeight;
       var x = r.left;
-      if (x + tw > vw - 8) x = Math.max(8, Math.min(r.right + 2, vw - 8) - tw);
+      /* X-9r1 S2：放不下改靠右緣時，左緣不能落進 sidebar（600 寬在 1280 中間位置會伸進去）；沒有 sidebar 的頁維持 8，收合時 21＋8 */
+      if (x + tw > vw - 8) x = Math.max(minX(), Math.min(r.right + 2, vw - 8) - tw);
       if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
       var below = cur.dataset.tipPos === 'below';
       var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
@@ -6091,14 +6510,103 @@ window.DEMO_APPLY = function (id) {
     document.addEventListener('mouseover', function (e) {
       var el = e.target.closest && e.target.closest('[data-tip]');
       if (!el || (el === cur && tip.style.display !== 'none')) return;
-      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place();
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place(); describe(el);
     });
     document.addEventListener('mouseout', function (e) {
       var el = e.target.closest && e.target.closest('[data-tip]');
-      if (el && el === cur && !el.contains(e.relatedTarget)) { cur = null; tip.style.display = 'none'; }
+      if (el && el === cur && !el.contains(e.relatedTarget)) hideTip();
+    });
+    /* 2026-10-22 X-9r3 FA23：鍵盤 focus 到帶 data-tip 的元素也顯示、blur／Esc 收起（additive，只吃 :focus-visible，滑鼠點擊不觸發） */
+    /* 2026-10-22 X-9r3 R4：:focus-visible 改判真正拿到焦點的 e.target（不是帶 data-tip 的祖先）；describedby 掛在拿到焦點的那個元素上 */
+    document.addEventListener('focusin', function (e) {
+      var t = e.target, el = t.closest && t.closest('[data-tip]');
+      if (!el || !t.matches || !t.matches(':focus-visible')) return;
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place(); describe(t);
+    });
+    document.addEventListener('focusout', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && el === cur) hideTip();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && cur) { hideTip(); return; }
+      /* role="button" 的 info icon（非原生按鈕）按 Enter／Space 切換 tooltip；滑鼠行為不變 */
+      if ((e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented) {
+        var t = e.target, b = t.closest && t.closest('[role="button"][data-tip]');
+        if (!b || b !== t || /^(BUTTON|A|INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+        e.preventDefault();
+        if (cur === b && tip.style.display !== 'none') hideTip();
+        else { cur = b; tip.textContent = b.dataset.tip; tip.style.display = 'block'; place(); describe(b); }
+      }
     });
     window.addEventListener('scroll', place, true);
     window.addEventListener('resize', place);
+  }
+
+  /* X-9r1 S8：頁面自建 #gl-tip（Anomaly Detection、All Resource List、Audit Log）時，shared 不綁 mouseover／mouseout／scroll／resize，
+     位置與顯示邏輯留給頁面；這裡只補讀屏與鍵盤語意：role="tooltip"、顯示時給觸發元件 aria-describedby="gl-tip"、Esc 收起、
+     role="button" 的 Enter／Space 切換、鍵盤 focus-visible 顯示（兩者都是發合成 mouseover／mouseout 交給頁面自己的邏輯，位置規則不動）。
+     觸發元件靠 :hover／activeElement 與文字比對找，不靠自己綁 mouseover */
+  function _enhanceHostTooltip(tip) {
+    if (tip.getAttribute('role') !== 'tooltip') tip.setAttribute('role', 'tooltip');
+    var described = null, pending = null;
+    function visible() { return tip.style.display !== 'none' && getComputedStyle(tip).display !== 'none'; }
+    function undescribe() {
+      if (!described) return;
+      var ids = (described.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (x) { return x && x !== 'gl-tip'; });
+      if (ids.length) described.setAttribute('aria-describedby', ids.join(' ')); else described.removeAttribute('aria-describedby');
+      described = null;
+    }
+    function describe(node) {
+      if (node === described) return;
+      undescribe();
+      var ids = (node.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+      if (ids.indexOf('gl-tip') === -1) { ids.push('gl-tip'); node.setAttribute('aria-describedby', ids.join(' ')); }
+      described = node;
+    }
+    function findTrigger() {
+      var txt = tip.textContent, list = [];
+      if (pending && pending.isConnected) list.push(pending);
+      var ae = document.activeElement; if (ae && ae.closest) list.push(ae);
+      [].forEach.call(document.querySelectorAll('[data-tip]:hover'), function (n) { list.push(n); });
+      for (var i = 0; i < list.length; i++) {
+        var host = list[i].closest && list[i].closest('[data-tip]');
+        if (host && host.dataset.tip === txt) return host;
+      }
+      return null;
+    }
+    function sync() {
+      if (!visible()) { undescribe(); pending = null; return; }
+      var t = findTrigger();
+      if (t) describe(t);
+    }
+    if (window.MutationObserver) new MutationObserver(sync).observe(tip, { attributes: true, attributeFilter: ['style', 'class'], childList: true, characterData: true, subtree: true });
+    /* 合成事件只是「請頁面自己的 mouseover／mouseout 邏輯照它的位置規則顯示或收起」，shared 不接管位置 */
+    function fire(node, type, rel) { try { node.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, relatedTarget: rel || null })); } catch (err) {} }
+    function hide() {
+      var n = described || pending;
+      if (n && n.isConnected) fire(n, 'mouseout', null);   // 讓頁面把自己的 cur 清掉，之後同一個元件才能再顯示
+      tip.style.display = 'none';
+    }
+    /* 鍵盤 focus 到帶 data-tip 的元件（:focus-visible）也顯示，blur 收起；頁面自己的 focusin（ARL 的 .cnt）照跑，同一元件不會重複顯示 */
+    document.addEventListener('focusin', function (e) {
+      var t = e.target, el = t.closest && t.closest('[data-tip]');
+      if (!el || !t.matches || !t.matches(':focus-visible')) return;
+      pending = el; fire(el, 'mouseover', null); sync();
+    });
+    document.addEventListener('focusout', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && (el === described || el === pending) && !el.contains(e.relatedTarget)) { fire(el, 'mouseout', e.relatedTarget); pending = null; sync(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && visible()) { hide(); return; }
+      if ((e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented) {
+        var t = e.target, b = t.closest && t.closest('[role="button"][data-tip]');
+        if (!b || b !== t || /^(BUTTON|A|INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+        e.preventDefault();
+        if (visible() && tip.textContent === b.dataset.tip) { hide(); return; }
+        pending = b; fire(b, 'mouseover', null); sync();
+      }
+    });
   }
 
   // ===== PUBLIC API =====
@@ -6136,6 +6644,7 @@ window.DEMO_APPLY = function (id) {
     var opening = !pop.classList.contains('show');
     pop.classList.toggle('show');
     fab.classList.toggle('popped');
+    fab.setAttribute('aria-expanded', opening ? 'true' : 'false');   /* X-9r1 S6 */
     if (opening && pulse) pulse.style.display = 'none';
   };
 

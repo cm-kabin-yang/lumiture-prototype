@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -505,6 +505,9 @@
     '.checkbox__input:focus-visible~.checkbox__box,',
     '.checkbox:focus-visible .checkbox__box{border-color:var(--lt-color-primary,#004FB0);box-shadow:0 0 0 3px rgba(0,79,176,.1);outline:none}',
     '.checkbox:focus-visible{outline:none}',
+    /* X-9r1 S5：光暈對白底只有 1.18:1，鍵盤 focus 另補 2px 實線外框（跟 .lt-btn-icon、.lt-link 同一套）；滑鼠不受影響 */
+    '.checkbox__input:focus-visible~.checkbox__box,',
+    '.checkbox:focus-visible .checkbox__box{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:2px}',
 
     /* disabled 最後宣告，蓋掉上面所有狀態 */
     '.checkbox__input:disabled~.checkbox__box,',
@@ -707,7 +710,7 @@ a { color: inherit; text-decoration: none; }
   grid-template-rows: auto 1fr auto;
   align-items: start; position: relative;
 }
-.content { padding: 24px 24px 0; min-width: 0; grid-row: 2; grid-column: 1; }
+.content { padding: 32px 24px 0; min-width: 0; grid-row: 2; grid-column: 1; }   /* X-9r1 Q2（Kabin 裁決，F122）：內容區頂部內距 24→32，跟 General Budget／Customized Budget 同，換頁標題不跳 8px */
 
 /* GLOBAL HEADER (grid 位置；視覺由 shared/lumiture-topbar.js 提供) */
 #lt-topbar { grid-column: 1 / -1; grid-row: 1; }
@@ -730,6 +733,15 @@ a { color: inherit; text-decoration: none; }
 .footer-credit { color: #676767; font-size: 12px; }
 .footer-credit a { color: #004FB0; text-decoration: none; }
 .footer-credit a:hover { text-decoration: underline; }
+
+/* X-9r3 FA1（2026-10-22）：稿 #01-1 Tooltip 14／24.5、內距 8／16、r4、max-width 600（shared demo-fab.js 預設 12／6·10／320，交 X-9r1 改） */
+body #gl-tip { max-width: 600px; font-size: 14px; line-height: 24.5px; padding: 8px 16px; border-radius: var(--lt-tooltip-radius, 4px); text-align: left; }
+/* X-9r3 FA23：info icon、Learn More 可鍵盤 focus 後顯示說明（原本只靠 :hover） */
+.config-section-tooltip:focus .tooltip, .config-section-tooltip:focus-visible .tooltip { display: block; }
+.meta-learn-more-link:focus .meta-learn-more-tooltip, .meta-learn-more-link:focus-visible .meta-learn-more-tooltip { display: block; }
+.config-section-tooltip:focus-visible, .meta-learn-more-link:focus-visible, .history-link:focus-visible, .modal-close:focus-visible, .config-header button:focus-visible { outline: 2px solid #004FB0; outline-offset: 2px; border-radius: 4px; }
+.select:focus-visible, .daterange:focus-visible { outline: none; border-color: #004FB0; box-shadow: 0 0 0 3px rgba(0,79,176,0.1); }
+.dropdown-item:focus-visible { outline: 2px solid #004FB0; outline-offset: -2px; }
 
 /* TOPBAR */
 .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -754,19 +766,21 @@ a { color: inherit; text-decoration: none; }
 
 /* TAB BAR — 對齊 production：無白底，純線條，僅 underline */
 .tabbar {
-  display: flex; align-items: center; border-bottom: 1px solid #DCE3EC; margin-bottom: 36px;
+  display: flex; align-items: center; border-bottom: 2px solid #E6E6E6; margin-bottom: 36px;   /* X-9r3 FA8（稿 #01 Tab / Horizontal）：底軌 2px #E6E6E6 */
   background: transparent; padding: 0;
 }
 .tab {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 12px 0; margin-right: 52px;
-  font-size: 14px; font-weight: 500; color: #676767;
-  border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer;
+  font-size: 14px; font-weight: 400; color: #676767;   /* X-9r3 FA8：未選 400、選中 700 */
+  cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
   position: relative;
 }
 .tab:hover { color: #262626; }
-.tab.active { color: #004FB0; border-bottom-color: #004FB0; font-weight: 600; }
+.tab.active { color: #004FB0; font-weight: 700; }
+/* X-9r3 FA8：選中底線 4px r10，疊在 2px 底軌上（底部 2px 落在軌道裡） */
+.tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 4px; border-radius: 10px; background: #004FB0; }
 .tab svg.csp-logo {
   width: 18px; height: 18px; flex-shrink: 0;
   display: inline-flex; align-items: center; justify-content: center;
@@ -843,7 +857,7 @@ a { color: inherit; text-decoration: none; }
   font-size: 12px; line-height: 1.5; width: 360px; max-width: 360px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000;
 }
-.currency-tooltip-wrap:hover .currency-tooltip { display: block; }
+.currency-tooltip-wrap:hover .currency-tooltip, .currency-tooltip-wrap:focus-within .currency-tooltip { display: block; }   /* X-9r3 FA23：鍵盤 focus 幣別鈕也顯示匯率說明 */
 
 /* CARDS */
 /* B-3（2026-10-15 裁決）：卡片 內距 24、圓角 8、陰影 0 0 20px .10（--lt-card-shadow） */
@@ -980,7 +994,7 @@ a { color: inherit; text-decoration: none; }
 /* Group By 標示 — 純 text primary，無 pill 樣式（per design review） */
 .groupby-pill { display: inline; color: #262626; font-size: 11px; font-weight: 600; margin-left: 4px; }
 .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.card-title { font-size: 20px; font-weight: 600; }
+.card-title { font-size: 20px; font-weight: 700; }   /* X-9r3 FA10（稿 #01）：20／700 */
 .card-meta { font-size: 12px; color: #676767; }
 
 /* AI INSIGHT — 對齊 FE AnalysisWrapper：頂部 4px gradient strip + 內容 padding */
@@ -1182,7 +1196,7 @@ a { color: inherit; text-decoration: none; }
   font-weight: 500; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; }
 .btn-primary:hover { background: #0B6DD7; }
 /* History link — text-button 行為：icon 永遠無底線（CMDS 通則） */
-.history-link { font-size: 14px; color: #004FB0; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; }
+.history-link { font-size: 14px; font-weight: 700; color: #004FB0; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; padding: 0; }   /* X-9r3 FA7（A18）：Button / S 14／700 #004FB0；FA16 改成真 <button>，讀取中 disabled */
 .history-link:hover { color: #0B6DD7; }
 .history-link .material-symbols-outlined { text-decoration: none; }
 .history-link > span:not(.material-symbols-outlined):hover,
@@ -1216,12 +1230,12 @@ a { color: inherit; text-decoration: none; }
 .table-wrap::-webkit-scrollbar-track { background: transparent; }
 .table-wrap::-webkit-scrollbar-thumb { background: #CCCCCC; border-radius: 3px; }
 .table-wrap::-webkit-scrollbar-thumb:hover { background: #B3B3B3; }
-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }   /* X-9r3 FA9：列 14／400（稿 #01） */
 thead th { background: #F2FAFF; color: #262626; font-size: 14px; font-weight: 700; text-align: left; padding: 14px 16px;
-  height: 50px; position: sticky; top: 0; z-index: 2; border-bottom: 1px solid #DCE3EC; white-space: nowrap;
+  height: 50px; position: sticky; top: 0; z-index: 2; border-bottom: 1px solid #B3B3B3; white-space: nowrap;   /* X-9r3 FA9：表頭底線 #B3B3B3（稿 #01 Line 88） */
   overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
 thead th.num, td.num { text-align: right; }
-tbody td { padding: 14px 16px; height: 50px; border-bottom: 1px solid #EEF1F5; color: #262626; white-space: nowrap;
+tbody td { padding: 14px 16px; height: 50px; border-bottom: 1px solid #E6E6E6; color: #262626; white-space: nowrap; font-weight: 400;   /* X-9r3 FA9：列分隔 #E6E6E6 */
   overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
 /* 第一欄（Group 名稱）通常較長 — 允許略寬，但仍截斷 */
 tbody td:first-child, thead th:first-child { max-width: 280px; }
@@ -1230,14 +1244,14 @@ tbody tr.total-row td { font-weight: 600; background: #FBFCFE; border-top: 1px s
 /* Sticky 前兩欄（Group 名稱 + Total Cost）— 橫向捲動時固定不動 */
 .table-wrap thead th:nth-child(1),
 .table-wrap tbody td:nth-child(1) { position: sticky; left: 0; z-index: 3; width: 220px; min-width: 220px; max-width: 220px; }
-.table-wrap thead th:nth-child(1) { z-index: 4; background: #F2FAFF; box-shadow: inset -1px 0 0 #DCE3EC; }
-.table-wrap tbody td:nth-child(1) { background: #fff; box-shadow: inset -1px 0 0 #EEF1F5; }
+.table-wrap thead th:nth-child(1) { z-index: 4; background: #F2FAFF; }   /* X-9r3 FA9：去欄間直線（只留凍結欄邊界那一條，在第 2 欄右緣） */
+.table-wrap tbody td:nth-child(1) { background: #fff; }
 .table-wrap tbody tr:hover td:nth-child(1) { background: #F2FAFF; }
 .table-wrap tbody tr.total-row td:nth-child(1) { background: #FBFCFE; }
 .table-wrap thead th:nth-child(2),
 .table-wrap tbody td:nth-child(2) { position: sticky; left: 220px; z-index: 3; width: 120px; min-width: 120px; max-width: 120px; }
-.table-wrap thead th:nth-child(2) { z-index: 4; background: #F2FAFF; box-shadow: inset -1px 0 0 #DCE3EC; }
-.table-wrap tbody td:nth-child(2) { background: #fff; box-shadow: inset -1px 0 0 #EEF1F5; }
+.table-wrap thead th:nth-child(2) { z-index: 4; background: #F2FAFF; box-shadow: inset -1px 0 0 #E6E6E6; }
+.table-wrap tbody td:nth-child(2) { background: #fff; box-shadow: inset -1px 0 0 #E6E6E6; }
 .table-wrap tbody tr:hover td:nth-child(2) { background: #F2FAFF; }
 .table-wrap tbody tr.total-row td:nth-child(2) { background: #FBFCFE; }
 /* Day/week/month columns: 給合理的 min-width 讓內容不擠 */
@@ -1271,6 +1285,9 @@ tbody tr.untagged td:first-child { color: #676767; font-style: italic; }
 .main.config-collapsed { grid-template-columns: 1fr 48px; }
 .config-header { padding: 16px 20px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #EEF1F5; }
 .config-header .title { font-weight: 600; font-size: 14px; }
+/* X-9r3 FA24（C-C7）：收合 chevron 鈕 20×21 → 用透明 ::before 補到 28×29（外觀不變） */
+.config-header button { position: relative; }
+.config-header button::before { content: ""; position: absolute; inset: -4px; }
 .config-body { flex: 1; overflow-y: auto; padding: 16px 20px 20px; }
 
 .config-section { margin-bottom: 24px; }
@@ -1400,10 +1417,10 @@ body.no-data-mode #ai-card .ai-no-data-body { display: flex; }
 
 /* Skeleton state — 右側 Configuration + 上方元件也 dim/skeleton（per 設計 #01-6） */
 body.skeleton-mode .daterange,
-body.skeleton-mode .curr-btn,
 body.skeleton-mode #reset-btn,
 body.skeleton-mode .lt-tb-ic { pointer-events: none; opacity: 0.4; }
-body.skeleton-mode .daterange { opacity: 1; background: #F2F2F2; color: #B3B3B3; }   /* B-1：讀取中的 Date Picker 呈 Disabled（稿：灰底灰字） */
+body.skeleton-mode .daterange { opacity: 1; background: #F2F2F2; color: #B3B3B3; border-color: #E6E6E6; }   /* X-9r3 FA3（稿 #11 同 OV）：底 #F2F2F2、框 #E6E6E6、字 #B3B3B3、icon #CCCCCC。幣別鈕改成真 disabled，整顆 .32 由 shared currency-picker.js 提供 */
+body.skeleton-mode .daterange .material-symbols-outlined { color: #CCCCCC; }   /* B-1：讀取中的 Date Picker 呈 Disabled（稿：灰底灰字） */
 body.skeleton-mode .config-section { position: relative; }
 body.skeleton-mode .config-section .field {
   pointer-events: none;
@@ -1420,8 +1437,8 @@ body.skeleton-mode .config-section .field > div:not(.field-label):not(.field-cap
   color: transparent !important;
 }
 body.skeleton-mode .config-section .select * { visibility: hidden; }
-body.skeleton-mode .history-link { pointer-events: none; color: #B3B3B3; }
-body.skeleton-mode .history-link .material-symbols-outlined { color: #B3B3B3; }
+body.skeleton-mode .history-link, .history-link:disabled { pointer-events: none; cursor: not-allowed; color: #CCCCCC; }   /* X-9r3 FA7：稿 #01-6 讀取中 #CCCCCC／700 */
+body.skeleton-mode .history-link .material-symbols-outlined, .history-link:disabled .material-symbols-outlined { color: #CCCCCC; }
 body.skeleton-mode .config-toggle { pointer-events: none; }
 @keyframes skeleton { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 .dropdown-skeleton-row .sk-box { background: linear-gradient(90deg, #F2F2F2 25%, #E6E6E6 37%, #F2F2F2 63%); background-size: 600px 100%; animation: sk-shimmer 1.4s ease infinite; border-radius: 4px; height: 14px; }
@@ -1494,6 +1511,7 @@ body.skeleton-mode .config-toggle { pointer-events: none; }
 }
 .modal-header h3 { font-size: 16px; font-weight: 600; }
 .modal-close {
+  border: none; background: none; padding: 0;   /* X-9r3 FA21：改成真 <button>（id／class 保留） */
   width: 32px; height: 32px; border-radius: 6px;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; color: #676767;
@@ -1649,6 +1667,92 @@ body.skeleton-mode .config-toggle { pointer-events: none; }
 .btn-secondary:hover { background: #F6F6F6; border-color: #0B6DD7; color: #0B6DD7; }
 .btn-secondary:disabled { background: #fff; border-color: #CCCCCC; color: #B3B3B3; cursor: not-allowed; }
 .btn-secondary:disabled:hover { background: #fff; border-color: #CCCCCC; color: #B3B3B3; }
+
+/* C-3 整頁對稿，2026-10-28：已裁決頁標題 24／頂距 32 保留。 */
+.content { padding:32px 32px 0; }
+.topbar { margin-bottom:32px; }
+.tabbar { height:42px; margin-bottom:20px; }
+.tab { padding:8px 0; }
+.section-header { margin-bottom:8px; height:30px; }
+#ai-card { margin-bottom:20px; }
+.ai-status { font-weight:700; line-height:24px; }
+.ai-insight-body { padding:20px 24px; }
+.cost-data-card { background:#fff; padding:24px; border-radius:8px; box-shadow:var(--lt-card-shadow); margin-bottom:24px; }
+.cost-data-card>.card { padding:0; box-shadow:none; border-radius:0; margin-bottom:0; }
+.cost-data-card>#cost-trend-card { margin-bottom:32px; }
+.cost-trend-header { display:block; position:relative; padding-top:0; }
+.cost-trend-header>.cost-trend-meta { position:absolute; inset:0 0 auto auto; width:100%; pointer-events:none; font-size:12px; line-height:18px; }
+.cd-update-row { display:flex; justify-content:flex-end; align-items:center; gap:16px; min-height:30px; color:#676767; font-size:12px; }
+.cd-update-row b { font-weight:500; }
+.cd-update-row .material-symbols-outlined { font-size:14px; pointer-events:auto; }
+.cd-period { margin-top:8px; font-size:14px; line-height:25px; font-style:italic; }
+.cost-summary { display:flex; flex-direction:row; align-items:baseline; flex-wrap:wrap; gap:4px 8px; padding-top:25px; position:relative; }
+.cost-summary>.label { position:absolute; top:0; left:0; font-weight:700; line-height:25px; }
+.cost-summary .total { line-height:54px; }
+.cost-summary .total .unit { font-size:12px; font-weight:700; color:#676767; }
+.cost-summary .compare { font-size:12px; }
+.cost-summary .cost-credit-line { flex-basis:100%; line-height:18px; }
+.cost-trend-meta .groupby-pill { font-size:12px; }
+#cost-trend-chart { height:420px; }
+.field-caption { font-size:12px; line-height:18px; }
+.config-header { padding:32px 16px 16px; border:0; }
+.config-header .title { font-size:16px; font-weight:700; }
+.config-body { padding:0 16px 24px; }
+.config-panel.collapsed { width:0; min-width:0; visibility:hidden; border:0; }
+.main.config-collapsed { grid-template-columns:minmax(0,1fr) 0; }
+.table-wrap { border:0; border-radius:0; max-height:525px; scrollbar-gutter:stable; }
+.table-wrap::-webkit-scrollbar { width:15px; height:15px; }
+.table-wrap::-webkit-scrollbar-track { background:#F2F2F2; }
+.table-wrap::-webkit-scrollbar-thumb { background:#D8D8D8; border:3px solid #F2F2F2; border-radius:8px; }
+.table-wrap thead th:nth-child(1),.table-wrap tbody td:nth-child(1) { width:160px; min-width:160px; max-width:160px; }
+.table-wrap thead th:nth-child(2),.table-wrap tbody td:nth-child(2) { left:160px; }
+.table-wrap thead th:nth-child(n+3),.table-wrap tbody td:nth-child(n+3) { min-width:120px; }
+.table-wrap tbody tr.total-row td { position:sticky; bottom:0; z-index:4; background:#F2FAFF; font-weight:500; border-top:0; }
+.table-wrap tbody tr.total-row td:first-child { font-weight:700; }
+.table-wrap tbody tr.total-row td:nth-child(-n+2) { z-index:5; background:#F2FAFF; }
+.cross-cloud #ai-section-header,.cross-cloud #ai-card,.no-auth-mode #ai-section-header { display:none!important; }
+.cross-cloud #page-state-overlay .ai-insight { display:none!important; }
+.no-auth-mode .cost-data-card,.skeleton-mode .cost-data-card { display:none; }
+body.no-auth-mode .config-section[data-section="filter"],body.no-auth-mode .config-section[data-section="adjustment"] { pointer-events:auto; opacity:1; }
+body.no-data-mode #cost-trend-card .cost-trend-meta { display:block; }
+body.no-data-mode #cost-trend-card .cd-period,body.no-data-mode #cost-trend-card .cost-trend-meta>div:last-child,body.no-data-mode #cost-details-card .btn-secondary { display:none; }
+body.no-data-mode #ai-strip { background:#FC9A0F!important; }
+body.no-auth-mode .lt-empty__desc { white-space:pre-line; }
+.cd-select-button { display:flex; align-items:center; justify-content:space-between; gap:inherit; text-align:left; width:100%; height:100%; }
+.cd-select-button:focus-visible { outline:2px solid #004FB0; outline-offset:3px; }
+@media(max-width:1000px){.cd-update-row{position:static;flex-wrap:wrap;gap:4px 12px}.cost-trend-header>.cost-trend-meta{position:static;text-align:left}.cost-summary{padding-top:25px}.main{grid-template-columns:minmax(0,1fr) 280px}.config-panel{min-width:0}.content{padding-left:16px;padding-right:16px}.tab{margin-right:16px}}
+@media(max-width:650px){.main{grid-template-columns:minmax(0,1fr) 0}.config-panel{display:none}.topbar{flex-wrap:wrap;gap:16px}.tabbar{height:auto;flex-wrap:wrap}.tab{margin-right:12px}.footer{flex-wrap:wrap;gap:8px}.ai-insight-row{flex-wrap:wrap}.cost-summary .compare{flex-basis:100%}}
+
+
+#cd-date-popover{position:fixed;z-index:2200;display:flex;width:420px;max-width:calc(100vw - 16px);background:white;padding:16px;border-radius:5px;box-shadow:0 0 6px #0003;gap:24px;overscroll-behavior:contain}
+.cd-calendar{flex:1;min-width:0}.cd-calendar-head{display:flex;align-items:center;gap:4px;padding-bottom:16px;border-bottom:1px solid #CCC}.cd-calendar-head strong{flex:1;text-align:center;font-size:14px}.cd-calendar-head button{width:20px;height:30px;color:#676767;font-size:20px}.cd-weekdays,.cd-calendar-days{display:grid;grid-template-columns:repeat(7,1fr);text-align:center}.cd-weekdays{padding:16px 0 8px;font-size:12px}.cd-calendar-days{row-gap:12px}.cd-day{height:28px;font-size:14px;border-radius:4px}.cd-day.selected{color:#fff;background:#004FB0}.cd-day.outside:not(.selected){color:#B3B3B3}.cd-day:hover:not(:disabled){background:#D1EEFF;color:#004FB0}.cd-day:disabled{opacity:.3;cursor:not-allowed}.cd-day:focus-visible{outline:2px solid #34B5D9;outline-offset:1px}.cd-shortcuts{display:flex;flex-direction:column;gap:4px}.cd-shortcuts button{height:32px;padding:0 8px;border-radius:5px;font-size:14px;font-weight:700;color:#004FB0;white-space:nowrap}.cd-shortcuts button.selected,.cd-shortcuts button:hover{background:#D1EEFF;color:#002663}
+
+
+.table-wrap.has-credit tbody tr.total-row td { bottom:50px; }
+.table-wrap tbody tr.credit-row td { position:sticky; bottom:0; z-index:4; background:#F2FAFF; color:#676767; }
+.table-wrap tbody tr.credit-row td:nth-child(-n+2) { z-index:5; }
+#cd-group-disclaimer { font-size:12px; line-height:18px; margin-top:16px; color:#676767; font-style:italic; }
+body.no-data-mode #cd-group-disclaimer {display:none}
+
+.cd-no-options,.cd-filter-loading {padding:16px;color:#676767;min-width:200px}
+.modal.cost-summary-modal {height:720px;max-height:calc(100vh - 48px)}
+
+.no-auth-mode .lt-empty__ic-svg{width:80px;height:80px}.no-auth-mode .lt-empty__title{font-size:18px;color:#676767}.no-auth-mode .lt-empty__desc{font-size:14px;line-height:24.5px}.no-auth-mode .lt-empty__action::before{content:"+";margin-right:4px}
+/* C-3：狀態卡維持稿上的版面高度；共用規格仍由 shared 提供。 */
+body.no-data-mode #cost-trend-card .cd-period {display:block}
+body.no-data-mode #cost-trend-card .card-empty-state {min-height:550px}
+body.no-data-mode #cost-details-card .card-empty-state {min-height:162px}
+body.no-data-mode .ai-no-data-body {min-height:108px;padding:24px}
+.cd-skeleton-data {background:#fff;padding:24px;border-radius:8px;box-shadow:var(--lt-card-shadow)}
+.cd-skeleton-data>.card {box-shadow:none;padding:0;border-radius:0}
+.cd-options-spinner {display:block;margin:22px auto;width:24px;height:24px;border:3px solid #E6E6E6;border-top-color:#004FB0;border-radius:50%;animation:cd-options-spin .8s linear infinite}
+@keyframes cd-options-spin {to{transform:rotate(360deg)}}
+.cd-filter-loading {min-height:88px}
+.config-section-tooltip.cd-demo-hover .tooltip {display:block;opacity:1;visibility:visible}
+.history-pin.cd-demo-hover::after {content:attr(data-tooltip);position:absolute;z-index:10;top:28px;left:0;width:260px;white-space:normal;background:#31383E;color:white;padding:12px;border-radius:5px;font-size:12px}
+#history-page .paper-title {margin-top:24px}
+#history-page .history-table button {font:inherit;color:inherit}
+@media(max-width:650px){.ai-insight-row{display:flex;flex-direction:column;align-items:stretch}.ai-main{width:100%}.ai-actions{align-self:flex-end}.cost-details-header{flex-wrap:wrap;gap:12px}.cost-details-header .btn-secondary{white-space:nowrap;flex-shrink:0}}
 </style>
 </head>
 <body>
@@ -1673,18 +1777,18 @@ body.skeleton-mode .config-toggle { pointer-events: none; }
           <h1 class="page-title">Cost Dashboard</h1>
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
-          <div class="daterange" onclick="openSingleSelectDropdown(event, this, 'daterange', setDateRange)">
+          <div class="daterange" onclick="event.stopPropagation();openCustomDateRangePicker()">
             <span class="material-symbols-outlined">calendar_month</span>
             <span class="daterange-text">28 Aug, 2035 → 26 Sep, 2035</span>
             <span class="material-symbols-outlined arrow">arrow_drop_down</span>
           </div>
-          <button class="config-toggle active" id="config-toggle-btn" onclick="toggleConfigPanel()" data-tip="Toggle Dashboard Configuration"><span class="material-symbols-outlined">tune</span></button>
+          <button class="config-toggle active" id="config-toggle-btn" onclick="toggleConfigPanel()" data-tip="Toggle Dashboard Configuration" aria-label="Toggle Dashboard Configuration" aria-expanded="true" aria-controls="config-panel"><span class="material-symbols-outlined" aria-hidden="true">tune</span></button>
         </div>
       </div>
 
       <!-- TABS -->
-      <div class="tabbar">
-        <div class="tab active" data-csp="cross" onclick="switchCSP('cross')">
+      <div class="tabbar" role="tablist" aria-label="Cloud service provider">
+        <button type="button" class="tab active" role="tab" data-csp="cross" aria-selected="true" onclick="switchCSP('cross')">
           <svg class="csp-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <!-- Lumiture Cross Cloud 3D hexagonal cube (green) -->
             <path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" fill="#34A853"/>
@@ -1692,8 +1796,8 @@ body.skeleton-mode .config-toggle { pointer-events: none; }
             <path d="M3 7L12 12V22L3 17V7Z" fill="#1F8A3D"/>
           </svg>
           <span>Cross Cloud</span>
-        </div>
-        <div class="tab" data-csp="gcp" onclick="switchCSP('gcp')">
+        </button>
+        <button type="button" class="tab" role="tab" data-csp="gcp" aria-selected="false" onclick="switchCSP('gcp')">
           <svg class="csp-logo" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M16.51 8H8.98v3.09h4.42c-.41 2.02-2.13 3.18-4.42 3.18a4.85 4.85 0 1 1 0-9.7c1.32 0 2.51.47 3.45 1.24L14.74 3.6A8.5 8.5 0 0 0 8.98.5C4.3.5.55 4.25.55 8.93s3.75 8.42 8.43 8.42c4.86 0 8.07-3.42 8.07-8.23 0-.42-.04-.74-.1-1.12Z" fill="#4285F4"/>
             <path d="M8.98 17.35c2.43 0 4.47-.8 5.96-2.18l-2.91-2.25c-.8.54-1.84.86-3.05.86a4.85 4.85 0 0 1-4.55-3.18l-3 2.32a8.43 8.43 0 0 0 7.55 4.43Z" fill="#34A853"/>
@@ -1701,19 +1805,19 @@ body.skeleton-mode .config-toggle { pointer-events: none; }
             <path d="M8.98 4.05c1.32 0 2.51.45 3.45 1.34l2.59-2.59A8.5 8.5 0 0 0 8.98.5a8.43 8.43 0 0 0-7.55 4.44l3 2.32a4.85 4.85 0 0 1 4.55-3.21Z" fill="#EA4335"/>
           </svg>
           <span>Google Cloud</span>
-        </div>
-        <div class="tab" data-csp="aws" onclick="switchCSP('aws')">
+        </button>
+        <button type="button" class="tab" role="tab" data-csp="aws" aria-selected="false" onclick="switchCSP('aws')">
           <span class="csp-logo-text">aws</span>
           <span>AWS</span>
-        </div>
-        <div class="tab" data-csp="azure" onclick="switchCSP('azure')">
+        </button>
+        <button type="button" class="tab" role="tab" data-csp="azure" aria-selected="false" onclick="switchCSP('azure')">
           <svg class="csp-logo" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <!-- Microsoft Azure A — 兩段三角形（左淺右深） -->
             <path fill="#54AEF0" d="M2 13.5L8 3l3 5.2L7.5 13.5H2z"/>
             <path fill="#0078D4" d="M9.5 5.5l-1.2 2.1L11.5 12 9 13.5l-1 1H16L9.5 5.5z"/>
           </svg>
           <span>Azure</span>
-        </div>
+        </button>
         <div class="currency-wrap currency-tooltip-wrap">
           <button class="curr-btn" id="currency-btn"
             onclick="CurrencyPicker.open(this, singleSelectData.currency.current, pickCurrency)">
@@ -1731,9 +1835,9 @@ body.skeleton-mode .config-toggle { pointer-events: none; }
       </div>
 
       <!-- AI INSIGHT — section header (title OUTSIDE card) + card body -->
-      <div class="section-header">
+      <div class="section-header" id="ai-section-header">
         <h4 class="section-title">AI Insight Center</h4>
-        <span class="history-link" onclick="showAnalysisHistory()"><span class="material-symbols-outlined" style="font-size:16px;">history</span><span>Analysis History</span></span>
+        <button type="button" class="history-link" id="history-link-btn" onclick="showAnalysisHistory()"><span class="material-symbols-outlined" style="font-size:16px;">history</span><span>Analysis History</span></button>
       </div>
       <div class="card ai-insight" id="ai-card">
         <div class="ai-insight-strip" id="ai-strip"></div>
@@ -1796,6 +1900,7 @@ body.skeleton-mode .config-toggle { pointer-events: none; }
 
       <!-- (Demo Scenarios moved to floating FAB — see bottom of body) -->
 
+      <div class="cost-data-card">
       <!-- COST TREND -->
       <div class="card" id="cost-trend-card">
         <div class="cost-trend-header">
@@ -1815,8 +1920,8 @@ body.skeleton-mode .config-toggle { pointer-events: none; }
             </div>
           </div>
           <div class="cost-trend-meta">
-            <div>Last Updated: 28/09/2035 09:00</div>
-            <div>Period: 28 Aug, 2035 - 26 Sep, 2035</div>
+            <div class="cd-update-row"><span><b>Last Updated</b> 28/09/2035 09:00</span><span><b>Next Update</b> 28/09/2035 15:00 (UTC+0)</span><span class="material-symbols-outlined" tabindex="0" data-tip="Cloud billing data is updated periodically. The next update time is an estimate.">info</span></div>
+            <div class="cd-period">Period: 28 Aug. 2035 - 26 Sep. 2035</div>
             <div style="margin-top:8px;">Group By <span class="groupby-pill" id="groupby-pill">Organization</span></div>
           </div>
         </div>
@@ -1836,9 +1941,9 @@ body.skeleton-mode .config-toggle { pointer-events: none; }
         <div class="cost-details-header">
           <div>
             <div class="card-title">Cost Details</div>
-            <div class="card-meta" style="margin-top:4px;">Period: 28 Aug, 2035 - 26 Sep, 2035</div>
+            <div class="card-meta" style="margin-top:4px;">Period: 28 Aug. 2035 - 26 Sep. 2035</div>
           </div>
-          <button class="btn-secondary"><span class="material-symbols-outlined">download</span>Download CSV</button>
+          <button class="btn-secondary" onclick="cdExportCSV()"><span class="material-symbols-outlined">download</span>Download CSV</button>
         </div>
         <!-- Meta value Learn More link（per 設計 #08-2 / #15-2）— Group by Label/Tag/LumiTag 時動態顯示
              懸停（hover）即顯示說明 tooltip（per Kabin 2026-05-14 確認）
@@ -1861,17 +1966,19 @@ body.skeleton-mode .config-toggle { pointer-events: none; }
             <tbody id="cost-details-body"></tbody>
           </table>
         </div>
+        <p id="cd-group-disclaimer" hidden>*Please note that both cost trends and cost details are aggregated at the group level. As a result, the amount displayed may not align with the organization's overall amount due to resource allocations across multiple groups.</p>
         <!-- Empty state (per 設計 #01-4) -->
         <div class="card-empty-state"></div>
       </div>
 
+      </div><!-- cost-data-card -->
     </div>
 
     <!-- CONFIG PANEL -->
-    <aside class="config-panel">
+    <aside class="config-panel" id="config-panel">
       <div class="config-header">
         <div class="title">Dashboard Configuration</div>
-        <button data-tip="Toggle Dashboard Configuration" style="color:#676767;" onclick="toggleConfigPanel()"><span class="material-symbols-outlined">chevron_right</span></button>
+        <button type="button" data-tip="Toggle Dashboard Configuration" aria-label="Toggle Dashboard Configuration" aria-expanded="true" aria-controls="config-panel" style="color:#676767;" onclick="toggleConfigPanel()"><span class="material-symbols-outlined" aria-hidden="true">chevron_right</span></button>
       </div>
 
       <div class="config-body">
@@ -2008,9 +2115,9 @@ body.skeleton-mode .config-toggle { pointer-events: none; }
           <path fill="#0B6DD7" opacity="0.7" d="M19 14L19.8 16.2L22 17L19.8 17.8L19 20L18.2 17.8L16 17L18.2 16.2L19 14Z"/>
           <path fill="#34B5D9" opacity="0.85" d="M5 14L5.6 15.6L7 16L5.6 16.4L5 18L4.4 16.4L3 16L4.4 15.6L5 14Z"/>
         </svg>
-        <span style="font-weight:700; font-size:18px; color:#262626;">Cost Summary</span>
+        <span id="cost-summary-title" style="font-weight:700; font-size:18px; color:#262626;">Cost Summary</span>
       </h3>
-      <div class="modal-close" onclick="closeCostSummary()"><span class="material-symbols-outlined">close</span></div>
+      <button type="button" class="modal-close" aria-label="Close" onclick="closeCostSummary()"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
     </div>
     <div style="padding:0 24px 12px; display:flex; align-items:center; justify-content:space-between;">
       <div style="display:inline-flex; align-items:center; gap:8px; font-size:13px; color:#676767;" id="cost-summary-meta">
@@ -2054,12 +2161,12 @@ body.skeleton-mode .config-toggle { pointer-events: none; }
 // =================================================================
 // DATA MODEL — buckets of resources, each with multi-LumiTag attrs
 // =================================================================
-const DAYS = 30;
-const startDate = new Date(2035, 7, 28);
-const dayLabels = Array.from({length: DAYS}, (_, i) => {
+let DAYS = 30;
+let startDate = new Date(2035, 7, 28);
+let dayLabels = Array.from({length: DAYS}, (_, i) => {
   const d = new Date(startDate);
   d.setDate(startDate.getDate() + i);
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return `${d.getDate()} ${d.toLocaleDateString('en-GB', {month:'short'})}.${d.getMonth() === 0 ? ' '+d.getFullYear() : ''}`;
 });
 
 // 14 resource buckets — each represents a slice of resources sharing same LumiTag combo
@@ -2092,7 +2199,7 @@ const buckets = [
 buckets.forEach(b => {
   b.daily = [];
   for (let i = 0; i < DAYS; i++) {
-    const noise = Math.sin(i * 0.5 + b.id * 0.3) * b.base * 0.15 + (Math.random() - 0.5) * b.base * 0.08;
+    const noise = Math.sin(i * 1.7) * b.base * 0.55 + Math.cos(i * 0.9 + b.id * 0.3) * b.base * 0.2; // C-3：穩定資料，截圖與重算可重現
     b.daily.push(Math.max(5, Math.round(b.base + noise)));
   }
 });
@@ -2331,6 +2438,21 @@ function formatCostAmount(actualDollars) {
   return (actualDollars / 1000000000).toFixed(2) + 'B';
 }
 
+/* X-9r3 FA2（A2、B7，X-9r1 #3）：換幣別真的換算（共用 CurrencyPicker.RATES／symbol，同 Rate Optimization 的 fx()）。
+ * 圖表資料單位是 K（千美元）：renderChart 先乘匯率再畫，所以刻度與 tooltip 都是顯示幣別的值 */
+function cdRate() { const c = singleSelectData.currency.current; return (window.CurrencyPicker && CurrencyPicker.RATES && CurrencyPicker.RATES[c]) || 1; }
+function cdSym() { const c = singleSelectData.currency.current; return (window.CurrencyPicker && CurrencyPicker.symbol) ? CurrencyPicker.symbol(c) : '$'; }
+/* Y 軸刻度：不帶幣別符號、單位大寫（OV 主頁同 axisLabel）。n 是實際金額（非 K） */
+function cdAxisLabel(n) {
+  if (!n) return '0';
+  const a = Math.abs(n);
+  if (a < 1000) return String(Math.round(n));
+  const u = [[1e12, 'T'], [1e9, 'B'], [1e6, 'M'], [1e3, 'K']].find(([x]) => a >= x);
+  const v = a / u[0];
+  return (n < 0 ? '-' : '') + (v % 1 === 0 ? v : v.toFixed(2)) + u[1];
+}
+const cdFmtK = (v) => v.toLocaleString('en-US', { maximumFractionDigits: 2 });
+
 function hasCreditSelected() {
   if (currentCSP === 'cross') {
     return singleSelectData?.credit?.current === 'ON';
@@ -2339,6 +2461,9 @@ function hasCreditSelected() {
   return set instanceof Set && set.size > 0;
 }
 
+// C-3：同一組 mock credit 同時用於淨額、明細及 tooltip，避免各處寫死互相矛盾。
+function cdCreditFraction(){if(!hasCreditSelected()||noCostMode)return 0;return .03*(currentCSP==='cross'?1:filterSelectedState.credit.size/(creditItemsByCsp[currentCSP]?.length||1));}
+function cdCreditByPeriod(){const daily=Array.from({length:DAYS},(_,i)=>getFilteredBuckets().reduce((sum,b)=>sum+(b.daily[i]||0),0)*cspConfig[currentCSP].factor*cdCreditFraction()*cdRate());return rollupByGranularity({Credit:daily},singleSelectData.granularity.current).groups.Credit;}
 function updateCreditLineVisibility() {
   const creditLine = document.getElementById('cost-credit-line');
   if (creditLine) creditLine.style.display = hasCreditSelected() ? 'inline-flex' : 'none';
@@ -2410,7 +2535,7 @@ const cspConfig = {
       { id: 'group',   label: 'Group',            placeholder: 'All Groups' },
       { id: 'project', label: 'Project',          placeholder: 'All Projects' },
       { id: 'service', label: 'Service Category', placeholder: 'All Service Categories' },
-      { id: 'sku',     label: 'SKU',              placeholder: '3 of 48 Selected' },
+      { id: 'sku',     label: 'SKU',              placeholder: 'All SKUs' },
       { id: 'label',   label: 'Label',            placeholder: 'All Labels' },
     ],
     groupByNative: [
@@ -2572,9 +2697,9 @@ function aggregate(filtered) {
     filtered.forEach(b => {
       const key = b[dim];
       if (!groups[key]) groups[key] = new Array(DAYS).fill(0);
-      b.daily.forEach((c, i) => groups[key][i] += c * factor);
+      b.daily.forEach((c, i) => groups[key][i] += c * factor * (1 - cdCreditFraction()));
     });
-    Object.keys(groups).forEach(k => { groups[k] = groups[k].map(v => Math.round(v)); });
+    Object.keys(groups).forEach(k => { groups[k] = groups[k].map(v => Math.round(v * 1e6) / 1e6); });
     return { dim, groups };
   }
 
@@ -2612,12 +2737,12 @@ function aggregate(filtered) {
   // Distribute total daily cost across categories using deterministic weights
   const totalDaily = new Array(DAYS).fill(0);
   filtered.forEach(b => {
-    b.daily.forEach((c, i) => totalDaily[i] += c * factor);
+    b.daily.forEach((c, i) => totalDaily[i] += c * factor * (1 - cdCreditFraction()));
   });
   const weights = distributeWeights(nativeDim + categories.join('|'), categories.length);
   const groups = {};
   categories.forEach((cat, idx) => {
-    groups[cat] = totalDaily.map(v => Math.round(v * weights[idx]));
+    groups[cat] = totalDaily.map(v => v * weights[idx]);
   });
   return { dim: nativeDim, groups };
 }
@@ -2671,7 +2796,7 @@ function rollupByGranularity(groups, granularity) {
       const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}`;
       if (!(key in monthMap)) {
         monthMap[key] = monthOrder.length;
-        monthOrder.push({ key, label: d.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' }) });
+        monthOrder.push({ key, label: d.toLocaleDateString('en-GB', { month: 'short' }) + '. ' + d.getFullYear() });
       }
     }
     const labels = monthOrder.map(m => m.label);
@@ -2744,6 +2869,7 @@ function toggleChartLegend() {
 }
 
 function renderChart() {
+  document.getElementById('cost-trend-chart').style.height=noCostMode?'180px':'420px';chart.resize();
   const filtered = getFilteredBuckets();
   const agg = aggregate(filtered);
 
@@ -2779,6 +2905,8 @@ function renderChart() {
   const granularity = singleSelectData.granularity.current;
   const rolled = rollupByGranularity(agg.groups, granularity);
   const xLabels = rolled.labels;
+  const rate = cdRate();   // X-9r3 FA2：換算後的資料（K）
+  const rolledGroups = {}; Object.keys(rolled.groups).forEach(k => { rolledGroups[k] = rolled.groups[k].map(v => v * rate); });
 
   // Adjust bar width per granularity (less data points → wider bar)
   const barWidth = granularity === 'Month' ? 60 : (granularity === 'Week' ? 40 : 26);
@@ -2787,7 +2915,7 @@ function renderChart() {
     name,
     type: 'bar',
     stack: 'cost',
-    data: rolled.groups[name],
+    data: rolledGroups[name],
     itemStyle: { color: colorFor(name, idx) },
     barMaxWidth: barWidth,
     emphasis: {
@@ -2797,8 +2925,8 @@ function renderChart() {
     blur: { itemStyle: { opacity: 0.25 } },
   }));
 
-  const totalCost = sortedKeys.reduce((s, k) => s + agg.groups[k].reduce((x, y) => x + y, 0), 0);
-  const untaggedCost = agg.groups['Untagged'] ? agg.groups['Untagged'].reduce((x, y) => x + y, 0) : 0;
+  const totalCost = sortedKeys.reduce((s, k) => s + agg.groups[k].reduce((x, y) => x + y, 0), 0) * rate;
+  const untaggedCost = (agg.groups['Untagged'] ? agg.groups['Untagged'].reduce((x, y) => x + y, 0) : 0) * rate;
   const untaggedPct = totalCost > 0 ? (untaggedCost / totalCost * 100).toFixed(1) : 0;
 
   chart.clear();
@@ -2842,12 +2970,14 @@ function renderChart() {
           html += `<div style="display:flex; align-items:center; gap:8px; margin:2px 0; min-width:0;">
             <span style="width:8px; height:8px; border-radius:50%; background:${p.color}; flex-shrink:0; display:inline-block;"></span>
             <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; ${nameStyle}" data-tip="${String(fmtMetaValueText(p.seriesName)).replace(/"/g, '&quot;')}">${fmtMetaValueText(p.seriesName)}</span>
-            <strong style="color:#262626; flex-shrink:0;">$${p.value.toLocaleString()}K</strong>
+            <strong style="color:#262626; flex-shrink:0;">${cdSym()}${formatCostAmount(p.value * 1000)}</strong>
           </div>`;
         });
+        /* X-9r3 R7：金額走全站縮寫規則 formatCostAmount（十萬以上 K／M／B 兩位小數，未達門檻千分位），不再手寫 `…K`（資料單位是 K，所以先 ×1000） */
         html += `<div style="margin-top:8px; padding-top:8px; border-top:1px solid #E6E6E6; display:flex; justify-content:space-between;">
-          <strong style="color:#262626;">Total</strong><strong style="color:#262626;">$${total.toLocaleString()}K</strong>
+          <strong style="color:#262626;">Total</strong><strong style="color:#262626;">${cdSym()}${formatCostAmount(total * 1000)}</strong>
         </div>`;
+        if(hasCreditSelected())html+=`<div style="margin-top:8px;color:#676767">Include Credits: ${cdSym()}${formatCostAmount((cdCreditByPeriod()[params[0].dataIndex]||0)*1000)}</div>`;
         return html;
       }
     },
@@ -2858,11 +2988,11 @@ function renderChart() {
     xAxis: {
       type: 'category', data: xLabels,
       axisLine: { lineStyle: { color: '#DCE3EC' } },
-      axisLabel: { color: '#676767', fontFamily: 'Noto Sans', fontSize: 11, rotate: granularity === 'Month' ? 0 : 45 },
+      axisLabel: { color: '#676767', fontFamily: 'Noto Sans', fontSize: 12, rotate: granularity === 'Month' ? 0 : 45 },
     },
     yAxis: {
-      type: 'value',
-      axisLabel: { color: '#676767', fontFamily: 'Noto Sans', fontSize: 11, formatter: '${value}K' },
+      type: 'value', name:singleSelectData.currency.current, nameGap:10, nameTextStyle:{color:'#999',fontSize:12,align:'left'},
+      axisLabel: { color: '#676767', fontFamily: 'Noto Sans', fontSize: 12, formatter: (v) => cdAxisLabel(v * 1000) },   // X-9r3 B7：Y 軸不帶幣別符號、單位大寫（OV 同）
       splitLine: { lineStyle: { color: '#EEF1F5' } },
     },
     series,
@@ -2872,7 +3002,7 @@ function renderChart() {
   // totalCost 單位是 K，所以乘以 1000 得到實際金額
   const totalCostEl = document.getElementById('total-cost');
   const actualTotal = totalCost * 1000;
-  totalCostEl.innerHTML = `${actualTotal === 0 ? '$0.00' : formatCostAmount(actualTotal)}<span class="unit cur-val">${singleSelectData.currency.current}</span>`;
+  totalCostEl.innerHTML = `${actualTotal === 0 ? cdSym() + '0.00' : formatCostAmount(actualTotal)}<span class="unit cur-val">${singleSelectData.currency.current}</span>`;
   const fullTotalCost = actualTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const tipEl = document.getElementById('total-cost-tooltip');
   if (tipEl) tipEl.textContent = `${fullTotalCost} ${singleSelectData.currency.current}`;
@@ -2881,7 +3011,14 @@ function renderChart() {
   renderHtmlLegend(sortedKeys);
 
   // Update Cost Details table — pass rolled (granularity-aware) data + xLabels
-  renderDetailsTable(agg.dim, sortedKeys, rolled.groups, totalCost, xLabels);
+  const creditAmt = document.getElementById('credit-amount');
+  if (creditAmt) creditAmt.textContent = (cdCreditByPeriod().reduce((a,b)=>a+b,0)*1000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  /* X-9r3 FA22（C-C5）：圖表替代文字（由資料組出） */
+  const trendEl = document.getElementById('cost-trend-chart');
+  if (trendEl) { trendEl.setAttribute('role', 'img'); trendEl.setAttribute('aria-label', `Cost Trend, grouped by ${groupByKey}, ${granularity}. Total cost ${cdSym()}${cdFmtK(actualTotal)} ${singleSelectData.currency.current}. Largest groups: ${sortedKeys.slice(0, 3).map(k => `${k} ${cdSym()}${cdFmtK(rolledGroups[k].reduce((a, b) => a + b, 0) * 1000)}`).join(', ')}.`); }
+  renderDetailsTable(agg.dim, sortedKeys, rolledGroups, totalCost, xLabels);
+  const delta = document.getElementById('delta'); delta.textContent = noCostMode ? '→ 0.00%' : '↗ 7.08%'; delta.style.color = noCostMode ? '#676767' : '#FF403D';
+  if (noCostMode) chart.setOption({yAxis:{min:0,max:0.1,interval:0.05}});
 }
 
 window.addEventListener('resize', () => chart.resize());
@@ -2889,6 +3026,7 @@ window.addEventListener('resize', () => chart.resize());
 // =================================================================
 // COST DETAILS TABLE
 // =================================================================
+function cdExportCSV(){const table=document.querySelector('#cost-details-card table');const rows=[...table.rows].map(r=>[...r.cells].map(c=>'"'+c.innerText.trim().replaceAll('"','""')+'"').join(','));const blob=new Blob(['\uFEFF'+rows.join('\r\n')],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`cost-dashboard-${currentCSP}-${singleSelectData.currency.current}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function renderDetailsTable(dim, sortedKeys, groups, totalCost, xLabels) {
   const isFocus = (dim || '').includes('FOCUS');
   const isLumiTag = groupByKey.startsWith('LumiTag: ');
@@ -2910,10 +3048,10 @@ function renderDetailsTable(dim, sortedKeys, groups, totalCost, xLabels) {
   // Rebuild thead so column count matches granularity (Day=30 / Week=5 / Month=1~2)
   const thead = document.getElementById('details-thead');
   if (thead && xLabels) {
-    let theadHtml = `<th id="details-dim">${titleHtml}</th>
-      <th class="num">Total Cost</th>`;
+    let theadHtml = `<th id="details-dim" scope="col">${titleHtml}</th>
+      <th class="num" scope="col">Total Cost</th>`;
     xLabels.forEach(lbl => {
-      theadHtml += `<th class="num">${lbl}</th>`;
+      theadHtml += `<th class="num" scope="col">${lbl}</th>`;
     });
     thead.innerHTML = theadHtml;
   } else {
@@ -2931,7 +3069,7 @@ function renderDetailsTable(dim, sortedKeys, groups, totalCost, xLabels) {
     // 顯示文字（含 Label:/Tag: 前綴 by groupBy context）
     const displayName = fmtMetaValueText(name);
     // 完整未縮寫金額 — 給 hover title 用（per 設計 #01-1：縮寫值 hover 顯示原值）
-    const fullTotal = `$${(total * 1000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const fullTotal = `${cdSym()}${(total * 1000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;   // X-9r3 FA2：groups 已是顯示幣別
     // Meta cell hover popover（per 設計 #08-2 / #15-2）— 僅在 Tag/Label/LumiTag context 才顯示
     // FOCUS 'Other charges' 雖然是 meta，但**不顯示** explainer（per Kabin 2026-05-14 確認）
     let metaTooltipHtml = '';
@@ -2953,38 +3091,29 @@ function renderDetailsTable(dim, sortedKeys, groups, totalCost, xLabels) {
     }
     html += `<tr class="${isMeta ? 'untagged' : ''}">
       <td class="${isMeta ? 'meta-cell' : ''}"${isMeta ? '' : ` data-tip="${displayName.replace(/"/g, '&quot;')}"`}>
-        <span class="legend-dot" style="background:${color};"></span>
         ${displayName}
-        <span style="color:#B0B7C0; font-size:11px; margin-left:6px;">${pct}%</span>
         ${metaTooltipHtml}
       </td>
-      <td class="num" data-tip="${fullTotal}">$${formatCostAmount(total * 1000)}</td>
-      ${data.map(v => `<td class="num" data-tip="$${(v * 1000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}">$${formatCostAmount(v * 1000)}</td>`).join('')}
+      <td class="num" data-tip="${fullTotal}">${cdSym()}${formatCostAmount(total * 1000)}</td>
+      ${data.map(v => `<td class="num" data-tip="${cdSym()}${(v * 1000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}">${cdSym()}${formatCostAmount(v * 1000)}</td>`).join('')}
     </tr>`;
   });
-  // Total row — fill all columns with em dash for visual consistency
+  // C-3：每個時間欄由同一份顯示資料加總。
   const colCount = (xLabels || []).length;
   html += `<tr class="total-row">
-    <td>Total</td><td class="num">$${formatCostAmount(totalCost * 1000)}</td>
-    ${Array.from({length: colCount}, () => '<td class="num">—</td>').join('')}
+    <td>Total</td><td class="num">${cdSym()}${formatCostAmount(totalCost * 1000)}</td>
+    ${Array.from({length: colCount}, (_, i) => `<td class="num">${cdSym()}${formatCostAmount(sortedKeys.reduce((sum, key) => sum + (groups[key][i] || 0), 0) * 1000)}</td>`).join('')}
   </tr>`;
   // Include Credits sub-row — 只在使用者實際選 credit 時顯示（per 設計 #01-6）
   if (hasCreditSelected()) {
-    const creditCells = (xLabels || []).map((_, i) => {
-      // Mock daily credit amount — first 3 cells have value, rest em dash
-      if (i < 3) {
-        const val = [999.00, 94.65, 0.00][i];
-        return `<td class="num" style="color:#676767;">$${val.toFixed(2)}</td>`;
-      }
-      return '<td class="num" style="color:#676767;">—</td>';
-    }).join('');
-    html += `<tr class="credit-row">
-      <td style="padding-left:32px; color:#676767; font-size:13px;">Include Credits</td>
-      <td class="num" style="color:#676767;">$999.00</td>
-      ${creditCells}
-    </tr>`;
+    const creditValues = cdCreditByPeriod();
+    const creditCells = creditValues.map(v=>`<td class="num">${cdSym()}${formatCostAmount(v*1000)}</td>`).join('');
+    html += `<tr class="credit-row"><td>Include Credits</td><td class="num">${cdSym()}${formatCostAmount(creditValues.reduce((a,b)=>a+b,0)*1000)}</td>${creditCells}</tr>`;
   }
+
   tbody.innerHTML = html;
+  const creditShown=hasCreditSelected();document.querySelector('.table-wrap').classList.toggle('has-credit',creditShown);
+  document.getElementById('cd-group-disclaimer').hidden=groupByKey!=='Group';
   // 更新表格上方的 "Learn More About 'XXX'" link（依當前 group by + CSP）
   updateMetaLearnMore();
 }
@@ -3115,6 +3244,7 @@ function renderLumiTagList(filterText = '') {
 }
 
 function toggleLumiTagDropdown(e) {
+  if(document.body.classList.contains('no-auth-mode')){cdNoAuthDropdown(e,document.getElementById('lumitag-select'));return;}
   e.stopPropagation();
   const dropdown = document.getElementById('lumitag-dropdown');
   const select = document.getElementById('lumitag-select');
@@ -3335,9 +3465,9 @@ function isDefaultConfig() {
     if (groupByKey !== 'Organization') return false;
     if (lumiTagDimensions.some(d => lumiTagState[d].checked.size > 0)) return false;
     if (Object.keys(labelHierState.label).some(k => labelHierState.label[k].checked.size > 0)) return false;
-    if (currentCSP === 'cross' && singleSelectData.credit.current !== 'OFF') return false;
+    if (currentCSP === 'cross' && singleSelectData.credit.current !== 'ON') return false;
     for (const k of Object.keys(filterSelectedState)) {
-      if (k === 'credit') { if (currentCSP !== 'cross' && filterSelectedState.credit && filterSelectedState.credit.size > 0) return false; continue; }
+      if (k === 'credit') { if (currentCSP !== 'cross' && filterSelectedState.credit && filterSelectedState.credit.size !== creditItemsByCsp[currentCSP].length) return false; continue; }
       const cur = filterSelectedState[k]; if (!cur || typeof cur.size !== 'number') continue;
       const def = new Set((filterMockData[k] && filterMockData[k].default) || []);
       if (cur.size !== def.size || [...cur].some(v => !def.has(v))) return false;
@@ -3345,7 +3475,7 @@ function isDefaultConfig() {
     return true;
   } catch (e) { return false; }
 }
-function updateResetState() { const b = document.getElementById('reset-btn'); if (b) b.disabled = isDefaultConfig(); }
+function updateResetState() { const b = document.getElementById('reset-btn'); if (b) b.disabled = isDefaultConfig() || document.body.classList.contains('no-auth-mode') || document.body.classList.contains('skeleton-mode'); }
 
 function applyChanges(opts = {}) {
   updateLumiTagSummary();
@@ -3360,7 +3490,7 @@ function applyChanges(opts = {}) {
   }
 }
 
-function resetAll() {
+function resetAll(silent = false) {
   // 0. Demo flags
   highCardinalityMode = false;
   filterLoading = false;
@@ -3375,7 +3505,7 @@ function resetAll() {
   document.getElementById('groupby-pill').innerHTML = fmtGroupByLabel('Organization');
   groupBySecondaryKey = null;
   // 3. Filter selections (multi-select fields: Project / Service Category / SKU)
-  Object.keys(filterSelectedState).forEach(k => filterSelectedState[k]?.clear());
+  Object.keys(filterSelectedState).forEach(k => {const v=filterSelectedState[k];if(v instanceof Set)v.clear();else if(v){v.values={};v._expandedKey=null;}});
   // 3b. Label hier filter
   Object.keys(labelHierState.label).forEach(k => labelHierState.label[k]?.checked.clear());
   // Re-init defaults
@@ -3393,14 +3523,14 @@ function resetAll() {
   setCurrency('USD');
   document.querySelectorAll('.field[data-filter="granularity"] .select span:first-child').forEach(el => el.textContent = 'Day');
   // Credit reset：兩種模式都要清
-  singleSelectData.credit.current = 'OFF'; // Cross Cloud 預設 OFF
-  if (filterSelectedState.credit) filterSelectedState.credit.clear(); // 其他 CSP 多選清空
+  singleSelectData.credit.current = 'ON'; // C-3：Cross Cloud 依 #30 預設 ON
+  filterSelectedState.credit = new Set(currentCSP === 'cross' ? [] : creditItemsByCsp[currentCSP]);
   renderAdjustmentCredit(); // 重新渲染依當前 CSP 套對的 UI
   setDateRange('Last 30 days');
   // 5. Re-render
   renderLumiTagList();
   // Re-render filter UI for current CSP
-  switchCSP(currentCSP); // Refresh filter dropdowns
+  renderNativeFilters(); renderGroupByList(); // 同一雲也刷新顯示值
 
   applyChanges({ fromScenario: true });
   // Reset returns to "Default" demo state
@@ -3408,13 +3538,15 @@ function resetAll() {
   setActiveDemoBtn(defaultBtn);
   setExplainer('default');
   document.getElementById('reset-btn').disabled = true;
-  showToast('Dashboard reset to default settings.');
+  if (!silent) showToast('Dashboard reset to default settings.');
 }
 
-function showToast(msg) {
+function showToast(msg, kind) {
   const m = msg || 'Dashboard configuration applied successfully.';
-  const isErr = /^(Please select both|Start date must be)/.test(m);   // 驗證失敗用錯誤色，其餘都是成功
-  LumitureToast.show({ kind: isErr ? 'error' : 'success', message: m });
+  const isErr = /^(Please select both|Start date must be)/.test(m);   // 驗證失敗用錯誤色
+  /* X-9r3 FA11（A23，X-9r1 #20／X-9r2 #9 同規則）：Demo 切換與操作說明用 info 藍，真正的結果回饋（套用、重設、釘選）才是成功綠 */
+  const isInfo = kind === 'info' || /^(Switched to |LumiTag options loaded|Set \S+ to |Group By |Selected (Label|Tag) Key|Date range updated|「|Mock:)/.test(m);
+  LumitureToast.show({ kind: kind || (isErr ? 'error' : (isInfo ? 'info' : 'success')), message: m });
 }
 
 // AI NOTIFICATION — rich card (3 states: in-progress / completed / failed)
@@ -3512,6 +3644,8 @@ function toggleConfigPanel() {
   main.classList.toggle('config-collapsed');
   // Sync toggle button: active when panel is open, normal when collapsed
   if (btn) btn.classList.toggle('active', !panel.classList.contains('collapsed'));
+  /* X-9r3 FA24：兩顆收合鈕的 aria-expanded 跟著面板狀態 */
+  document.querySelectorAll('#config-toggle-btn, .config-header button').forEach(b => b.setAttribute('aria-expanded', panel.classList.contains('collapsed') ? 'false' : 'true'));
   // Resize chart after transition
   setTimeout(() => { if (chart) chart.resize(); }, 280);
 }
@@ -3522,9 +3656,10 @@ function toggleConfigPanel() {
 function switchCSP(csp) {
   if (currentCSP === csp) return;
   currentCSP = csp;
+  document.body.classList.toggle("cross-cloud", csp === "cross");
   // Update tab UI
   document.querySelectorAll('.tab[data-csp]').forEach(t => {
-    t.classList.toggle('active', t.dataset.csp === csp);
+    t.classList.toggle('active', t.dataset.csp === csp); t.setAttribute('aria-selected', String(t.dataset.csp === csp)); t.tabIndex = t.dataset.csp === csp ? 0 : -1;
   });
 
   // Cross Cloud 不支援 LumiTag（per PRD §3 工程回饋 2026-05-11）：
@@ -3540,11 +3675,12 @@ function switchCSP(csp) {
   const isLumiTag = groupByKey.startsWith('LumiTag: ');
   const lumiTagAllowed = csp !== 'cross';
   if ((isLumiTag && !lumiTagAllowed) || (!isLumiTag && !validNative.includes(groupByKey))) {
-    groupByKey = (csp === 'cross') ? 'Organization' : 'LumiTag: Department';
+    groupByKey = 'Organization';
     document.getElementById('groupby-summary').textContent = displayGroupBy(groupByKey);
     document.getElementById('groupby-pill').innerHTML = fmtGroupByLabel(groupByKey);
   }
-  // Re-render chart (factor changes per CSP)
+  // C-3：先更新該雲 Credit，再重畫，以免切雲首幀仍用上一雲的選擇。
+  renderAdjustmentCredit();
   renderChart();
   // "Include Credits" sub-line — 只在使用者實際選 credit 時顯示（per 設計 #01-6）
   updateCreditLineVisibility();
@@ -3611,11 +3747,11 @@ function renderAdjustmentCredit() {
   const csp = currentCSP;
 
   if (csp === 'cross') {
-    // Cross Cloud: ON / OFF 單選，預設 OFF
+    // Cross Cloud: ON / OFF 單選，預設 ON（C-3 #30）
     singleSelectData.credit = {
       items: ['ON', 'OFF'],
       current: (singleSelectData.credit && (singleSelectData.credit.current === 'ON' || singleSelectData.credit.current === 'OFF'))
-        ? singleSelectData.credit.current : 'OFF',
+        ? singleSelectData.credit.current : 'ON',
     };
     host.innerHTML = `
       <div class="field" data-filter="credit" data-field-id="credit">
@@ -3624,11 +3760,12 @@ function renderAdjustmentCredit() {
           <span class="selected-count">${singleSelectData.credit.current}</span>
           <span class="material-symbols-outlined arrow">arrow_drop_down</span>
         </div>
-        <div class="field-caption" style="margin-top:6px;">Turn ON to deduct credits across all CSPs from the displayed total cost.</div>
+        <div class="field-caption" style="margin-top:6px;">When you select Credit, the amount will be deducted from the total cost, and the deducted Credit amount will be displayed.</div>
       </div>`;
   } else {
     // GCP / AWS / Azure: multi-select with per-CSP items
     filterMockData.credit.items = creditItemsByCsp[csp] || [];
+    if (window.cdCreditCsp !== csp) { filterSelectedState.credit = new Set(filterMockData.credit.items); window.cdCreditCsp = csp; }
     // 清掉切 CSP 後不再有效的選項
     const stateSet = filterSelectedState.credit;
     if (stateSet instanceof Set) {
@@ -3642,7 +3779,7 @@ function renderAdjustmentCredit() {
           <span class="selected-count" id="filter-summary-credit">Select Credits</span>
           <span class="material-symbols-outlined arrow">arrow_drop_down</span>
         </div>
-        <div class="field-caption" style="margin-top:6px;">When you select Credits, the amount will be deducted from the total cost, and the deducted Credit amount will be displayed.</div>
+        <div class="field-caption" style="margin-top:6px;">When you select Credit, the amount will be deducted from the total cost, and the deducted Credit amount will be displayed.</div>
       </div>`;
     updateMockFilterSummary('credit', 'Select Credits');
   }
@@ -3956,6 +4093,7 @@ function applyScenario(scenario, btn) {
 // Page state overlay (Skeleton / No Data / No Auth)
 function enterPageState(state) {
   const cards = document.querySelectorAll('.content .card');
+  if(state==='no-auth'){Object.keys(filterSelectedState).forEach(k=>{if(filterSelectedState[k] instanceof Set)filterSelectedState[k].clear();});renderNativeFilters();updateMockFilterSummary('credit','All Credits');}
   cards.forEach(c => c.style.display = 'none');
 
   // Create or reuse overlay container, insert before first card
@@ -3964,13 +4102,16 @@ function enterPageState(state) {
     overlay = document.createElement('div');
     overlay.id = 'page-state-overlay';
     overlay.style.cssText = 'padding:0; display:flex; flex-direction:column; gap:16px;';
-    if (cards[0]) cards[0].parentNode.insertBefore(overlay, cards[0]);
+    document.querySelector('.content').insertBefore(overlay, document.querySelector('.cost-data-card'));
   }
   overlay.innerHTML = '';
 
   if (state === 'skeleton') {
     // per 設計 #01-6（`2188:85391`）：讀取中不能操作的元件呈 Disabled；卡片標題、時間、Period 照常，內容換成圖表形狀的 skeleton（靜態、色 --lt-color-bg-skeleton，shared .lt-skeleton）
     document.body.classList.add('skeleton-mode');
+    /* X-9r3 FA16（A31）：讀取中不能操作的元件真的 disabled（稿 #01-6），不只擋 pointer-events */
+    const cb = document.getElementById('currency-btn'); if (cb) cb.disabled = true;
+    const hb = document.getElementById('history-link-btn'); if (hb) hb.disabled = true;
     const skb = (w, h, st = '') => `<span class="lt-skeleton" style="display:block;width:${w};height:${h}px;${st}"></span>`;
     const hs = [8, 14, 30, 58, 26, 22, 66, 70, 24, 40, 75, 50, 30, 18, 55, 62, 72, 48, 20, 44, 78, 52, 36, 16, 60, 64, 22, 68, 40, 20];
     const bars = hs.map(p => `<span class="lt-skeleton" style="flex:1;height:${p}%;border-radius:2px 2px 0 0"></span>`).join('');
@@ -3980,10 +4121,10 @@ function enterPageState(state) {
     overlay.innerHTML = `
       <div class="card ai-insight" style="padding:24px;"><div class="ai-insight-row" style="display:flex;align-items:center;justify-content:space-between;gap:24px;">
         <div style="flex:1;display:flex;flex-direction:column;gap:12px;">${skb('200px', 14)}${skb('100%', 12)}</div>${skb('120px', 36, 'border-radius:5px')}</div></div>
-      <div class="card" id="cost-trend-card-sk">
+      <div class="cd-skeleton-data"><div class="card" id="cost-trend-card-sk">
         <div class="cost-trend-header"><div><div class="card-title" style="margin-bottom:8px;">Cost Trend</div>
           <div class="cost-summary"><span class="label">Total Cost</span>${skb('200px', 28, 'margin-top:4px')}</div></div>
-          <div class="cost-trend-meta"><div>Last Updated: 28/09/2035 09:00</div><div>Period: 28 Aug, 2035 - 26 Sep, 2035</div></div></div>
+          <div class="cost-trend-meta"><div class="cd-update-row">Last Updated 28/09/2035 09:00 &nbsp; Next Update 28/09/2035 15:00 (UTC+0)</div><div class="cd-period">Period: 28 Aug. 2035 - 26 Sep. 2035</div></div></div>
         <div style="display:flex;gap:12px;height:380px;margin-top:8px;">
           <div style="display:flex;flex-direction:column;justify-content:space-between;padding:4px 0 28px;">${yt}</div>
           <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;">
@@ -3992,13 +4133,13 @@ function enterPageState(state) {
         <div style="display:flex;flex-direction:column;gap:8px;margin-top:20px;">${legRow([140, 90, 140, 80, 140])}${legRow([80, 150, 80, 150, 80])}</div>
       </div>
       <div class="card">
-        <div class="cost-details-header"><div><div class="card-title">Cost Details</div><div class="card-meta" style="margin-top:4px;">Period: 28 Aug, 2035 - 26 Sep, 2035</div></div>
+        <div class="cost-details-header"><div><div class="card-title">Cost Details</div><div class="card-meta" style="margin-top:4px;">Period: 28 Aug. 2035 - 26 Sep. 2035</div></div>
           <button class="btn-secondary" disabled><span class="material-symbols-outlined">download</span>Download CSV</button></div>
         <div style="border:1px solid #E6E6E6;border-radius:5px;overflow:hidden;">
           <div style="display:flex;align-items:center;gap:24px;height:50px;padding:0 16px;background:#F2F2F2;">${skb('100px', 12)}<span style="flex:1"></span>${skb('50px', 12)}${skb('50px', 12)}${skb('50px', 12)}${skb('50px', 12)}</div>
           <div style="display:flex;align-items:center;gap:24px;height:50px;padding:0 16px;">${skb('240px', 12)}<span style="flex:1"></span>${skb('50px', 12)}${skb('50px', 12)}${skb('50px', 12)}${skb('50px', 12)}</div>
           <div style="display:flex;align-items:center;height:50px;padding:0 16px;background:#F2F2F2;">${skb('100px', 12)}</div></div>
-      </div>`;
+      </div></div>`;
   } else if (state === 'no-data') {
     // per 設計 #01-4：不隱藏 cards，改為 body class 切換 → CSS 讓每張卡 swap 內部 empty 區塊
     // AI Insight Center 改顯示 warning callout、Cost Trend / Cost Details 顯示 No Data Available
@@ -4007,19 +4148,19 @@ function enterPageState(state) {
     cards.forEach(c => c.style.display = '');
     document.body.classList.add('no-data-mode');
   } else if (state === 'no-auth') {
-    // 進入 no-auth：dim Filter / Adjustment / DatePicker / Reset（per 設計 #17 註記）
+    // C-3：未授權只停用日期與 Reset；Filter 保留空選單入口。
     document.body.classList.add('no-auth-mode');
     // A-19：icon／版型改用 shared LumitureEmpty（FILL 0、#9ED7FF、L 號）；原本的 sparkle 動畫與 FILL 1 實心鎖拿掉。A-16：說明段落不設 max-width
     const sharedTitle = 'Unlock the Potential of Your Cloud Data Today';
     if (userRole === 'admin') {
       // Admin / Owner — per 設計 #17：可前往「所有雲共用授權引導頁」
-      overlay.innerHTML = `<div class="card" style="padding:56px 24px;">${LumitureEmpty.html({ size: 'l', icon: 'lock_open', title: sharedTitle,
-        desc: "Begin your cloud cost optimization journey by authorizing your cloud account. You'll gain the flexibility to explore your organization's spending trends and details at various granularities. Group data by different dimensions and filter to focus on specific cost areas of interest. Easily identify cost-saving opportunities.",
-        action: { label: 'Add Your Authorization', onclick: "showToast('Mock: navigate to the shared authorization onboarding page')" } })}</div>`;
+      overlay.innerHTML = `<div class="card" style="padding:78px 24px;">${LumitureEmpty.html({ size: 'l', iconHtml: '<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzBfNTApIj4KPHBhdGggZD0iTTIzLjY0MTIgOC40NDE5MkMyNC4wMzczIDguODEwODggMjQuMjg4OCA5LjMyNTkyIDI0LjI5ODggOS45MDA2NEwyNC40MTI2IDE1LjMyOTdDMjQuNDM2NyAxNi40NzkxIDIzLjQ5NTkgMTcuNDI5NiAyMi4zMTEyIDE3LjQ1MjlDMjEuMTI2NCAxNy40NzYxIDIwLjE0NjYgMTYuNTYzMyAyMC4xMjI1IDE1LjQxNEwyMC4wMDg3IDkuOTg0OTJDMTkuOTg0NiA4LjgzNTU2IDIwLjkyNTQgNy44ODUwNCAyMi4xMTAxIDcuODYxNzdDMjIuNzA0NSA3Ljg1MDA5IDIzLjI0NTIgOC4wNzI5NyAyMy42NDEyIDguNDQxOTJaTTE1Ljk0NTEgMTYuMDY0NEwxMi4wMTUzIDEyLjQwMzVDMTEuMTgzOSAxMS42MjkxIDkuODY5MjggMTEuNjQ3MSA5LjA4MDgxIDEyLjQ0MzdDOC4yOTIzNCAxMy4yNDAzIDguMzI3MTQgMTQuNTE1NCA5LjE1ODQ5IDE1LjI4OTlMMTMuMDg4MyAxOC45NTA3QzEzLjkxOTcgMTkuNzI1MiAxNS4yMzQzIDE5LjcwNzIgMTYuMDIyOCAxOC45MTA1QzE2LjgxMTIgMTguMTEzOSAxNi43NzY0IDE2LjgzODggMTUuOTQ1MSAxNi4wNjQ0Wk0yMC42MjE3IDU5LjY2MjRDMTguOTAxNiA1OS4yMTUyIDE3LjYxNzggNTguMjY1NCAxNi43NzAyIDU2LjgxMjlDMTUuOTIxMSA1NS4zNjAxIDE1LjcyMTkgNTMuODE3OCAxNi4xNzI1IDUyLjE4NjFMMjIuMTE4MiAzMC42NTlDMjIuNTY4OCAyOS4wMjczIDIzLjUzNjIgMjcuNzg4MyAyNS4wMjA0IDI2Ljk0MkMyNi41MDMgMjYuMDk1MiAyOC4xMDQzIDI1Ljg5NTQgMjkuODI0NCAyNi4zNDI2TDQ5LjAzMjQgMzEuMzM1N0w1MC4wMTU3IDI3Ljc3NTdDNTAuNDc2NiAyNi4xMDY5IDUwLjI5NCAyNC41Nzg1IDQ5LjQ2OCAyMy4xOTA1QzQ4LjY0MyAyMS44MDQzIDQ3LjQwODcgMjAuODk3NiA0NS43NjUxIDIwLjQ3MDNDNDQuNDI3MiAyMC4xMjI1IDQzLjE4OTkgMjAuMTg4IDQyLjA1MzEgMjAuNjY2OEM0MC45MTc0IDIxLjE0NzQgMzkuOTUyNiAyMS44NjA4IDM5LjE1ODcgMjIuODA3MUMzOC42MDIzIDIzLjMzODEgMzguMDI3MSAyMy43MTQ5IDM3LjQzMzEgMjMuOTM3MkMzNi44Mzg2IDI0LjE2MTEgMzYuMjU0NyAyNC4xOTg1IDM1LjY4MTQgMjQuMDQ5NUMzNC42NDkzIDIzLjc4MTIgMzMuOTIyMyAyMy4yMjQxIDMzLjUwMDQgMjIuMzc4NEMzMy4wNzgxIDIxLjUzNDEgMzMuMTcyMSAyMC42NzQ2IDMzLjc4MjQgMTkuNzk5OEMzNS4xNjQyIDE3LjYxNTIgMzcuMDk5OCAxNi4wMjE0IDM5LjU4OTIgMTUuMDE4MkM0Mi4wNzgyIDE0LjAxNjYgNDQuNjc5NiAxMy44Njg1IDQ3LjM5MzYgMTQuNTc0QzUwLjcxOTIgMTUuNDM4NSA1My4yMjg5IDE3LjI5MjggNTQuOTIyOCAyMC4xMzdDNTYuNjE0OCAyMi45ODIzIDU3LjAwNSAyNi4wNTUxIDU2LjA5MzQgMjkuMzU1Nkw1NS4xMTAyIDMyLjkxNTZMNTYuNTQzNiAzMy4yODgzQzU4LjI2MzcgMzMuNzM1NCA1OS41NDc1IDM0LjY4NTIgNjAuMzk1MSAzNi4xMzc3QzYxLjI0NDIgMzcuNTkwNSA2MS40NDM1IDM5LjEzMjggNjAuOTkyOCA0MC43NjQ1TDU1LjA0NzEgNjIuMjkxNkM1NC41OTY1IDYzLjkyMzMgNTMuNjI5MSA2NS4xNjIzIDUyLjE0NSA2Ni4wMDg2QzUwLjY2MjMgNjYuODU1NCA0OS4wNjEgNjcuMDU1MiA0Ny4zNDA5IDY2LjYwOEwyMC42MjE3IDU5LjY2MjRaTTM3LjM2MTMgNTAuODk3NUMzOC42MjI3IDUxLjIyNTQgMzkuODIzMiA1MS4wNzA5IDQwLjk2MjcgNTAuNDMzOUM0Mi4xMDExIDQ5Ljc5NSA0Mi44MzkzIDQ4Ljg2MzYgNDMuMTc3MyA0Ny42Mzk5QzQzLjUxNTMgNDYuNDE2MSA0My4zNTYgNDUuMjUxNSA0Mi42OTk0IDQ0LjE0NkM0Mi4wNDA4IDQzLjA0MTUgNDEuMDgwOCA0Mi4zMjUzIDM5LjgxOTQgNDEuOTk3NEMzOC41NTggNDEuNjY5NSAzNy4zNTgzIDQxLjgyNDMgMzYuMjIwMyA0Mi40NjE3QzM1LjA4MDMgNDMuMTAwMiAzNC4zNDE0IDQ0LjAzMTMgMzQuMDAzNCA0NS4yNTUxQzMzLjY2NTQgNDYuNDc4OSAzMy44MjU0IDQ3LjY0MzcgMzQuNDgzNiA0OC43NDk2QzM1LjE0MDYgNDkuODUzNyAzNi4wOTk4IDUwLjU2OTYgMzcuMzYxMyA1MC44OTc1Wk0xNC4xMTc4IDIzLjYwOTJDMTQuNTEzOCAyMy45NzgyIDE0Ljc2NTMgMjQuNDkzMiAxNC43NzUzIDI1LjA2NzlDMTQuNzk5NCAyNi4yMTczIDEzLjg1ODYgMjcuMTY3OCAxMi42NzM5IDI3LjE5MTFMNy4wNzc4IDI3LjMwMUM1Ljg5MzA3IDI3LjMyNDMgNC45MTMyMiAyNi40MTE1IDQuODg5MTIgMjUuMjYyMUM0Ljg2NTAzIDI0LjExMjggNS44MDU4MiAyMy4xNjIzIDYuOTkwNTUgMjMuMTM5TDEyLjU4NjcgMjMuMDI5MUMxMy4xNzkxIDIzLjAxOTQgMTMuNzIxNyAyMy4yNDAzIDE0LjExNzggMjMuNjA5MlpNNzAuODcwOSA2Ni4xOTk5TDc2LjUyMjYgNzEuNjgyOUM3Ni43MTU5IDcxLjg5MzggNzYuOTQ1MyA3MS45OTkyIDc3LjIxMSA3MS45OTkyQzc3LjQ3NjcgNzEuOTk5MiA3Ny43MDYxIDcxLjg5MzggNzcuODk5MyA3MS42ODI5TDc5LjY3NDYgNjkuOTYwN0M3OS44OTE5IDY5Ljc0OTggODAuMDAwNiA2OS41MjE2IDgwLjAwMDYgNjkuMjc2QzgwLjAwMDYgNjkuMDI5NSA3OS44OTE5IDY4LjgxMjUgNzkuNjc0NiA2OC42MjUxTDc0LjAyMjggNjMuMTQyMUw3Ni41OTUxIDYyLjI5ODVDNzcuMDU0IDYyLjEzNDUgNzcuMjc3NiA2MS44MjQzIDc3LjI2NjEgNjEuMzY3OEM3Ny4yNTM1IDYwLjkxMDQgNzcuMDE3OCA2MC42MTE0IDc2LjU1ODkgNjAuNDcwOUw2Ni4yNjk4IDU3LjQ4MzNDNjUuOTA3NSA1Ny4zODk2IDY1LjU4NzcgNTcuNDc3MiA2NS4zMTA0IDU3Ljc0NjJDNjUuMDMyMiA1OC4wMTYyIDY0Ljk0MTQgNTguMzI2OSA2NS4wMzggNTguNjc4M0w2OC4xMTc1IDY4LjY2MDJDNjguMjYyNCA2OS4xMDU0IDY4LjU3MDYgNjkuMzM0MSA2OS4wNDIgNjkuMzQ2M0M2OS41MTI1IDY5LjM1NzUgNjkuODMyMyA2OS4xNDA2IDcwLjAwMTQgNjguNjk1NEw3MC44NzA5IDY2LjE5OTlaIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZmlsbD0iIzlFRDdGRiIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzBfNTAiPgo8cmVjdCB3aWR0aD0iODAiIGhlaWdodD0iODAiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==" width="80" height="80" alt="">', title: sharedTitle,
+        desc: "Begin your cloud cost optimization journey by authorizing your cloud account. \n\nYou'll gain the flexibility to explore your organization's spending trends and details at various granularities.\nGroup data by different dimensions and filter to focus on specific cost areas of interest.\nEasily identify cost-saving opportunities.",
+        action: { label: 'Add Your Authorization', href: './organization-settings.html' } })}</div>`;   // X-9r3 FA4：真連結（OV、CB、AD 同）
     } else {
       // Viewer (T1/T2) — per 設計 #18：無 CTA，引導聯絡管理員
-      overlay.innerHTML = `<div class="card" style="padding:56px 24px;">${LumitureEmpty.html({ size: 'l', icon: 'lock_open', title: sharedTitle,
-        desc: "To kickstart your cloud cost optimization journey, please reach out to your organization's administrator for authorization.\n\nYou'll gain the flexibility to explore your organization's spending trends and details at various granularities. Group data by different dimensions and filter to focus on specific cost areas of interest. Easily identify cost-saving opportunities." })}</div>`;
+      overlay.innerHTML = `<div class="card" style="padding:78px 24px;">${LumitureEmpty.html({ size: 'l', iconHtml: '<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzBfNTApIj4KPHBhdGggZD0iTTIzLjY0MTIgOC40NDE5MkMyNC4wMzczIDguODEwODggMjQuMjg4OCA5LjMyNTkyIDI0LjI5ODggOS45MDA2NEwyNC40MTI2IDE1LjMyOTdDMjQuNDM2NyAxNi40NzkxIDIzLjQ5NTkgMTcuNDI5NiAyMi4zMTEyIDE3LjQ1MjlDMjEuMTI2NCAxNy40NzYxIDIwLjE0NjYgMTYuNTYzMyAyMC4xMjI1IDE1LjQxNEwyMC4wMDg3IDkuOTg0OTJDMTkuOTg0NiA4LjgzNTU2IDIwLjkyNTQgNy44ODUwNCAyMi4xMTAxIDcuODYxNzdDMjIuNzA0NSA3Ljg1MDA5IDIzLjI0NTIgOC4wNzI5NyAyMy42NDEyIDguNDQxOTJaTTE1Ljk0NTEgMTYuMDY0NEwxMi4wMTUzIDEyLjQwMzVDMTEuMTgzOSAxMS42MjkxIDkuODY5MjggMTEuNjQ3MSA5LjA4MDgxIDEyLjQ0MzdDOC4yOTIzNCAxMy4yNDAzIDguMzI3MTQgMTQuNTE1NCA5LjE1ODQ5IDE1LjI4OTlMMTMuMDg4MyAxOC45NTA3QzEzLjkxOTcgMTkuNzI1MiAxNS4yMzQzIDE5LjcwNzIgMTYuMDIyOCAxOC45MTA1QzE2LjgxMTIgMTguMTEzOSAxNi43NzY0IDE2LjgzODggMTUuOTQ1MSAxNi4wNjQ0Wk0yMC42MjE3IDU5LjY2MjRDMTguOTAxNiA1OS4yMTUyIDE3LjYxNzggNTguMjY1NCAxNi43NzAyIDU2LjgxMjlDMTUuOTIxMSA1NS4zNjAxIDE1LjcyMTkgNTMuODE3OCAxNi4xNzI1IDUyLjE4NjFMMjIuMTE4MiAzMC42NTlDMjIuNTY4OCAyOS4wMjczIDIzLjUzNjIgMjcuNzg4MyAyNS4wMjA0IDI2Ljk0MkMyNi41MDMgMjYuMDk1MiAyOC4xMDQzIDI1Ljg5NTQgMjkuODI0NCAyNi4zNDI2TDQ5LjAzMjQgMzEuMzM1N0w1MC4wMTU3IDI3Ljc3NTdDNTAuNDc2NiAyNi4xMDY5IDUwLjI5NCAyNC41Nzg1IDQ5LjQ2OCAyMy4xOTA1QzQ4LjY0MyAyMS44MDQzIDQ3LjQwODcgMjAuODk3NiA0NS43NjUxIDIwLjQ3MDNDNDQuNDI3MiAyMC4xMjI1IDQzLjE4OTkgMjAuMTg4IDQyLjA1MzEgMjAuNjY2OEM0MC45MTc0IDIxLjE0NzQgMzkuOTUyNiAyMS44NjA4IDM5LjE1ODcgMjIuODA3MUMzOC42MDIzIDIzLjMzODEgMzguMDI3MSAyMy43MTQ5IDM3LjQzMzEgMjMuOTM3MkMzNi44Mzg2IDI0LjE2MTEgMzYuMjU0NyAyNC4xOTg1IDM1LjY4MTQgMjQuMDQ5NUMzNC42NDkzIDIzLjc4MTIgMzMuOTIyMyAyMy4yMjQxIDMzLjUwMDQgMjIuMzc4NEMzMy4wNzgxIDIxLjUzNDEgMzMuMTcyMSAyMC42NzQ2IDMzLjc4MjQgMTkuNzk5OEMzNS4xNjQyIDE3LjYxNTIgMzcuMDk5OCAxNi4wMjE0IDM5LjU4OTIgMTUuMDE4MkM0Mi4wNzgyIDE0LjAxNjYgNDQuNjc5NiAxMy44Njg1IDQ3LjM5MzYgMTQuNTc0QzUwLjcxOTIgMTUuNDM4NSA1My4yMjg5IDE3LjI5MjggNTQuOTIyOCAyMC4xMzdDNTYuNjE0OCAyMi45ODIzIDU3LjAwNSAyNi4wNTUxIDU2LjA5MzQgMjkuMzU1Nkw1NS4xMTAyIDMyLjkxNTZMNTYuNTQzNiAzMy4yODgzQzU4LjI2MzcgMzMuNzM1NCA1OS41NDc1IDM0LjY4NTIgNjAuMzk1MSAzNi4xMzc3QzYxLjI0NDIgMzcuNTkwNSA2MS40NDM1IDM5LjEzMjggNjAuOTkyOCA0MC43NjQ1TDU1LjA0NzEgNjIuMjkxNkM1NC41OTY1IDYzLjkyMzMgNTMuNjI5MSA2NS4xNjIzIDUyLjE0NSA2Ni4wMDg2QzUwLjY2MjMgNjYuODU1NCA0OS4wNjEgNjcuMDU1MiA0Ny4zNDA5IDY2LjYwOEwyMC42MjE3IDU5LjY2MjRaTTM3LjM2MTMgNTAuODk3NUMzOC42MjI3IDUxLjIyNTQgMzkuODIzMiA1MS4wNzA5IDQwLjk2MjcgNTAuNDMzOUM0Mi4xMDExIDQ5Ljc5NSA0Mi44MzkzIDQ4Ljg2MzYgNDMuMTc3MyA0Ny42Mzk5QzQzLjUxNTMgNDYuNDE2MSA0My4zNTYgNDUuMjUxNSA0Mi42OTk0IDQ0LjE0NkM0Mi4wNDA4IDQzLjA0MTUgNDEuMDgwOCA0Mi4zMjUzIDM5LjgxOTQgNDEuOTk3NEMzOC41NTggNDEuNjY5NSAzNy4zNTgzIDQxLjgyNDMgMzYuMjIwMyA0Mi40NjE3QzM1LjA4MDMgNDMuMTAwMiAzNC4zNDE0IDQ0LjAzMTMgMzQuMDAzNCA0NS4yNTUxQzMzLjY2NTQgNDYuNDc4OSAzMy44MjU0IDQ3LjY0MzcgMzQuNDgzNiA0OC43NDk2QzM1LjE0MDYgNDkuODUzNyAzNi4wOTk4IDUwLjU2OTYgMzcuMzYxMyA1MC44OTc1Wk0xNC4xMTc4IDIzLjYwOTJDMTQuNTEzOCAyMy45NzgyIDE0Ljc2NTMgMjQuNDkzMiAxNC43NzUzIDI1LjA2NzlDMTQuNzk5NCAyNi4yMTczIDEzLjg1ODYgMjcuMTY3OCAxMi42NzM5IDI3LjE5MTFMNy4wNzc4IDI3LjMwMUM1Ljg5MzA3IDI3LjMyNDMgNC45MTMyMiAyNi40MTE1IDQuODg5MTIgMjUuMjYyMUM0Ljg2NTAzIDI0LjExMjggNS44MDU4MiAyMy4xNjIzIDYuOTkwNTUgMjMuMTM5TDEyLjU4NjcgMjMuMDI5MUMxMy4xNzkxIDIzLjAxOTQgMTMuNzIxNyAyMy4yNDAzIDE0LjExNzggMjMuNjA5MlpNNzAuODcwOSA2Ni4xOTk5TDc2LjUyMjYgNzEuNjgyOUM3Ni43MTU5IDcxLjg5MzggNzYuOTQ1MyA3MS45OTkyIDc3LjIxMSA3MS45OTkyQzc3LjQ3NjcgNzEuOTk5MiA3Ny43MDYxIDcxLjg5MzggNzcuODk5MyA3MS42ODI5TDc5LjY3NDYgNjkuOTYwN0M3OS44OTE5IDY5Ljc0OTggODAuMDAwNiA2OS41MjE2IDgwLjAwMDYgNjkuMjc2QzgwLjAwMDYgNjkuMDI5NSA3OS44OTE5IDY4LjgxMjUgNzkuNjc0NiA2OC42MjUxTDc0LjAyMjggNjMuMTQyMUw3Ni41OTUxIDYyLjI5ODVDNzcuMDU0IDYyLjEzNDUgNzcuMjc3NiA2MS44MjQzIDc3LjI2NjEgNjEuMzY3OEM3Ny4yNTM1IDYwLjkxMDQgNzcuMDE3OCA2MC42MTE0IDc2LjU1ODkgNjAuNDcwOUw2Ni4yNjk4IDU3LjQ4MzNDNjUuOTA3NSA1Ny4zODk2IDY1LjU4NzcgNTcuNDc3MiA2NS4zMTA0IDU3Ljc0NjJDNjUuMDMyMiA1OC4wMTYyIDY0Ljk0MTQgNTguMzI2OSA2NS4wMzggNTguNjc4M0w2OC4xMTc1IDY4LjY2MDJDNjguMjYyNCA2OS4xMDU0IDY4LjU3MDYgNjkuMzM0MSA2OS4wNDIgNjkuMzQ2M0M2OS41MTI1IDY5LjM1NzUgNjkuODMyMyA2OS4xNDA2IDcwLjAwMTQgNjguNjk1NEw3MC44NzA5IDY2LjE5OTlaIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZmlsbD0iIzlFRDdGRiIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzBfNTAiPgo8cmVjdCB3aWR0aD0iODAiIGhlaWdodD0iODAiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==" width="80" height="80" alt="">', title: sharedTitle,
+        desc: "To kickstart your cloud cost optimization journey, please reach out to your organization's administrator for authorization.\n\nYou'll gain the flexibility to explore your organization's spending trends and details at various granularities.\nGroup data by different dimensions and filter to focus on specific cost areas of interest.\nEasily identify cost-saving opportunities." })}</div>`;
     }
   }
 }
@@ -4030,6 +4171,8 @@ function exitPageState() {
   document.querySelectorAll('.card').forEach(c => c.style.display = '');
   // 解除 no-auth / no-data / skeleton mode
   document.body.classList.remove('no-auth-mode', 'no-data-mode', 'skeleton-mode');
+  const cb = document.getElementById('currency-btn'); if (cb) cb.disabled = false;   // X-9r3 FA16
+  const hb = document.getElementById('history-link-btn'); if (hb) hb.disabled = false;
 }
 
 // =================================================================
@@ -4038,11 +4181,11 @@ function exitPageState() {
 const filterMockData = {
   // simple multi-select
   group:         { type: 'multi', items: ['Group Alpha', 'Group Beta', 'Group Gamma', 'Group Delta'] },
-  project:       { type: 'multi', items: ['sales-prod-gcp', 'eng-platform-prod', 'eng-staging', 'operations-monitoring', 'marketing-campaigns', 'finance-reports', 'data-pipeline-prod'], default: ['sales-prod-gcp', 'eng-platform-prod', 'eng-staging', 'operations-monitoring'] },
+  project:       { type: 'multi', items: ['sales-prod-gcp', 'eng-platform-prod', 'eng-staging', 'operations-monitoring', 'marketing-campaigns', 'finance-reports', 'data-pipeline-prod'] },
   account:       { type: 'multi', items: ['123456789012 (sales-prod)', '234567890123 (engineering)', '345678901234 (operations)', '456789012345 (marketing)', '567890123456 (finance)'] },
   resourceGroup: { type: 'multi', items: ['rg-sales-prod', 'rg-eng-prod', 'rg-eng-staging', 'rg-mkt-prod', 'rg-fin-test', 'rg-ops-monitoring'] },
-  service:       { type: 'multi', items: ['Compute', 'Storage', 'Networking', 'Database', 'Analytics', 'AI/ML', 'Container', 'Other'], default: ['Compute', 'Storage', 'Networking'] },
-  sku:           { type: 'multi', items: ['CPU - General Purpose', 'CPU - Optimized', 'GPU - Tesla T4', 'GPU - A100', 'Storage - Standard', 'Storage - Premium', 'Egress - Internet', 'Network - Premium Tier'], default: ['CPU - General Purpose', 'CPU - Optimized', 'GPU - Tesla T4'] },
+  service:       { type: 'multi', items: ['Compute', 'Storage', 'Networking', 'Database', 'Analytics', 'AI/ML', 'Container', 'Other'] },
+  sku:           { type: 'multi', items: ['CPU - General Purpose', 'CPU - Optimized', 'GPU - Tesla T4', 'GPU - A100', 'Storage - Standard', 'Storage - Premium', 'Egress - Internet', 'Network - Premium Tier'] },
   chargeType:    { type: 'multi', items: ['Other out-of-cycle charges', 'Support fee', 'Tax', 'Usage'] }, // per 設計 #16-1
   credit:        { type: 'multi', items: [] }, // items 由 renderAdjustmentCredit() 依 CSP 動態填入（per 設計 #10-7 / #16-2 / #30）
   csp:           { type: 'multi', items: ['Google Cloud', 'AWS', 'Azure'] },
@@ -4075,7 +4218,7 @@ function getLabelTagValuesSummary(fieldId) {
   const set = state.values[state.selectedKey] || new Set();
   const total = filterMockData[fieldId].items[state.selectedKey].length;
   if (set.size === 0) return `0 of ${total} Selected`;
-  if (set.size === total) return `All ${total} Selected`;
+  if (set.size === total) return `${total} of ${total} Selected`;
   return `${set.size} of ${total} Selected`;
 }
 
@@ -4220,6 +4363,7 @@ function updateLabelTagValuesSummary(fieldId) {
 // LABEL HIERARCHICAL DROPDOWN (single-dropdown, same pattern as LumiTag)
 // =================================================================
 function openLabelHierDropdown(e, triggerEl, fieldId) {
+  if(document.body.classList.contains('no-auth-mode')){cdNoAuthDropdown(e,triggerEl);return;}
   e.stopPropagation();
   if (triggerEl.querySelector('.dropdown-menu') || triggerEl.classList.contains('open')) {
     closeAllDropdowns(); return;
@@ -4422,6 +4566,7 @@ function positionDropdownMenu(menu, triggerEl) {
   }
 }
 
+function cdNoAuthDropdown(e,trigger){e.stopPropagation();const open=trigger.classList.contains('open');closeAllDropdowns();if(open)return;const m=document.createElement('div');m.className='dropdown-menu';m.style.display='flex';m.innerHTML='<div class="cd-no-options">No options</div>';m.onclick=e=>e.stopPropagation();trigger.appendChild(m);trigger.classList.add('open');positionDropdownMenu(m,trigger);}
 function openMockFilterDropdown(e, triggerEl, fieldId, fieldLabel) {
   e.stopPropagation();
   const data = filterMockData[fieldId];
@@ -4444,7 +4589,7 @@ function openMockFilterDropdown(e, triggerEl, fieldId, fieldLabel) {
   menu.dataset.fieldId = fieldId;
   menu.onclick = e => e.stopPropagation();
 
-  if (data.type === 'multi') {
+  if (document.body.classList.contains('no-auth-mode')) { menu.innerHTML='<div class="cd-no-options">No options</div>'; } else if (filterLoading) { menu.innerHTML='<div class="cd-filter-loading" role="status" aria-label="Loading options"><span class="cd-options-spinner"></span></div>'; } else if (data.type === 'multi') {
     renderMultiDropdownContent(menu, fieldId, data.items, state);
   } else if (data.type === 'hier') {
     renderHierDropdownContent(menu, fieldId, data.items, state);
@@ -4637,7 +4782,7 @@ function updateMockFilterSummary(fieldId, placeholder) {
     const total = state.size;
     const max = data.items.length;
     if (total === 0) summaryEl.textContent = placeholder.startsWith('Select') ? placeholder : `All ${capitalize(fieldId)}`;
-    else if (total === max) summaryEl.textContent = `All ${total} Selected`;
+    else if (total === max) summaryEl.textContent = `${total} of ${max} Selected`;
     else summaryEl.textContent = `${total} of ${max} Selected`;
   } else if (data.type === 'hier') {
     const total = Object.values(state.values).reduce((s, set) => s + set.size, 0);
@@ -4658,7 +4803,7 @@ function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1) + 's'; }
 const singleSelectData = {
   granularity: { items: ['Day', 'Week', 'Month'], current: 'Day' },
   currency:    { items: ['HKD', 'IDR', 'MYR', 'TWD', 'PHP', 'SGD', 'USD'], current: 'USD' },
-  credit:      { items: ['ON', 'OFF'], current: 'OFF' }, // Cross Cloud 專用，其他 CSP 由 filterMockData 處理
+  credit:      { items: ['ON', 'OFF'], current: 'ON' }, // Cross Cloud 專用，其他 CSP 由 filterMockData 處理
   daterange:   { items: ['Last 7 days', 'Last 30 days', 'This month', 'Last month', 'Last 3 months', 'Last 6 months', 'Year to date', 'Custom...'], current: 'Last 30 days' },
 };
 
@@ -4719,6 +4864,7 @@ function setCurrency(v) {
   }
   // Update all currency-code labels throughout the page
   document.querySelectorAll('.cur-val').forEach(span => span.textContent = v);
+  renderChart();        // X-9r3 FA2：換幣別要重畫（金額、刻度、表格都跟著換算）
   updateResetState();   // A-21③
 }
 // Callback for CurrencyPicker shared component
@@ -4737,150 +4883,156 @@ function setCredit(v) {
   applyChanges();
 }
 function setDateRange(v) {
-  // Custom... → open custom range picker dialog instead of just setting label
-  if (v === 'Custom...') {
-    openCustomDateRangePicker();
-    return;
+  if(v==='Custom...'){openCustomDateRangePicker();return;}
+  const end=new Date(2035,8,26),start=new Date(end);
+  if(v==='Last 7 days')start.setDate(end.getDate()-6);
+  else if(v==='This month')start.setDate(1);
+  else if(v==='Last month'){start.setMonth(7,1);end.setMonth(8,0);}
+  else if(v==='Last 3 months')start.setMonth(start.getMonth()-3);
+  else if(v==='Last 6 months')start.setMonth(start.getMonth()-6);
+  else if(v==='Year to date')start.setMonth(0,1);
+  else start.setDate(end.getDate()-29);
+  cdApplyRange(start,end,v);
+}
+
+/* X-9r3 FA21（C-C3）：彈窗對話框語意與焦點管理（抄 Auth v1 的做法）。
+ * role=dialog＋aria-modal＋aria-labelledby；開啟時背景（body 其他子節點）inert、焦點進第一個可操作元件；Esc 關閉；Tab 在彈窗內循環；關閉後焦點回到開啟前的元素 */
+const X9Modal = (function () {
+  const FOCUSABLE = 'button:not([disabled]),[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  let opener = null, current = null, keyFn = null, fromMenu = false;
+  function open(overlay, onClose, labelledby) {
+    if (!overlay || current === overlay) return;
+    const dlg = overlay.querySelector('.modal') || overlay;
+    dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true');
+    if (labelledby) dlg.setAttribute('aria-labelledby', labelledby);
+    /* X-9r3 R6：從下拉選單選項開的彈窗（Custom...），選項已被移除，關閉後焦點回那個 .select／.daterange 觸發欄；其他情況照舊回開啟前的元素 */
+    fromMenu = !!(window.cdMenuPickRecent && window.cdMenuPickRecent());
+    opener = fromMenu ? null : document.activeElement; current = overlay;
+    Array.from(document.body.children).forEach(ch => { if (ch !== overlay && ch.tagName !== 'SCRIPT' && ch.tagName !== 'STYLE' && !ch.hasAttribute('inert')) { ch.setAttribute('inert', ''); ch.dataset.x9Inert = '1'; } });
+    keyFn = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); onClose && onClose(); return; }
+      if (e.key !== 'Tab') return;
+      const f = Array.from(dlg.querySelectorAll(FOCUSABLE)).filter(el => el.offsetParent !== null);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && (document.activeElement === first || !dlg.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && (document.activeElement === last || !dlg.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener('keydown', keyFn, true);
+    setTimeout(() => { const f = Array.from(dlg.querySelectorAll(FOCUSABLE)).filter(el => el.offsetParent !== null); if (f[0]) f[0].focus({ preventScroll: true }); }, 0);
   }
-  singleSelectData.daterange.current = v;
-  // Map preset → display text (FE 算實際日期，prototype 簡化用固定 mapping)
-  const display = {
-    'Last 7 days':    '20 Sep, 2035 → 26 Sep, 2035',
-    'Last 30 days':   '28 Aug, 2035 → 26 Sep, 2035',
-    'This month':     '01 Sep, 2035 → 26 Sep, 2035',
-    'Last month':     '01 Aug, 2035 → 31 Aug, 2035',
-    'Last 3 months':  '27 Jun, 2035 → 26 Sep, 2035',
-    'Last 6 months':  '27 Mar, 2035 → 26 Sep, 2035',
-    'Year to date':   '01 Jan, 2035 → 26 Sep, 2035',
-  }[v] || v;
-  document.querySelectorAll('.daterange-text').forEach(el => el.textContent = display);
-  updateResetState();   // A-21③
-}
-
-function openCustomDateRangePicker() {
-  // Mock custom date range picker (modal with two date inputs)
-  let modal = document.getElementById('custom-daterange-modal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'custom-daterange-modal';
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `
-      <div class="modal" style="width:480px; max-width:92vw;">
-        <div class="modal-header">
-          <h3 style="font-size:16px; font-weight:700;">Custom Date Range</h3>
-          <div class="modal-close" onclick="closeCustomDateRangePicker()"><span class="material-symbols-outlined">close</span></div>
-        </div>
-        <div class="modal-body" style="padding:24px;">
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
-            <div>
-              <label style="display:block; font-size:12px; font-weight:600; color:#262626; margin-bottom:6px;">Start Date</label>
-              <input type="date" id="custom-start-date" value="2035-08-28" style="width:100%; padding:8px 12px; border:1px solid #CCCCCC; border-radius:5px; font-size:14px; font-family:inherit;">
-            </div>
-            <div>
-              <label style="display:block; font-size:12px; font-weight:600; color:#262626; margin-bottom:6px;">End Date</label>
-              <input type="date" id="custom-end-date" value="2035-09-26" style="width:100%; padding:8px 12px; border:1px solid #CCCCCC; border-radius:5px; font-size:14px; font-family:inherit;">
-            </div>
-          </div>
-          <div style="font-size:12px; color:#676767; padding:8px 12px; background:#F2FAFF; border-radius:6px; margin-bottom:0;">
-            <span class="material-symbols-outlined" style="font-size:14px; color:#004FB0; vertical-align:middle;">info</span>
-            Maximum range: 365 days. Selected dates will be applied immediately.
-          </div>
-        </div>
-        <div style="padding:12px 24px 20px; display:flex; justify-content:flex-end; gap:8px;">
-          <button class="btn-text no-underline" onclick="closeCustomDateRangePicker()"><span>Cancel</span></button>
-          <button class="btn-primary" onclick="applyCustomDateRange()" style="padding:8px 20px;">Apply</button>
-        </div>
-      </div>`;
-    modal.onclick = e => { if (e.target === modal) closeCustomDateRangePicker(); };
-    document.body.appendChild(modal);
+  function close(overlay) {
+    if (current !== overlay) return;
+    document.removeEventListener('keydown', keyFn, true); keyFn = null; current = null;
+    document.querySelectorAll('[data-x9-inert]').forEach(ch => { ch.removeAttribute('inert'); delete ch.dataset.x9Inert; });
+    if (fromMenu && window.cdOwnerFocus && window.cdOwnerFocus()) { /* 已回觸發欄 */ }
+    else if (opener && opener.isConnected && opener.focus) opener.focus({ preventScroll: true });
+    opener = null; fromMenu = false;
   }
-  modal.classList.add('show');
-}
+  return { open, close };
+})();
 
-function closeCustomDateRangePicker() {
-  const modal = document.getElementById('custom-daterange-modal');
-  if (modal) modal.classList.remove('show');
+// C-3 #01-2：單月日曆＋四個捷徑。保留 2035 mock 年份（既有 P1 裁決）。
+let cdRangeStart = new Date(2035,7,28), cdRangeEnd = new Date(2035,8,26);
+let cdCalendarMonth = new Date(2035,8,1), cdRangeAnchor = null, cdRangeDraft = null;
+const cdDateText = d => `${d.getDate()} ${d.toLocaleDateString('en-GB',{month:'short'})}. ${d.getFullYear()}`;
+const cdDateISO = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+function cdApplyRange(start,end,preset='Custom...') {
+  cdRangeStart=new Date(start); cdRangeEnd=new Date(end); startDate=new Date(start);
+  DAYS=Math.round((end-start)/86400000)+1;
+  dayLabels=Array.from({length:DAYS},(_,i)=>{const d=new Date(start);d.setDate(d.getDate()+i);return `${d.getDate()} ${d.toLocaleDateString('en-GB',{month:'short'})}.${d.getMonth()===0?' '+d.getFullYear():''}`;});
+  buckets.forEach(b=>{b.daily=Array.from({length:DAYS},(_,i)=>Math.max(5,Math.round(b.base+Math.sin(i*1.7)*b.base*.55+Math.cos(i*.9+b.id*.3)*b.base*.2)));});
+  singleSelectData.daterange.current=preset;
+  const period=cdDateText(start)+' - '+cdDateText(end);
+  document.querySelectorAll('.daterange-text').forEach(e=>e.textContent=cdDateText(start)+' → '+cdDateText(end));
+  document.querySelectorAll('.cd-period,#cost-details-card .card-meta').forEach(e=>e.textContent='Period: '+period);
+  document.querySelectorAll('.ai-period').forEach(e=>e.textContent=period);
+  renderChart();updateResetState();
 }
-
-function applyCustomDateRange() {
-  const start = document.getElementById('custom-start-date').value;
-  const end = document.getElementById('custom-end-date').value;
-  if (!start || !end) { showToast('Please select both start and end dates.'); return; }
-  if (new Date(start) > new Date(end)) { showToast('Start date must be before end date.'); return; }
-  // Format as "DD MMM, YYYY → DD MMM, YYYY"
-  const fmt = iso => {
-    const d = new Date(iso);
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return `${String(d.getDate()).padStart(2,'0')} ${months[d.getMonth()]}, ${d.getFullYear()}`;
-  };
-  const display = `${fmt(start)} → ${fmt(end)}`;
-  singleSelectData.daterange.current = 'Custom...';
-  document.querySelectorAll('.daterange-text').forEach(el => el.textContent = display);
-  closeCustomDateRangePicker();
-  showToast(`Date range updated: ${display}`);
+function cdCalendarRender() {
+  const pop=document.getElementById('cd-date-popover');if(!pop)return;
+  const start=new Date(cdCalendarMonth);start.setDate(1-start.getDay());
+  const draft=cdRangeDraft||[cdRangeStart,cdRangeEnd];
+  const min=cdRangeAnchor?new Date(cdRangeAnchor.getFullYear(),cdRangeAnchor.getMonth()-18,cdRangeAnchor.getDate()):null;
+  const max=cdRangeAnchor?new Date(cdRangeAnchor.getFullYear(),cdRangeAnchor.getMonth()+18,cdRangeAnchor.getDate()):null;
+  let days='';
+  for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const iso=cdDateISO(d);const selected=d>=draft[0]&&d<=draft[1];days+=`<button type="button" class="cd-day${selected?' selected':''}${d.getMonth()!==cdCalendarMonth.getMonth()?' outside':''}" data-date="${iso}" aria-label="${cdDateText(d)}" aria-pressed="${selected}" ${(min&&d<min)||(max&&d>max)?'disabled':''} onclick="cdCalendarPick('${iso}')">${d.getDate()}</button>`;}
+  pop.innerHTML=`<div class="cd-calendar"><div class="cd-calendar-head"><button aria-label="Previous year" onclick="cdCalendarMove(-12)">«</button><button aria-label="Previous month" onclick="cdCalendarMove(-1)">‹</button><strong>${cdCalendarMonth.toLocaleDateString('en-GB',{month:'short',year:'numeric'})}</strong><button aria-label="Next month" onclick="cdCalendarMove(1)">›</button><button aria-label="Next year" onclick="cdCalendarMove(12)">»</button></div><div class="cd-weekdays">${['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<span>${d}</span>`).join('')}</div><div class="cd-calendar-days">${days}</div></div><div class="cd-shortcuts">${['Last 30 days','Last 7 days','Last month','This month'].map(v=>`<button type="button" class="${singleSelectData.daterange.current===v?'selected':''}" onclick="setDateRange('${v}');closeCustomDateRangePicker(false)">${v.replace(/\b\w/g,c=>c.toUpperCase())}</button>`).join('')}</div>`;
 }
+function cdCalendarMove(n){cdCalendarMonth.setMonth(cdCalendarMonth.getMonth()+n);cdCalendarRender();}
+function cdCalendarPick(iso){const d=new Date(iso+'T00:00:00');if(!cdRangeAnchor){cdRangeAnchor=d;cdRangeDraft=[d,d];}else{cdRangeDraft=d<cdRangeAnchor?[d,cdRangeAnchor]:[cdRangeAnchor,d];cdRangeAnchor=null;}cdCalendarRender();document.querySelector(`[data-date="${iso}"]`)?.focus();}
+function openCustomDateRangePicker(){
+  if(document.body.classList.contains('no-auth-mode')||document.body.classList.contains('skeleton-mode'))return;
+  if(document.getElementById('cd-date-popover')){closeCustomDateRangePicker();return;}
+  closeAllDropdowns();const trigger=document.querySelector('.daterange');const pop=document.createElement('div');pop.id='cd-date-popover';pop.setAttribute('role','dialog');pop.setAttribute('aria-label','Select date range');document.body.append(pop);
+  cdCalendarMonth=new Date(cdRangeEnd.getFullYear(),cdRangeEnd.getMonth(),1);cdRangeAnchor=null;cdRangeDraft=null;cdCalendarRender();
+  const r=trigger.getBoundingClientRect();pop.style.left=Math.max(8,Math.min(innerWidth-428,r.right-420))+'px';pop.style.top=Math.min(r.bottom+4,innerHeight-pop.offsetHeight-8)+'px';trigger.classList.add('open');pop.querySelector('.selected')?.focus();
+}
+function closeCustomDateRangePicker(apply=true){const pop=document.getElementById('cd-date-popover');if(!pop)return;if(apply&&cdRangeDraft&&!cdRangeAnchor)cdApplyRange(...cdRangeDraft);pop.remove();document.querySelector('.daterange')?.classList.remove('open');document.querySelector('.daterange')?.focus();cdRangeDraft=null;cdRangeAnchor=null;}
+function applyCustomDateRange(){closeCustomDateRangePicker();}
+document.addEventListener('pointerdown',e=>{if(document.getElementById('cd-date-popover')&&!e.target.closest('#cd-date-popover,.daterange'))closeCustomDateRangePicker();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('cd-date-popover')){e.preventDefault();closeCustomDateRangePicker();}const tab=e.target.closest('.tab[data-csp]');if(tab&&['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const tabs=[...document.querySelectorAll('.tab[data-csp]')];let i=tabs.indexOf(tab);i=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[i].click();tabs[i].focus();}});
 
 // =================================================================
 // AI ANALYSIS — 對齊 FE AIInsightCenter 三狀態：
 //   Ready → Analyzing (3D rotation Spark + Shimmer + cancel) → AttentionDetected (Cost Summary)
 // 完整 detected layout 對齊 Figma node 9644:155190
 // =================================================================
-const aiInsights = {
-  gcp: {
-    paragraph: 'The total cost for the selected period is <strong>4,808.07 <span class="cur-val">USD</span></strong>, which is an increase of <strong>6.27%</strong> compared to the previous period.',
-    // Hierarchical narrative format per Figma Cost Summary modal: top-line group, then nested sub-items
-    groups: [
-      {
-        line: '<strong>Core-Infrastructure Group</strong> has a total cost of <span class="cur-val">USD</span> 4,808.07 in the selected period, an increase of 6.27% from the previous period.',
-        subItems: [
-          '<strong>infra-db-primary-instance</strong> costs 556.71 <span class="cur-val">USD</span> in the selected period, an increase of 40.38% from the previous period.',
-          '<strong>project-apollo-gateway</strong> costs 425.01 <span class="cur-val">USD</span> in the selected period, an increase of 73.87% from the previous period.',
-          '<strong>legacy-archived-analytics</strong> costs 247.96 <span class="cur-val">USD</span> in the selected period, an increase of 440.99% from the previous period.',
-        ],
-      },
-      {
-        line: '<strong>Digital-Banking-Platform Group</strong> has a total cost of <span class="cur-val">USD</span> 3,030.00 in the selected period, a decrease from <span class="cur-val">USD</span> 1,919.42 in the previous period.',
-        subItems: [
-          '<strong>project-apollo-gateway</strong> costs 1939.29 <span class="cur-val">USD</span> in the selected period, an increase of 500.21% from the previous period.',
-          '<strong>ai-inference-engine-v2</strong> costs 1097.55 <span class="cur-val">USD</span> in the selected period, an increase of 38.69% from the previous period.',
-          '<strong>finops-optimization-prod</strong> costs 700.86 <span class="cur-val">USD</span> in the selected period, an increase of 284.18% from the previous period.',
-        ],
-      },
-      {
-        line: '<strong>Innovation-Sandbox Group</strong> has a total cost of <span class="cur-val">USD</span> 586.98 in the selected period, decrease from <span class="cur-val">USD</span> 347.47 in the previous period.',
-        subItems: [
-          '<strong>finops-optimization-prod</strong> costs 219.07 <span class="cur-val">USD</span> in the selected period, an increase of 34.74% from the previous period.',
-          '<strong>rnd-prototype-zeta</strong> costs 185.10 <span class="cur-val">USD</span> in the selected period, an increase of 535.00% from the previous period.',
-          '<strong>sandbox-dev-environment</strong> costs 38.11 <span class="cur-val">USD</span> in the selected period, an increase of 8.92% from the previous period.',
-        ],
-      },
-    ],
-  },
-  aws: {
-    paragraph: 'The total cost for the selected period is <strong>3,289.14 <span class="cur-val">USD</span></strong>, which is an increase of <strong>4.12%</strong> compared to the previous period.',
-    drivers: [
-      '<strong>Sales Account</strong> drives 42% of EC2 cost, primarily on m5.xlarge instances.',
-      '<strong>Reserved Instance coverage</strong> is at 14%. consider evaluating Savings Plans.',
-      '<strong>Untagged Department resources</strong> reach 14%. promote LumiTag rules to AWS Tag enforcement.',
-    ],
-  },
-  azure: {
-    paragraph: 'The total cost for the selected period is <strong>2,143.50 <span class="cur-val">USD</span></strong>, which is a decrease of <strong>1.84%</strong> compared to the previous period.',
-    drivers: [
-      '<strong>Marketing rg-mkt-prod</strong> consumes 28% of D-series VM hours.',
-      '<strong>Peak usage</strong> concentrated 9 AM – 6 PM weekdays. review autoscale settings.',
-      '<strong>Operations Untagged share</strong> is 12% on Cost Center.',
-    ],
-  },
-  cross: {
-    paragraph: 'The total cost for the selected period is <strong>10,240.71 <span class="cur-val">USD</span></strong>, which is an increase of <strong>7.20%</strong> compared to the previous period.',
-    drivers: [
-      '<strong>Cross-cloud distribution</strong>: GCP 50%, AWS 30%, Azure 20%.',
-      '<strong>Engineering department</strong> concentrates 38% of total spend. consider unified rightsizing.',
-      '<strong>Allocation hygiene</strong>: 11% of total spend is untagged across all LumiTag keys.',
-    ],
-  },
+// 2026-10-30 驗收前審查：AI 摘要原本是另一套寫死的數字（4,808.07、Core-Infrastructure Group…），跟儀表板的 15.54M／Group Alpha～Delta 對不起來。
+// 改成從同一份 mock 算：總額＝目前篩選後 buckets 的加總（同 renderChart 的 totalCost×1000），群組＝Group By「Group」的四組權重
+// （同 aggregate() 的 distributeWeights 種子），子項目＝Project 清單按權重分。Analysis History 的舊分析帶自己的 amount，就用那筆 amount 當總額。
+// 對上期的 % 是 mock：卡頭 delta 寫死 7.08%（renderChart），這裡共用同一個數字；各群組／子項目的 % 用固定序列，只求每行不一樣。
+const CD_PREV_DELTA = 7.08;
+const AI_INSIGHT_DRIVERS = {
+  aws: [
+    '<strong>Sales Account</strong> drives 42% of EC2 cost, primarily on m5.xlarge instances.',
+    '<strong>Reserved Instance coverage</strong> is at 14%. consider evaluating Savings Plans.',
+    '<strong>Untagged Department resources</strong> reach 14%. promote LumiTag rules to AWS Tag enforcement.',
+  ],
+  azure: [
+    '<strong>Marketing rg-mkt-prod</strong> consumes 28% of D-series VM hours.',
+    '<strong>Peak usage</strong> concentrated 9 AM – 6 PM weekdays. review autoscale settings.',
+    '<strong>Operations Untagged share</strong> is 12% on Cost Center.',
+  ],
+  cross: [
+    '<strong>Cross-cloud distribution</strong>: GCP 50%, AWS 30%, Azure 20%.',
+    '<strong>Engineering department</strong> concentrates 38% of total spend. consider unified rightsizing.',
+    '<strong>Allocation hygiene</strong>: 11% of total spend is untagged across all LumiTag keys.',
+  ],
 };
+const CD_AI_GROUP_PCT = [CD_PREV_DELTA, 12.41, 3.95, 5.60];
+const CD_AI_SUB_PCT = [40.38, 73.87, 24.99, 18.21, 38.69, 9.18, 34.74, 15.00, 8.92, 21.07, 4.46, 12.73];
+function cdAiLiveTotal() {
+  const factor = noCostMode ? 0 : cspConfig[currentCSP].factor;
+  const credit = 1 - cdCreditFraction();
+  let t = 0;
+  getFilteredBuckets().forEach(b => b.daily.forEach(c => { t += c * factor * credit; }));
+  return t * 1000;   // bucket 單位是 K
+}
+function cdAiMoney(v) { return v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function cdAiInsight(csp, total) {
+  csp = csp === 'cross' ? 'cross' : (csp || 'gcp');
+  const live = total == null;
+  if (live) total = cdAiLiveTotal();
+  const delta = (live && noCostMode) ? 0 : CD_PREV_DELTA;
+  const usd = '<span class="cur-val">USD</span>';
+  const paragraph = `The total cost for the selected period is <strong>${cdAiMoney(total)} ${usd}</strong>, which is an increase of <strong>${delta.toFixed(2)}%</strong> compared to the previous period.`;
+  if (csp !== 'gcp') return { paragraph, drivers: AI_INSIGHT_DRIVERS[csp] || AI_INSIGHT_DRIVERS.cross };
+  const cats = nativeGroupByCategories['Group'];
+  const w = distributeWeights('Group' + cats.join('|'), cats.length);
+  const projects = nativeGroupByCategories['Project'];
+  const groups = cats.map((name, gi) => ({ name, gi, total: total * w[gi] }))
+    .sort((a, b) => b.total - a.total)
+    .map((g, rank) => {
+      const subNames = [0, 1, 2].map(j => projects[(g.gi * 3 + j) % projects.length]);
+      const sw = distributeWeights(g.name + subNames.join('|'), subNames.length);
+      return {
+        line: `<strong>${g.name}</strong> has a total cost of ${usd} ${cdAiMoney(g.total)} in the selected period, an increase of ${CD_AI_GROUP_PCT[rank % CD_AI_GROUP_PCT.length].toFixed(2)}% from the previous period.`,
+        subItems: subNames.map((p, j) => `<strong>${p}</strong> costs ${cdAiMoney(g.total * sw[j])} ${usd} in the selected period, an increase of ${CD_AI_SUB_PCT[(g.gi * 3 + j) % CD_AI_SUB_PCT.length].toFixed(2)}% from the previous period.`),
+      };
+    });
+  return { paragraph, groups };
+}
 
 let aiPinned = false;
 
@@ -4987,7 +5139,7 @@ function setAIState(state) {
     detail.style.display = 'none'; // detected 不顯示 ai-detail，而是用下方 detected-body
 
     // Render full Cost Summary
-    const insight = aiInsights[currentCSP] || aiInsights.gcp;
+    const insight = cdAiInsight(currentCSP);
     document.getElementById('ai-summary-paragraph').innerHTML = insight.paragraph;
     const list = document.getElementById('ai-summary-list');
     if (insight.groups) {
@@ -5196,6 +5348,8 @@ const cspMiniIcons = {
 };
 const cspNames = { gcp: 'Google Cloud', aws: 'AWS', azure: 'Azure', cross: 'Cross Cloud' };
 
+let cdHistorySort={key:'createdTime',direction:-1};
+function cdSortHistory(key){cdHistorySort={key,direction:cdHistorySort.key===key?-cdHistorySort.direction:-1};showAnalysisHistory();}
 function showAnalysisHistory() {
   // Hide cost dashboard view + config panel
   const content = document.querySelector('.content');
@@ -5223,11 +5377,11 @@ function showAnalysisHistory() {
   // Pinned 排最上（依 createdTime 新→舊），其餘維持原順序
   const sortedHistory = [
     ...analysisHistory.filter(h => h.pinned).sort((a, b) => parseHistoryTime(b.createdTime) - parseHistoryTime(a.createdTime)),
-    ...analysisHistory.filter(h => !h.pinned),
+    ...analysisHistory.filter(h => !h.pinned).sort((a,b)=>cdHistorySort.direction*(cdHistorySort.key==='amount'?a.amount-b.amount:parseHistoryTime(a.createdTime)-parseHistoryTime(b.createdTime))),
   ];
   sortedHistory.forEach(h => {
     const pinTooltip = h.pinned && h.overSixtyDays
-      ? 'data-tooltip="This analysis is from over 60 days ago. Unpinning this item will remove it from your view permanently."'
+      ? 'data-tip="This analysis is from over 60 days ago. Unpinning this item will remove it from your view permanently."'
       : '';
     rowsHtml += `
       <tr class="history-row" onclick="openCostSummaryFromHistory('${h.id}')">
@@ -5257,27 +5411,27 @@ function showAnalysisHistory() {
       </button>
 
       <!-- Paper card with padding (table doesn't touch card edges) -->
-      <div class="paper-card paper-card--padded">
         <h4 class="paper-title">Analysis History</h4>
         <p class="paper-desc">This list shows up to 10 past AI Analysis records. Click to view the full summary.<br>Records are kept for 60 days. You can pin up to 3 items to the top of the list.</p>
 
+      <div class="paper-card paper-card--padded">
         <div style="overflow-x:auto;">
           <table class="data-table history-table">
             <thead>
               <tr>
                 <th style="width:80px; text-align:center;">Pinned</th>
-                <th class="sortable">
-                  <span style="display:inline-flex; align-items:center; gap:4px;">
+                <th class="sortable" aria-sort="${cdHistorySort.key==='amount'?(cdHistorySort.direction===1?'ascending':'descending'):'none'}">
+                  <button onclick="cdSortHistory('amount')" style="display:inline-flex; align-items:center; gap:4px;">
                     Total Cost
-                    <span class="material-symbols-outlined sort-icon">arrow_downward</span>
-                  </span>
+                    <span class="material-symbols-outlined sort-icon">${cdHistorySort.direction===1?'arrow_upward':'arrow_downward'}</span>
+                  </button>
                 </th>
                 <th>Analysis Period</th>
-                <th class="sortable">
-                  <span style="display:inline-flex; align-items:center; gap:4px;">
+                <th class="sortable" aria-sort="${cdHistorySort.key==='createdTime'?(cdHistorySort.direction===1?'ascending':'descending'):'none'}">
+                  <button onclick="cdSortHistory('createdTime')" style="display:inline-flex; align-items:center; gap:4px;">
                     Time Created
-                    <span class="material-symbols-outlined sort-icon">arrow_downward</span>
-                  </span>
+                    <span class="material-symbols-outlined sort-icon">${cdHistorySort.direction===1?'arrow_upward':'arrow_downward'}</span>
+                  </button>
                 </th>
               </tr>
             </thead>
@@ -5379,7 +5533,7 @@ function openCostSummary(historyItem) {
 
   // Determine CSP and content based on context
   const csp = historyItem?.csp || currentCSP;
-  const insight = aiInsights[csp === 'cross' ? 'cross' : (csp || 'gcp')] || aiInsights.gcp;
+  const insight = cdAiInsight(csp, historyItem ? historyItem.amount : null);
 
   // Meta line: CSP icon + Time Created
   if (historyItem) {
@@ -5422,6 +5576,7 @@ function openCostSummary(historyItem) {
   `;
 
   modal.classList.add('show');
+  X9Modal.open(modal, closeCostSummary, 'cost-summary-title');   // X-9r3 FA21
 
   // Hook Analysis Criteria hover (popover)
   setupAnalysisCriteriaHover('cost-summary-criteria');
@@ -5429,6 +5584,7 @@ function openCostSummary(historyItem) {
 
 function closeCostSummary() {
   document.getElementById('cost-summary-modal').classList.remove('show');
+  X9Modal.close(document.getElementById('cost-summary-modal'));   // X-9r3 FA21
   costSummaryCurrentItem = null;
 }
 
@@ -5642,17 +5798,17 @@ window.DEMO_SCENARIOS = [
   { id: 'first-time-lumitag',   category: 'states', label: 'First-time User（無 LumiTag）',   icon: 'label_off',
     tip: 'First-time User：尚未建立任何 LumiTag rule。打開 dropdown 看 onboarding empty state。' },
   { id: 'no-data',              category: 'states', label: 'No Data',                         icon: 'inbox',
-    tip: 'No Data（per 設計 #01-4）：保留 3 個 card 結構，AI Insight Center 變 warning callout，Cost Trend / Cost Details 顯示 No Data Available illustration。' },
+    tip: 'No Data（照稿 #01-4）：保留 3 個 card 結構，AI Insight Center 變 warning callout，Cost Trend / Cost Details 顯示 No Data Available illustration。' },
   { id: 'no-cost',              category: 'states', label: 'No Cost ($0)',                    icon: 'money_off',
-    tip: 'No Cost（per 設計 #01-5）：當期間有資料但金額為零，Total Cost = $0.00、圖表為空 bar、表格顯示 $0。AI Insight 不變。' },
+    tip: 'No Cost（照稿 #01-5）：當期間有資料但金額為零，Total Cost = $0.00、圖表為空 bar、表格顯示 $0。AI Insight 不變。' },
   { id: 'ai-error',             category: 'states', label: 'AI Error',                        icon: 'error',
-    tip: 'AI 分析失敗（per 設計 #19-4）：AI Insight Center 顯示橘色 warning + Retry Analysis CTA。' },
+    tip: 'AI 分析失敗（照稿 #19-4）：AI Insight Center 顯示橘色 warning + Retry Analysis CTA。' },
   { id: 'ai-not-ready',         category: 'states', label: 'AI Not Ready',                    icon: 'schedule',
-    tip: 'AI Not Ready（per 設計 #19-5）：時間範圍不符條件（e.g. 太短），AI Insight 顯示灰色提示 + Set Time Period CTA。' },
+    tip: 'AI Not Ready（照稿 #19-5）：時間範圍不符條件（e.g. 太短），AI Insight 顯示灰色提示 + Set Time Period CTA。' },
   { id: 'ai-quota-normal',      category: 'states', label: 'AI Quota: 正常（48/80）',          icon: 'bolt',
     tip: 'AI Quota 正常（剩 48/80）：Credit Balance Indicator 綠色 dot + 深色文字。按鈕正常可用。' },
   { id: 'ai-quota-warning',     category: 'states', label: 'AI Quota: 接近耗盡（10/80）',       icon: 'warning',
-    tip: 'AI Quota 接近耗盡（剩 10/80，< 20%）：Credit Balance Indicator 轉橘色 dot + 橘色文字。按鈕仍可用，用量提醒即早注意。' },
+    tip: 'AI Quota 接近耗盡（剩 10/80，< 20%）：Credit Balance Indicator 轉橘色 dot + 橘色文字。按鈕仍可用，用量提醒及早注意。' },
   { id: 'ai-quota-depleted',    category: 'states', label: 'AI Quota: 用盡（按鈕被擋）',        icon: 'block',
     tip: 'Analysis quota 用盡（80/80）：紅色 strip + warning icon；"AI Analyses limit reached for this cycle."；按鈕 disabled；引導聯絡 LumiTure.ai 購買 Add-ons（無 Contact Sales 按鈕，per LT-3140 + PM 決議）。' },
   // === Role ===
@@ -5675,6 +5831,45 @@ window.DEMO_APPLY = function (id, btn) {
   applyScenario(id, btn);
 };
 
+
+/* C-3：每張現行稿有獨立 Demo 入口，重設狀態後再套用，避免連續巡檢殘留。 */
+window.CD_FIGMA_CASES = [{"id":"2006:5094","name":"#01 Cost Dashboard: 30 days","csp":"gcp"},{"id":"3855:132288","name":"#01-6 Cost Dashboard: Display Credit","csp":"gcp"},{"id":"2190:38511","name":"#01-5 Cost Dashboard: No Cost","csp":"gcp","state":"no-cost"},{"id":"2190:33938","name":"#01-4 Cost Dashboard: No Data","csp":"gcp","state":"no-data"},{"id":"2188:85391","name":"#01-6 Cost Dashboard: Loading (Skeleton)","csp":"gcp","state":"skeleton"},{"id":"2098:58517","name":"#01-1 Cost Dashboard: 30 days, Hovering","csp":"gcp","chartHover":true},{"id":"2161:29589","name":"#01-2 Cost Dashboard: Set Time Period","csp":"gcp","calendar":true},{"id":"2187:27916","name":"#02-2 Cost Dashboard: Collapse Configuration","csp":"gcp","collapse":true},{"id":"2188:75674","name":"#02-3 Cost Dashboard: Collapse Configuration & Sidebar","csp":"gcp","collapse":true,"sidebar":true},{"id":"2091:42167","name":"#04 Cost Dashboard: Group by Group, 30 days","csp":"gcp","group":"Group"},{"id":"2204:44575","name":"#04-2 Cost Dashboard: Group by Group, 30 days, Hovering","csp":"gcp","group":"Group","chartHover":true},{"id":"2148:33502","name":"#05 Cost Dashboard: Group by Searvice Category, 30 days","csp":"gcp","group":"Service Category"},{"id":"2162:50512","name":"#06 Cost Dashboard: Group by Project, 30 days","csp":"gcp","group":"Project"},{"id":"2162:45124","name":"#07 Cost Dashboard: Group by SKU, 30 days","csp":"gcp","group":"SKU"},{"id":"2148:35770","name":"#01-6 Cost Dashboard: Group by Group, 30 days","csp":"gcp","group":"Group","groupMenu":true},{"id":"2126:849966","name":"#04-1 Cost Dashboard: Group by Group, 30 days, expand legends","csp":"gcp","group":"Group","expand":true},{"id":"2085:45505","name":"#09-1 Checkbox","csp":"gcp","filter":"group"},{"id":"2228:140793","name":"#09-3 Loading","csp":"gcp","filter":"group","loading":true},{"id":"2185:129692","name":"#09-2 Serach","csp":"gcp","filter":"group","search":"Alpha"},{"id":"2200:36003","name":"#10-1 Group Filter","csp":"gcp","filter":"group"},{"id":"2200:36120","name":"#10-2 Service Categories Filter","csp":"gcp","filter":"service"},{"id":"2200:36265","name":"#10-3 Project Filter","csp":"gcp","filter":"project"},{"id":"2200:36343","name":"#10-4 SKU Filter","csp":"gcp","filter":"sku"},{"id":"3817:62148","name":"#10-7 Credit Filter","csp":"gcp","filter":"credit"},{"id":"2185:172752","name":"#02 Filters","csp":"gcp"},{"id":"2200:100674","name":"#02-1 Filters: Hovering","csp":"gcp","filterInfo":true},{"id":"2705:53898","name":"#02-2 Filters: Scroll Bar","csp":"gcp","scroll":true},{"id":"2148:32339","name":"#08 Cost Dashboard: Group by Label Key, 30 days","csp":"gcp","group":"Label Key: application"},{"id":"12072:146041","name":"#31 Cost Dashboard: Group by LumiTag, 30 days","csp":"gcp","group":"LumiTag: Department"},{"id":"12072:149380","name":"#31-1 Cost Dashboard: Group by LumiTag, 30 days (Hovering)","csp":"gcp","group":"LumiTag: Department","meta":true},{"id":"4842:79808","name":"#08-1 Cost Dashboard: Group by Label Key, 30 days","csp":"gcp","group":"Label Key: application","metaBucket":true},{"id":"4855:74177","name":"#08-2 Cost Dashboard: Hovering","csp":"gcp","group":"Label Key: application","meta":true},{"id":"2200:126917","name":"#09 Filters","csp":"gcp","filter":"group"},{"id":"2926:71577","name":"#17 Cost Dashboard: No Authorization Yet","csp":"gcp","state":"no-auth"},{"id":"3102:50983","name":"#18 Cost Dashboard: No Authorization Yet","csp":"gcp","state":"no-auth-viewer"},{"id":"2190:41478","name":"#03 Cost Dashboard: Granularity by Month","csp":"gcp","month":true},{"id":"9644:155190","name":"#19-6 AI Analysis: Attention Neened Detected (Hovering)","csp":"gcp","ai":"detected","criteria":true},{"id":"7064:158341","name":"#19 AI Analysis: Ready to Analyze","csp":"gcp"},{"id":"7064:158344","name":"#21 AI Analysis: Analysis History","csp":"gcp","history":true},{"id":"7064:158347","name":"#21-1 AI Analysis: Analysis History, Hovering","csp":"gcp","history":true,"historyHover":true},{"id":"7064:158356","name":"#19-1 AI Analysis: Analyzing","csp":"gcp","ai":"analyzing"},{"id":"7064:158366","name":"#19-4 AI Analysis: Error","csp":"gcp","ai":"error"},{"id":"7064:158369","name":"#19-5 AI Analysis: Not Ready (Via Time Period)","csp":"gcp","ai":"not-ready"},{"id":"7064:158412","name":"#22 AI Analysis: Toasts","csp":"gcp","toast":"analyzing"},{"id":"9664:161004","name":"#23 Popup: Analysis Summary (Full)","csp":"gcp","summary":true},{"id":"9664:161329","name":"#23-1 Popup: Analysis Summary (Full)","csp":"gcp","summary":true,"pinned":true},{"id":"9664:161156","name":"#23-2 Popup: Analysis Summary (Full), Skeleton","csp":"gcp","summary":true,"summaryLoading":true},{"id":"7064:158363","name":"#19-3 AI Analysis: Cost Summary","csp":"gcp","ai":"detected"},{"id":"12073:168049","name":"#10-5 Label Key & Label Value","csp":"gcp","filter":"label"},{"id":"12073:169681","name":"#10-6 LumiTag","csp":"gcp","filter":"lumitag"},{"id":"2241:41754","name":"#11 AWS Cost Dashboard: 30 days","csp":"aws"},{"id":"4139:70777","name":"#11-2 AWS Cost Dashboard: Credits & Charges","csp":"aws"},{"id":"2241:41783","name":"#16 Account Filter","csp":"aws","filter":"account"},{"id":"4868:71470","name":"#15-1 Cost Dashboard: Group by Tag, 30 days","csp":"aws","group":"Tag Key: Owner","metaBucket":true},{"id":"4868:71475","name":"#15-2 Cost Dashboard: Hovering","csp":"aws","group":"Tag Key: Owner","meta":true},{"id":"2279:40352","name":"#12 Cost Dashboard: Group by Group, 30 days","csp":"aws","group":"Group"},{"id":"2279:40362","name":"#13 Cost Dashboard: Group by Account, 30 days","csp":"aws","group":"Account"},{"id":"2279:40368","name":"#14 Cost Dashboard: Group by SKU, 30 days","csp":"aws","group":"SKU"},{"id":"2279:40372","name":"#11-1 AWS Cost Dashboard: Group by Group, 30 days","csp":"aws","group":"Group","groupMenu":true},{"id":"2279:40390","name":"#15 Cost Dashboard: Group by Tag, 30 days","csp":"aws","group":"Tag Key: Owner"},{"id":"4133:65109","name":"#16-1 Charge Types Filter","csp":"aws","filter":"chargeType"},{"id":"4159:66914","name":"#16-2 Credits Filter","csp":"aws","filter":"credit"},{"id":"12093:177937","name":"#16-3 Tag Key & Tag Value","csp":"aws","filter":"tag"},{"id":"10929:181852","name":"#24 Cross Cloud Cost Dashboard: 30 days","csp":"cross"},{"id":"10929:181864","name":"#28 Cloud Service Provider","csp":"cross","filter":"csp"},{"id":"10949:229869","name":"#29 Service Category","csp":"cross","filter":"service-focus"},{"id":"10929:181951","name":"#27 Cost Dashboard: Group by FOCUS, 30 days","csp":"cross","group":"FOCUS Service Category"},{"id":"10943:226488","name":"#27-1 Cost Dashboard: Group by FOCUS, 30 days","csp":"cross","group":"FOCUS Service Category","meta":true},{"id":"10929:181976","name":"#26 Cost Dashboard: Group by Group, 30 days","csp":"cross","group":"Group"},{"id":"10929:181979","name":"#25 Cost Dashboard: Group by Account, 30 days","csp":"cross","group":"Cloud Service Provider"},{"id":"10929:181991","name":"#24-1 Cross Cloud Cost Dashboard: Group by Group, 30 days","csp":"cross","group":"Group","groupMenu":true},{"id":"10929:182058","name":"#30 Credits Filter","csp":"cross","filter":"credit"}];
+function cdApplyFigmaCase(id){
+ const c=CD_FIGMA_CASES.find(c=>c.id===id);if(!c)return;
+ closeCostSummary();closeAnalysisHistory();closeCustomDateRangePicker(false);closeAllDropdowns();dismissAINotification();
+ document.querySelector('#gl-tip')?.style.setProperty('display','none');
+ document.querySelectorAll('.cd-demo-hover').forEach(e=>e.classList.remove('cd-demo-hover'));
+ exitPageState();window.AI_ANALYSIS_QUOTA={used:32,total:80};
+ if(LumitureSidebar.isCollapsed())LumitureSidebar.toggleCollapse({persist:false});
+ if(document.querySelector('.config-panel').classList.contains('collapsed'))toggleConfigPanel();
+ switchCSP(c.csp);resetAll(true);applyScenario(c.state||'default');setAIState(c.ai||'ready');
+ if(c.group){demoMetaBucketEnabled=!!(c.meta||c.metaBucket);setGroupBy(c.group);}
+ if(c.month)setGranularity('Month');
+ if(c.expand){highCardinalityMode=true;renderChart();chartLegendExpanded=false;toggleChartLegend();}
+ if(c.collapse)toggleConfigPanel();if(c.sidebar)LumitureSidebar.toggleCollapse({persist:false});
+ if(c.calendar)openCustomDateRangePicker();
+ if(c.groupMenu)document.getElementById('groupby-select')?.click();
+ if(c.filterInfo)document.querySelector('.config-section[data-section="filter"] .config-section-tooltip')?.classList.add('cd-demo-hover');
+ if(c.loading)filterLoading=true;
+ if(c.filter==='lumitag')document.getElementById('lumitag-select').click();
+ else if(c.filter==='label'||c.filter==='tag')document.getElementById(c.filter+'-hier-select').click();
+ else if(c.filter){const t=document.querySelector(`[data-field-id="${c.filter}"] .select,[data-filter="${c.filter}"] .select`);if(t)t.click();}
+ if(c.search){const inp=document.querySelector('.dropdown-menu input');if(inp){inp.value=c.search;inp.dispatchEvent(new Event('input',{bubbles:true}));}}
+ if(c.scroll)document.querySelector('.config-body').scrollTop=400;
+ if(c.history){showAnalysisHistory();if(c.historyHover)setTimeout(()=>document.querySelector('.history-pin[data-tip]')?.dispatchEvent(new MouseEvent('mouseover',{bubbles:true})),350);}
+ if(c.summary){setAIState('detected');openCostSummary(c.pinned?analysisHistory.find(h=>h.pinned):null);}
+ if(c.summaryLoading)document.getElementById('cost-summary-body').innerHTML='<div class="cd-summary-skeleton" aria-label="Loading summary">'+Array.from({length:12},(_,i)=>`<span class="lt-skeleton" style="display:block;height:14px;margin:16px 0;width:${i%3===0?60:95}%"></span>`).join('')+'</div>';
+ if(c.toast)showAINotification(c.toast);
+ if(c.chartHover)setTimeout(()=>chart.dispatchAction({type:'showTip',seriesIndex:0,dataIndex:8}),300);
+ if(c.meta)setTimeout(()=>{if(c.csp==='cross')document.querySelectorAll('.config-section-tooltip').forEach(e=>e.classList.add('cd-demo-hover'));else document.getElementById('meta-learn-more-trigger')?.focus({preventScroll:true});},300);
+ if(c.criteria)setTimeout(()=>document.getElementById('ai-criteria-btn')?.dispatchEvent(new MouseEvent('mouseenter')),300);
+ window.scrollTo(0,0);setTimeout(()=>chart.resize(),320);
+}
+window.DEMO_CATEGORIES.push({id:'figma',label:'Figma 對稿'});
+CD_FIGMA_CASES.forEach(c=>DEMO_SCENARIOS.push({id:'figma-'+c.id,category:'figma',label:c.name,icon:'compare',tip:'對應現行稿 '+c.name+'，載入時還原該畫面的獨立狀態。'}));
+const cdBaseDemoApply=window.DEMO_APPLY;
+window.DEMO_APPLY=function(id,btn){if(id.startsWith('figma-')){cdApplyFigmaCase(id.slice(6));return;}if(id.startsWith('ai-')&&currentCSP==='cross')switchCSP('gcp');cdBaseDemoApply(id,btn);};
+
 // =================================================================
 // INIT
 // =================================================================
@@ -5683,10 +5878,13 @@ renderGroupByList();
 renderLumiTagList();
 renderAdjustmentChargeType();
 renderAdjustmentCredit(); // 初始載入時依預設 CSP 渲染 Credit field（Cross=ON/OFF, 其他=multi）
+document.body.classList.toggle("cross-cloud", currentCSP === "cross");
 applyLumiTagVisibilityForCSP(currentCSP); // 初始載入時若預設為 Cross Cloud，隱藏 LumiTag Filter
 updateMetaLearnMore(); // 初始載入時同步 Learn More link 狀態
 setAIState('ready'); // 注入 AI Quota chip（Run AI Analysis 按鈕內帶 {remaining}/{total}）
 renderChart();
+setDateRange('Last 30 days');
+updateCreditLineVisibility();
 
 // =================================================================
 // SIDEBAR NAV — NAV definition is in shared/lumiture-nav.js (single source of truth)
@@ -5772,6 +5970,8 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     'font-family:inherit;line-height:1;white-space:nowrap;',
     'transition:background .12s}',
     '.curr-btn:hover,.curr-btn.cp-open{background:rgba(103,103,103,.12)}',
+    /* 2026-10-22 X-9r3 FA3：讀取中停用（OV 稿 #11、EI 稿 #03-1）整顆 32% 透明、無底無框 */
+    '.curr-btn:disabled{opacity:.32;cursor:not-allowed;pointer-events:none;background:transparent}',
     /* Focus: blue focus ring (keyboard nav / Active state ring per CMDS) */
     '.curr-btn:focus-visible{outline:2px solid #004FB0;outline-offset:1px}',
     /* Flag：16 圓、1px #CCCCCC 框（emoji 國旗放大後裁成圓形） */
@@ -5799,6 +5999,8 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     'transition:background .1s;line-height:24.5px;white-space:nowrap}',
     '.curr-dd-item:hover{background:#F6F6F6}',
     '.curr-dd-item.cp-active{background:#E6E6E6}',
+    /* X-9r1 S4：鍵盤焦點框（項目本來就是 button；滑鼠不受影響） */
+    '.curr-dd-item:focus-visible{outline:2px solid #004FB0;outline-offset:-2px}',
   ].join('');
 
   var style = document.createElement('style');
@@ -5807,13 +6009,16 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
 
   /* ===== STATE ===== */
   var _activeTrigger = null;
+  var _kbd = null;   /* X-9r1 S4：開啟期間的鍵盤／焦點監聽，_close 時移除 */
 
   /* ===== INTERNAL ===== */
   function _close() {
     var dd = document.getElementById('_curr-dd');
     if (dd) dd.remove();
+    if (_kbd) { document.removeEventListener('keydown', _kbd.key, true); document.removeEventListener('focusin', _kbd.focus, true); _kbd = null; }
     if (_activeTrigger) {
       _activeTrigger.classList.remove('cp-open');
+      _activeTrigger.setAttribute('aria-expanded', 'false');
       if (_activeTrigger.hasAttribute('data-cp-tip')) { _activeTrigger.setAttribute('data-tip', _activeTrigger.getAttribute('data-cp-tip')); _activeTrigger.removeAttribute('data-cp-tip'); }
       _activeTrigger = null;
     }
@@ -5833,17 +6038,31 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     var dd = document.createElement('div');
     dd.className = 'curr-dd';
     dd.id = '_curr-dd';
+    dd.setAttribute('role', 'listbox');   /* X-9r1 S4 */
+    dd.setAttribute('aria-label', 'Currency');
+    triggerEl.setAttribute('aria-haspopup', 'listbox');
+    triggerEl.setAttribute('aria-expanded', 'true');
     dd.innerHTML = CURRENCIES.map(function (c) {
       var isActive = c.code === currentCode;
-      return '<button class="curr-dd-item' + (isActive ? ' cp-active' : '') + '">' +
+      return '<button type="button" role="option" tabindex="-1" aria-selected="' + (isActive ? 'true' : 'false') + '" class="curr-dd-item' + (isActive ? ' cp-active' : '') + '">' +
         c.name + ' (' + c.code + ')' +
         '</button>';
     }).join('');
 
     dd.querySelectorAll('.curr-dd-item').forEach(function (btn, i) {
       btn.addEventListener('click', function () {
+        var idx = [].indexOf.call(document.querySelectorAll('.curr-btn'), triggerEl);
         _close();
+        try { triggerEl.focus({ preventScroll: true }); } catch (e) {}   /* X-9r1 S4：選完焦點回按鈕 */
         onChange(CURRENCIES[i].code);
+        /* 頁面常把整塊工具列重畫（舊按鈕被換掉），焦點會掉到 body；換掉的話回到同一位置的新按鈕 */
+        function refocus() {
+          var ae = document.activeElement;
+          if (ae && ae !== document.body && ae.isConnected) return;
+          var all = document.querySelectorAll('.curr-btn'), nb = idx > -1 ? all[idx] : null;
+          if (nb && nb !== triggerEl) { try { nb.focus({ preventScroll: true }); } catch (e) {} }
+        }
+        refocus(); setTimeout(refocus, 60);
       });
     });
 
@@ -5855,6 +6074,32 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
       /* 按鈕寫 data-dd-align="left" 的改成左緣對齊（General Budget #01-7） */
       if (triggerEl.dataset.ddAlign === 'left') { dd.style.right = 'auto'; dd.style.left = triggerEl.offsetLeft + 'px'; }
     }
+
+    /* X-9r1 S4：鍵盤。開啟後焦點進選中項；↑↓／Home／End 移動、Enter／Space 選（原生 button 的 click）、Esc 關並回按鈕、Tab 離開即關 */
+    var items = [].slice.call(dd.querySelectorAll('.curr-dd-item'));
+    var sel = dd.querySelector('.cp-active') || items[0];
+    try { if (sel) sel.focus({ preventScroll: true }); } catch (e) {}
+    var kd = function (e) {
+      var ae = document.activeElement, inDd = dd.contains(ae);
+      if (e.key === 'Escape') {
+        if (!inDd && ae !== triggerEl) return;
+        e.preventDefault(); _close(); try { triggerEl.focus({ preventScroll: true }); } catch (err) {}
+        return;
+      }
+      if (!inDd) return;
+      var i = items.indexOf(ae);
+      if (e.key === 'ArrowDown') { e.preventDefault(); items[Math.min(items.length - 1, i + 1)].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); items[Math.max(0, i - 1)].focus(); }
+      else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+      else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (e.key === 'Tab') { try { triggerEl.focus({ preventScroll: true }); } catch (err) {} }   /* 焦點先回按鈕，預設的 Tab 再從按鈕往前／往後走，離開後 focusin 監聽會關掉選單 */
+    };
+    var fi = function (e) {
+      if (!dd.contains(e.target) && e.target !== triggerEl) _close();
+    };
+    _kbd = { key: kd, focus: fi };
+    document.addEventListener('keydown', kd, true);
+    document.addEventListener('focusin', fi, true);
 
     /* Outside click to close */
     setTimeout(function () {
@@ -5874,6 +6119,14 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     if (!b || b.classList.contains('cp-open') || b.disabled) return;
     if (!b.hasAttribute('data-tip') && !b.hasAttribute('data-tip-tip') && !b.hasAttribute('data-no-tip')) b.setAttribute('data-tip', TIP);
   }, true);
+
+  /* X-9r1 S4：幣別鈕預設帶 aria-haspopup／aria-expanded（還沒打開過也要讓讀屏知道這是下拉）；hover／聚焦時補，不動頁面 markup */
+  function _markBtn(e) {
+    var b = e.target.closest && e.target.closest('.curr-btn');
+    if (b && !b.hasAttribute('aria-haspopup')) { b.setAttribute('aria-haspopup', 'listbox'); b.setAttribute('aria-expanded', b.classList.contains('cp-open') ? 'true' : 'false'); }
+  }
+  document.addEventListener('focusin', _markBtn, true);
+  document.addEventListener('mouseover', _markBtn, true);
 
   window.CurrencyPicker = {
     CURRENCIES: CURRENCIES,
@@ -6078,7 +6331,9 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     '.lt-sb-group{margin-bottom:0}',
     '.lt-sb-group-hdr{display:flex;align-items:center;justify-content:space-between;',
     'padding:8px;min-height:40px;box-sizing:border-box;margin-bottom:8px;font-size:14px;font-weight:500;line-height:24px;color:#fff;border-radius:4px;',
-    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0}',
+    'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0;',
+    'width:100%;background:none;border:0;font-family:inherit;text-align:left;appearance:none;-webkit-appearance:none}',   /* X-9r6 F16：div 改 button，樣式 reset 回跟原本一樣 */
+    '.lt-sb-group-hdr:focus-visible{outline:2px solid #fff;outline-offset:-2px}',
     '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
     '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
     '.lt-sb-group-arrow{font-size:24px;transition:transform .18s;flex-shrink:0}',
@@ -6196,8 +6451,9 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     var tag = useHref ? 'a' : 'div';
     var hrefAttr = useHref ? ' href="' + _esc(item.href) + '"' : '';
     var dataId = ' data-nav-id="' + _esc(item.id) + '"';
-    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + '>' +
-             '<span class="material-symbols-outlined">' + _esc(item.icon || 'circle') + '</span>' +
+    var curAttr = isActive ? ' aria-current="page"' : '';   // X-9r6 F16
+    return '<' + tag + ' class="' + cls + active + dis + '"' + hrefAttr + dataId + curAttr + '>' +
+             '<span class="material-symbols-outlined" aria-hidden="true">' + _esc(item.icon || 'circle') + '</span>' +
              '<span>' + _esc(item.label) + '</span>' +
            '</' + tag + '>';
   }
@@ -6208,17 +6464,17 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
       return _renderItem(item, true);
     }).join('');
     return '<div class="lt-sb-group' + collapsed + '" data-group-id="' + _esc(grp.id) + '">' +
-             '<div class="lt-sb-group-hdr">' +
+             '<button type="button" class="lt-sb-group-hdr" aria-expanded="' + (grp.collapsed ? 'false' : 'true') + '">' +
                '<span>' + _esc(grp.label) + '</span>' +
-               '<span class="material-symbols-outlined lt-sb-group-arrow">keyboard_arrow_up</span>' +
-             '</div>' +
+               '<span class="material-symbols-outlined lt-sb-group-arrow" aria-hidden="true">keyboard_arrow_up</span>' +
+             '</button>' +
              '<div class="lt-sb-group-children">' + children + '</div>' +
            '</div>';
   }
 
   function _renderNav() {
     var nav = window.LUMITURE_NAV || [];
-    var html = '<div class="lt-sb-nav">';
+    var html = '<nav class="lt-sb-nav" aria-label="Main">';
     nav.forEach(function (entry) {
       if (entry.type === 'group') {
         html += _renderGroup(entry);
@@ -6227,7 +6483,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
       }
     });
     html += '<div class="lt-sb-skel" aria-hidden="true">' + '<span class="lt-sb-skel-bar"></span>'.repeat(5) + '</div>';
-    html += '</div>';
+    html += '</nav>';
     return html;
   }
 
@@ -6321,7 +6577,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     mount.querySelectorAll('.lt-sb-group-hdr').forEach(function (hdr) {
       hdr.addEventListener('click', function () {
         var grp = hdr.parentElement;
-        if (grp) grp.classList.toggle('lt-collapsed');
+        if (grp) { grp.classList.toggle('lt-collapsed'); hdr.setAttribute('aria-expanded', grp.classList.contains('lt-collapsed') ? 'false' : 'true'); }
       });
     });
     // Collapse the whole sidebar
@@ -6337,7 +6593,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
   window.LumitureSidebar = {
     toggleGroup: function (groupId) {
       var grp = document.querySelector('[data-group-id="' + groupId + '"]');
-      if (grp) grp.classList.toggle('lt-collapsed');
+      if (grp) { grp.classList.toggle('lt-collapsed'); var h = grp.querySelector('.lt-sb-group-hdr'); if (h) h.setAttribute('aria-expanded', grp.classList.contains('lt-collapsed') ? 'false' : 'true'); }
     },
     toggleCollapse: function (opts) { _setCollapsed(!_collapsed, opts); },
     setCollapsed: function (on, opts) { _setCollapsed(on, opts); },
@@ -6348,6 +6604,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
       window.LUMITURE_ACTIVE = itemId;
       document.querySelectorAll('.lt-sb-item, .lt-sb-subitem').forEach(function (el) {
         el.classList.toggle('lt-active', el.dataset.navId === itemId);
+        if (el.dataset.navId === itemId) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
       });
     },
     setLoading: function (on) { _loading = !!on; _applyLoading(); },
@@ -6510,7 +6767,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     '.lt-tb-user:hover{opacity:.92}',
     '.lt-tb-avatar-ic{font-size:34px;color:#fff;flex-shrink:0;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 34}',
     '.lt-tb-user-text{display:flex;flex-direction:column;font-size:12px;line-height:1.3;min-width:0;font-family:\'Noto Sans\',sans-serif;text-align:left}',
-    '.lt-tb-user-name{font-weight:600;color:#fff;white-space:nowrap}',
+    '.lt-tb-user-name{font-weight:500;color:#fff;white-space:nowrap}',   /* X-9r6 R3：稿 #01-3 使用者姓名 500；原 600 不在字重表，沒載 600 的頁會退成 700 */
     '.lt-tb-user-role{color:rgba(255,255,255,.6);font-size:11px;white-space:nowrap}',
     '.lt-tb-chev{color:rgba(255,255,255,.6);font-size:20px;transition:transform .18s}',
     '.lt-tb-user.is-open .lt-tb-chev{transform:rotate(180deg)}',
@@ -6634,22 +6891,22 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
 
   // ===== Renderers =====
   function _renderIcon(item) {
-    var attrs = ' class="lt-tb-ic" data-tip="' + _esc(item.title || '') + '" data-tip-pos="below" aria-label="' + _esc(item.title || '') + '"';   /* 原生 title 改 data-tip（#gl-tip） */
+    var attrs = ' class="lt-tb-ic" data-tip="' + _esc(item.title || '') + '" data-tip-pos="below" aria-label="' + _esc((item.title || '') + (item.badge ? ', 1 unread' : '')) + '"';   /* X-9r6 F17：紅點只有 CSS，讀屏要有字（aria-label 會蓋掉內部文字，所以未讀訊息寫進 label） */   /* 原生 title 改 data-tip（#gl-tip） */
     if (item.onclick) attrs += ' onclick="' + _esc(item.onclick) + '"';
     var badge = item.badge ? '<span class="lt-tb-badge"></span>' : '';
     return '<button type="button"' + attrs + '>' +
-             '<span class="material-symbols-outlined">' + _esc(item.icon) + '</span>' + badge +
+             '<span class="material-symbols-outlined" aria-hidden="true">' + _esc(item.icon) + '</span>' + badge +
            '</button>';
   }
 
   function _renderUserChip(u) {
     return '<button type="button" class="lt-tb-user" id="lt-tb-user" aria-haspopup="true" aria-expanded="false">' +
-             '<span class="material-symbols-outlined lt-tb-avatar-ic">account_circle</span>' +
+             '<span class="material-symbols-outlined lt-tb-avatar-ic" aria-hidden="true">account_circle</span>' +
              '<div class="lt-tb-user-text">' +
                '<span class="lt-tb-user-name">' + _esc(u.name) + '</span>' +
                '<span class="lt-tb-user-role" id="lt-tb-user-role">' + _esc(u.role) + '</span>' +
              '</div>' +
-             '<span class="material-symbols-outlined lt-tb-chev">keyboard_arrow_down</span>' +
+             '<span class="material-symbols-outlined lt-tb-chev" aria-hidden="true">keyboard_arrow_down</span>' +
            '</button>';
   }
 
@@ -6700,7 +6957,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     if (u.quota.state === 'error') {
       var headErr = '<div class="lt-q-head"><span class="lt-q-title">AI Quota</span><span class="lt-q-sub">Org-wide</span></div>';
       return '<div class="lt-q">' + headErr +
-               '<div class="lt-q-err"><span class="material-symbols-outlined">help</span>' +
+               '<div class="lt-q-err"><span class="material-symbols-outlined" aria-hidden="true">help</span>' +
                '<span class="lt-q-err-msg">Couldn\'t load quota</span>' +
                '<a role="menuitem" tabindex="0" onclick="window.LumitureTopbar._retryQuota()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.LumitureTopbar._retryQuota()}">Retry</a></div>' +
              '</div>';
@@ -6708,7 +6965,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     var rows = items.map(function (k) { return _renderQuotaItem(k, u.quota[k] || {}); }).join('');
     // add-on 行（packs>0，Premium 不適用）；naming 對齊 PRD：單數 "AI Quota Add-on × N"
     var addon = (!isPremium && (u.addonPacks || 0) > 0)
-      ? '<div class="lt-q-addon"><span class="material-symbols-outlined">auto_awesome</span>' +
+      ? '<div class="lt-q-addon"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>' +
           u.addonPacks + ' × AI Quota Add-ons Activated</div>'
       : '';
     return '<div class="lt-q">' + head + rows + addon + '</div>';
@@ -6720,12 +6977,12 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     var viewAs = u.canSwitchRole
       ? '<div class="lt-am-grp">' +
           '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar.openRoleDialog()">' +
-            '<span class="material-symbols-outlined">sync_alt</span>View as Another Role</button></div>' +
+            '<span class="material-symbols-outlined" aria-hidden="true">sync_alt</span>View as Another Role</button></div>' +
         '<div class="lt-am-div"></div>'
       : '';
     var box = _renderQuotaBox(u);
     return '<div class="lt-am-backdrop" id="lt-am-backdrop" onclick="window.LumitureTopbar.closeMenu()"></div>' +
-           '<div class="lt-am" id="lt-am" role="menu">' +
+           '<div class="lt-am" id="lt-am" role="menu" aria-label="Account menu">' +
              '<div class="lt-am-plan" style="' + bannerStyle + '">' +
                '<span class="lt-am-plan-name">' + planName + '</span>' +
                '<span class="lt-am-plan-date">' + _esc(u.planDateRange) + '</span>' +
@@ -6735,21 +6992,21 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
                  '<div class="lt-am-id-name">' + _esc(u.name) + '</div>' +
                  '<div class="lt-am-id-email">' + _esc(u.email) + '</div>' +
                '</div>' +
-               '<span class="lt-am-chip"><span class="material-symbols-outlined">' + _roleIcon(u.role) + '</span>' + _esc(u.role) + '</span>' +
+               '<span class="lt-am-chip"><span class="material-symbols-outlined" aria-hidden="true">' + _roleIcon(u.role) + '</span>' + _esc(u.role) + '</span>' +
              '</div>' +
              '<div class="lt-am-div"></div>' +
              (box ? box + '<div class="lt-am-div"></div>' : '') +
              viewAs +
              '<div class="lt-am-grp">' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Profile\')">' +
-                 '<span class="material-symbols-outlined">manage_accounts</span>Profile</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">manage_accounts</span>Profile</button>' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar._noop(\'Settings\')">' +
-                 '<span class="material-symbols-outlined">settings</span>Settings</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">settings</span>Settings</button>' +
              '</div>' +
              '<div class="lt-am-div"></div>' +
              '<div class="lt-am-grp">' +
                '<button type="button" role="menuitem" class="lt-am-item" onclick="window.LumitureTopbar.logout()">' +
-                 '<span class="material-symbols-outlined">logout</span>Log out</button>' +
+                 '<span class="material-symbols-outlined" aria-hidden="true">logout</span>Log out</button>' +
              '</div>' +
            '</div>';
   }
@@ -6964,7 +7221,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
         '<div class="lt-rd-desc">' + ROLE_COPY.desc.map(function (l) { return '<p>' + _esc(l) + '</p>'; }).join('') + '</div></div>' +
       '<div class="lt-rd-body"><div class="lt-rd-sel" id="lt-rd-sel" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="' + (r.ddOpen ? 'true' : 'false') +
         '" aria-controls="lt-rd-list" aria-labelledby="lt-rd-t"><span class="lt-rd-v">' + _esc(sel.name) + '</span><span class="lt-rd-chip">' + _esc(sel.role) +
-        '</span><span class="material-symbols-outlined lt-rd-arr">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
+        '</span><span class="material-symbols-outlined lt-rd-arr" aria-hidden="true">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
       '<div class="lt-rd-act"><button type="button" class="lt-rd-btn out" id="lt-rd-keep"' + (r.loading ? ' disabled' : '') + '>' + ROLE_COPY.keep + '</button>' +
         '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') + '>' +
         (r.loading ? '<span class="lt-rd-spin" role="status" aria-label="Loading"></span>' : ROLE_COPY.cont) + '</button></div>' +
@@ -7011,7 +7268,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     _rd.ddOpen = true; s.setAttribute('aria-expanded', 'true'); s.querySelector('.lt-rd-arr').textContent = 'arrow_drop_up';
     var host = _rdPopHost();
     host.innerHTML = '<div class="lt-rd-pop" id="lt-rd-popbox"><div class="lt-rd-pop-in"><div class="lt-rd-search"><input id="lt-rd-q" placeholder="' + ROLE_COPY.search +
-      '" autocomplete="off" role="combobox" aria-label="' + ROLE_COPY.search + '" aria-controls="lt-rd-list" aria-expanded="true" aria-autocomplete="list"><span class="material-symbols-outlined">search</span></div><hr>' +
+      '" autocomplete="off" role="combobox" aria-label="' + ROLE_COPY.search + '" aria-controls="lt-rd-list" aria-expanded="true" aria-autocomplete="list"><span class="material-symbols-outlined" aria-hidden="true">search</span></div><hr>' +
       '<div class="lt-rd-list" id="lt-rd-list" role="listbox" aria-label="Roles">' + _rdOptsHtml('') + '</div></div></div>';
     var el = document.getElementById('lt-rd-popbox'), rc = s.getBoundingClientRect();
     el.style.width = rc.width + 'px'; el.style.left = rc.left + 'px';
@@ -7133,6 +7390,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
       window.LUMITURE_USER = Object.assign({}, window.LUMITURE_USER || {}, user || {});
       _render(); if (_menuOpen) _openMenu();
     },
+    roleIcon: _roleIcon,   /* 角色 chip icon 對應公開給頁面用（X-9r6 F1：GBH Role view 卡） */
     setRole: function (role) {
       var el = document.getElementById('lt-tb-user-role');
       if (el) el.textContent = role;
@@ -7244,7 +7502,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
  *
  * 規格（FE libs/lumiture-ui/src/Toaster/toast.css＋Toaster.tsx，Figma GB #02-3／GL #18-3／EI #08／RS #06／RO #06 逐值一致）：
  *   成功 #008F88、錯誤 #BF302E、info #0B6DD7、warning #EC6F09｜圓角 4｜寬 400｜最小高 46｜內距 8／16｜icon 20（check_circle／info／warning）
- *   位置：左下，left = var(--lt-toast-left)（sidebar 展開 274／收合 45；沒有 sidebar 的頁面自動改 24），bottom 24｜z-index 4000（高於彈窗 2000、Demo FAB 999）
+ *   位置：左下，left = var(--lt-toast-left)（sidebar 展開 274／收合 45；沒有 sidebar 的頁面自動改 24），bottom = var(--lt-toast-bottom,24px)（X-9r1 S3：有固定底列的頁自己設 calc(底列高 + 16px)）｜z-index 4000（高於彈窗 2000、Demo FAB 999）
  *   5 秒自動消失，點一下立即關閉｜可堆疊（新的在最下面，column-reverse，gap 16）｜字 14／400／行高 24.5
  *
  * 用法（頁面把自己的 toast() 換成這個，不要再各寫一套 CSS）：
@@ -7271,7 +7529,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     var s = document.createElement('style');
     s.id = 'lt-toast-css';
     s.textContent = [
-      '.lt-toast-wrap{position:fixed;left:var(--lt-toast-left,274px);bottom:24px;z-index:var(--lt-z-toast,4000);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif)}',
+      '.lt-toast-wrap{position:fixed;left:var(--lt-toast-left,274px);bottom:var(--lt-toast-bottom,24px);z-index:var(--lt-z-toast,4000);display:flex;flex-direction:column-reverse;gap:16px;pointer-events:none;font-family:var(--lt-font-sans,\'Noto Sans\',sans-serif)}',
       '.lt-toast{pointer-events:auto;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:var(--lt-toast-width,400px);max-width:calc(100vw - 96px);min-height:46px;padding:8px 16px;',
       'border-radius:var(--lt-toast-radius,4px);color:#fff;cursor:pointer;',
       'box-shadow:0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12);',   /* MUI shadows[1]，FE Toaster 的 inline style */
@@ -7328,7 +7586,17 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     el.addEventListener('click', close);
     _getWrap().appendChild(el);
     var d = opts.duration == null ? 5000 : opts.duration;
-    if (d > 0) setTimeout(close, d);
+    var timer = null;
+    function arm() { if (d > 0) timer = setTimeout(close, d); }
+    function disarm() { if (timer) { clearTimeout(timer); timer = null; } }
+    arm();
+    /* X-9r1 S7：帶 action（Undo）或 extra 的 toast，滑鼠停上面或焦點進去時暫停計時，離開後重新計 5 秒（WCAG 2.2.1） */
+    if ((opts.action && opts.action.label) || (opts.extra && opts.extra.nodeType === 1)) {
+      el.addEventListener('mouseenter', disarm);
+      el.addEventListener('focusin', disarm);
+      el.addEventListener('mouseleave', function () { if (el.parentNode && !el.contains(document.activeElement)) { disarm(); arm(); } });
+      el.addEventListener('focusout', function (e) { if (el.parentNode && !el.matches(':hover') && !el.contains(e.relatedTarget)) { disarm(); arm(); } });
+    }
     return el;
   }
 
@@ -7361,7 +7629,8 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
  *   預設內容：
  *   LumitureEmpty.noAccess({ href })     // 整頁無權限：lock／「You do not have access to this page」／「Please contact your organization's administrator if you believe this is a mistake.」／Back to Overview（href 預設 ./overview.html）。回傳含卡片外框的 HTML，放在頁標題下方
  *   LumitureEmpty.error({ size, onclick }) // 「Something Went Wrong」／「Please ensure you have a stable internet connection\nand try refreshing the page.」（FE EmptyState constants），按鈕 Retry（有給 onclick 才出）
- *   LumitureEmpty.noData({ size, title, desc, icon })  // 「No Data Available」
+ *   LumitureEmpty.noData({ size, title, desc, icon, iconHtml })  // 「No Data Available」
+ *   html()／noData() 的 iconHtml（2026-10-22 X-9r3 FA17，選用）：直接給一段 <svg>（呼叫端自己保證內容可信），會取代 icon；沒給時行為完全不變。
  * 文字一律 escape；desc 的 \n 轉成換行。不要自己加 max-width（全站規則：段落不設 max-width，寬度交給外層）。
  */
 (function () {
@@ -7377,6 +7646,9 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
       '.lt-empty .lt-empty__ic{font-family:\'Material Symbols Outlined\';font-weight:400;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;-webkit-font-feature-settings:\'liga\';font-feature-settings:\'liga\';',
       'color:#9ED7FF;font-variation-settings:\'FILL\' 0,\'wght\' 400,\'GRAD\' 0,\'opsz\' 48;width:1em;height:1em;display:block;overflow:hidden}',
       '.lt-empty--s .lt-empty__ic{font-size:48px}.lt-empty--m .lt-empty__ic,.lt-empty--page .lt-empty__ic{font-size:64px}.lt-empty--l .lt-empty__ic{font-size:80px}',
+      /* 2026-10-22 X-9r3 FA17：iconHtml（自帶 SVG 的圖示，additive）。尺寸跟著 S 48／M 64／L 80／page 64，SVG 自己 viewBox 縮放 */
+      '.lt-empty__ic-svg{display:block;line-height:0}.lt-empty__ic-svg svg{display:block;width:64px;height:64px}',
+      '.lt-empty--s .lt-empty__ic-svg svg{width:48px;height:48px}.lt-empty--l .lt-empty__ic-svg svg{width:80px;height:80px}',
       '.lt-empty__t{margin:12px 0 0;font-weight:700;line-height:1.5;color:var(--lt-color-text-secondary,#676767)}',
       '.lt-empty--s .lt-empty__t{font-size:14px}.lt-empty--m .lt-empty__t{font-size:16px}.lt-empty--l .lt-empty__t{font-size:20px}.lt-empty--page .lt-empty__t{font-size:18px;margin-top:16px}',
       '.lt-empty__d{margin:8px 0 0;font-size:14px;line-height:24.5px;color:var(--lt-color-text-secondary,#676767);white-space:pre-line}',
@@ -7403,7 +7675,8 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
         : '<button type="button" class="' + esc(cls) + '"' + (o.action.onclick ? ' onclick="' + esc(o.action.onclick) + '"' : '') + '>' + esc(o.action.label) + '</button>') + '</div>';
     }
     return '<div class="lt-empty lt-empty--' + size + '">' +
-      (o.icon ? '<span class="lt-empty__ic material-symbols-outlined" aria-hidden="true">' + esc(o.icon) + '</span>' : '') +
+      (o.iconHtml ? '<span class="lt-empty__ic-svg" aria-hidden="true">' + o.iconHtml + '</span>'
+        : (o.icon ? '<span class="lt-empty__ic material-symbols-outlined" aria-hidden="true">' + esc(o.icon) + '</span>' : '')) +
       (o.title ? '<h3 class="lt-empty__t">' + esc(o.title) + '</h3>' : '') +
       (o.desc ? '<p class="lt-empty__d">' + esc(o.desc) + '</p>' : '') + a + '</div>';
   }
@@ -7428,7 +7701,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     },
     noData: function (o) {
       o = o || {};
-      return html({ size: o.size || 'm', icon: o.icon || 'table_view', title: o.title || 'No Data Available', desc: o.desc, action: o.action });
+      return html({ size: o.size || 'm', icon: o.icon || 'table_view', iconHtml: o.iconHtml, title: o.title || 'No Data Available', desc: o.desc, action: o.action });
     }
   };
 })();
@@ -7496,6 +7769,10 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     'linear-gradient(135deg,#0D1B3E 0%,#0E3A82 100%);',
     'color:#fff;box-shadow:0 4px 14px rgba(13,27,62,.36);z-index:999;cursor:pointer;',
     'display:flex;align-items:center;justify-content:center;transition:transform .18s,box-shadow .18s;border:0}',
+    /* X-9r6 F11：sidebar 收合時 toast 的 left 是 45（--lt-toast-left 收合值），會蓋住移到 left 54 的 FAB（5 秒內點不到）；
+       收合時把 FAB 與說明面板抬到 toast 上方（toast 預設 bottom 24、高 46、間距 16 → 86）。展開時 toast left 274 不碰到 FAB，位置不變 */
+    'html.lt-sb-collapsed .demo-fab{bottom:86px}',
+    'html.lt-sb-collapsed .demo-popover{bottom:146px;max-height:calc(100vh - 170px)}',   /* X-9r6 R1：視窗 ≤625 高時面板頂端不被切 */
     '.demo-fab:hover{transform:scale(1.08);box-shadow:0 6px 20px rgba(13,27,62,.45)}',
     '.demo-fab:active{transform:scale(.96)}',
     '.demo-fab .material-symbols-outlined{font-size:24px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}',
@@ -7602,8 +7879,9 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     '.demo-page-tab[data-tip]::after,.demo-cat-tab[data-tip]::after{display:none!important}',
 
     /* #gl-tip — body-level fixed tooltip (auto-injected) */
-    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:12px;line-height:1.4;',
-    'padding:6px 10px;border-radius:4px;max-width:320px;white-space:normal;',
+    /* X-9r1 S1：預設值改稿值（Tooltip 元件 14／24.5、內距 8／16、r4、max-width 600）；各頁 body #gl-tip 覆寫維持有效 */
+    '#gl-tip{position:fixed;background:#31383E;color:#fff;font-size:14px;line-height:24.5px;',
+    'padding:8px 16px;border-radius:4px;max-width:600px;white-space:normal;',
     'pointer-events:none;z-index:9999;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25);',
     'font-family:\'Noto Sans\',sans-serif}'
   ].join('');
@@ -7765,6 +8043,9 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     fabEl.className = 'demo-fab';
     fabEl.id = 'demo-fab';
     fabEl.setAttribute('data-tip', 'Designer Demo Scenarios');   /* 原生 title 改 data-tip（#gl-tip），B 區 A-15 */
+    fabEl.setAttribute('aria-label', 'Designer Demo Scenarios');   /* X-9r1 S6：原本讀屏只唸 icon 字「science」 */
+    fabEl.setAttribute('aria-expanded', 'false');
+    fabEl.setAttribute('aria-controls', 'demo-popover');
     fabEl.innerHTML =
       '<span class="material-symbols-outlined">science</span>' +
       '<span class="demo-pulse" id="demo-fab-pulse"></span>';
@@ -7774,13 +8055,15 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     var popEl = document.createElement('div');
     popEl.className = 'demo-popover';
     popEl.id = 'demo-popover';
+    popEl.setAttribute('role', 'dialog');   /* X-9r1 S6 */
+    popEl.setAttribute('aria-label', 'Demo scenarios');
     popEl.innerHTML =
       '<div class="demo-popover-hdr">' +
         '<div class="demo-popover-title">' +
           '<span class="material-symbols-outlined" style="font-size:16px">science</span>' +
           'Demo Scenarios' +
         '</div>' +
-        '<button class="demo-popover-close" id="demo-pop-close">' +
+        '<button class="demo-popover-close" id="demo-pop-close" aria-label="Close demo scenarios">' +
           '<span class="material-symbols-outlined" style="font-size:18px">close</span>' +
         '</button>' +
       '</div>' +
@@ -7843,7 +8126,21 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
       if (!pop.contains(e.target) && !fab.contains(e.target) && pop.classList.contains('show')) {
         pop.classList.remove('show');
         fab.classList.remove('popped');
+        fab.setAttribute('aria-expanded', 'false');
       }
+    });
+
+    /* X-9r1 S6：面板開著、焦點在面板或 FAB 上時 Esc 關面板並回 FAB；焦點在別處（頁面自己的彈窗、輸入框）不攔 */
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      var pop = document.getElementById('demo-popover'), fab = document.getElementById('demo-fab');
+      if (!pop || !fab || !pop.classList.contains('show')) return;
+      var ae = document.activeElement;
+      if (!ae || !(pop.contains(ae) || fab.contains(ae))) return;
+      pop.classList.remove('show');
+      fab.classList.remove('popped');
+      fab.setAttribute('aria-expanded', 'false');
+      try { fab.focus({ preventScroll: true }); } catch (err) { fab.focus(); }
     });
 
     _injectGlobalTooltip();
@@ -7851,23 +8148,52 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
 
   // ===== #gl-tip auto-injection =====
   function _injectGlobalTooltip() {
-    if (document.getElementById('gl-tip')) return; // host page already provides one
+    var hostTip = document.getElementById('gl-tip');
+    if (hostTip) { _enhanceHostTooltip(hostTip); return; } // host page already provides one：X-9r1 S8 只補語意，不接管位置與 hover
     var tip = document.createElement('div');
     tip.id = 'gl-tip';
+    tip.setAttribute('role', 'tooltip');   /* 2026-10-22 X-9r3 R4：讀屏要認得這是 tooltip */
     document.body.appendChild(tip);
-    var cur = null;
+    var cur = null, described = null;
+    /* 2026-10-22 X-9r3 R4：tooltip 顯示時給觸發元件 aria-describedby="gl-tip"（保留它原本的 describedby，只加／移除自己的 token），收起時移除 */
+    function describe(node) {
+      undescribe();
+      if (!node || !node.setAttribute) return;
+      var ids = (node.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+      if (ids.indexOf('gl-tip') === -1) { ids.push('gl-tip'); node.setAttribute('aria-describedby', ids.join(' ')); }
+      described = node;
+    }
+    function undescribe() {
+      if (!described) return;
+      var ids = (described.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (x) { return x && x !== 'gl-tip'; });
+      if (ids.length) described.setAttribute('aria-describedby', ids.join(' ')); else described.removeAttribute('aria-describedby');
+      described = null;
+    }
+    function hideTip() { cur = null; tip.style.display = 'none'; undescribe(); }
+    /* 頁面自己把 #gl-tip 設成 display:none（例：開 Month Picker 時收起）也要跟著移除 describedby */
+    if (window.MutationObserver) new MutationObserver(function () { if (tip.style.display === 'none') undescribe(); }).observe(tip, { attributes: true, attributeFilter: ['style'] });
     // 2026-10-09 Kabin 裁決：全站 tooltip 改成錨在元件上（Figma／MUI 行為），不再跟著游標跑。
     // 規則照 Anomaly Detection #01-3 量到的：預設出現在元件上方 6px、水平靠元件左緣，
     // 右邊放不下就改靠元件右緣 +2；上方放不下改到下方。
     // 可選屬性：data-tip-pos="below"（固定放下方）、data-tip-dy（下方距離，預設 4）、
     // data-tip-anchor（CSS 選擇器，錨在子元素上）、data-tip-align="content-right"（右緣對齊內容右緣 −16）。
+    function minX() {
+      try {
+        var sb = document.querySelector('.lt-sidebar');
+        if (sb && sb.offsetWidth > 0) return (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--lt-sb-w')) || sb.offsetWidth) + 8;
+      } catch (err) {}
+      return 8;
+    }
     function place() {
-      if (!cur || !cur.isConnected) { cur = null; tip.style.display = 'none'; return; }
+      if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
+      /* X-9r1 R1：量測前先歸位，不然 tooltip 還停在上一個位置時寬度被視窗右緣擠窄（先 hover 右側短提示、再 hover 長提示，寬只有 440） */
+      tip.style.left = '0px'; tip.style.top = '0px';
       var r = a.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
       var vw = window.innerWidth, vh = window.innerHeight;
       var x = r.left;
-      if (x + tw > vw - 8) x = Math.max(8, Math.min(r.right + 2, vw - 8) - tw);
+      /* X-9r1 S2：放不下改靠右緣時，左緣不能落進 sidebar（600 寬在 1280 中間位置會伸進去）；沒有 sidebar 的頁維持 8，收合時 21＋8 */
+      if (x + tw > vw - 8) x = Math.max(minX(), Math.min(r.right + 2, vw - 8) - tw);
       if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
       var below = cur.dataset.tipPos === 'below';
       var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
@@ -7879,14 +8205,103 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     document.addEventListener('mouseover', function (e) {
       var el = e.target.closest && e.target.closest('[data-tip]');
       if (!el || (el === cur && tip.style.display !== 'none')) return;
-      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place();
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place(); describe(el);
     });
     document.addEventListener('mouseout', function (e) {
       var el = e.target.closest && e.target.closest('[data-tip]');
-      if (el && el === cur && !el.contains(e.relatedTarget)) { cur = null; tip.style.display = 'none'; }
+      if (el && el === cur && !el.contains(e.relatedTarget)) hideTip();
+    });
+    /* 2026-10-22 X-9r3 FA23：鍵盤 focus 到帶 data-tip 的元素也顯示、blur／Esc 收起（additive，只吃 :focus-visible，滑鼠點擊不觸發） */
+    /* 2026-10-22 X-9r3 R4：:focus-visible 改判真正拿到焦點的 e.target（不是帶 data-tip 的祖先）；describedby 掛在拿到焦點的那個元素上 */
+    document.addEventListener('focusin', function (e) {
+      var t = e.target, el = t.closest && t.closest('[data-tip]');
+      if (!el || !t.matches || !t.matches(':focus-visible')) return;
+      cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place(); describe(t);
+    });
+    document.addEventListener('focusout', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && el === cur) hideTip();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && cur) { hideTip(); return; }
+      /* role="button" 的 info icon（非原生按鈕）按 Enter／Space 切換 tooltip；滑鼠行為不變 */
+      if ((e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented) {
+        var t = e.target, b = t.closest && t.closest('[role="button"][data-tip]');
+        if (!b || b !== t || /^(BUTTON|A|INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+        e.preventDefault();
+        if (cur === b && tip.style.display !== 'none') hideTip();
+        else { cur = b; tip.textContent = b.dataset.tip; tip.style.display = 'block'; place(); describe(b); }
+      }
     });
     window.addEventListener('scroll', place, true);
     window.addEventListener('resize', place);
+  }
+
+  /* X-9r1 S8：頁面自建 #gl-tip（Anomaly Detection、All Resource List、Audit Log）時，shared 不綁 mouseover／mouseout／scroll／resize，
+     位置與顯示邏輯留給頁面；這裡只補讀屏與鍵盤語意：role="tooltip"、顯示時給觸發元件 aria-describedby="gl-tip"、Esc 收起、
+     role="button" 的 Enter／Space 切換、鍵盤 focus-visible 顯示（兩者都是發合成 mouseover／mouseout 交給頁面自己的邏輯，位置規則不動）。
+     觸發元件靠 :hover／activeElement 與文字比對找，不靠自己綁 mouseover */
+  function _enhanceHostTooltip(tip) {
+    if (tip.getAttribute('role') !== 'tooltip') tip.setAttribute('role', 'tooltip');
+    var described = null, pending = null;
+    function visible() { return tip.style.display !== 'none' && getComputedStyle(tip).display !== 'none'; }
+    function undescribe() {
+      if (!described) return;
+      var ids = (described.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (x) { return x && x !== 'gl-tip'; });
+      if (ids.length) described.setAttribute('aria-describedby', ids.join(' ')); else described.removeAttribute('aria-describedby');
+      described = null;
+    }
+    function describe(node) {
+      if (node === described) return;
+      undescribe();
+      var ids = (node.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+      if (ids.indexOf('gl-tip') === -1) { ids.push('gl-tip'); node.setAttribute('aria-describedby', ids.join(' ')); }
+      described = node;
+    }
+    function findTrigger() {
+      var txt = tip.textContent, list = [];
+      if (pending && pending.isConnected) list.push(pending);
+      var ae = document.activeElement; if (ae && ae.closest) list.push(ae);
+      [].forEach.call(document.querySelectorAll('[data-tip]:hover'), function (n) { list.push(n); });
+      for (var i = 0; i < list.length; i++) {
+        var host = list[i].closest && list[i].closest('[data-tip]');
+        if (host && host.dataset.tip === txt) return host;
+      }
+      return null;
+    }
+    function sync() {
+      if (!visible()) { undescribe(); pending = null; return; }
+      var t = findTrigger();
+      if (t) describe(t);
+    }
+    if (window.MutationObserver) new MutationObserver(sync).observe(tip, { attributes: true, attributeFilter: ['style', 'class'], childList: true, characterData: true, subtree: true });
+    /* 合成事件只是「請頁面自己的 mouseover／mouseout 邏輯照它的位置規則顯示或收起」，shared 不接管位置 */
+    function fire(node, type, rel) { try { node.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, relatedTarget: rel || null })); } catch (err) {} }
+    function hide() {
+      var n = described || pending;
+      if (n && n.isConnected) fire(n, 'mouseout', null);   // 讓頁面把自己的 cur 清掉，之後同一個元件才能再顯示
+      tip.style.display = 'none';
+    }
+    /* 鍵盤 focus 到帶 data-tip 的元件（:focus-visible）也顯示，blur 收起；頁面自己的 focusin（ARL 的 .cnt）照跑，同一元件不會重複顯示 */
+    document.addEventListener('focusin', function (e) {
+      var t = e.target, el = t.closest && t.closest('[data-tip]');
+      if (!el || !t.matches || !t.matches(':focus-visible')) return;
+      pending = el; fire(el, 'mouseover', null); sync();
+    });
+    document.addEventListener('focusout', function (e) {
+      var el = e.target.closest && e.target.closest('[data-tip]');
+      if (el && (el === described || el === pending) && !el.contains(e.relatedTarget)) { fire(el, 'mouseout', e.relatedTarget); pending = null; sync(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && visible()) { hide(); return; }
+      if ((e.key === 'Enter' || e.key === ' ') && !e.defaultPrevented) {
+        var t = e.target, b = t.closest && t.closest('[role="button"][data-tip]');
+        if (!b || b !== t || /^(BUTTON|A|INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return;
+        e.preventDefault();
+        if (visible() && tip.textContent === b.dataset.tip) { hide(); return; }
+        pending = b; fire(b, 'mouseover', null); sync();
+      }
+    });
   }
 
   // ===== PUBLIC API =====
@@ -7924,6 +8339,7 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
     var opening = !pop.classList.contains('show');
     pop.classList.toggle('show');
     fab.classList.toggle('popped');
+    fab.setAttribute('aria-expanded', opening ? 'true' : 'false');   /* X-9r1 S6 */
     if (opening && pulse) pulse.style.display = 'none';
   };
 
@@ -8026,7 +8442,10 @@ window.LUMITURE_ACTIVE = 'cost-dashboard';
 </script>
 <script>
 /* A-19：空狀態改用 shared/lumiture-empty.js（FILL 0、#9ED7FF、M 號）；No Data 區塊在 HTML 裡是空殼 */
-document.querySelectorAll('.card-empty-state').forEach(function (el) { el.innerHTML = LumitureEmpty.noData({ size: 'm', icon: 'bar_chart' }); });
+/* X-9r3 FA17（B2）：圖示改用 OV #03 那顆帶底線與左軸的長條圖（三張稿同一顆），走 shared LumitureEmpty 的 iconHtml 選項。
+ * FA16（A32）：Cost Trend 空狀態標題 18／700（稿 #01-4），Cost Details 維持 16 */
+var CD_NODATA_SVG = '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40.3212 38.7686H44.4823C44.8422 38.7442 45.1812 38.5883 45.4362 38.3298C45.6913 38.0713 45.8452 37.7278 45.8693 37.3631V22.6107C45.8452 22.246 45.6913 21.9025 45.4362 21.644C45.1812 21.3855 44.8422 21.2296 44.4823 21.2052H40.3212C39.9612 21.2296 39.6223 21.3855 39.3672 21.644C39.1121 21.9025 38.9582 22.246 38.9341 22.6107V37.3661C38.9589 37.7303 39.1131 38.073 39.3681 38.3309C39.6231 38.5888 39.9617 38.7443 40.3212 38.7686ZM50.721 38.7686H54.8821C55.242 38.7442 55.581 38.5883 55.8361 38.3298C56.0911 38.0713 56.245 37.7278 56.2691 37.3631V12.0721C56.2449 11.7068 56.0906 11.363 55.835 11.1044C55.5793 10.8458 55.2396 10.6902 54.8791 10.6665H50.721C50.361 10.6909 50.0221 10.8468 49.767 11.1053C49.5119 11.3638 49.358 11.7073 49.3339 12.0721V37.3661C49.3587 37.7303 49.5129 38.073 49.7679 38.3309C50.0229 38.5888 50.3615 38.7443 50.721 38.7686ZM19.5215 38.7686H23.6797C24.0396 38.7442 24.3786 38.5883 24.6337 38.3298C24.8888 38.0713 25.0426 37.7278 25.0667 37.3631V29.6206C25.0426 29.2559 24.8888 28.9124 24.6337 28.6539C24.3786 28.3954 24.0396 28.2395 23.6797 28.2151H19.5215C19.1616 28.2395 18.8226 28.3954 18.5675 28.6539C18.3125 28.9124 18.1586 29.2559 18.1345 29.6206V37.3631C18.1586 37.7278 18.3125 38.0713 18.5675 38.3298C18.8226 38.5883 19.1616 38.7442 19.5215 38.7686ZM29.9213 38.7686H34.0824C34.4424 38.7442 34.7813 38.5883 35.0364 38.3298C35.2915 38.0713 35.4454 37.7278 35.4695 37.3631V15.5859C35.4454 15.2212 35.2915 14.8777 35.0364 14.6192C34.7813 14.3607 34.4424 14.2048 34.0824 14.1804H29.9213C29.5614 14.2048 29.2224 14.3607 28.9674 14.6192C28.7123 14.8777 28.5584 15.2212 28.5343 15.5859V37.3661C28.5591 37.7303 28.7133 38.073 28.9683 38.3309C29.2233 38.5888 29.5619 38.7443 29.9213 38.7686ZM58 45.8053H11.1993V12.4234C11.1993 11.958 11.0171 11.5115 10.6925 11.1821C10.368 10.8527 9.92779 10.6673 9.46847 10.6665H6.00088C5.54105 10.6665 5.10006 10.8516 4.77491 11.1811C4.44976 11.5106 4.26709 11.9575 4.26709 12.4234V49.3073C4.26709 50.2392 4.63242 51.133 5.28272 51.792C5.93302 52.451 6.81501 52.8212 7.73467 52.8212H58C58.4598 52.8212 58.9008 52.6361 59.2259 52.3066C59.5511 51.9771 59.7338 51.5302 59.7338 51.0642V47.5504C59.7307 47.0865 59.5466 46.6426 59.2218 46.3157C58.897 45.9888 58.4578 45.8053 58 45.8053Z" fill="#9ED7FF"/></svg>';
+document.querySelectorAll('.card-empty-state').forEach(function (el) { el.innerHTML = LumitureEmpty.noData({ size: el.closest('#cost-trend-card') ? 'page' : 'm', iconHtml: CD_NODATA_SVG }); });
 </script>
 
 <script>
@@ -8044,6 +8463,117 @@ document.querySelectorAll('.card-empty-state').forEach(function (el) { el.innerH
     (window._demoFabApply || window.DEMO_APPLY)(key === 'admin' ? 'role-admin' : 'role-viewer');
     if (window.LumitureTopbar) LumitureTopbar.setRole(LumitureTopbar.roleLabel(group));   /* 頁面的 setRole 會把 chip 寫成頁面慣用寫法，換回使用者選的群組 */
   };
+})();
+</script>
+
+<script>
+/* ============================================================
+ * X-9r3 FA20／FA23（C-C2、C-C6）：鍵盤與讀屏。
+ * 側面板的下拉觸發欄（.select）與 Date Picker（.daterange）原本是 tabIndex -1 的 div，鍵盤完全碰不到。
+ * 做法：保留 div 與 class（工具與既有 JS 靠 .select、動態選單 appendChild 進觸發欄），補 role="combobox"、tabindex、aria-haspopup／aria-expanded／aria-label（label 文字＋目前選項，
+ * label 裡有 info tooltip，所以不用 aria-labelledby 免得整段說明一起唸出來）；選單開啟後上下鍵／Enter／Space／Esc。
+ * 為什麼不改 <button>：動態選單是 triggerEl.appendChild(menu)（選單與搜尋框在觸發欄裡面），button 裡不能放互動元素。
+ * ============================================================ */
+(function () {
+  const labelOf = (field) => { const l = field && field.querySelector('.field-label'); if (!l) return ''; let t = ''; l.childNodes.forEach(n => { if (n.nodeType === 3) t += n.textContent; }); return t.replace(/\s+/g, ' ').trim(); };
+  const valueOf = (sel) => { const v = sel.querySelector('.selected-count,.placeholder,.daterange-text'); return v ? v.textContent.replace(/\s+/g, ' ').trim() : ''; };
+  function enhance() {
+    document.querySelectorAll('.select, .daterange').forEach(sel => {
+      let control = sel.querySelector(':scope > .cd-select-button');
+      if (!control) {
+        control = document.createElement('button'); control.type = 'button'; control.className = 'cd-select-button';
+        Array.from(sel.childNodes).filter(n => n.nodeType === 3 || (n.nodeType === 1 && !n.classList.contains('dropdown-menu'))).forEach(n => control.appendChild(n));
+        sel.prepend(control); sel.focus = opts => control.focus(opts);
+      }
+      sel.removeAttribute('tabindex'); sel.removeAttribute('role'); sel.removeAttribute('aria-haspopup'); sel.removeAttribute('aria-label');
+      control.setAttribute('aria-haspopup', sel.classList.contains('daterange') ? 'dialog' : 'listbox');
+      control.setAttribute('aria-expanded', sel.classList.contains('open') ? 'true' : 'false');
+      control.disabled = document.body.classList.contains('skeleton-mode') || (sel.classList.contains('daterange') && document.body.classList.contains('no-auth-mode'));
+      const name = sel.classList.contains('daterange') ? 'Date range' : labelOf(sel.closest('.field'));
+      const val = valueOf(sel);
+      control.setAttribute('aria-label', [name, val].filter(Boolean).join(': '));
+      sel.querySelectorAll(':scope > .material-symbols-outlined').forEach(i => i.setAttribute('aria-hidden', 'true'));
+    });
+    document.querySelectorAll('.config-section-tooltip').forEach(t => { if (!t.hasAttribute('tabindex')) { t.setAttribute('tabindex', '0'); t.setAttribute('role', 'button'); t.setAttribute('aria-label', 'More information'); } });
+    const lm = document.getElementById('meta-learn-more-trigger');
+    if (lm && !lm.hasAttribute('tabindex')) { lm.setAttribute('tabindex', '0'); lm.setAttribute('role', 'button'); }
+  }
+  let raf = 0;
+  new MutationObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(enhance); })
+    .observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['class'] });
+  enhance();
+
+  const menuOf = (trig) => trig.querySelector(':scope > .dropdown-menu') || (trig.nextElementSibling && trig.nextElementSibling.classList.contains('dropdown-menu') ? trig.nextElementSibling : null);
+  const isOpen = (trig) => { const m = menuOf(trig); return !!m && getComputedStyle(m).display !== 'none'; };
+  const itemsOf = (menu) => Array.from(menu.querySelectorAll('.dropdown-item')).filter(i => i.offsetParent !== null).map(i => { i.setAttribute('tabindex', '-1'); return i; });
+  function focusInto(trig) {
+    const m = menuOf(trig); if (!m) return;
+    const inp = m.querySelector('input[type="text"]');
+    const its = itemsOf(m);
+    const target = inp || its[0]; if (target) target.focus({ preventScroll: true });
+  }
+  /* X-9r3 R5／R6：記住「最近互動的觸發欄」（用序號，因為面板重繪時節點會被換掉）與「剛從選單選了東西」的時間點 */
+  const allOwners = () => Array.from(document.querySelectorAll('.select, .daterange'));
+  const ownerOfNode = (n) => {
+    if (!n || !n.closest) return null;
+    const o = n.closest('.select, .daterange'); if (o) return o;
+    const m = n.closest('.dropdown-menu');
+    return m && m.previousElementSibling && m.previousElementSibling.matches('.select, .daterange') ? m.previousElementSibling : null;
+  };
+  let lastOwnerIdx = -1, lastPickAt = 0;
+  const remember = (n) => { const o = ownerOfNode(n); if (o) lastOwnerIdx = allOwners().indexOf(o); };
+  document.addEventListener('focusin', (e) => remember(e.target), true);
+  document.addEventListener('click', (e) => { remember(e.target); if (e.target.closest && e.target.closest('.dropdown-menu')) lastPickAt = performance.now(); }, true);
+  window.cdMenuPickRecent = () => performance.now() - lastPickAt < 600;
+  window.cdOwnerFocus = () => { const o = allOwners()[lastOwnerIdx]; if (!o) return false; o.focus({ preventScroll: true }); return true; };
+  /* 選完之後的焦點：單選（選單關了）回觸發欄；多選（選單重繪但還開著）回同一位置的選項，↓ 才能繼續移動；開彈窗的由 X9Modal 接手 */
+  function afterPick(idx) {
+    const fix = () => {
+      if (document.querySelector('.modal-overlay.show')) return;
+      const a = document.activeElement;
+      if (a && a !== document.body && a.isConnected && a.offsetParent !== null) return;
+      const own = allOwners()[lastOwnerIdx]; if (!own) return;
+      if (isOpen(own)) { const its = itemsOf(menuOf(own)); const n = its[Math.min(idx, its.length - 1)]; if (n) { n.focus({ preventScroll: true }); return; } }
+      own.focus({ preventScroll: true });
+    };
+    setTimeout(fix, 0); setTimeout(fix, 160);
+  }
+  document.addEventListener('keydown', (e) => {
+    const t = e.target;
+    if (!t || !t.closest) return;
+    const trig = t.closest('.select, .daterange');
+    /* 觸發欄本身：Enter／Space／↓ 開啟並把焦點放進選單 */
+    if (trig && (t === trig || t.classList.contains('cd-select-button'))) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!isOpen(trig) && !trig.classList.contains('open')) trig.click();
+        setTimeout(() => focusInto(trig), 0);
+      } else if (e.key === 'Escape' && (trig.classList.contains('open') || isOpen(trig))) { e.preventDefault(); closeAllDropdowns(); trig.focus(); }
+      return;
+    }
+    const menu = t.closest('.dropdown-menu');
+    if (!menu) return;
+    const owner = menu.closest('.select, .daterange') || (menu.previousElementSibling && menu.previousElementSibling.matches && menu.previousElementSibling.matches('.select') ? menu.previousElementSibling : null);
+    const its = itemsOf(menu);
+    const idx = its.indexOf(t.closest('.dropdown-item'));
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!its.length) return;
+      const next = e.key === 'ArrowDown' ? its[Math.min(its.length - 1, idx + 1)] : (idx <= 0 ? null : its[idx - 1]);
+      if (next) { next.setAttribute('tabindex', '-1'); next.focus({ preventScroll: true }); next.scrollIntoView({ block: 'nearest' }); }
+      else if (owner && menu.querySelector('input[type="text"]')) menu.querySelector('input[type="text"]').focus();
+    } else if ((e.key === 'Enter' || e.key === ' ') && idx >= 0 && t.classList.contains('dropdown-item')) {
+      e.preventDefault(); remember(t); t.click(); afterPick(idx);
+    } else if (e.key === 'Escape') {
+      e.preventDefault(); closeAllDropdowns(); if (owner) owner.focus();
+    }
+  });
+  /* 彈窗開著時 Esc 由 X9Modal 處理；下拉開著、焦點不在選單裡時 Esc 也能關 */
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || document.querySelector('.modal-overlay.show')) return;
+    const o = document.querySelector('.select.open, .daterange.open');
+    if (o) { closeAllDropdowns(); if (o.isConnected) o.focus({ preventScroll: true }); }   // X-9r3 R5：焦點已掉到 body 時 Esc 關選單，也把焦點還給觸發欄
+  });
 })();
 </script>
 </body>
