@@ -733,6 +733,12 @@
 .vc.ac.ac-blank .ac-match{display:none} /* 2026-10-30：空白卡（還沒有完整條件）不放摘要列，也不出現 Recalculate（#12-2） */
 .vc.ac.ac-recalc .ac-w,.vc.ac.ac-recalc .ac-amt,.vc.ac.ac-recalc .ac-dc{color:transparent!important;background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;height:12px;width:56px;justify-self:end;align-self:center;overflow:hidden}
 .vc.ac.ac-recalc .ac-row-basis,.vc.ac.ac-recalc .ac-row-hint{display:none}
+/* 2026-11-02 Kabin 稿 #12-9：重算中 Disable 各式互動按鈕，需重新計算的項目（含 Total）以 skeleton 呈現 */
+.vc.ac.ac-recalc .ac-total-n:not(:empty){color:transparent!important;background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;height:12px;width:72px;justify-self:end;align-self:center;overflow:hidden}
+.v10-recalc-busy .v10-direct a,.v10-recalc-busy .v10-ac-rm,.v10-recalc-busy .vc.ac .ac-addrow,.v10-recalc-busy .vc.ac .ac-rm,.v10-recalc-busy .vc.ac .csp-block-rm,.v10-recalc-busy .vc.ac .bac{color:var(--g300)!important;pointer-events:none}
+.v10-recalc-busy .vc.ac .ac-rm,.v10-recalc-busy .vc.ac .ac-rm *{color:var(--g300)!important}
+.v10-recalc-busy .vc.ac .add-csp-btn{color:var(--g300)!important;border-color:var(--g200)!important;pointer-events:none}
+.v10-recalc-busy .vc.ac .csp-blocks-area .cr :is(select,input,button,.ms-trigger,.nsel-btn){background:var(--lt-color-bg-disabled-input,#F2F2F2)!important;color:var(--g400)!important;pointer-events:none}
 /* 2026-10-28 過期：保留舊數字但變灰（不用 skeleton，skeleton＝正在算），提示句放在表頭上方 */
 .vc.ac.ac-stale .ac-w,.vc.ac.ac-stale .ac-amt,.vc.ac.ac-stale .ac-dc,.vc.ac.ac-stale.ac-stale-cond .ac-match>span:not(.ac-match-status){color:var(--g400,#B3B3B3)!important} /* matched 只跟條件有關：只改分給誰時維持原色（10/28 設計審查） */
 .cr-invalid .is-err-ctl{border-color:var(--err)!important}.cr-emsg{flex-basis:100%;margin:-4px 0 0;font-size:12px;line-height:18px;color:var(--err)} /* 2026-10-29 條件不合法：欄位紅框＋下方錯誤字（同 Tag key 必填的 .fh.err） */
@@ -3143,7 +3149,7 @@ const V10_STALE_TIP='Out of date. Recalculate to update.',V10_UNCALC_TIP='Not ca
 function v10StaleTips(el,on){
   on=on&&!el.classList.contains('ac-recalc'); // 重算中顯示 skeleton，不掛 tooltip
   const tip=el.classList.contains('ac-invalid')?V10_INVALID_TIP:el.dataset.calcSig===''?V10_UNCALC_TIP:V10_STALE_TIP;
-  const nums=[...el.querySelectorAll('.ac-row .ac-w,.ac-row .ac-amt,.ac-row .ac-dc')];
+  const nums=[...el.querySelectorAll('.ac-row .ac-w,.ac-row .ac-amt,.ac-row .ac-dc,.ac-total .ac-total-n:not(:empty)')]; // 11/02 Kabin #12-3：灰色部分（含 Total）都有 tooltip
   const m=el.querySelector('[data-acmatch]>span:not(.material-symbols-outlined):not(.ac-match-status)');
   if(m)(on&&el.classList.contains('ac-stale-cond')?nums.push(m):[V10_STALE_TIP,V10_UNCALC_TIP,V10_INVALID_TIP].includes(m.dataset.tip)&&(delete m.dataset.tip,m.removeAttribute('tabindex')));
   nums.forEach(x=>{if(on){x.dataset.tip=tip;x.tabIndex=0}else if([V10_STALE_TIP,V10_UNCALC_TIP,V10_INVALID_TIP].includes(x.dataset.tip)){delete x.dataset.tip;x.removeAttribute('tabindex')}});
