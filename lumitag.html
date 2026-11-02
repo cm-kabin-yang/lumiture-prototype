@@ -1666,7 +1666,7 @@ dd.innerHTML=h;dd.classList.add('open')}
 function selectSuggestion(prefix,name){const input=document.getElementById(prefix+'-name');input.value=name;closeSuggestions(prefix);validateName(input,prefix)}
 
 /* ===== VALUE CARD ===== */
-function tryAddVC(cid){const count=document.getElementById(cid)?.querySelectorAll('.vc').length||0;if(count>=1000){toast('Maximum 1,000 values per tag reached',1);return}S._isDirty=true;addVC(cid)}
+function tryAddVC(cid){const count=document.getElementById(cid)?.querySelectorAll('.vc').length||0;if(count>=100){toast('Maximum 100 values per tag reached',1);return}S._isDirty=true;addVC(cid)}
 function addVC(cid,vname,cspBlocks,mres,mcost,insertAfterEl){
 const ctn=document.getElementById(cid);const emptyEl=document.getElementById(cid+'-empty');if(emptyEl)emptyEl.style.display='none';
 const num=ctn.querySelectorAll('.vc').length+1;const d=document.createElement('div');d.className='vc';d.draggable=true;
@@ -1991,7 +1991,7 @@ if(emptyEl){emptyEl.style.display=cards.length===0?'':'none';if(cards.length>0)e
 // clear no-values error when values exist
 const valsErrEl=document.getElementById(prefix+'-vals-err');if(valsErrEl&&cards.length>0)valsErrEl.classList.remove('show');
 // Add Value button limit
-const addValBtn=document.getElementById(prefix+'-add-val-btn');if(addValBtn){const atLimit=cards.length>=1000;addValBtn.disabled=atLimit;if(atLimit)addValBtn.setAttribute('data-tip','Maximum 1,000 values per tag reached');else addValBtn.removeAttribute('data-tip');}
+const addValBtn=document.getElementById(prefix+'-add-val-btn');if(addValBtn){const atLimit=cards.length>=100;addValBtn.disabled=atLimit;if(atLimit)addValBtn.setAttribute('data-tip','Maximum 100 values per tag reached');else addValBtn.removeAttribute('data-tip');}
 const cpvEl=document.getElementById(prefix+'-cpv');if(!cpvEl)return;let totalAlloc=0;let totalCost=0;const segs=[];
 cards.forEach((card,i)=>{const vm=card.querySelector('[data-vmatch]');const name=card.querySelector('.vni')?.value.trim()||`Value ${i+1}`;if(vm&&vm.classList.contains('ok')){const txt=vm.textContent;const m=txt.match(/(\d+) resources/);const cm=txt.match(/\$([0-9,]+)/);const r=m?parseInt(m[1]):0;const c=cm?parseInt(cm[1].replace(/,/g,'')):0;totalAlloc+=r;totalCost+=c;segs.push({name,res:r,cost:c,color:COLORS[i%8]})}});
 const ur=831-totalAlloc;const uc=222050-totalCost;const up=pct(ur,831);
@@ -3063,7 +3063,7 @@ function v9CloseAddMenu(){document.querySelectorAll('.v9-add-menu').forEach(m=>m
  * Allocation card
  * ============================================================ */
 function v9TryAddAC(cid){
-  const count=document.getElementById(cid)?.querySelectorAll('.vc').length||0;if(count>=1000){toast('Maximum 1,000 values per tag reached',1);return}
+  const count=document.getElementById(cid)?.querySelectorAll('.vc').length||0;if(count>=100){toast('Maximum 100 values per tag reached',1);return}
   S._isDirty=true;
   const names=v9ValueNames(cid);
   // 新卡一律加在最下面（Q-C 的 UX 建議：預設就放在不會吃掉 value card 的位置）
