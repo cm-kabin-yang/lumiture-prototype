@@ -1694,7 +1694,7 @@ block.innerHTML=`<div class="csp-block-hdr"><span class="csp-all-pre">All</span>
 area.appendChild(block);
 const ca=block.querySelector('.ca');
 if(conds&&conds.length>0)conds.forEach((c,i)=>addCR(ca,c.f,c.o,c.v,i>0?(c.c||'AND'):'',c.k||''));
-const ab=document.createElement('button');ab.className='bac';ab.style.marginLeft='4px';ab.innerHTML='<span class="material-symbols-outlined">add_circle</span>Add Condition';ab.onclick=function(){S._isDirty=true;addCR(ca,'','','','')};ca.appendChild(ab);
+const ab=document.createElement('button');ab.className='bac';ab.style.marginLeft='4px';ab.innerHTML='<span class="material-symbols-outlined">add_circle</span>Add Condition';ab.onclick=function(){if(this.getAttribute('aria-disabled')==='true')return;S._isDirty=true;addCR(ca,'','','','')};ca.appendChild(ab);
 /* v9：Figma #03-1「預設給予一條 Rule 並呈現預設選項」。v8 新卡沒有預設條件列，這裡補上（空白 block 才補） */
 if(!conds||!conds.length)addCR(ca,csp==='GCP'?'billing_account_id':'','','','');
 }
@@ -1743,13 +1743,14 @@ function v9NumberBlocks(vcEl){
     // 2026-10-15 Kabin 選 A：× 的文案照實際刪除範圍。同一朵雲有兩組以上時，第一組標頭的 × 只刪 Group 1，所以也叫 Group
     const hdrRm=b.querySelector('.csp-block-hdr .csp-block-rm');if(hdrRm)hdrRm.dataset.tip=cnt[c]>1?'Remove this Group':'Remove this Data Source';
     if(prevSame){const h=document.createElement('div');h.className='csp-sub-hdr';h.innerHTML=`${sep?'':'<span class="csp-or">OR</span>'}<span class="csp-grp-n">Group ${seen[c]}</span><span class="csp-hdr-txt">resources matching ALL conditions below:</span><button class="csp-block-rm" type="button" onclick="removeCspBlock(this)" data-tip="Remove this Group"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>`;b.prepend(h)}
-    if(grp&&!nextSame){const ca=b.querySelector('.ca'),bac=ca&&ca.querySelector('.bac');if(bac){const g=document.createElement('button');g.type='button';g.className='bac v9-bac-grp';g.innerHTML='<span class="material-symbols-outlined">add_circle</span>Add OR group';g.onclick=function(){v9AddGroup(this)};
+    if(grp&&!nextSame){const ca=b.querySelector('.ca'),bac=ca&&ca.querySelector('.bac');if(bac){const g=document.createElement('button');g.type='button';g.className='bac v9-bac-grp';g.innerHTML='<span class="material-symbols-outlined">add_circle</span>Add OR group';g.onclick=function(){v9AddGroup(this)};if(cnt[c]>=5){g.setAttribute('aria-disabled','true');g.dataset.tip='Maximum 5 groups per data source.'} /* 2026-11-02 Kabin 照推薦：同一個 Data Source 最多 5 組（LT-3607），第 5 組之後 Add OR group 停用＋hover 說原因 */
       // 2026-10-16 方案 A（會議 Zack 提的層級問題）：Add OR group 移出條件動作列，放到最後一組下方、跟 OR Group 標頭同一層，前面帶 OR
       // 2026-10-16 方案 A＋實線分界（Kabin：OR 出現太多次；RD：虛線不夠明顯）：OR 只在兩組交界的實線上出現一次，組標頭與 Add OR group 前面都不再帶 OR
       if(S._orRow){const row=document.createElement('div');row.className='csp-sub-hdr v10-or-add'+(sep?' is-sep':'')+(dash&&S._orDashAll?' is-dash-all':'');row.innerHTML=(sep||dash)?'':'<span class="csp-or">OR</span>';row.appendChild(g);b.appendChild(row)}else bac.after(g)}}
   });
 }
 function v9AddGroup(btn){
+  if(btn.getAttribute('aria-disabled')==='true')return;
   const b=btn.closest('.csp-block'),vc=b.closest('.vc');addCspBlock(vc,b.dataset.csp,[]);
   const nb=vc.querySelector('.csp-blocks-area').lastElementChild;if(nb!==b)b.after(nb);
   S._isDirty=true;v9NumberBlocks(vc);updAddCspBtn(vc);const cid=vc.closest('[id]')?.id;if(cid)v9Sched(cid);
@@ -1786,8 +1787,8 @@ function closePickers(){document.querySelectorAll('.csp-picker.open').forEach(p=
 function getMsOpts(f,key){if(FIELD_VALUES[f])return FIELD_VALUES[f];if(getFieldOpset(f)==='tag'&&key)return TAG_VALUE_OPTS[key]||[];return[]}
 function buildMsWrap(opts,initVals){const itemsHtml=opts.length?opts.map(opt=>{const chk=initVals.includes(opt)?'checked':'';return`<button class="ms-item" data-label="${opt.replace(/"/g,'&quot;')}" type="button" onclick="msTglItem(this)">${LumiCheckbox.html({stateful:true, wrapTag:'span', cls:'ms-chk', value:opt, checked:!!chk, onclick:'msUpdTrigger(this)'})}<span>${opt}</span></button>`}).join(''):'<div class="ms-empty">No options</div>';return`<div class="ms-wrap"><div class="ms-trigger" onclick="toggleMs(this)"><span class="ms-placeholder">Select values…</span><span class="ms-arr material-symbols-outlined">arrow_drop_down</span></div><div class="ms-panel"><div class="ms-search"><input type="text" placeholder="Search values…" oninput="filterMs(this)"><span class="material-symbols-outlined">search</span></div><div class="ms-list"><button class="ms-item" type="button" onclick="msTglAll(this)">${LumiCheckbox.html({stateful:true, wrapTag:'span', cls:'ms-chk-all', onclick:'event.stopPropagation()', stop:false, onchange:"msTglAll(this.closest('button'))"})}<span class="ms-selall-lbl">Select All</span></button><div class="ms-divider"></div>${itemsHtml}</div></div></div>`}
 
-function updBacBtn(ca){const bac=ca.querySelector('.bac');if(!bac)return;const count=ca.querySelectorAll('.cr').length;bac.disabled=count>=20;if(count>=20)bac.setAttribute('data-tip','Maximum 20 conditions per rule reached');else bac.removeAttribute('data-tip')}
-function addCR(ca,f,o,v,conn,k){const rows=ca.querySelectorAll('.cr');if(rows.length>=20){toast('Maximum 20 conditions per rule reached',1);return}const ab=ca.querySelector('.bac');const r=document.createElement('div');r.className='cr';
+function updBacBtn(ca){const bac=ca.querySelector('.bac');if(!bac)return;const full=ca.querySelectorAll('.cr').length>=20;bac.disabled=false;bac.setAttribute('aria-disabled',String(full));if(full)bac.setAttribute('data-tip','Maximum 20 conditions per group.');else bac.removeAttribute('data-tip')} /* 2026-11-02 Kabin 照推薦：到上限 disabled＋hover 說原因，不用 toast；文案同後端 LT-3607。用 aria-disabled 不用 disabled，停用狀態才 hover／focus 得到 tooltip */
+function addCR(ca,f,o,v,conn,k){const rows=ca.querySelectorAll('.cr');if(rows.length>=20)return;const ab=ca.querySelector('.bac');const r=document.createElement('div');r.className='cr';
 const csp=ca.closest('.csp-block')?.dataset.csp||'GCP';
 const curF=f||defaultField(csp);
 const opset=getFieldOpset(curF);
@@ -6484,6 +6485,7 @@ go('list');</script>
 .vc.ac .ac-stale-btn:disabled{background:var(--lt-color-bg-default);border-color:var(--lt-grey-300);color:var(--lt-grey-300);opacity:1;cursor:not-allowed;gap:4px}
 .v10-spinner{box-sizing:border-box;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--lt-grey-300);border-right-color:transparent;flex-shrink:0;animation:v10spin .9s linear infinite}
 @media (prefers-reduced-motion:reduce){.v10-spinner{animation-duration:2.4s}}
+.bac[aria-disabled="true"]{color:var(--lt-color-text-disabled)!important;cursor:not-allowed}.bac[aria-disabled="true"]:hover{text-decoration:none}
 </style>
 </body>
 </html>
