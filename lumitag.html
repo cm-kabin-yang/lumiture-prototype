@@ -1670,7 +1670,7 @@ btn.closest('.csp-picker').classList.remove('open');
 function closePickers(){document.querySelectorAll('.csp-picker.open').forEach(p=>p.classList.remove('open'))}
 
 function getMsOpts(f,key){if(FIELD_VALUES[f])return FIELD_VALUES[f];if(getFieldOpset(f)==='tag'&&key)return TAG_VALUE_OPTS[key]||[];return[]}
-function buildMsWrap(opts,initVals){const itemsHtml=opts.length?opts.map(opt=>{const chk=initVals.includes(opt)?'checked':'';return`<button class="ms-item" data-label="${opt.replace(/"/g,'&quot;')}" type="button" onclick="msTglItem(this)">${LumiCheckbox.html({stateful:true, wrapTag:'span', cls:'ms-chk', value:opt, checked:!!chk, onclick:'msUpdTrigger(this)'})}<span>${opt}</span></button>`}).join(''):'<div class="ms-empty">No options</div>';return`<div class="ms-wrap"><div class="ms-trigger" onclick="toggleMs(this)"><span class="ms-placeholder">Select values…</span><span class="ms-arr material-symbols-outlined">expand_more</span></div><div class="ms-panel"><div class="ms-search"><input type="text" placeholder="Search values…" oninput="filterMs(this)"><span class="material-symbols-outlined">search</span></div><div class="ms-list"><button class="ms-item" type="button" onclick="msTglAll(this)">${LumiCheckbox.html({stateful:true, wrapTag:'span', cls:'ms-chk-all', onclick:'event.stopPropagation()', stop:false, onchange:"msTglAll(this.closest('button'))"})}<span class="ms-selall-lbl">Select All</span></button><div class="ms-divider"></div>${itemsHtml}</div></div></div>`}
+function buildMsWrap(opts,initVals){const itemsHtml=opts.length?opts.map(opt=>{const chk=initVals.includes(opt)?'checked':'';return`<button class="ms-item" data-label="${opt.replace(/"/g,'&quot;')}" type="button" onclick="msTglItem(this)">${LumiCheckbox.html({stateful:true, wrapTag:'span', cls:'ms-chk', value:opt, checked:!!chk, onclick:'msUpdTrigger(this)'})}<span>${opt}</span></button>`}).join(''):'<div class="ms-empty">No options</div>';return`<div class="ms-wrap"><div class="ms-trigger" onclick="toggleMs(this)"><span class="ms-placeholder">Select values…</span><span class="ms-arr material-symbols-outlined">arrow_drop_down</span></div><div class="ms-panel"><div class="ms-search"><input type="text" placeholder="Search values…" oninput="filterMs(this)"><span class="material-symbols-outlined">search</span></div><div class="ms-list"><button class="ms-item" type="button" onclick="msTglAll(this)">${LumiCheckbox.html({stateful:true, wrapTag:'span', cls:'ms-chk-all', onclick:'event.stopPropagation()', stop:false, onchange:"msTglAll(this.closest('button'))"})}<span class="ms-selall-lbl">Select All</span></button><div class="ms-divider"></div>${itemsHtml}</div></div></div>`}
 
 function updBacBtn(ca){const bac=ca.querySelector('.bac');if(!bac)return;const count=ca.querySelectorAll('.cr').length;bac.disabled=count>=20;if(count>=20)bac.setAttribute('data-tip','Maximum 20 conditions per rule reached');else bac.removeAttribute('data-tip')}
 function addCR(ca,f,o,v,conn,k){const rows=ca.querySelectorAll('.cr');if(rows.length>=20){toast('Maximum 20 conditions per rule reached',1);return}const ab=ca.querySelector('.bac');const r=document.createElement('div');r.className='cr';
@@ -1748,7 +1748,7 @@ function msUpdTrigger(chk){const panel=chk.closest('.ms-panel');msRefreshTrigger
  * 但因為分母還是全部 8 個，表頭會顯示 mixed 而不是 checked。改成跟
  * msTglAll() 同一份 msVisibleChks()，兩邊分母永遠一致。 */
 function msUpdAllState(panel){if(!panel)return;const all=msVisibleChks(panel);const chkd=all.filter(c=>c.checked);const chkAll=panel.querySelector('.ms-chk-all');if(!chkAll)return;if(chkd.length===0){chkAll.checked=false;chkAll.indeterminate=false}else if(chkd.length===all.length){chkAll.checked=true;chkAll.indeterminate=false}else{chkAll.checked=false;chkAll.indeterminate=true}}
-function msRefreshTrigger(trigger,panel){const vals=Array.from(panel.querySelectorAll('.ms-chk:checked')).map(c=>c.value);const total=panel.querySelectorAll('.ms-item:not(:first-child)').length;const arr=trigger.querySelector('.ms-arr');Array.from(trigger.childNodes).forEach(n=>{if(n!==arr)n.remove();});if(!vals.length){const ph=document.createElement('span');ph.className='ms-placeholder';ph.textContent='Select values…';trigger.insertBefore(ph,arr);trigger.removeAttribute('data-tip');return;}const lbl=document.createElement('span');lbl.className='ms-count-lbl';lbl.textContent=`${vals.length} of ${total} selected`;trigger.insertBefore(lbl,arr);const MAX_TIP=5;const shown=vals.slice(0,MAX_TIP).map(v=>`• ${v}`).join('\n');const extra=vals.length-MAX_TIP;const tip=extra>0?`${shown}\n...+${extra} more, view full list in dropdown list.`:shown;trigger.setAttribute('data-tip',tip);}
+function msRefreshTrigger(trigger,panel){const vals=Array.from(panel.querySelectorAll('.ms-chk:checked')).map(c=>c.value);const total=panel.querySelectorAll('.ms-item:not(:first-child)').length;const arr=trigger.querySelector('.ms-arr');Array.from(trigger.childNodes).forEach(n=>{if(n!==arr)n.remove();});if(!vals.length){const ph=document.createElement('span');ph.className='ms-placeholder';ph.textContent='Select values…';trigger.insertBefore(ph,arr);trigger.removeAttribute('data-tip');return;}const lbl=document.createElement('span');lbl.className='ms-count-lbl';lbl.textContent=`${vals.length} of ${total} Selected`;trigger.insertBefore(lbl,arr);const MAX_TIP=5;const shown=vals.slice(0,MAX_TIP).map(v=>`• ${v}`).join('\n');const extra=vals.length-MAX_TIP;const tip=extra>0?`${shown}\n...+${extra} more, view full list in dropdown list.`:shown;trigger.setAttribute('data-tip',tip);}
 function updOpMode(sel){
 const row=sel.closest('.cr');const op=sel.value;
 const f=row.querySelector('.field-sel')?.value;
@@ -2761,7 +2761,7 @@ function v10UpdRecalcBtn(cid){
   /* 2026-10-28 Kabin（設計審查）：底部不再放 Recalculate，只留提醒框裡那顆（離原因最近）；Next 與 Step 3 照舊擋住 */
   const ctn=document.getElementById(cid);const view=ctn?.closest('#v-create,#v-edit');if(!view||!v10On()||S._step!==2)return;
   const busy=!!ctn.querySelector(':scope>.vc.ac.ac-recalc');const stale=!!ctn.querySelector(':scope>.vc.ac.ac-stale');
-  ctn.querySelectorAll(':scope>.vc.ac.ac-recalc .ac-stale-btn').forEach(b=>{b.disabled=true;b.innerHTML='<span class="material-symbols-outlined v10-spin" aria-hidden="true">progress_activity</span>Recalculate'});
+  ctn.querySelectorAll(':scope>.vc.ac.ac-recalc .ac-stale-btn').forEach(b=>{b.disabled=true;b.innerHTML='<span class="v10-spinner" aria-hidden="true"></span>Recalculating'});
   /* 10/29 Kabin：重算不了（條件不合法）就鎖在第 2 步，Next 停用（同 #12-7「不能執行 Next」）。10/30 Kabin 更正：數字過期（橘框）時 Next 也停用、hover 提示先按 Recalculate（回到 10/28 定案；10/29 那版「過期不擋、按 Next 自動重算」是 Claude 自行延伸，沒有經過她同意） */
   const inv=S._freeSteps&&!!ctn.querySelector(':scope>.vc.ac.ac-invalid');const block=stale||busy||inv;const btip=inv?V10_INVALID_BTN_TIP:'Recalculate the amounts above first.';const nx=view.querySelector('[data-v10preview]');const wrap=nx?.parentElement; // 2026-10-29 前端結論：步驟之間不擋（S._freeSteps），舊做法在 Demo FAB 已不採用
   const rsb=view.querySelector('.v10-reset');if(rsb){const pf=v10Pfx(cid);const sv=S._savedSnap&&S._savedSnap[pf];rsb.disabled=busy||!sv||sv===JSON.stringify(v10AcSnap(cid));rsb.parentElement.dataset.tip=rsb.disabled?'Nothing to reset. This step matches its last saved settings.':'Reset this step to its last saved settings.'}
@@ -3943,7 +3943,7 @@ document.addEventListener('click',e=>{
     b.style.paddingRight='10px';/* 原生 select 右側留給自己箭頭的空間不要照搬，不然箭頭不會靠右 */
     b._styled=true;sel.classList.add('nsel-off');b.style.visibility=''}
   function enhance(sel){if(sel._nselBtn||sel.multiple||sel.closest('.nsel-skip'))return;
-    const b=document.createElement('button');b.type='button';b.className='nsel-btn';b.innerHTML='<span class="nsel-t"></span><span class="material-symbols-outlined">expand_more</span>';
+    const b=document.createElement('button');b.type='button';b.className='nsel-btn';b.innerHTML='<span class="nsel-t"></span><span class="material-symbols-outlined">arrow_drop_down</span>';
     b.onclick=e=>{e.stopPropagation();if(b.disabled)return;cur===sel?close():open(sel,b)};
     sel._nselBtn=b;b._sel=sel;sel.after(b);sync(sel);requestAnimationFrame(()=>sync(sel))}
   function scan(root){(root.querySelectorAll?root.querySelectorAll('select'):[]).forEach(enhance);if(root.tagName==='SELECT')enhance(root)}
@@ -6312,5 +6312,50 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
   const r=g=>{const k=rank.indexOf(g);return k<0?rank.length-1:k};
   items.map((s,k)=>[s,k]).sort((a,b)=>r(a[0].group)-r(b[0].group)||a[1]-b[1]).forEach(([s],k)=>{L[idx[k]]=s});})();
 go('list');</script>
+<style id="v10-figma-1102">
+/* 2026-11-02 Kabin：Step 2 逐項對稿（Layout Components → Element / Shared Cost Allocation：Split、Out of date；#12-9）。
+   放在 body 最後，蓋過前面幾輪疊上去的規則；數值都是稿上量到的 */
+/* 標題列 Optional chip（稿：框 #B3B3B3、字 #7C7C7C 12/18、內距 0 8、圓角 4） */
+.v10-split-opt{box-sizing:border-box;padding:0 8px;border:1px solid var(--g400,#B3B3B3);color:#7C7C7C;line-height:18px}
+.v10-desc:has(+.v10-direct){margin-bottom:20px}
+/* 上方摘要：兩欄各佔一半、頂端對齊；2 values 實線底線、行高 18，值那行高 24 */
+.v10-sum{align-items:flex-start}
+.v10-sum-stat{flex:1 1 0;min-width:0}
+.v10-sum-n{line-height:18px;text-decoration:underline solid;text-decoration-color:currentColor;text-underline-offset:2px}
+/* 卡片標頭 chip（稿：底 #F0FFFF、框 #9CF3FF、字與 icon #34B5D9 12/18 Regular、圓角 4、內距 0 8）；chip 與 Split by Spend 間距 12 */
+.vc.ac .vh{gap:12px;min-height:25px}
+.vc.ac .ac-badge{box-sizing:border-box;height:24px;padding:0 8px;border-radius:4px;background:#F0FFFF;border:1px solid #9CF3FF;color:#34B5D9;font-weight:400;line-height:18px;gap:0}
+.vc.ac .ac-meta{line-height:18px}
+/* 卡片內容不縮排；區塊之間一律 20 */
+.vc.ac .ac-body{padding-left:0}
+.vc.ac .ac-sec{gap:4px;margin:0 0 20px}
+.vc.ac .ac-sec-t{font-size:14px;line-height:21px;color:var(--g900)}
+.vc.ac .ac-sec-d{line-height:18px}
+.vc.ac .ac-split{margin:20px 0 0!important}
+.vc.ac:is(.ac-stale,.ac-recalc) .ac-split{padding:11px 15px!important}
+.vc.ac .ac-split>.ac-match{margin:0 0 20px!important}
+.vc.ac .ac-split>.ac-sec{margin:0 0 20px!important}
+/* 計算摘要條（過期時）：字 12/18、條高 46、狀態 icon 20、按鈕不用負邊距 */
+.vc.ac .ac-match{box-sizing:border-box;min-height:46px;font-size:12px;line-height:18px;color:var(--g900)}
+.vc.ac .ac-match-status .btn{margin:0 0 0 0}
+.vc.ac .ac-match-status>.material-symbols-outlined{font-size:20px}
+/* Split across 表格：表頭 12/18 Regular #262626、欄寬照稿（Direct cost／Allocated 187、Share 131、× 24）、列分隔 #E6E6E6 */
+.vc.ac .ac-tbl{--ac-cols:minmax(0,1fr) 187px 131px 187px 24px;margin-top:0}
+.vc.ac .ac-tbl .ac-rows-h{margin-bottom:0;font-weight:400;line-height:18px;color:var(--g900)}
+.vc.ac .ac-tbl .ac-row{border-bottom-color:var(--g200,#E6E6E6)}
+.vc.ac .ac-tbl .ac-addrow{margin:20px 0 0}
+/* 文字按鈕（Add Condition、Add OR group、Add Value）沒有左右內距，對齊內容左緣 */
+.vc.ac .bac{padding:0}
+.vc.ac .csp-block .ca+.bac,.vc.ac .csp-block .bac:not(.v9-bac-grp):not(.ac-addrow){margin:6px 0 5px!important}
+/* 資料來源區塊右上 ×：稿是 Primary */
+.vc.ac .csp-block-hdr .csp-block-rm{color:var(--pri)}
+.vc.ac .tv-of{padding:0 8px}
+/* 下拉箭頭照 CMDS：實心 arrow_drop_down（A-11） */
+.nsel-btn .material-symbols-outlined,.ms-trigger .ms-arr{font-size:24px;color:var(--g500);font-variation-settings:'FILL' 1}
+/* #12-9 Recalculating：Button/S outlined disabled（框與字 #CCCCCC、白底）＋16px 轉圈（#CCCCCC 環、#308CE3 弧） */
+.vc.ac .ac-stale-btn:disabled{background:var(--wh);border-color:var(--g300,#CCCCCC);color:var(--g300,#CCCCCC);opacity:1;cursor:not-allowed;gap:4px}
+.v10-spinner{box-sizing:border-box;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--g300,#CCCCCC);border-top-color:#308CE3;flex-shrink:0;animation:v10spin .9s linear infinite}
+@media (prefers-reduced-motion:reduce){.v10-spinner{animation-duration:2.4s}}
+</style>
 </body>
 </html>
