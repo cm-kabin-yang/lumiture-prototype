@@ -82,6 +82,7 @@
   --lt-color-error-light:   #FFEBEF;   /* TBC: Figma audit needed */
   --lt-color-warning-base:  #FC9A0F;   /* TBC: Figma audit needed */
   --lt-color-warning-light: #FEF3E1;   /* TBC: Figma audit needed */
+  --lt-color-warning-dark:  #EC6F09;   /* CM Color Kit Warning/Dark（2026-11-02 補；FE warning.dark，LumiTag 過期與分到 0 提示用） */
   --lt-color-info-base:     #0B6DD7;   /* = blue-60，符合 Figma info usage */
   --lt-color-info-light:    #E6F6FF;   /* TBC: Figma audit needed */
 
@@ -3516,7 +3517,7 @@ function v9RenderPreview(t,el){
   const acList=cards.map((c,i)=>({c,i,info:R.cards[i]})).filter(x=>x.c.type==='alloc');
   /* 2026-11-03 Kabin 照推薦重整（Phase 2、3 會放更多「每張卡怎麼分」的說明，所以區塊保留、每張 allocation card 一列）：
      標頭＝chip＋Split by {依據}＋例外時的狀態標籤（CMDS chip #6 Tangerine Orange）；主句寫出抓到、重疊、分給誰各多少（上下兩組數字接得起來）；
-     例外時另在 Spend Breakdown 上方放 CMDS Alert / Large（orange），原因仍寫在這裡那一列。⚠ 設計端暫擬：文案 */
+     例外時標頭右側放 Edit allocation card 回第 2 步（11/03 Kabin：原本上方的 Alert 併進這裡）。⚠ 設計端暫擬：文案 */
   const v10Exc=x=>['no-match','no-weight','partial'].includes(x.info.reason);
   const acHtml=acList.length?`<div class="card" id="v10-ac-sec" style="margin-bottom:24px"><div class="st" style="margin-bottom:12px">Shared Cost Allocation Details</div>${acList.map(({c,i,info})=>{
     const who=(c.recipients||[]).join(', ')||'—';
@@ -3535,10 +3536,7 @@ function v9RenderPreview(t,el){
     const acNo=acList.findIndex(x=>x.i===i)+1;
     const badge=(typeof v10On==='function'&&v10On())?`<span class="ac-badge lt-chip lt-chip--outline lt-chip--c3"><span class="material-symbols-outlined lt-chip__icon" aria-hidden="true">call_split</span>${acList.length>1?`Allocation card ${acNo}`:'Allocation card'}</span>`:`<span class="pn">${i+1}</span>`;
     const lineHtml=status?`<div class="v10-ac-warn"><span class="material-symbols-outlined" aria-hidden="true">warning</span><span><strong>${status}.</strong> ${line}</span></div>`:line;
-    return `<div class="v9-ac-line v10-ac-row"><div class="v10-ac-row-h">${badge}<span class="v10-ac-row-basis">${v10SplitHead(c)}</span></div><div class="v10-ac-row-b">${lineHtml}${zeroHtml}${takenHtml}</div></div>`}).join('')}</div>`:'';
-  const excList=acList.filter(v10Exc);
-  const excLeft=uc; // 警示寫結果（多少錢留在 Untagged），原因留給下方那一列，兩處不重複同一句
-  const alertHtml=excList.length?`<div class="v10-pv-alert" role="alert"><div class="v10-pv-alert-b"><span class="v10-pv-alert-ic"><span class="material-symbols-outlined" aria-hidden="true">error</span></span><div class="v10-pv-alert-txt"><div class="v10-pv-alert-t">${acList.length>1?`${excList.length} allocation card${excList.length>1?'s':''} didn't split all shared cost`:excList[0].info.reason==='partial'?"Some shared cost wasn't split":"Your allocation card didn't split any cost"}</div><div class="v10-pv-alert-d">${excLeft>0?`${v10Amt(excLeft)} stays Untagged.`:'Some shared cost may stay Untagged.'} See Shared Cost Allocation Details below for why.</div></div><button class="btn btn-o" type="button" onclick="v10FromPreview(2)">Edit Allocation Card</button></div></div>`:'';
+    return `<div class="v9-ac-line v10-ac-row"><div class="v10-ac-row-h">${badge}<span class="v10-ac-row-basis">${v10SplitHead(c)}</span>${status?`<button class="v10-tbtn v10-ac-edit" type="button" onclick="v10FromPreview(2)">Edit allocation card</button>`:''}</div><div class="v10-ac-row-b">${lineHtml}${zeroHtml}${takenHtml}</div></div>`}).join('')}</div>`:'';
   // ⏸ PARKED：Rule Conflicts（Figma #05 / #05-1 的隱藏元件，註記「暫不實作」）
   const conflictHtml=(S._showParked&&R.multi.length)?(()=>{
     const cspName={GCP:'Google Cloud',AWS:'AWS',Azure:'Azure',FOCUS:'FOCUS'};
@@ -3559,7 +3557,7 @@ function v9RenderPreview(t,el){
   const cover=T-uc;const valCount=vals.filter(v=>v.total>0).length;
   el.innerHTML=`<div class="pg-hdr"><a class="back-btn" href="#" onclick="showLeaveConfirm('list');return false"><span class="material-symbols-outlined">arrow_circle_left</span>LumiTag List</a><div class="pg-hdr-row"><div class="pg-title">Coverage Preview</div></div></div>
 <div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div class="st">Coverage for LumiTag: ${t.name}</div><span style="font-size:12px;font-weight:500;color:var(--g500)">Total 30 Days Spend: <strong style="font-weight:500">${fmtFull(T)}</strong></span></div>${bar}${leg}</div>
-${alertHtml}<div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div class="st">Spend Breakdown</div>${canToggle?`<span style="flex:1"></span>${v9ParkedBadge('proposal')}<div class="v9-seg" role="tablist"><button type="button" class="${before?'':'on'}" onclick="S._pvMode='after';go('preview','${t.id}')">After allocation</button><button type="button" class="${before?'on':''}" onclick="S._pvMode='before';go('preview','${t.id}')">Before allocation</button></div>`:''}</div><div class="pt-wrap"><table class="pt" style="table-layout:fixed">${colW}<thead><tr><th>Tag Value</th>${twoCol?`<th style="text-align:right">Direct <span class="info-tip" tabindex="0" data-tip="Cost that value cards assign to this value."><span class="material-symbols-outlined">info</span></span></th><th style="text-align:right">Allocated <span class="info-tip" tabindex="0" data-tip="Shared cost split to this value by your allocation card. It's an estimate based on your allocation rules. See Shared Cost Allocation Details below for how it's split."><span class="material-symbols-outlined">info</span></span></th>`:''}<th style="text-align:right">30 Days Spend</th><th>Share of Spend</th><th>Resources</th></tr></thead><tbody>${trows}</tbody></table></div>${untaggedFooter}${kubeLine}</div>
+<div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div class="st">Spend Breakdown</div>${canToggle?`<span style="flex:1"></span>${v9ParkedBadge('proposal')}<div class="v9-seg" role="tablist"><button type="button" class="${before?'':'on'}" onclick="S._pvMode='after';go('preview','${t.id}')">After allocation</button><button type="button" class="${before?'on':''}" onclick="S._pvMode='before';go('preview','${t.id}')">Before allocation</button></div>`:''}</div><div class="pt-wrap"><table class="pt" style="table-layout:fixed">${colW}<thead><tr><th>Tag Value</th>${twoCol?`<th style="text-align:right">Direct <span class="info-tip" tabindex="0" data-tip="Cost that value cards assign to this value."><span class="material-symbols-outlined">info</span></span></th><th style="text-align:right">Allocated <span class="info-tip" tabindex="0" data-tip="Shared cost split to this value by your allocation card. It's an estimate based on your allocation rules. See Shared Cost Allocation Details below for how it's split."><span class="material-symbols-outlined">info</span></span></th>`:''}<th style="text-align:right">30 Days Spend</th><th>Share of Spend</th><th>Resources</th></tr></thead><tbody>${trows}</tbody></table></div>${untaggedFooter}${kubeLine}</div>
 ${acHtml}${kubeHtml}${conflictHtml}
 <div class="sbtm"><button class="btn btn-o" onclick="${S._isNew?`S._v10Restore=true;go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_circle_left</span>Back to Edit</button><div class="ssp"></div><button class="btn btn-o" onclick="showSaveDraftModal('${t.id}',${!!S.tags.find(x=>x.id===t.id&&x.status==='active')})">Save as Inactive Tag</button><button class="btn btn-p" onclick="v9ShowApply('${t.id}',${cover},${uc},${valCount},${acAll.reduce((s,x)=>s+(x.info.allocated||0),0)})">Apply LumiTag</button></div>`;
   setTimeout(()=>{el.querySelectorAll('.aseg').forEach(s=>{if(s.offsetWidth<44){const sp=s.querySelector('.seg-pct');if(sp)sp.style.visibility='hidden'}})},50);
@@ -6510,17 +6508,7 @@ go('list');</script>
 .bac[aria-disabled="true"]{color:var(--lt-color-text-disabled)!important;cursor:not-allowed}.bac[aria-disabled="true"]:hover{text-decoration:none}
 </style>
 <style id="v10-1103-ac">
-/* 2026-11-03 Kabin 照推薦：Coverage Preview 的 Shared Cost Allocation 每張卡一列（標頭＋說明），例外時 Spend Breakdown 上方放 CMDS Alert / Large（orange）。
-   Alert 數值量自 CMDS Alert / Large（Color=orange）：白底 r6、陰影 dialog、頂條 4、內距 20、icon 框 32 r4、間距 16、標題 H6、說明 Body Secondary */
-.v10-pv-alert{background:var(--lt-white);border-radius:6px;box-shadow:var(--lt-shadow-dialog);overflow:hidden;margin-bottom:24px}
-.v10-pv-alert::before{content:"";display:block;height:4px;background:var(--lt-color-attention-main)}
-.v10-pv-alert-b{display:flex;align-items:center;gap:16px;padding:20px}
-.v10-pv-alert-ic{width:32px;height:32px;border-radius:4px;background:var(--lt-color-attention-lighter);display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:flex-start}
-.v10-pv-alert-ic .material-symbols-outlined{font-size:24px;color:var(--lt-color-attention-main)}
-.v10-pv-alert-txt{flex:1;min-width:0}
-.v10-pv-alert-t{font:var(--lt-type-h6);color:var(--lt-color-text-primary)}
-.v10-pv-alert-d{font:var(--lt-type-body);color:var(--lt-color-text-secondary);margin-top:4px}
-.v10-pv-alert .btn{flex-shrink:0}
+/* 2026-11-03 Kabin：Coverage Preview 的 Shared Cost Allocation Details 每張卡一列（標頭＋說明）；沒分成功時說明句開頭用 Warning/Dark＋warning icon，標頭右側放 Edit allocation card（原本上方的 Alert 已併進這一列） */
 .v9-ac-line.v10-ac-row{display:block;padding:16px 0}
 .v10-ac-row-h{display:flex;align-items:center;gap:12px}
 .v10-ac-row-basis{font:var(--lt-type-caption);color:var(--lt-color-text-secondary)}
@@ -6528,6 +6516,7 @@ go('list');</script>
 .v10-ac-warn{display:flex;gap:4px;align-items:flex-start;color:var(--lt-color-warning-dark)}
 .v10-ac-warn>.material-symbols-outlined{font-size:16px;line-height:24.5px;font-variation-settings:'FILL' 1}
 .v10-ac-warn strong{font-weight:700}
+.v10-ac-edit{margin-left:auto;font:var(--lt-type-body-bold);color:var(--lt-color-text-link)}.v10-ac-edit:hover{color:var(--lt-color-text-link-hover)}
 </style>
 </body>
 </html>
