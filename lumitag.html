@@ -3522,7 +3522,7 @@ function v9RenderPreview(t,el){
   const v10Exc=x=>['no-match','no-weight','partial'].includes(x.info.reason);
   /* 11/03 晚 Kabin：分攤成功時整塊不顯示（每個 value 分到多少看表格、總共分多少看綠色列；要分的錢怎麼來的在 Step 2 摘要與 Total 列），只在沒分成功、或 Phase 2 有說明要補時出現；不再寫「條件抓到 − 已拿走」那段 */
   const acShow=acList.filter(({c,info})=>v10Exc({info})||v10RowExtra(c,info));
-  const acHtml=acShow.length?`<div class="card" id="v10-ac-sec" style="margin-bottom:24px"><div class="st" style="margin-bottom:12px">Shared Cost Allocation Details</div>${acShow.map(({c,i,info})=>{
+  const acHtml=acShow.length?`<div class="card" id="v10-ac-sec" style="margin-bottom:24px"><div class="st" style="margin-bottom:12px">${acShow.some(v10Exc)?'Shared Cost Not Split':'Shared Cost Allocation Details'}</div>${acShow.map(({c,i,info})=>{
     const who=(c.recipients||[]).join(', ')||'—';
     const parts=(info.noWeight||[]).map(v9PartLabel).join(', ');
     const gotList=v10List((c.recipients||[]).filter(n=>(info.byRecip||{})[n]>0).map(n=>`${n} (${v10Amt(info.byRecip[n])})`));
