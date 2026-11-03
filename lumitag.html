@@ -3537,8 +3537,8 @@ function v9RenderPreview(t,el){
     const takenHtml=false?`<div class="v10-taken"><span class="material-symbols-outlined">info</span><span>The Step 2 conditions match ${v10Amt(info.takenAbove+info.matched)}. ${v10Amt(info.takenAbove)} of it is already direct cost of ${v10List(takenLinks)}, so ${info.matched?`only the remaining ${v10Amt(info.matched)} is split`:`nothing is left to split`}.</span></div>`:'';
     const acNo=acList.findIndex(x=>x.i===i)+1;
     const badge=(typeof v10On==='function'&&v10On())?`<span class="ac-badge lt-chip lt-chip--outline lt-chip--c3"><span class="material-symbols-outlined lt-chip__icon" aria-hidden="true">call_split</span>${acList.length>1?`Allocation card ${acNo}`:'Allocation card'}</span>`:`<span class="pn">${i+1}</span>`;
-    const lineHtml=status?`<div class="v10-ac-warn"><span class="material-symbols-outlined" aria-hidden="true">warning</span><span><strong>${status}.</strong> ${line}</span></div>`:line;
-    return `<div class="v9-ac-line v10-ac-row"><div class="v10-ac-row-h">${badge}<span class="v10-ac-row-basis">${v10SplitHead(c)}</span>${status?`<button class="v10-tbtn v10-ac-edit" type="button" onclick="v10FromPreview(2)">Edit allocation card</button>`:''}</div><div class="v10-ac-row-b">${lineHtml}${zeroHtml}${takenHtml}</div></div>`}).join('')}</div>`:'';
+    const lineHtml=status?`<div class="v10-ac-warn"><span class="material-symbols-outlined" aria-hidden="true">warning</span><span><strong>${status}.</strong> ${line} <button class="v10-tbtn v10-ac-edit" type="button" onclick="v10FromPreview(2)">Edit allocation card</button></span></div>`:line; // 11/03 Kabin：修正入口接在原因後面（原本在標頭右側太遠）
+    return `<div class="v9-ac-line v10-ac-row"><div class="v10-ac-row-h">${badge}<span class="v10-ac-row-basis">${v10SplitHead(c)}</span></div><div class="v10-ac-row-b">${lineHtml}${zeroHtml}${takenHtml}</div></div>`}).join('')}</div>`:'';
   // ⏸ PARKED：Rule Conflicts（Figma #05 / #05-1 的隱藏元件，註記「暫不實作」）
   const conflictHtml=(S._showParked&&R.multi.length)?(()=>{
     const cspName={GCP:'Google Cloud',AWS:'AWS',Azure:'Azure',FOCUS:'FOCUS'};
@@ -6518,7 +6518,7 @@ go('list');</script>
 .v10-ac-warn{display:flex;gap:4px;align-items:flex-start;color:var(--lt-color-warning-dark)}
 .v10-ac-warn>.material-symbols-outlined{font-size:16px;line-height:24.5px;font-variation-settings:'FILL' 1}
 .v10-ac-warn strong{font-weight:700}
-.v10-ac-edit{margin-left:auto;font:var(--lt-type-body-bold);color:var(--lt-color-text-link)}.v10-ac-edit:hover{color:var(--lt-color-text-link-hover)}
+.v10-ac-edit{margin-left:4px;font:var(--lt-type-body-bold);color:var(--lt-color-text-link)}.v10-ac-edit:hover{color:var(--lt-color-text-link-hover)}
 </style>
 </body>
 </html>
