@@ -165,6 +165,14 @@
   --lt-kit-11-light: var(--lt-grey-100);       /* #F2F2F2  #11 Gray */
   --lt-kit-11-main:  var(--lt-grey-400);       /* #B3B3B3 */
   --lt-kit-11-dark:  #7C7C7C;                  /*          CM Color Kit/Dark/#11 Dark */
+  --lt-kit-4-light:  #E6FFF8;                  /* CM Color Kit/Light/#4 Light（2026-11-03 補，LumiTag Preview 狀態標籤） */
+  --lt-kit-4-main:   var(--lt-chart-4);        /* #00DCC2 */
+  --lt-kit-4-dark:   var(--lt-color-success);  /* #00B5A6  CM Color Kit/Dark/#4 Dark */
+  --lt-kit-6-light:  var(--lt-color-warning-light); /* #FEF3E1  #6 Tangerine Orange（2026-11-03 補，LumiTag Not split／Partially split） */
+  --lt-kit-6-main:   var(--lt-chart-6);        /* #F3BE68 */
+  --lt-kit-6-dark:   var(--lt-color-warning-base);  /* #FC9A0F  CM Color Kit/Dark/#6 Dark */
+  --lt-color-attention-main:    #FFA500;       /* CDP color/Attention/Attention1 Main（CMDS Alert / Large orange 頂條與 icon，2026-11-03 補） */
+  --lt-color-attention-lighter: #FFF3DE;       /* CDP color/Attention/Attention4 Lighter（Alert icon 底） */
 
   /* --- Shadow: 對齊 CMDS Figma 規範 (2026-05-12 audit)
    * 來源：Figma node 20599-107518 — CMDS 4 個官方 shadow variables
@@ -410,6 +418,8 @@
 .lt-chip--solid.lt-chip--c3{background:var(--lt-kit-3-dark,#34B5D9);color:var(--lt-white,#fff)}
 .lt-chip--outline.lt-chip--c11{background:var(--lt-kit-11-light,#F2F2F2);border-color:var(--lt-kit-11-main,#B3B3B3);color:var(--lt-kit-11-dark,#7C7C7C)}
 .lt-chip--solid.lt-chip--c11{background:var(--lt-kit-11-dark,#7C7C7C);color:var(--lt-white,#fff)}
+.lt-chip--outline.lt-chip--c4{background:var(--lt-kit-4-light,#E6FFF8);border-color:var(--lt-kit-4-main,#00DCC2);color:var(--lt-kit-4-dark,#00B5A6)}
+.lt-chip--outline.lt-chip--c6{background:var(--lt-kit-6-light,#FEF3E1);border-color:var(--lt-kit-6-main,#F3BE68);color:var(--lt-kit-6-dark,#FC9A0F)}
 
 </style>
 <!-- checkbox 共用元件放 head：body 尾端的 inline script 會在 shared script block 之前執行 -->
@@ -2767,6 +2777,7 @@ function v9EvalCard(row,card){return (card.cspBlocks||[]).some(b=>v9EvalBlock(ro
 function v9Part(row){if(S._scope!=='cluster')return '*';const cl=(row.labels||{})['goog-k8s-cluster-name'];return cl?`${row.project_id}|${cl}`:'*'}
 /* 句子裡要能加減對帳，金額一律寫完整（不套十萬縮寫），不然 100.00K − 40,000.00 很難對 */
 function v10Amt(n){return fmtCurr(Math.round(n*100)/100)}
+function v10SplitHead(c){return 'Split by Spend'} // Preview Shared Cost Allocation 每列標頭的依據；v11 依分攤依據／分配方式覆寫
 function v10SplitBy(c,info){return `by their direct cost ${v10Where(info)}`} // Preview 說明句的分攤依據片語；v11 依 Phase 2 分攤依據覆寫
 function v10List(a){return a.length<2?(a[0]||'—'):a.length===2?`${a[0]} and ${a[1]}`:`${a.slice(0,-1).join(', ')}, and ${a[a.length-1]}`}
 function v10Where(info){const ps=[...(info.usedParts||[])];return ps.length===1?(ps[0]==='*'?'in this tag':`in ${v9PartLabel(ps[0])}`):'where this shared cost sits'}
@@ -3503,21 +3514,31 @@ function v9RenderPreview(t,el){
         :`<div class="lt-ok-row">100% Coverage Achieved! All resources are successfully tagged and accounted for.</div>`})();
   // 分攤狀態（PRD：未攤分標示，兩種原因）⚠ ASSUMPTION 文案
   const acList=cards.map((c,i)=>({c,i,info:R.cards[i]})).filter(x=>x.c.type==='alloc');
+  /* 2026-11-03 Kabin 照推薦重整（Phase 2、3 會放更多「每張卡怎麼分」的說明，所以區塊保留、每張 allocation card 一列）：
+     標頭＝chip＋Split by {依據}＋例外時的狀態標籤（CMDS chip #6 Tangerine Orange）；主句寫出抓到、重疊、分給誰各多少（上下兩組數字接得起來）；
+     例外時另在 Spend Breakdown 上方放 CMDS Alert / Large（orange），原因仍寫在這裡那一列。⚠ 設計端暫擬：文案 */
+  const v10Exc=x=>['no-match','no-weight','partial'].includes(x.info.reason);
   const acHtml=acList.length?`<div class="card" id="v10-ac-sec" style="margin-bottom:24px"><div class="st" style="margin-bottom:12px">Shared Cost Allocation</div>${acList.map(({c,i,info})=>{
     const who=(c.recipients||[]).join(', ')||'—';
-    const line=info.reason==='no-match'?`<span class="v9-pill muted">Not split</span>No cost matched this card's conditions in the last 30 days.`
-      :info.reason==='no-weight'?`<span class="v9-pill warn">Not split</span>${v9fmt(info.unallocated)} stays Untagged: none of ${who} has direct cost in ${info.noWeight.map(v9PartLabel).join(', ')}.`
-      :info.reason==='partial'?`<span class="v9-pill ok">Split</span>${v9fmt(info.allocated)} split across ${who}. <span class="v9-warn-t">${v9fmt(info.unallocated)} stays Untagged: no direct cost in ${info.noWeight.map(v9PartLabel).join(', ')}.</span>`
-      /* 2026-11-03 Kabin 照推薦（前端：各 value 分到多少表格已有）：成功時只留一句「這張卡抓到多少 → 多少已是直接成本 → 剩多少依什麼分」，不再逐一列 value 金額；狀態標籤照 10/16 定案只在例外出現 */
-      :`${S._acPillExc?'':'<span class="v9-pill ok">Split</span>'}${info.takenAbove?`The Step 2 conditions match ${v10Amt(info.takenAbove+info.matched)}. ${v10Amt(info.takenAbove)} of it is already direct cost from Step 1 value cards, so the remaining ${v10Amt(info.matched)} is split ${v10SplitBy(c,info)}.`:`The Step 2 conditions match ${v10Amt(info.matched)}, all split ${v10SplitBy(c,info)}.`}`;
+    const parts=(info.noWeight||[]).map(v9PartLabel).join(', ');
+    const gotList=v10List((c.recipients||[]).filter(n=>(info.byRecip||{})[n]>0).map(n=>`${n} (${v10Amt(info.byRecip[n])})`));
+    const status=info.reason==='partial'?'Partially split':(info.reason==='no-match'||info.reason==='no-weight')?'Not split':(S._acPillExc?'':'Split');
+    const line=info.reason==='no-match'?`No cost matched the Step 2 conditions in the last 30 days.`
+      :info.reason==='no-weight'?`${v9fmt(info.unallocated)} stays Untagged: none of ${who} has direct cost in ${parts}.`
+      :info.reason==='partial'?`${v10Amt(info.allocated)} is split across ${gotList}. <span class="v9-warn-t">${v9fmt(info.unallocated)} stays Untagged: no direct cost in ${parts}.</span>`
+      :info.takenAbove?`The Step 2 conditions match ${v10Amt(info.takenAbove+info.matched)}. ${v10Amt(info.takenAbove)} of it is already direct cost from Step 1 value cards, so the remaining ${v10Amt(info.matched)} is split across ${gotList}.`
+      :`The Step 2 conditions match ${v10Amt(info.matched)}, all split across ${gotList}.`;
     const zeroNames=(c.recipients||[]).filter(n=>info.matched&&!(info.byRecip||{})[n]&&R.direct[n]>0&&info.noWeight.length===0);
     const zeroHtml=zeroNames.length&&info.reason!=='no-match'?`<div class="v9-warn-t" style="margin-top:4px">${zeroNames.map(n=>v9Basis().noShareHere(n,v10ZeroWhere(info))).join(' ')}</div>`:'';
-    /* 2026-10-05：回應「最後才看到、想改 value 要多走幾步」→ 名字可以點，直接回第 1 步、捲到那張 value card */
-    const takenLinks=[...info.takenBy]; // 2026-11-03：回 Step 1 的連結搬到表格的 value 名稱，這裡只寫名稱
-    // 2026-10-16 改寫：先給這張卡條件抓到的總數，再說其中多少已是 value card 的直接成本，加減對得起來（100K − 40K = 60K）
-    const takenHtml=(info.takenAbove&&['no-match','no-weight','partial'].includes(info.reason))? /* 成功時這句已併進主句；只在例外狀態補充 */`<div class="v10-taken"><span class="material-symbols-outlined">info</span><span>The Step 2 conditions match ${v10Amt(info.takenAbove+info.matched)}. ${v10Amt(info.takenAbove)} of it is already direct cost of ${v10List(takenLinks)}, so ${info.matched?`only the remaining ${v10Amt(info.matched)} is split`:`nothing is left to split`}.</span></div>`:'';
+    const takenLinks=[...info.takenBy];
+    const takenHtml=(info.takenAbove&&v10Exc({info}))?`<div class="v10-taken"><span class="material-symbols-outlined">info</span><span>The Step 2 conditions match ${v10Amt(info.takenAbove+info.matched)}. ${v10Amt(info.takenAbove)} of it is already direct cost of ${v10List(takenLinks)}, so ${info.matched?`only the remaining ${v10Amt(info.matched)} is split`:`nothing is left to split`}.</span></div>`:'';
     const acNo=acList.findIndex(x=>x.i===i)+1;
-    return `<div class="v9-ac-line">${(typeof v10On==='function'&&v10On())?`<span class="ac-badge lt-chip lt-chip--outline lt-chip--c3"><span class="material-symbols-outlined lt-chip__icon" aria-hidden="true">call_split</span>${acList.length>1?`Allocation card ${acNo}`:'Allocation card'}</span>`:`<span class="pn">${i+1}</span>`}<div>${line}${zeroHtml}${takenHtml}</div></div>`}).join('')}</div>`:'';
+    const badge=(typeof v10On==='function'&&v10On())?`<span class="ac-badge lt-chip lt-chip--outline lt-chip--c3"><span class="material-symbols-outlined lt-chip__icon" aria-hidden="true">call_split</span>${acList.length>1?`Allocation card ${acNo}`:'Allocation card'}</span>`:`<span class="pn">${i+1}</span>`;
+    const stChip=status?`<span class="lt-chip lt-chip--xs lt-chip--outline ${status==='Split'?'lt-chip--c4':'lt-chip--c6'}">${status}</span>`:'';
+    return `<div class="v9-ac-line v10-ac-row"><div class="v10-ac-row-h">${badge}<span class="v10-ac-row-basis">${v10SplitHead(c)}</span>${stChip}</div><div class="v10-ac-row-b">${line}${zeroHtml}${takenHtml}</div></div>`}).join('')}</div>`:'';
+  const excList=acList.filter(v10Exc);
+  const excLeft=uc; // 警示寫結果（多少錢留在 Untagged），原因留給下方那一列，兩處不重複同一句
+  const alertHtml=excList.length?`<div class="v10-pv-alert" role="alert"><div class="v10-pv-alert-b"><span class="v10-pv-alert-ic"><span class="material-symbols-outlined" aria-hidden="true">error</span></span><div class="v10-pv-alert-txt"><div class="v10-pv-alert-t">${acList.length>1?`${excList.length} allocation card${excList.length>1?'s':''} didn't split all shared cost`:excList[0].info.reason==='partial'?"Some shared cost wasn't split":"Your allocation card didn't split any cost"}</div><div class="v10-pv-alert-d">${excLeft>0?`${v10Amt(excLeft)} stays Untagged.`:'Some shared cost may stay Untagged.'} See Shared Cost Allocation below for why.</div></div><button class="btn btn-o" type="button" onclick="v10FromPreview(2)">Edit Allocation Card</button></div></div>`:'';
   // ⏸ PARKED：Rule Conflicts（Figma #05 / #05-1 的隱藏元件，註記「暫不實作」）
   const conflictHtml=(S._showParked&&R.multi.length)?(()=>{
     const cspName={GCP:'Google Cloud',AWS:'AWS',Azure:'Azure',FOCUS:'FOCUS'};
@@ -3538,7 +3559,7 @@ function v9RenderPreview(t,el){
   const cover=T-uc;const valCount=vals.filter(v=>v.total>0).length;
   el.innerHTML=`<div class="pg-hdr"><a class="back-btn" href="#" onclick="showLeaveConfirm('list');return false"><span class="material-symbols-outlined">arrow_circle_left</span>LumiTag List</a><div class="pg-hdr-row"><div class="pg-title">Coverage Preview</div></div></div>
 <div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div class="st">Coverage for LumiTag: ${t.name}</div><span style="font-size:12px;font-weight:500;color:var(--g500)">Total 30 Days Spend: <strong style="font-weight:500">${fmtFull(T)}</strong></span></div>${bar}${leg}</div>
-<div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div class="st">Spend Breakdown</div>${canToggle?`<span style="flex:1"></span>${v9ParkedBadge('proposal')}<div class="v9-seg" role="tablist"><button type="button" class="${before?'':'on'}" onclick="S._pvMode='after';go('preview','${t.id}')">After allocation</button><button type="button" class="${before?'on':''}" onclick="S._pvMode='before';go('preview','${t.id}')">Before allocation</button></div>`:''}</div><div class="pt-wrap"><table class="pt" style="table-layout:fixed">${colW}<thead><tr><th>Tag Value</th>${twoCol?`<th style="text-align:right">Direct <span class="info-tip" tabindex="0" data-tip="Cost that value cards assign to this value."><span class="material-symbols-outlined">info</span></span></th><th style="text-align:right">Allocated <span class="info-tip" tabindex="0" data-tip="Shared cost split to this value by your allocation card. It's an estimate based on your allocation rules. See Shared Cost Allocation below for how it's split."><span class="material-symbols-outlined">info</span></span></th>`:''}<th style="text-align:right">30 Days Spend</th><th>Share of Spend</th><th>Resources</th></tr></thead><tbody>${trows}</tbody></table></div>${untaggedFooter}${kubeLine}</div>
+${alertHtml}<div class="card" style="margin-bottom:24px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div class="st">Spend Breakdown</div>${canToggle?`<span style="flex:1"></span>${v9ParkedBadge('proposal')}<div class="v9-seg" role="tablist"><button type="button" class="${before?'':'on'}" onclick="S._pvMode='after';go('preview','${t.id}')">After allocation</button><button type="button" class="${before?'on':''}" onclick="S._pvMode='before';go('preview','${t.id}')">Before allocation</button></div>`:''}</div><div class="pt-wrap"><table class="pt" style="table-layout:fixed">${colW}<thead><tr><th>Tag Value</th>${twoCol?`<th style="text-align:right">Direct <span class="info-tip" tabindex="0" data-tip="Cost that value cards assign to this value."><span class="material-symbols-outlined">info</span></span></th><th style="text-align:right">Allocated <span class="info-tip" tabindex="0" data-tip="Shared cost split to this value by your allocation card. It's an estimate based on your allocation rules. See Shared Cost Allocation below for how it's split."><span class="material-symbols-outlined">info</span></span></th>`:''}<th style="text-align:right">30 Days Spend</th><th>Share of Spend</th><th>Resources</th></tr></thead><tbody>${trows}</tbody></table></div>${untaggedFooter}${kubeLine}</div>
 ${acHtml}${kubeHtml}${conflictHtml}
 <div class="sbtm"><button class="btn btn-o" onclick="${S._isNew?`S._v10Restore=true;go('create')`:`go('edit','${t.id}')`}"><span class="material-symbols-outlined">arrow_circle_left</span>Back to Edit</button><div class="ssp"></div><button class="btn btn-o" onclick="showSaveDraftModal('${t.id}',${!!S.tags.find(x=>x.id===t.id&&x.status==='active')})">Save as Inactive Tag</button><button class="btn btn-p" onclick="v9ShowApply('${t.id}',${cover},${uc},${valCount},${acAll.reduce((s,x)=>s+(x.info.allocated||0),0)})">Apply LumiTag</button></div>`;
   setTimeout(()=>{el.querySelectorAll('.aseg').forEach(s=>{if(s.offsetWidth<44){const sp=s.querySelector('.seg-pct');if(sp)sp.style.visibility='hidden'}})},50);
@@ -6489,6 +6510,23 @@ go('list');</script>
 .v10-spinner{box-sizing:border-box;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--lt-grey-300);border-right-color:transparent;flex-shrink:0;animation:v10spin .9s linear infinite}
 @media (prefers-reduced-motion:reduce){.v10-spinner{animation-duration:2.4s}}
 .bac[aria-disabled="true"]{color:var(--lt-color-text-disabled)!important;cursor:not-allowed}.bac[aria-disabled="true"]:hover{text-decoration:none}
+</style>
+<style id="v10-1103-ac">
+/* 2026-11-03 Kabin 照推薦：Coverage Preview 的 Shared Cost Allocation 每張卡一列（標頭＋說明），例外時 Spend Breakdown 上方放 CMDS Alert / Large（orange）。
+   Alert 數值量自 CMDS Alert / Large（Color=orange）：白底 r6、陰影 dialog、頂條 4、內距 20、icon 框 32 r4、間距 16、標題 H6、說明 Body Secondary */
+.v10-pv-alert{background:var(--lt-white);border-radius:6px;box-shadow:var(--lt-shadow-dialog);overflow:hidden;margin-bottom:24px}
+.v10-pv-alert::before{content:"";display:block;height:4px;background:var(--lt-color-attention-main)}
+.v10-pv-alert-b{display:flex;align-items:center;gap:16px;padding:20px}
+.v10-pv-alert-ic{width:32px;height:32px;border-radius:4px;background:var(--lt-color-attention-lighter);display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:flex-start}
+.v10-pv-alert-ic .material-symbols-outlined{font-size:24px;color:var(--lt-color-attention-main)}
+.v10-pv-alert-txt{flex:1;min-width:0}
+.v10-pv-alert-t{font:var(--lt-type-h6);color:var(--lt-color-text-primary)}
+.v10-pv-alert-d{font:var(--lt-type-body);color:var(--lt-color-text-secondary);margin-top:4px}
+.v10-pv-alert .btn{flex-shrink:0}
+.v9-ac-line.v10-ac-row{display:block;padding:16px 0}
+.v10-ac-row-h{display:flex;align-items:center;gap:12px}
+.v10-ac-row-basis{font:var(--lt-type-caption);color:var(--lt-color-text-secondary)}
+.v10-ac-row-b{margin-top:8px;font:var(--lt-type-body);color:var(--lt-color-text-primary);font-variant-numeric:tabular-nums}
 </style>
 </body>
 </html>
