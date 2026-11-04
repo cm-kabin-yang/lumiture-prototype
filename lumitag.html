@@ -3529,8 +3529,8 @@ function v9RenderPreview(t,el){
     const gotList=v10List((c.recipients||[]).filter(n=>(info.byRecip||{})[n]>0).map(n=>`${n} (${v10Amt(info.byRecip[n])})`));
     const status=info.reason==='partial'?'Partially split':(info.reason==='no-match'||info.reason==='no-weight')?'Not split':''; // 11/03 Kabin：狀態不用 chip，改在說明句開頭用 Warning/Dark＋warning icon（跟 Step 2 分到 0 的提示同一套）
     const line=info.reason==='no-match'?`No cost matched the Step 2 conditions in the last 30 days.`
-      :info.reason==='no-weight'?`${v9fmt(info.unallocated)} stays Untagged: none of ${who} has direct cost in ${parts}.`
-      :info.reason==='partial'?`${v9fmt(info.unallocated)} stays Untagged: none of ${who} has direct cost in ${parts}.` /* 11/04 Kabin：partial 跟 Not split 同一句型；分出去的金額看 Spend Breakdown */
+      :info.reason==='no-weight'?`${v9fmt(info.unallocated)} stays Untagged: none of the values in Split across has direct cost to split by.` /* 11/04 Kabin：不列 value 名稱，value 多時寫不完 */
+      :info.reason==='partial'?`${v9fmt(info.unallocated)} couldn't be split and stays Untagged.` /* 11/04 Kabin：通用寫法，不列 value；分出去的金額看 Spend Breakdown */
       :'';
     const zeroNames=(c.recipients||[]).filter(n=>info.matched&&!(info.byRecip||{})[n]&&R.direct[n]>0&&info.noWeight.length===0);
     const zeroHtml=zeroNames.length&&info.reason!=='no-match'?`<div class="v9-warn-t" style="margin-top:4px">${zeroNames.map(n=>v9Basis().noShareHere(n,v10ZeroWhere(info))).join(' ')}</div>`:'';
