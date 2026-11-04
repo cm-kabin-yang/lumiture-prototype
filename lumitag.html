@@ -2980,7 +2980,7 @@ function v10OpenChoose(btn,cid){
   const cards=v9ReadCards(cid);const idx=cards.findIndex(c=>c.el===ac);
   const cards2=cards.map((c,i)=>i===idx?Object.assign({},c,{recipients:names}):c);
   const info=idx>=0?v9Compute(cards2,v9RowsFor(cid)).cards[idx]:{};const parts=[...(info.usedParts||[])];const mixed=parts.includes('*')&&parts.length>1;
-  const amt=n=>!info.matched?'--':mixed?'Varies':v9fmt((info.basis||{})[n]||0);
+  const amt=n=>!info.matched?v9fmt(0):mixed?'Varies':v9fmt((info.basis||{})[n]||0);
   const order=names.map((n,i)=>[n,i]).sort((a,b)=>(((info.basis||{})[b[0]]||0)-((info.basis||{})[a[0]]||0))||a[1]-b[1]).map(x=>x[0]);
   const head=ac.querySelector('.ac-dc-t')?.textContent||'Direct cost';
   const m=document.createElement('div');m.className='v10-choose';m.setAttribute('role','dialog');m.setAttribute('aria-label','Choose values');m._btn=btn;
@@ -3250,7 +3250,7 @@ function v10UpdDcCell(cell,n,info){
   if(!cell)return;const ps=v10DcParts(info);const multi=ps.length>1;
   /* cluster 內外混在一起時，cluster 外那份是拿整個 tag 的直接成本比（含 cluster 內的錢），加總會重複算，所以不顯示加總、只給 Varies＋明細 */
   const mixed=ps.includes('*')&&ps.length>1;
-  cell.textContent=n&&info.matched?(mixed?'Varies':v9fmt((info.basis||{})[n]||0)):'--';cell.classList.toggle('is-multi',multi&&!!n&&!!info.matched);
+  cell.textContent=n?(info.matched?(mixed?'Varies':v9fmt((info.basis||{})[n]||0)):v9fmt(0)):'--';cell.classList.toggle('is-multi',multi&&!!n&&!!info.matched);
   if(multi&&n&&info.matched){cell.tabIndex=0;cell.dataset.tip=`${n}\n`+ps.map(p=>`${v10DcName(p,ps)}: direct ${v9fmt((info.basisByPart[p]||{})[n]||0)} · allocated ${v9fmt(((info.allocByPart||{})[p]||{})[n]||0)}`).join('\n')}
   else{cell.removeAttribute('tabindex');delete cell.dataset.tip}
 }
@@ -3343,7 +3343,7 @@ function v9UpdAll(cid){
     const sample=v9IsSampleData(cid)?`<span class="ac-sample" data-tip="這個 tag 沒有示範帳單，數字借用 cost-owner 的示範帳單計算。">Sample bill</span>`:'';
     { /* 10/29 表格樣式比較 D：符合金額改成表格最後一列 Total（摘要列平常不出現） */
       el.classList.toggle('ac-has-total',!!info.matched);const tot=el.querySelector('.ac-total');if(tot){
-        tot.innerHTML=info.matched?`<span class="ac-total-l">Total <span class="ac-total-p">(last 30 days)</span></span><span class="ac-total-n"></span><span class="ac-total-n">${info.allocated&&c.recipients.length?'100.00%':'--'}</span><span class="ac-total-n">${c.recipients.length?v9fmt(info.matched):'--'}</span><span></span>`:''}}
+        tot.innerHTML=info.matched?`<span class="ac-total-l">Total <span class="ac-total-p">(last 30 days)</span></span><span class="ac-total-n"></span><span class="ac-total-n">${c.recipients.length?(info.allocated?'100.00%':'0.00%'):'--'}</span><span class="ac-total-n">${c.recipients.length?v9fmt(info.matched):'--'}</span><span></span>`:''}}
     el.querySelector('[data-acmatch]').innerHTML=info.matched
       ?`<span class="material-symbols-outlined">receipt_long</span><span>Last 30 days: <strong>${v9fmt(info.matched)}</strong> matched</span>${sample}`
       :`<span class="material-symbols-outlined">receipt_long</span><span class="ac-muted">No cost matches these conditions in the last 30 days.</span>${sample}`;
@@ -3352,8 +3352,8 @@ function v9UpdAll(cid){
     el.querySelectorAll('.ac-row').forEach(r=>{
       const n=(r.querySelector('.ac-sel')?.value||r.querySelector('.ac-txt')?.value||r.dataset.name||'').trim();
       const amt=info.byRecip[n]||0;const w=info.allocated?amt/info.allocated:0;
-      r.querySelector('.ac-w').textContent=n&&info.allocated?(w*100).toFixed(2)+'%':'--';
-      r.querySelector('.ac-amt').textContent=n&&info.allocated?v9fmt(amt):'--'; // 10/13 R10：還沒算＝--，不是 0
+      r.querySelector('.ac-w').textContent=n&&!blank?(w*100).toFixed(2)+'%':'--'; // 11/04 RD：有算但分到 0 顯示 0；-- 只留給沒算（空白卡）或算不出來
+      r.querySelector('.ac-amt').textContent=n&&!blank?v9fmt(amt):'--'; // 10/13 R10：還沒算＝--；11/04 RD：算過但分到 0＝0
       v10UpdDcCell(r.querySelector('.ac-dc'),n,info);if(blank&&n)r.querySelector('.ac-dc').textContent=v9fmt(R.direct[n]||0); // 空白卡：整個 tag 的直接成本（#12-2）
       const hint=r.querySelector('.ac-row-hint');
       const noDirect=n&&info.matched&&!amt;
@@ -3500,9 +3500,9 @@ function v9RenderPreview(t,el){
     /* 2026-10-14：PM 決定維持 View Details（不顯示資源數），PRD 已移除「Resources 欄語意變更」；Resources 表頭說明一併拿掉 */
     const resCell=`<td><div><a href="#" onclick="event.preventDefault();showMatchedModal('${esc}',${v.res},${Math.round(v.direct)},${Math.round(v.alloc)})" style="color:var(--pri);font-size:14px;font-weight:500;text-decoration:underline;white-space:nowrap">View Details</a></div></td>`;
     const vLink=`<a href="#" class="lt-link v10-val-link" data-tip="Edit this value card" onclick="v10EditCardFromPreview('${String(v.name).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}');return false">${v.name}</a>`; /* 2026-11-03 前端提議、Kabin 同意：回 Step 1 改條件的連結放在表格的 value 名稱上（原本在下方 Shared Cost Allocation 的說明句裡） */
-    if(v.total>0&&twoCol){trows+=`<tr><td><div class="li"><div class="ld" style="background:${color}"></div>${vLink}</div></td><td style="text-align:right">${v9fmt(v.direct)}</td><td style="text-align:right">${v.alloc?v9fmt(v.alloc):'<span style="color:var(--g400)">--</span>'}</td><td style="text-align:right;font-weight:700">${v9fmt(v.total)}</td><td>${v9pct(v.total,T)}</td>${resCell}</tr>`;return}
+    if(v.total>0&&twoCol){trows+=`<tr><td><div class="li"><div class="ld" style="background:${color}"></div>${vLink}</div></td><td style="text-align:right">${v9fmt(v.direct)}</td><td style="text-align:right">${v9fmt(v.alloc||0)}</td><td style="text-align:right;font-weight:700">${v9fmt(v.total)}</td><td>${v9pct(v.total,T)}</td>${resCell}</tr>`;return}
     if(v.total>0)trows+=`<tr><td><div class="li"><div class="ld" style="background:${color}"></div>${vLink}</div></td><td style="text-align:right"><div class="v9-amt-cell">${split}<span>${v9fmt(v.total)}</span>${est}</div></td><td>${v9pct(v.total,T)}</td><td><div><a href="#" onclick="event.preventDefault();showMatchedModal('${esc}',${v.res},${Math.round(v.total)})" style="color:var(--pri);font-size:14px;font-weight:500;text-decoration:underline;white-space:nowrap">View Details</a></div></td></tr>`;
-    else if(twoCol)trows+=`<tr class="nm"><td><div class="li"><div class="ld" style="background:var(--g200)"></div>${v.name}</div></td><td style="text-align:right;color:var(--g400)">${S._currency} 0</td><td style="text-align:right;color:var(--g400)">--</td><td style="text-align:right;color:var(--g400)">${S._currency} 0</td><td style="color:var(--g400)">0%</td><td><span style="font-size:12px;color:var(--g400)">No resources matched</span></td></tr>`;
+    else if(twoCol)trows+=`<tr class="nm"><td><div class="li"><div class="ld" style="background:var(--g200)"></div>${v.name}</div></td><td style="text-align:right;color:var(--g400)">${v9fmt(0)}</td><td style="text-align:right;color:var(--g400)">${v9fmt(0)}</td><td style="text-align:right;color:var(--g400)">${v9fmt(0)}</td><td style="color:var(--g400)">0%</td><td><span style="font-size:12px;color:var(--g400)">No resources matched</span></td></tr>`;
     else trows+=`<tr class="nm"><td><div class="li"><div class="ld" style="background:var(--g200)"></div>${v.name}</div></td><td style="text-align:right;color:var(--g400)">${S._currency} 0</td><td style="color:var(--g400)">0%</td><td><span style="font-size:12px;color:var(--g400)">No resources matched</span></td></tr>`;
   });
   pools.forEach(pl=>{trows+=`<tr class="v9-pool-row"><td><div class="li"><span class="material-symbols-outlined" style="font-size:16px;color:var(--g500)">call_split</span>${pl.name}</div></td><td style="text-align:right">${v9fmt(pl.total)}</td><td>${v9pct(pl.total,T)}</td><td><span style="font-size:12px;color:var(--g500)">To be split across ${pl.to}</span></td></tr>`});
@@ -3530,7 +3530,7 @@ function v9RenderPreview(t,el){
     const status=info.reason==='partial'?'Partially split':(info.reason==='no-match'||info.reason==='no-weight')?'Not split':''; // 11/03 Kabin：狀態不用 chip，改在說明句開頭用 Warning/Dark＋warning icon（跟 Step 2 分到 0 的提示同一套）
     const line=info.reason==='no-match'?`No cost matched the Step 2 conditions in the last 30 days.`
       :info.reason==='no-weight'?`${v9fmt(info.unallocated)} stays Untagged: none of ${who} has direct cost in ${parts}.`
-      :info.reason==='partial'?`${v10Amt(info.allocated)} is split across ${gotList}. <span class="v9-warn-t">${v9fmt(info.unallocated)} stays Untagged: no direct cost in ${parts}.</span>`
+      :info.reason==='partial'?`${v9fmt(info.unallocated)} stays Untagged: none of ${who} has direct cost in ${parts}.` /* 11/04 Kabin：partial 跟 Not split 同一句型；分出去的金額看 Spend Breakdown */
       :'';
     const zeroNames=(c.recipients||[]).filter(n=>info.matched&&!(info.byRecip||{})[n]&&R.direct[n]>0&&info.noWeight.length===0);
     const zeroHtml=zeroNames.length&&info.reason!=='no-match'?`<div class="v9-warn-t" style="margin-top:4px">${zeroNames.map(n=>v9Basis().noShareHere(n,v10ZeroWhere(info))).join(' ')}</div>`:'';
