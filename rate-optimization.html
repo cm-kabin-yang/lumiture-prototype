@@ -84,6 +84,7 @@
   --lt-color-error-light:   #FFEBEF;   /* TBC: Figma audit needed */
   --lt-color-warning-base:  #FC9A0F;   /* TBC: Figma audit needed */
   --lt-color-warning-light: #FEF3E1;   /* TBC: Figma audit needed */
+  --lt-color-warning-dark:  #EC6F09;   /* CM Color Kit Warning/Dark（2026-11-02 補；FE warning.dark，LumiTag 過期與分到 0 提示用） */
   --lt-color-info-base:     #0B6DD7;   /* = blue-60，符合 Figma info usage */
   --lt-color-info-light:    #E6F6FF;   /* TBC: Figma audit needed */
 
@@ -140,6 +141,42 @@
 
   /* --- Typography: Letter Spacing (對齊 Figma: 全部 0) --- */
   --lt-tracking-normal: 0;
+
+  /* --- Typography: CMDS 文字樣式（composite，用在 `font:` 簡寫）2026-11-02 ---
+   * 一對一對應 Figma「CM Typography」的文字樣式；寫 CSS 一律從這組挑，不自己組字級／字重／行高。
+   * `font:` 簡寫會把 font-variant-numeric 重設成 normal，數字欄要另外補 tabular-nums。
+   * Link Bold 1 稿上自帶底線；底線由元件決定（Lumiture 文字按鈕不加底線，見 Guideline Text Button）。 */
+  --lt-type-h3:               700 24px/36px var(--lt-font-sans);    /* Headers/H3 頁面標題 */
+  --lt-type-h4:               700 20px/30px var(--lt-font-sans);    /* Headers/H4 頁面副標題 */
+  --lt-type-h5:               700 18px/27px var(--lt-font-sans);    /* Headers/H5 功能名稱 */
+  --lt-type-h6:               700 16px/24px var(--lt-font-sans);    /* Headers/H6 小標題 */
+  --lt-type-body:             400 14px/24.5px var(--lt-font-sans);  /* Body/Body Regular 內文 */
+  --lt-type-body-medium:      500 14px/24.5px var(--lt-font-sans);  /* Body/Body Medium 內文重點 */
+  --lt-type-body-bold:        700 14px/24.5px var(--lt-font-sans);  /* Body/Body Bold 內文標題 */
+  --lt-type-caption:          400 12px/18px var(--lt-font-sans);    /* Caption/Caption Regular 註記 */
+  --lt-type-caption-bold:     700 12px/18px var(--lt-font-sans);    /* Caption/Caption Bold 重要註記 */
+  --lt-type-button-regular-0: 400 12px/18px var(--lt-font-sans);    /* Content/Button Regular 0（chip 字） */
+  --lt-type-button-regular-1: 400 14px/21px var(--lt-font-sans);    /* Content/Button Regular 1（下拉選項字） */
+  --lt-type-button-bold-1:    700 14px/21px var(--lt-font-sans);    /* Content/Button Bold 1 */
+  --lt-type-button-bold-2:    700 16px/24px var(--lt-font-sans);    /* Content/Button Bold 2 */
+  --lt-type-link-bold-1:      700 14px/24.5px var(--lt-font-sans);  /* Content/Link Bold 1 超連結 */
+  --lt-type-link-medium-1:    500 14px/24.5px var(--lt-font-sans);  /* Content/Link Medium 1 超連結（2026-11-03 補，LumiTag Edit allocation card） */
+
+  /* --- Color: CM Color Kit（chip 等元件用；Light＝底、Main＝框、Dark＝字）2026-11-02，先收 #3、#11，其他色用到再補 --- */
+  --lt-kit-3-light:  var(--lt-turquoise-10);   /* #F0FFFF  #3 Turquoise Blue */
+  --lt-kit-3-main:   var(--lt-chart-3);        /* #9CF3FF */
+  --lt-kit-3-dark:   var(--lt-turquoise-70);   /* #34B5D9  CM Color Kit/Dark/#3 Dark */
+  --lt-kit-11-light: var(--lt-grey-100);       /* #F2F2F2  #11 Gray */
+  --lt-kit-11-main:  var(--lt-grey-400);       /* #B3B3B3 */
+  --lt-kit-11-dark:  #7C7C7C;                  /*          CM Color Kit/Dark/#11 Dark */
+  --lt-kit-4-light:  #E6FFF8;                  /* CM Color Kit/Light/#4 Light（2026-11-03 補，LumiTag Preview 狀態標籤） */
+  --lt-kit-4-main:   var(--lt-chart-4);        /* #00DCC2 */
+  --lt-kit-4-dark:   var(--lt-color-success);  /* #00B5A6  CM Color Kit/Dark/#4 Dark */
+  --lt-kit-6-light:  var(--lt-color-warning-light); /* #FEF3E1  #6 Tangerine Orange（2026-11-03 補，LumiTag Not split／Partially split） */
+  --lt-kit-6-main:   var(--lt-chart-6);        /* #F3BE68 */
+  --lt-kit-6-dark:   var(--lt-color-warning-base);  /* #FC9A0F  CM Color Kit/Dark/#6 Dark */
+  --lt-color-attention-main:    #FFA500;       /* CDP color/Attention/Attention1 Main（CMDS Alert / Large orange 頂條與 icon，2026-11-03 補） */
+  --lt-color-attention-lighter: #FFF3DE;       /* CDP color/Attention/Attention4 Lighter（Alert icon 底） */
 
   /* --- Shadow: 對齊 CMDS Figma 規範 (2026-05-12 audit)
    * 來源：Figma node 20599-107518 — CMDS 4 個官方 shadow variables
@@ -292,7 +329,7 @@
  * - ~~Chart palette~~ ✅ 已加入（2026-05-12 從 Figma General Behavior file audit）
  * - Gradient tokens (Figma 有 Lumiture.ai Blue / Orange / Lemon C 等)
  * - Opacity tokens (Figma 有 CM Opacity Color 系列)
- * - Composite typography tokens (--lt-type-h1, --lt-type-body 等 style sets)
+ * - ~~Composite typography tokens~~ ✅ 已加入 --lt-type-*（2026-11-02，H1／H2 用到再補）
  * - Focus / Inset shadow 特殊變體
  * - Dark mode 對應 token
  *
@@ -310,6 +347,7 @@
  *   .lt-skeleton 骨架屏（A-18）
  *   .lt-link     文字連結（B-14）
  *   .lt-btn-icon 表格 Action icon button（B-6，CB 版）
+ *   .lt-chip     CMDS「Deletable chips / Squared colors」（2026-11-02）
  *   空狀態／無權限見 lumiture-empty.js；Toast 見 lumiture-toast.js
  * ============================================================ */
 
@@ -369,6 +407,29 @@
 .lt-btn-icon:focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:1px}
 .lt-btn-icon:disabled{color:var(--lt-grey-400,#B3B3B3);cursor:not-allowed;background:none}
 
+/* ---------- .lt-chip ----------
+ * CMDS「Deletable chips / Squared colors」，Deletable=false。Lumiture 用到的 chip 一律走這個，不要各頁自刻。
+ * 結構：<span class="lt-chip lt-chip--outline lt-chip--c3"><span class="material-symbols-outlined lt-chip__icon">call_split</span>Allocation card</span>
+ * Size：預設 s（高 24）、.lt-chip--xs（高 20）。CMDS 只有這兩個尺寸。
+ * 圓角 4、左右內距 8、icon（Show icon L）16 與字間距 4、字 Button Regular 0（12／18）。
+ * Appearance：.lt-chip--outline 底 Light／框 Main／字 Dark；.lt-chip--solid 底 Dark／白字。
+ * Color：.lt-chip--c3（#3 Turquoise Blue）、.lt-chip--c4（#4 Green）、.lt-chip--c6（#6 Tangerine Orange）、.lt-chip--c11（#11 Gray）；其他色用到時照 CM Color Kit 在 tokens.css 補 --lt-kit-N-*。 */
+.lt-chip{display:inline-flex;align-items:center;gap:4px;box-sizing:border-box;height:24px;padding:0 8px;border-radius:4px;border:1px solid transparent;
+  font:var(--lt-type-button-regular-0,400 12px/18px sans-serif);white-space:nowrap;flex-shrink:0;vertical-align:middle}
+.lt-chip--xs{height:20px}
+.lt-chip__icon{font-size:16px;line-height:1;font-variation-settings:'FILL' 1}
+.lt-chip--outline.lt-chip--c3{background:var(--lt-kit-3-light,#F0FFFF);border-color:var(--lt-kit-3-main,#9CF3FF);color:var(--lt-kit-3-dark,#34B5D9)}
+.lt-chip--solid.lt-chip--c3{background:var(--lt-kit-3-dark,#34B5D9);color:var(--lt-white,#fff)}
+.lt-chip--outline.lt-chip--c11{background:var(--lt-kit-11-light,#F2F2F2);border-color:var(--lt-kit-11-main,#B3B3B3);color:var(--lt-kit-11-dark,#7C7C7C)}
+.lt-chip--solid.lt-chip--c11{background:var(--lt-kit-11-dark,#7C7C7C);color:var(--lt-white,#fff)}
+.lt-chip--outline.lt-chip--c4{background:var(--lt-kit-4-light,#E6FFF8);border-color:var(--lt-kit-4-main,#00DCC2);color:var(--lt-kit-4-dark,#00B5A6)}
+.lt-chip--outline.lt-chip--c6{background:var(--lt-kit-6-light,#FEF3E1);border-color:var(--lt-kit-6-main,#F3BE68);color:var(--lt-kit-6-dark,#FC9A0F)}
+
+/* X-9r1 11-13 S-FOCUS：鍵盤 focus 框統一 2px primary 外框（X-9r2／X-9r5 已定「focus 統一 2px primary 外框」）。
+   用 :where() 零權重：各頁自己寫了 :focus-visible 或 outline:none＋光暈的照舊贏。
+   排除共用外殼（sidebar／topbar／Account Menu／角色彈窗／Demo FAB／toast）：它們在深色底上有自己的青色或白色框。 */
+:where(button,[role="button"],[role="tab"],a[href]):where(:not(.lt-sidebar *,.lt-topbar *,.lt-tb-logo *,#lt-am *,.lt-rd-back *,.demo-fab,.demo-popover *,.lt-toast-wrap *)):focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:2px}
+
 </style>
 <style>
 :root{
@@ -423,7 +484,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .btn-sm{height:30px;padding:0 12px;font-size:14px}
 .btn .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 16}
 .btn:disabled{background:var(--lt-button-disabled-bg,#CCCCCC)!important;color:var(--lt-button-disabled-text,#fff)!important;border-color:transparent!important;cursor:not-allowed}   /* B-1：FE 版停用按鈕 #CCCCCC 底白字 */
-.btn-o:disabled{background:#fff!important;color:var(--g400)!important;border-color:var(--g300)!important}
+.btn-o:disabled{background:#fff!important;color:var(--g300)!important;border-color:var(--g300)!important}   /* X-9r1 11-13 P3：外框鈕停用字與 icon #CCCCCC（稿 Overview #11／Rate Optimization #02、#11／General Budget #01-6 等一律白底、框字 icon #CCCCCC） */
 .btn-b:disabled{background:transparent!important;color:var(--g400)!important}
 .btn-b .btn-text{transition:text-decoration .15s}
 .btn-b:hover .btn-text{text-decoration:underline}
@@ -562,9 +623,9 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-viewseg button.active:hover{background:var(--pri-lt20)}
 .rs-viewseg button:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(0,79,176,.35)}
 /* RB2（X-9r4）：讀取中分頁字 #CCCCCC、不能點（稿 #02／#08／#11）；選中那格底改 #F2F2F2，免得淡藍底配灰字 */
-.rs-viewseg button:disabled{color:var(--g300);cursor:not-allowed}
+.rs-viewseg button:disabled{color:var(--g400);cursor:not-allowed}   /* X-9r1 11-13 P5：停用字 #B3B3B3（稿 Toggle / Status=disabled；原 #CCCCCC） */
 .rs-viewseg button:disabled:hover{background:none}
-.rs-viewseg button.active:disabled,.rs-viewseg button.active:disabled:hover{background:var(--g100)}
+.rs-viewseg button.active:disabled,.rs-viewseg button.active:disabled:hover{background:#fff;font-weight:400}   /* X-9r1 11-13 P5：選中格停用也沒有底色（原 #F2F2F2） */
 /* 2026-08 Kickoff final: PM decided already-expired commitments never display in
    this tab at all (TL's point — an expired commitment should already have become
    a Recommendation, not linger here). So this badge only ever counts items that
@@ -589,6 +650,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-filter .rs-fr{display:flex;align-items:center;gap:12px}
 /* A-11（2026-10-15）：下拉觸發欄改掛 shared .lt-select（框 #CCCCCC、hover #B3B3B3、MUI 實心 ▾ 24px）；A-33⑧：拿掉前導 cloud／tag icon（稿與 RS 都沒有） */
 .rs-sel.lt-select{gap:0;padding:0 2px 0 12px;box-sizing:border-box;flex-shrink:0}
+.rs-sel:disabled{border-color:var(--g200);color:var(--g400)}   /* X-9r1 11-13 P4：停用下拉觸發欄 底 #F2F2F2（shared）、框 #E6E6E6、字 #B3B3B3、箭頭 #CCCCCC（稿 #02／#08／#11；shared .lt-select:disabled 框字是 #CCCCCC） */
 .rs-sel.on{border-color:var(--pri);color:var(--pri)}
 .rs-sel.on .lt-select__arrow{color:var(--pri)}
 .rs-selwrap.open .rs-sel{border-color:var(--lt-color-border-focus,#004FB0);box-shadow:var(--lt-button-focus-ring,0 0 0 3px rgba(0,79,176,.1))}
@@ -599,6 +661,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .rs-search .material-symbols-outlined{font-size:20px;color:var(--g400);font-variation-settings:'FILL' 0}
 .rs-search input{border:none;outline:none;background:none;width:100%;height:100%;font-size:14px;color:var(--g700)}   /* RB19：輸入框撐滿外框高（點擊區） */
 .rs-search input:disabled{cursor:not-allowed;color:var(--g400)}
+.rs-search input:disabled::placeholder{color:var(--g400)}   /* X-9r1 11-13：停用時提示字 #B3B3B3（稿 #02 `10627:34782`；原本只設了 color，placeholder 仍是深色，看起來像已輸入的字；同 Rightsizing） */
 .rs-search.is-disabled{background:var(--g100);border-color:var(--g200)}
 .rs-search.is-disabled:hover{border-color:var(--g200)}
 .rs-search.is-disabled .material-symbols-outlined{color:var(--g300)}
@@ -698,7 +761,8 @@ table.rstbl.acttbl{min-width:1080px}
 /* .empty-state's own gap is 12px; the extra 20px here makes the image-to-title
    gap 32px specifically, without changing the other gaps in this stack. */
 #rs-srcgate{flex:1}
-.rs-tbl-empty{padding:48px 24px}   /* 空狀態版型走 shared LumitureEmpty（A-19） */
+.rs-tbl-empty{padding:48px 24px}
+/* X-9r1 11-13 S-S5：稿 #03／#09／#04 標題 18／700，shared size l 預設已改 18，原本的頁面覆寫拿掉 */   /* 空狀態版型走 shared LumitureEmpty（A-19） */
 
 /* No-auth / first-time full card */
 .rs-fullcard{background:#fff;border-radius:var(--r-md);box-shadow:var(--lt-card-shadow,0 0 20px rgba(0,0,0,.10));min-height:420px;display:flex;align-items:center;justify-content:center;padding:48px}
@@ -1175,7 +1239,7 @@ table.rstbl.acttbl{min-width:1080px}
  * 規格（Guideline Empty State，全站唯一用 outlined icon 的元件）：
  *   icon：Material Symbols FILL 0、色 #9ED7FF（Primary Light 30）；尺寸 S 48／M 64／L 80
  *   標題色 #676767（2026-10-16 X-9r1：Overview、Executive Insights、Anomaly Detection、General Budget 的稿都是 text-secondary）
- *   標題 S 14／M 16／L 20，Bold｜說明 S 12／M 14／L 14（#676767）｜整體水平垂直置中｜icon→標題 12（page 版 16）→說明 4~8→按鈕 16
+ *   標題 S 14／M 16／L 18，Bold（L 20 → 18：X-9r1 11-13 S-S5，依據 Rightsizing #03／#04、Rate Optimization #03／#09／#04、Executive Insights #06／#11、Overview #07 的稿標題都是 18／27，行高 1.5＝27）｜說明 S 12／M 14／L 14（#676767）｜整體水平垂直置中｜icon→標題 12（page 版 16）→說明 4~8→按鈕 16
  *   page：整頁卡片版（ARL 10/09 裁決方案 B）：icon 64、標題 18／700、說明 14、按鈕離說明 32、卡片最小高 521
  *
  * 用法：
@@ -1206,7 +1270,7 @@ table.rstbl.acttbl{min-width:1080px}
       '.lt-empty__ic-svg{display:block;line-height:0}.lt-empty__ic-svg svg{display:block;width:64px;height:64px}',
       '.lt-empty--s .lt-empty__ic-svg svg{width:48px;height:48px}.lt-empty--l .lt-empty__ic-svg svg{width:80px;height:80px}',
       '.lt-empty__t{margin:12px 0 0;font-weight:700;line-height:1.5;color:var(--lt-color-text-secondary,#676767)}',
-      '.lt-empty--s .lt-empty__t{font-size:14px}.lt-empty--m .lt-empty__t{font-size:16px}.lt-empty--l .lt-empty__t{font-size:20px}.lt-empty--page .lt-empty__t{font-size:18px;margin-top:16px}',
+      '.lt-empty--s .lt-empty__t{font-size:14px}.lt-empty--m .lt-empty__t{font-size:16px}.lt-empty--l .lt-empty__t{font-size:18px}.lt-empty--page .lt-empty__t{font-size:18px;margin-top:16px}',
       '.lt-empty__d{margin:8px 0 0;font-size:14px;line-height:24.5px;color:var(--lt-color-text-secondary,#676767);white-space:pre-line}',
       '.lt-empty--s .lt-empty__d{font-size:12px;line-height:18px;margin-top:4px}',
       '.lt-empty__a{margin-top:16px}.lt-empty--page .lt-empty__a{margin-top:32px}',
@@ -2018,7 +2082,7 @@ function renderTable(){
   var area = $('#rs-tablearea');
   if(state.pageState==='loading'){ area.innerHTML = skeletonTable('rec'); return; }
   if(state.pageState==='empty' || state.pageState==='nodata'){
-    area.innerHTML = '<div class="rs-tblwrap rs-tbl-empty">'+LumitureEmpty.noData({size:'m', desc:'Recommendations will appear once enough billing history has accumulated.'})+'</div>';   /* A-19：共用空狀態 */
+    area.innerHTML = '<div class="rs-tbl-empty">'+LumitureEmpty.noData({size:'l'})+'</div>';   /* X-9r4 11-06 A3／A13／A14：稿 #03 只有「No Data Available」、icon 80、標題 18，沒有說明句；不包 .rs-tblwrap 外框（同 RS RA19） */   /* A-19：共用空狀態 */
     _visRec = [];
     return;
   }
@@ -2077,7 +2141,7 @@ function renderTable(){
     // No all-sources-off branch: that case never reaches the table now, it's caught
     // earlier by the page-level gate in renderListPage().
     if(state.fProv && !state.provEnabled[state.fProv]){ area.innerHTML = provGateHtml(state.fProv); return; }
-    area.innerHTML = '<div class="rs-tblwrap rs-tbl-empty">'+LumitureEmpty.html({size:'m', icon:(q?'search_off':'inbox'), title:'No matching recommendations', desc:'Try adjusting your search or filters.'})+'</div>';
+    area.innerHTML = '<div class="rs-tbl-empty">'+LumitureEmpty.html({size:'l', icon:(q?'search_off':'inbox'), title:'No matching recommendations', desc:'Try adjusting your search or filters.'})+'</div>';
     return;
   }
   area.innerHTML = '<div class="rs-tblwrap"><div class="rs-tblscroll"><table class="rstbl" aria-label="Commitment recommendations"><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div></div>';
@@ -2090,8 +2154,8 @@ function renderTable(){
    the button is dropped rather than offering a dead action. */
 function provGateHtml(key){
   var p = provOf(key) || {label:key, supported:true};
-  return '<div class="rs-tblwrap rs-tbl-empty">'+LumitureEmpty.html({
-    size:'m', icon:'cloud_off', title:p.label+' is not enabled',
+  return '<div class="rs-tbl-empty">'+LumitureEmpty.html({
+    size:'l', icon:'cloud_off', title:p.label+' is not enabled',
     desc: p.supported ? 'Enable it in Cloud Data Sources above to see '+p.label+' recommendations and active commitments.'
                       : 'Support for '+p.label+' is coming in upcoming releases.',
     action: p.supported ? { label:'Open Data Sources', onclick:'openSourcesModal()' } : null
@@ -2130,7 +2194,7 @@ function renderActiveTable(){
   var area = $('#rs-acttablearea');
   if(state.pageState==='loading'){ area.innerHTML = skeletonTable('active'); return; }
   if(state.pageState==='empty' || state.pageState==='nodata'){
-    area.innerHTML = '<div class="rs-tblwrap rs-tbl-empty">'+LumitureEmpty.noData({size:'m'})+'</div>';   /* RB9：稿 #09 `10700:64379` 只有「No Data Available」，沒有自寫標題與說明 */
+    area.innerHTML = '<div class="rs-tbl-empty">'+LumitureEmpty.noData({size:'l'})+'</div>';   /* RB9：稿 #09 `10700:64379` 只有「No Data Available」，沒有自寫標題與說明 */
     _visAct = [];
     return;
   }
@@ -2178,7 +2242,7 @@ function renderActiveTable(){
   if(rows.length===0){
     // all-sources-off is caught by the page-level gate before reaching here.
     if(state.fProv && !state.provEnabled[state.fProv]){ area.innerHTML = provGateHtml(state.fProv); return; }
-    area.innerHTML = '<div class="rs-tblwrap rs-tbl-empty">'+LumitureEmpty.html({size:'m', icon:'search_off', title:'No matching commitments'})+'</div>';
+    area.innerHTML = '<div class="rs-tbl-empty">'+LumitureEmpty.html({size:'l', icon:'search_off', title:'No matching commitments'})+'</div>';
     return;
   }
   area.innerHTML = '<div class="rs-tblwrap"><div class="rs-tblscroll"><table class="rstbl acttbl" aria-label="Active commitments"><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div></div>';
@@ -2330,7 +2394,7 @@ function authState(){
   // "switch role to see the difference" was equally stale, now fixed.)
   /* A-25：文案照稿 #04 `10627:34820`；A-33②：CTA 連到授權頁（organization-settings v4，RS 同） */
   var cta = '<div class="lt-empty__a"><a class="btn btn-p" href="./organization-settings.html" style="text-decoration:none"><span class="material-symbols-outlined">add</span>Add Your Authorization</a></div>';
-  var body = LumitureEmpty.html({ size:'page', icon:'lock_open',
+  var body = LumitureEmpty.html({ size:'l', iconHtml:'<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzBfNTApIj4KPHBhdGggZD0iTTIzLjY0MTIgOC40NDE5MkMyNC4wMzczIDguODEwODggMjQuMjg4OCA5LjMyNTkyIDI0LjI5ODggOS45MDA2NEwyNC40MTI2IDE1LjMyOTdDMjQuNDM2NyAxNi40NzkxIDIzLjQ5NTkgMTcuNDI5NiAyMi4zMTEyIDE3LjQ1MjlDMjEuMTI2NCAxNy40NzYxIDIwLjE0NjYgMTYuNTYzMyAyMC4xMjI1IDE1LjQxNEwyMC4wMDg3IDkuOTg0OTJDMTkuOTg0NiA4LjgzNTU2IDIwLjkyNTQgNy44ODUwNCAyMi4xMTAxIDcuODYxNzdDMjIuNzA0NSA3Ljg1MDA5IDIzLjI0NTIgOC4wNzI5NyAyMy42NDEyIDguNDQxOTJaTTE1Ljk0NTEgMTYuMDY0NEwxMi4wMTUzIDEyLjQwMzVDMTEuMTgzOSAxMS42MjkxIDkuODY5MjggMTEuNjQ3MSA5LjA4MDgxIDEyLjQ0MzdDOC4yOTIzNCAxMy4yNDAzIDguMzI3MTQgMTQuNTE1NCA5LjE1ODQ5IDE1LjI4OTlMMTMuMDg4MyAxOC45NTA3QzEzLjkxOTcgMTkuNzI1MiAxNS4yMzQzIDE5LjcwNzIgMTYuMDIyOCAxOC45MTA1QzE2LjgxMTIgMTguMTEzOSAxNi43NzY0IDE2LjgzODggMTUuOTQ1MSAxNi4wNjQ0Wk0yMC42MjE3IDU5LjY2MjRDMTguOTAxNiA1OS4yMTUyIDE3LjYxNzggNTguMjY1NCAxNi43NzAyIDU2LjgxMjlDMTUuOTIxMSA1NS4zNjAxIDE1LjcyMTkgNTMuODE3OCAxNi4xNzI1IDUyLjE4NjFMMjIuMTE4MiAzMC42NTlDMjIuNTY4OCAyOS4wMjczIDIzLjUzNjIgMjcuNzg4MyAyNS4wMjA0IDI2Ljk0MkMyNi41MDMgMjYuMDk1MiAyOC4xMDQzIDI1Ljg5NTQgMjkuODI0NCAyNi4zNDI2TDQ5LjAzMjQgMzEuMzM1N0w1MC4wMTU3IDI3Ljc3NTdDNTAuNDc2NiAyNi4xMDY5IDUwLjI5NCAyNC41Nzg1IDQ5LjQ2OCAyMy4xOTA1QzQ4LjY0MyAyMS44MDQzIDQ3LjQwODcgMjAuODk3NiA0NS43NjUxIDIwLjQ3MDNDNDQuNDI3MiAyMC4xMjI1IDQzLjE4OTkgMjAuMTg4IDQyLjA1MzEgMjAuNjY2OEM0MC45MTc0IDIxLjE0NzQgMzkuOTUyNiAyMS44NjA4IDM5LjE1ODcgMjIuODA3MUMzOC42MDIzIDIzLjMzODEgMzguMDI3MSAyMy43MTQ5IDM3LjQzMzEgMjMuOTM3MkMzNi44Mzg2IDI0LjE2MTEgMzYuMjU0NyAyNC4xOTg1IDM1LjY4MTQgMjQuMDQ5NUMzNC42NDkzIDIzLjc4MTIgMzMuOTIyMyAyMy4yMjQxIDMzLjUwMDQgMjIuMzc4NEMzMy4wNzgxIDIxLjUzNDEgMzMuMTcyMSAyMC42NzQ2IDMzLjc4MjQgMTkuNzk5OEMzNS4xNjQyIDE3LjYxNTIgMzcuMDk5OCAxNi4wMjE0IDM5LjU4OTIgMTUuMDE4MkM0Mi4wNzgyIDE0LjAxNjYgNDQuNjc5NiAxMy44Njg1IDQ3LjM5MzYgMTQuNTc0QzUwLjcxOTIgMTUuNDM4NSA1My4yMjg5IDE3LjI5MjggNTQuOTIyOCAyMC4xMzdDNTYuNjE0OCAyMi45ODIzIDU3LjAwNSAyNi4wNTUxIDU2LjA5MzQgMjkuMzU1Nkw1NS4xMTAyIDMyLjkxNTZMNTYuNTQzNiAzMy4yODgzQzU4LjI2MzcgMzMuNzM1NCA1OS41NDc1IDM0LjY4NTIgNjAuMzk1MSAzNi4xMzc3QzYxLjI0NDIgMzcuNTkwNSA2MS40NDM1IDM5LjEzMjggNjAuOTkyOCA0MC43NjQ1TDU1LjA0NzEgNjIuMjkxNkM1NC41OTY1IDYzLjkyMzMgNTMuNjI5MSA2NS4xNjIzIDUyLjE0NSA2Ni4wMDg2QzUwLjY2MjMgNjYuODU1NCA0OS4wNjEgNjcuMDU1MiA0Ny4zNDA5IDY2LjYwOEwyMC42MjE3IDU5LjY2MjRaTTM3LjM2MTMgNTAuODk3NUMzOC42MjI3IDUxLjIyNTQgMzkuODIzMiA1MS4wNzA5IDQwLjk2MjcgNTAuNDMzOUM0Mi4xMDExIDQ5Ljc5NSA0Mi44MzkzIDQ4Ljg2MzYgNDMuMTc3MyA0Ny42Mzk5QzQzLjUxNTMgNDYuNDE2MSA0My4zNTYgNDUuMjUxNSA0Mi42OTk0IDQ0LjE0NkM0Mi4wNDA4IDQzLjA0MTUgNDEuMDgwOCA0Mi4zMjUzIDM5LjgxOTQgNDEuOTk3NEMzOC41NTggNDEuNjY5NSAzNy4zNTgzIDQxLjgyNDMgMzYuMjIwMyA0Mi40NjE3QzM1LjA4MDMgNDMuMTAwMiAzNC4zNDE0IDQ0LjAzMTMgMzQuMDAzNCA0NS4yNTUxQzMzLjY2NTQgNDYuNDc4OSAzMy44MjU0IDQ3LjY0MzcgMzQuNDgzNiA0OC43NDk2QzM1LjE0MDYgNDkuODUzNyAzNi4wOTk4IDUwLjU2OTYgMzcuMzYxMyA1MC44OTc1Wk0xNC4xMTc4IDIzLjYwOTJDMTQuNTEzOCAyMy45NzgyIDE0Ljc2NTMgMjQuNDkzMiAxNC43NzUzIDI1LjA2NzlDMTQuNzk5NCAyNi4yMTczIDEzLjg1ODYgMjcuMTY3OCAxMi42NzM5IDI3LjE5MTFMNy4wNzc4IDI3LjMwMUM1Ljg5MzA3IDI3LjMyNDMgNC45MTMyMiAyNi40MTE1IDQuODg5MTIgMjUuMjYyMUM0Ljg2NTAzIDI0LjExMjggNS44MDU4MiAyMy4xNjIzIDYuOTkwNTUgMjMuMTM5TDEyLjU4NjcgMjMuMDI5MUMxMy4xNzkxIDIzLjAxOTQgMTMuNzIxNyAyMy4yNDAzIDE0LjExNzggMjMuNjA5MlpNNzAuODcwOSA2Ni4xOTk5TDc2LjUyMjYgNzEuNjgyOUM3Ni43MTU5IDcxLjg5MzggNzYuOTQ1MyA3MS45OTkyIDc3LjIxMSA3MS45OTkyQzc3LjQ3NjcgNzEuOTk5MiA3Ny43MDYxIDcxLjg5MzggNzcuODk5MyA3MS42ODI5TDc5LjY3NDYgNjkuOTYwN0M3OS44OTE5IDY5Ljc0OTggODAuMDAwNiA2OS41MjE2IDgwLjAwMDYgNjkuMjc2QzgwLjAwMDYgNjkuMDI5NSA3OS44OTE5IDY4LjgxMjUgNzkuNjc0NiA2OC42MjUxTDc0LjAyMjggNjMuMTQyMUw3Ni41OTUxIDYyLjI5ODVDNzcuMDU0IDYyLjEzNDUgNzcuMjc3NiA2MS44MjQzIDc3LjI2NjEgNjEuMzY3OEM3Ny4yNTM1IDYwLjkxMDQgNzcuMDE3OCA2MC42MTE0IDc2LjU1ODkgNjAuNDcwOUw2Ni4yNjk4IDU3LjQ4MzNDNjUuOTA3NSA1Ny4zODk2IDY1LjU4NzcgNTcuNDc3MiA2NS4zMTA0IDU3Ljc0NjJDNjUuMDMyMiA1OC4wMTYyIDY0Ljk0MTQgNTguMzI2OSA2NS4wMzggNTguNjc4M0w2OC4xMTc1IDY4LjY2MDJDNjguMjYyNCA2OS4xMDU0IDY4LjU3MDYgNjkuMzM0MSA2OS4wNDIgNjkuMzQ2M0M2OS41MTI1IDY5LjM1NzUgNjkuODMyMyA2OS4xNDA2IDcwLjAwMTQgNjguNjk1NEw3MC44NzA5IDY2LjE5OTlaIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZmlsbD0iIzlFRDdGRiIvPgo8L2c+CjxkZWZzPgo8Y2xpcFBhdGggaWQ9ImNsaXAwXzBfNTAiPgo8cmVjdCB3aWR0aD0iODAiIGhlaWdodD0iODAiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==" width="80" height="80" alt="">',   /* X-9r4 11-06 A5：稿 #04 彩色鎖頭 80（同 Rightsizing C2-11 同一張 svg），原本共用線框 lock_open 64 */
     title:'Unlock the Potential of Your Rate Optimization Today',
     desc:"Begin your rate optimization journey by authorizing both your billing and usage data. You'll be able to discover commitment discount opportunities, monitor coverage and utilization, and take action to maximize rate savings while reducing cloud spend. Please click the button below to proceed with the authorization." });
   return '<div id="rs-statefull" class="rs-fullcard">'+body.replace(/<\/div>$/, cta+'</div>')+'</div>';
@@ -3064,14 +3128,14 @@ bindTips();
   }
   function _renderLogo() {
     var href = _homeHref();
-    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-sb-logo">';
+    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-sb-logo">';
     return open + _logoBody(LOGO_ICON) + (href ? '</a>' : '</div>');
   }
   // 收合時顯示在 topbar 左側的 logo（同一組圖形，mask id 改 ltT* 避免跟 sidebar 那份撞 id）
   function _renderTopbarLogo() {
     var href = _homeHref();
     var icon = LOGO_ICON.replace(/ltH(ring|bars|leg)/g, 'ltT$1');
-    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-tb-logo">';
+    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-tb-logo">';
     return open + _logoBody(icon) + (href ? '</a>' : '</div>');
   }
   function _mountTopbarLogo(host) {
@@ -3323,7 +3387,7 @@ bindTips();
  *     version:     'v1.19.0',               // Software version 列
  *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
  *     quota: {                              // AI Quota box 數據；total 已含 add-on
- *       refreshDate: '2 Nov. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）
+ *       refreshDate: '2 Dec. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）。沒給（或給空值）就自動算下一個 2 號（X-9r1 11-13 S-A1，LumitureTopbar.nextRefreshDate）
  *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
  *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
  *     },
@@ -3334,6 +3398,7 @@ bindTips();
  *   window.LumitureTopbar.setRole('Manager - ...')— 只更新 role chip（Demo FAB role 切換用）
  *   window.LumitureTopbar.setPlan('Essential')    — 切 plan（連動 AI Quota box 顯示項目）
  *   window.LumitureTopbar.setQuota({analyses:{...}, rightsizing:{...}, refreshDate, addonPacks})
+ *   window.LumitureTopbar.nextRefreshDate()        — 依今天算下一個計費週期錨日（每月 2 號），回 '2 Dec. 2026' 這種寫法
  *   window.LumitureTopbar.openMenu() / closeMenu() / toggleMenu()
  *   window.LumitureTopbar.rerender()
  *   window.LumitureTopbar.openRoleDialog() / closeRoleDialog()   — View as Another Role 彈窗（#01-5；頁面掛勾見下方 role 區塊註解）
@@ -3342,6 +3407,16 @@ bindTips();
  */
 (function () {
   'use strict';
+
+  /* X-9r1 11-13 S-A1：下一個計費週期錨日（每月 2 號），格式照稿的「2 Apr. 2028」；今天 ≥ 2 號就取下個月。
+     原本寫死 '2 Nov. 2026'，過了那天 13 頁的 Account Menu 都顯示過期日（User Menu 頁自己算過，這裡搬進 shared 讓全站共用）。 */
+  function _nextRefreshDate() {
+    var M = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'];
+    var d = new Date(), y = d.getFullYear(), m = d.getMonth();
+    if (d.getDate() >= 2) m += 1;
+    if (m > 11) { m = 0; y += 1; }
+    return '2 ' + M[m] + ' ' + y;
+  }
 
   // ===== Defaults ===== (預設給 Standard plan + Normal 狀態，所有既有 prototype 直接吃，不破版)
   var DEFAULT_USER = {
@@ -3356,7 +3431,7 @@ bindTips();
     version: 'v1.19.0',
     addonPacks: 0,
     quota: {
-      refreshDate: '2 Nov. 2026',          // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期（原 2 Jul. 2026 已過期）
+      refreshDate: _nextRefreshDate(),     // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期；X-9r1 11-13 S-A1：改成依今天自動算（原寫死 2 Nov. 2026 已過期）
       analyses:    { used: 32,  total: 80 },
       rightsizing: { used: 410, total: 1000 },
     },
@@ -3422,8 +3497,11 @@ bindTips();
     /* ---------- Account Menu popover ----------
        2026-10-14 逐格對 Figma #01-6（hover）／#01-7（loading & error）：左右內距 24、方案列 37 高、姓名 16/700、角色 chip 藍 #004FB0 方角、
        AI Quota 每列 24 高、狀態色 #00DCC2／#F4A938／#FF403D、功能列 40 高（外包 8／16）、陰影 0 0 6px .2。舊值（內距 16、狀態色提亮）是 06-22 的目視估計 */
-    '.lt-am-backdrop{position:fixed;inset:0;z-index:1000;background:transparent}',
-    '.lt-am{position:fixed;top:64px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
+    /* X-9r1 11-13 S-A2：背板 1000 → 997。Demo FAB 999、面板 998，背板要讓到它們底下，否則選單開著時（User Menu 頁進頁就開著）
+       第一下點 FAB 只會被背板吃掉去關選單，面板不開。選單本體 #lt-am 維持 1001。不要去抬 FAB 的層級：
+       Cost Dashboard、Group List、All Resource List 有 1000 以上的彈窗遮罩，FAB 抬上去會浮在遮罩上。 */
+    '.lt-am-backdrop{position:fixed;inset:0;z-index:997;background:transparent}',
+    '.lt-am{position:fixed;top:68px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
     'box-shadow:0 0 6px rgba(0,0,0,.2);font-family:\'Noto Sans\',sans-serif;color:#fff;',
     'animation:lt-am-in .14s ease;transform-origin:top right}',   /* 不設 overflow:hidden：hover tooltip（寬 400）要能伸出選單左邊，圓角改由第一／最後一個子區塊自己帶 */
     '@keyframes lt-am-in{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}',
@@ -3520,6 +3598,7 @@ bindTips();
   function _user() {
     var u = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
     u.quota = Object.assign({}, DEFAULT_USER.quota, (window.LUMITURE_USER || {}).quota || {});
+    if (!u.quota.refreshDate) u.quota.refreshDate = _nextRefreshDate();   /* 頁面傳 undefined／null／'' 也吃自動值（S-A1） */
     return u;
   }
   function _status(used, total) {
@@ -3690,7 +3769,8 @@ bindTips();
     var m = document.getElementById('lt-am');
     return m ? Array.prototype.slice.call(m.querySelectorAll('.lt-am-item,.lt-q-err a,.lt-q-item.has-tip')) : [];
   }
-  function _openMenu() {
+  function _openMenu(opts) {
+    var noFocus = !!(opts && opts.focus === false);   /* X-9r1 11-13 S-B9：程式開選單（User Menu 進頁、Demo 情境）不搶焦點 */
     var wasOpen = _menuOpen, items0 = wasOpen ? _menuItems() : [], idx = items0.indexOf(document.activeElement);
     var u = _user();
     _menuHost().innerHTML = _renderMenu(u);
@@ -3698,7 +3778,7 @@ bindTips();
     var chip = document.getElementById('lt-tb-user');
     if (chip) { chip.classList.add('is-open'); chip.setAttribute('aria-expanded', 'true'); }
     var items = _menuItems(), t = null;
-    if (!wasOpen) t = document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
+    if (!wasOpen) t = noFocus ? null : document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
     else if (idx > -1 && items.length) t = items[Math.min(idx, items.length - 1)];            // 重繪（Retry、切 plan…）：焦點留在原位
     if (t) t.focus({ preventScroll: true });
   }
@@ -3771,7 +3851,7 @@ bindTips();
     '.lt-rd-btn.pri{background:#004FB0;color:#fff;border-color:#004FB0;min-width:160px}',
     '.lt-rd-btn.pri:hover{background:#0B6DD7;border-color:#0B6DD7}',
     '.lt-rd-btn.out{background:#fff;color:#004FB0;border-color:#004FB0}',
-    '.lt-rd-btn.out:hover{background:#F2FAFF}',
+    '.lt-rd-btn.out:hover{background:#F6F6F6;color:#0B6DD7;border-color:#0B6DD7}',   /* X-9r1 11-13 S-KCR：照全站外框主色鈕 hover（Guideline .btn--outlined-primary:hover） */
     '.lt-rd-btn[disabled]{background:#CCCCCC;border-color:#CCCCCC;color:#fff;cursor:not-allowed}',
     '.lt-rd-btn:focus-visible,.lt-rd-sel:focus-visible{outline:2px solid #004FB0;outline-offset:2px}',
     '.lt-rd-spin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:lt-rd-spin .8s linear infinite}',
@@ -3870,8 +3950,9 @@ bindTips();
         '" aria-controls="lt-rd-list" aria-labelledby="lt-rd-t"><span class="lt-rd-v">' + _esc(sel.name) + '</span><span class="lt-rd-chip">' + _esc(sel.role) +
         '</span><span class="material-symbols-outlined lt-rd-arr" aria-hidden="true">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
       '<div class="lt-rd-act"><button type="button" class="lt-rd-btn out" id="lt-rd-keep"' + (r.loading ? ' disabled' : '') + '>' + ROLE_COPY.keep + '</button>' +
-        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') + '>' +
-        (r.loading ? '<span class="lt-rd-spin" role="status" aria-label="Loading"></span>' : ROLE_COPY.cont) + '</button></div>' +
+        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') +
+        (r.loading ? ' aria-label="' + _esc(ROLE_COPY.cont) + '" aria-busy="true"' : '') + '>' +   /* X-9r1 11-13 S-A4：讀取中名稱維持 Continue（同 Auth 11-05 N2） */
+        (r.loading ? '<span class="lt-rd-spin" aria-hidden="true"></span>' : ROLE_COPY.cont) + '</button></div>' +
     '</div></div>';
   }
   function _rdRender(keepFocusId) {
@@ -4053,10 +4134,12 @@ bindTips();
       window.LUMITURE_USER = Object.assign({}, cur, {
         quota: Object.assign({}, DEFAULT_USER.quota, cur.quota || {}, q || {}),
       });
+      if (!window.LUMITURE_USER.quota.refreshDate) window.LUMITURE_USER.quota.refreshDate = _nextRefreshDate();   /* 空值用自動值（S-A1） */
       if (q && typeof q.addonPacks !== 'undefined') window.LUMITURE_USER.addonPacks = q.addonPacks;
       if (_menuOpen) _openMenu();
     },
-    openMenu: _openMenu,
+    openMenu: _openMenu,   /* openMenu({focus:false})：程式開選單不搶焦點（S-B9） */
+    nextRefreshDate: _nextRefreshDate,
     closeMenu: _closeMenu,
     toggleMenu: _toggleMenu,
     rerender: function () { _render(); if (_menuOpen) _openMenu(); },
@@ -4619,6 +4702,14 @@ bindTips();
       } catch (err) {}
       return 8;
     }
+    /* X-9r1 B1（2026-11-05）：固定頂欄的下緣。tooltip 放在錨點上方時不能壓到頂欄（頁首那排 info icon／截圖鈕／幣別鈕的 tooltip 之前 top 9～54，蓋在鈴鐺與頭像上）；頂欄捲走或沒有頂欄時回 8 */
+    function topMin() {
+      try {
+        var tb = document.querySelector('.lt-topbar');
+        if (tb) { var b = tb.getBoundingClientRect().bottom; if (b > 0) return b + 4; }
+      } catch (err) {}
+      return 8;
+    }
     function place() {
       if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
@@ -4630,10 +4721,11 @@ bindTips();
       /* X-9r1 S2：放不下改靠右緣時，左緣不能落進 sidebar（600 寬在 1280 中間位置會伸進去）；沒有 sidebar 的頁維持 8，收合時 21＋8 */
       if (x + tw > vw - 8) x = Math.max(minX(), Math.min(r.right + 2, vw - 8) - tw);
       if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
+      x = Math.max(8, x);   /* X-9r1 11-13 S-A7：至少離視窗左緣 8（sidebar 裡的錨點不套 minX()，logo tooltip 原本貼在 left 0） */
       var below = cur.dataset.tipPos === 'below';
       var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
       var y = below ? r.bottom + dy : r.top - th - 6;
-      if (y < 8) y = r.bottom + 4;
+      if (y < topMin()) y = r.bottom + 4;   /* X-9r1 B1：上方放不下或會蓋到頂欄就翻到下方 */
       if (y + th > vh - 8) y = Math.max(8, r.top - th - 6);
       tip.style.left = x + 'px'; tip.style.top = y + 'px';
     }

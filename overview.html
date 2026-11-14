@@ -83,6 +83,7 @@
   --lt-color-error-light:   #FFEBEF;   /* TBC: Figma audit needed */
   --lt-color-warning-base:  #FC9A0F;   /* TBC: Figma audit needed */
   --lt-color-warning-light: #FEF3E1;   /* TBC: Figma audit needed */
+  --lt-color-warning-dark:  #EC6F09;   /* CM Color Kit Warning/Dark（2026-11-02 補；FE warning.dark，LumiTag 過期與分到 0 提示用） */
   --lt-color-info-base:     #0B6DD7;   /* = blue-60，符合 Figma info usage */
   --lt-color-info-light:    #E6F6FF;   /* TBC: Figma audit needed */
 
@@ -139,6 +140,42 @@
 
   /* --- Typography: Letter Spacing (對齊 Figma: 全部 0) --- */
   --lt-tracking-normal: 0;
+
+  /* --- Typography: CMDS 文字樣式（composite，用在 `font:` 簡寫）2026-11-02 ---
+   * 一對一對應 Figma「CM Typography」的文字樣式；寫 CSS 一律從這組挑，不自己組字級／字重／行高。
+   * `font:` 簡寫會把 font-variant-numeric 重設成 normal，數字欄要另外補 tabular-nums。
+   * Link Bold 1 稿上自帶底線；底線由元件決定（Lumiture 文字按鈕不加底線，見 Guideline Text Button）。 */
+  --lt-type-h3:               700 24px/36px var(--lt-font-sans);    /* Headers/H3 頁面標題 */
+  --lt-type-h4:               700 20px/30px var(--lt-font-sans);    /* Headers/H4 頁面副標題 */
+  --lt-type-h5:               700 18px/27px var(--lt-font-sans);    /* Headers/H5 功能名稱 */
+  --lt-type-h6:               700 16px/24px var(--lt-font-sans);    /* Headers/H6 小標題 */
+  --lt-type-body:             400 14px/24.5px var(--lt-font-sans);  /* Body/Body Regular 內文 */
+  --lt-type-body-medium:      500 14px/24.5px var(--lt-font-sans);  /* Body/Body Medium 內文重點 */
+  --lt-type-body-bold:        700 14px/24.5px var(--lt-font-sans);  /* Body/Body Bold 內文標題 */
+  --lt-type-caption:          400 12px/18px var(--lt-font-sans);    /* Caption/Caption Regular 註記 */
+  --lt-type-caption-bold:     700 12px/18px var(--lt-font-sans);    /* Caption/Caption Bold 重要註記 */
+  --lt-type-button-regular-0: 400 12px/18px var(--lt-font-sans);    /* Content/Button Regular 0（chip 字） */
+  --lt-type-button-regular-1: 400 14px/21px var(--lt-font-sans);    /* Content/Button Regular 1（下拉選項字） */
+  --lt-type-button-bold-1:    700 14px/21px var(--lt-font-sans);    /* Content/Button Bold 1 */
+  --lt-type-button-bold-2:    700 16px/24px var(--lt-font-sans);    /* Content/Button Bold 2 */
+  --lt-type-link-bold-1:      700 14px/24.5px var(--lt-font-sans);  /* Content/Link Bold 1 超連結 */
+  --lt-type-link-medium-1:    500 14px/24.5px var(--lt-font-sans);  /* Content/Link Medium 1 超連結（2026-11-03 補，LumiTag Edit allocation card） */
+
+  /* --- Color: CM Color Kit（chip 等元件用；Light＝底、Main＝框、Dark＝字）2026-11-02，先收 #3、#11，其他色用到再補 --- */
+  --lt-kit-3-light:  var(--lt-turquoise-10);   /* #F0FFFF  #3 Turquoise Blue */
+  --lt-kit-3-main:   var(--lt-chart-3);        /* #9CF3FF */
+  --lt-kit-3-dark:   var(--lt-turquoise-70);   /* #34B5D9  CM Color Kit/Dark/#3 Dark */
+  --lt-kit-11-light: var(--lt-grey-100);       /* #F2F2F2  #11 Gray */
+  --lt-kit-11-main:  var(--lt-grey-400);       /* #B3B3B3 */
+  --lt-kit-11-dark:  #7C7C7C;                  /*          CM Color Kit/Dark/#11 Dark */
+  --lt-kit-4-light:  #E6FFF8;                  /* CM Color Kit/Light/#4 Light（2026-11-03 補，LumiTag Preview 狀態標籤） */
+  --lt-kit-4-main:   var(--lt-chart-4);        /* #00DCC2 */
+  --lt-kit-4-dark:   var(--lt-color-success);  /* #00B5A6  CM Color Kit/Dark/#4 Dark */
+  --lt-kit-6-light:  var(--lt-color-warning-light); /* #FEF3E1  #6 Tangerine Orange（2026-11-03 補，LumiTag Not split／Partially split） */
+  --lt-kit-6-main:   var(--lt-chart-6);        /* #F3BE68 */
+  --lt-kit-6-dark:   var(--lt-color-warning-base);  /* #FC9A0F  CM Color Kit/Dark/#6 Dark */
+  --lt-color-attention-main:    #FFA500;       /* CDP color/Attention/Attention1 Main（CMDS Alert / Large orange 頂條與 icon，2026-11-03 補） */
+  --lt-color-attention-lighter: #FFF3DE;       /* CDP color/Attention/Attention4 Lighter（Alert icon 底） */
 
   /* --- Shadow: 對齊 CMDS Figma 規範 (2026-05-12 audit)
    * 來源：Figma node 20599-107518 — CMDS 4 個官方 shadow variables
@@ -291,7 +328,7 @@
  * - ~~Chart palette~~ ✅ 已加入（2026-05-12 從 Figma General Behavior file audit）
  * - Gradient tokens (Figma 有 Lumiture.ai Blue / Orange / Lemon C 等)
  * - Opacity tokens (Figma 有 CM Opacity Color 系列)
- * - Composite typography tokens (--lt-type-h1, --lt-type-body 等 style sets)
+ * - ~~Composite typography tokens~~ ✅ 已加入 --lt-type-*（2026-11-02，H1／H2 用到再補）
  * - Focus / Inset shadow 特殊變體
  * - Dark mode 對應 token
  *
@@ -309,6 +346,7 @@
  *   .lt-skeleton 骨架屏（A-18）
  *   .lt-link     文字連結（B-14）
  *   .lt-btn-icon 表格 Action icon button（B-6，CB 版）
+ *   .lt-chip     CMDS「Deletable chips / Squared colors」（2026-11-02）
  *   空狀態／無權限見 lumiture-empty.js；Toast 見 lumiture-toast.js
  * ============================================================ */
 
@@ -368,6 +406,29 @@
 .lt-btn-icon:focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:1px}
 .lt-btn-icon:disabled{color:var(--lt-grey-400,#B3B3B3);cursor:not-allowed;background:none}
 
+/* ---------- .lt-chip ----------
+ * CMDS「Deletable chips / Squared colors」，Deletable=false。Lumiture 用到的 chip 一律走這個，不要各頁自刻。
+ * 結構：<span class="lt-chip lt-chip--outline lt-chip--c3"><span class="material-symbols-outlined lt-chip__icon">call_split</span>Allocation card</span>
+ * Size：預設 s（高 24）、.lt-chip--xs（高 20）。CMDS 只有這兩個尺寸。
+ * 圓角 4、左右內距 8、icon（Show icon L）16 與字間距 4、字 Button Regular 0（12／18）。
+ * Appearance：.lt-chip--outline 底 Light／框 Main／字 Dark；.lt-chip--solid 底 Dark／白字。
+ * Color：.lt-chip--c3（#3 Turquoise Blue）、.lt-chip--c4（#4 Green）、.lt-chip--c6（#6 Tangerine Orange）、.lt-chip--c11（#11 Gray）；其他色用到時照 CM Color Kit 在 tokens.css 補 --lt-kit-N-*。 */
+.lt-chip{display:inline-flex;align-items:center;gap:4px;box-sizing:border-box;height:24px;padding:0 8px;border-radius:4px;border:1px solid transparent;
+  font:var(--lt-type-button-regular-0,400 12px/18px sans-serif);white-space:nowrap;flex-shrink:0;vertical-align:middle}
+.lt-chip--xs{height:20px}
+.lt-chip__icon{font-size:16px;line-height:1;font-variation-settings:'FILL' 1}
+.lt-chip--outline.lt-chip--c3{background:var(--lt-kit-3-light,#F0FFFF);border-color:var(--lt-kit-3-main,#9CF3FF);color:var(--lt-kit-3-dark,#34B5D9)}
+.lt-chip--solid.lt-chip--c3{background:var(--lt-kit-3-dark,#34B5D9);color:var(--lt-white,#fff)}
+.lt-chip--outline.lt-chip--c11{background:var(--lt-kit-11-light,#F2F2F2);border-color:var(--lt-kit-11-main,#B3B3B3);color:var(--lt-kit-11-dark,#7C7C7C)}
+.lt-chip--solid.lt-chip--c11{background:var(--lt-kit-11-dark,#7C7C7C);color:var(--lt-white,#fff)}
+.lt-chip--outline.lt-chip--c4{background:var(--lt-kit-4-light,#E6FFF8);border-color:var(--lt-kit-4-main,#00DCC2);color:var(--lt-kit-4-dark,#00B5A6)}
+.lt-chip--outline.lt-chip--c6{background:var(--lt-kit-6-light,#FEF3E1);border-color:var(--lt-kit-6-main,#F3BE68);color:var(--lt-kit-6-dark,#FC9A0F)}
+
+/* X-9r1 11-13 S-FOCUS：鍵盤 focus 框統一 2px primary 外框（X-9r2／X-9r5 已定「focus 統一 2px primary 外框」）。
+   用 :where() 零權重：各頁自己寫了 :focus-visible 或 outline:none＋光暈的照舊贏。
+   排除共用外殼（sidebar／topbar／Account Menu／角色彈窗／Demo FAB／toast）：它們在深色底上有自己的青色或白色框。 */
+:where(button,[role="button"],[role="tab"],a[href]):where(:not(.lt-sidebar *,.lt-topbar *,.lt-tb-logo *,#lt-am *,.lt-rd-back *,.demo-fab,.demo-popover *,.lt-toast-wrap *)):focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:2px}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 <style>
@@ -424,7 +485,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 .icon-btn svg{width:18px;height:18px;fill:currentColor}   /* C-5 #37：稿 Icon button 24×24、圖示 18（同子頁 .rk-shot） */
 
 .pg-sub{display:flex;align-items:center;justify-content:space-between;gap:var(--lt-space-16);flex-wrap:wrap}
-.disclaimer{font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);line-height:1.6}
+.disclaimer{font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);line-height:18px}   /* X-9r3 第二輪 A16：稿 #01 12／18 */
 .disclaimer strong{color:var(--lt-color-text-primary);font-weight:var(--lt-fw-bold)}
 .disclaimer .lm{text-decoration:underline;cursor:help}
 .pg-sub-r{display:flex;align-items:center;gap:var(--lt-space-8)}
@@ -445,7 +506,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 .btn .material-symbols-outlined{font-size:18px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 18}
 .btn:disabled{background:var(--lt-button-disabled-bg)!important;color:var(--lt-button-disabled-text)!important;border-color:transparent!important;cursor:not-allowed}
 /* B-1：停用的「按鈕」用 FE 版（底 #CCCCCC 白字）；Outlined 沒有實心底，照 skeleton 稿（#11）畫成白底灰框灰字 */
-.btn-o:disabled{background:var(--lt-color-bg-default)!important;color:var(--lt-color-text-disabled)!important;border-color:var(--lt-grey-300)!important}
+.btn-o:disabled{background:var(--lt-color-bg-default)!important;color:var(--lt-grey-300)!important;border-color:var(--lt-grey-300)!important}   /* X-9r1 11-13 P3：外框鈕停用字與 icon #CCCCCC（稿 Overview #11／Rate Optimization #02、#11／General Budget #01-6 等一律白底、框字 icon #CCCCCC） */
 /* X-9r3 FA3：停用幣別鈕整顆 32% 透明、無底無框（稿 #11），由 shared currency-picker.js 的 .curr-btn:disabled 提供，這頁不再覆寫 */
 
 /* ===== Dropdown Field (CMDS M 36px) — Display Frequency ===== */
@@ -521,7 +582,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 .kpi-cur{font-size:var(--lt-fs-12);font-weight:var(--lt-fw-bold)}
 .kpi-ft{display:flex;justify-content:flex-end;align-items:center;gap:var(--lt-space-8);flex-wrap:wrap}
 .kpi-desc{font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);text-align:right;white-space:pre-line;line-height:1.5}
-.kpi-desc.is-cmp{white-space:nowrap}   /* C-5 #6：比較區間一行（稿 Frame 4437：文案一行、箭頭百分比第二行）；日期較長時往左吃一點內距，不讓年份單獨掉一行 */
+.kpi-desc.is-cmp{white-space:nowrap;flex:0 0 100%}   /* X-9r3 第二輪 B24：比較文案自己佔一行，箭頭與百分比固定在下一行靠右（稿 #01），不隨卡寬決定 */   /* C-5 #6：比較區間一行（稿 Frame 4437：文案一行、箭頭百分比第二行）；日期較長時往左吃一點內距，不讓年份單獨掉一行 */
 .kpi-trend{display:inline-flex;align-items:center;gap:var(--lt-space-4);font-size:var(--lt-fs-12);font-variant-numeric:tabular-nums}
 .kpi-trend.up{color:var(--lt-color-error)}
 .kpi-trend.down{color:var(--lt-color-success)}
@@ -632,6 +693,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
 .rk-tick{position:absolute;top:0;transform:translateX(-50%);font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-primary);white-space:nowrap}
 .rk-wrap.is-sticky .rk-axis.is-stuck{box-shadow:0 -1px 0 var(--lt-grey-200)}   /* ⚠ 設計端暫擬（Fable #4）：只在真的貼住視窗底（圖表還沒捲完）時才畫 1px 上線，讓「浮在內容上」講得出來；捲到圖表尾端落回原位時不畫，跟稿的靜態 X 軸一樣 */
 .rk-sentinel{height:1px;margin-top:-1px}
+body.ov-rk:has(.rk-wrap.is-sticky .rk-axis){--lt-toast-bottom:calc(33px + 16px)}   /* X-9r3 第二輪 A15：子頁 X 軸列（高 33）貼視窗底，shared toast 抬到它上方 16px；驗證 N2：只在真的有貼底 X 軸時生效（loading／empty／error／no-auth 與不黏、內捲動兩種對照做法維持 24） */
 .rk-wrap.is-static .rk-axis{position:relative}
 .rk-wrap.is-maxh .rk-scroll{max-height:560px;overflow-y:auto;overscroll-behavior:contain}
 .rk-wrap.is-maxh .rk-axis{position:relative;padding-right:var(--rk-sbw,0px)}
@@ -970,14 +1032,14 @@ body.is-shot .content{padding:0}
   }
   function _renderLogo() {
     var href = _homeHref();
-    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-sb-logo">';
+    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-sb-logo">';
     return open + _logoBody(LOGO_ICON) + (href ? '</a>' : '</div>');
   }
   // 收合時顯示在 topbar 左側的 logo（同一組圖形，mask id 改 ltT* 避免跟 sidebar 那份撞 id）
   function _renderTopbarLogo() {
     var href = _homeHref();
     var icon = LOGO_ICON.replace(/ltH(ring|bars|leg)/g, 'ltT$1');
-    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-tb-logo">';
+    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-tb-logo">';
     return open + _logoBody(icon) + (href ? '</a>' : '</div>');
   }
   function _mountTopbarLogo(host) {
@@ -1229,7 +1291,7 @@ body.is-shot .content{padding:0}
  *     version:     'v1.19.0',               // Software version 列
  *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
  *     quota: {                              // AI Quota box 數據；total 已含 add-on
- *       refreshDate: '2 Nov. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）
+ *       refreshDate: '2 Dec. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）。沒給（或給空值）就自動算下一個 2 號（X-9r1 11-13 S-A1，LumitureTopbar.nextRefreshDate）
  *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
  *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
  *     },
@@ -1240,6 +1302,7 @@ body.is-shot .content{padding:0}
  *   window.LumitureTopbar.setRole('Manager - ...')— 只更新 role chip（Demo FAB role 切換用）
  *   window.LumitureTopbar.setPlan('Essential')    — 切 plan（連動 AI Quota box 顯示項目）
  *   window.LumitureTopbar.setQuota({analyses:{...}, rightsizing:{...}, refreshDate, addonPacks})
+ *   window.LumitureTopbar.nextRefreshDate()        — 依今天算下一個計費週期錨日（每月 2 號），回 '2 Dec. 2026' 這種寫法
  *   window.LumitureTopbar.openMenu() / closeMenu() / toggleMenu()
  *   window.LumitureTopbar.rerender()
  *   window.LumitureTopbar.openRoleDialog() / closeRoleDialog()   — View as Another Role 彈窗（#01-5；頁面掛勾見下方 role 區塊註解）
@@ -1248,6 +1311,16 @@ body.is-shot .content{padding:0}
  */
 (function () {
   'use strict';
+
+  /* X-9r1 11-13 S-A1：下一個計費週期錨日（每月 2 號），格式照稿的「2 Apr. 2028」；今天 ≥ 2 號就取下個月。
+     原本寫死 '2 Nov. 2026'，過了那天 13 頁的 Account Menu 都顯示過期日（User Menu 頁自己算過，這裡搬進 shared 讓全站共用）。 */
+  function _nextRefreshDate() {
+    var M = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'];
+    var d = new Date(), y = d.getFullYear(), m = d.getMonth();
+    if (d.getDate() >= 2) m += 1;
+    if (m > 11) { m = 0; y += 1; }
+    return '2 ' + M[m] + ' ' + y;
+  }
 
   // ===== Defaults ===== (預設給 Standard plan + Normal 狀態，所有既有 prototype 直接吃，不破版)
   var DEFAULT_USER = {
@@ -1262,7 +1335,7 @@ body.is-shot .content{padding:0}
     version: 'v1.19.0',
     addonPacks: 0,
     quota: {
-      refreshDate: '2 Nov. 2026',          // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期（原 2 Jul. 2026 已過期）
+      refreshDate: _nextRefreshDate(),     // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期；X-9r1 11-13 S-A1：改成依今天自動算（原寫死 2 Nov. 2026 已過期）
       analyses:    { used: 32,  total: 80 },
       rightsizing: { used: 410, total: 1000 },
     },
@@ -1328,8 +1401,11 @@ body.is-shot .content{padding:0}
     /* ---------- Account Menu popover ----------
        2026-10-14 逐格對 Figma #01-6（hover）／#01-7（loading & error）：左右內距 24、方案列 37 高、姓名 16/700、角色 chip 藍 #004FB0 方角、
        AI Quota 每列 24 高、狀態色 #00DCC2／#F4A938／#FF403D、功能列 40 高（外包 8／16）、陰影 0 0 6px .2。舊值（內距 16、狀態色提亮）是 06-22 的目視估計 */
-    '.lt-am-backdrop{position:fixed;inset:0;z-index:1000;background:transparent}',
-    '.lt-am{position:fixed;top:64px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
+    /* X-9r1 11-13 S-A2：背板 1000 → 997。Demo FAB 999、面板 998，背板要讓到它們底下，否則選單開著時（User Menu 頁進頁就開著）
+       第一下點 FAB 只會被背板吃掉去關選單，面板不開。選單本體 #lt-am 維持 1001。不要去抬 FAB 的層級：
+       Cost Dashboard、Group List、All Resource List 有 1000 以上的彈窗遮罩，FAB 抬上去會浮在遮罩上。 */
+    '.lt-am-backdrop{position:fixed;inset:0;z-index:997;background:transparent}',
+    '.lt-am{position:fixed;top:68px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
     'box-shadow:0 0 6px rgba(0,0,0,.2);font-family:\'Noto Sans\',sans-serif;color:#fff;',
     'animation:lt-am-in .14s ease;transform-origin:top right}',   /* 不設 overflow:hidden：hover tooltip（寬 400）要能伸出選單左邊，圓角改由第一／最後一個子區塊自己帶 */
     '@keyframes lt-am-in{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}',
@@ -1426,6 +1502,7 @@ body.is-shot .content{padding:0}
   function _user() {
     var u = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
     u.quota = Object.assign({}, DEFAULT_USER.quota, (window.LUMITURE_USER || {}).quota || {});
+    if (!u.quota.refreshDate) u.quota.refreshDate = _nextRefreshDate();   /* 頁面傳 undefined／null／'' 也吃自動值（S-A1） */
     return u;
   }
   function _status(used, total) {
@@ -1596,7 +1673,8 @@ body.is-shot .content{padding:0}
     var m = document.getElementById('lt-am');
     return m ? Array.prototype.slice.call(m.querySelectorAll('.lt-am-item,.lt-q-err a,.lt-q-item.has-tip')) : [];
   }
-  function _openMenu() {
+  function _openMenu(opts) {
+    var noFocus = !!(opts && opts.focus === false);   /* X-9r1 11-13 S-B9：程式開選單（User Menu 進頁、Demo 情境）不搶焦點 */
     var wasOpen = _menuOpen, items0 = wasOpen ? _menuItems() : [], idx = items0.indexOf(document.activeElement);
     var u = _user();
     _menuHost().innerHTML = _renderMenu(u);
@@ -1604,7 +1682,7 @@ body.is-shot .content{padding:0}
     var chip = document.getElementById('lt-tb-user');
     if (chip) { chip.classList.add('is-open'); chip.setAttribute('aria-expanded', 'true'); }
     var items = _menuItems(), t = null;
-    if (!wasOpen) t = document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
+    if (!wasOpen) t = noFocus ? null : document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
     else if (idx > -1 && items.length) t = items[Math.min(idx, items.length - 1)];            // 重繪（Retry、切 plan…）：焦點留在原位
     if (t) t.focus({ preventScroll: true });
   }
@@ -1677,7 +1755,7 @@ body.is-shot .content{padding:0}
     '.lt-rd-btn.pri{background:#004FB0;color:#fff;border-color:#004FB0;min-width:160px}',
     '.lt-rd-btn.pri:hover{background:#0B6DD7;border-color:#0B6DD7}',
     '.lt-rd-btn.out{background:#fff;color:#004FB0;border-color:#004FB0}',
-    '.lt-rd-btn.out:hover{background:#F2FAFF}',
+    '.lt-rd-btn.out:hover{background:#F6F6F6;color:#0B6DD7;border-color:#0B6DD7}',   /* X-9r1 11-13 S-KCR：照全站外框主色鈕 hover（Guideline .btn--outlined-primary:hover） */
     '.lt-rd-btn[disabled]{background:#CCCCCC;border-color:#CCCCCC;color:#fff;cursor:not-allowed}',
     '.lt-rd-btn:focus-visible,.lt-rd-sel:focus-visible{outline:2px solid #004FB0;outline-offset:2px}',
     '.lt-rd-spin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:lt-rd-spin .8s linear infinite}',
@@ -1776,8 +1854,9 @@ body.is-shot .content{padding:0}
         '" aria-controls="lt-rd-list" aria-labelledby="lt-rd-t"><span class="lt-rd-v">' + _esc(sel.name) + '</span><span class="lt-rd-chip">' + _esc(sel.role) +
         '</span><span class="material-symbols-outlined lt-rd-arr" aria-hidden="true">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
       '<div class="lt-rd-act"><button type="button" class="lt-rd-btn out" id="lt-rd-keep"' + (r.loading ? ' disabled' : '') + '>' + ROLE_COPY.keep + '</button>' +
-        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') + '>' +
-        (r.loading ? '<span class="lt-rd-spin" role="status" aria-label="Loading"></span>' : ROLE_COPY.cont) + '</button></div>' +
+        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') +
+        (r.loading ? ' aria-label="' + _esc(ROLE_COPY.cont) + '" aria-busy="true"' : '') + '>' +   /* X-9r1 11-13 S-A4：讀取中名稱維持 Continue（同 Auth 11-05 N2） */
+        (r.loading ? '<span class="lt-rd-spin" aria-hidden="true"></span>' : ROLE_COPY.cont) + '</button></div>' +
     '</div></div>';
   }
   function _rdRender(keepFocusId) {
@@ -1959,10 +2038,12 @@ body.is-shot .content{padding:0}
       window.LUMITURE_USER = Object.assign({}, cur, {
         quota: Object.assign({}, DEFAULT_USER.quota, cur.quota || {}, q || {}),
       });
+      if (!window.LUMITURE_USER.quota.refreshDate) window.LUMITURE_USER.quota.refreshDate = _nextRefreshDate();   /* 空值用自動值（S-A1） */
       if (q && typeof q.addonPacks !== 'undefined') window.LUMITURE_USER.addonPacks = q.addonPacks;
       if (_menuOpen) _openMenu();
     },
-    openMenu: _openMenu,
+    openMenu: _openMenu,   /* openMenu({focus:false})：程式開選單不搶焦點（S-B9） */
+    nextRefreshDate: _nextRefreshDate,
     closeMenu: _closeMenu,
     toggleMenu: _toggleMenu,
     rerender: function () { _render(); if (_menuOpen) _openMenu(); },
@@ -2447,7 +2528,7 @@ body.is-shot .content{padding:0}
  *   - 顏色順序按 ranking：rank 1→#2、rank 2→#4、rank 3→#6、rank 4→#10、
  *     rank 5→#9、rank 6→#8、rank 7→#7、rank 8→#5、rank 9→#3、rank 10→#1
  *     （CMDS Color Kit Main palette；參考 FE rankingColor array）
- *   - Treemap label 顯示「服務名 + 花費」，面積過小自動隱藏（ECharts 預設行為）
+ *   - Treemap label 顯示「服務名 + 花費」；色塊版面矩形寬 < 56 或高 < 44（放不下兩行 18＋18＋上下各 4）整個標籤不顯示（X-9r1 11-13 S-T2，Overview 稿 #01 註記「面積過小無法呈現 Label 部分則不顯示」）；放得下兩行但字被裁掉的維持「…」截斷（稿 #01 自己就畫了 Database／USD 976,04…）
  *   - 底部 index / 下層 drill-down 暫不顯示（PM 指示）
  *   - Top10 排行榜 width 固定 452px；圖表 fill 剩餘 width
  *   - 雙方都需延展時 chart : ranking = 6 : 4（由 caller layout 控制 max-width）
@@ -2654,7 +2735,7 @@ body.is-shot .content{padding:0}
         confine: true,
         borderWidth: 0,
         backgroundColor: '#FFFFFF',
-        textStyle: { color: '#262626', fontSize: 12 },
+        textStyle: { color: '#262626', fontSize: 12, fontFamily: 'Noto Sans' },   /* X-9r1 11-13 S-T1：同頁其他圖表都有指定 Noto Sans */
         extraCssText: 'border-radius:6px;padding:10px 12px;max-width:280px;box-shadow:0 4px 16px rgba(0,0,0,.12)',
         // C-4：稿 #01-1 Chart / Tooltip＝標題＋（色點）名稱＋完整金額與幣別代碼
         formatter: function (p) {
@@ -2683,10 +2764,10 @@ body.is-shot .content{padding:0}
           position: 'inside',
           align: 'center',
           verticalAlign: 'middle',
-          fontSize: 12, fontWeight: 700,
+          fontFamily: 'Noto Sans', fontSize: 12, fontWeight: 700,   /* X-9r1 11-13 S-T1：稿 Overview #01 色塊標籤 Noto Sans 700 */
           color: '#FFFFFF',
           lineHeight: 18,
-          // 面積過小 ECharts 預設會自動隱藏 label（min font size constraint）
+          // 放不下的小色塊整個標籤隱藏：見下方 _hideSmallLabels（X-9r1 11-13 S-T2）
           formatter: function (p) {
             return p.name + '\n' + symbol + fullFormat(p.value);   // C-4：完整金額（稿「USD 3,935,412.28」）
           },
@@ -2699,6 +2780,31 @@ body.is-shot .content{padding:0}
         }],
       }],
     });
+
+    /* X-9r1 11-13 S-T2：取每個節點的版面矩形（寬 < 56 或高 < 44 → 放不下兩行標籤），不符合的在 data 項設 label.show=false，再 setOption 一次。
+       隱藏標籤不會改版面，所以第二次 setOption 後算出的集合一樣、不會無限迴圈（用 hiddenKey 比對擋住）。
+       容器 resize 後 ECharts 重繪會再觸發 finished，重算一次；tooltip 不受影響（仍是完整名稱與金額）。 */
+    var MIN_W = 56, MIN_H = 44, hiddenKey = '';
+    function _hideSmallLabels() {
+      if (!el.clientWidth || !el.clientHeight || chart.isDisposed()) return;
+      var model = chart.getModel(), ser = model && model.getSeriesByIndex(0), d = ser && ser.getData(), tree = d && d.tree;
+      if (!tree) return;
+      var hide = {};
+      d.each(function (i) {
+        var n = tree.getNodeByDataIndex(i), l = n && n.getLayout(), nm = d.getName(i);
+        if (!nm || !l) return;                              // 根節點沒有名稱
+        if (l.width < MIN_W || l.height < MIN_H) hide[nm] = true;
+      });
+      var key = Object.keys(hide).sort().join('|');
+      if (key === hiddenKey) return;
+      hiddenKey = key;
+      chart.setOption({ series: [{ data: formattedData.map(function (it) {
+        if (!hide[it.name]) return it;
+        return Object.assign({}, it, { label: { show: false }, emphasis: { label: { show: false } } });
+      }) }] });
+    }
+    _hideSmallLabels();
+    chart.on('finished', _hideSmallLabels);
     return chart;
   }
 
@@ -3164,6 +3270,7 @@ function renderAll() {
   const root = document.getElementById('content');
   disposeCharts();
   root.classList.toggle('is-rk', state.route === 'rankings');
+  document.body.classList.toggle('ov-rk', state.route === 'rankings');   // X-9r3 第二輪 A15：子頁 toast 抬到貼底 X 軸上方
   if (state.route === 'rankings') { root.innerHTML = rankingsHtml(); mountRankings(); return; }
   if (state.pageState === 'loading') { root.innerHTML = pageLoadingHtml(); return; }
   document.body.classList.toggle('is-shot', state.shot && state.route === 'main');
@@ -3384,7 +3491,8 @@ function kpiCardHtml(cfg, d, noData) {
   /* C-5 #7（K1，稿 #01、#01-1）：數字有縮寫就 hover 顯示完整數值；有預算門檻提示才加第二行。⚠ DEVIATION：FE 只有超過門檻的卡才有 tooltip */
   const full = `${fmtNum(cx(item.cost), 2)} ${state.currency}`, abbreviated = Math.abs(cx(item.cost)) >= 100000;
   const tipText = st.threshold ? COPY.exceeded(full, Math.round(st.threshold * 100)) : (abbreviated ? full : '');
-  const tip = tipText ? ` data-tip="${esc(tipText)}"` : '';
+  /* X-9r3 第二輪 C-C1：縮寫數字的完整值鍵盤與讀屏也拿得到（可聚焦 → 同一個 #gl-tip；aria-label 唸完整數值） */
+  const tip = tipText ? ` data-tip="${esc(tipText)}" tabindex="0" role="img" aria-label="${esc(tipText)}"` : '';
   const r = item.comparisonRate;
   let ft;
   if (cfg.fixed) {
@@ -3530,7 +3638,7 @@ function freqSelectorHtml(forceDisabled) {
   /* C-5 K3（稿 #01 Dropdown / Field / S）：主頁三個也用 S（132×30），跟子頁一致 */
   return `<div class="dd sm" id="freq-dd">
     <span class="dd-label">${COPY.freq.label}</span>
-    <button class="dd-trig lt-select" onclick="toggleFreq(event)" aria-haspopup="listbox" ${disabled ? 'disabled' : ''}><span class="lt-select__v">${opt.label}</span><span class="material-symbols-outlined lt-select__arrow">arrow_drop_down</span></button>
+    <button class="dd-trig lt-select" onclick="toggleFreq(event)" aria-haspopup="listbox" aria-expanded="false" ${disabled ? 'disabled' : ''}><span class="lt-select__v">${opt.label}</span><span class="material-symbols-outlined lt-select__arrow">arrow_drop_down</span></button>
     <div class="dd-list" role="listbox">${COPY.freq.options.map(o => `<div class="dd-item${o.v === state.freq ? ' sel' : ''}" role="option" aria-selected="${o.v === state.freq}" onclick="setFreq('${o.v}')">${o.label}</div>`).join('')}</div>
   </div>`;
 }
@@ -3697,7 +3805,11 @@ function mountByCloudChart() {
   const src = cloudSrc();
   const clouds = Object.keys(src);
   const cost = clouds.map(k => ({ value: cx(src[k].cost), itemStyle: { color: PLATFORM[k].color } }));
-  const budget = clouds.map(k => ({ value: cx(src[k].budget), itemStyle: { color: PLATFORM[k].budget.color, borderColor: PLATFORM[k].budget.border, borderWidth: 1, borderType: 'dashed' } }));
+  /* X-9r3 第二輪 B1：虛線框只包「剩餘預算」那一段（稿 #01）。原本預算系列整根畫 0→預算再被實際花費蓋住，長條兩側會露出虛線。
+   * 改成同一疊：透明墊底（＝實際與預算取小）＋剩餘預算（預算 − 實際，超支時不畫）＋超支段，頂端高度不變 */
+  const hasB = (k) => typeof src[k].budget === 'number';
+  const budgetBase = clouds.map(k => ({ value: hasB(k) ? cx(Math.min(src[k].cost || 0, src[k].budget)) : null, itemStyle: { color: 'transparent' } }));
+  const budget = clouds.map(k => { const rem = hasB(k) ? src[k].budget - (src[k].cost || 0) : null; return { value: rem !== null && rem > 0 ? cx(rem) : null, itemStyle: { color: PLATFORM[k].budget.color, borderColor: PLATFORM[k].budget.border, borderWidth: 1, borderType: 'dashed' } }; });
   const overrun = clouds.map(k => { const d = src[k]; const diff = (typeof d.cost === 'number' && typeof d.budget === 'number') ? d.cost - d.budget : null; return { value: diff !== null && diff > 0 ? cx(diff) : null, itemStyle: { color: CHART.alert.main } }; });
   const values = clouds.flatMap(k => { const d = src[k]; const arr = [cx(d.cost), cx(d.budget)]; if (typeof d.budget === 'number' && d.cost > d.budget) arr.push(cx(d.cost + d.cost - d.budget)); return arr; });
   const maxValue = Math.max(...values.map(Math.abs), 0);
@@ -3730,6 +3842,7 @@ function mountByCloudChart() {
     barWidth: 16,
     series: [
       { name: 'cost',   type: 'bar', stack: 'cost',   barGap: '-100%', z: 2, data: cost },
+      { name: 'budgetBase', type: 'bar', stack: 'budget', barWidth: 16, z: 1, silent: true, emphasis: { disabled: true }, data: budgetBase },
       { name: 'budget', type: 'bar', stack: 'budget', barWidth: 16, z: 1, data: budget },
       { name: 'overrun', type: 'bar', stack: 'budget', itemStyle: { color: CHART.alert.main }, data: maxIdx > -1 ? overrun : [],
         markPoint: { label: { show: false }, symbolSize: 16, symbolOffset: [0, -12],
@@ -3781,18 +3894,20 @@ window.addEventListener('resize', () => {
  * 8. Interactions
  * ============================================================ */
 function closeAllPopovers() {
-  document.querySelectorAll('.dd.open').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.dd.open').forEach(d => d.classList.remove('open')); syncFreqAria();
   closeMonthPicker();
   if (window.CurrencyPicker) CurrencyPicker.close();
 }
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('.dd')) document.querySelectorAll('.dd.open').forEach(d => d.classList.remove('open'));
+  if (!e.target.closest('.dd')) { document.querySelectorAll('.dd.open').forEach(d => d.classList.remove('open')); syncFreqAria(); }
   if (!e.target.closest('#mp-wrap')) closeMonthPicker();
 });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAllPopovers(); });
 
 /* Display Frequency（FE：改 URL query → 三張 CardContainer 一起重新抓資料） */
-function toggleFreq(e) { e.stopPropagation(); const dd = document.getElementById('freq-dd'); if (dd) dd.classList.toggle('open'); }
+function toggleFreq(e) { e.stopPropagation(); const dd = document.getElementById('freq-dd'); if (dd) { dd.classList.toggle('open'); syncFreqAria(); } }
+/* X-9r3 第二輪 C-C2：Display Frequency 觸發欄的 aria-expanded 跟著開關走 */
+function syncFreqAria() { document.querySelectorAll('.dd').forEach(d => { const t = d.querySelector('.dd-trig'); if (t) t.setAttribute('aria-expanded', d.classList.contains('open') ? 'true' : 'false'); }); }
 function setFreq(v) {
   if (v === state.freq) { closeAllPopovers(); return; }
   state.freq = v;
@@ -4012,7 +4127,7 @@ function rkFreqHtml(disabled) {
   const opt = COPY.freq.options.find(o => o.v === state.freq);
   return `<div class="dd sm" id="freq-dd">
     <span class="dd-label">${COPY.freq.label}</span>
-    <button class="dd-trig lt-select" onclick="toggleFreq(event)" aria-haspopup="listbox" ${disabled ? 'disabled' : ''}><span class="lt-select__v">${opt.label}</span><span class="material-symbols-outlined lt-select__arrow">arrow_drop_down</span></button>
+    <button class="dd-trig lt-select" onclick="toggleFreq(event)" aria-haspopup="listbox" aria-expanded="false" ${disabled ? 'disabled' : ''}><span class="lt-select__v">${opt.label}</span><span class="material-symbols-outlined lt-select__arrow">arrow_drop_down</span></button>
     <div class="dd-list" role="listbox">${COPY.freq.options.map(o => `<div class="dd-item${o.v === state.freq ? ' sel' : ''}" role="option" aria-selected="${o.v === state.freq}" onclick="setFreq('${o.v}')">${o.label}</div>`).join('')}</div>
   </div>`;
 }
@@ -4182,6 +4297,7 @@ function applyRankings(id) {
   state.pageState = ({ 'rk-loading': 'sec-loading', 'rk-empty': 'empty', 'rk-error': 'error', 'rk-noauth': 'no-auth' })[id] || 'set';
   state.currency = id === 'rk-twd' ? 'TWD' : 'USD';
   state.freq = id === 'rk-year' ? 'year' : 'month';
+  state.data = 'normal';   // X-9r3 第二輪 B29：先點過 Data = 0 等資料情境再點子頁情境，也從「有資料」開始（原本沿用上一個資料情境，子頁只剩預算條）
   state.manyGroups = id === 'rk-many';
   state.rkAxis = id === 'rk-axis-static' ? 'static' : id === 'rk-axis-maxh' ? 'maxh' : 'sticky';
   _mainShown = true;
@@ -4703,6 +4819,14 @@ window.DEMO_APPLY = function (id) {
       } catch (err) {}
       return 8;
     }
+    /* X-9r1 B1（2026-11-05）：固定頂欄的下緣。tooltip 放在錨點上方時不能壓到頂欄（頁首那排 info icon／截圖鈕／幣別鈕的 tooltip 之前 top 9～54，蓋在鈴鐺與頭像上）；頂欄捲走或沒有頂欄時回 8 */
+    function topMin() {
+      try {
+        var tb = document.querySelector('.lt-topbar');
+        if (tb) { var b = tb.getBoundingClientRect().bottom; if (b > 0) return b + 4; }
+      } catch (err) {}
+      return 8;
+    }
     function place() {
       if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
@@ -4714,10 +4838,11 @@ window.DEMO_APPLY = function (id) {
       /* X-9r1 S2：放不下改靠右緣時，左緣不能落進 sidebar（600 寬在 1280 中間位置會伸進去）；沒有 sidebar 的頁維持 8，收合時 21＋8 */
       if (x + tw > vw - 8) x = Math.max(minX(), Math.min(r.right + 2, vw - 8) - tw);
       if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
+      x = Math.max(8, x);   /* X-9r1 11-13 S-A7：至少離視窗左緣 8（sidebar 裡的錨點不套 minX()，logo tooltip 原本貼在 left 0） */
       var below = cur.dataset.tipPos === 'below';
       var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
       var y = below ? r.bottom + dy : r.top - th - 6;
-      if (y < 8) y = r.bottom + 4;
+      if (y < topMin()) y = r.bottom + 4;   /* X-9r1 B1：上方放不下或會蓋到頂欄就翻到下方 */
       if (y + th > vh - 8) y = Math.max(8, r.top - th - 6);
       tip.style.left = x + 'px'; tip.style.top = y + 'px';
     }

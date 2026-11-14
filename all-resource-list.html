@@ -83,6 +83,7 @@
   --lt-color-error-light:   #FFEBEF;   /* TBC: Figma audit needed */
   --lt-color-warning-base:  #FC9A0F;   /* TBC: Figma audit needed */
   --lt-color-warning-light: #FEF3E1;   /* TBC: Figma audit needed */
+  --lt-color-warning-dark:  #EC6F09;   /* CM Color Kit Warning/Dark（2026-11-02 補；FE warning.dark，LumiTag 過期與分到 0 提示用） */
   --lt-color-info-base:     #0B6DD7;   /* = blue-60，符合 Figma info usage */
   --lt-color-info-light:    #E6F6FF;   /* TBC: Figma audit needed */
 
@@ -139,6 +140,42 @@
 
   /* --- Typography: Letter Spacing (對齊 Figma: 全部 0) --- */
   --lt-tracking-normal: 0;
+
+  /* --- Typography: CMDS 文字樣式（composite，用在 `font:` 簡寫）2026-11-02 ---
+   * 一對一對應 Figma「CM Typography」的文字樣式；寫 CSS 一律從這組挑，不自己組字級／字重／行高。
+   * `font:` 簡寫會把 font-variant-numeric 重設成 normal，數字欄要另外補 tabular-nums。
+   * Link Bold 1 稿上自帶底線；底線由元件決定（Lumiture 文字按鈕不加底線，見 Guideline Text Button）。 */
+  --lt-type-h3:               700 24px/36px var(--lt-font-sans);    /* Headers/H3 頁面標題 */
+  --lt-type-h4:               700 20px/30px var(--lt-font-sans);    /* Headers/H4 頁面副標題 */
+  --lt-type-h5:               700 18px/27px var(--lt-font-sans);    /* Headers/H5 功能名稱 */
+  --lt-type-h6:               700 16px/24px var(--lt-font-sans);    /* Headers/H6 小標題 */
+  --lt-type-body:             400 14px/24.5px var(--lt-font-sans);  /* Body/Body Regular 內文 */
+  --lt-type-body-medium:      500 14px/24.5px var(--lt-font-sans);  /* Body/Body Medium 內文重點 */
+  --lt-type-body-bold:        700 14px/24.5px var(--lt-font-sans);  /* Body/Body Bold 內文標題 */
+  --lt-type-caption:          400 12px/18px var(--lt-font-sans);    /* Caption/Caption Regular 註記 */
+  --lt-type-caption-bold:     700 12px/18px var(--lt-font-sans);    /* Caption/Caption Bold 重要註記 */
+  --lt-type-button-regular-0: 400 12px/18px var(--lt-font-sans);    /* Content/Button Regular 0（chip 字） */
+  --lt-type-button-regular-1: 400 14px/21px var(--lt-font-sans);    /* Content/Button Regular 1（下拉選項字） */
+  --lt-type-button-bold-1:    700 14px/21px var(--lt-font-sans);    /* Content/Button Bold 1 */
+  --lt-type-button-bold-2:    700 16px/24px var(--lt-font-sans);    /* Content/Button Bold 2 */
+  --lt-type-link-bold-1:      700 14px/24.5px var(--lt-font-sans);  /* Content/Link Bold 1 超連結 */
+  --lt-type-link-medium-1:    500 14px/24.5px var(--lt-font-sans);  /* Content/Link Medium 1 超連結（2026-11-03 補，LumiTag Edit allocation card） */
+
+  /* --- Color: CM Color Kit（chip 等元件用；Light＝底、Main＝框、Dark＝字）2026-11-02，先收 #3、#11，其他色用到再補 --- */
+  --lt-kit-3-light:  var(--lt-turquoise-10);   /* #F0FFFF  #3 Turquoise Blue */
+  --lt-kit-3-main:   var(--lt-chart-3);        /* #9CF3FF */
+  --lt-kit-3-dark:   var(--lt-turquoise-70);   /* #34B5D9  CM Color Kit/Dark/#3 Dark */
+  --lt-kit-11-light: var(--lt-grey-100);       /* #F2F2F2  #11 Gray */
+  --lt-kit-11-main:  var(--lt-grey-400);       /* #B3B3B3 */
+  --lt-kit-11-dark:  #7C7C7C;                  /*          CM Color Kit/Dark/#11 Dark */
+  --lt-kit-4-light:  #E6FFF8;                  /* CM Color Kit/Light/#4 Light（2026-11-03 補，LumiTag Preview 狀態標籤） */
+  --lt-kit-4-main:   var(--lt-chart-4);        /* #00DCC2 */
+  --lt-kit-4-dark:   var(--lt-color-success);  /* #00B5A6  CM Color Kit/Dark/#4 Dark */
+  --lt-kit-6-light:  var(--lt-color-warning-light); /* #FEF3E1  #6 Tangerine Orange（2026-11-03 補，LumiTag Not split／Partially split） */
+  --lt-kit-6-main:   var(--lt-chart-6);        /* #F3BE68 */
+  --lt-kit-6-dark:   var(--lt-color-warning-base);  /* #FC9A0F  CM Color Kit/Dark/#6 Dark */
+  --lt-color-attention-main:    #FFA500;       /* CDP color/Attention/Attention1 Main（CMDS Alert / Large orange 頂條與 icon，2026-11-03 補） */
+  --lt-color-attention-lighter: #FFF3DE;       /* CDP color/Attention/Attention4 Lighter（Alert icon 底） */
 
   /* --- Shadow: 對齊 CMDS Figma 規範 (2026-05-12 audit)
    * 來源：Figma node 20599-107518 — CMDS 4 個官方 shadow variables
@@ -291,7 +328,7 @@
  * - ~~Chart palette~~ ✅ 已加入（2026-05-12 從 Figma General Behavior file audit）
  * - Gradient tokens (Figma 有 Lumiture.ai Blue / Orange / Lemon C 等)
  * - Opacity tokens (Figma 有 CM Opacity Color 系列)
- * - Composite typography tokens (--lt-type-h1, --lt-type-body 等 style sets)
+ * - ~~Composite typography tokens~~ ✅ 已加入 --lt-type-*（2026-11-02，H1／H2 用到再補）
  * - Focus / Inset shadow 特殊變體
  * - Dark mode 對應 token
  *
@@ -356,6 +393,7 @@ input{font-family:inherit;letter-spacing:0}
 /* X-9r5 RA7：頁面層 focus 指示（原本只換底色 1.21:1 或自訂光暈 1.18:1），統一 2px primary outline */
 .tab:focus-visible,.cnt:focus-visible,.sel:focus-visible,.icon-btn:focus-visible,.th.sortable:focus-visible,.chkcell:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px;box-shadow:none}
 .mi:focus-visible,.opt:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:-2px}
+.modal button:focus-visible,.toolbar .btn:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px}   /* X-9r1 11-13 P12：Assign 彈窗內實心鈕、外框鈕、× 的鍵盤 focus 同列表區（2px primary、offset 2；本頁沒載 shared/lumiture-ui.css，不靠它） */
 /* X-9r5 GA32：點擊目標補到 24，外觀不動 */
 .icon-btn::before{content:'';position:absolute;inset:-2px}
 .cnt.hv{position:relative}
@@ -375,7 +413,7 @@ input{font-family:inherit;letter-spacing:0}
 .tab{position:relative;display:flex;align-items:flex-start;gap:4px;padding:0;height:30px;font-size:var(--lt-fs-14);line-height:21px;font-weight:var(--lt-fw-regular);color:var(--lt-color-text-secondary);z-index:1}
 .tab .csp-logo{width:16px;height:16px;margin-top:2px;flex-shrink:0;display:inline-flex}
 .tab .csp-logo svg{width:16px;height:16px}
-.tab:hover{color:var(--lt-color-primary-hover)}
+.tab:hover{color:var(--lt-color-text-primary)}   /* X-9r1 11-13 P2：未選項 hover #262626（Guideline:2396，同 Cost Dashboard／General Budget／Group List） */
 .tab.on{font-weight:var(--lt-fw-bold);color:var(--lt-color-primary)}
 .tab.on::after{content:'';position:absolute;left:0;right:0;bottom:0;height:4px;border-radius:10px;background:var(--lt-color-primary)}
 
@@ -409,6 +447,10 @@ input{font-family:inherit;letter-spacing:0}
 .tbl-scroll-x{overflow-x:auto;overscroll-behavior:contain}
 .tbl-inner{min-width:760px}
 .th-row,.tr{display:grid;grid-template-columns:48px minmax(150px,261fr) minmax(150px,261fr) 120px 100px 120px 80px}
+/* X-9r5 B13（11-12）：AWS 第一欄表頭 `Management Account Name / ID`＋排序 icon 在這台字型要 290（文字 228＋內距 32＋gap 10＋icon 20），稿 #17 完整顯示；
+ * 兩欄等寬 261 時 1366 被截成 `Management Account Na…`。1340 以上 AWS 第一欄至少 296（C 層 B32：原 290 餘裕 0，連續套情境時會被截；多留 6）、第二欄讓出（1366 為 296／226，1440 仍各 298）；
+ * 1340 以下維持 X-9r5 RA1 的截斷＋tooltip（四欄固定寬度加起來放不下第二欄表頭與第一欄表頭一起完整） */
+@media(min-width:1340px){.tbl.is-aws .th-row,.tbl.is-aws .tr{grid-template-columns:48px minmax(296px,1fr) minmax(150px,1fr) 120px 100px 120px 80px}}
 .th-row{height:50px;background:var(--lt-color-primary-bg);border-bottom:1px solid var(--lt-grey-400);padding-right:14px}   /* 14＝body 捲軸寬，讓兩邊欄寬對齊；表頭底色延伸到捲軸上方（#14 量到） */
 .th{display:flex;align-items:center;gap:10px;padding:0 16px;font-weight:var(--lt-fw-bold);font-size:var(--lt-fs-14);color:var(--lt-color-text-heading);white-space:nowrap;min-width:0;position:relative}
 .th.c-chk,.td.c-chk{padding:0 0 0 16px}
@@ -444,8 +486,8 @@ input{font-family:inherit;letter-spacing:0}
 .hide-badges .ux-badge{display:none}
 
 /* ===== Skeleton（Figma #14-4：表頭 #F2F2F2、條 14 高 #E6E6E6 r4、左側合併欄 502＋四個窄欄、直線 #E6E6E6）===== */
-.sk{background:linear-gradient(90deg,#E6E6E6 25%,#F0F0F0 50%,#E6E6E6 75%);background-size:200% 100%;animation:shimmer 1.5s infinite linear;border-radius:4px;height:14px}
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+/* X-9r5 A16（11-12）：A-18 全站規則（Kabin 2026-10-15）骨架靜態不動畫、吃 --lt-color-bg-skeleton（#E6E6E6）；原本 shimmer gradient 是四頁裡唯一還在閃的，同 Audit Log X-9r1 P5 */
+.sk{background:var(--lt-color-bg-skeleton);border-radius:4px;height:14px}
 .sk-tbl{display:grid;grid-template-columns:minmax(0,502fr) repeat(4,minmax(0,125.5fr));border-collapse:collapse}
 .sk-c{height:50px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--lt-grey-200);background:#fff}
 .sk-c.h{background:var(--lt-grey-100);height:50px}
@@ -526,7 +568,7 @@ input{font-family:inherit;letter-spacing:0}
 .modal .m-hd{display:flex;align-items:center;gap:15px;flex-shrink:0}
 .modal .m-hd h2{flex:1;font-size:20px;line-height:30px;font-weight:var(--lt-fw-bold);color:var(--lt-color-text-heading)}
 .modal .m-x{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--lt-grey-500);flex-shrink:0}
-.modal .m-x:hover{background:var(--lt-grey-100)}
+.modal .m-x:hover{color:var(--lt-color-text-primary)}   /* X-9r1 11-13 P1：彈窗 × hover 只變 icon 色 #262626、不加底（Guideline:1467／:1662，同 Group List／Organization Settings） */
 .modal .m-x .material-symbols-outlined{font-size:24px;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24}
 .modal .m-body{font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-primary);flex-shrink:0}
 .modal .m-body b{font-weight:var(--lt-fw-bold);color:var(--lt-color-primary)}
@@ -555,6 +597,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
   <div class="main">
     <header id="lt-topbar"></header>
     <main class="content" id="content"></main>
+    <div id="sr-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
     <div class="footer">
       <span class="footer-version">All Resource List Prototype<span class="ver-tag">v1</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
@@ -827,14 +870,14 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
   }
   function _renderLogo() {
     var href = _homeHref();
-    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-sb-logo">';
+    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-sb-logo">';
     return open + _logoBody(LOGO_ICON) + (href ? '</a>' : '</div>');
   }
   // 收合時顯示在 topbar 左側的 logo（同一組圖形，mask id 改 ltT* 避免跟 sidebar 那份撞 id）
   function _renderTopbarLogo() {
     var href = _homeHref();
     var icon = LOGO_ICON.replace(/ltH(ring|bars|leg)/g, 'ltT$1');
-    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-tb-logo">';
+    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-tb-logo">';
     return open + _logoBody(icon) + (href ? '</a>' : '</div>');
   }
   function _mountTopbarLogo(host) {
@@ -1086,7 +1129,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
  *     version:     'v1.19.0',               // Software version 列
  *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
  *     quota: {                              // AI Quota box 數據；total 已含 add-on
- *       refreshDate: '2 Nov. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）
+ *       refreshDate: '2 Dec. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）。沒給（或給空值）就自動算下一個 2 號（X-9r1 11-13 S-A1，LumitureTopbar.nextRefreshDate）
  *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
  *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
  *     },
@@ -1097,6 +1140,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
  *   window.LumitureTopbar.setRole('Manager - ...')— 只更新 role chip（Demo FAB role 切換用）
  *   window.LumitureTopbar.setPlan('Essential')    — 切 plan（連動 AI Quota box 顯示項目）
  *   window.LumitureTopbar.setQuota({analyses:{...}, rightsizing:{...}, refreshDate, addonPacks})
+ *   window.LumitureTopbar.nextRefreshDate()        — 依今天算下一個計費週期錨日（每月 2 號），回 '2 Dec. 2026' 這種寫法
  *   window.LumitureTopbar.openMenu() / closeMenu() / toggleMenu()
  *   window.LumitureTopbar.rerender()
  *   window.LumitureTopbar.openRoleDialog() / closeRoleDialog()   — View as Another Role 彈窗（#01-5；頁面掛勾見下方 role 區塊註解）
@@ -1105,6 +1149,16 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
  */
 (function () {
   'use strict';
+
+  /* X-9r1 11-13 S-A1：下一個計費週期錨日（每月 2 號），格式照稿的「2 Apr. 2028」；今天 ≥ 2 號就取下個月。
+     原本寫死 '2 Nov. 2026'，過了那天 13 頁的 Account Menu 都顯示過期日（User Menu 頁自己算過，這裡搬進 shared 讓全站共用）。 */
+  function _nextRefreshDate() {
+    var M = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'];
+    var d = new Date(), y = d.getFullYear(), m = d.getMonth();
+    if (d.getDate() >= 2) m += 1;
+    if (m > 11) { m = 0; y += 1; }
+    return '2 ' + M[m] + ' ' + y;
+  }
 
   // ===== Defaults ===== (預設給 Standard plan + Normal 狀態，所有既有 prototype 直接吃，不破版)
   var DEFAULT_USER = {
@@ -1119,7 +1173,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
     version: 'v1.19.0',
     addonPacks: 0,
     quota: {
-      refreshDate: '2 Nov. 2026',          // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期（原 2 Jul. 2026 已過期）
+      refreshDate: _nextRefreshDate(),     // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期；X-9r1 11-13 S-A1：改成依今天自動算（原寫死 2 Nov. 2026 已過期）
       analyses:    { used: 32,  total: 80 },
       rightsizing: { used: 410, total: 1000 },
     },
@@ -1185,8 +1239,11 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
     /* ---------- Account Menu popover ----------
        2026-10-14 逐格對 Figma #01-6（hover）／#01-7（loading & error）：左右內距 24、方案列 37 高、姓名 16/700、角色 chip 藍 #004FB0 方角、
        AI Quota 每列 24 高、狀態色 #00DCC2／#F4A938／#FF403D、功能列 40 高（外包 8／16）、陰影 0 0 6px .2。舊值（內距 16、狀態色提亮）是 06-22 的目視估計 */
-    '.lt-am-backdrop{position:fixed;inset:0;z-index:1000;background:transparent}',
-    '.lt-am{position:fixed;top:64px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
+    /* X-9r1 11-13 S-A2：背板 1000 → 997。Demo FAB 999、面板 998，背板要讓到它們底下，否則選單開著時（User Menu 頁進頁就開著）
+       第一下點 FAB 只會被背板吃掉去關選單，面板不開。選單本體 #lt-am 維持 1001。不要去抬 FAB 的層級：
+       Cost Dashboard、Group List、All Resource List 有 1000 以上的彈窗遮罩，FAB 抬上去會浮在遮罩上。 */
+    '.lt-am-backdrop{position:fixed;inset:0;z-index:997;background:transparent}',
+    '.lt-am{position:fixed;top:68px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
     'box-shadow:0 0 6px rgba(0,0,0,.2);font-family:\'Noto Sans\',sans-serif;color:#fff;',
     'animation:lt-am-in .14s ease;transform-origin:top right}',   /* 不設 overflow:hidden：hover tooltip（寬 400）要能伸出選單左邊，圓角改由第一／最後一個子區塊自己帶 */
     '@keyframes lt-am-in{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}',
@@ -1283,6 +1340,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
   function _user() {
     var u = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
     u.quota = Object.assign({}, DEFAULT_USER.quota, (window.LUMITURE_USER || {}).quota || {});
+    if (!u.quota.refreshDate) u.quota.refreshDate = _nextRefreshDate();   /* 頁面傳 undefined／null／'' 也吃自動值（S-A1） */
     return u;
   }
   function _status(used, total) {
@@ -1453,7 +1511,8 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
     var m = document.getElementById('lt-am');
     return m ? Array.prototype.slice.call(m.querySelectorAll('.lt-am-item,.lt-q-err a,.lt-q-item.has-tip')) : [];
   }
-  function _openMenu() {
+  function _openMenu(opts) {
+    var noFocus = !!(opts && opts.focus === false);   /* X-9r1 11-13 S-B9：程式開選單（User Menu 進頁、Demo 情境）不搶焦點 */
     var wasOpen = _menuOpen, items0 = wasOpen ? _menuItems() : [], idx = items0.indexOf(document.activeElement);
     var u = _user();
     _menuHost().innerHTML = _renderMenu(u);
@@ -1461,7 +1520,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
     var chip = document.getElementById('lt-tb-user');
     if (chip) { chip.classList.add('is-open'); chip.setAttribute('aria-expanded', 'true'); }
     var items = _menuItems(), t = null;
-    if (!wasOpen) t = document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
+    if (!wasOpen) t = noFocus ? null : document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
     else if (idx > -1 && items.length) t = items[Math.min(idx, items.length - 1)];            // 重繪（Retry、切 plan…）：焦點留在原位
     if (t) t.focus({ preventScroll: true });
   }
@@ -1534,7 +1593,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
     '.lt-rd-btn.pri{background:#004FB0;color:#fff;border-color:#004FB0;min-width:160px}',
     '.lt-rd-btn.pri:hover{background:#0B6DD7;border-color:#0B6DD7}',
     '.lt-rd-btn.out{background:#fff;color:#004FB0;border-color:#004FB0}',
-    '.lt-rd-btn.out:hover{background:#F2FAFF}',
+    '.lt-rd-btn.out:hover{background:#F6F6F6;color:#0B6DD7;border-color:#0B6DD7}',   /* X-9r1 11-13 S-KCR：照全站外框主色鈕 hover（Guideline .btn--outlined-primary:hover） */
     '.lt-rd-btn[disabled]{background:#CCCCCC;border-color:#CCCCCC;color:#fff;cursor:not-allowed}',
     '.lt-rd-btn:focus-visible,.lt-rd-sel:focus-visible{outline:2px solid #004FB0;outline-offset:2px}',
     '.lt-rd-spin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:lt-rd-spin .8s linear infinite}',
@@ -1633,8 +1692,9 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
         '" aria-controls="lt-rd-list" aria-labelledby="lt-rd-t"><span class="lt-rd-v">' + _esc(sel.name) + '</span><span class="lt-rd-chip">' + _esc(sel.role) +
         '</span><span class="material-symbols-outlined lt-rd-arr" aria-hidden="true">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
       '<div class="lt-rd-act"><button type="button" class="lt-rd-btn out" id="lt-rd-keep"' + (r.loading ? ' disabled' : '') + '>' + ROLE_COPY.keep + '</button>' +
-        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') + '>' +
-        (r.loading ? '<span class="lt-rd-spin" role="status" aria-label="Loading"></span>' : ROLE_COPY.cont) + '</button></div>' +
+        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') +
+        (r.loading ? ' aria-label="' + _esc(ROLE_COPY.cont) + '" aria-busy="true"' : '') + '>' +   /* X-9r1 11-13 S-A4：讀取中名稱維持 Continue（同 Auth 11-05 N2） */
+        (r.loading ? '<span class="lt-rd-spin" aria-hidden="true"></span>' : ROLE_COPY.cont) + '</button></div>' +
     '</div></div>';
   }
   function _rdRender(keepFocusId) {
@@ -1816,10 +1876,12 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
       window.LUMITURE_USER = Object.assign({}, cur, {
         quota: Object.assign({}, DEFAULT_USER.quota, cur.quota || {}, q || {}),
       });
+      if (!window.LUMITURE_USER.quota.refreshDate) window.LUMITURE_USER.quota.refreshDate = _nextRefreshDate();   /* 空值用自動值（S-A1） */
       if (q && typeof q.addonPacks !== 'undefined') window.LUMITURE_USER.addonPacks = q.addonPacks;
       if (_menuOpen) _openMenu();
     },
-    openMenu: _openMenu,
+    openMenu: _openMenu,   /* openMenu({focus:false})：程式開選單不搶焦點（S-B9） */
+    nextRefreshDate: _nextRefreshDate,
     closeMenu: _closeMenu,
     toggleMenu: _toggleMenu,
     rerender: function () { _render(); if (_menuOpen) _openMenu(); },
@@ -2604,7 +2666,7 @@ function tableHtml(rows) {
       <div class="td c-assign"><button class="icon-btn" data-a="assign-one" data-id="${r.id}" aria-label="${COPY.assignTip}" data-tip="${COPY.assignTip}"><span aria-hidden="true" class="material-symbols-outlined">contract_edit</span></button></div>
     </div>`;
   }).join('');
-  return `<div class="tbl">${assignedHeaderBadge()}<div class="tbl-scroll-x" onscroll="placeBadge()"><div class="tbl-inner" role="table" aria-label="${esc(c.label)} resources">
+  return `<div class="tbl${state.cloud === 'aws' ? ' is-aws' : ''}">${assignedHeaderBadge()}<div class="tbl-scroll-x" onscroll="placeBadge()"><div class="tbl-inner" role="table" aria-label="${esc(c.label)} resources">
     <div role="rowgroup"><div class="th-row" role="row">
       <div class="th c-chk"><span class="chkcell" role="checkbox" tabindex="0" aria-checked="${mixed ? 'mixed' : allSel}" aria-label="Select all resources" data-a="sel-all">${LumiCheckbox.html({ checked: allSel, mixed })}</span></div>
       <div class="th ${sortable}" data-a="sort"${state.sort.on ? ' tabindex="0"' : ''} aria-sort="${state.sort.mode === 'desc' ? 'descending' : state.sort.mode === 'asc' ? 'ascending' : 'none'}"><span class="th-t" data-trunc="${esc(c.colA)}">${esc(c.colA)}</span>${sortIconHtml()}</div>
@@ -2706,10 +2768,18 @@ function placeBadge() {
 window.addEventListener('resize', () => { markTrunc(); placePop(); placeBadge(); });
 
 /* 進入「有資料」畫面前故意跑一段 skeleton（Kabin 偏好）；tab 切換、filter 送出也各跑一次（#14-3：Focus 狀態結束後更新表單內容，進 Loading）*/
+/* X-9r5 C 層 C-C4（11-13）：視覺隱藏的狀態播報區（同 Group List #sr-status、Organization Settings #os-status），篩選／切雲端載入完與排序後讀屏才知道表格換了內容 */
+function announce(text) {
+  const el = document.getElementById('sr-status'); if (!el) return;
+  el.textContent = ''; setTimeout(() => { el.textContent = text; }, 40);
+}
 function withLoading(apply, ms) {
   const tok = ++LOAD_TOKEN;
   state.pageState = 'loading'; render();
-  setTimeout(() => { if (tok !== LOAD_TOKEN) return; apply && apply(); state.pageState = state.dataMode === 'ok' ? 'set' : state.dataMode; render(); }, ms || 600);
+  setTimeout(() => {
+    if (tok !== LOAD_TOKEN) return; apply && apply(); state.pageState = state.dataMode === 'ok' ? 'set' : state.dataMode; render();
+    if (state.pageState === 'set') { const n = visibleRows().length; announce(n ? `${n} result${n === 1 ? '' : 's'}` : 'No data found'); }
+  }, ms || 600);
 }
 
 Object.assign(ACT, {
@@ -2724,6 +2794,7 @@ Object.assign(ACT, {
        三段循環 預設（灰↓）→ 降冪（藍↓）→ 升冪（藍↑）→ 回到預設，灰色狀態點得回來，語意才學得會。灰↓ 的形狀照稿（元件 element/sort_by）。⚠ 未確認：紅便條沒答案，Demo 可切「只畫箭頭」 */
     state.sort.mode = m === 'default' ? 'desc' : m === 'desc' ? 'asc' : 'default';
     render();
+    announce(state.sort.mode === 'default' ? `Sorting by ${cfg().colA} cleared` : `Sorted by ${cfg().colA}, ${state.sort.mode === 'desc' ? 'descending' : 'ascending'}`);
   }
 });
 </script>
@@ -3166,7 +3237,7 @@ function applyState(id) {
 function fire(el, type) { el.dispatchEvent(new MouseEvent(type, { bubbles: true, clientX: el.getBoundingClientRect().left + 30, clientY: el.getBoundingClientRect().top + 10 })); }
 function ensureList() { state.noAccess = false; state.pageState = 'set'; state.dataMode = 'ok'; if (state.role !== 'admin') setRole('admin'); closeModal(); }   /* X-9r5 RA2：這些情境畫面是 Admin 才看得到的清單，角色 chip 要回 Admin（先前只有 loading／empty／set 會回） */
 window.DEMO_APPLY = function (id) {
-  closePop(true); hideGroupTip();
+  closePop(true); hideGroupTip(); if (window._glTipHide) window._glTipHide();
   if (['set', 'aws', 'loading', 'empty', 'error', 'no-auth'].includes(id)) return applyState(id);
   if (ROLES[id]) { state.noAccessMode = 'page'; return applyRole(id); }   // 一律走方案 B（Kabin 10/09）
   if (id === 'na-a') { state.noAccessMode = 'redirect'; return applyRole('t1m'); }   // 以 T1 Manager 身分誤入，走方案 A
@@ -3235,8 +3306,10 @@ window.DEMO_APPLY = function (id) {
   let cur = null;
   function place() {
     if (!cur || !cur.isConnected) { cur = null; tip.style.display = 'none'; return; }
-    const r = cur.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight, vw = innerWidth, vh = innerHeight;
+    const a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;   /* X-9r1 11-13 P11：支援 data-tip-anchor（錨在子元素，sidebar logo tooltip 用），寫法同 shared/demo-fab.js place() */
+    const r = a.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight, vw = innerWidth, vh = innerHeight;
     let x = r.left; if (x + tw > vw - 8) x = Math.max(8, Math.min(r.right + 2, vw - 8) - tw);
+    x = Math.max(8, x);   /* X-9r1 11-13 P11：至少離視窗左緣 8（同 shared S-A7） */
     let y = cur.dataset.tipPos === 'below' ? r.bottom + 4 : r.top - th - 5;
     if (y < 8) y = r.bottom + 4; if (y + th > vh - 8) y = Math.max(8, r.top - th - 5);
     tip.style.left = x + 'px'; tip.style.top = y + 'px';
@@ -3250,6 +3323,7 @@ window.DEMO_APPLY = function (id) {
     const el = e.target.closest && e.target.closest('[data-tip]');
     if (el && el === cur && !el.contains(e.relatedTarget)) { cur = null; tip.style.display = 'none'; }
   });
+  window._glTipHide = () => { cur = null; tip.style.display = 'none'; };   /* X-9r5 C 層 B33：切 Demo 情境時收掉程式叫出的 tooltip（hover-trunc 之後會一直留在原位） */
   window.addEventListener('scroll', place, true);
 })();
 </script>
@@ -3730,6 +3804,14 @@ window.DEMO_APPLY = function (id) {
       } catch (err) {}
       return 8;
     }
+    /* X-9r1 B1（2026-11-05）：固定頂欄的下緣。tooltip 放在錨點上方時不能壓到頂欄（頁首那排 info icon／截圖鈕／幣別鈕的 tooltip 之前 top 9～54，蓋在鈴鐺與頭像上）；頂欄捲走或沒有頂欄時回 8 */
+    function topMin() {
+      try {
+        var tb = document.querySelector('.lt-topbar');
+        if (tb) { var b = tb.getBoundingClientRect().bottom; if (b > 0) return b + 4; }
+      } catch (err) {}
+      return 8;
+    }
     function place() {
       if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
@@ -3741,10 +3823,11 @@ window.DEMO_APPLY = function (id) {
       /* X-9r1 S2：放不下改靠右緣時，左緣不能落進 sidebar（600 寬在 1280 中間位置會伸進去）；沒有 sidebar 的頁維持 8，收合時 21＋8 */
       if (x + tw > vw - 8) x = Math.max(minX(), Math.min(r.right + 2, vw - 8) - tw);
       if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
+      x = Math.max(8, x);   /* X-9r1 11-13 S-A7：至少離視窗左緣 8（sidebar 裡的錨點不套 minX()，logo tooltip 原本貼在 left 0） */
       var below = cur.dataset.tipPos === 'below';
       var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
       var y = below ? r.bottom + dy : r.top - th - 6;
-      if (y < 8) y = r.bottom + 4;
+      if (y < topMin()) y = r.bottom + 4;   /* X-9r1 B1：上方放不下或會蓋到頂欄就翻到下方 */
       if (y + th > vh - 8) y = Math.max(8, r.top - th - 6);
       tip.style.left = x + 'px'; tip.style.top = y + 'px';
     }

@@ -82,6 +82,7 @@
   --lt-color-error-light:   #FFEBEF;   /* TBC: Figma audit needed */
   --lt-color-warning-base:  #FC9A0F;   /* TBC: Figma audit needed */
   --lt-color-warning-light: #FEF3E1;   /* TBC: Figma audit needed */
+  --lt-color-warning-dark:  #EC6F09;   /* CM Color Kit Warning/Dark（2026-11-02 補；FE warning.dark，LumiTag 過期與分到 0 提示用） */
   --lt-color-info-base:     #0B6DD7;   /* = blue-60，符合 Figma info usage */
   --lt-color-info-light:    #E6F6FF;   /* TBC: Figma audit needed */
 
@@ -138,6 +139,42 @@
 
   /* --- Typography: Letter Spacing (對齊 Figma: 全部 0) --- */
   --lt-tracking-normal: 0;
+
+  /* --- Typography: CMDS 文字樣式（composite，用在 `font:` 簡寫）2026-11-02 ---
+   * 一對一對應 Figma「CM Typography」的文字樣式；寫 CSS 一律從這組挑，不自己組字級／字重／行高。
+   * `font:` 簡寫會把 font-variant-numeric 重設成 normal，數字欄要另外補 tabular-nums。
+   * Link Bold 1 稿上自帶底線；底線由元件決定（Lumiture 文字按鈕不加底線，見 Guideline Text Button）。 */
+  --lt-type-h3:               700 24px/36px var(--lt-font-sans);    /* Headers/H3 頁面標題 */
+  --lt-type-h4:               700 20px/30px var(--lt-font-sans);    /* Headers/H4 頁面副標題 */
+  --lt-type-h5:               700 18px/27px var(--lt-font-sans);    /* Headers/H5 功能名稱 */
+  --lt-type-h6:               700 16px/24px var(--lt-font-sans);    /* Headers/H6 小標題 */
+  --lt-type-body:             400 14px/24.5px var(--lt-font-sans);  /* Body/Body Regular 內文 */
+  --lt-type-body-medium:      500 14px/24.5px var(--lt-font-sans);  /* Body/Body Medium 內文重點 */
+  --lt-type-body-bold:        700 14px/24.5px var(--lt-font-sans);  /* Body/Body Bold 內文標題 */
+  --lt-type-caption:          400 12px/18px var(--lt-font-sans);    /* Caption/Caption Regular 註記 */
+  --lt-type-caption-bold:     700 12px/18px var(--lt-font-sans);    /* Caption/Caption Bold 重要註記 */
+  --lt-type-button-regular-0: 400 12px/18px var(--lt-font-sans);    /* Content/Button Regular 0（chip 字） */
+  --lt-type-button-regular-1: 400 14px/21px var(--lt-font-sans);    /* Content/Button Regular 1（下拉選項字） */
+  --lt-type-button-bold-1:    700 14px/21px var(--lt-font-sans);    /* Content/Button Bold 1 */
+  --lt-type-button-bold-2:    700 16px/24px var(--lt-font-sans);    /* Content/Button Bold 2 */
+  --lt-type-link-bold-1:      700 14px/24.5px var(--lt-font-sans);  /* Content/Link Bold 1 超連結 */
+  --lt-type-link-medium-1:    500 14px/24.5px var(--lt-font-sans);  /* Content/Link Medium 1 超連結（2026-11-03 補，LumiTag Edit allocation card） */
+
+  /* --- Color: CM Color Kit（chip 等元件用；Light＝底、Main＝框、Dark＝字）2026-11-02，先收 #3、#11，其他色用到再補 --- */
+  --lt-kit-3-light:  var(--lt-turquoise-10);   /* #F0FFFF  #3 Turquoise Blue */
+  --lt-kit-3-main:   var(--lt-chart-3);        /* #9CF3FF */
+  --lt-kit-3-dark:   var(--lt-turquoise-70);   /* #34B5D9  CM Color Kit/Dark/#3 Dark */
+  --lt-kit-11-light: var(--lt-grey-100);       /* #F2F2F2  #11 Gray */
+  --lt-kit-11-main:  var(--lt-grey-400);       /* #B3B3B3 */
+  --lt-kit-11-dark:  #7C7C7C;                  /*          CM Color Kit/Dark/#11 Dark */
+  --lt-kit-4-light:  #E6FFF8;                  /* CM Color Kit/Light/#4 Light（2026-11-03 補，LumiTag Preview 狀態標籤） */
+  --lt-kit-4-main:   var(--lt-chart-4);        /* #00DCC2 */
+  --lt-kit-4-dark:   var(--lt-color-success);  /* #00B5A6  CM Color Kit/Dark/#4 Dark */
+  --lt-kit-6-light:  var(--lt-color-warning-light); /* #FEF3E1  #6 Tangerine Orange（2026-11-03 補，LumiTag Not split／Partially split） */
+  --lt-kit-6-main:   var(--lt-chart-6);        /* #F3BE68 */
+  --lt-kit-6-dark:   var(--lt-color-warning-base);  /* #FC9A0F  CM Color Kit/Dark/#6 Dark */
+  --lt-color-attention-main:    #FFA500;       /* CDP color/Attention/Attention1 Main（CMDS Alert / Large orange 頂條與 icon，2026-11-03 補） */
+  --lt-color-attention-lighter: #FFF3DE;       /* CDP color/Attention/Attention4 Lighter（Alert icon 底） */
 
   /* --- Shadow: 對齊 CMDS Figma 規範 (2026-05-12 audit)
    * 來源：Figma node 20599-107518 — CMDS 4 個官方 shadow variables
@@ -290,7 +327,7 @@
  * - ~~Chart palette~~ ✅ 已加入（2026-05-12 從 Figma General Behavior file audit）
  * - Gradient tokens (Figma 有 Lumiture.ai Blue / Orange / Lemon C 等)
  * - Opacity tokens (Figma 有 CM Opacity Color 系列)
- * - Composite typography tokens (--lt-type-h1, --lt-type-body 等 style sets)
+ * - ~~Composite typography tokens~~ ✅ 已加入 --lt-type-*（2026-11-02，H1／H2 用到再補）
  * - Focus / Inset shadow 特殊變體
  * - Dark mode 對應 token
  *
@@ -308,6 +345,7 @@
  *   .lt-skeleton 骨架屏（A-18）
  *   .lt-link     文字連結（B-14）
  *   .lt-btn-icon 表格 Action icon button（B-6，CB 版）
+ *   .lt-chip     CMDS「Deletable chips / Squared colors」（2026-11-02）
  *   空狀態／無權限見 lumiture-empty.js；Toast 見 lumiture-toast.js
  * ============================================================ */
 
@@ -366,6 +404,29 @@
 .lt-btn-icon:hover{background:var(--lt-blue-20,#D1EEFF)}
 .lt-btn-icon:focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:1px}
 .lt-btn-icon:disabled{color:var(--lt-grey-400,#B3B3B3);cursor:not-allowed;background:none}
+
+/* ---------- .lt-chip ----------
+ * CMDS「Deletable chips / Squared colors」，Deletable=false。Lumiture 用到的 chip 一律走這個，不要各頁自刻。
+ * 結構：<span class="lt-chip lt-chip--outline lt-chip--c3"><span class="material-symbols-outlined lt-chip__icon">call_split</span>Allocation card</span>
+ * Size：預設 s（高 24）、.lt-chip--xs（高 20）。CMDS 只有這兩個尺寸。
+ * 圓角 4、左右內距 8、icon（Show icon L）16 與字間距 4、字 Button Regular 0（12／18）。
+ * Appearance：.lt-chip--outline 底 Light／框 Main／字 Dark；.lt-chip--solid 底 Dark／白字。
+ * Color：.lt-chip--c3（#3 Turquoise Blue）、.lt-chip--c4（#4 Green）、.lt-chip--c6（#6 Tangerine Orange）、.lt-chip--c11（#11 Gray）；其他色用到時照 CM Color Kit 在 tokens.css 補 --lt-kit-N-*。 */
+.lt-chip{display:inline-flex;align-items:center;gap:4px;box-sizing:border-box;height:24px;padding:0 8px;border-radius:4px;border:1px solid transparent;
+  font:var(--lt-type-button-regular-0,400 12px/18px sans-serif);white-space:nowrap;flex-shrink:0;vertical-align:middle}
+.lt-chip--xs{height:20px}
+.lt-chip__icon{font-size:16px;line-height:1;font-variation-settings:'FILL' 1}
+.lt-chip--outline.lt-chip--c3{background:var(--lt-kit-3-light,#F0FFFF);border-color:var(--lt-kit-3-main,#9CF3FF);color:var(--lt-kit-3-dark,#34B5D9)}
+.lt-chip--solid.lt-chip--c3{background:var(--lt-kit-3-dark,#34B5D9);color:var(--lt-white,#fff)}
+.lt-chip--outline.lt-chip--c11{background:var(--lt-kit-11-light,#F2F2F2);border-color:var(--lt-kit-11-main,#B3B3B3);color:var(--lt-kit-11-dark,#7C7C7C)}
+.lt-chip--solid.lt-chip--c11{background:var(--lt-kit-11-dark,#7C7C7C);color:var(--lt-white,#fff)}
+.lt-chip--outline.lt-chip--c4{background:var(--lt-kit-4-light,#E6FFF8);border-color:var(--lt-kit-4-main,#00DCC2);color:var(--lt-kit-4-dark,#00B5A6)}
+.lt-chip--outline.lt-chip--c6{background:var(--lt-kit-6-light,#FEF3E1);border-color:var(--lt-kit-6-main,#F3BE68);color:var(--lt-kit-6-dark,#FC9A0F)}
+
+/* X-9r1 11-13 S-FOCUS：鍵盤 focus 框統一 2px primary 外框（X-9r2／X-9r5 已定「focus 統一 2px primary 外框」）。
+   用 :where() 零權重：各頁自己寫了 :focus-visible 或 outline:none＋光暈的照舊贏。
+   排除共用外殼（sidebar／topbar／Account Menu／角色彈窗／Demo FAB／toast）：它們在深色底上有自己的青色或白色框。 */
+:where(button,[role="button"],[role="tab"],a[href]):where(:not(.lt-sidebar *,.lt-topbar *,.lt-tb-logo *,#lt-am *,.lt-rd-back *,.demo-fab,.demo-popover *,.lt-toast-wrap *)):focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:2px}
 
 </style>
 <script>
@@ -499,9 +560,9 @@
   --ad-card-shadow: var(--lt-card-shadow);   /* B-3：改吃 token（0 0 20px rgba(0,0,0,.10)） */
   --ad-radius-field: 5px;
   --ad-radius-modal: var(--lt-modal-radius);   /* B-4：表單類彈窗 r15（Alert Settings） */
-  --ad-field-border: #CCCCCC;                 /* = --lt-grey-300 */
-  --ad-scroll-thumb: #D8D8D8;
-  --ad-badge-bg: #B3B3B3;                     /* Figma Badge / Text：子項計數膠囊（= --lt-grey-400）；FE 的 gray.borderDark，tokens 沒有對應語意 token */
+  --ad-field-border: var(--lt-grey-300);        /* #CCCCCC（X-9r2 F8：色一律 token） */
+  --ad-scroll-thumb: #D8D8D8;                 /* 稿的捲軸 thumb，tokens.css 沒有對應語意（X-9r2 F8 留著） */
+  --ad-badge-bg: var(--lt-grey-400);            /* #B3B3B3  Figma Badge / Text：子項計數膠囊（= --lt-grey-400）；FE 的 gray.borderDark，tokens 沒有對應語意 token */
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
@@ -519,7 +580,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 .content{padding:var(--lt-space-32);flex:1;display:flex;flex-direction:column;gap:20px;min-width:0}
 
 /* ===== Buttons（Figma Button/M：36h、圓角 5、14/700）===== */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--lt-space-4);min-width:80px;padding:0 var(--lt-button-padding-x);height:36px;border-radius:var(--ad-radius-field);font-weight:var(--lt-fw-bold);font-size:var(--lt-fs-14);line-height:1.5;white-space:nowrap;border:1px solid transparent;transition:background-color var(--lt-transition-fast),border-color var(--lt-transition-fast),color var(--lt-transition-fast)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--lt-space-4);min-width:80px;padding:0 var(--lt-button-padding-x);height:36px;border-radius:var(--ad-radius-field);font:var(--lt-type-button-bold-1);white-space:nowrap;border:1px solid transparent;transition:background-color var(--lt-transition-fast),border-color var(--lt-transition-fast),color var(--lt-transition-fast)}
 .btn-p{background:var(--lt-color-primary);color:var(--lt-color-text-inverse)}
 .btn-p:hover{background:var(--lt-color-primary-hover)}
 .btn-p:active{background:var(--lt-color-primary-active)}
@@ -529,13 +590,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 .btn .material-symbols-outlined{font-size:16px}
 .btn .ic-add{font-variation-settings:'FILL' 1,'wght' 600,'GRAD' 0,'opsz' 20}
 .btn:disabled,.btn.is-disabled{background:var(--lt-button-disabled-bg)!important;color:var(--lt-button-disabled-text)!important;border-color:transparent!important;cursor:not-allowed}
-.btn.btn-o:disabled,.btn.btn-o.is-disabled{background:#fff!important;color:var(--lt-grey-300)!important;border-color:var(--lt-grey-300)!important}
+.btn.btn-o:disabled,.btn.btn-o.is-disabled{background:var(--lt-white)!important;color:var(--lt-grey-300)!important;border-color:var(--lt-grey-300)!important}
 
 /* ===== Page header（Figma #01：H4 20/700、說明 14/24.5 #676767）===== */
 .pg-hdr{display:flex;align-items:center;gap:var(--lt-space-16);min-height:36px}
 /* ⚠ DEVIATION（B-2，Kabin 2026-10-15 裁決全站 24）：Figma #01 量到 H4 20/700/30，但全站頁標題統一 24；Figma 待回改（見 specs/2026-10-14-x6-figma-fix-list.md） */
 .pg-title{font-size:var(--lt-page-title-size);font-weight:var(--lt-fw-bold);color:var(--lt-color-text-heading);line-height:36px}
-.pg-desc{font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-secondary)}
+#sm-t:focus{outline:none}   /* X-9r2 第三輪驗證後小修 N3：Alert Settings 開啟時程式聚焦的標題不畫瀏覽器預設細框 */
+.pg-desc{font:var(--lt-type-body);color:var(--lt-color-text-secondary)}
 .hdr-block{display:flex;flex-direction:column;gap:4px}
 
 /* ===== Card（Figma：白底 r8 內距 24 陰影 0 0 20 .10）===== */
@@ -544,7 +606,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 
 /* ===== 工具列（Figma #01：高 36、Alert List 18/700 靠左；右側 Alert Settings／狀態 chip／All|Pinned，gap 16）===== */
 .toolbar{display:flex;align-items:center;gap:16px;min-height:36px}
-.tb-title{font-size:var(--lt-fs-18);font-weight:var(--lt-fw-bold);line-height:27px;color:var(--lt-color-text-heading);margin-right:auto}
+.tb-title{font:var(--lt-type-h5);color:var(--lt-color-text-heading);margin-right:auto}
 .tb-title.none{margin-right:auto;min-width:1px}
 .toolbar.is-empty{min-height:30px}   /* 對稿修正（Figma #01-4）：空狀態沒有切換器，工具列高 30 不是 36 */
 .tb-r{display:flex;align-items:center;gap:16px;margin-left:auto}
@@ -556,7 +618,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 .lnk-btn:disabled{color:var(--lt-grey-300);cursor:not-allowed}
 .lnk-btn:disabled:hover{color:var(--lt-grey-300)}
 /* 偵測狀態 chip（Figma Status Chips：高 24、r4、內距 2/8、燈 8×8、文字 12/18）*/
-.st-chip{display:inline-flex;align-items:center;gap:4px;height:24px;padding:2px 8px;border-radius:var(--lt-radius-sm);background:var(--lt-color-info-light);font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-primary)}
+.st-chip{display:inline-flex;align-items:center;gap:4px;height:24px;padding:2px 8px;border-radius:var(--lt-radius-sm);background:var(--lt-color-info-light);font:var(--lt-type-button-regular-0);color:var(--lt-color-text-primary)}
 .st-chip .dot{width:8px;height:8px;border-radius:50%;background:var(--lt-color-primary);flex-shrink:0}
 .st-chip .tx{white-space:pre}   /* Figma 文案 `Detection Enabled  (Sensitivity: High)` 中間是兩個空格，照稿保留 */
 .st-chip.off{background:var(--lt-grey-100)}
@@ -564,16 +626,16 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 .st-chip.skel{width:224px;background:transparent;padding:0}
 .st-chip.skel .sk{background:var(--lt-grey-100);animation:none}   /* Figma #01-6：狀態 chip 的佔位是靜態 #F2F2F2 224×14 */
 /* All | Pinned Toggle Group（Figma：101×36、外框 #CCCCCC r6、All 48 寬／Pin 52 寬、選中底 #D1EEFF 字 #002663）*/
-.tg{display:inline-flex;height:36px;border:1px solid var(--lt-grey-300);border-radius:6px;overflow:hidden;background:#fff;flex-shrink:0}
+.tg{display:inline-flex;height:36px;border:1px solid var(--lt-grey-300);border-radius:6px;overflow:hidden;background:var(--lt-white);flex-shrink:0}
 .tgb{display:inline-flex;align-items:center;justify-content:center;height:34px;color:var(--lt-grey-500);transition:background var(--lt-transition-fast)}
-.tgb.t-all{width:48px;font-size:var(--lt-fs-14);line-height:21px}
+.tgb.t-all{width:48px;font:var(--lt-type-button-regular-1)}
 .tgb.t-pin{width:52px}
 .tgb .material-symbols-outlined{font-size:20px}
 .tgb:hover{background:var(--lt-grey-50)}
 .tgb.on{background:var(--lt-blue-20);color:var(--lt-blue-90)}   /* ⚠ 設計端暫擬：Figma 只畫 All 選中；Pinned 選中的 icon 色沿用 All 選中字色 #002663 */
 .tgb.on:hover{background:var(--lt-blue-20)}
 .tg .sep{width:1px;background:var(--lt-grey-300);flex-shrink:0}
-.tg.is-disabled .tgb{color:var(--lt-grey-400);cursor:not-allowed;background:#fff}   /* Figma #01-6：讀取中不能操作的元件呈現 Disabled（字 #B3B3B3、icon #CCCCCC）*/
+.tg.is-disabled .tgb{color:var(--lt-grey-400);cursor:not-allowed;background:var(--lt-white)}   /* Figma #01-6：讀取中不能操作的元件呈現 Disabled（字 #B3B3B3、icon #CCCCCC）*/
 .tg.is-disabled .tgb.t-pin .material-symbols-outlined{color:var(--lt-grey-300)}
 
 /* ===== Table（Figma：Header 50＋Row 50、header #F2FAFF、header 下緣 #B3B3B3、列分隔 #E6E6E6；最多 10.5 列→外框高 575）=====
@@ -586,15 +648,15 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 .tbl-scroll::-webkit-scrollbar{width:15px;height:15px}
 /* 對稿修正（Figma #01 取樣）：軌道從表頭下緣開始、表頭底色與下緣線延伸過捲軸那一欄；軌道左右 1px #E6E6E6、thumb 約 9 寬 #D8D8D8。
  * 表頭那 50px 由 .tbl-scroll 自己的背景補（背景不隨內容捲動，剛好是固定在頂端的那一段）*/
-.tbl-scroll{background:linear-gradient(#F2FAFF 0,#F2FAFF 49px,#B3B3B3 49px,#B3B3B3 50px,#fff 50px)}
-.tbl-scroll::-webkit-scrollbar-track{background:#fff;box-shadow:inset 1px 0 #E6E6E6,inset -1px 0 #E6E6E6}
+.tbl-scroll{background:linear-gradient(var(--lt-color-primary-bg) 0,var(--lt-color-primary-bg) 49px,var(--lt-grey-400) 49px,var(--lt-grey-400) 50px,var(--lt-white) 50px)}
+.tbl-scroll::-webkit-scrollbar-track{background:var(--lt-white);box-shadow:inset 1px 0 var(--lt-grey-200),inset -1px 0 var(--lt-grey-200)}
 .tbl-scroll::-webkit-scrollbar-track:vertical{margin-top:50px}
-.tbl-scroll::-webkit-scrollbar-track:horizontal{box-shadow:inset 0 1px #E6E6E6,inset 0 -1px #E6E6E6}
-.tbl-scroll::-webkit-scrollbar-thumb{background:var(--ad-scroll-thumb);border:solid transparent;border-width:0 2px 0 3px;background-clip:padding-box;border-radius:2px;box-shadow:inset 0 0 0 1px #E6E6E6}   /* Figma Scroll bar / Vertical：thumb 10 寬、距軌道左 3、#D8D8D8＋1px #E6E6E6、r2 */
+.tbl-scroll::-webkit-scrollbar-track:horizontal{box-shadow:inset 0 1px var(--lt-grey-200),inset 0 -1px var(--lt-grey-200)}
+.tbl-scroll::-webkit-scrollbar-thumb{background:var(--ad-scroll-thumb);border:solid transparent;border-width:0 2px 0 3px;background-clip:padding-box;border-radius:2px;box-shadow:inset 0 0 0 1px var(--lt-grey-200)}   /* Figma Scroll bar / Vertical：thumb 10 寬、距軌道左 3、#D8D8D8＋1px #E6E6E6、r2 */
 .tbl-scroll::-webkit-scrollbar-thumb:horizontal{border-width:3px 0 2px 0}
-.tbl-scroll::-webkit-scrollbar-corner{background:#fff}
+.tbl-scroll::-webkit-scrollbar-corner{background:var(--lt-white)}
 .tr{display:grid;grid-template-columns:var(--cols);min-width:var(--minw)}
-.td,.th{height:50px;padding:0 16px;display:flex;align-items:center;min-width:0;background:#fff;border-bottom:1px solid var(--lt-grey-200);font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-primary)}
+.td,.th{height:50px;padding:0 16px;display:flex;align-items:center;min-width:0;background:var(--lt-white);border-bottom:1px solid var(--lt-grey-200);font:var(--lt-type-body);color:var(--lt-color-text-primary)}
 .th{background:var(--lt-color-primary-bg);font-weight:var(--lt-fw-bold);color:var(--lt-color-text-heading);border-bottom-color:var(--lt-grey-400);gap:4px}
 .th-row{position:sticky;top:0;z-index:5}
 .td .ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
@@ -617,9 +679,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 .csp{width:24px;height:24px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
 .csp svg,.csp img{width:24px;height:24px;display:block}
 .cell-2l{display:flex;flex-direction:column;justify-content:center;min-width:0;flex:1}
-.cell-2l .l1{font-size:var(--lt-fs-14);line-height:21px;color:var(--lt-color-text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cell-2l .l2{font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-grey-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cnt{flex-shrink:0;min-width:20px;height:20px;padding:0 4px;border-radius:5px;background:var(--ad-badge-bg);color:#fff;font-size:var(--lt-fs-14);font-weight:var(--lt-fw-bold);line-height:20px;text-align:center;font-variant-numeric:tabular-nums}
+.cell-2l .l1{font:var(--lt-type-button-regular-1);color:var(--lt-color-text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell-2l .l2{font:var(--lt-type-caption);color:var(--lt-grey-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cnt{flex-shrink:0;min-width:20px;height:20px;padding:0 4px;border-radius:5px;background:var(--ad-badge-bg);color:var(--lt-white);font-size:var(--lt-fs-14);font-weight:var(--lt-fw-bold);line-height:20px;text-align:center;font-variant-numeric:tabular-nums}
 /* 展開：主列與子列左側 4px #9ED7FF 前綴線；子列底色 #F6F6F6（#01-9 註記：各種狀態定義請見 CMDS）*/
 .tr.is-open .td.res::before,.tr.is-child .td.res::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--lt-blue-30)}
 .tr.is-open .td.res{padding:0 10px 0 22px;gap:8px}
@@ -641,51 +703,54 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 /* Pin：Figma 兩態 icon 同形（FILL 1）、只換顏色：已釘＝primary、未釘＝#676767；hover 淡藍圓底。
  * ⚠ DEVIATION: Guideline 規定 On/Off icon 要「on=FILL 1+primary、off=FILL 0+neutral」；Figma 與 FE 都只切顏色，Kabin 09-11 裁決「Figma 有畫就照 Figma」→ 照稿，不切 FILL。 */
 .ib.pin.on{color:var(--lt-color-primary)}
-.ib:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring)}
-.td.res:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(0,79,176,.35)}
-.th .info{font-size:16px;color:var(--lt-grey-500);cursor:help}
+.ib:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px}   /* X-9r2 F6：focus 統一 2px primary 外框（X-9r5 四頁做法；原 3px 光暈 1.18:1 不過 WCAG 2.4.11） */
+.td.res:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--lt-color-primary)}
+.th .info{font-size:16px;color:var(--lt-grey-500);cursor:help;position:relative}
+.th .info:focus-visible,.sec-t .info:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px;border-radius:50%}   /* X-9r2 第三輪 CC6：info icon 可 Tab 聚焦（說明用共用 #gl-tip 的 focusin 顯示） */
+.th .info::before{content:'';position:absolute;inset:-4px}   /* X-9r2 F18（X-9r1 C1 交付）：16px info icon 透明點擊區補到 24，外觀不變 */
 
 /* ===== Skeleton（#01-6：表頭 #F2F2F2＋上緣 2px、四列、左欄與右四欄間 1px 分隔）===== */
 /* 對稿修正（Figma #01-6）：條的底色 #E6E6E6（稿上再疊一層動畫光），原本 #EBEBEB 偏淡 */
-.sk{background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px;height:14px}   /* A-18 靜態（2026-10-16 X-9r1 拿掉 shimmer） */
+.sk{background:var(--lt-color-bg-skeleton,var(--lt-grey-200));border-radius:4px;height:14px}   /* A-18 靜態（2026-10-16 X-9r1 拿掉 shimmer） */
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 .sk-tbl{display:grid;grid-template-columns:476fr 1px 528fr}
 .sk-tbl .sk-div{background:var(--lt-grey-200)}
 .sk-left,.sk-right{display:flex;flex-direction:column}
 .sk-hd{height:50px;background:var(--lt-grey-100);border-top:2px solid var(--lt-grey-200);border-bottom:1px solid var(--lt-grey-200);display:flex;align-items:center;padding:0 16px}
-.sk-row{height:50px;border-bottom:1px solid var(--lt-grey-200);display:flex;align-items:center;padding:0 16px;background:#fff}
+.sk-row{height:50px;border-bottom:1px solid var(--lt-grey-200);display:flex;align-items:center;padding:0 16px;background:var(--lt-white)}
 /* 對稿修正（Figma #01-6）：右半四欄等寬 132、每欄一條 50 寬的條置中（原本是 gap 25 靠左排）*/
 .sk-right .sk-hd,.sk-right .sk-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:0;justify-items:center}
 .sk-right .sk{width:50px}
-.sk-hd .sk{background:#E6E6E6;animation:none}
+.sk-hd .sk{background:var(--lt-grey-200);animation:none}
 
 /* ===== Empty / No-auth / Error（#01-4／#01-5／#01-8）===== */
 .es{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--lt-color-text-secondary);flex:1;min-height:300px;padding:16px 0}
 .es .es-ic{font-size:80px;color:var(--lt-blue-30);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;line-height:80px;width:80px;height:80px}
 .es .es-ic.is-outline{font-variation-settings:'FILL' 0,'wght' 700,'GRAD' 0,'opsz' 48}   /* 對稿修正（Fable §5 #1）：#01-4 的 table_view 格子是空心的，Material Symbols 的 FILL 0 就是這個字形 */
 .es svg{width:80px;height:80px;display:block}
-.es-title{font-size:var(--lt-fs-18);font-weight:var(--lt-fw-bold);line-height:27px;margin-top:16px}
-.es-desc{font-size:var(--lt-fs-14);white-space:pre-line;margin-top:8px;line-height:24.5px}
+.es-title{font:var(--lt-type-h5);margin-top:16px}
+.es-desc{font:var(--lt-type-body);white-space:pre-line;margin-top:8px}
 .es .btn{margin-top:32px}
 .es.err{min-height:70vh}
 
 /* ===== Switch（Figma 30×16、r8、knob 12）／ 下拉（36h、8×6 實心三角 #676767）===== */
-.sw{position:relative;display:inline-block;width:30px;height:16px;border-radius:8px;border:1px solid var(--lt-color-primary);background:#fff;vertical-align:middle;cursor:pointer;transition:background var(--lt-transition-fast);flex-shrink:0}
+.sw{position:relative;display:inline-block;width:30px;height:16px;border-radius:8px;border:1px solid var(--lt-color-primary);background:var(--lt-white);vertical-align:middle;cursor:pointer;transition:background var(--lt-transition-fast);flex-shrink:0}
 .sw::after{content:'';position:absolute;left:1px;top:1px;width:12px;height:12px;border-radius:50%;background:transparent;border:1px solid var(--lt-color-primary);transition:transform var(--lt-transition-fast),background var(--lt-transition-fast)}
 .sw.on{background:var(--lt-color-primary)}
-.sw.on::after{background:#fff;border-color:#fff;transform:translateX(14px)}
+.sw.on::after{background:var(--lt-white);border:0;width:12px;height:12px;transform:translateX(14px)}   /* X-9r2 第三輪 B14：ON 的白點跟 Customized Budget 同一寫法（12px 無框，右邊留 1px 藍邊）；原本多了 1px 白框變 14px、頂到軌道外緣看起來凸出；OFF 的空心藍點不動 */
 .sw::before{content:'';position:absolute;left:0;right:0;top:-5px;bottom:-5px}   /* X-9r2 F20：透明點擊區補到 30×24 以上，外觀不變（WCAG 2.5.8） */
-.sw:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring)}
-.sw.is-disabled{cursor:not-allowed;background:#fff;border-color:var(--lt-grey-300)}
+.sw:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px}
+.sw.is-disabled{cursor:not-allowed;background:var(--lt-white);border-color:var(--lt-grey-300)}
 .sw.is-disabled.on{background:var(--lt-grey-300)}   /* Figma #03-2：Disabled ON 軌 #CCCCCC、白點 */
-.sel{display:flex;align-items:center;justify-content:space-between;gap:10px;height:36px;padding:0 10px;background:#fff;border:1px solid var(--ad-field-border);border-radius:var(--ad-radius-field);font-size:var(--lt-fs-14);color:var(--lt-color-text-primary);cursor:pointer;text-align:left;width:100%;min-width:0;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}
+.sel{display:flex;align-items:center;justify-content:space-between;gap:10px;height:36px;padding:0 10px;background:var(--lt-white);border:1px solid var(--ad-field-border);border-radius:var(--ad-radius-field);font-size:var(--lt-fs-14);color:var(--lt-color-text-primary);cursor:pointer;text-align:left;width:100%;min-width:0;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}
 .sel:hover{border-color:var(--lt-grey-400)}
+.sel:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:-1px}   /* X-9r2 第三輪 A5：F6 漏掉的下拉觸發欄（原瀏覽器預設 1px #005FCC）；在彈窗內捲區貼邊，外框往內蓋過 1px 框，不被裁掉 */
 .sel.open{border-color:var(--lt-color-border-focus);box-shadow:var(--lt-button-focus-ring)}
 .tri{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--lt-grey-500);flex-shrink:0}
 .sel.open .tri{transform:rotate(180deg)}
 .sel:disabled{background:var(--lt-grey-100);border-color:var(--lt-grey-200);color:var(--lt-grey-400);cursor:not-allowed}   /* Figma #03-2：底 #F2F2F2、框 #E6E6E6、字 #B3B3B3 */
 .sel:disabled .tri{border-top-color:var(--lt-grey-300)}
-.pop{position:fixed;z-index:calc(var(--lt-z-modal) + 1);background:#fff;border:1px solid var(--lt-grey-200);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.1);overscroll-behavior:contain;font-size:var(--lt-fs-14);max-height:320px;overflow-y:auto}
+.pop{position:fixed;z-index:calc(var(--lt-z-modal) + 1);background:var(--lt-white);border:1px solid var(--lt-grey-200);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.1);overscroll-behavior:contain;font-size:var(--lt-fs-14);max-height:320px;overflow-y:auto}
 /* ⚠ 設計端暫擬（Fable §5 #2）：Figma 沒畫 Sensitivity 下拉的展開態 → 照 Guideline「Dropdown / Select」的 List／Item：
  * 容器 1px #E6E6E6、r8、上下 4、陰影 0 4 12 .08＋0 1 3 .1；項目 40 高、內距 0 12；Hover #F6F6F6、鍵盤焦點 #E6E6E6、
  * Selected 底 #F2FAFF＋字 #004FB0＋右側勾、Selected+Hover #D1EEFF。
@@ -700,35 +765,35 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 
 /* ===== Modal（#03-1／#03-2：700 寬、r15、內距 24/32、gap 24、陰影 0 0 6 .2、標題 20/700；上下 Padding 24、左右 32 是 #03-1 紫色註記）===== */
 .mask{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:var(--lt-z-modal);display:flex;align-items:center;justify-content:center;padding:24px}
-.modal{width:700px;max-width:100%;max-height:calc(100vh - 48px);background:#fff;border-radius:var(--ad-radius-modal);box-shadow:var(--lt-modal-shadow);padding:24px 32px;display:flex;flex-direction:column;gap:24px;min-height:0}
+.modal{width:700px;max-width:100%;max-height:calc(100vh - 48px);background:var(--lt-white);border-radius:var(--ad-radius-modal);box-shadow:var(--lt-modal-shadow);padding:24px 32px;display:flex;flex-direction:column;gap:24px;min-height:0}
 .modal .m-hd{display:flex;align-items:center;gap:15px;flex-shrink:0}
-.modal .m-hd h2{flex:1;font-size:20px;line-height:30px;font-weight:var(--lt-fw-bold);color:var(--lt-color-text-heading)}
+.modal .m-hd h2{flex:1;font:var(--lt-type-h4);color:var(--lt-color-text-heading)}
 .modal .m-x{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--lt-grey-500);flex-shrink:0}
-.modal .m-x:hover{background:var(--lt-grey-100);color:#262626}   /* X-9r2 F11：hover 底色＋icon #262626（同 General Budget） */
+.modal .m-x:hover{background:var(--lt-grey-100);color:var(--lt-color-text-primary)}   /* X-9r2 F11：hover 底色＋icon #262626（同 General Budget） */
 .modal .m-x .material-symbols-outlined{font-size:24px;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24}
-.modal .m-desc{font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-primary);flex-shrink:0}
+.modal .m-desc{font:var(--lt-type-caption);color:var(--lt-color-text-primary);flex-shrink:0}
 .modal .m-scroll{flex:1 1 auto;min-height:0;overflow-y:scroll;overscroll-behavior:contain}
 /* 內容區右側固定一條 15px 捲軸（Figma 一直畫著，thumb #D8D8D8）*/
 .modal .m-scroll::-webkit-scrollbar{width:15px}
-.modal .m-scroll::-webkit-scrollbar-track{background:#fff;box-shadow:inset 1px 0 #E6E6E6,inset -1px 0 #E6E6E6}   /* 對稿修正：scrollbar 軌道的 border 不會畫，改 inset 陰影 */
-.modal .m-scroll::-webkit-scrollbar-thumb{background:var(--ad-scroll-thumb);border:solid transparent;border-width:0 2px 0 3px;background-clip:padding-box;border-radius:2px;box-shadow:inset 0 0 0 1px #E6E6E6}
+.modal .m-scroll::-webkit-scrollbar-track{background:var(--lt-white);box-shadow:inset 1px 0 var(--lt-grey-200),inset -1px 0 var(--lt-grey-200)}   /* 對稿修正：scrollbar 軌道的 border 不會畫，改 inset 陰影 */
+.modal .m-scroll::-webkit-scrollbar-thumb{background:var(--ad-scroll-thumb);border:solid transparent;border-width:0 2px 0 3px;background-clip:padding-box;border-radius:2px;box-shadow:inset 0 0 0 1px var(--lt-grey-200)}
 .m-inner{display:flex;flex-direction:column;gap:24px;padding-right:8px}
 .modal .m-ft{display:flex;justify-content:flex-end;gap:10px;flex-shrink:0}
 .modal .m-ft .btn{min-width:100px}
-.lbl{font-size:var(--lt-fs-12);font-weight:var(--lt-fw-bold);line-height:18px;color:var(--lt-color-primary)}
+.lbl{font:var(--lt-type-caption-bold);color:var(--lt-color-primary)}
 .fld{display:flex;flex-direction:column;gap:4px;min-width:0}
-.swrow{display:inline-flex;align-items:center;gap:10px;height:36px;cursor:pointer;align-self:flex-start;font-size:var(--lt-fs-14);line-height:24.5px}
+.swrow{display:inline-flex;align-items:center;gap:10px;height:36px;cursor:pointer;align-self:flex-start;font:var(--lt-type-body)}
 .swrow.is-disabled{cursor:not-allowed;color:var(--lt-grey-300)}
-.help{font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-secondary)}
+.help{font:var(--lt-type-caption);color:var(--lt-color-text-secondary)}
 .sens{display:flex;flex-direction:column;gap:8px}
 .sens .sel{width:240px;padding:0 10px 0 7px}   /* 對稿修正（Fable §5 #9，同 CB §5 #16）：Figma 文字距欄位左緣 8（外框畫在框內）→ 1px 框＋7 */
 .sens.is-disabled .lbl{color:var(--lt-color-primary)}   /* Figma #03-2：Detection Sensitivity 標籤維持藍色，欄位與說明變灰 */
 .sens.is-disabled .help{color:var(--lt-grey-400)}
-.nbox{border:1px solid var(--lt-grey-200);border-radius:8px;background:#fff;padding:23px;display:flex;flex-direction:column;gap:16px}
-.nbox h3{font-size:var(--lt-fs-16);font-weight:var(--lt-fw-bold);line-height:24px;color:var(--lt-color-text-heading)}
+.nbox{border:1px solid var(--lt-grey-200);border-radius:8px;background:var(--lt-white);padding:23px;display:flex;flex-direction:column;gap:16px}
+.nbox h3{font:var(--lt-type-h6);color:var(--lt-color-text-heading)}
 .nbox .intro{display:flex;flex-direction:column;gap:8px}
 .nbox .role{display:flex;flex-direction:column;gap:8px}
-.nbox .role .rl{font-size:var(--lt-fs-12);font-weight:var(--lt-fw-bold);line-height:18px;color:var(--lt-color-text-primary)}
+.nbox .role .rl{font:var(--lt-type-caption-bold);color:var(--lt-color-text-primary)}
 .nbox .role .swrow{height:25px}
 .nbox hr{border:none;border-top:1px solid var(--lt-grey-200);margin:0 0 -1px}   /* 對稿修正（Figma #03-1）：Figma 外框畫在框內、分隔線高 0；padding 23＋分隔線不佔高，框高 483 與稿一致 */
 .nbox.is-disabled h3,.nbox.is-disabled .rl{color:var(--lt-grey-400)}
@@ -741,32 +806,32 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
 
 /* ===== Footer（CLAUDE.md 規定的 prototype footer；Figma 底部 Copyright 列是產品 footer，不是這個）===== */
 .footer{padding:var(--lt-space-16) var(--lt-space-32);background:var(--lt-color-primary-bg);border-top:1px solid var(--lt-color-border-default);display:flex;align-items:center;justify-content:space-between;font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);flex-wrap:wrap;gap:10px}
-.footer-version{font-weight:var(--lt-fw-medium);color:#262626}
-.footer-version .ver-tag{background:#34B5D9;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}
-.footer-credit{color:#676767;font-size:12px}
+.footer-version{font-weight:var(--lt-fw-medium);color:var(--lt-color-text-primary)}
+.footer-version .ver-tag{background:var(--lt-turquoise-70);color:var(--lt-white);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}
+.footer-credit{color:var(--lt-color-text-secondary);font-size:12px}
 
 /* ============================================================
  * v2：Anomaly Details（`/budget/anomaly/[alertId]`）
  * Figma section「Anomaly Details」4520:186300：#02／#02-1／#02-2／#02-3／#04／#05／#06／#07／#08（數值皆由 REST 節點樹量得）
  * ============================================================ */
 :root{
-  --ad-tip-bg: #31383E;
+  --ad-tip-bg: var(--lt-tooltip-bg);   /* #31383E */
   --ad-chart-tip-shadow: 0 0 6px rgba(0,0,0,.2);
 }
 
 /* ---- 頂端 GoBack（Figma：16/700 #004FB0、icon arrow_circle_left 16；Text Button hover 底線只套文字）---- */
-.gb{display:inline-flex;align-items:center;gap:4px;height:25px;align-self:flex-start;font-size:16px;font-weight:var(--lt-fw-bold);line-height:24px;color:var(--lt-color-primary);cursor:pointer}
+.gb{display:inline-flex;align-items:center;gap:4px;height:25px;align-self:flex-start;font:var(--lt-type-h6);color:var(--lt-color-primary);cursor:pointer}
 .gb .material-symbols-outlined{font-size:16px}
 /* 對稿修正（#02 Arrow_Circle/Left、Right）：稿是 Material Icons 版（箭頭較長、圓較滿），Material Symbols 的 arrow_circle_* 箭頭只剩一小截；改用稿匯出的 16px 向量，顏色跟文字（currentColor）*/
 .ico16{width:16px;height:16px;flex-shrink:0;display:block}
 .gb:hover{color:var(--lt-color-primary-hover)}
 .gb:hover .t{text-decoration:underline}
-.gb:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring);border-radius:5px}
+.gb:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px;border-radius:5px}
 
 /* ---- 報表卡（Figma：白底 r8 內距 24、區塊間距 32）---- */
 .rpt{gap:32px}
 .rpt-hd{display:flex;align-items:center;gap:10px;min-height:30px}
-.rpt-hd h1{font-size:20px;font-weight:var(--lt-fw-bold);line-height:30px;color:var(--lt-color-text-heading);margin-right:auto}
+.rpt-hd h1{font:var(--lt-type-h4);color:var(--lt-color-text-heading);margin-right:auto}
 .rpt-act{display:flex;align-items:center;gap:8px}
 /* View 1-Month Cost Trend：12/700、文字底線、icon 永遠不畫底線 */
 .tx-link{display:inline-flex;align-items:center;gap:4px;height:30px;font-size:12px;font-weight:var(--lt-fw-bold);line-height:21px;color:var(--lt-color-primary)}
@@ -780,33 +845,33 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
 .ib30 svg{width:18px;height:18px;display:block}
 .ib30:hover{background:rgba(11,109,215,.12)}
 .ib30:disabled{color:var(--lt-grey-300);cursor:not-allowed;background:none}
-.ib30:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring)}
+.ib30:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px}
 
 /* 上半：左資訊、右 AI Analysis（兩欄等寬，AI 隱藏時左欄寬度不變）*/
 .rpt-top{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
 .rpt-info{display:flex;flex-direction:column;gap:16px;min-width:0}
-.l12{font-size:12px;font-weight:var(--lt-fw-bold);line-height:18px;color:var(--lt-color-text-secondary)}
+.l12{font:var(--lt-type-caption-bold);color:var(--lt-color-text-secondary)}
 .blk{display:flex;flex-direction:column;gap:4px;min-width:0}
 .rn{display:flex;align-items:center;gap:8px;height:30px;min-width:0}
 .rn .csp{flex-shrink:0}
-.rn .nm{font-size:20px;font-weight:var(--lt-fw-bold);line-height:30px;color:var(--lt-color-text-heading);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
-.rn .id{font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:0 0 auto;max-width:45%}
+.rn .nm{font:var(--lt-type-h4);color:var(--lt-color-text-heading);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
+.rn .id{font:var(--lt-type-body);color:var(--lt-color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:0 0 auto;max-width:45%}
 /* Fable §5 #2：資源名稱過長（AWS account name 上限 50、Azure RG 上限 90）時名稱先截斷、ID 保留（最多佔一行的 45%），兩者都掛 tooltip（#02-2 註記「內容過長的項目 Hover 皆以 Tooltips 顯示全內容」）*/
 .cost-v{display:flex;align-items:flex-end;gap:8px;height:54px}
 .cost-v .v{font-size:36px;font-weight:var(--lt-fw-bold);line-height:54px;color:var(--lt-color-text-heading);font-variant-numeric:tabular-nums}
-.cost-v .u{font-size:12px;font-weight:var(--lt-fw-bold);line-height:18px;color:#0D2037;padding-bottom:8px}
-.adate{font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-secondary)}
+.cost-v .u{font:var(--lt-type-caption-bold);color:#0D2037;padding-bottom:8px}   /* #0D2037 是稿 #02 的 Cost 單位字色，tokens.css 沒有對應（X-9r2 F8 留著） */
+.adate{font:var(--lt-type-body);color:var(--lt-color-text-secondary)}
 
 /* AI Analysis（⏸ PARKED：純示意，PM 尚未確定功能方向，暫不開發）*/
 .ai{background:var(--lt-color-primary-bg);border:1px solid var(--lt-blue-20);border-radius:10px;padding:15px;display:flex;flex-direction:column;gap:8px;min-width:0}
-.ai.is-parked{border:1px dashed var(--lt-grey-300);background:repeating-linear-gradient(-45deg,var(--lt-color-primary-bg) 0 12px,#E4F3FC 12px 13px)}
+.ai.is-parked{border:1px dashed var(--lt-grey-300);background:repeating-linear-gradient(-45deg,var(--lt-color-primary-bg) 0 12px,#E4F3FC 12px 13px)}   /* 斜紋的 #E4F3FC 是 parked 示意色，tokens.css 沒有對應（X-9r2 F8 留著） */
 .ai-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:24px}
-.ai-t{display:inline-flex;align-items:center;gap:4px;font-size:16px;font-weight:var(--lt-fw-bold);line-height:24px}
-.ai-t .material-symbols-outlined,.ai-t .tx{background:linear-gradient(180deg,#004FB0,#4ADFFF);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.ai-t{display:inline-flex;align-items:center;gap:4px;font:var(--lt-type-h6)}
+.ai-t .material-symbols-outlined,.ai-t .tx{background:linear-gradient(180deg,var(--lt-color-primary),var(--lt-turquoise-60));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
 .ai-t .material-symbols-outlined{font-size:16px}
 /* 對稿修正（#02 AI Analysis 標題圖示）：稿是一大一小兩顆星（Material Symbols 的 auto_awesome 是三顆），改用稿匯出的向量當遮罩、底色同一組漸層 */
-.ai-ic{width:16px;height:16px;flex-shrink:0;background:linear-gradient(180deg,#004FB0,#4ADFFF);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5.74796 10.6865C5.86066 10.7661 5.98965 10.8196 6.12558 10.8432C6.26151 10.8667 6.40099 10.8598 6.53391 10.8228C6.66682 10.7858 6.78985 10.7198 6.89408 10.6294C6.99831 10.539 7.08112 10.4265 7.13654 10.3002L7.57654 8.96305C7.68367 8.64141 7.86418 8.34911 8.1038 8.1093C8.34342 7.86948 8.63556 7.68873 8.95711 7.58133L10.236 7.1659C10.4175 7.10232 10.5746 6.98341 10.6851 6.8259C10.7702 6.70628 10.8256 6.56814 10.8468 6.42288C10.868 6.27762 10.8543 6.12941 10.8069 5.99047C10.7595 5.85153 10.6798 5.72586 10.5742 5.62382C10.4687 5.52178 10.3404 5.4463 10.2 5.40362L8.93425 4.99219C8.61246 4.88544 8.31996 4.70521 8.07992 4.46577C7.83989 4.22634 7.65894 3.93428 7.55139 3.61276L7.13596 2.33447C7.07202 2.1534 6.95342 1.99665 6.79654 1.8859C6.63867 1.77704 6.45144 1.71875 6.25968 1.71875C6.06792 1.71875 5.88069 1.77704 5.72282 1.8859C5.56338 1.99851 5.44343 2.15845 5.37996 2.34304L4.95939 3.63733C4.85222 3.95057 4.67514 4.2353 4.44159 4.46994C4.20803 4.70459 3.92413 4.88298 3.61139 4.99162L2.33139 5.40647C2.14925 5.47086 1.99171 5.59041 1.88069 5.7485C1.76966 5.9066 1.71068 6.09536 1.71193 6.28854C1.71319 6.48172 1.77463 6.6697 1.8877 6.82634C2.00078 6.98297 2.15986 7.10047 2.34282 7.16247L3.60911 7.5739C4.01971 7.71156 4.38065 7.96715 4.64682 8.30876C4.79882 8.50476 4.91596 8.72476 4.99311 8.96019L5.40911 10.2368C5.47311 10.4185 5.59196 10.5756 5.74911 10.6865M11.3171 14.1608C11.4334 14.2429 11.5724 14.2869 11.7148 14.2865C11.8563 14.2869 11.9944 14.2436 12.1102 14.1625C12.2293 14.078 12.3185 13.9579 12.3651 13.8196L12.5777 13.1665C12.6226 13.0308 12.6985 12.9076 12.7994 12.8064C12.9003 12.7052 13.0233 12.6289 13.1588 12.5836L13.8251 12.3676C13.9593 12.3197 14.0755 12.2315 14.1578 12.1151C14.2402 11.9988 14.2846 11.8599 14.2851 11.7173C14.2851 11.571 14.2383 11.4285 14.1515 11.3107C14.0648 11.1929 13.9426 11.1059 13.8028 11.0625L13.1491 10.851C13.0134 10.8061 12.8901 10.7301 12.7889 10.6291C12.6877 10.5281 12.6115 10.4049 12.5662 10.2693L12.3491 9.60476C12.3023 9.46912 12.2141 9.35159 12.0969 9.26873C11.9798 9.18586 11.8396 9.14183 11.6961 9.14284C11.5526 9.14385 11.4131 9.18985 11.2971 9.27436C11.1811 9.35886 11.0946 9.47762 11.0497 9.6139L10.836 10.2688C10.7922 10.4026 10.7182 10.5246 10.6199 10.6253C10.5215 10.7261 10.4013 10.8029 10.2685 10.8499L9.60225 11.0659C9.46771 11.1137 9.35121 11.2019 9.26867 11.3183C9.18613 11.4348 9.14158 11.574 9.14111 11.7168C9.14126 11.8608 9.18677 12.0012 9.27118 12.1179C9.3556 12.2346 9.47463 12.3218 9.61139 12.367L10.2651 12.5796C10.4012 12.6248 10.5248 12.7012 10.626 12.8027C10.7272 12.9042 10.8032 13.028 10.848 13.1642L11.0645 13.8288C11.1118 13.963 11.1997 14.0793 11.316 14.1613'/%3E%3C/svg%3E") center/16px 16px no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5.74796 10.6865C5.86066 10.7661 5.98965 10.8196 6.12558 10.8432C6.26151 10.8667 6.40099 10.8598 6.53391 10.8228C6.66682 10.7858 6.78985 10.7198 6.89408 10.6294C6.99831 10.539 7.08112 10.4265 7.13654 10.3002L7.57654 8.96305C7.68367 8.64141 7.86418 8.34911 8.1038 8.1093C8.34342 7.86948 8.63556 7.68873 8.95711 7.58133L10.236 7.1659C10.4175 7.10232 10.5746 6.98341 10.6851 6.8259C10.7702 6.70628 10.8256 6.56814 10.8468 6.42288C10.868 6.27762 10.8543 6.12941 10.8069 5.99047C10.7595 5.85153 10.6798 5.72586 10.5742 5.62382C10.4687 5.52178 10.3404 5.4463 10.2 5.40362L8.93425 4.99219C8.61246 4.88544 8.31996 4.70521 8.07992 4.46577C7.83989 4.22634 7.65894 3.93428 7.55139 3.61276L7.13596 2.33447C7.07202 2.1534 6.95342 1.99665 6.79654 1.8859C6.63867 1.77704 6.45144 1.71875 6.25968 1.71875C6.06792 1.71875 5.88069 1.77704 5.72282 1.8859C5.56338 1.99851 5.44343 2.15845 5.37996 2.34304L4.95939 3.63733C4.85222 3.95057 4.67514 4.2353 4.44159 4.46994C4.20803 4.70459 3.92413 4.88298 3.61139 4.99162L2.33139 5.40647C2.14925 5.47086 1.99171 5.59041 1.88069 5.7485C1.76966 5.9066 1.71068 6.09536 1.71193 6.28854C1.71319 6.48172 1.77463 6.6697 1.8877 6.82634C2.00078 6.98297 2.15986 7.10047 2.34282 7.16247L3.60911 7.5739C4.01971 7.71156 4.38065 7.96715 4.64682 8.30876C4.79882 8.50476 4.91596 8.72476 4.99311 8.96019L5.40911 10.2368C5.47311 10.4185 5.59196 10.5756 5.74911 10.6865M11.3171 14.1608C11.4334 14.2429 11.5724 14.2869 11.7148 14.2865C11.8563 14.2869 11.9944 14.2436 12.1102 14.1625C12.2293 14.078 12.3185 13.9579 12.3651 13.8196L12.5777 13.1665C12.6226 13.0308 12.6985 12.9076 12.7994 12.8064C12.9003 12.7052 13.0233 12.6289 13.1588 12.5836L13.8251 12.3676C13.9593 12.3197 14.0755 12.2315 14.1578 12.1151C14.2402 11.9988 14.2846 11.8599 14.2851 11.7173C14.2851 11.571 14.2383 11.4285 14.1515 11.3107C14.0648 11.1929 13.9426 11.1059 13.8028 11.0625L13.1491 10.851C13.0134 10.8061 12.8901 10.7301 12.7889 10.6291C12.6877 10.5281 12.6115 10.4049 12.5662 10.2693L12.3491 9.60476C12.3023 9.46912 12.2141 9.35159 12.0969 9.26873C11.9798 9.18586 11.8396 9.14183 11.6961 9.14284C11.5526 9.14385 11.4131 9.18985 11.2971 9.27436C11.1811 9.35886 11.0946 9.47762 11.0497 9.6139L10.836 10.2688C10.7922 10.4026 10.7182 10.5246 10.6199 10.6253C10.5215 10.7261 10.4013 10.8029 10.2685 10.8499L9.60225 11.0659C9.46771 11.1137 9.35121 11.2019 9.26867 11.3183C9.18613 11.4348 9.14158 11.574 9.14111 11.7168C9.14126 11.8608 9.18677 12.0012 9.27118 12.1179C9.3556 12.2346 9.47463 12.3218 9.61139 12.367L10.2651 12.5796C10.4012 12.6248 10.5248 12.7012 10.626 12.8027C10.7272 12.9042 10.8032 13.028 10.848 13.1642L11.0645 13.8288C11.1118 13.963 11.1997 14.0793 11.316 14.1613'/%3E%3C/svg%3E") center/16px 16px no-repeat}
-.ai-b{font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-primary)}
+.ai-ic{width:16px;height:16px;flex-shrink:0;background:linear-gradient(180deg,var(--lt-color-primary),var(--lt-turquoise-60));-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5.74796 10.6865C5.86066 10.7661 5.98965 10.8196 6.12558 10.8432C6.26151 10.8667 6.40099 10.8598 6.53391 10.8228C6.66682 10.7858 6.78985 10.7198 6.89408 10.6294C6.99831 10.539 7.08112 10.4265 7.13654 10.3002L7.57654 8.96305C7.68367 8.64141 7.86418 8.34911 8.1038 8.1093C8.34342 7.86948 8.63556 7.68873 8.95711 7.58133L10.236 7.1659C10.4175 7.10232 10.5746 6.98341 10.6851 6.8259C10.7702 6.70628 10.8256 6.56814 10.8468 6.42288C10.868 6.27762 10.8543 6.12941 10.8069 5.99047C10.7595 5.85153 10.6798 5.72586 10.5742 5.62382C10.4687 5.52178 10.3404 5.4463 10.2 5.40362L8.93425 4.99219C8.61246 4.88544 8.31996 4.70521 8.07992 4.46577C7.83989 4.22634 7.65894 3.93428 7.55139 3.61276L7.13596 2.33447C7.07202 2.1534 6.95342 1.99665 6.79654 1.8859C6.63867 1.77704 6.45144 1.71875 6.25968 1.71875C6.06792 1.71875 5.88069 1.77704 5.72282 1.8859C5.56338 1.99851 5.44343 2.15845 5.37996 2.34304L4.95939 3.63733C4.85222 3.95057 4.67514 4.2353 4.44159 4.46994C4.20803 4.70459 3.92413 4.88298 3.61139 4.99162L2.33139 5.40647C2.14925 5.47086 1.99171 5.59041 1.88069 5.7485C1.76966 5.9066 1.71068 6.09536 1.71193 6.28854C1.71319 6.48172 1.77463 6.6697 1.8877 6.82634C2.00078 6.98297 2.15986 7.10047 2.34282 7.16247L3.60911 7.5739C4.01971 7.71156 4.38065 7.96715 4.64682 8.30876C4.79882 8.50476 4.91596 8.72476 4.99311 8.96019L5.40911 10.2368C5.47311 10.4185 5.59196 10.5756 5.74911 10.6865M11.3171 14.1608C11.4334 14.2429 11.5724 14.2869 11.7148 14.2865C11.8563 14.2869 11.9944 14.2436 12.1102 14.1625C12.2293 14.078 12.3185 13.9579 12.3651 13.8196L12.5777 13.1665C12.6226 13.0308 12.6985 12.9076 12.7994 12.8064C12.9003 12.7052 13.0233 12.6289 13.1588 12.5836L13.8251 12.3676C13.9593 12.3197 14.0755 12.2315 14.1578 12.1151C14.2402 11.9988 14.2846 11.8599 14.2851 11.7173C14.2851 11.571 14.2383 11.4285 14.1515 11.3107C14.0648 11.1929 13.9426 11.1059 13.8028 11.0625L13.1491 10.851C13.0134 10.8061 12.8901 10.7301 12.7889 10.6291C12.6877 10.5281 12.6115 10.4049 12.5662 10.2693L12.3491 9.60476C12.3023 9.46912 12.2141 9.35159 12.0969 9.26873C11.9798 9.18586 11.8396 9.14183 11.6961 9.14284C11.5526 9.14385 11.4131 9.18985 11.2971 9.27436C11.1811 9.35886 11.0946 9.47762 11.0497 9.6139L10.836 10.2688C10.7922 10.4026 10.7182 10.5246 10.6199 10.6253C10.5215 10.7261 10.4013 10.8029 10.2685 10.8499L9.60225 11.0659C9.46771 11.1137 9.35121 11.2019 9.26867 11.3183C9.18613 11.4348 9.14158 11.574 9.14111 11.7168C9.14126 11.8608 9.18677 12.0012 9.27118 12.1179C9.3556 12.2346 9.47463 12.3218 9.61139 12.367L10.2651 12.5796C10.4012 12.6248 10.5248 12.7012 10.626 12.8027C10.7272 12.9042 10.8032 13.028 10.848 13.1642L11.0645 13.8288C11.1118 13.963 11.1997 14.0793 11.316 14.1613'/%3E%3C/svg%3E") center/16px 16px no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5.74796 10.6865C5.86066 10.7661 5.98965 10.8196 6.12558 10.8432C6.26151 10.8667 6.40099 10.8598 6.53391 10.8228C6.66682 10.7858 6.78985 10.7198 6.89408 10.6294C6.99831 10.539 7.08112 10.4265 7.13654 10.3002L7.57654 8.96305C7.68367 8.64141 7.86418 8.34911 8.1038 8.1093C8.34342 7.86948 8.63556 7.68873 8.95711 7.58133L10.236 7.1659C10.4175 7.10232 10.5746 6.98341 10.6851 6.8259C10.7702 6.70628 10.8256 6.56814 10.8468 6.42288C10.868 6.27762 10.8543 6.12941 10.8069 5.99047C10.7595 5.85153 10.6798 5.72586 10.5742 5.62382C10.4687 5.52178 10.3404 5.4463 10.2 5.40362L8.93425 4.99219C8.61246 4.88544 8.31996 4.70521 8.07992 4.46577C7.83989 4.22634 7.65894 3.93428 7.55139 3.61276L7.13596 2.33447C7.07202 2.1534 6.95342 1.99665 6.79654 1.8859C6.63867 1.77704 6.45144 1.71875 6.25968 1.71875C6.06792 1.71875 5.88069 1.77704 5.72282 1.8859C5.56338 1.99851 5.44343 2.15845 5.37996 2.34304L4.95939 3.63733C4.85222 3.95057 4.67514 4.2353 4.44159 4.46994C4.20803 4.70459 3.92413 4.88298 3.61139 4.99162L2.33139 5.40647C2.14925 5.47086 1.99171 5.59041 1.88069 5.7485C1.76966 5.9066 1.71068 6.09536 1.71193 6.28854C1.71319 6.48172 1.77463 6.6697 1.8877 6.82634C2.00078 6.98297 2.15986 7.10047 2.34282 7.16247L3.60911 7.5739C4.01971 7.71156 4.38065 7.96715 4.64682 8.30876C4.79882 8.50476 4.91596 8.72476 4.99311 8.96019L5.40911 10.2368C5.47311 10.4185 5.59196 10.5756 5.74911 10.6865M11.3171 14.1608C11.4334 14.2429 11.5724 14.2869 11.7148 14.2865C11.8563 14.2869 11.9944 14.2436 12.1102 14.1625C12.2293 14.078 12.3185 13.9579 12.3651 13.8196L12.5777 13.1665C12.6226 13.0308 12.6985 12.9076 12.7994 12.8064C12.9003 12.7052 13.0233 12.6289 13.1588 12.5836L13.8251 12.3676C13.9593 12.3197 14.0755 12.2315 14.1578 12.1151C14.2402 11.9988 14.2846 11.8599 14.2851 11.7173C14.2851 11.571 14.2383 11.4285 14.1515 11.3107C14.0648 11.1929 13.9426 11.1059 13.8028 11.0625L13.1491 10.851C13.0134 10.8061 12.8901 10.7301 12.7889 10.6291C12.6877 10.5281 12.6115 10.4049 12.5662 10.2693L12.3491 9.60476C12.3023 9.46912 12.2141 9.35159 12.0969 9.26873C11.9798 9.18586 11.8396 9.14183 11.6961 9.14284C11.5526 9.14385 11.4131 9.18985 11.2971 9.27436C11.1811 9.35886 11.0946 9.47762 11.0497 9.6139L10.836 10.2688C10.7922 10.4026 10.7182 10.5246 10.6199 10.6253C10.5215 10.7261 10.4013 10.8029 10.2685 10.8499L9.60225 11.0659C9.46771 11.1137 9.35121 11.2019 9.26867 11.3183C9.18613 11.4348 9.14158 11.574 9.14111 11.7168C9.14126 11.8608 9.18677 12.0012 9.27118 12.1179C9.3556 12.2346 9.47463 12.3218 9.61139 12.367L10.2651 12.5796C10.4012 12.6248 10.5248 12.7012 10.626 12.8027C10.7272 12.9042 10.8032 13.028 10.848 13.1642L11.0645 13.8288C11.1118 13.963 11.1997 14.0793 11.316 14.1613'/%3E%3C/svg%3E") center/16px 16px no-repeat}
+.ai-b{font:var(--lt-type-body);color:var(--lt-color-text-primary)}
 .ai-b b{font-weight:var(--lt-fw-bold)}
 /* ⏸ PARKED badge：樣式複製自 LumiTag v10 的 .v9-parked-badge（不動 shared，第二個 prototype 使用，抽 shared 的條件已達成，見 specs/parked-designs.md）*/
 .pk-badge{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:12px;background:var(--lt-grey-100);color:var(--lt-color-text-primary);font-size:12px;font-weight:600;cursor:help;flex-shrink:0;white-space:nowrap}
@@ -821,10 +886,10 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
 .gt-n+.gt-n{margin-top:8px}
 .gt-row{display:flex;align-items:center;gap:8px;height:21px;min-width:0}
 .gt-row.can{cursor:pointer}
-.gt-row.can:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring);border-radius:4px}
+.gt-row.can:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px;border-radius:4px}
 .gt-row .tw{margin:0}
-.chip{display:inline-flex;align-items:center;justify-content:center;height:20px;padding:0 7px;border-radius:4px;background:var(--lt-grey-100);border:1px solid var(--lt-grey-400);color:#7C7C7C;font-size:12px;line-height:18px;flex-shrink:0;white-space:nowrap}
-.gt-tx{font-size:var(--lt-fs-14);line-height:21px;color:var(--lt-color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.chip{padding:0 7px}   /* X-9r2 F10：chip 改 shared .lt-chip（CMDS Deletable chips / Squared colors #11，稿 #02 就是這個元件：51×20、#F2F2F2／#B3B3B3／#7C7C7C、12／18）。只留 7px 內距：稿的 1px 框畫在內距裡＝51 寬，shared 的框在內距外會變 53，L 型連線常數（.gt-kids.k1／k2）照 51 算；shared 的 2px 已登記 shared-requests */
+.gt-tx{font:var(--lt-type-button-regular-1);color:var(--lt-color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
 /* 階層連線：L 型（#02 左側便條：Meta／Jira 留言串的 L 型連結線）。垂直線與子列左緣在父列 chip 中心，水平腳 20、圓角 8 */
 .gt-n.ch{padding-left:0}
 .gt-n.ch>.gt-row{padding-left:22px}
@@ -841,22 +906,23 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
 
 /* 圖表區 */
 .sec{display:flex;flex-direction:column;gap:16px;min-width:0}
-.sec-t{display:flex;align-items:center;gap:8px;font-size:var(--lt-fs-18);font-weight:var(--lt-fw-bold);line-height:27px;color:var(--lt-color-text-heading)}
-.sec-t .info{font-size:16px;color:var(--lt-grey-400);cursor:help}
+.sec-t{display:flex;align-items:center;gap:8px;font:var(--lt-type-h5);color:var(--lt-color-text-heading)}
+.sec-t .info{font-size:16px;color:var(--lt-grey-400);cursor:help;position:relative}
+.sec-t .info::before{content:'';position:absolute;inset:-4px}   /* X-9r2 F18 */
 .c-unit{font-size:12px;font-weight:500;line-height:18px;color:var(--lt-grey-400)}
 .chart{width:100%;height:270px}
 .cwrap{display:flex;flex-direction:column;gap:16px}
 .lgd{display:flex;flex-wrap:wrap;justify-content:center;column-gap:8px;row-gap:4px;padding:0 68px}
-.lg-i{position:relative;display:inline-flex;align-items:center;gap:4px;height:18px;padding:0;font-size:12px;line-height:18px;color:var(--lt-color-text-secondary);cursor:pointer;white-space:nowrap}
+.lg-i{position:relative;display:inline-flex;align-items:center;gap:4px;height:18px;padding:0;font:var(--lt-type-button-regular-0);color:var(--lt-color-text-secondary);cursor:pointer;white-space:nowrap}
 .lg-i::before{content:'';position:absolute;left:0;right:0;top:-2px;bottom:-2px}   /* X-9r2 F20／R：圖例鈕 18 高的透明點擊區補到 22；兩行圖例間距只有 4，補到 24 會互疊 2px（驗證 N1），所以取 22 */
 .lg-i i{width:8px;height:8px;background:var(--c);display:block;flex-shrink:0}
 .lg-i.off{color:var(--lt-grey-400)}
 .lg-i.off i{background:var(--lt-grey-200)}
-.lg-i:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring);border-radius:2px}
+.lg-i:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px;border-radius:2px}
 .lgd.is-static .lg-i{cursor:default;pointer-events:none}
 
 /* chart tooltip（Figma #02-2：白底、r5、內距 8、陰影 0 0 6 .2；行：8 圓點＋名稱＋右對齊 $ 金額；Others 固定最後）*/
-.ct{min-width:264px;font-family:var(--lt-font-sans);font-size:12px;line-height:18px;color:#262626}
+.ct{min-width:264px;font:var(--lt-type-caption);color:var(--lt-color-text-primary)}
 .ct .ct-t{padding-bottom:7px;margin-bottom:8px;border-bottom:1px solid var(--lt-grey-300);font-weight:500}   /* 對稿修正（#02-2 Chart / Tooltip）：標題 12/500、分隔線 #CCCCCC */
 .ct .ct-r{display:flex;align-items:center;gap:4px;margin-top:4px}
 .ct .ct-r:first-of-type{margin-top:0}
@@ -867,8 +933,8 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
 /* 36 小時明細表（9 欄；前三欄固定、滾動時才出陰影；欄位不可點、列 hover 無效果）*/
 .tb-top{display:flex;flex-direction:column;gap:4px}
 .tb-row{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:30px}
-.tb-d{font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-secondary)}
-.dtbl .tbody .tr:hover .td{background:#fff}
+.tb-d{font:var(--lt-type-body);color:var(--lt-color-text-secondary)}
+.dtbl .tbody .tr:hover .td{background:var(--lt-white)}
 .dtbl .td{cursor:default}
 .dtbl .th{white-space:nowrap;gap:10px}   /* 對稿修正：標題與排序箭頭間距 10（Header / M gap）*/
 /* 對稿修正（#02 Table）：稿的 575＝表頭＋10.5 列，橫向捲軸另外 16 高接在下面；原生捲軸算在 max-height 裡會少看到 0.3 列 */
@@ -877,9 +943,11 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
 .btn.btn-s{height:30px;padding:0 12px 0 10px;min-width:0}
 .dtbl .th.r,.dtbl .td.r{justify-content:flex-end;text-align:right}
 .dtbl .th.sortable{cursor:pointer;user-select:none}
-.dtbl .th.sortable:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(0,79,176,.35)}
+.dtbl .th.sortable:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--lt-color-primary)}
+.btn:focus-visible,.lnk-btn:focus-visible,.tx-link:focus-visible,.tgb:focus-visible,.modal .m-x:focus-visible,.mi:focus-visible,.swrow:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px}   /* X-9r2 F6 */
+.tgb:focus-visible,.mi:focus-visible{outline-offset:-2px}
 .dtbl .si{font-size:20px;color:var(--lt-grey-300);font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20;flex-shrink:0}
-.dtbl .th.on .si{color:var(--lt-color-primary)}
+.dtbl .th.on .si{color:var(--lt-color-primary);font-variation-settings:'FILL' 0,'wght' 700,'GRAD' 0,'opsz' 20}   /* X-9r2 第三輪 B17：稿 #02／#06 排序中的箭頭筆畫比未排序的灰箭頭粗一階（原只靠顏色分辨） */
 .dtbl .sl{position:sticky;z-index:3}
 .dtbl .th.sl{z-index:6}
 .dtbl .sl3::after{content:'';position:absolute;top:0;bottom:-1px;right:-10px;width:10px;pointer-events:none;opacity:0;transition:opacity var(--lt-transition-fast);background:linear-gradient(90deg,rgba(0,0,0,.063),rgba(0,0,0,.012) 7px,rgba(0,0,0,0) 8px)}
@@ -889,13 +957,13 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
 /* Skeleton（#04）：標籤保留、內容換成灰條；讀取中不能操作的按鈕 Disabled */
 .skl{background:var(--lt-grey-100)}
 .sk-b{height:14px;border-radius:4px}
-.sk-s{background:var(--lt-color-bg-skeleton,#E6E6E6);border-radius:4px}   /* A-18 靜態（X-9r1） */
+.sk-s{background:var(--lt-color-bg-skeleton,var(--lt-grey-200));border-radius:4px}   /* A-18 靜態（X-9r1） */
 .dsk-chart{position:relative;height:360px}   /* 對稿修正（#04 Skeleton/Line Chart，1005×360）：以下座標都是稿的值（相對圖表區左上）*/
 .dsk-grid{position:absolute;left:35px;right:4px;top:38px;height:250px}
-.dsk-h{position:absolute;left:0;right:0;height:1px;background:repeating-linear-gradient(90deg,#E6E6E6 0 5px,transparent 5px 10px)}
-.dsk-h.solid{background:#E6E6E6}
+.dsk-h{position:absolute;left:0;right:0;height:1px;background:repeating-linear-gradient(90deg,var(--lt-grey-200) 0 5px,transparent 5px 10px)}
+.dsk-h.solid{background:var(--lt-grey-200)}
 .dsk-vs{position:absolute;inset:0;display:flex;justify-content:space-between;padding:0 10px}
-.dsk-vs i{width:1px;height:100%;background:repeating-linear-gradient(180deg,#E6E6E6 0 5px,transparent 5px 10px)}
+.dsk-vs i{width:1px;height:100%;background:repeating-linear-gradient(180deg,var(--lt-grey-200) 0 5px,transparent 5px 10px)}
 .dsk-wave{position:absolute;left:35px;right:4px;top:37px;height:174px}
 .dsk-wave svg{width:100%;height:100%;display:block}
 .dsk-yl{position:absolute;left:4px;width:25px;height:12px}
@@ -923,19 +991,19 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
 
 /* ---- Screenshot 預覽（#08；⚠ 設計端暫擬：真產品下載 PNG LumiTure_anomaly_report，prototype 用預覽＋window.print()）---- */
 #shot-root{display:none}
-#shot-root.on{display:flex;flex-direction:column;position:fixed;inset:0;z-index:calc(var(--lt-z-modal) + 5);background:#3a3f45}
-.shot-bar{display:flex;align-items:center;gap:12px;padding:10px 20px;background:#262626;color:#fff;font-size:13px;flex-shrink:0}
+#shot-root.on{display:flex;flex-direction:column;position:fixed;inset:0;z-index:calc(var(--lt-z-modal) + 5);background:#3a3f45}   /* 預覽層底色是設計端暫擬（深灰襯 2026 寬的輸出），tokens.css 沒有對應（X-9r2 F8 留著） */
+.shot-bar{display:flex;align-items:center;gap:12px;padding:10px 20px;background:var(--lt-color-text-primary);color:var(--lt-white);font-size:13px;flex-shrink:0}
 .shot-bar .sp{flex:1}
 .shot-bar .btn{height:32px;min-width:0;padding:0 14px}
-.shot-bar .btn-o{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
-.shot-bar .btn-o:hover{background:rgba(255,255,255,.12);color:#fff;border-color:#fff}
+.shot-bar .btn-o{background:transparent;color:var(--lt-white);border-color:rgba(255,255,255,.6)}
+.shot-bar .btn-o:hover{background:rgba(255,255,255,.12);color:var(--lt-white);border-color:var(--lt-white)}
 .shot-scroll{flex:1;overflow:auto;overscroll-behavior:contain}
 .shot-canvas{width:2026px;background:var(--lt-color-primary-bg);display:flex;flex-direction:column;gap:32px;transform-origin:0 0}
-.shot-hd,.shot-ft{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;background:linear-gradient(90deg,#4ADFFF,#004FB0);color:#fff}
+.shot-hd,.shot-ft{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;background:linear-gradient(90deg,var(--lt-turquoise-60),var(--lt-color-primary));color:var(--lt-white)}
 .shot-hd{height:88px}
 .shot-ft{height:129px;gap:4px}
-.shot-ft .cp{font-size:var(--lt-fs-14);line-height:24.5px;color:#fff}
-.shot-logo{display:flex;align-items:center;gap:10px;height:40px;color:#fff}
+.shot-ft .cp{font:var(--lt-type-body);color:var(--lt-white)}
+.shot-logo{display:flex;align-items:center;gap:10px;height:40px;color:var(--lt-white)}
 .shot-logo svg{height:40px;width:238px;display:block}
 .shot-logo .wm{font-size:32px;font-weight:500;line-height:40px;letter-spacing:0}
 .shot-main{padding:0 157px}
@@ -947,11 +1015,11 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
 .shot-main .tbl-scroll .sl3::after{display:none}
 .shot-main .tbl-scroll .th{background:var(--lt-color-primary-bg)}
 .shot-main .th:not(.on) .si{display:none}
-.shot-disc{text-align:center;font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-secondary);padding:0 93px}
+.shot-disc{text-align:center;font:var(--lt-type-body);color:var(--lt-color-text-secondary);padding:0 93px}
 .shot-disc b{font-weight:var(--lt-fw-bold)}
 @media print{
   @page{size:2026px 3300px;margin:0}
-  html,body{background:#fff}
+  html,body{background:var(--lt-white)}
   .app,.lt-toast-wrap,#modal-root,.demo-fab,.demo-popover,#gl-tip,.shot-bar{display:none!important}
   #shot-root.on{position:static;display:block;background:none}
   .shot-scroll{overflow:visible}
@@ -972,7 +1040,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
   </div>
 </div>
 <div id="modal-root"></div>
-<div id="shot-root"></div>
+<div id="shot-root" role="dialog" aria-modal="true" aria-label="Screenshot output preview"></div>   <!-- X-9r2 F13 -->
 
 <script>
   window.LUMITURE_ACTIVE = 'anomaly-detection';
@@ -1238,14 +1306,14 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
   }
   function _renderLogo() {
     var href = _homeHref();
-    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-sb-logo">';
+    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-sb-logo">';
     return open + _logoBody(LOGO_ICON) + (href ? '</a>' : '</div>');
   }
   // 收合時顯示在 topbar 左側的 logo（同一組圖形，mask id 改 ltT* 避免跟 sidebar 那份撞 id）
   function _renderTopbarLogo() {
     var href = _homeHref();
     var icon = LOGO_ICON.replace(/ltH(ring|bars|leg)/g, 'ltT$1');
-    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-tb-logo">';
+    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-tb-logo">';
     return open + _logoBody(icon) + (href ? '</a>' : '</div>');
   }
   function _mountTopbarLogo(host) {
@@ -1497,7 +1565,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
  *     version:     'v1.19.0',               // Software version 列
  *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
  *     quota: {                              // AI Quota box 數據；total 已含 add-on
- *       refreshDate: '2 Nov. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）
+ *       refreshDate: '2 Dec. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）。沒給（或給空值）就自動算下一個 2 號（X-9r1 11-13 S-A1，LumitureTopbar.nextRefreshDate）
  *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
  *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
  *     },
@@ -1508,6 +1576,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
  *   window.LumitureTopbar.setRole('Manager - ...')— 只更新 role chip（Demo FAB role 切換用）
  *   window.LumitureTopbar.setPlan('Essential')    — 切 plan（連動 AI Quota box 顯示項目）
  *   window.LumitureTopbar.setQuota({analyses:{...}, rightsizing:{...}, refreshDate, addonPacks})
+ *   window.LumitureTopbar.nextRefreshDate()        — 依今天算下一個計費週期錨日（每月 2 號），回 '2 Dec. 2026' 這種寫法
  *   window.LumitureTopbar.openMenu() / closeMenu() / toggleMenu()
  *   window.LumitureTopbar.rerender()
  *   window.LumitureTopbar.openRoleDialog() / closeRoleDialog()   — View as Another Role 彈窗（#01-5；頁面掛勾見下方 role 區塊註解）
@@ -1516,6 +1585,16 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
  */
 (function () {
   'use strict';
+
+  /* X-9r1 11-13 S-A1：下一個計費週期錨日（每月 2 號），格式照稿的「2 Apr. 2028」；今天 ≥ 2 號就取下個月。
+     原本寫死 '2 Nov. 2026'，過了那天 13 頁的 Account Menu 都顯示過期日（User Menu 頁自己算過，這裡搬進 shared 讓全站共用）。 */
+  function _nextRefreshDate() {
+    var M = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'];
+    var d = new Date(), y = d.getFullYear(), m = d.getMonth();
+    if (d.getDate() >= 2) m += 1;
+    if (m > 11) { m = 0; y += 1; }
+    return '2 ' + M[m] + ' ' + y;
+  }
 
   // ===== Defaults ===== (預設給 Standard plan + Normal 狀態，所有既有 prototype 直接吃，不破版)
   var DEFAULT_USER = {
@@ -1530,7 +1609,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     version: 'v1.19.0',
     addonPacks: 0,
     quota: {
-      refreshDate: '2 Nov. 2026',          // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期（原 2 Jul. 2026 已過期）
+      refreshDate: _nextRefreshDate(),     // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期；X-9r1 11-13 S-A1：改成依今天自動算（原寫死 2 Nov. 2026 已過期）
       analyses:    { used: 32,  total: 80 },
       rightsizing: { used: 410, total: 1000 },
     },
@@ -1596,8 +1675,11 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     /* ---------- Account Menu popover ----------
        2026-10-14 逐格對 Figma #01-6（hover）／#01-7（loading & error）：左右內距 24、方案列 37 高、姓名 16/700、角色 chip 藍 #004FB0 方角、
        AI Quota 每列 24 高、狀態色 #00DCC2／#F4A938／#FF403D、功能列 40 高（外包 8／16）、陰影 0 0 6px .2。舊值（內距 16、狀態色提亮）是 06-22 的目視估計 */
-    '.lt-am-backdrop{position:fixed;inset:0;z-index:1000;background:transparent}',
-    '.lt-am{position:fixed;top:64px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
+    /* X-9r1 11-13 S-A2：背板 1000 → 997。Demo FAB 999、面板 998，背板要讓到它們底下，否則選單開著時（User Menu 頁進頁就開著）
+       第一下點 FAB 只會被背板吃掉去關選單，面板不開。選單本體 #lt-am 維持 1001。不要去抬 FAB 的層級：
+       Cost Dashboard、Group List、All Resource List 有 1000 以上的彈窗遮罩，FAB 抬上去會浮在遮罩上。 */
+    '.lt-am-backdrop{position:fixed;inset:0;z-index:997;background:transparent}',
+    '.lt-am{position:fixed;top:68px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
     'box-shadow:0 0 6px rgba(0,0,0,.2);font-family:\'Noto Sans\',sans-serif;color:#fff;',
     'animation:lt-am-in .14s ease;transform-origin:top right}',   /* 不設 overflow:hidden：hover tooltip（寬 400）要能伸出選單左邊，圓角改由第一／最後一個子區塊自己帶 */
     '@keyframes lt-am-in{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}',
@@ -1694,6 +1776,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
   function _user() {
     var u = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
     u.quota = Object.assign({}, DEFAULT_USER.quota, (window.LUMITURE_USER || {}).quota || {});
+    if (!u.quota.refreshDate) u.quota.refreshDate = _nextRefreshDate();   /* 頁面傳 undefined／null／'' 也吃自動值（S-A1） */
     return u;
   }
   function _status(used, total) {
@@ -1864,7 +1947,8 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     var m = document.getElementById('lt-am');
     return m ? Array.prototype.slice.call(m.querySelectorAll('.lt-am-item,.lt-q-err a,.lt-q-item.has-tip')) : [];
   }
-  function _openMenu() {
+  function _openMenu(opts) {
+    var noFocus = !!(opts && opts.focus === false);   /* X-9r1 11-13 S-B9：程式開選單（User Menu 進頁、Demo 情境）不搶焦點 */
     var wasOpen = _menuOpen, items0 = wasOpen ? _menuItems() : [], idx = items0.indexOf(document.activeElement);
     var u = _user();
     _menuHost().innerHTML = _renderMenu(u);
@@ -1872,7 +1956,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     var chip = document.getElementById('lt-tb-user');
     if (chip) { chip.classList.add('is-open'); chip.setAttribute('aria-expanded', 'true'); }
     var items = _menuItems(), t = null;
-    if (!wasOpen) t = document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
+    if (!wasOpen) t = noFocus ? null : document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
     else if (idx > -1 && items.length) t = items[Math.min(idx, items.length - 1)];            // 重繪（Retry、切 plan…）：焦點留在原位
     if (t) t.focus({ preventScroll: true });
   }
@@ -1945,7 +2029,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     '.lt-rd-btn.pri{background:#004FB0;color:#fff;border-color:#004FB0;min-width:160px}',
     '.lt-rd-btn.pri:hover{background:#0B6DD7;border-color:#0B6DD7}',
     '.lt-rd-btn.out{background:#fff;color:#004FB0;border-color:#004FB0}',
-    '.lt-rd-btn.out:hover{background:#F2FAFF}',
+    '.lt-rd-btn.out:hover{background:#F6F6F6;color:#0B6DD7;border-color:#0B6DD7}',   /* X-9r1 11-13 S-KCR：照全站外框主色鈕 hover（Guideline .btn--outlined-primary:hover） */
     '.lt-rd-btn[disabled]{background:#CCCCCC;border-color:#CCCCCC;color:#fff;cursor:not-allowed}',
     '.lt-rd-btn:focus-visible,.lt-rd-sel:focus-visible{outline:2px solid #004FB0;outline-offset:2px}',
     '.lt-rd-spin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:lt-rd-spin .8s linear infinite}',
@@ -2044,8 +2128,9 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
         '" aria-controls="lt-rd-list" aria-labelledby="lt-rd-t"><span class="lt-rd-v">' + _esc(sel.name) + '</span><span class="lt-rd-chip">' + _esc(sel.role) +
         '</span><span class="material-symbols-outlined lt-rd-arr" aria-hidden="true">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
       '<div class="lt-rd-act"><button type="button" class="lt-rd-btn out" id="lt-rd-keep"' + (r.loading ? ' disabled' : '') + '>' + ROLE_COPY.keep + '</button>' +
-        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') + '>' +
-        (r.loading ? '<span class="lt-rd-spin" role="status" aria-label="Loading"></span>' : ROLE_COPY.cont) + '</button></div>' +
+        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') +
+        (r.loading ? ' aria-label="' + _esc(ROLE_COPY.cont) + '" aria-busy="true"' : '') + '>' +   /* X-9r1 11-13 S-A4：讀取中名稱維持 Continue（同 Auth 11-05 N2） */
+        (r.loading ? '<span class="lt-rd-spin" aria-hidden="true"></span>' : ROLE_COPY.cont) + '</button></div>' +
     '</div></div>';
   }
   function _rdRender(keepFocusId) {
@@ -2227,10 +2312,12 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
       window.LUMITURE_USER = Object.assign({}, cur, {
         quota: Object.assign({}, DEFAULT_USER.quota, cur.quota || {}, q || {}),
       });
+      if (!window.LUMITURE_USER.quota.refreshDate) window.LUMITURE_USER.quota.refreshDate = _nextRefreshDate();   /* 空值用自動值（S-A1） */
       if (q && typeof q.addonPacks !== 'undefined') window.LUMITURE_USER.addonPacks = q.addonPacks;
       if (_menuOpen) _openMenu();
     },
-    openMenu: _openMenu,
+    openMenu: _openMenu,   /* openMenu({focus:false})：程式開選單不搶焦點（S-B9） */
+    nextRefreshDate: _nextRefreshDate,
     closeMenu: _closeMenu,
     toggleMenu: _toggleMenu,
     rerender: function () { _render(); if (_menuOpen) _openMenu(); },
@@ -2498,7 +2585,7 @@ function toolbarHtml(mode) {
   const loading = mode === 'loading';
   const settingsBtn = canSet ? `<button class="lnk-btn" data-a="open-settings" ${loading ? 'disabled' : ''}><span class="material-symbols-outlined">settings</span><span class="t">${COPY.settingsBtn}</span></button>` : '';
   const chip = loading ? '<span class="st-chip skel"><span class="sk" style="width:224px"></span></span>' : chipHtml();
-  const tg = mode === 'empty' ? '' : `<div class="tg ${loading ? 'is-disabled' : ''}" role="group" aria-label="Alert list view"><button class="tgb t-all ${state.view === 'all' ? 'on' : ''}" data-a="view" data-v="all" ${loading ? 'disabled' : ''}>All</button><i class="sep"></i><button class="tgb t-pin ${state.view === 'pinned' ? 'on' : ''}" data-a="view" data-v="pinned" aria-label="Pinned" ${loading ? 'disabled' : ''}><span class="material-symbols-outlined">keep</span></button></div>`;
+  const tg = mode === 'empty' ? '' : `<div class="tg ${loading ? 'is-disabled' : ''}" role="group" aria-label="Alert list view"><button class="tgb t-all ${state.view === 'all' ? 'on' : ''}" data-a="view" data-v="all" aria-pressed="${state.view === 'all'}" ${loading ? 'disabled' : ''}>All</button><i class="sep"></i><button class="tgb t-pin ${state.view === 'pinned' ? 'on' : ''}" data-a="view" data-v="pinned" aria-label="Pinned" aria-pressed="${state.view === 'pinned'}" ${loading ? 'disabled' : ''}><span class="material-symbols-outlined">keep</span></button></div>`;
   return `<div class="toolbar ${mode === 'empty' ? 'is-empty' : ''}">${mode === 'empty' ? '<span class="tb-title none"></span>' : `<h2 class="tb-title">${COPY.listTitle}</h2>`}<div class="tb-r">${settingsBtn}${chip}${tg}</div></div>`;
 }
 
@@ -2512,7 +2599,7 @@ function rowHtml(it, kind) {
   const can = kind === 'p' && it.children.length > 0;
   const open = can && state.expanded.has(it.id);
   const total = it.children.length + 1;
-  const badge = can ? `<span class="cnt">${total > MAX_BADGE ? MAX_BADGE + '+' : total}</span>` : '';
+  const badge = can ? `<span class="cnt" role="img" aria-label="${total} alerts">${total > MAX_BADGE ? MAX_BADGE + '+' : total}</span>` : '';   /* X-9r2 第三輪 CC7：計數膠囊的說明（⚠ 設計端暫擬：稿只畫數字；註記「若有超過一則告警則後綴告警總數」） */
   const gs = groupsOf(it);
   const txt = gs.length ? esc(gs.join(', ')) : '<span class="dash">--</span>';
   const noAssigned = hideAssigned();
@@ -2538,7 +2625,7 @@ function tableHtml(rows) {
       <div class="th st-l" role="columnheader" style="padding-left:16px">Resource Name / ID</div>
       <div class="th" role="columnheader">Actual Cost</div>
       <div class="th" role="columnheader">Anomaly Date</div>
-      ${na ? '' : `<div class="th" role="columnheader">Assigned to<span class="material-symbols-outlined info" id="assigned-info" data-tip="${esc(COPY.assignedTip)}">info</span></div>`}
+      ${na ? '' : `<div class="th" role="columnheader">Assigned to<span class="material-symbols-outlined info" id="assigned-info" data-tip="${esc(COPY.assignedTip)}" data-tip-maxw="416" tabindex="0" role="img" aria-label="${esc(COPY.assignedTip)}">info</span></div>`}
       <div class="th st-r" role="columnheader">Action</div>
     </div>
     <div class="tbody" role="rowgroup">${rows}</div></div>`;
@@ -2616,18 +2703,24 @@ function renderSettings() {
   const d = state.draft; if (!d) return;
   const off = !d.detection;
   const keepScroll = ($('#modal-root .m-scroll') || {}).scrollTop || 0;
+  /* X-9r2 第三輪 CC3：重繪整個彈窗前記住焦點在哪個開關，重繪後還原（原本每次切換開關焦點都跳到 Save）；第一次開啟焦點進標題（內容長的對話框，WAI-ARIA APG） */
+  const had = !!$('#modal-root .modal'), ae = document.activeElement;
+  const fk = had && ae && ae.closest && ae.closest('#modal-root') ? (ae.id ? '#' + ae.id : ae.matches('.sw[data-a]') ? `.sw[data-a="${ae.dataset.a}"][data-k="${ae.dataset.k || ''}"]` : null) : null;
   const roles = NOTIF_ROLES.map(([k, l]) => `<div class="role"><div class="rl">${l}</div>${swRow(d.notif[k], 'sm-notif', k, off, l)}</div>${NOTIF_DIVIDE_AFTER.includes(k) ? '<hr>' : ''}`).join('');
   $('#modal-root').innerHTML = `<div class="mask"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="sm-t">
-    <div class="m-hd"><h2 id="sm-t">${COPY.settings.title}</h2><button class="m-x" data-a="m-close" aria-label="Close"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="m-hd"><h2 id="sm-t" tabindex="-1">${COPY.settings.title}</h2><button class="m-x" data-a="m-close" aria-label="Close"><span class="material-symbols-outlined">close</span></button></div>
     <div class="m-desc">${esc(COPY.settings.desc)}</div>
     <div class="m-scroll"><div class="m-inner">
       <div class="fld"><div class="lbl">${COPY.settings.detection}</div>${swRow(d.detection, 'sm-det', '', false, 'Detection')}</div>
-      <div class="sens ${off ? 'is-disabled' : ''}"><div class="fld"><div class="lbl">${COPY.settings.sensitivity}</div><button class="sel" id="sm-sel" data-a="sm-sens" ${off ? 'disabled' : ''} aria-haspopup="listbox"><span>${d.sensitivity}</span><span class="tri"></span></button></div><div class="help">${esc(COPY.settings.sensHelp)}</div></div>
+      <div class="sens ${off ? 'is-disabled' : ''}"><div class="fld"><div class="lbl" id="sm-sens-lbl">${COPY.settings.sensitivity}</div><button class="sel" id="sm-sel" data-a="sm-sens" ${off ? 'disabled' : ''} aria-haspopup="listbox" aria-expanded="false" aria-labelledby="sm-sens-lbl"><span>${d.sensitivity}</span><span class="tri"></span></button></div><div class="help">${esc(COPY.settings.sensHelp)}</div></div>
       <div class="nbox ${off ? 'is-disabled' : ''}"><div class="intro"><h3>${COPY.settings.notif}</h3><div class="help">${esc(COPY.settings.notifDesc)}</div></div>${roles.replace(/<hr>$/, '')}</div>
     </div></div>
     <div class="m-ft"><button class="btn btn-o" data-a="m-close">Cancel</button><button class="btn btn-p" data-a="sm-save">Save</button></div></div></div>`;
   const sc = $('#modal-root .m-scroll'); if (sc) sc.scrollTop = keepScroll;
-  const b = $('#modal-root .btn-p'); if (b && !document.activeElement.closest('#modal-root')) b.focus({ preventScroll: true });
+  const nf = fk && $('#modal-root ' + fk);
+  if (nf) nf.focus({ preventScroll: true });
+  else if (!had) { const t = $('#sm-t'); t && t.focus({ preventScroll: true }); }
+  else if (!document.activeElement.closest('#modal-root')) { const t = $('#sm-t'); t && t.focus({ preventScroll: true }); }
 }
 function closeModal() { closePop(); $('#modal-root').innerHTML = ''; state.draft = null; }
 Object.assign(ACT, {
@@ -2636,12 +2729,13 @@ Object.assign(ACT, {
   'sm-det': () => { state.draft.detection = !state.draft.detection; closePop(); renderSettings(); },
   'sm-notif': el => { const k = el.dataset.k; state.draft.notif[k] = !state.draft.notif[k]; renderSettings(); },
   'sm-sens': el => openSensMenu(el),
-  'sm-pick': el => { state.draft.sensitivity = el.dataset.v; closePop(); renderSettings(); },
+  'sm-pick': el => { state.draft.sensitivity = el.dataset.v; closePop(); renderSettings(); const b = $('#sm-sel'); b && b.focus(); },   /* X-9r2 F14：選完焦點回觸發欄（重繪後是新的節點） */
   'sm-save': () => {
     const d = state.draft; closeModal();
     if (state.failNext) { state.failNext = false; toast('error', COPY.toast.fail); return; }   // #Toast：因連線等其他不可避原因導致失敗者，關閉彈窗並顯示 Toast 於左下角
     state.settings = { detection: d.detection, sensitivity: d.sensitivity, notif: Object.assign({}, d.notif) };
     renderList(); toast('ok', COPY.toast.ok);
+    setTimeout(() => { const l = $('[data-a="open-settings"]'); l && l.focus({ preventScroll: true }); }, 0);   /* CC3：Save 成功後焦點回 Alert Settings 連結（列表被重繪，等背景 inert 解除再聚焦；Esc／Cancel 本來就會回去） */
   }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (POP) closePop(); else if ($('#modal-root').firstChild) closeModal(); } });
@@ -2659,8 +2753,11 @@ function openSensMenu(el) {
   const h = pop.offsetHeight;
   pop.style.top = (r.bottom + 4 + h > window.innerHeight ? Math.max(8, r.top - h - 4) : r.bottom + 4) + 'px';
   el.classList.add('open'); POP = { pop, anchor: el };
+  /* X-9r2 F14：開啟焦點進選中項、aria-expanded */
+  el.setAttribute('aria-expanded', 'true'); pop.querySelectorAll('.mi').forEach(m => { m.tabIndex = -1; });
+  const cur = pop.querySelector('.mi.is-sel') || pop.querySelector('.mi'); cur && cur.focus();
 }
-function closePop() { if (!POP) return; POP.pop.remove(); POP.anchor.classList && POP.anchor.classList.remove('open'); POP = null; }
+function closePop() { if (!POP) return; const p = POP; POP = null; const had = p.pop.contains(document.activeElement); p.pop.remove(); p.anchor.classList && p.anchor.classList.remove('open'); p.anchor.setAttribute && p.anchor.setAttribute('aria-expanded', 'false'); if (had && p.anchor.focus) p.anchor.focus(); }   /* X-9r2 F14：關閉時 aria-expanded 回 false，焦點在選單裡就回到觸發欄 */
 document.addEventListener('mousedown', e => { if (POP && !e.target.closest('.pop') && !e.target.closest('#sm-sel')) closePop(); });
 window.addEventListener('resize', () => closePop());
 document.addEventListener('scroll', e => { if (POP && !(e.target.closest && e.target.closest('.pop'))) closePop(); }, true);
@@ -2881,7 +2978,7 @@ function treeNode(n, depth, interactive) {
   const can = depth === 0 && n.kids.length > 0;
   const open = can && state.dTree && interactive;
   const arrow = depth === 0 && can ? `<span class="tw ${open ? 'open' : ''}"><i></i></span>` : '';
-  return `<div class="gt-n ${depth ? 'ch d' + depth : ''}"><div class="gt-row ${can && interactive ? 'can' : ''}" ${can && interactive ? `data-a="d-tree" tabindex="0" role="button" aria-expanded="${open}" aria-label="Show subgroups"` : ''}>${arrow}<span class="chip">${n.chip}</span><span class="gt-tx" data-tip="${esc(tx)}" data-tip-align="right" data-tip-gap="4" data-tip-trunc>${esc(tx)}</span></div>${depth === 0 ? (open ? kids : '') : kids}</div>`;
+  return `<div class="gt-n ${depth ? 'ch d' + depth : ''}"><div class="gt-row ${can && interactive ? 'can' : ''}" ${can && interactive ? `data-a="d-tree" tabindex="0" role="button" aria-expanded="${open}" aria-label="Show subgroups"` : ''}>${arrow}<span class="chip lt-chip lt-chip--xs lt-chip--outline lt-chip--c11">${n.chip}</span><span class="gt-tx" data-tip="${esc(tx)}" data-tip-align="right" data-tip-gap="4" data-tip-trunc>${esc(tx)}</span></div>${depth === 0 ? (open ? kids : '') : kids}</div>`;
 }
 function assignedHtml(it, interactive) {
   /* ⚠ 設計端暫擬（對稿時補）：資源沒有指派給任何群組（屬於 org 層級，#02 黃便條「後端將 Assigned Group 全部移除 → 只有 Admin 看得到」）稿沒畫。
@@ -2950,10 +3047,10 @@ function reportHtml(it, D, shot) {
       <div class="blk"><div class="l12">Anomaly Date</div><div class="adate">${fmtDMYs(dateOf(it.off))}</div></div>
     </div>${state.showParked ? aiHtml(it, D, shot) : ''}</div>
     ${assignedHtml(it, !shot)}
-    <div class="sec"><div class="sec-t">${DCOPY.chartTitle}<span class="material-symbols-outlined info" data-tip="${esc(DCOPY.chartTip)}" data-tip-gap="4">info</span></div>
-      <div class="cwrap"><div class="c-unit">${DCOPY.chartUnit}</div><div class="chart js-chart" data-shot="${shot ? 1 : 0}"></div></div>
+    <div class="sec"><h2 class="sec-t">${DCOPY.chartTitle}<span class="material-symbols-outlined info" data-tip="${esc(DCOPY.chartTip)}" data-tip-gap="4" tabindex="0" role="img" aria-label="${esc(DCOPY.chartTip)}">info</span></h2>
+      <div class="cwrap"><div class="c-unit">${DCOPY.chartUnit}</div><div class="chart js-chart" data-shot="${shot ? 1 : 0}" role="img" aria-label="${esc(DCOPY.chartTitle)}, hourly line chart: ${esc(D.series.map(s => s.name).join(', '))}"></div></div>
       <div class="lgd ${shot ? 'is-static' : ''}">${lg}</div></div>
-    <div class="dtbl"><div class="tb-top"><div class="tb-row"><div class="sec-t">${DCOPY.tblTitle}</div>${shot ? '' : `<button class="btn btn-o btn-s" data-a="d-csv"><span class="material-symbols-outlined">download</span>${DCOPY.csv}</button>`}</div><div class="tb-d">${DCOPY.tblDesc}</div></div><div style="height:16px"></div>${dTableHtml(D, shot)}</div>`;
+    <div class="dtbl"><div class="tb-top"><div class="tb-row"><h2 class="sec-t">${DCOPY.tblTitle}</h2>${shot ? '' : `<button class="btn btn-o btn-s" data-a="d-csv"><span class="material-symbols-outlined">download</span>${DCOPY.csv}</button>`}</div><div class="tb-d">${DCOPY.tblDesc}</div></div><div style="height:16px"></div>${dTableHtml(D, shot)}</div>`;
 }
 
 /* ---------- ECharts ---------- */
@@ -3011,14 +3108,14 @@ function dSkelHtml(it) {
     <div class="blk"><div class="l12">Anomaly Date</div>${sk('200px', 14, '5px 0')}</div>
   </div>${state.showParked ? `<div class="ai is-parked"><div class="ai-hd"><span class="ai-t"><span class="ai-ic" aria-hidden="true"></span><span class="tx">${DCOPY.ai}</span></span><span class="pk-badge"><span class="material-symbols-outlined">pause_circle</span>已設計・PM 尚未安排開發</span></div><div style="display:flex;flex-direction:column">${'<div class="sk-a"></div>'.repeat(5)}</div></div>` : ''}</div>
   <div class="asg"><div class="l12">${DCOPY.asg}</div><div>${sk('200px', 12, '3px 0 6px')}</div></div>
-  <div class="sec"><div class="sec-t">${DCOPY.chartTitle}<span class="material-symbols-outlined info">info</span></div>
+  <div class="sec"><h2 class="sec-t">${DCOPY.chartTitle}<span class="material-symbols-outlined info">info</span></h2>
     <div class="dsk-chart">${sk('80px', 12, '2px 0 0 4px')}
       ${[70, 158, 244].map(t => `<div class="sk-s dsk-yl" style="top:${t}px"></div>`).join('')}
       <div class="dsk-grid"><div class="dsk-h" style="top:0"></div><div class="dsk-h" style="top:126px"></div><div class="dsk-h solid" style="top:250px"></div><div class="dsk-vs">${'<i></i>'.repeat(16)}</div></div>
       <div class="dsk-wave">${WAVE}</div>
       <div class="dsk-xl">${'<div class="sk-s"></div>'.repeat(16)}</div>
       <div class="dsk-lg">${lgRow([247, 80, 247, 80, 247])}${lgRow([80, 330, 80, 330, 80])}</div></div></div>
-  <div class="dtbl dtbl-sk"><div class="tb-top"><div class="tb-row"><div class="sec-t">${DCOPY.tblTitle}</div><button class="btn btn-o btn-s" disabled><span class="material-symbols-outlined">download</span>${DCOPY.csv}</button></div><div class="tb-d">${DCOPY.tblDesc}</div></div><div style="height:15px"></div>
+  <div class="dtbl dtbl-sk"><div class="tb-top"><div class="tb-row"><h2 class="sec-t">${DCOPY.tblTitle}</h2><button class="btn btn-o btn-s" disabled><span class="material-symbols-outlined">download</span>${DCOPY.csv}</button></div><div class="tb-d">${DCOPY.tblDesc}</div></div><div style="height:15px"></div>
     <div class="dsk-tbl"><div class="l"><div class="hd">${sk('100px', 14)}</div>${`<div class="rw">${sk('100%', 14)}</div>`.repeat(3)}</div><div class="dv"></div><div class="r">${rRow('hd')}${rRow('rw').repeat(3)}</div></div></div>`;
 }
 
@@ -3049,14 +3146,21 @@ function syncStickyLeft(sc) {
 }
 function renderShot() {
   const r = $('#shot-root'), it = findItem(state.detailId);
-  if (state.route !== 'screenshot' || !it) { r.className = ''; r.innerHTML = ''; return; }
+  if (state.route !== 'screenshot' || !it) {
+    const wasOn = r.classList.contains('on'); r.className = ''; r.innerHTML = '';
+    if (wasOn) { document.querySelector('.app').inert = false; const back = $('[data-a="d-shot"]') || ((shotOpener && shotOpener.isConnected && shotOpener !== document.body) ? shotOpener : null); back && back.focus && back.focus(); }   /* X-9r2 F13：關閉後解除 inert、焦點回截圖鈕 */
+    shotOpener = null; return;
+  }
+  if (!r.classList.contains('on')) shotOpener = (document.activeElement && document.activeElement !== document.body) ? document.activeElement : null;   /* 進預覽前 renderDetail 已重繪，截圖鈕通常是新節點，關閉時優先用 [data-a=d-shot] 找 */
   const D = genDetail(it);
   r.className = 'on';
   r.innerHTML = `<div class="shot-bar"><span class="material-symbols-outlined">screenshot_monitor</span><span>Screenshot output preview · LumiTure_anomaly_report.png　<span style="opacity:.7">⚠ 設計端暫擬：真產品下載 PNG，prototype 用預覽＋列印</span></span><span class="sp"></span><button class="btn btn-o" data-a="shot-print"><span class="material-symbols-outlined">print</span>Print / Save as PDF</button><button class="btn btn-p" data-a="shot-close">Close</button></div>
   <div class="shot-scroll"><div class="shot-canvas" id="shot-canvas"><div class="shot-hd">${logoLockup()}</div><div class="shot-main"><div class="card rpt">${reportHtml(it, D, true)}</div></div><div class="shot-disc">${DCOPY.disc}</div><div class="shot-ft">${logoLockup()}<div class="cp">Copyright © 2026 LumiTure.ai, Inc. All rights reserved.</div></div></div></div>`;
   fitShot();
   r.querySelectorAll('.js-chart').forEach(el => mkChart(el, D, true));
+  document.querySelector('.app').inert = true; const c = r.querySelector('[data-a="shot-close"]'); c && c.focus();   /* X-9r2 F13：預覽層是 dialog：背景 inert、焦點進 Close（Esc 原本就會關） */
 }
+let shotOpener = null;
 /* 對稿修正（#08 Logo_LumiTure.ai 238×40）：原本用圖形標＋文字代替字標，改用稿匯出的官方 Logo 向量（Figma REST images?format=svg）*/
 function logoLockup() {
   return `<div class="shot-logo"><svg viewBox="0 0 238 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="LumiTure.ai" role="img"><path d="M35.7729 0C46.8186 0 55.7729 8.9543 55.7729 20C55.7729 31.0457 46.8186 40 35.7729 40C31.2718 40 27.1189 38.5119 23.7768 36.0025C23.6891 35.9366 23.5826 35.9004 23.4728 35.9004H15.06C14.6812 35.9004 14.3348 35.6855 14.1654 35.3467L12.3031 31.623C12.1375 31.2908 12.3792 30.9007 12.7504 30.9004H18.08C18.4769 30.9004 18.718 30.4584 18.5169 30.1162C17.9771 29.1975 17.5084 28.2318 17.1188 27.2268C17.043 27.0314 16.8562 26.9004 16.6466 26.9004H2.80996C2.43119 26.9004 2.08482 26.6855 1.91543 26.3467L0.0531277 22.623C-0.112484 22.2908 0.129151 21.9007 0.500393 21.9004H15.3143C15.609 21.9004 15.8392 21.6469 15.8192 21.3529C15.7889 20.9058 15.7729 20.4547 15.7729 20C15.7729 19.4794 15.793 18.9635 15.8322 18.453C15.8549 18.1572 15.624 17.9004 15.3274 17.9004H0.750393C0.379151 17.9001 0.137516 17.509 0.303128 17.1768L2.16543 13.4531C2.33482 13.1143 2.68119 12.9004 3.05996 12.9004H16.7267C16.9344 12.9004 17.1199 12.7718 17.1969 12.579C17.599 11.5732 18.0799 10.6077 18.6327 9.69016C18.8389 9.34787 18.5982 8.90039 18.1986 8.90039H7.25039C6.87915 8.90009 6.63752 8.50896 6.80313 8.17676L8.66543 4.45312C8.83482 4.11434 9.18119 3.90039 9.55996 3.90039H23.7421C23.849 3.90039 23.9529 3.86598 24.0394 3.8032C27.3353 1.41136 31.389 0 35.7729 0ZM35.7729 4C26.9363 4 19.7729 11.1634 19.7729 20C19.7729 28.8366 26.9363 36 35.7729 36C44.6094 36 51.7729 28.8366 51.7729 20C51.7729 11.1634 44.6094 4 35.7729 4Z" fill="white"/><path d="M9.2178 31.4527C9.04841 31.1139 8.70214 30.8999 8.32337 30.8999H4.75042C4.37873 30.8999 4.13698 31.2911 4.30321 31.6235L6.16501 35.3471C6.3344 35.6859 6.68067 35.8999 7.05944 35.8999H10.6324C11.0041 35.8999 11.2458 35.5087 11.0796 35.1763L9.2178 31.4527Z" fill="#4ADFFF"/><path d="M35.7734 8C42.4009 8 47.7734 13.3726 47.7734 20C47.7734 26.6274 42.4009 32 35.7734 32C29.146 32 23.7734 26.6274 23.7734 20C23.7734 13.3726 29.146 8 35.7734 8ZM35.7734 12C34.3566 12 33.0264 12.3695 31.8721 13.0156C33.4832 13.0677 34.7733 14.39 34.7734 16.0137C34.7734 17.6705 33.4303 19.0137 31.7734 19.0137C30.1528 19.0137 28.8323 17.7288 28.7754 16.1221C28.1374 17.2709 27.7734 18.5928 27.7734 20C27.7734 24.4183 31.3552 28 35.7734 28C40.1917 28 43.7734 24.4183 43.7734 20C43.7734 15.5817 40.1917 12 35.7734 12Z" fill="white"/><path fill-rule="evenodd" clip-rule="evenodd" d="M219.977 32.8643C222.502 32.8643 224.618 31.6083 226.324 29.0961V19.1618C225.679 18.0199 224.772 17.093 223.604 16.381C222.435 15.669 221.199 15.313 219.896 15.313C217.787 15.313 215.946 16.1862 214.375 17.9326C212.816 19.6656 212.037 21.6941 212.037 24.0181C212.037 26.4765 212.81 28.5655 214.354 30.285C215.913 32.0046 217.787 32.8643 219.977 32.8643ZM217.026 27.9572C216.05 26.9318 215.534 25.7028 215.534 24.0636C215.534 22.6174 216.016 21.4306 217.05 20.3464L217.05 20.3479C217.05 20.347 217.051 20.3462 217.051 20.3453C218.096 19.2517 219.076 18.8954 220.128 18.8954L220.153 18.8955L220.178 18.8954C221.229 18.8954 222.21 19.2517 223.254 20.3453L223.28 27.9572C222.718 28.5403 222.151 28.9176 221.547 29.1346C221.099 29.3074 220.655 29.3716 220.213 29.3716C220.193 29.3716 220.173 29.3715 220.153 29.3712C220.133 29.3715 220.113 29.3716 220.093 29.3716C219.65 29.3716 219.206 29.3074 218.758 29.1346C218.154 28.9176 217.588 28.5403 217.026 27.9572ZM224.771 24.0636C224.771 25.7028 224.255 26.9318 223.28 27.9572L223.255 20.3464C224.29 21.4306 224.771 22.6174 224.771 24.0636Z" fill="white"/><path d="M199.398 24.0718C199.414 24.4546 199.1 24.7637 198.717 24.7637H185.223C185.532 26.4698 186.23 27.7192 187.319 28.5118C188.42 29.2909 189.616 29.6805 190.905 29.6805C192.714 29.6805 194.608 28.7133 196.125 27.3879C196.384 27.1614 196.768 27.1362 197.042 27.3438L198.532 28.4698C198.853 28.7126 198.904 29.1776 198.625 29.4676C196.462 31.7114 193.733 32.8643 190.744 32.8643C188.272 32.8643 186.204 32.018 184.538 30.3253C182.872 28.6327 182.039 26.5303 182.039 24.0181C182.039 21.6672 182.879 19.632 184.558 17.9124C186.251 16.1795 188.313 15.313 190.744 15.313C193.135 15.313 195.184 16.1929 196.89 17.9527C198.453 19.5527 199.289 21.5924 199.398 24.0718ZM185.586 21.9628H195.742C194.613 19.679 192.947 18.5371 190.744 18.5371C188.34 18.5371 186.62 19.679 185.586 21.9628Z" fill="white"/><path d="M151.061 16.6784C151.061 16.2927 151.373 15.98 151.759 15.98H153.868C154.254 15.98 154.567 16.2927 154.567 16.6784V25.3501C154.567 28.2384 155.836 29.6825 158.375 29.6825C159.504 29.6825 160.397 29.2997 161.055 28.5339C161.714 27.7548 162.043 26.6935 162.043 25.3501V16.6784C162.043 16.2927 162.355 15.98 162.741 15.98H164.81C165.196 15.98 165.509 16.2927 165.509 16.6784V25.9143C165.509 27.9966 164.83 29.7094 163.473 31.0528C162.117 32.3962 160.384 33.0679 158.275 33.0679C156.125 33.0679 154.385 32.3962 153.055 31.0528C151.726 29.7094 151.061 27.9563 151.061 25.7934V16.6784Z" fill="white"/><path d="M133.992 7.63054C133.992 7.24482 134.305 6.93213 134.691 6.93213H148.991C149.377 6.93213 149.69 7.24482 149.69 7.63054V9.73996C149.69 10.1257 149.377 10.4384 148.991 10.4384H143.564V31.9058C143.564 32.2916 143.251 32.6043 142.865 32.6043H140.796C140.411 32.6043 140.098 32.2916 140.098 31.9058V10.4384H134.691C134.305 10.4384 133.992 10.1257 133.992 9.73996V7.63054Z" fill="white"/><path d="M126.496 16.675C126.496 16.2893 126.809 15.9766 127.195 15.9766H129.264C129.649 15.9766 129.962 16.2893 129.962 16.675V31.9003C129.962 32.286 129.649 32.5987 129.264 32.5987H127.195C126.809 32.5987 126.496 32.286 126.496 31.9003V16.675Z" fill="white"/><path d="M99.0031 32.604C98.6174 32.604 98.3047 32.2913 98.3047 31.9056V16.678C98.3047 16.2923 98.6174 15.9796 99.0031 15.9796H101.072C101.458 15.9796 101.771 16.2923 101.771 16.678V18.5387C102.59 17.4909 103.369 16.7252 104.108 16.2415C104.86 15.7579 105.72 15.5161 106.687 15.5161C107.95 15.5161 108.938 15.7915 109.65 16.3423C110.375 16.8931 110.986 17.773 111.483 18.9821C112.357 17.773 113.196 16.8931 114.002 16.3423C114.822 15.7915 115.769 15.5161 116.843 15.5161C118.16 15.5161 119.295 16.0132 120.249 17.0073C121.203 17.9879 121.68 19.1567 121.68 20.5135V31.9056C121.68 32.2913 121.367 32.604 120.981 32.604H118.892C118.506 32.604 118.194 32.2913 118.194 31.9056V21.4203C118.194 19.5799 117.287 18.6596 115.473 18.6596C114.439 18.6596 113.559 19.1298 112.833 20.0702C112.121 21.0106 111.765 22.1726 111.765 23.5563V31.9056C111.765 32.2913 111.453 32.604 111.067 32.604H108.958C108.572 32.604 108.259 32.2913 108.259 31.9056V21.8838C108.259 19.7075 107.366 18.6193 105.579 18.6193C104.518 18.6193 103.618 19.0627 102.879 19.9493C102.14 20.8359 101.771 21.9308 101.771 23.2339V31.9056C101.771 32.2913 101.458 32.604 101.072 32.604H99.0031Z" fill="white"/><path d="M79.9277 16.6779C79.9277 16.2922 80.2404 15.9795 80.6261 15.9795H82.7356C83.1213 15.9795 83.434 16.2922 83.434 16.6779V25.3496C83.434 28.2379 84.7035 29.682 87.2425 29.682C88.3709 29.682 89.2643 29.2992 89.9225 28.5334C90.5808 27.7543 90.9099 26.693 90.9099 25.3496V16.6779C90.9099 16.2922 91.2226 15.9795 91.6083 15.9795H93.6775C94.0632 15.9795 94.3759 16.2922 94.3759 16.6779V25.9138C94.3759 27.9961 93.6975 29.7089 92.3406 31.0523C90.9838 32.3957 89.2508 33.0674 87.1417 33.0674C84.9923 33.0674 83.2526 32.3957 81.9227 31.0523C80.5927 29.7089 79.9277 27.9558 79.9277 25.7929V16.6779Z" fill="white"/><path d="M65.5 7.63054C65.5 7.24482 65.8127 6.93213 66.1984 6.93213H68.2675C68.6532 6.93213 68.9659 7.24482 68.9659 7.63054V28.4399C68.9659 28.8256 69.2786 29.1383 69.6643 29.1383H76.6301C77.0158 29.1383 77.3285 29.451 77.3285 29.8367V31.9058C77.3285 32.2916 77.0158 32.6043 76.6301 32.6043H66.1984C65.8127 32.6043 65.5 32.2916 65.5 31.9058V7.63054Z" fill="white"/><path d="M128.755 7.55279C128.586 7.214 128.239 7 127.86 7H124.288C123.916 7 123.674 7.39116 123.84 7.72361L125.702 11.4472C125.872 11.786 126.218 12 126.597 12H130.169C130.541 12 130.783 11.6088 130.617 11.2764L128.755 7.55279Z" fill="white"/><path d="M233.805 16.675C233.805 16.2893 234.117 15.9766 234.503 15.9766H236.572C236.958 15.9766 237.271 16.2893 237.271 16.675V31.9003C237.271 32.286 236.958 32.5987 236.572 32.5987H234.503C234.117 32.5987 233.805 32.286 233.805 31.9003V16.675Z" fill="white"/><path d="M225.312 16.675C225.312 16.2893 225.625 15.9766 226.011 15.9766H228.106C228.492 15.9766 228.805 16.2893 228.805 16.675V31.9003C228.805 32.286 228.492 32.5987 228.106 32.5987H226.011C225.625 32.5987 225.312 32.286 225.312 31.9003V16.675Z" fill="white"/><path d="M235.755 7.55279C235.586 7.214 235.239 7 234.86 7H231.288C230.916 7 230.674 7.39116 230.84 7.72361L232.702 11.4472C232.872 11.786 233.218 12 233.597 12H237.169C237.541 12 237.783 11.6088 237.617 11.2764L235.755 7.55279Z" fill="white"/><path d="M208.017 28.4527C207.847 28.1139 207.501 27.8999 207.122 27.8999H203.549C203.178 27.8999 202.936 28.2911 203.102 28.6235L204.964 32.3471C205.133 32.6859 205.479 32.8999 205.858 32.8999H209.431C209.803 32.8999 210.045 32.5087 209.878 32.1763L208.017 28.4527Z" fill="white"/><path d="M172.866 16.0704C173.252 16.0704 173.564 16.3831 173.564 16.7688V19.496C174.343 18.1258 175.102 17.1384 175.841 16.5339C176.594 15.9159 177.568 15.6069 178.763 15.6069C178.959 15.6069 179.205 15.6343 179.501 15.689C179.892 15.7614 180.117 16.1671 180.001 16.5481L179.331 18.7495C179.226 19.0931 178.878 19.2988 178.524 19.2385C178.192 19.1818 177.956 19.1535 177.816 19.1535C176.634 19.1535 175.64 19.5699 174.834 20.4028C174.041 21.2223 173.645 22.25 173.645 23.4859V31.9964C173.645 32.3821 173.332 32.6948 172.947 32.6948H170.837C170.451 32.6948 170.139 32.3821 170.139 31.9964V16.7688C170.139 16.3831 170.451 16.0704 170.837 16.0704H172.866Z" fill="white"/></svg></div>`;
@@ -3164,7 +3268,7 @@ window.DEMO_SCENARIOS = [
   { id: 'h-assigned-list', page: 'view', group: 'Hover (#01-3)', label: 'Assigned to 內容：超過 5 組', icon: 'format_list_bulleted', tip: '前 5 筆（字母升冪）＋ ...+2 more, view full list in detail page.' },
   { id: 'h-assigned-dash', page: 'view', group: 'Hover (#01-3)', label: 'Assigned to：-- 說明', icon: 'help' },
   { id: 'h-pin',      page: 'view', group: 'Hover (#01-3)', label: 'Pin 提示（已釘選）', icon: 'push_pin', tip: '⚠ 未確認：Figma 只在已釘選那顆畫出提示，文案又說「超過 30 天」；FE 一律掛。' },
-  { id: 'h-name',     page: 'view', group: 'Hover (#01-3)', label: 'Resource 名稱＋ID', icon: 'badge', tip: '一律顯示 “Name (ID)”。' },
+  { id: 'h-name',     page: 'view', group: 'Hover (#01-3)', label: 'Resource 名稱＋ID', icon: 'badge', tip: '一律顯示「Name (ID)」。' },
   { id: 'h-detail',   page: 'view', group: 'Hover (#01-3)', label: 'Check Anomaly Details', icon: 'description' },
   { id: 'view-email', page: 'view', group: '通知信', label: '看通知信（Notification Emails）', icon: 'mail', tip: 'Anomaly Detection 的告警信（Figma Email Notification）。開新分頁，信裡的 View Details／See All 會連回這支 prototype 的詳情頁與列表。' },
   { id: 'd-detail',   page: 'view', group: '詳情入口', label: '點詳情 icon → 進詳情頁', icon: 'description', tip: '列表 Action 欄的 description icon 進詳情頁（hash #detail/<alertId>，進頁先跑 650ms skeleton）。Row 本身不可點。' },
@@ -3281,6 +3385,8 @@ window.DEMO_APPLY = function (id) {
   if (id === 'v-expand') { resetData(); state.expanded.add('r1'); showList({ noSkel: true }); return; }
   if (id === 'v-expand-many') { resetData(); ['r1', 'r3', 'r7'].forEach(x => state.expanded.add(x)); showList({ noSkel: true }); return; }
   if (id === 'v-t2') { resetData(); setRole('t2m'); showList({ noSkel: true }); return; }
+  /* X-9r2 第三輪 B12：T2 沒有 Assigned to 欄（稿 #01-7），Assigned to 的 hover 情境從 T2 套用時 simHover 找不到元素、畫面沒變；先切回看得到那一欄的 Admin */
+  if (/^h-assigned-/.test(id) && hideAssigned()) setRole('admin');
   if (id === 'h-assigned-info') { resetData(); showList({ noSkel: true }); later(() => simHover('#assigned-info')); return; }
   if (id === 'h-assigned-list') { resetData(); showList({ noSkel: true }); later(() => simHover('.tr[data-rid="r8"] .td[data-tip]:not(.res)')); return; }
   if (id === 'h-assigned-dash') { resetData(); showList({ noSkel: true }); later(() => simHover('.tr[data-rid="r2"] .td[data-tip]:not(.res)')); return; }
@@ -3348,7 +3454,20 @@ window.DEMO_APPLY = function (id) {
     if (!el || (el === cur && tip.style.display !== 'none')) return;
     /* Fable §5 #5：data-tip-trunc 的元件只在文字被截斷時才顯示（#02-3「超過呈現 …，懸停可查看完整內容」）；表格儲存格維持「不論長短統一顯示」 */
     if (el.dataset.tipTrunc != null && el.scrollWidth <= el.clientWidth) return;
-    cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place();
+    show(el);
+  });
+  /* X-9r2 第三輪 B8②（照推薦，Kabin 未勾）：data-tip-maxw 讓單顆 tooltip 放寬 max-width——Assigned to 標題說明稿 #01-3 是三行，Chrome 字寬比 Figma 寬約 5%，400 會折成四行、最後一行只剩「group.」；416 剛好三行（量到 ≥408 即三行） */
+  function show(el) { cur = el; tip.textContent = el.dataset.tip; tip.style.maxWidth = el.dataset.tipMaxw ? el.dataset.tipMaxw + 'px' : ''; tip.style.display = 'block'; place(); }
+  /* X-9r2 第三輪 CC6：鍵盤 Tab 到有說明的 info icon 也顯示 tooltip（比照 shared demo-fab.js 的 focusin；只在 :focus-visible 時，滑鼠點擊不重複觸發） */
+  document.addEventListener('focusin', e => {
+    const el = e.target.closest && e.target.closest('[data-tip]');
+    if (!el || !el.matches(':focus-visible')) return;
+    if (el.dataset.tipTrunc != null && el.scrollWidth <= el.clientWidth) return;
+    show(el);
+  });
+  document.addEventListener('focusout', e => {
+    const el = e.target.closest && e.target.closest('[data-tip]');
+    if (el && el === cur) { cur = null; tip.style.display = 'none'; }
   });
   document.addEventListener('mouseout', e => {
     const el = e.target.closest && e.target.closest('[data-tip]');
@@ -3357,6 +3476,21 @@ window.DEMO_APPLY = function (id) {
   window.addEventListener('scroll', place, true);
   window.addEventListener('resize', place);
 })();
+</script>
+<script>
+/* ============================================================
+ * X-9r2 F14（2026-11-05）：Detection Sensitivity 下拉的鍵盤——↑↓ Home End 在選項間移焦點、Enter／Space 選、Tab 離開即關（Esc 原本的全域處理已會關並回觸發欄）；觸發欄 ↓↑ 可開
+ * ============================================================ */
+document.addEventListener('keydown', e => {
+  const t = e.target;
+  if (t.matches && t.matches('#sm-sel') && (e.key === 'ArrowDown' || e.key === 'ArrowUp') && !POP) { e.preventDefault(); t.click(); return; }
+  if (!POP || !t.matches || !t.matches('.pop .mi')) return;
+  const its = Array.from(POP.pop.querySelectorAll('.mi')); let i = its.indexOf(t);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); its[(i + (e.key === 'ArrowDown' ? 1 : -1) + its.length) % its.length].focus(); }
+  else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); its[e.key === 'Home' ? 0 : its.length - 1].focus(); }
+  else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ACT['sm-pick'](t); }
+  else if (e.key === 'Tab') { closePop(); }
+});
 </script>
 <script>
 /* === Inlined: shared/demo-fab.js === */
@@ -3835,6 +3969,14 @@ window.DEMO_APPLY = function (id) {
       } catch (err) {}
       return 8;
     }
+    /* X-9r1 B1（2026-11-05）：固定頂欄的下緣。tooltip 放在錨點上方時不能壓到頂欄（頁首那排 info icon／截圖鈕／幣別鈕的 tooltip 之前 top 9～54，蓋在鈴鐺與頭像上）；頂欄捲走或沒有頂欄時回 8 */
+    function topMin() {
+      try {
+        var tb = document.querySelector('.lt-topbar');
+        if (tb) { var b = tb.getBoundingClientRect().bottom; if (b > 0) return b + 4; }
+      } catch (err) {}
+      return 8;
+    }
     function place() {
       if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
@@ -3846,10 +3988,11 @@ window.DEMO_APPLY = function (id) {
       /* X-9r1 S2：放不下改靠右緣時，左緣不能落進 sidebar（600 寬在 1280 中間位置會伸進去）；沒有 sidebar 的頁維持 8，收合時 21＋8 */
       if (x + tw > vw - 8) x = Math.max(minX(), Math.min(r.right + 2, vw - 8) - tw);
       if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
+      x = Math.max(8, x);   /* X-9r1 11-13 S-A7：至少離視窗左緣 8（sidebar 裡的錨點不套 minX()，logo tooltip 原本貼在 left 0） */
       var below = cur.dataset.tipPos === 'below';
       var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
       var y = below ? r.bottom + dy : r.top - th - 6;
-      if (y < 8) y = r.bottom + 4;
+      if (y < topMin()) y = r.bottom + 4;   /* X-9r1 B1：上方放不下或會蓋到頂欄就翻到下方 */
       if (y + th > vh - 8) y = Math.max(8, r.top - th - 6);
       tip.style.left = x + 'px'; tip.style.top = y + 'px';
     }

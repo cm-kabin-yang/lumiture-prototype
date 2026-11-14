@@ -83,6 +83,7 @@
   --lt-color-error-light:   #FFEBEF;   /* TBC: Figma audit needed */
   --lt-color-warning-base:  #FC9A0F;   /* TBC: Figma audit needed */
   --lt-color-warning-light: #FEF3E1;   /* TBC: Figma audit needed */
+  --lt-color-warning-dark:  #EC6F09;   /* CM Color Kit Warning/Dark（2026-11-02 補；FE warning.dark，LumiTag 過期與分到 0 提示用） */
   --lt-color-info-base:     #0B6DD7;   /* = blue-60，符合 Figma info usage */
   --lt-color-info-light:    #E6F6FF;   /* TBC: Figma audit needed */
 
@@ -139,6 +140,42 @@
 
   /* --- Typography: Letter Spacing (對齊 Figma: 全部 0) --- */
   --lt-tracking-normal: 0;
+
+  /* --- Typography: CMDS 文字樣式（composite，用在 `font:` 簡寫）2026-11-02 ---
+   * 一對一對應 Figma「CM Typography」的文字樣式；寫 CSS 一律從這組挑，不自己組字級／字重／行高。
+   * `font:` 簡寫會把 font-variant-numeric 重設成 normal，數字欄要另外補 tabular-nums。
+   * Link Bold 1 稿上自帶底線；底線由元件決定（Lumiture 文字按鈕不加底線，見 Guideline Text Button）。 */
+  --lt-type-h3:               700 24px/36px var(--lt-font-sans);    /* Headers/H3 頁面標題 */
+  --lt-type-h4:               700 20px/30px var(--lt-font-sans);    /* Headers/H4 頁面副標題 */
+  --lt-type-h5:               700 18px/27px var(--lt-font-sans);    /* Headers/H5 功能名稱 */
+  --lt-type-h6:               700 16px/24px var(--lt-font-sans);    /* Headers/H6 小標題 */
+  --lt-type-body:             400 14px/24.5px var(--lt-font-sans);  /* Body/Body Regular 內文 */
+  --lt-type-body-medium:      500 14px/24.5px var(--lt-font-sans);  /* Body/Body Medium 內文重點 */
+  --lt-type-body-bold:        700 14px/24.5px var(--lt-font-sans);  /* Body/Body Bold 內文標題 */
+  --lt-type-caption:          400 12px/18px var(--lt-font-sans);    /* Caption/Caption Regular 註記 */
+  --lt-type-caption-bold:     700 12px/18px var(--lt-font-sans);    /* Caption/Caption Bold 重要註記 */
+  --lt-type-button-regular-0: 400 12px/18px var(--lt-font-sans);    /* Content/Button Regular 0（chip 字） */
+  --lt-type-button-regular-1: 400 14px/21px var(--lt-font-sans);    /* Content/Button Regular 1（下拉選項字） */
+  --lt-type-button-bold-1:    700 14px/21px var(--lt-font-sans);    /* Content/Button Bold 1 */
+  --lt-type-button-bold-2:    700 16px/24px var(--lt-font-sans);    /* Content/Button Bold 2 */
+  --lt-type-link-bold-1:      700 14px/24.5px var(--lt-font-sans);  /* Content/Link Bold 1 超連結 */
+  --lt-type-link-medium-1:    500 14px/24.5px var(--lt-font-sans);  /* Content/Link Medium 1 超連結（2026-11-03 補，LumiTag Edit allocation card） */
+
+  /* --- Color: CM Color Kit（chip 等元件用；Light＝底、Main＝框、Dark＝字）2026-11-02，先收 #3、#11，其他色用到再補 --- */
+  --lt-kit-3-light:  var(--lt-turquoise-10);   /* #F0FFFF  #3 Turquoise Blue */
+  --lt-kit-3-main:   var(--lt-chart-3);        /* #9CF3FF */
+  --lt-kit-3-dark:   var(--lt-turquoise-70);   /* #34B5D9  CM Color Kit/Dark/#3 Dark */
+  --lt-kit-11-light: var(--lt-grey-100);       /* #F2F2F2  #11 Gray */
+  --lt-kit-11-main:  var(--lt-grey-400);       /* #B3B3B3 */
+  --lt-kit-11-dark:  #7C7C7C;                  /*          CM Color Kit/Dark/#11 Dark */
+  --lt-kit-4-light:  #E6FFF8;                  /* CM Color Kit/Light/#4 Light（2026-11-03 補，LumiTag Preview 狀態標籤） */
+  --lt-kit-4-main:   var(--lt-chart-4);        /* #00DCC2 */
+  --lt-kit-4-dark:   var(--lt-color-success);  /* #00B5A6  CM Color Kit/Dark/#4 Dark */
+  --lt-kit-6-light:  var(--lt-color-warning-light); /* #FEF3E1  #6 Tangerine Orange（2026-11-03 補，LumiTag Not split／Partially split） */
+  --lt-kit-6-main:   var(--lt-chart-6);        /* #F3BE68 */
+  --lt-kit-6-dark:   var(--lt-color-warning-base);  /* #FC9A0F  CM Color Kit/Dark/#6 Dark */
+  --lt-color-attention-main:    #FFA500;       /* CDP color/Attention/Attention1 Main（CMDS Alert / Large orange 頂條與 icon，2026-11-03 補） */
+  --lt-color-attention-lighter: #FFF3DE;       /* CDP color/Attention/Attention4 Lighter（Alert icon 底） */
 
   /* --- Shadow: 對齊 CMDS Figma 規範 (2026-05-12 audit)
    * 來源：Figma node 20599-107518 — CMDS 4 個官方 shadow variables
@@ -291,7 +328,7 @@
  * - ~~Chart palette~~ ✅ 已加入（2026-05-12 從 Figma General Behavior file audit）
  * - Gradient tokens (Figma 有 Lumiture.ai Blue / Orange / Lemon C 等)
  * - Opacity tokens (Figma 有 CM Opacity Color 系列)
- * - Composite typography tokens (--lt-type-h1, --lt-type-body 等 style sets)
+ * - ~~Composite typography tokens~~ ✅ 已加入 --lt-type-*（2026-11-02，H1／H2 用到再補）
  * - Focus / Inset shadow 特殊變體
  * - Dark mode 對應 token
  *
@@ -388,8 +425,18 @@ input{font-family:inherit}
 .fsel{display:flex;flex-wrap:wrap;gap:8px}
 /* ⏸ PARKED（UX 提案 點 1）：搜尋框一律靠右（掉到第二行也靠右，不貼左） */
 .ux-p1 .fbar{justify-content:flex-start}
-.ux-p1 .fs{margin-left:auto;flex:1 1 200px;max-width:240px}
+.ux-p1 .fs{margin-left:auto;flex:1 1 150px;max-width:240px}   /* X-9r5 B20（11-12）：basis 200→150。選了自訂日期（兩個完整日期＋Clear filter）篩選列內容 916，1440 卡片內寬 1078 剩 154，basis 200 讓搜尋框掉到第二行、表格被推下一列；150 放得下（placeholder 只有 Search），空間夠時仍長到 240 */
 .ux-p1 .fs .search{width:100%}
+/* 2026-11-13 Kabin 裁決：1366／1280 選了自訂日期也不換行，推翻 10-14「下拉 140 不縮」。1280 以上篩選列不折行：空間不夠時搜尋框先縮（最小 100），再由四個下拉一起縮（沒選值時縮到 placeholder 放得下為止，有選值時最小 100、截斷靠 tooltip）；1280 以下照舊換行 */
+@media(min-width:1280px){
+  .ux-p1 .fbar,.ux-p1 .fl,.ux-p1 .fsel{flex-wrap:nowrap}
+  .ux-p1 .fl,.ux-p1 .fsel{flex:0 1 auto;min-width:0}
+  .ux-p1 .fsel>.sel,.ux-p1 .fsel>.sel-wrap{flex:0 1 140px;min-width:auto;width:140px}
+  .ux-p1 .fsel .sel .tx{min-width:62px}
+  .ux-p1 .fsel .sel .tx.ph{min-width:max-content}   /* 沒選值時下拉最窄縮到 placeholder 剛好放完（Select Country 不截）；有選值時最窄 100，截斷靠 tooltip */
+  .ux-p1 .fsel>.sel-wrap>.sel{width:100%}
+  .ux-p1 .fs{flex:1 10 150px;min-width:100px}
+}
 /* 點 6 加了第四個下拉之後：下拉觸發欄維持 FE 的 140（Kabin 2026-10-14 裁決，不縮）。1280（sidebar 展開、卡片內寬 918）各篩選都有選值時放不下單列，搜尋框換到第二行並靠右（flex-wrap＋margin-left:auto）；1440 以上仍單列。截斷的觸發欄文字靠 tooltip。 */
 .fs{display:flex;flex-direction:column;gap:4px}
 .search{display:flex;align-items:center;gap:6px;height:36px;width:240px;padding:0 12px;border:1px solid var(--al-field-border);border-radius:var(--al-radius-field);background:#fff;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}
@@ -401,7 +448,12 @@ input{font-family:inherit}
 /* ⚠ DEVIATION: FE 搜尋框的 search icon 在右（endAdornment）；CMDS Text Field Search 變體＝icon 在左（同 rightsizing v2 .rs-search，Kabin 2026-10-14 裁決）。篩選列搜尋框與下拉內建搜尋一律 icon 在左、18px */
 .search .material-symbols-outlined{font-size:18px;flex-shrink:0;color:var(--lt-grey-500);font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20}
 .search.is-disabled{background:var(--lt-grey-100);border-color:var(--lt-grey-200)}
+.sr-only{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .help-err{font-size:12px;line-height:18px;color:var(--lt-color-error)}
+/* X-9r5 C 層 B29（11-13）：搜尋只打 1～2 個字時的 `Enter at least 3 characters` 不佔高度（原本篩選列 36→58、表格掉 22px 再跳回去）。絕對定位在搜尋框正下方 1px，行高 15 剛好塞進篩選列與表格之間的 16 間距；位置（框下方）、字級 12、顏色不變，提案點 1 開著時右緣對齊搜尋框（框靠卡片右緣，往左長） */
+.fs{position:relative}
+.fs .help-err{position:absolute;top:calc(100% + 1px);left:0;line-height:15px;white-space:nowrap;z-index:6}
+.ux-p1 .fs .help-err{left:auto;right:0}
 /* 下拉觸發欄（MultiSelect／GroupedMultiSelect：width 140、36h）*/
 .sel{display:flex;align-items:center;justify-content:space-between;gap:8px;height:36px;padding:0 10px;background:#fff;border:1px solid var(--al-field-border);border-radius:var(--al-radius-field);font-size:var(--lt-fs-14);color:var(--lt-color-text-primary);cursor:pointer;text-align:left;width:140px;flex-shrink:0;min-width:0;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}
 .sel-wrap{position:relative;display:inline-flex}
@@ -509,6 +561,8 @@ input{font-family:inherit}
 .tbl-scroll::-webkit-scrollbar-thumb:horizontal{border-width:3px 0 2px 0}
 .tbl-scroll::-webkit-scrollbar-corner{background:#fff}
 .tr{display:grid;grid-template-columns:var(--cols);min-width:var(--minw)}
+.tbl-scroll{--em-min:226px}   /* X-9r5 B21：見 columns() 的 email 欄 */
+@media(max-width:1339px){.tbl-scroll{--ip-shave:8px;--desc-shave:8px}}   /* 2026-11-13 Kabin 裁決 1280 User 欄也不截：User 226 多出的 8／16px 從 IP／Location 與 Description 各讓 8（IP 最長 140.112.8.142 仍放得下；Description 本來就截斷靠 tooltip） */
 .td,.th{height:50px;padding:0 16px;display:flex;align-items:center;min-width:0;background:#fff;border-bottom:1px solid var(--lt-grey-200);font-size:var(--lt-fs-14);line-height:24.5px;color:var(--lt-color-text-primary)}
 .th{white-space:nowrap;background:var(--lt-color-primary-bg);font-weight:var(--lt-fw-bold);color:var(--lt-color-text-heading);border-bottom-color:var(--lt-grey-400);gap:4px;user-select:none}
 .th-row{position:sticky;top:0;z-index:5}
@@ -518,6 +572,8 @@ input{font-family:inherit}
 .si{font-size:16px;color:var(--lt-grey-300);font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20;flex-shrink:0}
 .th.on .si{color:var(--lt-color-primary)}
 .td .ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+/* X-9r5 CQ1（Kabin 2026-11-13 裁決）：User Activity 的 Description 最多兩行（line-clamp:2），列高維持 50（兩行 2×21＝42），跟同列 IP／Location 兩行格一樣。⏸ PARKED／偏離 FE（FE SingleLineCell 單行）：併進 UX 提案點 5（欄位重排），只在點 5 開著時套用（.ell-2 只由 p5 的 Description 輸出），點 5 關掉回到 FE 的單行 */
+.td .ell.ell-2{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;white-space:normal;text-overflow:clip;line-height:21px;overflow-wrap:anywhere}
 .tbody .tr:hover .td{background:var(--lt-grey-50)}   /* Review #13：列不可點，hover 用 FE VirtualizedTable／CB／AD 一致的 #F6F6F6（#F2FAFF 是 Guideline 可點列） */
 .td .hl{color:var(--lt-color-primary-hover);font-weight:var(--lt-fw-bold)}   /* 搜尋命中：藍字粗體、無底色（Figma 8117:40065，rightsizing v2 已查證）。⚠ DEVIATION: FE HighlightText 預設只有粗體 */
 .td .rs{color:var(--lt-color-text-secondary)}   /* 角色後綴 (Owner) */
@@ -580,6 +636,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
   <div class="main">
     <header id="lt-topbar"></header>
     <main class="content" id="content"></main>   <!-- X-9r5 LB6（C14）：內容區改 <main> landmark（.content／#content 不變） -->
+    <div id="sr-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>   <!-- X-9r5 C 層 C-C4（11-13）：篩選、搜尋、排序後讀屏的狀態播報（同 Group List #sr-status） -->
     <div class="footer">
       <span class="footer-version">Audit Log Prototype<span class="ver-tag">v1</span></span>
       <span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin</span>
@@ -852,14 +909,14 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
   }
   function _renderLogo() {
     var href = _homeHref();
-    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-sb-logo">';
+    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-sb-logo">';
     return open + _logoBody(LOGO_ICON) + (href ? '</a>' : '</div>');
   }
   // 收合時顯示在 topbar 左側的 logo（同一組圖形，mask id 改 ltT* 避免跟 sidebar 那份撞 id）
   function _renderTopbarLogo() {
     var href = _homeHref();
     var icon = LOGO_ICON.replace(/ltH(ring|bars|leg)/g, 'ltT$1');
-    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-tb-logo">';
+    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-tb-logo">';
     return open + _logoBody(icon) + (href ? '</a>' : '</div>');
   }
   function _mountTopbarLogo(host) {
@@ -1111,7 +1168,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
  *     version:     'v1.19.0',               // Software version 列
  *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
  *     quota: {                              // AI Quota box 數據；total 已含 add-on
- *       refreshDate: '2 Nov. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）
+ *       refreshDate: '2 Dec. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）。沒給（或給空值）就自動算下一個 2 號（X-9r1 11-13 S-A1，LumitureTopbar.nextRefreshDate）
  *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
  *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
  *     },
@@ -1122,6 +1179,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
  *   window.LumitureTopbar.setRole('Manager - ...')— 只更新 role chip（Demo FAB role 切換用）
  *   window.LumitureTopbar.setPlan('Essential')    — 切 plan（連動 AI Quota box 顯示項目）
  *   window.LumitureTopbar.setQuota({analyses:{...}, rightsizing:{...}, refreshDate, addonPacks})
+ *   window.LumitureTopbar.nextRefreshDate()        — 依今天算下一個計費週期錨日（每月 2 號），回 '2 Dec. 2026' 這種寫法
  *   window.LumitureTopbar.openMenu() / closeMenu() / toggleMenu()
  *   window.LumitureTopbar.rerender()
  *   window.LumitureTopbar.openRoleDialog() / closeRoleDialog()   — View as Another Role 彈窗（#01-5；頁面掛勾見下方 role 區塊註解）
@@ -1130,6 +1188,16 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
  */
 (function () {
   'use strict';
+
+  /* X-9r1 11-13 S-A1：下一個計費週期錨日（每月 2 號），格式照稿的「2 Apr. 2028」；今天 ≥ 2 號就取下個月。
+     原本寫死 '2 Nov. 2026'，過了那天 13 頁的 Account Menu 都顯示過期日（User Menu 頁自己算過，這裡搬進 shared 讓全站共用）。 */
+  function _nextRefreshDate() {
+    var M = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'];
+    var d = new Date(), y = d.getFullYear(), m = d.getMonth();
+    if (d.getDate() >= 2) m += 1;
+    if (m > 11) { m = 0; y += 1; }
+    return '2 ' + M[m] + ' ' + y;
+  }
 
   // ===== Defaults ===== (預設給 Standard plan + Normal 狀態，所有既有 prototype 直接吃，不破版)
   var DEFAULT_USER = {
@@ -1144,7 +1212,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     version: 'v1.19.0',
     addonPacks: 0,
     quota: {
-      refreshDate: '2 Nov. 2026',          // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期（原 2 Jul. 2026 已過期）
+      refreshDate: _nextRefreshDate(),     // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期；X-9r1 11-13 S-A1：改成依今天自動算（原寫死 2 Nov. 2026 已過期）
       analyses:    { used: 32,  total: 80 },
       rightsizing: { used: 410, total: 1000 },
     },
@@ -1210,8 +1278,11 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     /* ---------- Account Menu popover ----------
        2026-10-14 逐格對 Figma #01-6（hover）／#01-7（loading & error）：左右內距 24、方案列 37 高、姓名 16/700、角色 chip 藍 #004FB0 方角、
        AI Quota 每列 24 高、狀態色 #00DCC2／#F4A938／#FF403D、功能列 40 高（外包 8／16）、陰影 0 0 6px .2。舊值（內距 16、狀態色提亮）是 06-22 的目視估計 */
-    '.lt-am-backdrop{position:fixed;inset:0;z-index:1000;background:transparent}',
-    '.lt-am{position:fixed;top:64px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
+    /* X-9r1 11-13 S-A2：背板 1000 → 997。Demo FAB 999、面板 998，背板要讓到它們底下，否則選單開著時（User Menu 頁進頁就開著）
+       第一下點 FAB 只會被背板吃掉去關選單，面板不開。選單本體 #lt-am 維持 1001。不要去抬 FAB 的層級：
+       Cost Dashboard、Group List、All Resource List 有 1000 以上的彈窗遮罩，FAB 抬上去會浮在遮罩上。 */
+    '.lt-am-backdrop{position:fixed;inset:0;z-index:997;background:transparent}',
+    '.lt-am{position:fixed;top:68px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
     'box-shadow:0 0 6px rgba(0,0,0,.2);font-family:\'Noto Sans\',sans-serif;color:#fff;',
     'animation:lt-am-in .14s ease;transform-origin:top right}',   /* 不設 overflow:hidden：hover tooltip（寬 400）要能伸出選單左邊，圓角改由第一／最後一個子區塊自己帶 */
     '@keyframes lt-am-in{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}',
@@ -1308,6 +1379,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
   function _user() {
     var u = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
     u.quota = Object.assign({}, DEFAULT_USER.quota, (window.LUMITURE_USER || {}).quota || {});
+    if (!u.quota.refreshDate) u.quota.refreshDate = _nextRefreshDate();   /* 頁面傳 undefined／null／'' 也吃自動值（S-A1） */
     return u;
   }
   function _status(used, total) {
@@ -1478,7 +1550,8 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     var m = document.getElementById('lt-am');
     return m ? Array.prototype.slice.call(m.querySelectorAll('.lt-am-item,.lt-q-err a,.lt-q-item.has-tip')) : [];
   }
-  function _openMenu() {
+  function _openMenu(opts) {
+    var noFocus = !!(opts && opts.focus === false);   /* X-9r1 11-13 S-B9：程式開選單（User Menu 進頁、Demo 情境）不搶焦點 */
     var wasOpen = _menuOpen, items0 = wasOpen ? _menuItems() : [], idx = items0.indexOf(document.activeElement);
     var u = _user();
     _menuHost().innerHTML = _renderMenu(u);
@@ -1486,7 +1559,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     var chip = document.getElementById('lt-tb-user');
     if (chip) { chip.classList.add('is-open'); chip.setAttribute('aria-expanded', 'true'); }
     var items = _menuItems(), t = null;
-    if (!wasOpen) t = document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
+    if (!wasOpen) t = noFocus ? null : document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
     else if (idx > -1 && items.length) t = items[Math.min(idx, items.length - 1)];            // 重繪（Retry、切 plan…）：焦點留在原位
     if (t) t.focus({ preventScroll: true });
   }
@@ -1559,7 +1632,7 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
     '.lt-rd-btn.pri{background:#004FB0;color:#fff;border-color:#004FB0;min-width:160px}',
     '.lt-rd-btn.pri:hover{background:#0B6DD7;border-color:#0B6DD7}',
     '.lt-rd-btn.out{background:#fff;color:#004FB0;border-color:#004FB0}',
-    '.lt-rd-btn.out:hover{background:#F2FAFF}',
+    '.lt-rd-btn.out:hover{background:#F6F6F6;color:#0B6DD7;border-color:#0B6DD7}',   /* X-9r1 11-13 S-KCR：照全站外框主色鈕 hover（Guideline .btn--outlined-primary:hover） */
     '.lt-rd-btn[disabled]{background:#CCCCCC;border-color:#CCCCCC;color:#fff;cursor:not-allowed}',
     '.lt-rd-btn:focus-visible,.lt-rd-sel:focus-visible{outline:2px solid #004FB0;outline-offset:2px}',
     '.lt-rd-spin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:lt-rd-spin .8s linear infinite}',
@@ -1658,8 +1731,9 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
         '" aria-controls="lt-rd-list" aria-labelledby="lt-rd-t"><span class="lt-rd-v">' + _esc(sel.name) + '</span><span class="lt-rd-chip">' + _esc(sel.role) +
         '</span><span class="material-symbols-outlined lt-rd-arr" aria-hidden="true">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
       '<div class="lt-rd-act"><button type="button" class="lt-rd-btn out" id="lt-rd-keep"' + (r.loading ? ' disabled' : '') + '>' + ROLE_COPY.keep + '</button>' +
-        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') + '>' +
-        (r.loading ? '<span class="lt-rd-spin" role="status" aria-label="Loading"></span>' : ROLE_COPY.cont) + '</button></div>' +
+        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') +
+        (r.loading ? ' aria-label="' + _esc(ROLE_COPY.cont) + '" aria-busy="true"' : '') + '>' +   /* X-9r1 11-13 S-A4：讀取中名稱維持 Continue（同 Auth 11-05 N2） */
+        (r.loading ? '<span class="lt-rd-spin" aria-hidden="true"></span>' : ROLE_COPY.cont) + '</button></div>' +
     '</div></div>';
   }
   function _rdRender(keepFocusId) {
@@ -1841,10 +1915,12 @@ body #gl-tip{max-width:400px;white-space:pre-line;font-size:14px;line-height:24.
       window.LUMITURE_USER = Object.assign({}, cur, {
         quota: Object.assign({}, DEFAULT_USER.quota, cur.quota || {}, q || {}),
       });
+      if (!window.LUMITURE_USER.quota.refreshDate) window.LUMITURE_USER.quota.refreshDate = _nextRefreshDate();   /* 空值用自動值（S-A1） */
       if (q && typeof q.addonPacks !== 'undefined') window.LUMITURE_USER.addonPacks = q.addonPacks;
       if (_menuOpen) _openMenu();
     },
-    openMenu: _openMenu,
+    openMenu: _openMenu,   /* openMenu({focus:false})：程式開選單不搶焦點（S-B9） */
+    nextRefreshDate: _nextRefreshDate,
     closeMenu: _closeMenu,
     toggleMenu: _toggleMenu,
     rerender: function () { _render(); if (_menuOpen) _openMenu(); },
@@ -2372,15 +2448,15 @@ const COPY = {
   clear: 'Clear filter',
   minSearch: 'Enter at least 3 characters',                                            // FE SEARCH_LABELS.searchMinLengthError
   empty: { title: 'No Data Available', desc: 'There are no data available.' },        // FE emptyTable 預設文案
-  /* ⚠ DEVIATION: FE 篩選或搜尋沒結果也是同一個 emptyTable（說「沒有資料」會讓人以為這個組織沒有紀錄）。Fable §3「直接做」：有篩選時改 No data found／Try adjusting your filters＋清除鈕 */
-  noResult: { title: 'No data found', desc: 'Try adjusting your filters.', btn: 'Clear Filter' },
+  /* ⚠ DEVIATION: FE 篩選或搜尋沒結果也是同一個 emptyTable（說「沒有資料」會讓人以為這個組織沒有紀錄）。Fable §3「直接做」：有篩選時改 No Data Found／Try adjusting your filters＋清除鈕 */
+  noResult: { title: 'No Data Found', desc: 'Try adjusting your filters.', btn: 'Clear filter' },   // X-9r5 B22（11-12）：跟篩選列的連結同一個動作同一種寫法（PRD 原文 Clear filter；FE 只有 Reset，沒有這個按鈕）
   /* ⚠ 設計端暫擬：FE audit-log 沒有 error 分支（Fable §3：Empty State 的 Error 變體） */
   /* Review #10：標題與說明對齊 FE 共用 EmptyState `error`（Customized Budget／Anomaly Detection／All Resource List／Overview 也都沿用這句）。Retry 鈕 FE 共用元件沒有，⚠ 設計端暫擬 */
   error: { title: 'Something Went Wrong', desc: 'Please ensure you have a stable internet connection\nand try refreshing the page.', btn: 'Retry' },
   /* ⚠ 設計端暫擬：PRD 只寫「僅 Admin 以上可進入、一般使用者沒有入口」，沒畫誤入的畫面；照 All Resource List v1／Overview v2 的 no-access 整頁模式 */
   noAccess: { title: 'You do not have access to this page', desc: 'Please contact your organization’s administrator if you believe this is a mistake.', btn: 'Back to Overview' },
   /* ⚠ 設計端暫擬：AI Token（LT-3091）是另一份規格，正式 FE 08-11 沒有這個 tab */
-  ai: { title: 'AI Token audit log is coming soon', desc: 'This tab is covered by a separate spec (LT-3091) and will be designed later.\nLogin Activity and User Activity are available now.' },
+  ai: { title: 'AI Token Audit Log Is Coming Soon', desc: 'This tab is covered by a separate spec (LT-3091) and will be designed later.\nLogin Activity and User Activity are available now.' },
   /* 每個 UX 提案的 tooltip（badge 只寫「UX 提案」四個字，說明放這裡）*/
   pk: {
     p1: '點 1・篩選列（方案 A）：日期觸發欄在快捷範圍時只顯示標籤（All Time），Clear filter 只在有篩選時出現，搜尋框一律靠右（1024 以下換行也靠右）。FE 現況：兩個完整日期＋Reset 永遠顯示，1280 展開 sidebar 時搜尋框會掉到第二行左邊。',
@@ -2389,7 +2465,7 @@ const COPY = {
     p4: '點 4・自訂時間（方案 A）：行內 popover 補 Reset／Cancel／Apply；快捷立即套用、自訂才要 Apply；觸發欄顯示標籤；開在下方。Last Month 改 Previous Month。自訂單日：點一下起日，迄日預設同起日、Apply 立即可按，再點另一天延伸成範圍（X-9r5 Q4，Kabin 裁決）。FE 現況：沒有 Apply，點外面才套用，只點起日就點外面不會有任何反應；選單日要點同一天兩次。',
     p6: '點 6・Status 篩選（只在 Login Activity）：多選 Success／Failed／Account Locked，行為同 Type／Country（選完關閉才套用）。PRD 有 Status 篩選器、FE 沒有。FE 現況：沒有。',
     p7: '點 7・Timestamp 標時區：兩個 tab 的表頭寫成 Timestamp (UTC+8)（時區照瀏覽器算，不寫死），匯出 CSV 的欄名同樣帶時區。稽核紀錄要能跟別地區的同事對時間。FE 現況：表頭只寫 Timestamp，沒有標時區。',
-    p5: '點 5・欄位順序（方案 A）：Timestamp 第一欄，之後 User → Type（Login 加 Status）→ IP／Location 兩行格；User Activity 的 Description 放 Type 後面。FE 現況：Email 第一欄、Country 與 IP 各一欄。'
+    p5: '點 5・欄位順序（方案 A）：Timestamp 第一欄，之後 User → Type（Login 加 Status）→ IP／Location 兩行格；User Activity 的 Description 放 Type 後面，最多顯示兩行（FE 是單行省略；被截斷仍有 tooltip）。FE 現況：Email 第一欄、Country 與 IP 各一欄。'
   }
 };
 const PAGE = 40;            // 每次載入列數（FE 無限捲動，這裡模擬 13 個月資料分頁）
@@ -2958,6 +3034,7 @@ function closePop(commit, focusBack) {
  * 9. 表格（FE VirtualizedTable＋無限捲動）
  * ============================================================ */
 const ell = (text, html) => `<span class="ell" data-tip="${esc(text)}" data-tip-trunc data-tip-pos="below" data-tip-dy="0">${html == null ? esc(text) : html}</span>`;
+const ell2 = (text, html) => ell(text, html).replace('class="ell"', 'class="ell ell-2"');   // CQ1：最多兩行，被截斷才有 tooltip
 /* ⏸ PARKED（UX 提案 點 5 欄位順序、點 2 Status 欄）：isUx('p5')／isUx('p2') */
 /* 點 7（UX 提案）：Timestamp 表頭標時區，CSV 欄名同。表頭變長後欄寬由 TS_MIN 保證不換行、不截斷（表頭＝label＋sort icon＋mini badge）*/
 /* ⏸ PARKED（UX 提案 點 7：Timestamp 標時區，登記在 specs/parked-designs.md #19）*/
@@ -2979,18 +3056,19 @@ function columns(tab) {
   /* Review #4：Timestamp 內容固定約 140px（Noto Sans 實載入後；沒載入字型時量到 132），不吃 fr（原本 min 210＋.9fr 浪費約 78px）；Type 給足 190（最長 `Update · Usage Optimization` 189px）；Description 拿 Timestamp 讓出來的空間。
    * Type 實際要 222：最長 `Update · Usage Optimization` 文字 189px ＋ 左右內距 32（Fable 量的 188 沒含內距）；1280 展開 sidebar 下 Description 因此只剩 153（本來就一定會截斷，hover 看全文），換到整張表不出橫向捲軸。
    * p5 的 badge 從 Timestamp 表頭搬到 Type 表頭（Timestamp 固定 164 放不下 badge）*/
+  /* X-9r5 B21（11-12）：p5 的 User 欄（`email (角色)` 一行）最長 `grace@ntu.edu.tw (Manager)` 在這台字型 192＋內距 32＝224，原本 User Activity 210／Login 220 讓 `(Manag…` 被截，隔壁 Type 欄卻有空；1340 以上讓 User 欄最小寬長到 226（CSS 變數 --em-min，見 .tbl-scroll 的 media query）；1340 以下維持原值，不然 1280 加總會超過 901 出橫向捲軸（量到 +16），截斷靠 tooltip。 */
   const C = {
     ts: mk('ts', tsLabel(), p5 ? tsMin() : tsMin() - 6, p5 ? 0 : .9, { badge: isUx('p7') ? pkBadge('p7', 'mini') : '', sort: can('ts') ? 'ts' : null, cell: r => ell(fmtTs(r.ts)) }),
-    email: mk('email', p5 ? 'User' : 'Email', p5 ? (ua ? 210 : (isUx('p7') ? 205 : 220)) : (ua ? 250 : 200), 1.3, { sort: can('email') ? 'email' : null,
+    email: mk('email', p5 ? 'User' : 'Email', p5 ? (ua ? 210 : (isUx('p7') ? 205 : 220)) : (ua ? 250 : 200), 1.3, { ...(p5 ? { w: 'minmax(var(--em-min,' + (ua ? 210 : (isUx('p7') ? 205 : 220)) + 'px),1.3fr)' } : {}), sort: can('email') ? 'email' : null,
       cell: r => p5 ? ell(`${r.email} (${r.role})`, `${hl(r.email, q)} <span class="rs">(${hl(r.role, q)})</span>`) : ell(r.email, hl(r.email, q)) }),   // Review #5：角色後綴也要標命中
     type: mk('type', p5 ? 'Type' : 'Activity Type', ua ? (p5 ? 222 : 150) : (p5 ? 150 : 120), ua ? (p5 ? 0 : 1) : .8, { badge: p5 ? pkBadge('p5') : '', cell: r => ell(typeText(tab, r), hl(typeText(tab, r), q)) }),
     /* ⚠ 設計端暫擬：Failed 用 CMDS Status Icons 的 Failure＝圓圈叉（cancel）；Account Locked 的 lock 沒有 CMDS 對應（Review #21）*/
     status: mk('status', 'Status', 164, .9, { badge: pkBadge('p2'),
       cell: r => r.status === 'Success' ? `<span class="stt ok"><span aria-hidden="true" class="material-symbols-outlined">check_circle</span>${hl('Success', q)}</span>` : `<span class="stt bad"><span aria-hidden="true" class="material-symbols-outlined">${r.status === 'Locked' ? 'lock' : 'cancel'}</span>${hl(statusText(r), q)}</span>` }),
-    desc: mk('desc', 'Description', p5 ? Math.max(100, 153 - (tsMin() - 176)) : 250, p5 ? 3 : 1.6, { cell: r => ell(r.description, hl(r.description, q)) }),
+    desc: mk('desc', 'Description', p5 ? Math.max(100, 153 - (tsMin() - 176)) : 250, p5 ? 3 : 1.6, { ...(p5 ? { w: 'minmax(calc(' + Math.max(100, 153 - (tsMin() - 176)) + 'px - var(--desc-shave,0px)),3fr)' } : {}), cell: r => (p5 ? ell2 : ell)(r.description, hl(r.description, q)) }),   /* CQ1：p5（UX 提案點 5）開著時 Description 最多兩行，關掉回 FE 單行 */
     country: mk('country', 'Country', 130, .8, { sort: can('country') ? 'country' : null, cell: r => ell(r.country, hl(r.country, q)) }),
     ip: mk('ip', 'IP Address', 150, .9, { sort: can('ip') ? 'ip' : null, cell: r => ell(r.ip, hl(r.ip, q)) }),
-    iploc: mk('iploc', 'IP / Location', ua ? 140 : 150, 1, {
+    iploc: mk('iploc', 'IP / Location', ua ? 140 : 150, 1, { ...(p5 ? { w: 'minmax(calc(' + (ua ? 140 : 150) + 'px - var(--ip-shave,0px)),1fr)' } : {}),
       cell: r => `<div class="cell-2l"><div class="l1" data-tip="${esc(r.ip)}" data-tip-trunc data-tip-pos="below" data-tip-dy="0">${hl(r.ip, q)}</div><div class="l2" data-tip="${esc(r.city + ', ' + r.country)}" data-tip-trunc data-tip-pos="below" data-tip-dy="0">${hl(r.city, q)}, ${hl(r.country, q)}</div></div>` })
   };
   const st = p2 && tab === 'login' ? [C.status] : [];
@@ -3005,6 +3083,8 @@ function skeletonHtml() {
   return `<div class="sk-t" aria-busy="true"><div class="sk-hd" style="${g}">${Array.from({ length: cols }, () => `<div class="sk" style="width:60%"></div>`).join('')}</div>${row.repeat(11)}</div>`;   // X-9r5 LB9：11 列由 .sk-t 的 max-height:575 裁成 10.5 列，跟載入後的表同高（⚠ DEVIATION: FE TableSkeleton rows=5）
 }
 const rowHtml = (cols, r, tab) => `<div class="tr ${isUx('p2') && tab === 'login' && r.status !== 'Success' ? 'fail' : ''}" role="row">${cols.map(c => `<div class="td" role="cell">${c.cell(r)}</div>`).join('')}</div>`;
+let _annLast = '', _annAt = 0;   // §C 驗證 N11（11-13）：切 User Activity 時同一句連播兩次；1 秒內同一句不重播
+function announce(text) { const el = $('#sr-status'); if (!el) return; const now = Date.now(); if (text === _annLast && now - _annAt < 1000) return; _annLast = text; _annAt = now; el.textContent = ''; setTimeout(() => { el.textContent = text; }, 40); }
 function renderTable() {
   const wrap = $('#tblwrap'); if (!wrap) return;
   const tab = state.tab, t = tabState();
@@ -3013,6 +3093,8 @@ function renderTable() {
   wrap.setAttribute('aria-busy', state.pageState === 'loading' || state.loadingRows ? 'true' : 'false');   // X-9r5 LB7（C21）：讀取中讓讀屏知道表格正在更新
   if (state.pageState === 'loading' || state.loadingRows) { wrap.innerHTML = skeletonHtml(); return; }
   const rows = state.pageState === 'empty' ? [] : querySorted(tab);
+  if (renderTable._silent) renderTable._silent = false;   // C-C4：排序那次自己播「Sorted by …」，不再播筆數
+  else announce(rows.length ? `${rows.length} result${rows.length === 1 ? '' : 's'}` : 'No data found');
   if (!rows.length) {
     wrap.innerHTML = state.pageState === 'empty' || !isFiltered(t)
       ? esBlock({ n: 'table_view', o: 1 }, COPY.empty.title, COPY.empty.desc)
@@ -3120,7 +3202,9 @@ const ACT = {
     /* Review #20：UX 版 Timestamp 有預設降冪（箭頭一直亮），改兩段循環（升↔降）；其餘欄照 Guideline 升 → 降 → reset */
     if (k === 'ts' && isUx('p5')) t.sort = { key: 'ts', dir: cur && cur.key === 'ts' && cur.dir === 'asc' ? 'desc' : 'asc' };
     else if (!cur || cur.key !== k) t.sort = { key: k, dir: 'asc' }; else if (cur.dir === 'asc') t.sort = { key: k, dir: 'desc' }; else t.sort = null;
-    t.pages = 1; renderTable();
+    t.pages = 1; renderTable._silent = true; renderTable();
+    const hd = $(`.th[data-k="${k}"]`), lbl = hd ? hd.textContent.replace(/arrow_\w+|\s+/g, ' ').replace(/UX 提案|lightbulb/g, '').trim() : k;
+    announce(t.sort ? `Sorted by ${lbl}, ${t.sort.dir === 'asc' ? 'ascending' : 'descending'}` : `Sorting by ${lbl} cleared`);
     const h = $(`.th[data-k="${k}"]`); if (h) h.focus({ preventScroll: true });     // Review #7：排序重繪後焦點還給表頭（AD v2 前例）
   },
   retry() { state.pageState = 'loading'; renderCard(); setTimeout(() => { state.pageState = 'set'; renderTabs(); renderCard(); }, ENTER_MS); },
@@ -3212,10 +3296,10 @@ window.DEMO_SCENARIOS = [
   { id: 'l-bottom', page: 'login', group: '排序與載入', label: '捲到底：載入下一頁', icon: 'expand_more', tip: 'FE useTableInfiniteScroll：捲到底顯示 24px 圈圈 spinner 再載入下一頁。' },
 
   /* ---- User ---- */
-  { id: 'u-all', page: 'user', group: '清單', label: 'User Activity（預設）', icon: 'manage_history', tip: '約 370 筆。Description 單行省略、hover 看完整（FE SingleLineCell）。' },
+  { id: 'u-all', page: 'user', group: '清單', label: 'User Activity（預設）', icon: 'manage_history', tip: '約 370 筆。Description 最多兩行（UX 提案點 5；點 5 關掉回 FE 的單行 SingleLineCell）、被截斷才 hover 看完整。' },
   { id: 'u-carol', page: 'user', group: '清單', label: 'PRD 場景 3：carol 改 Budget', icon: 'savings', tip: 'User＝carol、Type＝Customized Budget：看得到 raised limit USD 5,000 → 8,000。' },
   { id: 'u-role', page: 'user', group: '清單', label: '搜尋「role」：角色變更', icon: 'manage_accounts', tip: 'Search＝role，命中字樣藍字粗體。' },
-  { id: 'u-long', page: 'user', group: '清單', label: '很長的 Description（tooltip）', icon: 'more_horiz', tip: '單行省略；被截斷時才顯示完整內容 tooltip（FE SingleLineCell useOverflow）。' },
+  { id: 'u-long', page: 'user', group: '清單', label: '很長的 Description（tooltip）', icon: 'more_horiz', tip: '最多兩行（點 5 關掉為單行）；被截斷時才顯示完整內容 tooltip（FE SingleLineCell useOverflow）。' },
   { id: 'u-sort', page: 'user', group: '排序與載入', label: 'Timestamp 升冪', icon: 'arrow_upward', tip: '⚠ DEVIATION：FE User Activity 的 Email、Timestamp 兩欄都沒有 accessorKey，不能排序（只有 Country、IP 可排；PRD 寫 Email、Timestamp 兩欄可排）。UX 提案點 5 開著時照 PRD 可排；切回 FE 現況這兩欄不可點。' },
   { id: 'u-bottom', page: 'user', group: '排序與載入', label: '捲到底：載入下一頁', icon: 'expand_more' },
 
@@ -3246,7 +3330,7 @@ window.DEMO_SCENARIOS = [
   { id: 's-set', page: 'states', group: '必備狀態', label: 'With data', icon: 'check_circle' },
   { id: 's-loading', page: 'states', group: '必備狀態', label: 'Loading（skeleton）', icon: 'hourglass_top', isNoData: true, tip: 'FE AuditLogSkeleton：控制項 disabled、TableSkeleton 5 列。進頁固定跑 650ms。' },
   { id: 's-empty', page: 'states', group: '必備狀態', label: 'Empty（組織沒有紀錄）', icon: 'table_view', isNoData: true, tip: 'FE emptyTable：No Data Available／There are no data available.' },
-  { id: 's-noresult', page: 'states', group: '必備狀態', label: '搜尋無結果', icon: 'search_off', isNoData: true, tip: '⚠ DEVIATION：FE 沒結果也是同一個 emptyTable，容易被讀成「這個組織沒有紀錄」；改成 No data found＋Clear Filter 鈕（Fable §3「直接做」）。' },
+  { id: 's-noresult', page: 'states', group: '必備狀態', label: '搜尋無結果', icon: 'search_off', isNoData: true, tip: '⚠ DEVIATION：FE 沒結果也是同一個 emptyTable，容易被讀成「這個組織沒有紀錄」；改成 No data found＋Clear filter 鈕（Fable §3「直接做」）。' },
   { id: 's-error', page: 'states', group: '必備狀態', label: 'Error', icon: 'cloud_off', isNoData: true, tip: '⚠ 設計端暫擬：FE 沒有 error 分支。Empty State 的 Error 變體＋Retry。' },
   { id: 's-export-ok', page: 'states', group: 'Export CSV', label: 'Export：成功', icon: 'download', tip: '真的下載 audit-log-login.csv／audit-log-user.csv（BOM），並跳 FE 原文 toast。⚠ DEVIATION：FE 沒有下載，是寄信通知；範圍照 FE＝目前套用的篩選與搜尋（PRD v1 寫完整資料集）。' },
   { id: 's-export-fail', page: 'states', group: 'Export CSV', label: 'Export：失敗 toast', icon: 'error' },
@@ -3376,8 +3460,10 @@ window.DEMO_APPLY = function (id) {
   let cur = null;
   function place() {
     if (!cur || !cur.isConnected) { cur = null; tip.style.display = 'none'; return; }
-    const r = cur.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight, vw = innerWidth, vh = innerHeight;
+    const a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;   /* X-9r1 11-13 P11：支援 data-tip-anchor（錨在子元素，sidebar logo tooltip 用），寫法同 shared/demo-fab.js place() */
+    const r = a.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight, vw = innerWidth, vh = innerHeight;
     let x = r.left; if (x + tw > vw - 8) x = Math.max(8, Math.min(r.right + 2, vw - 8) - tw);
+    x = Math.max(8, x);   /* X-9r1 11-13 P11：至少離視窗左緣 8（同 shared S-A7） */
     const below = cur.dataset.tipPos === 'below', dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
     let y = below ? r.bottom + dy + 4 : r.top - th - 6;
     if (y < 8) y = r.bottom + 4; if (y + th > vh - 8) y = Math.max(8, r.top - th - 6);
@@ -3386,7 +3472,7 @@ window.DEMO_APPLY = function (id) {
   document.addEventListener('mouseover', e => {
     const el = e.target.closest && e.target.closest('[data-tip]');
     if (!el || (el === cur && tip.style.display !== 'none')) return;
-    if (el.dataset.tipTrunc != null && el.scrollWidth <= el.clientWidth) return;
+    if (el.dataset.tipTrunc != null && el.scrollWidth <= el.clientWidth && el.scrollHeight <= el.clientHeight + 1) return;   /* CQ1：兩行截斷（line-clamp）看高度 */
     cur = el; tip.textContent = el.dataset.tip; tip.style.display = 'block'; place();
   });
   document.addEventListener('mouseout', e => {
@@ -3874,6 +3960,14 @@ window.DEMO_APPLY = function (id) {
       } catch (err) {}
       return 8;
     }
+    /* X-9r1 B1（2026-11-05）：固定頂欄的下緣。tooltip 放在錨點上方時不能壓到頂欄（頁首那排 info icon／截圖鈕／幣別鈕的 tooltip 之前 top 9～54，蓋在鈴鐺與頭像上）；頂欄捲走或沒有頂欄時回 8 */
+    function topMin() {
+      try {
+        var tb = document.querySelector('.lt-topbar');
+        if (tb) { var b = tb.getBoundingClientRect().bottom; if (b > 0) return b + 4; }
+      } catch (err) {}
+      return 8;
+    }
     function place() {
       if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
@@ -3885,10 +3979,11 @@ window.DEMO_APPLY = function (id) {
       /* X-9r1 S2：放不下改靠右緣時，左緣不能落進 sidebar（600 寬在 1280 中間位置會伸進去）；沒有 sidebar 的頁維持 8，收合時 21＋8 */
       if (x + tw > vw - 8) x = Math.max(minX(), Math.min(r.right + 2, vw - 8) - tw);
       if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
+      x = Math.max(8, x);   /* X-9r1 11-13 S-A7：至少離視窗左緣 8（sidebar 裡的錨點不套 minX()，logo tooltip 原本貼在 left 0） */
       var below = cur.dataset.tipPos === 'below';
       var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
       var y = below ? r.bottom + dy : r.top - th - 6;
-      if (y < 8) y = r.bottom + 4;
+      if (y < topMin()) y = r.bottom + 4;   /* X-9r1 B1：上方放不下或會蓋到頂欄就翻到下方 */
       if (y + th > vh - 8) y = Math.max(8, r.top - th - 6);
       tip.style.left = x + 'px'; tip.style.top = y + 'px';
     }

@@ -82,6 +82,7 @@
   --lt-color-error-light:   #FFEBEF;   /* TBC: Figma audit needed */
   --lt-color-warning-base:  #FC9A0F;   /* TBC: Figma audit needed */
   --lt-color-warning-light: #FEF3E1;   /* TBC: Figma audit needed */
+  --lt-color-warning-dark:  #EC6F09;   /* CM Color Kit Warning/Dark（2026-11-02 補；FE warning.dark，LumiTag 過期與分到 0 提示用） */
   --lt-color-info-base:     #0B6DD7;   /* = blue-60，符合 Figma info usage */
   --lt-color-info-light:    #E6F6FF;   /* TBC: Figma audit needed */
 
@@ -138,6 +139,42 @@
 
   /* --- Typography: Letter Spacing (對齊 Figma: 全部 0) --- */
   --lt-tracking-normal: 0;
+
+  /* --- Typography: CMDS 文字樣式（composite，用在 `font:` 簡寫）2026-11-02 ---
+   * 一對一對應 Figma「CM Typography」的文字樣式；寫 CSS 一律從這組挑，不自己組字級／字重／行高。
+   * `font:` 簡寫會把 font-variant-numeric 重設成 normal，數字欄要另外補 tabular-nums。
+   * Link Bold 1 稿上自帶底線；底線由元件決定（Lumiture 文字按鈕不加底線，見 Guideline Text Button）。 */
+  --lt-type-h3:               700 24px/36px var(--lt-font-sans);    /* Headers/H3 頁面標題 */
+  --lt-type-h4:               700 20px/30px var(--lt-font-sans);    /* Headers/H4 頁面副標題 */
+  --lt-type-h5:               700 18px/27px var(--lt-font-sans);    /* Headers/H5 功能名稱 */
+  --lt-type-h6:               700 16px/24px var(--lt-font-sans);    /* Headers/H6 小標題 */
+  --lt-type-body:             400 14px/24.5px var(--lt-font-sans);  /* Body/Body Regular 內文 */
+  --lt-type-body-medium:      500 14px/24.5px var(--lt-font-sans);  /* Body/Body Medium 內文重點 */
+  --lt-type-body-bold:        700 14px/24.5px var(--lt-font-sans);  /* Body/Body Bold 內文標題 */
+  --lt-type-caption:          400 12px/18px var(--lt-font-sans);    /* Caption/Caption Regular 註記 */
+  --lt-type-caption-bold:     700 12px/18px var(--lt-font-sans);    /* Caption/Caption Bold 重要註記 */
+  --lt-type-button-regular-0: 400 12px/18px var(--lt-font-sans);    /* Content/Button Regular 0（chip 字） */
+  --lt-type-button-regular-1: 400 14px/21px var(--lt-font-sans);    /* Content/Button Regular 1（下拉選項字） */
+  --lt-type-button-bold-1:    700 14px/21px var(--lt-font-sans);    /* Content/Button Bold 1 */
+  --lt-type-button-bold-2:    700 16px/24px var(--lt-font-sans);    /* Content/Button Bold 2 */
+  --lt-type-link-bold-1:      700 14px/24.5px var(--lt-font-sans);  /* Content/Link Bold 1 超連結 */
+  --lt-type-link-medium-1:    500 14px/24.5px var(--lt-font-sans);  /* Content/Link Medium 1 超連結（2026-11-03 補，LumiTag Edit allocation card） */
+
+  /* --- Color: CM Color Kit（chip 等元件用；Light＝底、Main＝框、Dark＝字）2026-11-02，先收 #3、#11，其他色用到再補 --- */
+  --lt-kit-3-light:  var(--lt-turquoise-10);   /* #F0FFFF  #3 Turquoise Blue */
+  --lt-kit-3-main:   var(--lt-chart-3);        /* #9CF3FF */
+  --lt-kit-3-dark:   var(--lt-turquoise-70);   /* #34B5D9  CM Color Kit/Dark/#3 Dark */
+  --lt-kit-11-light: var(--lt-grey-100);       /* #F2F2F2  #11 Gray */
+  --lt-kit-11-main:  var(--lt-grey-400);       /* #B3B3B3 */
+  --lt-kit-11-dark:  #7C7C7C;                  /*          CM Color Kit/Dark/#11 Dark */
+  --lt-kit-4-light:  #E6FFF8;                  /* CM Color Kit/Light/#4 Light（2026-11-03 補，LumiTag Preview 狀態標籤） */
+  --lt-kit-4-main:   var(--lt-chart-4);        /* #00DCC2 */
+  --lt-kit-4-dark:   var(--lt-color-success);  /* #00B5A6  CM Color Kit/Dark/#4 Dark */
+  --lt-kit-6-light:  var(--lt-color-warning-light); /* #FEF3E1  #6 Tangerine Orange（2026-11-03 補，LumiTag Not split／Partially split） */
+  --lt-kit-6-main:   var(--lt-chart-6);        /* #F3BE68 */
+  --lt-kit-6-dark:   var(--lt-color-warning-base);  /* #FC9A0F  CM Color Kit/Dark/#6 Dark */
+  --lt-color-attention-main:    #FFA500;       /* CDP color/Attention/Attention1 Main（CMDS Alert / Large orange 頂條與 icon，2026-11-03 補） */
+  --lt-color-attention-lighter: #FFF3DE;       /* CDP color/Attention/Attention4 Lighter（Alert icon 底） */
 
   /* --- Shadow: 對齊 CMDS Figma 規範 (2026-05-12 audit)
    * 來源：Figma node 20599-107518 — CMDS 4 個官方 shadow variables
@@ -290,7 +327,7 @@
  * - ~~Chart palette~~ ✅ 已加入（2026-05-12 從 Figma General Behavior file audit）
  * - Gradient tokens (Figma 有 Lumiture.ai Blue / Orange / Lemon C 等)
  * - Opacity tokens (Figma 有 CM Opacity Color 系列)
- * - Composite typography tokens (--lt-type-h1, --lt-type-body 等 style sets)
+ * - ~~Composite typography tokens~~ ✅ 已加入 --lt-type-*（2026-11-02，H1／H2 用到再補）
  * - Focus / Inset shadow 特殊變體
  * - Dark mode 對應 token
  *
@@ -308,6 +345,7 @@
  *   .lt-skeleton 骨架屏（A-18）
  *   .lt-link     文字連結（B-14）
  *   .lt-btn-icon 表格 Action icon button（B-6，CB 版）
+ *   .lt-chip     CMDS「Deletable chips / Squared colors」（2026-11-02）
  *   空狀態／無權限見 lumiture-empty.js；Toast 見 lumiture-toast.js
  * ============================================================ */
 
@@ -366,6 +404,29 @@
 .lt-btn-icon:hover{background:var(--lt-blue-20,#D1EEFF)}
 .lt-btn-icon:focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:1px}
 .lt-btn-icon:disabled{color:var(--lt-grey-400,#B3B3B3);cursor:not-allowed;background:none}
+
+/* ---------- .lt-chip ----------
+ * CMDS「Deletable chips / Squared colors」，Deletable=false。Lumiture 用到的 chip 一律走這個，不要各頁自刻。
+ * 結構：<span class="lt-chip lt-chip--outline lt-chip--c3"><span class="material-symbols-outlined lt-chip__icon">call_split</span>Allocation card</span>
+ * Size：預設 s（高 24）、.lt-chip--xs（高 20）。CMDS 只有這兩個尺寸。
+ * 圓角 4、左右內距 8、icon（Show icon L）16 與字間距 4、字 Button Regular 0（12／18）。
+ * Appearance：.lt-chip--outline 底 Light／框 Main／字 Dark；.lt-chip--solid 底 Dark／白字。
+ * Color：.lt-chip--c3（#3 Turquoise Blue）、.lt-chip--c4（#4 Green）、.lt-chip--c6（#6 Tangerine Orange）、.lt-chip--c11（#11 Gray）；其他色用到時照 CM Color Kit 在 tokens.css 補 --lt-kit-N-*。 */
+.lt-chip{display:inline-flex;align-items:center;gap:4px;box-sizing:border-box;height:24px;padding:0 8px;border-radius:4px;border:1px solid transparent;
+  font:var(--lt-type-button-regular-0,400 12px/18px sans-serif);white-space:nowrap;flex-shrink:0;vertical-align:middle}
+.lt-chip--xs{height:20px}
+.lt-chip__icon{font-size:16px;line-height:1;font-variation-settings:'FILL' 1}
+.lt-chip--outline.lt-chip--c3{background:var(--lt-kit-3-light,#F0FFFF);border-color:var(--lt-kit-3-main,#9CF3FF);color:var(--lt-kit-3-dark,#34B5D9)}
+.lt-chip--solid.lt-chip--c3{background:var(--lt-kit-3-dark,#34B5D9);color:var(--lt-white,#fff)}
+.lt-chip--outline.lt-chip--c11{background:var(--lt-kit-11-light,#F2F2F2);border-color:var(--lt-kit-11-main,#B3B3B3);color:var(--lt-kit-11-dark,#7C7C7C)}
+.lt-chip--solid.lt-chip--c11{background:var(--lt-kit-11-dark,#7C7C7C);color:var(--lt-white,#fff)}
+.lt-chip--outline.lt-chip--c4{background:var(--lt-kit-4-light,#E6FFF8);border-color:var(--lt-kit-4-main,#00DCC2);color:var(--lt-kit-4-dark,#00B5A6)}
+.lt-chip--outline.lt-chip--c6{background:var(--lt-kit-6-light,#FEF3E1);border-color:var(--lt-kit-6-main,#F3BE68);color:var(--lt-kit-6-dark,#FC9A0F)}
+
+/* X-9r1 11-13 S-FOCUS：鍵盤 focus 框統一 2px primary 外框（X-9r2／X-9r5 已定「focus 統一 2px primary 外框」）。
+   用 :where() 零權重：各頁自己寫了 :focus-visible 或 outline:none＋光暈的照舊贏。
+   排除共用外殼（sidebar／topbar／Account Menu／角色彈窗／Demo FAB／toast）：它們在深色底上有自己的青色或白色框。 */
+:where(button,[role="button"],[role="tab"],a[href]):where(:not(.lt-sidebar *,.lt-topbar *,.lt-tb-logo *,#lt-am *,.lt-rd-back *,.demo-fab,.demo-popover *,.lt-toast-wrap *)):focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:2px}
 
 </style>
 <script>
@@ -499,13 +560,13 @@
   --cb-card-shadow: var(--lt-card-shadow);   /* B-3：改吃 token（0 0 20px rgba(0,0,0,.10)） */
   --cb-radius-field: 5px;
   --cb-radius-modal: var(--lt-modal-radius-sm);   /* B-4：CB 彈窗全是確認類（Batch Create 確認／Remove／Leave），r10；表單類是 15 */
-  --cb-field-border: #CCCCCC;                 /* = --lt-grey-300 */
-  --cb-bar-track: #E6E6E6;
-  --cb-bar-ok: #00B5A6;                       /* = --lt-color-success */
-  --cb-bar-warn: #FC9A0F;                     /* = --lt-color-warning（FE 的 warning.hover 實際色值）*/
-  --cb-bar-alert: #FF403D;                    /* = --lt-color-error */
-  --cb-scroll-thumb: #D8D8D8;
-  --cb-rule-border: #D1EEFF;                  /* = --lt-blue-20（FE 的 primary.light20）*/
+  --cb-field-border: var(--lt-grey-300);        /* #CCCCCC（X-9r2 F8：色一律 token） */
+  --cb-bar-track: var(--lt-grey-200);           /* #E6E6E6 */
+  --cb-bar-ok: var(--lt-color-success);         /* #00B5A6 */
+  --cb-bar-warn: var(--lt-color-warning);       /* #FC9A0F（FE 的 warning.hover 實際色值）*/
+  --cb-bar-alert: var(--lt-color-error);        /* #FF403D */
+  --cb-scroll-thumb: #D8D8D8;                 /* 稿的捲軸 thumb，tokens.css 沒有對應語意（X-9r2 F8 留著） */
+  --cb-rule-border: var(--lt-blue-20);          /* #D1EEFF（FE 的 primary.light20）*/
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
@@ -517,6 +578,7 @@ input{font-family:inherit;letter-spacing:0}
 .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;vertical-align:middle;user-select:none}
 .icon-outline{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20}
 [hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}   /* X-9r2 第三輪：視覺隱藏（讀屏用的標籤與播報區） */
 
 /* ===== App layout（Figma：內容區 padding 32、段落間距 20）===== */
 .app{display:flex;min-height:100vh}
@@ -524,7 +586,7 @@ input{font-family:inherit;letter-spacing:0}
 .content{padding:var(--lt-space-32);flex:1;display:flex;flex-direction:column;gap:20px;min-width:0}
 
 /* ===== Buttons（Figma Button/M：36h、圓角 5、14/700）===== */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--lt-space-4);min-width:80px;padding:0 var(--lt-button-padding-x);height:36px;border-radius:var(--cb-radius-field);font-weight:var(--lt-fw-bold);font-size:var(--lt-fs-14);line-height:1.5;white-space:nowrap;border:1px solid transparent;transition:background-color var(--lt-transition-fast),border-color var(--lt-transition-fast),color var(--lt-transition-fast)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--lt-space-4);min-width:80px;padding:0 var(--lt-button-padding-x);height:36px;border-radius:var(--cb-radius-field);font:var(--lt-type-button-bold-1);white-space:nowrap;border:1px solid transparent;transition:background-color var(--lt-transition-fast),border-color var(--lt-transition-fast),color var(--lt-transition-fast)}
 .btn-p{background:var(--lt-color-primary);color:var(--lt-color-text-inverse)}
 .btn-p:hover{background:var(--lt-color-primary-hover)}
 .btn-p:active{background:var(--lt-color-primary-active)}
@@ -534,7 +596,7 @@ input{font-family:inherit;letter-spacing:0}
 .btn .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}
 .btn .ic-add{font-variation-settings:'FILL' 1,'wght' 600,'GRAD' 0,'opsz' 20}   /* Figma 的 + 是 Material Icons 字形，筆畫比 Symbols wght 400 粗 */
 .btn:disabled,.btn.is-disabled{background:var(--lt-button-disabled-bg)!important;color:var(--lt-button-disabled-text)!important;border-color:transparent!important;cursor:not-allowed}   /* Figma #04：Disabled Primary＝填 #CCCCCC、白字 */
-.btn.btn-o:disabled,.btn.btn-o.is-disabled{background:#fff!important;color:var(--lt-grey-300)!important;border-color:var(--lt-grey-300)!important}   /* Disabled Outlined＝白底、#CCCCCC 框與字 */
+.btn.btn-o:disabled,.btn.btn-o.is-disabled{background:var(--lt-white)!important;color:var(--lt-grey-300)!important;border-color:var(--lt-grey-300)!important}   /* Disabled Outlined＝白底、#CCCCCC 框與字 */
 /* Text Button（icon 永遠不畫底線、hover 底線只套文字 span）*/
 .btn-t{display:inline-flex;align-items:center;gap:var(--lt-space-4);color:var(--lt-color-primary);font-weight:var(--lt-fw-bold);font-size:var(--lt-fs-14);line-height:24px;height:25px}
 .btn-t .material-symbols-outlined{font-size:16px}
@@ -551,9 +613,11 @@ input{font-family:inherit;letter-spacing:0}
 .pg-hdr{display:flex;align-items:center;gap:var(--lt-space-16);min-height:36px}
 /* ⚠ DEVIATION（B-2，Kabin 2026-10-15 裁決全站 24）：Figma #01／#05／#08／#13 量到 H4 20/700/30，但全站頁標題統一 24；Figma 待回改（見 specs/2026-10-14-x6-figma-fix-list.md） */
 .pg-title{font-size:var(--lt-page-title-size);font-weight:var(--lt-fw-bold);color:var(--lt-color-text-heading);line-height:36px}
-.upd{display:flex;align-items:center;gap:20px;margin-left:auto;font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);line-height:18px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pg-title[tabindex="-1"]:focus{outline:none}   /* X-9r2 第三輪驗證後小修 N3：程式聚焦的標題是落點、不是可操作元件，不畫瀏覽器預設細框 */
+.upd{display:flex;align-items:center;gap:20px;margin-left:auto;font:var(--lt-type-caption);color:var(--lt-color-text-secondary);font-variant-numeric:tabular-nums;white-space:nowrap}
 .upd b{font-weight:var(--lt-fw-medium);margin-right:4px}
-.upd .ic-info{font-size:16px;color:var(--lt-color-text-secondary);cursor:help;margin-left:4px}
+.upd .ic-info{font-size:16px;color:var(--lt-color-text-secondary);cursor:help;margin-left:4px;position:relative}
+.upd .ic-info::before{content:'';position:absolute;inset:-4px}   /* X-9r2 F18（X-9r1 C1 交付）：16px info icon 透明點擊區補到 24，外觀不變（同 Overview X-9r3 R2） */
 .upd.is-skel{opacity:.55}
 .pg-desc{font-size:var(--lt-fs-14);line-height:24px;color:var(--lt-color-text-secondary)}
 .pg-actions{display:flex;justify-content:flex-end;gap:16px}
@@ -565,14 +629,14 @@ input{font-family:inherit;letter-spacing:0}
 .tbl-scroll{overflow-x:scroll;overflow-y:hidden;overscroll-behavior:contain;position:relative}
 /* 進入頁面直接顯示橫向 scroll bar（#01 註記）：thumb #D8D8D8 r2、上下 1px #E6E6E6 */
 .tbl-scroll::-webkit-scrollbar{height:16px}
-.tbl-scroll::-webkit-scrollbar-track{background:#fff;border-top:1px solid #E6E6E6;border-bottom:1px solid #E6E6E6}
-.tbl-scroll::-webkit-scrollbar-thumb{background:var(--cb-scroll-thumb);border:3px solid #fff;border-left-width:0;border-right-width:0;border-radius:6px;background-clip:padding-box}
+.tbl-scroll::-webkit-scrollbar-track{background:var(--lt-white);border-top:1px solid var(--lt-grey-200);border-bottom:1px solid var(--lt-grey-200)}
+.tbl-scroll::-webkit-scrollbar-thumb{background:var(--cb-scroll-thumb);border:3px solid var(--lt-white);border-left-width:0;border-right-width:0;border-radius:6px;background-clip:padding-box}
 table.tbl{border-collapse:separate;border-spacing:0;width:100%;min-width:1360px;table-layout:fixed}
-.tbl th,.tbl td{height:50px;padding:0 16px;text-align:left;vertical-align:middle;background:#fff;border-bottom:1px solid var(--lt-grey-200);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tbl th{background:var(--lt-color-primary-bg);font-weight:var(--lt-fw-bold);font-size:var(--lt-fs-14);color:var(--lt-color-text-heading);border-bottom:1px solid var(--lt-grey-400);position:relative}
+.tbl th,.tbl td{height:50px;padding:0 16px;text-align:left;vertical-align:middle;background:var(--lt-white);border-bottom:1px solid var(--lt-grey-200);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbl th{background:var(--lt-color-primary-bg);font:var(--lt-type-body-bold);color:var(--lt-color-text-heading);border-bottom:1px solid var(--lt-grey-400);position:relative}
 .tbl tbody tr{cursor:pointer}
 .tbl tbody tr:hover td{background:var(--lt-grey-50)}
-.tbl tbody tr.is-sel td{background:#fff}
+.tbl tbody tr.is-sel td{background:var(--lt-white)}
 .tbl tbody tr.is-opt{cursor:default}
 .tbl tbody tr.is-opt td{opacity:.6}
 .tbl th.sortable{cursor:pointer;user-select:none}
@@ -581,9 +645,10 @@ table.tbl{border-collapse:separate;border-spacing:0;width:100%;min-width:1360px;
 .tbl .c-name{width:240px;padding-right:8px}   /* 文案寬度容差：Figma 文字框 208，這裡右內距縮到 8 避免 14px 字型差異多截一個字 */
 .tbl .c-spend{width:355px}
 .tbl .c-apply{width:146px}
-.tbl .c-period{width:200px}
+.tbl .c-period{width:210px}   /* X-9r2 第三輪 B13：稿 200 在 Chrome 字寬下 `1 May. 2026 - 23 Dec. 2028` 需要 175＋內距 32，結束年份被截；表格本來就橫捲 */
 .tbl .c-trig{width:auto}
 .tbl .c-status{width:75px;padding:0 0 0 16px}
+.tbl td.c-status{padding-left:23px}   /* X-9r2 第三輪 B15：稿 #01 開關置中在「Status」表頭字正下方（Chrome 字寬下表頭字 44.4 寬，開關 30 寬 → 左內距 16＋(44.4−30)/2≈23；原貼齊表頭字左緣、比稿靠左約 7px） */
 .tbl .c-action{width:76px;padding:0 0 0 14px}
 .tbl th.c-action{padding-left:16px}
 /* sticky 欄：左 = checkbox + Budget Name/ID（一開始無陰影，捲動後才有）；右 = Status + Action（一開始就有陰影，捲到底消失）*/
@@ -597,29 +662,42 @@ table.tbl{border-collapse:separate;border-spacing:0;width:100%;min-width:1360px;
 .tbl .st-r1::after{left:-10px;background:linear-gradient(270deg,rgba(0,0,0,.10),rgba(0,0,0,0))}
 .tbl-wrap.sh-l .st-l2::after{opacity:1}
 .tbl-wrap.sh-r .st-r1::after{opacity:1}
+.tbl th.st-l2,.tbl td.st-l2,.tbl th.st-r1,.tbl td.st-r1{overflow:visible}   /* X-9r2 第三輪 A2：`.tbl th,td{overflow:hidden}` 把 left／right:-10px 的接合陰影偽元素裁掉，左右兩側陰影從來沒畫出來；這兩欄內容本身都不會溢出（Name 的 .l1 自己有 ellipsis） */
 .cell-2l{display:flex;flex-direction:column;justify-content:center;min-width:0;line-height:1}
 .cell-2l .l1{font-size:var(--lt-fs-14);line-height:24px;color:var(--lt-color-text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cell-2l .l2{font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-grey-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-period .cell-2l .l1{line-height:21px}   /* X-9r2 第三輪 A4：稿 #01 Budget Period 兩行 21＋18＝39（原 24＋18＝42） */
+.cell-2l .l2{font:var(--lt-type-caption);color:var(--lt-grey-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .spend-cell{display:flex;align-items:center;min-width:0}
 .bar{width:120px;height:16px;border-radius:4px;background:var(--cb-bar-track);position:relative;overflow:hidden;flex-shrink:0;margin-right:19px}
 .bar i{position:absolute;left:0;top:0;bottom:0}
 /* 五格離散進度條：五段白色 2px 分隔（Figma Dividers 每 24px 一條）*/
-.bar::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent 23px,#fff 23px,#fff 25px);background-size:120px 100%}
-.spend-cap{font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.bar::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent 23px,var(--lt-white) 23px,var(--lt-white) 25px);background-size:120px 100%}
+.spend-cap{font:var(--lt-type-caption);color:var(--lt-color-text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .spend-cap div{overflow:hidden;text-overflow:ellipsis}
 .spend-cap div:first-child{color:var(--lt-color-text-primary)}
 /* Switch（Figma 30×16、r8、knob 12）*/
-.sw{position:relative;display:inline-block;width:30px;height:16px;border-radius:8px;border:1px solid var(--lt-color-primary);background:#fff;vertical-align:middle;cursor:pointer;transition:background var(--lt-transition-fast)}
+.sw{position:relative;display:inline-block;width:30px;height:16px;border-radius:8px;border:1px solid var(--lt-color-primary);background:var(--lt-white);vertical-align:middle;cursor:pointer;transition:background var(--lt-transition-fast)}
 .sw::after{content:'';position:absolute;left:1px;top:1px;width:12px;height:12px;border-radius:50%;background:var(--lt-color-primary);transition:transform var(--lt-transition-fast),background var(--lt-transition-fast)}
 .sw.on{background:var(--lt-color-primary)}
-.sw.on::after{background:#fff;transform:translateX(14px)}
+.sw.on::after{background:var(--lt-white);transform:translateX(14px)}
 .sw::before{content:'';position:absolute;left:0;right:0;top:-5px;bottom:-5px}   /* X-9r2 F20：透明點擊區補到 30×24 以上，外觀不變（WCAG 2.5.8） */
-.sw:focus-visible{outline:none;box-shadow:var(--lt-button-focus-ring)}
+.sw:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px}   /* X-9r2 F6：focus 統一 2px primary 外框（X-9r5 四頁做法；原 3px 光暈 1.18:1 不過 WCAG 2.4.11） */
+.btn:focus-visible,.btn-t:focus-visible,.icon-btn:focus-visible,.goback:focus-visible,.chip .x:focus-visible,.cf-clear:focus-visible,.dp-d:focus-visible,.dp-hd .nv:focus-visible,.dp-hd .ttl:focus-visible,.dp-mg .m:focus-visible,.modal .m-x:focus-visible,.err-msg a:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px}   /* X-9r2 F6 */
+.dp-d:focus-visible,.chip .x:focus-visible,.dp-mg .m:focus-visible{outline-offset:-2px}   /* 在 overflow hidden 或貼邊的容器裡，外框往內畫才看得到 */
+.sel:focus-visible,.dp-trig:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px}   /* X-9r2 第三輪 A5：F6 漏掉的下拉／日期觸發欄（原瀏覽器預設 1px #005FCC）；.open 時仍是 primary 框＋光暈 */
+.upd .ic-info:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px;border-radius:50%}   /* X-9r2 第三輪 CC6 */
+.chipfield:focus-visible{outline:none}   /* chipfield 本身 tabindex=0，focus 樣式由 :focus-within 的 primary 框＋光暈負責（同 .lt-select） */
 .sw.is-disabled{opacity:.5;cursor:not-allowed}
 .act-cell{display:flex;align-items:center;gap:8px}
 .act-cell .icon-btn{width:20px;height:20px;position:relative}
 .act-cell .icon-btn::before{content:'';position:absolute;inset:-2px}   /* X-9r2 F20：Action icon 20 的透明點擊區補到 24×24 */
 .act-cell .icon-btn .material-symbols-outlined{font-size:16px}
+/* X-9r2 第三輪 CC1：列可用鍵盤進 Edit（Enter）、勾選框可 Tab＋Space；焦點 2px primary 往內畫（同 F6／Anomaly Detection 的列） */
+.tbl tbody tr:focus-visible{outline:none}
+.tbl tbody tr:focus-visible td{box-shadow:inset 0 2px 0 var(--lt-color-primary),inset 0 -2px 0 var(--lt-color-primary)}
+.tbl tbody tr:focus-visible td:first-child{box-shadow:inset 2px 0 0 var(--lt-color-primary),inset 0 2px 0 var(--lt-color-primary),inset 0 -2px 0 var(--lt-color-primary)}
+.tbl tbody tr:focus-visible td:last-child{box-shadow:inset -2px 0 0 var(--lt-color-primary),inset 0 2px 0 var(--lt-color-primary),inset 0 -2px 0 var(--lt-color-primary)}
+.chkcell:focus-visible{outline:2px solid var(--lt-color-primary);outline-offset:2px;border-radius:2px}
 /* Checkbox：A-13（2026-10-15）shared/lumiture-checkbox.js 預設已改成 primary 框、圓角 2，本頁原本的覆寫刪掉 */
 .chkcell{vertical-align:middle;display:flex;align-items:center;justify-content:center;cursor:pointer;width:16px;height:16px}
 
@@ -640,38 +718,39 @@ table.tbl{border-collapse:separate;border-spacing:0;width:100%;min-width:1360px;
 .es .es-ic{font-size:80px;color:var(--lt-blue-30);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;line-height:80px;width:80px;height:80px}
 .es .es-ic.is-outline{font-variation-settings:'FILL' 0,'wght' 700,'GRAD' 0,'opsz' 48}   /* Kabin 2026-10-09 驗收裁決：#03 空狀態的 table_view 稿上是空心格子，比照 Anomaly Detection（FILL 0＋wght 700 才對上稿的筆畫粗細） */
 .es svg{width:80px;height:80px;display:block}
-.es-title{font-size:var(--lt-fs-18);font-weight:var(--lt-fw-bold);line-height:27px;margin-top:16px}
-.es-desc{font-size:var(--lt-fs-14);white-space:pre-line;margin-top:8px;line-height:24.5px}
+.es-title{font:var(--lt-type-h5);margin-top:16px}
+.es-desc{font:var(--lt-type-body);white-space:pre-line;margin-top:8px}
 .es .btn{margin-top:32px}
 .es.err{min-height:70vh}
 
 /* ===== Form 版面（#05：GoBack 16/700、標題 20/700、雙欄各 486、欄間距 32）===== */
-.goback{display:inline-flex;align-items:center;gap:4px;font-size:var(--lt-fs-16);font-weight:var(--lt-fw-bold);line-height:24px;color:var(--lt-color-primary);align-self:flex-start;height:25px}
+.goback{display:inline-flex;align-items:center;gap:4px;font:var(--lt-type-h6);color:var(--lt-color-primary);align-self:flex-start;height:25px}
 .goback .material-symbols-outlined{font-size:16px;color:var(--lt-color-primary)}
+.goback .ico16{width:16px;height:16px;flex-shrink:0;display:block}   /* X-9r2 F16：箭頭改稿匯出的 16px 向量（同 Anomaly Detection 詳情 GoBack；Material Symbols 的 arrow_circle_left 箭頭只剩一小截） */
 .goback:hover .t{text-decoration:underline}
 .goback:disabled{opacity:.5;cursor:not-allowed}
 .sec-stack{display:flex;flex-direction:column;gap:20px}
 .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
 .card-col{display:flex;flex-direction:column;gap:32px;min-width:0}
 @media(max-width:1100px){.card-grid{grid-template-columns:1fr}}   /* ⚠ 設計端暫擬：Figma 只畫 1367 寬；窄視窗時兩欄改上下堆疊 */
-.sec-title{font-size:var(--lt-fs-18);font-weight:var(--lt-fw-bold);line-height:27px;color:var(--lt-color-text-heading)}
+.sec-title{font:var(--lt-type-h5);color:var(--lt-color-text-heading)}
 .sec-title .req{color:var(--lt-color-error);margin-left:4px}
 .fld{display:flex;flex-direction:column;gap:4px;min-width:0}
 .fld-group{display:flex;flex-direction:column;gap:8px;min-width:0}
 label.lbl{display:block}
-.lbl{font-size:var(--lt-fs-12);font-weight:var(--lt-fw-bold);line-height:18px;color:var(--lt-color-primary)}
+.lbl{font:var(--lt-type-caption-bold);color:var(--lt-color-primary)}
 .lbl .req{color:var(--lt-color-error);font-weight:var(--lt-fw-regular)}
-.help{font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-secondary)}
+.help{font:var(--lt-type-caption);color:var(--lt-color-text-secondary)}
 .help b{font-weight:var(--lt-fw-bold);color:var(--lt-color-text-primary)}
 .help b.u{text-decoration:underline}
 .help .note{color:var(--lt-color-error);display:block}
-.err-msg{font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-error)}
+.err-msg{font:var(--lt-type-caption);color:var(--lt-color-error)}
 .th-item > .err-msg{width:191px}   /* Figma #05-7：門檻錯誤訊息落在百分比輸入欄（191）底下、在欄內換行，不跨到等號與金額 */
 .err-msg a,.err-msg .lnk{color:var(--lt-color-primary);text-decoration:underline;cursor:pointer}
-.inp{display:flex;align-items:center;gap:8px;height:36px;padding:0 8px;background:#fff;border:1px solid var(--cb-field-border);border-radius:var(--cb-radius-field);min-width:0;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}
+.inp{display:flex;align-items:center;gap:8px;height:36px;padding:0 8px;background:var(--lt-white);border:1px solid var(--cb-field-border);border-radius:var(--cb-radius-field);min-width:0;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}
 .inp:hover{border-color:var(--lt-grey-400)}
 .inp:focus-within{border-color:var(--lt-color-border-focus);box-shadow:var(--lt-button-focus-ring)}
-.inp input{flex:1;min-width:0;border:none;outline:none;background:none;font-size:var(--lt-fs-14);line-height:21px;color:var(--lt-color-text-primary)}
+.inp input{flex:1;min-width:0;border:none;outline:none;background:none;font:var(--lt-type-button-regular-1);color:var(--lt-color-text-primary)}
 .inp input::placeholder{color:var(--lt-grey-400)}
 .inp .pfx,.inp .sfx{color:var(--lt-color-text-secondary);font-size:var(--lt-fs-14);flex-shrink:0}
 .inp.is-err,.inp.is-err:hover{border-color:var(--lt-color-error);box-shadow:inset 0 0 0 1px var(--lt-color-error)}   /* Figma #05-7：錯誤框 2px */
@@ -679,7 +758,7 @@ label.lbl{display:block}
 .inp.is-disabled{background:var(--lt-grey-100);border-color:var(--lt-grey-200);cursor:not-allowed}
 .inp.is-disabled input,.inp.is-disabled .pfx{color:var(--lt-grey-400);cursor:not-allowed}
 /* 下拉（Dropdown Field M：36h、箭頭是 8×6 實心三角 #676767）*/
-.sel{display:flex;align-items:center;justify-content:space-between;gap:10px;height:36px;padding:0 9px 0 8px;background:#fff;border:1px solid var(--cb-field-border);border-radius:var(--cb-radius-field);font-size:var(--lt-fs-14);color:var(--lt-color-text-primary);cursor:pointer;text-align:left;width:100%;min-width:0;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}
+.sel{display:flex;align-items:center;justify-content:space-between;gap:10px;height:36px;padding:0 9px 0 8px;background:var(--lt-white);border:1px solid var(--cb-field-border);border-radius:var(--cb-radius-field);font-size:var(--lt-fs-14);color:var(--lt-color-text-primary);cursor:pointer;text-align:left;width:100%;min-width:0;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}
 .sel:hover{border-color:var(--lt-grey-400)}
 .sel.open{border-color:var(--lt-color-border-focus);box-shadow:var(--lt-button-focus-ring)}
 .sel .tri,.tri{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--lt-grey-500);flex-shrink:0}
@@ -689,22 +768,26 @@ label.lbl{display:block}
 .sel:disabled .tri{border-top-color:var(--lt-grey-400)}
 .sel.is-err{border-color:var(--lt-color-error);box-shadow:inset 0 0 0 1px var(--lt-color-error)}
 .fld-sel-w200{width:200px;flex-shrink:0}
-.period-row{display:flex;align-items:center;gap:16px}
-.starts{display:flex;align-items:center;gap:8px;font-size:var(--lt-fs-14);line-height:24px;white-space:nowrap}
-.dp-trig{display:flex;align-items:center;gap:8px;height:36px;padding:0 16px;width:206px;background:#fff;border:1px solid var(--cb-field-border);border-radius:var(--lt-input-radius,5px);color:var(--lt-color-text-secondary);font-size:var(--lt-fs-14);cursor:pointer;text-align:left;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}   /* B-8／B-7：輸入與觸發欄 r5（2026-10-16 X-9r1，原 6；其他頁日期觸發欄都是 5） */
+.period-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;container-type:inline-size}   /* X-9r2 第三輪驗證後小修 DQ1／N1：Fixed Period 的區間欄（270）在欄寬放不下 200＋16＋270 時（1280）掉到週期下拉下一行、跟欄同寬，不再把日期擠成兩行；1366 以上維持同一列 */
+.starts{display:flex;align-items:center;gap:8px;font-size:var(--lt-fs-14);line-height:24px;white-space:nowrap;flex:1;min-width:0}   /* X-9r2 第三輪 B1：日期觸發欄吃掉 Starts on 右邊剩下的寬度，右緣跟 Budget Name／Amount 切齊（原寫死 206，1280 超出左欄 46px、1440 短 34px） */
+.starts .dp-trig{flex:1;min-width:0;width:auto}
+.dp-trig{display:flex;align-items:center;gap:8px;height:36px;padding:0 16px;width:206px;background:var(--lt-white);border:1px solid var(--cb-field-border);border-radius:var(--lt-input-radius,5px);color:var(--lt-color-text-secondary);font-size:var(--lt-fs-14);cursor:pointer;text-align:left;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}   /* B-8／B-7：輸入與觸發欄 r5（2026-10-16 X-9r1，原 6；其他頁日期觸發欄都是 5） */
 .dp-trig .material-symbols-outlined{font-size:18px;color:var(--lt-grey-500)}
 .dp-trig .dp-ic{font-size:20px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}   /* Figma #05 Date Picker：Date 圖示 20×20 */
 .dp-trig:not(.range) .dp-tx{flex:1;text-align:center}   /* Figma #05：日期在 146 寬的文字框內置中 */
 .dp-trig.range{justify-content:center}
 .dp-trig:hover{border-color:var(--lt-grey-400)}
 .dp-trig.open{border-color:var(--lt-color-border-focus);box-shadow:var(--lt-button-focus-ring)}
-.dp-trig.range{width:270px}
+.dp-trig.range{width:270px;flex:0 0 270px;max-width:100%}
+.dp-trig.range span{white-space:nowrap}
+@container (max-width:485px){.dp-trig.range{width:auto;flex:1 1 100%}}
 .dp-trig.range .arr{font-size:16px}
 .dp-trig:disabled{background:var(--lt-grey-100);border-color:var(--lt-grey-200);color:var(--lt-grey-400);cursor:not-allowed}
 .dp-trig:disabled .material-symbols-outlined{color:var(--lt-grey-400)}
 
 /* Thresholds（容器 #F2FAFF、邊框 #E6E6E6、r8、內距 16、列距 16）*/
-.th-box .btn-t{height:20px}
+.th-box .btn-t{height:20px;position:relative}
+.th-box .btn-t::before{content:'';position:absolute;left:0;right:0;top:-2px;bottom:-2px}   /* X-9r2 F15：稿 #05-6 的 Add Threshold 20 高，透明點擊區補到 24（WCAG 2.5.8） */
 .th-box{background:var(--lt-color-primary-bg);border:1px solid var(--lt-grey-200);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:16px}
 .th-row{display:flex;gap:8px;align-items:flex-end}
 .th-item{display:flex;flex-direction:column;gap:4px}
@@ -715,19 +798,21 @@ label.lbl{display:block}
 .th-del{width:24px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
 /* Chips field（Figma Dropdown/Field/Deletable Chip：chip r5、外框 primary、右側 primary 實心刪除鈕）*/
-.chipfield{display:flex;align-items:center;gap:8px;min-height:36px;max-height:240px;padding:4px 8px;background:#fff;border:1px solid var(--cb-field-border);border-radius:var(--cb-radius-field);cursor:pointer;min-width:0;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}
+.chipfield{display:flex;align-items:center;gap:8px;min-height:36px;max-height:240px;padding:4px 8px;background:var(--lt-white);border:1px solid var(--cb-field-border);border-radius:var(--cb-radius-field);cursor:pointer;min-width:0;transition:border-color var(--lt-transition-fast),box-shadow var(--lt-transition-fast)}
 .chipfield:hover{border-color:var(--lt-grey-400)}
 .chipfield.open,.chipfield:focus-within{border-color:var(--lt-color-border-focus);box-shadow:var(--lt-button-focus-ring)}
 /* Figma #08-1：Batch 對象欄展開時是 #B3B3B3 2px，跟其他欄位的 primary focus 不同（Kabin 2026-10-09 裁決照稿，只改這一欄）*/
-.chipfield[data-fid="cf:batch"].open,.chipfield[data-fid="cf:batch"].open:focus-within{border-color:#B3B3B3;box-shadow:inset 0 0 0 1px #B3B3B3}
+.chipfield[data-fid="cf:batch"].open,.chipfield[data-fid="cf:batch"].open:focus-within{border-color:var(--lt-grey-400);box-shadow:inset 0 0 0 1px var(--lt-grey-400)}
 .chipfield.is-err{border-color:var(--lt-color-error);box-shadow:inset 0 0 0 1px var(--lt-color-error)}
+.chipfield.is-err:focus-within{box-shadow:inset 0 0 0 1px var(--lt-color-error),0 0 0 3px rgba(255,64,61,.10)}   /* X-9r2 第三輪驗證後小修 N5：跟 .inp.is-err 聚焦時一樣的 3px 淡紅光暈 */
 .chipfield.is-disabled{background:var(--lt-grey-100);cursor:not-allowed}
-.chip-list{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:8px 4px;align-items:center;overflow-y:auto;overscroll-behavior:contain;max-height:230px;line-height:1}
-.chipfield .ph{color:var(--lt-grey-400);font-size:var(--lt-fs-14);line-height:21px}
-.chip{display:inline-flex;align-items:stretch;height:20px;border:1px solid var(--lt-color-primary);border-radius:var(--cb-radius-field);overflow:hidden;color:var(--lt-color-primary);font-size:var(--lt-fs-12);line-height:18px;background:#fff;min-width:0}
+.chip-list{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:8px 4px;align-items:center;overflow-y:auto;overscroll-behavior:contain;max-height:230px;line-height:1;padding:3px 0;margin:-3px 0}
+.chipfield .ph{color:var(--lt-grey-400);font:var(--lt-type-button-regular-1)}
+.chip{display:inline-flex;align-items:stretch;height:20px;border:1px solid var(--lt-color-primary);border-radius:var(--cb-radius-field);overflow:visible;color:var(--lt-color-primary);font:var(--lt-type-button-regular-0);background:var(--lt-white);min-width:0}
 .chip{max-width:300px}   /* #07 註記：Layout Chip Max Width = 300px（收件人 chip 另依 #05-4 為欄位寬的一半，inline style 覆寫）*/
 .chip .tx{padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center}
-.chip .x{width:24px;display:flex;align-items:center;justify-content:center;background:var(--lt-color-primary);color:#fff;cursor:pointer;flex-shrink:0}
+.chip .x{width:24px;padding:0;border:none;display:flex;align-items:center;justify-content:center;background:var(--lt-color-primary);color:var(--lt-white);cursor:pointer;flex-shrink:0;position:relative;border-radius:0 4px 4px 0}
+.chip .x::before{content:'';position:absolute;left:0;right:0;top:-3px;bottom:-3px}   /* X-9r2 第三輪 CC8：× 實際 24×18（chip 高 20 扣 1px 框）的透明點擊區補到 24×24（chip 改 overflow:visible、× 自己帶右側圓角，外觀不變；chip-list 上下各留 3 讓偽元素不被裁） */
 .chip .x .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 0,'wght' 700,'GRAD' 0,'opsz' 20}
 .chip .x:hover{background:var(--lt-color-primary-hover)}
 .chip.is-bad{border-color:var(--lt-color-error);color:var(--lt-color-error)}
@@ -735,14 +820,14 @@ label.lbl{display:block}
 .chip.is-bad .x:hover{background:var(--lt-toast-error-bg)}
 .chip.is-more{border:none;color:var(--lt-color-text-primary);padding:0 4px}
 .cf-ic{display:flex;align-items:center;gap:8px;flex-shrink:0;align-self:center}
-.cf-clear{width:16px;height:16px;border-radius:50%;background:#CCCCCC;color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.cf-clear{width:16px;height:16px;border-radius:50%;background:var(--lt-grey-300);color:var(--lt-white);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
 .cf-clear .material-symbols-outlined{font-size:12px;font-variation-settings:'FILL' 0,'wght' 700,'GRAD' 0,'opsz' 20}
 .cf-clear:hover{background:var(--lt-grey-500)}
-.chipfield .rin{border:none;outline:none;flex:1 1 24px;width:24px;min-width:24px;font-size:var(--lt-fs-14);line-height:21px;background:none;color:var(--lt-color-text-primary)}
+.chipfield .rin{border:none;outline:none;flex:1 1 24px;width:24px;min-width:24px;font:var(--lt-type-button-regular-1);background:none;color:var(--lt-color-text-primary)}
 .chipfield .rin::placeholder{color:var(--lt-grey-400)}
 
 /* ===== Budget Scope（#07：規則卡 #F2FAFF／邊框 #D1EEFF／r8／內距 16／gap 16）===== */
-.scope-hint{font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-secondary)}
+.scope-hint{font:var(--lt-type-caption);color:var(--lt-color-text-secondary)}
 .scope-hint b{color:var(--lt-color-text-primary);font-weight:var(--lt-fw-bold)}
 .rules{display:flex;flex-direction:column;gap:16px}
 .rule-row{display:flex;gap:16px;align-items:flex-start}
@@ -753,58 +838,63 @@ label.lbl{display:block}
 .csp-logo svg{width:24px;height:24px}
 .cond-row{display:flex;align-items:flex-start;gap:8px;min-height:36px}
 .cond-row .kw{width:48px;flex-shrink:0;text-align:right;line-height:36px}
-.cond-row .ty{width:72px;height:36px;flex-shrink:0;border:1px solid var(--cb-field-border);border-radius:var(--cb-radius-field);background:#fff;display:flex;align-items:center;justify-content:center;font-size:var(--lt-fs-14)}
+.cond-row .ty{width:72px;height:36px;flex-shrink:0;border:1px solid var(--cb-field-border);border-radius:var(--cb-radius-field);background:var(--lt-white);display:flex;align-items:center;justify-content:center;font-size:var(--lt-fs-14)}
 .cond-row .isin{line-height:36px;flex-shrink:0}
 .cond-row .cf-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 .cond-row .cond-x{height:36px;display:flex;align-items:center;flex-shrink:0}
+.rule-side .icon-btn{width:30px;height:30px}   /* X-9r2 第三輪 B2：稿 #07 Icon button/light 30×30、圖示 24（原 24／18） */
+.rule-side .icon-btn .material-symbols-outlined{font-size:24px}
+.cond-x .icon-btn .icon-outline{font-variation-settings:'FILL' 0,'wght' 600,'GRAD' 0,'opsz' 20}   /* X-9r2 第三輪 B9：稿 #07-5 的「−」橫線 11×2，wght 400 在 1 倍螢幕只剩約 1.5px 看起來像停用 */
 .rule-side{display:flex;flex-direction:column;justify-content:center;align-self:stretch;gap:16px;flex-shrink:0;width:30px;align-items:center}   /* Figma #07 Actions 30×(規則卡高) V gap16、置中 */
 .rule-empty{background:var(--lt-color-primary-bg);border:1px dashed var(--lt-grey-500);border-radius:8px;padding:32px 0;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;color:var(--lt-color-text-secondary)}
-.rule-empty .t1{font-size:var(--lt-fs-16);font-weight:var(--lt-fw-bold);line-height:24px}
+.rule-empty .t1{font:var(--lt-type-h6)}
 .rule-empty .t2{font-size:var(--lt-fs-14);line-height:24px}
 .add-rule-row{display:flex;align-items:center;gap:16px}
 .add-rule-row .btn{min-width:112px}
-.tip-l{position:relative}
-.tip-l::before{content:attr(data-tipl);position:absolute;right:calc(100% + 6px);top:50%;transform:translateY(-50%);background:var(--lt-tooltip-bg);color:#fff;font-size:14px;line-height:21px;padding:6px 12px;border-radius:var(--lt-tooltip-radius);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s;z-index:50}
-.tip-l:hover::before,.tip-l:focus-visible::before{opacity:1}
+/* X-9r2 F17：原本的 .tip-l 左側 tooltip 規則沒人用（Remove／Duplicate 走 #gl-tip），已刪 */
 
 /* ===== 底部固定動作條（#05 Save：#F2FAFF、陰影 0 0 6 .2、內距 16/32、貼視窗底）===== */
 .fixbar{position:sticky;bottom:0;margin:12px -32px -32px;padding:16px 32px;background:var(--lt-color-primary-bg);box-shadow:0 0 6px rgba(0,0,0,.2);display:flex;justify-content:flex-end;gap:16px;z-index:30}
 
 /* ===== Popover（menu／multi／recipients／date）===== */
-.pop{position:fixed;z-index:var(--lt-z-dropdown);background:#fff;border-radius:5px;box-shadow:0 0 6px rgba(0,0,0,.2),0 4px 12px rgba(0,0,0,.08);overscroll-behavior:contain;font-size:var(--lt-fs-14)}
+.pop{position:fixed;z-index:var(--lt-z-dropdown);background:var(--lt-white);border-radius:5px;box-shadow:0 0 6px rgba(0,0,0,.2),0 4px 12px rgba(0,0,0,.08);overscroll-behavior:contain;font-size:var(--lt-fs-14)}
 .pop.menu{padding:8px;min-width:250px}
 .mi{display:flex;align-items:center;gap:8px;height:40px;padding:0 8px;border-radius:4px;cursor:pointer;color:var(--lt-color-text-primary);white-space:nowrap}
 .mi:hover,.mi.hl{background:var(--lt-grey-50)}
-.mi.sel{background:var(--lt-grey-100)}
+.mi.is-sel{background:var(--lt-grey-100)}   /* X-9r2 F1：原本叫 .sel，會吃到下拉欄位 .sel 的 1px 框線（AD 10-12 同一題已改 is-sel） */
 .mi.is-disabled{color:var(--lt-grey-400);cursor:not-allowed;background:none}
 .pop.multi{padding:8px;display:flex;flex-direction:column}
 .pop.multi .srch{display:flex;align-items:center;height:32px;border:1px solid var(--cb-field-border);border-radius:var(--cb-radius-field);padding:0 8px;gap:8px;flex-shrink:0}
-.pop.multi .srch input{flex:1;border:none;outline:none;font-size:var(--lt-fs-14);background:none;min-width:0;color:#262626}   /* X-9r2 F12：輸入字色 #262626 */
+.pop.multi .srch input{flex:1;border:none;outline:none;font-size:var(--lt-fs-14);background:none;min-width:0;color:var(--lt-color-text-primary)}   /* X-9r2 F12：輸入字色 #262626 */
 .pop.multi .srch input::placeholder{color:var(--lt-grey-400)}
 .pop.multi .srch .material-symbols-outlined{font-size:20px;color:var(--lt-grey-500)}
 .pop.multi .lst{overflow-y:auto;overscroll-behavior:contain;margin-top:4px;flex:1;min-height:0}
 .pop.multi .opt{display:flex;align-items:center;gap:8px;height:40px;padding:0 8px;cursor:pointer;white-space:nowrap}
 .pop.multi .opt:hover{background:var(--lt-grey-50)}
-.pop.multi .opt.all{border-bottom:1px solid var(--lt-grey-200);position:sticky;top:0;background:#fff;z-index:1}
+.pop.multi .opt.all{border-bottom:1px solid var(--lt-grey-200);position:sticky;top:0;background:var(--lt-white);z-index:1}
 .pop.multi .opt.all:hover{background:var(--lt-grey-50)}
 .pop.multi .opt .lbl-t{overflow:hidden;text-overflow:ellipsis}
 .pop.multi .empty{padding:16px;text-align:center;color:var(--lt-color-text-secondary)}
 .pop.recip{padding:8px 0}
 .pop.recip .lst{overflow-y:auto;overscroll-behavior:contain;max-height:296px;padding:0 8px}
-.ru{display:flex;flex-direction:column;justify-content:center;height:58px;padding:0 8px;border-radius:4px;cursor:pointer}
-.ru .n{font-size:var(--lt-fs-14);line-height:21px;color:var(--lt-color-text-primary)}
-.ru .e{font-size:var(--lt-fs-12);line-height:18px;color:var(--lt-color-text-secondary)}
+.ru{display:flex;flex-direction:column;justify-content:center;height:60px;padding:0 8px;border-radius:4px;cursor:pointer}
+.ru .n{font:var(--lt-type-button-regular-1);font-weight:var(--lt-fw-medium);line-height:24.5px;color:var(--lt-color-text-primary)}   /* X-9r2 第三輪 A3／B7：稿 #05-4 姓名 14／500／24.5、一項 60 高（原 400／21、58） */
+.ru .e{font:var(--lt-type-caption);color:var(--lt-color-text-secondary)}
 .ru b{font-weight:var(--lt-fw-bold)}
 .ru:hover,.ru.hl{background:var(--lt-grey-200)}
 .ru.is-disabled{opacity:.45;cursor:not-allowed;background:none}
 .pop.recip .empty{padding:16px;text-align:center;color:var(--lt-color-text-secondary)}
+/* X-9r2 第三輪 B6：稿 #18／#10／#05-4／#07-6／#08-1 的清單都畫了常駐捲軸（15px 軌道、thumb #D8D8D8），抄 Anomaly Detection 的 `.modal .m-scroll` 那組；macOS 預設的隱形捲軸只剩「最後一列被切半」這個線索 */
+.modal .m-list::-webkit-scrollbar,.pop.multi .lst::-webkit-scrollbar,.pop.recip .lst::-webkit-scrollbar,.chip-list::-webkit-scrollbar{width:15px}
+.modal .m-list::-webkit-scrollbar-track,.pop.multi .lst::-webkit-scrollbar-track,.pop.recip .lst::-webkit-scrollbar-track,.chip-list::-webkit-scrollbar-track{background:var(--lt-white);box-shadow:inset 1px 0 var(--lt-grey-200),inset -1px 0 var(--lt-grey-200)}
+.modal .m-list::-webkit-scrollbar-thumb,.pop.multi .lst::-webkit-scrollbar-thumb,.pop.recip .lst::-webkit-scrollbar-thumb,.chip-list::-webkit-scrollbar-thumb{background:var(--cb-scroll-thumb);border:solid transparent;border-width:0 2px 0 3px;background-clip:padding-box;border-radius:2px;box-shadow:inset 0 0 0 1px var(--lt-grey-200)}
 /* Date picker（CMDS：« ‹ Mon YYYY ▾ › »、Su–Sa、40×40 儲存格、選取 primary、範圍連續）*/
 .pop.dp{padding:16px 20px 12px;width:300px}
 .dp-hd{display:flex;align-items:center;gap:4px;height:32px;border-bottom:1px solid var(--lt-grey-200);padding-bottom:12px;box-sizing:content-box}
-.dp-hd .nv{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;color:var(--lt-grey-700);border-radius:4px}
+.dp-hd .nv{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;color:var(--lt-grey-500);border-radius:4px}
 .dp-hd .nv:hover{background:var(--lt-grey-100)}
-.dp-hd .nv .material-symbols-outlined{font-size:18px;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20}
-.dp-hd .ttl{flex:1;text-align:center;font-weight:var(--lt-fw-bold);font-size:var(--lt-fs-14);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.dp-hd .nv .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20}   /* X-9r2 第三輪 B3：稿 #05-1 箭頭 16px、#676767、細（原 18／#262626／wght 500） */
+.dp-hd .ttl{flex:1;text-align:center;font-weight:var(--lt-fw-bold);font-size:var(--lt-fs-16);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px}
 .dp-hd .ttl .tri{border-left-width:3px;border-right-width:3px;border-top-width:5px}
 .dp-wk{display:grid;grid-template-columns:repeat(7,1fr);margin-top:12px;font-size:var(--lt-fs-12);color:var(--lt-grey-500);text-align:center;line-height:24px}
 .dp-gr{display:grid;grid-template-columns:repeat(7,1fr);row-gap:2px}
@@ -816,9 +906,9 @@ label.lbl{display:block}
 .dp-d.dis{color:var(--lt-grey-300);cursor:not-allowed}
 .dp-d.dis:hover span{background:none}
 .dp-d.today span{background:var(--lt-grey-100)}
-.dp-d.sel span{background:var(--lt-color-primary);color:#fff}
-.dp-d.in-range{background:var(--lt-color-primary);color:#fff}
-.dp-d.in-range span{color:#fff}
+.dp-d.sel span{background:var(--lt-color-primary);color:var(--lt-white)}
+.dp-d.in-range{background:var(--lt-color-primary);color:var(--lt-white)}
+.dp-d.in-range span{color:var(--lt-white)}
 .dp-d.in-range:hover span{background:transparent}
 .dp-d.rs{border-radius:6px 0 0 6px}
 .dp-d.re{border-radius:0 6px 6px 0}
@@ -826,25 +916,27 @@ label.lbl{display:block}
 .dp-mg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:16px 0 8px}
 .dp-mg .m{height:36px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-weight:var(--lt-fw-bold);color:var(--lt-grey-500);cursor:pointer}
 .dp-mg .m:hover{background:var(--lt-color-primary-bg)}
-.dp-mg .m.sel{background:var(--lt-color-primary);color:#fff}
+.dp-mg .m.sel{background:var(--lt-color-primary);color:var(--lt-white)}
 
 /* ===== Modal（#16／#17／#09：655 寬、r10、內距 24/32、陰影 0 0 6 .2、標題 20/700）===== */
 .mask{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:var(--lt-z-modal);display:flex;align-items:center;justify-content:center;padding:24px}
-.modal{width:655px;max-width:100%;max-height:calc(100vh - 48px);background:#fff;border-radius:var(--cb-radius-modal);box-shadow:var(--lt-modal-shadow);padding:24px 32px;display:flex;flex-direction:column;gap:24px;min-height:0}
+.modal{width:655px;max-width:100%;max-height:calc(100vh - 48px);background:var(--lt-white);border-radius:var(--cb-radius-modal);box-shadow:var(--lt-modal-shadow);padding:24px 32px;display:flex;flex-direction:column;gap:24px;min-height:0}
 .modal.g30{gap:30px}
+.modal.g32{gap:32px}   /* X-9r1 11-13：#16 離開確認標題→內文、內文→按鈕 32（稿 655×203；原吃預設 gap 24，彈窗只有 186 高，比 Executive Insights／General Budget 同類彈窗擠）*/
 .modal .m-hd{display:flex;align-items:center;gap:15px;flex-shrink:0}
 .modal .m-hd .ic{font-size:30px;color:var(--lt-color-error);flex-shrink:0}
-.modal .m-hd h2{flex:1;font-size:20px;line-height:30px;font-weight:var(--lt-fw-bold);color:var(--lt-color-text-heading)}
+.modal .m-hd h2{flex:1;font:var(--lt-type-h4);color:var(--lt-color-text-heading)}
 .modal .m-x{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--lt-grey-500);flex-shrink:0}
-.modal .m-x:hover{background:var(--lt-grey-100);color:#262626}   /* X-9r2 F11：hover 底色＋icon #262626（同 General Budget） */
+.modal .m-x:hover{background:var(--lt-grey-100);color:var(--lt-color-text-primary)}   /* X-9r2 F11：hover 底色＋icon #262626（同 General Budget） */
 .modal .m-x .material-symbols-outlined{font-size:24px;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24}
 .modal .m-body{font-size:var(--lt-fs-14);line-height:24px;color:var(--lt-color-text-primary);flex-shrink:0}
-.modal .m-body.ind{padding-left:45px}
+.modal .m-body.ind{padding-left:0}   /* Kabin 2026-11-13 裁決：確認彈窗內文全站跟 icon 左緣齊平（X-9r1 Q1，F173；稿 #12／#16 待回改）。原照稿 #16 左內距 45 */
 .modal .m-body b{font-weight:var(--lt-fw-bold)}
 .modal .m-list{border:1px solid var(--lt-grey-200);border-radius:8px;padding:8px;overflow-y:auto;overscroll-behavior:contain;min-height:0;flex:1 1 auto}
 .modal .m-list.r5{border-radius:5px}
 .modal .m-list li{list-style:none;color:var(--lt-color-primary);font-size:var(--lt-fs-14);line-height:24px;display:flex;gap:8px;word-break:break-word}
-.modal .m-list li::before{content:'•';font-size:10px;line-height:24px;flex-shrink:0;margin-left:4px}
+.modal .m-list li::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0;margin:10px 1px 0 6px}   /* X-9r2 第三輪 B16：稿 #17／#18／#09／#10 實心圓點約 4px、離文字約 9px（原 10px 字的「•」只剩約 2px） */
+.modal .m-body.wide{margin-right:-16px}   /* X-9r2 第三輪 B8（照推薦，Kabin 未勾；同 Executive Insights Q5）：Chrome 的 Noto Sans 14px 比 Figma 寬約 5%，Batch 確認說明句右邊界放寬讓它回到稿的一行；彈窗寬與內距不動 */
 .modal .m-ft{display:flex;justify-content:flex-end;gap:16px;flex-shrink:0}
 
 /* ===== Toast：改用 shared/lumiture-toast.js（A-1；成功 #008F88／錯誤 #BF302E、r4、寬 400、左下起點跟 sidebar 展開收合；頁面不再自己寫 toast CSS） ===== */
@@ -854,9 +946,9 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
 
 /* ===== Footer（CLAUDE.md 規定的 prototype footer；Figma 底部 Copyright 列是產品 footer，不是這個）===== */
 .footer{padding:var(--lt-space-16) var(--lt-space-32);background:var(--lt-color-primary-bg);border-top:1px solid var(--lt-color-border-default);display:flex;align-items:center;justify-content:space-between;font-size:var(--lt-fs-12);color:var(--lt-color-text-secondary);flex-wrap:wrap;gap:10px}
-.footer-version{font-weight:var(--lt-fw-medium);color:#262626}
-.footer-version .ver-tag{background:#34B5D9;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}
-.footer-credit{color:#676767;font-size:12px}
+.footer-version{font-weight:var(--lt-fw-medium);color:var(--lt-color-text-primary)}
+.footer-version .ver-tag{background:var(--lt-turquoise-70);color:var(--lt-white);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}
+.footer-credit{color:var(--lt-color-text-secondary);font-size:12px}
 </style>
 </head>
 <body class="cb-page">
@@ -872,6 +964,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
   </div>
 </div>
 <div id="modal-root"></div>
+<div id="form-live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>   <!-- X-9r2 第三輪 CC4：表單送出驗證失敗的播報（畫面不變） -->
 
 <script>
   window.LUMITURE_ACTIVE = 'customized-budget';
@@ -1137,14 +1230,14 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
   }
   function _renderLogo() {
     var href = _homeHref();
-    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-sb-logo">';
+    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-sb-logo">';
     return open + _logoBody(LOGO_ICON) + (href ? '</a>' : '</div>');
   }
   // 收合時顯示在 topbar 左側的 logo（同一組圖形，mask id 改 ltT* 避免跟 sidebar 那份撞 id）
   function _renderTopbarLogo() {
     var href = _homeHref();
     var icon = LOGO_ICON.replace(/ltH(ring|bars|leg)/g, 'ltT$1');
-    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-tb-logo">';
+    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-tb-logo">';
     return open + _logoBody(icon) + (href ? '</a>' : '</div>');
   }
   function _mountTopbarLogo(host) {
@@ -1396,7 +1489,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
  *     version:     'v1.19.0',               // Software version 列
  *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
  *     quota: {                              // AI Quota box 數據；total 已含 add-on
- *       refreshDate: '2 Nov. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）
+ *       refreshDate: '2 Dec. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）。沒給（或給空值）就自動算下一個 2 號（X-9r1 11-13 S-A1，LumitureTopbar.nextRefreshDate）
  *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
  *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
  *     },
@@ -1407,6 +1500,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
  *   window.LumitureTopbar.setRole('Manager - ...')— 只更新 role chip（Demo FAB role 切換用）
  *   window.LumitureTopbar.setPlan('Essential')    — 切 plan（連動 AI Quota box 顯示項目）
  *   window.LumitureTopbar.setQuota({analyses:{...}, rightsizing:{...}, refreshDate, addonPacks})
+ *   window.LumitureTopbar.nextRefreshDate()        — 依今天算下一個計費週期錨日（每月 2 號），回 '2 Dec. 2026' 這種寫法
  *   window.LumitureTopbar.openMenu() / closeMenu() / toggleMenu()
  *   window.LumitureTopbar.rerender()
  *   window.LumitureTopbar.openRoleDialog() / closeRoleDialog()   — View as Another Role 彈窗（#01-5；頁面掛勾見下方 role 區塊註解）
@@ -1415,6 +1509,16 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
  */
 (function () {
   'use strict';
+
+  /* X-9r1 11-13 S-A1：下一個計費週期錨日（每月 2 號），格式照稿的「2 Apr. 2028」；今天 ≥ 2 號就取下個月。
+     原本寫死 '2 Nov. 2026'，過了那天 13 頁的 Account Menu 都顯示過期日（User Menu 頁自己算過，這裡搬進 shared 讓全站共用）。 */
+  function _nextRefreshDate() {
+    var M = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'];
+    var d = new Date(), y = d.getFullYear(), m = d.getMonth();
+    if (d.getDate() >= 2) m += 1;
+    if (m > 11) { m = 0; y += 1; }
+    return '2 ' + M[m] + ' ' + y;
+  }
 
   // ===== Defaults ===== (預設給 Standard plan + Normal 狀態，所有既有 prototype 直接吃，不破版)
   var DEFAULT_USER = {
@@ -1429,7 +1533,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
     version: 'v1.19.0',
     addonPacks: 0,
     quota: {
-      refreshDate: '2 Nov. 2026',          // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期（原 2 Jul. 2026 已過期）
+      refreshDate: _nextRefreshDate(),     // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期；X-9r1 11-13 S-A1：改成依今天自動算（原寫死 2 Nov. 2026 已過期）
       analyses:    { used: 32,  total: 80 },
       rightsizing: { used: 410, total: 1000 },
     },
@@ -1495,8 +1599,11 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
     /* ---------- Account Menu popover ----------
        2026-10-14 逐格對 Figma #01-6（hover）／#01-7（loading & error）：左右內距 24、方案列 37 高、姓名 16/700、角色 chip 藍 #004FB0 方角、
        AI Quota 每列 24 高、狀態色 #00DCC2／#F4A938／#FF403D、功能列 40 高（外包 8／16）、陰影 0 0 6px .2。舊值（內距 16、狀態色提亮）是 06-22 的目視估計 */
-    '.lt-am-backdrop{position:fixed;inset:0;z-index:1000;background:transparent}',
-    '.lt-am{position:fixed;top:64px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
+    /* X-9r1 11-13 S-A2：背板 1000 → 997。Demo FAB 999、面板 998，背板要讓到它們底下，否則選單開著時（User Menu 頁進頁就開著）
+       第一下點 FAB 只會被背板吃掉去關選單，面板不開。選單本體 #lt-am 維持 1001。不要去抬 FAB 的層級：
+       Cost Dashboard、Group List、All Resource List 有 1000 以上的彈窗遮罩，FAB 抬上去會浮在遮罩上。 */
+    '.lt-am-backdrop{position:fixed;inset:0;z-index:997;background:transparent}',
+    '.lt-am{position:fixed;top:68px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
     'box-shadow:0 0 6px rgba(0,0,0,.2);font-family:\'Noto Sans\',sans-serif;color:#fff;',
     'animation:lt-am-in .14s ease;transform-origin:top right}',   /* 不設 overflow:hidden：hover tooltip（寬 400）要能伸出選單左邊，圓角改由第一／最後一個子區塊自己帶 */
     '@keyframes lt-am-in{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}',
@@ -1593,6 +1700,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
   function _user() {
     var u = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
     u.quota = Object.assign({}, DEFAULT_USER.quota, (window.LUMITURE_USER || {}).quota || {});
+    if (!u.quota.refreshDate) u.quota.refreshDate = _nextRefreshDate();   /* 頁面傳 undefined／null／'' 也吃自動值（S-A1） */
     return u;
   }
   function _status(used, total) {
@@ -1763,7 +1871,8 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
     var m = document.getElementById('lt-am');
     return m ? Array.prototype.slice.call(m.querySelectorAll('.lt-am-item,.lt-q-err a,.lt-q-item.has-tip')) : [];
   }
-  function _openMenu() {
+  function _openMenu(opts) {
+    var noFocus = !!(opts && opts.focus === false);   /* X-9r1 11-13 S-B9：程式開選單（User Menu 進頁、Demo 情境）不搶焦點 */
     var wasOpen = _menuOpen, items0 = wasOpen ? _menuItems() : [], idx = items0.indexOf(document.activeElement);
     var u = _user();
     _menuHost().innerHTML = _renderMenu(u);
@@ -1771,7 +1880,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
     var chip = document.getElementById('lt-tb-user');
     if (chip) { chip.classList.add('is-open'); chip.setAttribute('aria-expanded', 'true'); }
     var items = _menuItems(), t = null;
-    if (!wasOpen) t = document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
+    if (!wasOpen) t = noFocus ? null : document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
     else if (idx > -1 && items.length) t = items[Math.min(idx, items.length - 1)];            // 重繪（Retry、切 plan…）：焦點留在原位
     if (t) t.focus({ preventScroll: true });
   }
@@ -1844,7 +1953,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
     '.lt-rd-btn.pri{background:#004FB0;color:#fff;border-color:#004FB0;min-width:160px}',
     '.lt-rd-btn.pri:hover{background:#0B6DD7;border-color:#0B6DD7}',
     '.lt-rd-btn.out{background:#fff;color:#004FB0;border-color:#004FB0}',
-    '.lt-rd-btn.out:hover{background:#F2FAFF}',
+    '.lt-rd-btn.out:hover{background:#F6F6F6;color:#0B6DD7;border-color:#0B6DD7}',   /* X-9r1 11-13 S-KCR：照全站外框主色鈕 hover（Guideline .btn--outlined-primary:hover） */
     '.lt-rd-btn[disabled]{background:#CCCCCC;border-color:#CCCCCC;color:#fff;cursor:not-allowed}',
     '.lt-rd-btn:focus-visible,.lt-rd-sel:focus-visible{outline:2px solid #004FB0;outline-offset:2px}',
     '.lt-rd-spin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:lt-rd-spin .8s linear infinite}',
@@ -1943,8 +2052,9 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
         '" aria-controls="lt-rd-list" aria-labelledby="lt-rd-t"><span class="lt-rd-v">' + _esc(sel.name) + '</span><span class="lt-rd-chip">' + _esc(sel.role) +
         '</span><span class="material-symbols-outlined lt-rd-arr" aria-hidden="true">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
       '<div class="lt-rd-act"><button type="button" class="lt-rd-btn out" id="lt-rd-keep"' + (r.loading ? ' disabled' : '') + '>' + ROLE_COPY.keep + '</button>' +
-        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') + '>' +
-        (r.loading ? '<span class="lt-rd-spin" role="status" aria-label="Loading"></span>' : ROLE_COPY.cont) + '</button></div>' +
+        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') +
+        (r.loading ? ' aria-label="' + _esc(ROLE_COPY.cont) + '" aria-busy="true"' : '') + '>' +   /* X-9r1 11-13 S-A4：讀取中名稱維持 Continue（同 Auth 11-05 N2） */
+        (r.loading ? '<span class="lt-rd-spin" aria-hidden="true"></span>' : ROLE_COPY.cont) + '</button></div>' +
     '</div></div>';
   }
   function _rdRender(keepFocusId) {
@@ -2126,10 +2236,12 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
       window.LUMITURE_USER = Object.assign({}, cur, {
         quota: Object.assign({}, DEFAULT_USER.quota, cur.quota || {}, q || {}),
       });
+      if (!window.LUMITURE_USER.quota.refreshDate) window.LUMITURE_USER.quota.refreshDate = _nextRefreshDate();   /* 空值用自動值（S-A1） */
       if (q && typeof q.addonPacks !== 'undefined') window.LUMITURE_USER.addonPacks = q.addonPacks;
       if (_menuOpen) _openMenu();
     },
-    openMenu: _openMenu,
+    openMenu: _openMenu,   /* openMenu({focus:false})：程式開選單不搶焦點（S-B9） */
+    nextRefreshDate: _nextRefreshDate,
     closeMenu: _closeMenu,
     toggleMenu: _toggleMenu,
     rerender: function () { _render(); if (_menuOpen) _openMenu(); },
@@ -2727,7 +2839,7 @@ function headerHtml(skeleton) {
   return `
     <div class="pg-hdr">
       <h1 class="pg-title">${COPY.title}</h1>
-      <div class="upd ${skeleton ? 'is-skel' : ''}"><span><b>Last Updated</b>${pr}</span><span><b>Next Update</b>${nx} (UTC+0)<span class="material-symbols-outlined ic-info" data-tip="${esc(COPY.updateAtTip)}">info</span></span></div>
+      <div class="upd ${skeleton ? 'is-skel' : ''}"><span><b>Last Updated</b>${pr}</span><span><b>Next Update</b>${nx} (UTC+0)<span class="material-symbols-outlined ic-info" data-tip="${esc(COPY.updateAtTip)}" tabindex="0" role="img" aria-label="${esc(COPY.updateAtTip)}">info</span></span></div>
     </div>
     <div class="pg-desc">${esc(COPY.desc1)}<br>${esc(COPY.desc2)}</div>`;
 }
@@ -2765,9 +2877,9 @@ function rowHtml(b) {
   const spendTxt = `${ORG_CURRENCY} ${fmtMoney(b.spend)} / ${fmtMoney(b.amount)}`;
   const cap2 = creditLine(b.credit);
   const trig = b.thresholds.slice().sort((a, c) => a - c).map(t => t + '%').join(', ');
-  const act = opt ? '' : `data-a="row-open" data-id="${esc(b.id)}"`;
+  const act = opt ? '' : `data-a="row-open" data-id="${esc(b.id)}" tabindex="0"`;   /* X-9r2 第三輪 CC1：列可聚焦、Enter 進 Edit */
   return `<tr class="${sel ? 'is-sel' : ''} ${opt ? 'is-opt' : ''}" ${act}>
-    <td class="c-chk st-l1"><span class="chkcell" ${opt ? '' : `data-a="sel-row" data-id="${esc(b.id)}"`}>${LumiCheckbox.html({ checked: sel, disabled: !!opt })}</span></td>
+    <td class="c-chk st-l1"><span class="chkcell" role="checkbox" aria-checked="${sel}" aria-label="Select ${esc(b.name)}" ${opt ? 'aria-disabled="true"' : `tabindex="0" data-a="sel-row" data-id="${esc(b.id)}"`}>${LumiCheckbox.html({ checked: sel, disabled: !!opt })}</span></td>
     <td class="c-name st-l2"><div class="cell-2l"><div class="l1" data-trunc="${esc(b.name + '\n' + (opt ? '--' : b.id))}">${esc(b.name)}</div><div class="l2">${opt ? '--' : esc(b.id)}</div></div></td>
     <td class="c-spend"><div class="spend-cell"><div class="bar"><i style="width:${bar.w}px;background:${bar.color}"></i></div><div class="spend-cap" data-trunc="${esc(spendTxt + '\n' + cap2)}"><div>${spendTxt}</div><div>${esc(cap2)}</div></div></div></td>
     <td class="c-apply">${b.resources.toLocaleString('en-US')} ${b.resources === 1 ? 'resource' : 'resources'}</td>
@@ -2785,9 +2897,9 @@ function tableCardHtml() {
   const allSel = rows.length > 0 && rows.every(r => state.sel.has(r.id));
   const mixed = state.sel.size > 0 && !allSel;
   /* Figma #01-4：Select All 三態（Unchecked→全選、Mixed→全選、Checked→取消全選）。⚠ DEVIATION: FE 是「全勾或半勾 → 清空」（盤點 §1-1 欄 1），這裡照 Figma */
-  return `<div class="card"><div class="tbl-wrap" id="tbl-wrap"><div class="tbl-scroll" id="tbl-scroll"><table class="tbl">
+  return `<div class="card"><div class="tbl-wrap" id="tbl-wrap"><div class="tbl-scroll" id="tbl-scroll"><table class="tbl" aria-label="Customized budgets">
     <thead><tr>
-      <th class="c-chk st-l1"><span class="chkcell" data-a="sel-all">${LumiCheckbox.html({ checked: allSel, mixed })}</span></th>
+      <th class="c-chk st-l1"><span class="chkcell" role="checkbox" aria-checked="${mixed ? 'mixed' : allSel}" aria-label="Select all budgets" tabindex="0" data-a="sel-all">${LumiCheckbox.html({ checked: allSel, mixed })}</span></th>
       ${thHtml('c-name st-l2', 'name', 'Budget Name / ID')}
       ${thHtml('c-spend', 'spend', 'Spend and Budget Amount')}
       ${thHtml('c-apply', 'apply', 'Applies to')}
@@ -2819,6 +2931,7 @@ function renderList() {
   root.innerHTML = headerHtml(ps === 'loading') + listActionsHtml() + body;
   const sc = $('#tbl-scroll');
   if (sc) { sc.scrollLeft = prevScroll; sc.addEventListener('scroll', syncShadow, { passive: true }); syncShadow(); markTrunc(); }
+  syncToastLift();
 }
 function syncShadow() {
   const sc = $('#tbl-scroll'), w = $('#tbl-wrap'); if (!sc || !w) return;
@@ -2833,18 +2946,27 @@ function markTrunc() {
   });
 }
 window.addEventListener('resize', () => { if (state.view === 'list') { syncShadow(); markTrunc(); } });
+/* X-9r2 第三輪 A1：表單頁有固定底列 .fixbar，toast 要在底列上方 16（CLAUDE.md 共用層速查 X-9r1 S3，同 General Budget／Executive Insights）。
+ * 底列是 sticky：捲到底時它會停在頁尾上方（不在視窗最底），所以不寫死 84，每次依底列實際上緣算 `視窗高 − 底列上緣 + 16`；沒有底列（列表、Edit 錯誤頁）回預設 24。 */
+function syncToastLift() {
+  const fb = document.querySelector('.fixbar'), b = document.body;
+  if (!fb) { b.style.removeProperty('--lt-toast-bottom'); return; }
+  b.style.setProperty('--lt-toast-bottom', Math.max(24, Math.round(window.innerHeight - fb.getBoundingClientRect().top + 16)) + 'px');
+}
+window.addEventListener('scroll', syncToastLift, { passive: true });
+window.addEventListener('resize', syncToastLift);
 
 Object.assign(ACT, {
   'sort': el => { const k = el.dataset.key; state.sort = state.sort.key === k ? { key: k, dir: -state.sort.dir } : { key: k, dir: 1 }; renderList(); },
-  'sel-row': el => { const id = el.dataset.id; state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id); renderList(); },
-  'sel-all': () => { const all = state.budgets.every(b => state.sel.has(b.id)); state.sel = all ? new Set() : new Set(state.budgets.map(b => b.id)); renderList(); },
+  'sel-row': el => { const id = el.dataset.id, kb = document.activeElement === el; state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id); renderList(); if (kb) { const n = document.querySelector('.chkcell[data-a="sel-row"][data-id="' + CSS.escape(id) + '"]'); n && n.focus({ preventScroll: true }); } },   /* CC1：重繪後鍵盤焦點留在同一格 */
+  'sel-all': el => { const kb = document.activeElement === el, all = state.budgets.every(b => state.sel.has(b.id)); state.sel = all ? new Set() : new Set(state.budgets.map(b => b.id)); renderList(); if (kb) { const n = document.querySelector('.chkcell[data-a="sel-all"]'); n && n.focus({ preventScroll: true }); } },
   'toggle-status': el => {
     /* Figma #01 註記：Switch 直接切換，不加確認（⚠ 停用預算＝停掉告警，有後果；Kabin 2026-09 裁決照 Figma 不加確認）*/
     const b = state.budgets.find(x => x.id === el.dataset.id); if (!b) return;
     b.status = !b.status; b.alertStatus = b.status ? 'Active' : 'Inactive';
     el.classList.toggle('on', b.status); el.setAttribute('aria-checked', b.status);
   },
-  'row-open': el => openEdit(el.dataset.id),
+  'row-open': el => openEdit(el.dataset.id, { focusTitle: true }),   /* X-9r2 第三輪驗證後小修 N2：鍵盤 Enter 進 Edit 後焦點到頁標題（載入完成重繪後再聚焦一次） */
   'del-one': el => openRemoveModal([el.dataset.id]),
   'bulk-remove': () => openRemoveModal([...state.sel]),
   'go-create': () => startForm('create'),
@@ -2852,6 +2974,10 @@ Object.assign(ACT, {
 });
 document.addEventListener('keydown', e => {
   if ((e.key === ' ' || e.key === 'Enter') && e.target.matches && e.target.matches('.sw[data-a]')) { e.preventDefault(); e.target.click(); }
+  /* X-9r2 第三輪 CC1：列 Enter 進 Edit；勾選格 Space／Enter 切換；chipfield（Budget Scope 條件、Batch 對象）Enter／Space／↓ 開下拉 */
+  if (e.key === 'Enter' && e.target.matches && e.target.matches('tr[data-a="row-open"]')) { e.preventDefault(); e.target.click(); }
+  if ((e.key === ' ' || e.key === 'Enter') && e.target.matches && e.target.matches('.chkcell[data-a]')) { e.preventDefault(); e.target.click(); }
+  if ((e.key === ' ' || e.key === 'Enter') && e.target.matches && e.target.matches('.chipfield[data-a="cf-open"]') && e.target === document.activeElement) { e.preventDefault(); e.target.click(); }
 });
 </script>
 <script>
@@ -2923,17 +3049,20 @@ function revalidate() { const f = F(); if (f.submitted) f.errors = validate(f); 
 /* ---------- Regions ---------- */
 function selHtml(menuId, text, o) {
   o = o || {};
-  return `<button type="button" class="sel ${o.cls || ''}" data-a="open-menu" data-menu="${menuId}" data-fid="menu:${menuId}${o.key ? ':' + o.key : ''}" ${o.disabled ? 'disabled' : ''}><span class="v">${o.icon || ''}${esc(text)}</span><span class="tri"></span></button>`;
+  const sid = 'sel-' + menuId + (o.key ? '-' + o.key : '');   /* X-9r2 第三輪 CC5：名稱＝標籤＋目前值（原本讀屏只念到「No, button」） */
+  return `<button type="button" id="${sid}" class="sel ${o.cls || ''}" data-a="open-menu" data-menu="${menuId}" data-fid="menu:${menuId}${o.key ? ':' + o.key : ''}" ${o.disabled ? 'disabled' : ''} aria-haspopup="listbox" aria-expanded="false"${o.lbl ? ` aria-labelledby="${o.lbl} ${sid}"` : ''}><span class="v">${o.icon || ''}${esc(text)}</span><span class="tri"></span></button>`;
 }
 /* X-9r2 F18：有對應輸入框的標籤用 <label for>（外觀同原本 div.lbl） */
-const lbl = (t, req, forId) => forId ? `<label class="lbl" for="${forId}">${t}${req ? ' <span class="req">*</span>' : ''}</label>` : `<div class="lbl">${t}${req ? ' <span class="req">*</span>' : ''}</div>`;
-const errHtml = m => m ? `<div class="err-msg">${m}</div>` : '';
+/* X-9r2 F16：GoBack 箭頭用稿匯出的向量（複製自 Anomaly Detection v2 的 SVG_BACK） */
+const SVG_BACK = '<svg class="ico16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8.00026 14.9336C6.62898 14.9336 5.28849 14.527 4.14831 13.7651C3.00813 13.0033 2.11947 11.9204 1.5947 10.6535C1.06993 9.38663 0.932628 7.99257 1.20015 6.64764C1.46768 5.3027 2.12801 4.0673 3.09766 3.09766C4.0673 2.12801 5.3027 1.46768 6.64764 1.20015C7.99257 0.932628 9.38663 1.06993 10.6535 1.5947C11.9204 2.11947 13.0033 3.00813 13.7651 4.14831C14.527 5.28849 14.9336 6.62898 14.9336 8.00026C14.9336 9.8391 14.2031 11.6026 12.9029 12.9029C11.6026 14.2031 9.8391 14.9336 8.00026 14.9336ZM8.80915 10.9192L6.69795 8.89466H11.802C12.1703 8.89466 12.4734 8.59156 12.4734 8.22328V7.77608C12.4734 7.4078 12.1703 7.10471 11.802 7.10471H6.6968L8.80915 5.08133C9.07646 4.82566 9.08191 4.38407 8.82071 4.12222L8.51333 3.81715C8.25424 3.55639 7.82486 3.55639 7.56577 3.81715L3.85644 7.52417C3.59568 7.78326 3.59568 8.21264 3.85644 8.47173L7.56577 12.1845C7.82486 12.4452 8.25424 12.4452 8.51333 12.1845L8.82071 11.8795C9.0819 11.6127 9.07763 11.1788 8.80915 10.9192Z"/></svg>', SVG_TREND = '<svg class="ico16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M7.99974 1.06641C9.37102 1.06641 10.7115 1.47304 11.8517 2.23488C12.9919 2.99673 13.8805 4.07957 14.4053 5.34647C14.9301 6.61337 15.0674 8.00743 14.7998 9.35236C14.5323 10.6973 13.872 11.9327 12.9023 12.9023C11.9327 13.872 10.6973 14.5323 9.35236 14.7998C8.00743 15.0674 6.61337 14.9301 5.34647 14.4053C4.07957 13.8805 2.99673 12.9919 2.23488 11.8517C1.47304 10.7115 1.06641 9.37102 1.06641 7.99974C1.06641 6.1609 1.79688 4.39738 3.09713 3.09713C4.39738 1.79688 6.1609 1.06641 7.99974 1.06641ZM7.19085 5.08081L9.30205 7.10534H4.19796C3.82968 7.10534 3.52658 7.40844 3.52658 7.77672V8.22392C3.52658 8.5922 3.82968 8.89529 4.19796 8.89529H9.3032L7.19085 10.9187C6.92354 11.1743 6.91809 11.6159 7.17929 11.8778L7.48667 12.1828C7.74576 12.4436 8.17514 12.4436 8.43423 12.1828L12.1436 8.47583C12.4043 8.21674 12.4043 7.78736 12.1436 7.52827L8.43423 3.81547C8.17514 3.55471 7.74576 3.55471 7.48667 3.81547L7.17929 4.12054C6.9181 4.38726 6.92237 4.82122 7.19085 5.08081Z"/></svg>', SVG_SHOT = '<svg viewBox="0 0 18 18" aria-hidden="true"><path fill="currentColor" d="M12.5732 7.73535C12.9387 7.73545 13.2874 7.89451 13.5312 8.17188L14.1924 8.92773C14.2554 9.01018 14.311 9.03711 14.3682 9.03711H14.917C15.6242 9.03711 16.2002 9.62177 16.2002 10.3398V13.874C16.2002 14.5921 15.6242 15.1768 14.917 15.1768H8.6875C7.98051 15.1765 7.40527 14.5919 7.40527 13.874V10.3398C7.40527 9.62192 7.98051 9.03735 8.6875 9.03711H9.2373C9.29444 9.03711 9.3493 9.0089 9.38379 8.96289L10.0742 8.17188C10.3181 7.89452 10.6667 7.7354 11.0322 7.73535H12.5732ZM11.8027 10.1533C10.7929 10.1533 9.9709 10.9885 9.9707 12.0137C9.9707 13.0391 10.7928 13.874 11.8027 13.874C12.8126 13.874 13.6348 13.0391 13.6348 12.0137C13.6346 10.9885 12.8125 10.1534 11.8027 10.1533ZM11.374 3C12.4786 3 13.374 3.89543 13.374 5V6.11133H11.5742V5.57227H3.59961V10.002C3.59961 10.1124 3.68937 10.2021 3.7998 10.2021H5.78906V12.002H3.7998L3.5957 11.9922C2.58701 11.8899 1.7998 11.0376 1.7998 10.002V5C1.7998 3.89545 2.69526 3.00003 3.7998 3H11.374Z"/></svg>';
+const lbl = (t, req, forId, lid) => forId ? `<label class="lbl" for="${forId}">${t}${req ? ' <span class="req">*</span>' : ''}</label>` : `<div class="lbl"${lid ? ` id="${lid}"` : ''}>${t}${req ? ' <span class="req">*</span>' : ''}</div>`;   /* X-9r2 第三輪 CC5：沒有輸入框可關聯的標籤（給下拉觸發欄用）帶 id，觸發欄用 aria-labelledby 指過來 */
+const errHtml = (m, id) => m ? `<div class="err-msg"${id ? ` id="${id}"` : ''}>${m}</div>` : '';   /* X-9r2 F5：錯誤句給 id，欄位用 aria-describedby 指過來 */
 
 function nameFieldHtml(f) {
   const batch = f.mode === 'batch';
   return `<div class="fld">${lbl('Budget Name', true, 'f-name')}
-    <div class="inp ${f.errors.name ? 'is-err' : ''}"><input id="f-name" data-in="name" data-fid="in:name" type="text" value="${esc(f.name)}" placeholder="Please give your customized budget a name." autocomplete="off"></div>
-    ${errHtml(f.errors.name)}
+    <div class="inp ${f.errors.name ? 'is-err' : ''}"><input id="f-name" aria-required="true" ${f.errors.name ? 'aria-invalid="true" aria-describedby="f-name-err"' : ''} data-in="name" data-fid="in:name" type="text" value="${esc(f.name)}" placeholder="Please give your customized budget a name." autocomplete="off"></div>
+    ${errHtml(f.errors.name, 'f-name-err')}
     ${batch ? '<div class="help">This name will be <b>prefixed</b> to the selected group or resource name.&nbsp; For example: Monthly Budget_Group A.</div>' : ''}
   </div>`;
 }
@@ -2942,8 +3071,8 @@ function periodHtml(f) {
   /* ⚠ Figma 註記矛盾：#14 紫色註記寫「週期選項調整為 Disable，用戶僅可調整開始時間或週期」，但同一張稿的畫面把週期選單與 Starts on 都畫成 disabled。照畫面（兩者皆 disabled），回報 */
   const p = f.period;
   const trig = p === 'fixed'
-    ? `<button type="button" class="dp-trig range" data-a="open-date" data-fid="dp" ${edit ? 'disabled' : ''}><span class="material-symbols-outlined dp-ic">event</span><span>${fmtDMY(f.start)}</span><span class="material-symbols-outlined arr">arrow_right_alt</span><span>${fmtDMY(f.end)}</span></button>`
-    : `<div class="starts"><span>Starts on</span><button type="button" class="dp-trig" data-a="open-date" data-fid="dp" ${edit ? 'disabled' : ''}><span class="material-symbols-outlined dp-ic">event</span><span class="dp-tx">${fmtDMY(f.start)}</span></button></div>`;
+    ? `<button type="button" class="dp-trig range" data-a="open-date" data-fid="dp" ${edit ? 'disabled' : ''} aria-haspopup="dialog" aria-label="Select date range, ${fmtDMY(f.start)} to ${fmtDMY(f.end)}"><span class="material-symbols-outlined dp-ic" aria-hidden="true">event</span><span>${fmtDMY(f.start)}</span><span class="material-symbols-outlined arr" aria-hidden="true">arrow_right_alt</span><span>${fmtDMY(f.end)}</span></button>`
+    : `<div class="starts"><span>Starts on</span><button type="button" class="dp-trig" data-a="open-date" data-fid="dp" ${edit ? 'disabled' : ''} aria-haspopup="dialog" aria-label="Starts on ${fmtDMY(f.start)}, choose date"><span class="material-symbols-outlined dp-ic" aria-hidden="true">event</span><span class="dp-tx">${fmtDMY(f.start)}</span></button></div>`;
   let help = '';
   const s = f.start;
   if (p === 'monthly') {
@@ -2955,15 +3084,15 @@ function periodHtml(f) {
   } else if (p === 'daily') help = '<div class="help">This budget will be monitored daily until you manually disable the alerts.</div>';
   else help = '<div class="help">This budget will be deactivated and no longer monitored after the end date.</div>';
   return `<div class="fld-group">
-    <div class="fld">${lbl('Monitoring Period')}
-      <div class="period-row"><div class="fld-sel-w200">${selHtml('period', periodLabel(p), { disabled: edit })}</div>${trig}</div></div>
+    <div class="fld">${lbl('Monitoring Period', false, null, 'lb-period')}
+      <div class="period-row"><div class="fld-sel-w200">${selHtml('period', periodLabel(p), { disabled: edit, lbl: 'lb-period' })}</div>${trig}</div></div>
     ${help}</div>`;
 }
 function amountFieldHtml(f) {
   const batch = f.mode === 'batch';
   return `<div class="fld-group"><div class="fld">${lbl('Budget Amount', true, 'f-amount')}
-    <div class="inp ${f.errors.amount ? 'is-err' : ''}"><span class="pfx">${ORG_CURRENCY}</span><input id="f-amount" data-in="amount" data-fid="in:amount" type="text" inputmode="numeric" value="${esc(f.amount)}" autocomplete="off"></div>
-    ${errHtml(f.errors.amount)}</div>
+    <div class="inp ${f.errors.amount ? 'is-err' : ''}"><span class="pfx">${ORG_CURRENCY}</span><input id="f-amount" aria-required="true" ${f.errors.amount ? 'aria-invalid="true" aria-describedby="f-amount-err"' : ''} data-in="amount" data-fid="in:amount" type="text" inputmode="numeric" value="${esc(f.amount)}" autocomplete="off"></div>
+    ${errHtml(f.errors.amount, 'f-amount-err')}</div>
     ${batch ? '' : '<div class="help">This budget covers costs meeting the <b>cost calculation rules</b> you\'ve set below.</div>'}</div>`;   /* #08 紫色：批次建立移除輸入框下方說明 */
 }
 function thresholdsHtml(f) {
@@ -2973,37 +3102,37 @@ function thresholdsHtml(f) {
     const err = f.errors.th && f.errors.th[t.id];
     return `<div class="th-item"><div class="th-row">
       <div class="th-cols">
-        <div class="fld">${i === 0 ? lbl('Percent of Budget', true, 'f-th-' + t.id) : ''}<div class="inp ${err ? 'is-err' : ''}"><input id="f-th-${t.id}" ${i === 0 ? '' : `aria-label="Percent of Budget ${i + 1}"`} data-in="th" data-id="${t.id}" data-fid="in:th:${t.id}" type="text" inputmode="numeric" value="${esc(t.v)}" autocomplete="off"><span class="sfx">%</span></div></div>
+        <div class="fld">${i === 0 ? lbl('Percent of Budget', true, 'f-th-' + t.id) : ''}<div class="inp ${err ? 'is-err' : ''}"><input id="f-th-${t.id}" aria-required="true" ${i === 0 ? '' : `aria-label="Percent of Budget ${i + 1}"`} ${err ? `aria-invalid="true" aria-describedby="f-th-${t.id}-err"` : ''} data-in="th" data-id="${t.id}" data-fid="in:th:${t.id}" type="text" inputmode="numeric" value="${esc(t.v)}" autocomplete="off"><span class="sfx">%</span></div></div>
         <div class="eq">=</div>
         <div class="fld">${i === 0 ? lbl('Amount') : ''}<div class="amt" data-amt="${t.id}">${ORG_CURRENCY} ${fmtMoney(amt)}</div></div>
       </div>
-      <button class="icon-btn th-del ${f.thresholds.length === 1 ? 'is-disabled' : ''}" aria-label="Delete threshold" data-a="th-del" data-id="${t.id}"><span class="material-symbols-outlined">delete</span></button>
-    </div>${errHtml(err)}</div>`;
+      <button class="icon-btn th-del ${f.thresholds.length === 1 ? 'is-disabled' : ''}" ${f.thresholds.length === 1 ? 'aria-disabled="true"' : ''} aria-label="Delete threshold" data-a="th-del" data-id="${t.id}"><span class="material-symbols-outlined">delete</span></button>
+    </div>${errHtml(err, 'f-th-' + t.id + '-err')}</div>`;
   }).join('');
   return `<div class="fld-group" style="gap:16px">
-    <div class="fld-group"><div class="sec-title" style="font-size:16px;line-height:24px">Thresholds</div><div class="help">You can set up to 5 thresholds. Allowed values: 1~1000</div></div>
-    <div class="th-box">${rows}<div><button type="button" class="btn-t ${full ? 'is-disabled' : ''}" data-a="th-add" ${full ? `data-tip="${COPY.limit}"` : ''}><span class="material-symbols-outlined">add_circle</span><span class="t">Add Threshold</span></button></div></div></div>`;
+    <div class="fld-group"><h3 class="sec-title" style="font-size:16px;line-height:24px">Thresholds</h3><div class="help">You can set up to 5 thresholds. Allowed values: 1~1000</div></div>
+    <div class="th-box">${rows}<div><button type="button" class="btn-t ${full ? 'is-disabled' : ''}" data-a="th-add" ${full ? `aria-disabled="true" data-tip="${COPY.limit}"` : ''}><span class="material-symbols-outlined">add_circle</span><span class="t">Add Threshold</span></button></div></div></div>`;
 }
 function recipHtml(f) {
   const shown = f.recipFocus ? f.recipients : f.recipients.slice(0, MAX_CHIPS_SHOWN);
   const more = f.recipFocus ? 0 : Math.max(0, f.recipients.length - MAX_CHIPS_SHOWN);
-  const chips = shown.map(e => `<span class="chip" style="max-width:50%"><span class="tx">${esc(e)}</span><span class="x" data-a="chip-rm" data-fid="cf:recip" data-val="${esc(e)}"><span class="material-symbols-outlined">close</span></span></span>`).join('');
+  const chips = shown.map(e => `<span class="chip" style="max-width:50%"><span class="tx">${esc(e)}</span><button type="button" class="x" data-a="chip-rm" data-fid="cf:recip" data-val="${esc(e)}" aria-label="Remove ${esc(e)}"><span class="material-symbols-outlined">close</span></button></span>`).join('');
   const showPh = !f.recipients.length && !f.recipText && !f.recipFocus;
   /* #05-4：點擊 dropdown 後隱藏 placeholder 並顯示 cursor；最多顯示十個 chips，超過顯示 +N（N＝總數−10），focus 後展開全部 */
   return `<div class="fld-group"><div class="fld">${lbl('Alert Recipients', false, 'f-recip')}
     <div class="chipfield ${f.errors.recip ? 'is-err' : ''} ${f.recipFocus ? 'open' : ''}" data-a="recip-focus" data-fid="cf:recip">
-      <div class="chip-list">${chips}${more ? `<span class="chip is-more">+${more}</span>` : ''}<input id="f-recip" class="rin" data-in="recip" data-fid="in:recip" type="text" value="${esc(f.recipText)}" ${showPh ? `placeholder="Please enter the recipients' name or email addresses."` : ''} autocomplete="off"></div>
+      <div class="chip-list">${chips}${more ? `<span class="chip is-more">+${more}</span>` : ''}<input id="f-recip" class="rin" ${f.errors.recip ? 'aria-invalid="true" aria-describedby="f-recip-err"' : ''} data-in="recip" data-fid="in:recip" type="text" value="${esc(f.recipText)}" ${showPh ? `placeholder="Please enter the recipients' name or email addresses."` : ''} autocomplete="off"></div>
       <div class="cf-ic">${f.recipients.length ? '<span class="cf-clear" data-a="recip-clear" aria-label="Clear"><span class="material-symbols-outlined">close</span></span>' : ''}<span class="tri"></span></div>
-    </div>${errHtml(f.errors.recip)}</div>
+    </div>${errHtml(f.errors.recip, 'f-recip-err')}</div>
     <div class="help"><b>You</b> will be set as the default recipient of this alert.</div></div>`;
 }
-function alertStatusHtml(f) { return `<div class="fld">${lbl('Alert Status')}${selHtml('alertStatus', f.alertStatus)}</div>`; }
+function alertStatusHtml(f) { return `<div class="fld">${lbl('Alert Status', false, null, 'lb-alertStatus')}${selHtml('alertStatus', f.alertStatus, { lbl: 'lb-alertStatus' })}</div>`; }
 
 /* ---------- Chips field（Budget Scope 條件／Batch 對象）---------- */
 function chipFieldHtml(fid, o) {
-  const chips = o.chips.map(c => `<span class="chip ${c.bad ? 'is-bad' : ''}"><span class="tx">${esc(c.label)}</span><span class="x" data-a="chip-rm" data-fid="${esc(fid)}" data-val="${esc(c.value)}" aria-label="Remove"><span class="material-symbols-outlined">close</span></span></span>`).join('');
+  const chips = o.chips.map(c => `<span class="chip ${c.bad ? 'is-bad' : ''}"><span class="tx">${esc(c.label)}</span><button type="button" class="x" data-a="chip-rm" data-fid="${esc(fid)}" data-val="${esc(c.value)}" aria-label="Remove ${esc(c.label)}"><span class="material-symbols-outlined">close</span></button></span>`).join('');
   const hasAny = o.chips.length > 0;
-  return `<div class="chipfield ${o.err || o.bad ? 'is-err' : ''}" data-a="cf-open" data-fid="${esc(fid)}" tabindex="0">
+  return `<div class="chipfield ${o.err || o.bad ? 'is-err' : ''}" data-a="cf-open" data-fid="${esc(fid)}" tabindex="0" ${o.err || o.bad ? `aria-invalid="true" aria-describedby="err-${esc(fid)}"` : ''}>
     <div class="chip-list">${chips || `<span class="ph">${esc(o.ph)}</span>`}</div>
     <div class="cf-ic">${hasAny ? `<span class="cf-clear" data-a="cf-clear" data-fid="${esc(fid)}" aria-label="Clear all"><span class="material-symbols-outlined">close</span></span>` : ''}<span class="tri"></span></div></div>`;
 }
@@ -3012,7 +3141,7 @@ function condRowHtml(f, r, c, idx) {
   const err = f.errors.cond && f.errors.cond[r.id + ':' + c.type];
   const fid = 'cf:rule:' + r.id + ':' + c.type;
   const chips = c.values.map(v => ({ value: v, label: v, bad: bad.has(v) }));
-  const msg = has ? `<div class="err-msg">This condition contains invalid or deleted items. Click <a data-a="rm-invalid" data-rule="${r.id}" data-type="${c.type}">here</a> to remove them.</div>` : errHtml(err);
+  const msg = has ? `<div class="err-msg" id="err-${esc(fid)}">This condition contains invalid or deleted items. Click <a data-a="rm-invalid" data-rule="${r.id}" data-type="${c.type}">here</a> to remove them.</div>` : errHtml(err, 'err-' + fid);
   return `<div class="cond-row"><div class="kw">${idx === 0 ? 'Where' : 'And'}</div><div class="ty">${condName(c.type, r.platform)}</div><div class="isin">is in</div>
     <div class="cf-wrap">${chipFieldHtml(fid, { chips, ph: condPh(c.type, r.platform), err: !!err, bad: has })}${msg}</div>
     <div class="cond-x"><button class="icon-btn" aria-label="Remove condition" data-tip="Remove" data-a="cond-rm" data-rule="${r.id}" data-type="${c.type}"><span class="material-symbols-outlined icon-outline">remove</span></button></div></div>`;
@@ -3020,43 +3149,43 @@ function condRowHtml(f, r, c, idx) {
 function ruleHtml(f, r) {
   const full = r.conds.length >= MAX_CONDITIONS;
   return `<div class="rule-row"><div class="rule-card">
-      <div class="rule-hd"><span>All</span>${selHtml('platform', CSP[r.platform].label, { key: r.id, icon: `<span class="csp-logo">${CSP[r.platform].logo}</span>` })}<span>resources assigned to the groups you have permissions for</span></div>
+      <div class="rule-hd"><span>All</span><span class="sr-only" id="plat-lbl-${r.id}">Cloud platform</span>${selHtml('platform', CSP[r.platform].label, { key: r.id, lbl: 'plat-lbl-' + r.id, icon: `<span class="csp-logo">${CSP[r.platform].logo}</span>` })}<span>resources assigned to the groups you have permissions for</span></div>
       ${r.conds.map((c, i) => condRowHtml(f, r, c, i)).join('')}
       <!-- ⚠ 未確認：Figma #13／#14 的 Add Condition 畫成灰色（無 tooltip），但條件只有一個、#14-1 同一個按鈕是藍色可用。判斷是 Figma 殘留，邏輯上只在 3 個條件都設定時才 Disabled（#07-7），回報 -->
-      <div><button type="button" class="btn-t ${full ? 'is-disabled' : ''}" data-a="open-addcond" data-rule="${r.id}" data-fid="menu:addcond:${r.id}" ${full ? `data-tip="${COPY.limit}"` : ''}><span class="material-symbols-outlined">add_circle</span><span class="t">Add Condition</span></button></div>
+      <div><button type="button" class="btn-t ${full ? 'is-disabled' : ''}" data-a="open-addcond" data-rule="${r.id}" data-fid="menu:addcond:${r.id}" ${full ? `aria-disabled="true" data-tip="${COPY.limit}"` : ''}><span class="material-symbols-outlined">add_circle</span><span class="t">Add Condition</span></button></div>
     </div>
     <div class="rule-side"><button class="icon-btn" data-tip="Remove" aria-label="Remove rule" data-a="rule-rm" data-rule="${r.id}"><span class="material-symbols-outlined">delete</span></button><button class="icon-btn" data-tip="Duplicate" aria-label="Duplicate rule" data-a="rule-dup" data-rule="${r.id}"><span class="material-symbols-outlined">content_copy</span></button></div></div>`;
 }
 function scopeCardHtml(f) {
   const full = f.rules.length >= MAX_RULES;
   return `<div class="card"><div class="fld-group" style="gap:16px">
-    <div class="sec-title">Budget Scope<span class="req">*</span></div>
+    <h2 class="sec-title">Budget Scope<span class="req">*</span></h2>
     <div class="scope-hint">${COPY.scopeHint}</div>
     <div class="rules">${f.rules.length ? f.rules.map(r => ruleHtml(f, r)).join('') : `<div class="rule-empty"><div class="t1">No Rule Added</div><div class="t2">Add rule and rule condition to define the Budget Settings.</div></div>`}
-      <div class="add-rule-row"><button type="button" class="btn btn-o ${full ? 'is-disabled' : ''}" data-a="open-addrule" data-fid="menu:addrule" ${full ? `data-tip="${COPY.limit}"` : ''}><span class="material-symbols-outlined ic-add">add</span>Add Rule</button>${f.errors.rules ? `<span class="err-msg">${f.errors.rules}</span>` : ''}</div>
+      <div class="add-rule-row"><button type="button" class="btn btn-o ${full ? 'is-disabled' : ''}" data-a="open-addrule" data-fid="menu:addrule" ${full ? `aria-disabled="true" data-tip="${COPY.limit}"` : ''}><span class="material-symbols-outlined ic-add">add</span>Add Rule</button>${f.errors.rules ? `<span class="err-msg">${f.errors.rules}</span>` : ''}</div>
     </div></div></div>`;
 }
 function batchCardHtml(f) {
   const o = BATCH_OPTS[f.batchBy];
   const err = f.errors.batch;
   return `<div class="card"><div class="fld-group" style="gap:32px">
-    <div class="fld" style="width:200px">${lbl('Batch create by')}${selHtml('batchBy', o.label)}</div>
+    <div class="fld" style="width:200px">${lbl('Batch create by', false, null, 'lb-batchBy')}${selHtml('batchBy', o.label, { lbl: 'lb-batchBy' })}</div>
     <div class="fld">${lbl(o.fieldLbl, true)}${chipFieldHtml('cf:batch', { chips: f.batchTargets.map(v => ({ value: v, label: v })), ph: o.ph, err: !!err })}${errHtml(err)}</div></div></div>`;
 }
 function skeletonFormHtml(f) {
   const f1 = () => `<div class="fld"><div class="sk" style="width:100px;height:8px;margin:5px 0 4px"></div><div class="sk" style="height:36px;border-radius:5px"></div></div>`;
-  return `<button class="goback" data-a="goback"><span class="material-symbols-outlined">arrow_circle_left</span><span class="t">Customized Budget List</span></button>
+  return `<button class="goback" data-a="goback">${SVG_BACK}<span class="t">Customized Budget List</span></button>
     <h1 class="pg-title">Edit Customized Budget</h1>
     <!-- ⚠ 未確認：#15 skeleton 稿上卡片標題還是舊名 Cost Calculation Rules，其他畫面已改 Budget Scope；這裡跟新名 -->
     <div class="card" role="status" aria-label="Loading"><div class="card-grid">
-      <div class="card-col"><div class="sec-title">Budget Settings</div>${f1()}${f1()}${f1()}${f1()}</div>
-      <div class="card-col"><div class="sec-title">Alert Settings</div>${f1()}${f1()}<div class="fld-group"><div class="sec-title" style="font-size:16px;line-height:24px">Thresholds</div><div class="help">You can set up to 5 thresholds. Allowed values: 1~1000</div><div class="th-box" style="background:#F2F2F2;border-color:#CCCCCC"><div class="sk" style="width:100px;height:8px"></div><div class="sk" style="width:191px;height:36px;border-radius:5px"></div><span class="btn-t is-disabled"><span class="material-symbols-outlined">add_circle</span><span class="t">Add Threshold</span></span></div></div></div></div></div>
-    <div class="card"><div class="fld-group" style="gap:16px"><div class="sec-title">Budget Scope<span class="req">*</span></div><div class="scope-hint">${COPY.scopeHint}</div><div class="sk-rule"><div class="sk" style="width:200px;height:14px"></div><div class="sk" style="width:707px;max-width:100%;height:14px"></div></div><div><button class="btn btn-o is-disabled"><span class="material-symbols-outlined ic-add">add</span>Add Rule</button></div></div></div>
+      <div class="card-col"><h2 class="sec-title">Budget Settings</h2>${f1()}${f1()}${f1()}${f1()}</div>
+      <div class="card-col"><h2 class="sec-title">Alert Settings</h2>${f1()}${f1()}<div class="fld-group"><h3 class="sec-title" style="font-size:16px;line-height:24px">Thresholds</h3><div class="help">You can set up to 5 thresholds. Allowed values: 1~1000</div><div class="th-box" style="background:var(--lt-grey-100);border-color:var(--lt-grey-300)"><div class="sk" style="width:100px;height:8px"></div><div class="sk" style="width:191px;height:36px;border-radius:5px"></div><span class="btn-t is-disabled"><span class="material-symbols-outlined">add_circle</span><span class="t">Add Threshold</span></span></div></div></div></div></div>
+    <div class="card"><div class="fld-group" style="gap:16px"><h2 class="sec-title">Budget Scope<span class="req">*</span></h2><div class="scope-hint">${COPY.scopeHint}</div><div class="sk-rule"><div class="sk" style="width:200px;height:14px"></div><div class="sk" style="width:707px;max-width:100%;height:14px"></div></div><div><button class="btn btn-o is-disabled"><span class="material-symbols-outlined ic-add">add</span>Add Rule</button></div></div></div>
     <div class="fixbar"><button class="btn btn-o" disabled>Cancel</button><button class="btn btn-p" disabled>Save</button></div>`;
 }
 function formPageHtml() {
   const f = F();
-  const back = `<button class="goback" data-a="goback"><span class="material-symbols-outlined">arrow_circle_left</span><span class="t">Customized Budget List</span></button>`;
+  const back = `<button class="goback" data-a="goback">${SVG_BACK}<span class="t">Customized Budget List</span></button>`;
   if (f.mode === 'edit' && state.editError) return back + `<div class="card"><div class="es err">${ILLUS_ERR}<div class="es-title">${COPY.error.title}</div><div class="es-desc">${esc(COPY.error.desc)}</div></div></div>`;
   if (f.mode === 'edit' && state.editLoading) return skeletonFormHtml(f);
   const title = f.mode === 'create' ? 'Create Customized Budget' : f.mode === 'batch' ? 'Batch Create Budgets' : 'Edit Customized Budget';
@@ -3065,8 +3194,8 @@ function formPageHtml() {
   return `${back}<h1 class="pg-title">${title}</h1>
     ${f.mode === 'batch' ? batchCardHtml(f) : ''}
     <div class="card"><div class="card-grid">
-      <div class="card-col"><div class="sec-title">Budget Settings</div>${nameFieldHtml(f)}${periodHtml(f)}${amountFieldHtml(f)}<div class="fld">${lbl('Include Credit')}${selHtml('credit', f.credit)}</div></div>
-      <div class="card-col"><div class="sec-title">Alert Settings</div>${recipHtml(f)}${alertStatusHtml(f)}${thresholdsHtml(f)}</div>
+      <div class="card-col"><h2 class="sec-title">Budget Settings</h2>${nameFieldHtml(f)}${periodHtml(f)}${amountFieldHtml(f)}<div class="fld">${lbl('Include Credit', false, null, 'lb-credit')}${selHtml('credit', f.credit, { lbl: 'lb-credit' })}</div></div>
+      <div class="card-col"><h2 class="sec-title">Alert Settings</h2>${recipHtml(f)}${alertStatusHtml(f)}${thresholdsHtml(f)}</div>
     </div>${f.mode === 'batch' ? '<div style="border-top:1px solid var(--lt-grey-200);margin-top:32px;padding-top:32px;font-size:14px;line-height:24px">All budgets that are batch created will have these settings applied.</div>' : ''}</div>
     ${f.mode === 'batch' ? '' : scopeCardHtml(f)}
     <div class="fixbar"><button class="btn btn-o" data-a="cancel">Cancel</button><button class="btn btn-p" data-a="submit">${mainBtn}</button></div>`;
@@ -3077,7 +3206,7 @@ function renderForm() {
   if (ae && ae.dataset && ae.dataset.fid && $('#content').contains(ae) && ae.tagName === 'INPUT') { fid = ae.dataset.fid; ss = ae.selectionStart; se = ae.selectionEnd; }
   const y = window.scrollY;
   $('#content').innerHTML = formPageHtml();
-  window.scrollTo(0, y);
+  window.scrollTo(0, y); syncToastLift();
   if (fid) { const n = document.querySelector(`[data-fid="${fid}"]`); if (n) { n.focus({ preventScroll: true }); try { n.setSelectionRange(ss, se); } catch (_) {} } }
 }
 </script>
@@ -3101,12 +3230,14 @@ function placePop() {
   a.classList.add('open');
   const r = a.getBoundingClientRect(), el = POP.el, vh = window.innerHeight, vw = window.innerWidth;
   if (POP.matchWidth) el.style.width = Math.max(r.width, POP.minW || 0) + 'px';
-  const room = vh - r.bottom - 12, roomUp = r.top - 12;
+  const fb = document.querySelector('.fixbar'), limit = fb ? Math.min(vh, fb.getBoundingClientRect().top) : vh;   /* X-9r2 第三輪 B5：表單頁的固定底列（Cancel／Create）不被下拉蓋住，下方放不下就往上開 */
+  const tb = document.getElementById('lt-topbar'), topMin = Math.max(0, tb ? tb.getBoundingClientRect().bottom : 0) + 8;   /* X-9r2 第三輪驗證後小修 N4：往上翻的下拉頂端不超過頂欄下緣＋8（視窗高 ≤600 時原本會蓋過頂欄） */
+  const room = limit - r.bottom - 12, roomUp = r.top - 4 - topMin;
   const maxH = POP.maxH || 360;
   el.style.maxHeight = Math.max(160, Math.min(maxH, (room >= Math.min(maxH, 240) || room >= roomUp) ? room : roomUp)) + 'px';
   const h = el.getBoundingClientRect().height, w = el.offsetWidth;   /* X-9r2 F15：offsetHeight 取整數，maxHeight 剛好等於 room 時 332 > 331.5 會誤翻上去，改用小數高度 */
   const down = room >= h - 0.5 || room >= roomUp;
-  el.style.top = (down ? r.bottom + 4 : Math.max(8, r.top - h - 4)) + 'px';
+  el.style.top = (down ? r.bottom + 4 : Math.max(topMin, r.top - h - 4)) + 'px';
   let left = POP.alignRight ? r.right - w : r.left;
   left = Math.max(8, Math.min(left, vw - w - 8));
   el.style.left = left + 'px';
@@ -3131,7 +3262,7 @@ document.addEventListener('mousedown', e => {
 function openMenu(fid, items, onPick) {
   if (POP && POP.fid === fid) { closePop(); return; }
   const el = document.createElement('div'); el.className = 'pop menu';
-  el.innerHTML = items.map((it, i) => `<div class="mi ${it.disabled ? 'is-disabled' : ''} ${it.selected ? 'sel' : ''} ${i === 0 && !it.selected && !it.disabled && !items.some(x => x.selected) ? 'hl' : ''}" data-a="mi-pick" data-v="${esc(it.value)}">${it.icon || ''}<span>${esc(it.label)}</span></div>`).join('');
+  el.innerHTML = items.map((it, i) => `<div class="mi ${it.disabled ? 'is-disabled' : ''} ${it.selected ? 'is-sel' : ''} ${i === 0 && !it.selected && !it.disabled && !items.some(x => x.selected) ? 'hl' : ''}" data-a="mi-pick" data-v="${esc(it.value)}">${it.icon || ''}<span>${esc(it.label)}</span></div>`).join('');
   mountPop(el, fid, { kind: 'menu', onPick, matchWidth: true, minW: 200, maxH: 420 });
 }
 Object.assign(ACT, { 'mi-pick': el => { if (!POP || el.classList.contains('is-disabled')) return; const cb = POP.onPick, v = el.dataset.v; closePop(); cb(v); } });
@@ -3274,7 +3405,7 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'Backspace' && !f.recipText && f.recipients.length) { f.recipients.pop(); renderForm(); focusRecip(); afterEdit(); renderRecip(); }
   else if (e.key === 'Escape') closePop();
 });
-document.addEventListener('focusin', e => { const t = e.target; if (t.matches && t.matches('[data-in="recip"]') && state.form && !state.form.recipFocus && state.view !== 'list') { state.form.recipFocus = true; renderForm(); focusRecip(); openRecip(); } });
+document.addEventListener('focusin', e => { const t = e.target; if (t.matches && t.matches('[data-in="recip"]') && state.form && !state.form.recipFocus && state.view !== 'list' && !_noRecipOpen) { state.form.recipFocus = true; renderForm(); focusRecip(); openRecip(); } });
 
 /* ---- date picker ---- */
 let DP = { y: 0, m: 0, mode: 'day', pickingEnd: false };
@@ -3284,7 +3415,7 @@ Object.assign(ACT, {
     if (POP && POP.fid === 'dp') { closePop(); return; }
     const f = F(); DP = { y: f.start.getFullYear(), m: f.start.getMonth(), mode: 'day', pickingEnd: false };
     const d = document.createElement('div'); d.className = 'pop dp';
-    mountPop(d, 'dp', { kind: 'date', maxH: 520 }); renderDP();
+    mountPop(d, 'dp', { kind: 'date', maxH: 520, alignRight: true }); renderDP();   /* X-9r2 第三輪 B4＋DQ1（Kabin 11-13 裁決）：面板右緣貼齊觸發欄右緣、留在 Budget Settings 這一欄裡，Fixed Period 也一樣 */
   },
   'dp-nav': el => { const k = el.dataset.k; if (DP.mode === 'month') { DP.y += k === 'py' ? -1 : k === 'ny' ? 1 : 0; } else { const dt = new Date(DP.y, DP.m + ({ py: -12, pm: -1, nm: 1, ny: 12 }[k]), 1); DP.y = dt.getFullYear(); DP.m = dt.getMonth(); } renderDP(); },
   'dp-title': () => { DP.mode = DP.mode === 'day' ? 'month' : 'day'; renderDP(); },
@@ -3355,7 +3486,8 @@ function submitForm() {
   if (f.errors.any) {
     /* ⚠ 設計端暫擬：#08-3 註記要求「Error Message + Toast」但稿上沒給 toast 文案，沿用 #6／#19 的失敗文案（Kabin 2026-10-09 裁決），之後再跟 PM 確認 */
     if (f.mode === 'batch') toast('error', COPY.toast.createFail);
-    renderForm(); const n = document.querySelector('.is-err, .chip.is-bad, .err-msg'); if (n) n.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+    renderForm(); const n = document.querySelector('.is-err, .chip.is-bad, .err-msg'); if (n) n.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    focusFirstError(f); announceErrors(f.errors); return; }
   if (f.mode === 'batch') { openBatchConfirm(); return; }
   if (state.failNext) { state.failNext = false; toast('error', f.mode === 'edit' ? COPY.toast.updateFail : COPY.toast.createFail); return; }   // #6／#19：失敗留在原地 + toast
   if (f.mode === 'create') { state.budgets.unshift(budgetFromForm(f, null)); state.sel = new Set(); showList(); toast('ok', COPY.toast.created); }   // #6：成功回到瀏覽模式 + toast
@@ -3364,6 +3496,22 @@ function submitForm() {
     f.recipients.sort(); f.thresholds.sort((a, b) => thN(a.v) - thN(b.v));
     state.budgets[i] = budgetFromForm(f, old); f.snap = snapOf(f); renderForm(); toast('ok', COPY.toast.updated);
   }
+}
+/* X-9r2 第三輪 CQ1（Kabin 11-13：移，維持紅框）：驗證失敗後焦點移到第一個出錯的欄位，鍵盤與讀屏使用者可以直接改。
+ * 出錯又聚焦的欄位維持稿 #05-7 的紅框（`.inp.is-err`／`.chipfield.is-err` 的框色與陰影都壓過一般聚焦的 primary 框，只多輸入游標）。
+ * 沒有欄位可聚焦的錯誤（Budget Scope 為空）聚焦 Add Rule。Alert Recipients 輸入框被聚焦時頁面原本會自動開自動完成面板，程式聚焦時不開（_noRecipOpen）。 */
+let _noRecipOpen = false;
+function focusFirstError(f) {
+  const root = $('#content'); let t = root.querySelector('[aria-invalid="true"]');
+  if (!t && f.errors.rules) t = root.querySelector('[data-fid="menu:addrule"]');
+  if (!t) return;
+  _noRecipOpen = true; try { t.focus({ preventScroll: true }); } finally { _noRecipOpen = false; }
+}
+/* X-9r2 第三輪 CC4：送出失敗的播報（WCAG 4.1.3），畫面不變。 */
+function announceErrors(e) {
+  const n = (e.name ? 1 : 0) + (e.amount ? 1 : 0) + (e.recip ? 1 : 0) + (e.batch ? 1 : 0) + (e.rules ? 1 : 0) + Object.keys(e.th || {}).length + Object.keys(e.cond || {}).length + (e.hasBad ? 1 : 0);
+  const l = $('#form-live'); if (!l || !n) return;
+  l.textContent = ''; setTimeout(() => { l.textContent = n === 1 ? '1 field needs attention.' : n + ' fields need attention.'; }, 60);
 }
 function budgetFromForm(f, old) {
   const amount = amountNum(f);
@@ -3381,7 +3529,7 @@ function openBatchConfirm() {
   const f = F(), names = batchNames(f);
   openModal(`<div class="modal" role="dialog" aria-modal="true">
     <div class="m-hd"><h2>Batch Create ${names.length} Budget(s)</h2><button class="m-x" data-a="m-close" aria-label="Close"><span class="material-symbols-outlined">close</span></button></div>
-    <div class="m-body">${COPY.batchConfirm.body}</div>
+    <div class="m-body wide">${COPY.batchConfirm.body}</div>
     <ul class="m-list">${names.map(n => `<li>${esc(n)}</li>`).join('')}</ul>
     <div class="m-ft"><button class="btn btn-o" data-a="m-close">Cancel</button><button class="btn btn-p" data-a="batch-go">${COPY.batchConfirm.ok}</button></div></div>`);
 }
@@ -3395,34 +3543,41 @@ Object.assign(ACT, {
       const b = budgetFromForm(Object.assign({}, f, { name: nm, rules, mode: 'create' }), null); b.name = nm; b.batch = true; state.budgets.unshift(b);
     });
     /* ⚠ 設計端暫擬：Figma 只畫了單筆建立的 toast（#6）；批次建立成功沿用同一句 Budget created successfully. */
-    state.sel = new Set(); showList(); toast('ok', COPY.toast.created);   // #09：Confirm and Create 完成建立回到預算列表
+    state.sel = new Set(); showList(); toast('ok', COPY.toast.created); setTimeout(focusListTop, 0);   // #09：Confirm and Create 完成建立回到預算列表
   }
 });
 
 /* ============================================================
  * 8. Modals／Toast／Guard
  * ============================================================ */
-function openModal(html) { const r = $('#modal-root'); r.innerHTML = `<div class="mask">${html}</div>`; const b = r.querySelector('.btn-p'); if (b) b.focus({ preventScroll: true }); }
-function closeModal() { $('#modal-root').innerHTML = ''; MODAL_CB = null; }
-let MODAL_CB = null;
+/* X-9r2 第三輪 CC2：破壞性確認（Remove Budget(s)、Discard Changes）開啟時焦點在 Cancel，不是主鈕（WAI-ARIA APG alertdialog；Group List／Organization Settings X-9r5 R2／R5 同做法）：Enter 按兩下不會刪掉一筆。Batch 確認不是破壞性，維持聚焦主鈕。 */
+function openModal(html, focusSel) { const r = $('#modal-root'); r.innerHTML = `<div class="mask">${html}</div>`; const b = r.querySelector(focusSel || '.btn-p'); if (b) b.focus({ preventScroll: true }); }
+function closeModal() { $('#modal-root').innerHTML = ''; MODAL_CB = null; MODAL_AFTER = null; }
+let MODAL_CB = null, MODAL_AFTER = null;
+/* 刪除、離開後原本的元素已經被重繪掉，焦點會掉到 body；改回列表上有意義的位置（CC2） */
+function focusListTop() { const h = $('.pg-title'); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } }
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#modal-root').firstChild) closeModal(); });
-Object.assign(ACT, { 'm-close': () => closeModal(), 'm-ok': () => { const cb = MODAL_CB; closeModal(); cb && cb(); } });
+Object.assign(ACT, { 'm-close': () => closeModal(), 'm-ok': () => { const cb = MODAL_CB, af = MODAL_AFTER; closeModal(); cb && cb(); af && setTimeout(af, 0); } });   /* af 延後一個 tick：背景 inert 要等彈窗關閉的 MutationObserver 先解除，不然聚焦會落空 */
 function openRemoveModal(ids, namesOverride) {
   const names = namesOverride || ids.map(id => (state.budgets.find(b => b.id === id) || {}).name).filter(Boolean);
   /* ⚠ 設計端暫擬：Figma #17／#18 只定義「刪除並重整回 Budget List」，沒有成功／失敗 toast，所以這裡也不跳 */
+  const at = sortedBudgets().findIndex(b => ids.includes(b.id));
   MODAL_CB = namesOverride ? null : () => { state.budgets = state.budgets.filter(b => !ids.includes(b.id)); ids.forEach(i => state.sel.delete(i)); renderList(); };   // #17／#18：刪除並重整回 Budget List（Figma 沒有畫成功 toast）
   openModal(`<div class="modal g30" role="dialog" aria-modal="true">
     <div class="m-hd"><span class="material-symbols-outlined ic">error</span><h2>Remove ${names.length} Customized Budget(s)</h2><button class="m-x" data-a="m-close" aria-label="Close"><span class="material-symbols-outlined">close</span></button></div>
     <div class="m-body">${esc(COPY.remove.body)}</div>
     <ul class="m-list r5">${names.map(n => `<li>${esc(n)}</li>`).join('')}</ul>
-    <div class="m-ft" style="gap:10px"><button class="btn btn-o" data-a="m-close">Cancel</button><button class="btn btn-p" data-a="m-ok">${COPY.remove.ok}</button></div></div>`);
+    <div class="m-ft" style="gap:10px"><button class="btn btn-o" data-a="m-close">Cancel</button><button class="btn btn-p" data-a="m-ok">${COPY.remove.ok}</button></div></div>`, '.m-ft .btn-o');
+  /* 刪完焦點回列表：原位置的下一列（沒有就最後一列、全刪光就 Create Budget） */
+  MODAL_AFTER = namesOverride ? null : () => { const rows = Array.from(document.querySelectorAll('.tbl tbody tr[tabindex="0"]')); (rows[Math.min(Math.max(at, 0), rows.length - 1)] || document.querySelector('.pg-actions .btn-p') || document.body).focus({ preventScroll: true }); };
 }
 function openLeaveModal(cb) {
   MODAL_CB = cb;
-  openModal(`<div class="modal" role="dialog" aria-modal="true">
+  openModal(`<div class="modal g32" role="dialog" aria-modal="true">
     <div class="m-hd"><span class="material-symbols-outlined ic">error</span><h2>${COPY.leave.title}</h2><button class="m-x" data-a="m-close" aria-label="Close"><span class="material-symbols-outlined">close</span></button></div>
     <div class="m-body ind">${COPY.leave.body}</div>
-    <div class="m-ft"><button class="btn btn-o" data-a="m-close">Cancel</button><button class="btn btn-p" data-a="m-ok">${COPY.leave.ok}</button></div></div>`);
+    <div class="m-ft"><button class="btn btn-o" data-a="m-close">Cancel</button><button class="btn btn-p" data-a="m-ok">${COPY.leave.ok}</button></div></div>`, '.m-ft .btn-o');
+  MODAL_AFTER = focusListTop;   /* CC2：Discard Changes 離開後焦點到頁標題（表單已被重繪掉） */
 }
 /* #16：創建／批次創建／編輯狀態下內容有異動，點其他頁面或 Cancel 離開時攔截；Cancel 與 X 留在原地，Discard Changes 離開 */
 function guard(fn) { if (isDirty()) openLeaveModal(fn); else fn(); }
@@ -3434,6 +3589,7 @@ document.addEventListener('click', e => {
 }, true);
 /* A-1：toast 走共用元件。kind：'ok'（預設）｜'error'｜'info'。⚠ info 原本是深色 tooltip 底（頁面自己的），改走共用 info 藍 #0B6DD7 */
 function toast(kind, msg) {
+  syncToastLift();
   LumitureToast.show({ kind: kind === 'error' ? 'error' : kind === 'info' ? 'info' : 'success', message: msg });
 }
 
@@ -3451,18 +3607,20 @@ function showList() {
   } else renderList();
   window.scrollTo(0, 0);
 }
+/* 切到另一張表單（Demo 情境、進 Edit）時，不把上一張表單輸入框的焦點帶過去（renderForm 會照 data-fid 還原焦點，Recipients 輸入框一被聚焦又會自動開自動完成面板） */
+function dropInputFocus() { const ae = document.activeElement; if (ae && ae.tagName === 'INPUT' && $('#content').contains(ae)) ae.blur(); }
 function startForm(mode, mutate) {
-  closePop(true); closeModal(); state.editLoading = false; state.editError = false; state.deleted = state.deleted || new Set();
+  dropInputFocus(); closePop(true); closeModal(); state.editLoading = false; state.editError = false; state.deleted = state.deleted || new Set();
   state.view = mode; state.form = newForm(mode); if (mutate) { mutate(state.form); state.form.snap = state.form.snap; } setHash(mode); renderForm(); window.scrollTo(0, 0);
 }
 function openEdit(id, opt) {
   opt = opt || {};
   const b = opt.record || state.budgets.find(x => x.id === id) || state.budgets[0];
   if (!opt.record) state.deleted = new Set();
-  closePop(true); closeModal(); state.view = 'edit'; state.form = formFromBudget(b); state.editError = !!opt.error; state.editLoading = !opt.error;
+  dropInputFocus(); closePop(true); closeModal(); state.view = 'edit'; state.form = formFromBudget(b); state.editError = !!opt.error; state.editLoading = !opt.error;
   if (opt.mutate) { opt.mutate(state.form); state.form.snap = snapOf(state.form); }
-  setHash('edit'); renderForm(); window.scrollTo(0, 0);
-  if (state.editLoading && !opt.stayLoading) setTimeout(() => { if (state.view === 'edit' && state.form && state.form.id === b.id) { state.editLoading = false; renderForm(); if (opt.after) opt.after(); } }, 650);
+  setHash('edit'); renderForm(); window.scrollTo(0, 0); if (opt.focusTitle) focusListTop();
+  if (state.editLoading && !opt.stayLoading) setTimeout(() => { if (state.view === 'edit' && state.form && state.form.id === b.id) { state.editLoading = false; renderForm(); if (opt.focusTitle) focusListTop(); if (opt.after) opt.after(); } }, 650);
 }
 state.deleted = new Set();
 
@@ -3508,7 +3666,7 @@ window.DEMO_SCENARIOS = [
   { id: 't2mb',  page: 'role', label: 'T2 Member',     icon: 'person_outline',       tip: '同 T1 Manager。' },
 
   { id: 'set',     page: 'state', group: 'List 狀態', label: 'With data (#01)',     icon: 'check_circle', tip: '預設：10 筆預算。五格進度條門檻：>=100% 紅、>=60% 黃、其餘綠。' },
-  { id: 'loading', page: 'state', group: 'List 狀態', label: 'Loading skeleton (#02)', icon: 'hourglass_top', tip: '按鈕 Disabled、UpdateAt 淡化、skeleton 固定三列。' },
+  { id: 'loading', page: 'state', group: 'List 狀態', label: 'Loading skeleton (#02)', icon: 'hourglass_top', tip: 'UpdateAt 淡化、skeleton 固定三列；Batch Create／Create Budget 維持可用（稿 #02），只有 No-auth 才 Disabled。' },
   { id: 'empty',   page: 'state', group: 'List 狀態', label: 'No data (#03)',        icon: 'monitoring', tip: 'No Budget Yet。按鈕仍可用。' },
   { id: 'no-auth', page: 'state', group: 'List 狀態', label: 'No authorization (#04 / #04-1)', icon: 'lock', tip: '文案依角色分兩版；Batch Create / Create Budget Disabled。' },
   { id: 'error',   page: 'state', group: 'List 狀態', label: 'Error（補的，Figma 沒畫）', icon: 'cloud_off', tip: '⚠ DEVIATION：FE 把列表錯誤顯示成「No Budget Yet」，這裡補正確的 error 狀態。' },
@@ -3533,7 +3691,7 @@ window.DEMO_SCENARIOS = [
   { id: 'f-fixed', page: 'form', group: 'Monitoring Period', label: 'Fixed Period (#05-3)', icon: 'date_range', tip: '右方是範圍選擇；只選一個日期時 end date 自動帶入 start date（單日預算）。' },
   { id: 'f-daily', page: 'form', group: 'Monitoring Period', label: 'Repeats Daily (#05-9)', icon: 'today' },
   { id: 'f-date-open', page: 'form', group: 'Monitoring Period', label: '開啟 Date Picker（Monthly）(#05-1)', icon: 'edit_calendar', tip: 'Hover 29 / 30 / 31 日會出現說明 tooltip。' },
-  { id: 'f-recip-open', page: 'form', group: 'Alert / Thresholds', label: 'Recipients 自動完成 (#05-4)', icon: 'alternate_email', tip: '輸入 five9：已選項目 Disable、符合關鍵字粗體。' },
+  { id: 'f-recip-open', page: 'form', group: 'Alert / Thresholds', label: 'Recipients 自動完成 (#05-4)', icon: 'alternate_email', tip: '輸入 five9：已選項目 Disabled、符合關鍵字粗體。' },
   { id: 'f-recip-many', page: 'form', group: 'Alert / Thresholds', label: 'Recipients 14 人 → +4 (#05-5)', icon: 'groups', tip: '最多顯示十個 chips，超過顯示 +N；點開後展開全部。' },
   { id: 'f-th-max', page: 'form', group: 'Alert / Thresholds', label: 'Thresholds 達 5 個上限 (#05-6)', icon: 'filter_5', tip: 'Add Threshold Disabled + tooltip「You have reached the limit.」。' },
   { id: 'f-errors', page: 'form', group: '錯誤狀態', label: '按下 Create 後的格式錯誤 (#05-7)', icon: 'error', tip: '名稱超過 300 字、Amount 為 0、Recipients 殘留字串、Thresholds 重複與超出範圍。' },
@@ -3544,7 +3702,7 @@ window.DEMO_SCENARIOS = [
   { id: 'f-rule-full', page: 'form', group: 'Budget Scope', label: 'Rule 完整範例 (#07)', icon: 'account_tree', tip: 'chip max-width 300、輸入框 max-height 240 超過捲動、超出顯示捲軸。' },
   { id: 'f-rule-limit', page: 'form', group: 'Budget Scope', label: 'Rule 10 條 / Condition 3 個 達上限 (#07-7)', icon: 'block', tip: 'Add Rule 與 Add Condition Disabled + tooltip。' },
   { id: 'f-menu-rule', page: 'form', group: 'Budget Scope', label: '開啟 Add Rule 選單 (#07-2)', icon: 'arrow_drop_down_circle' },
-  { id: 'f-menu-cond', page: 'form', group: 'Budget Scope', label: '開啟 Add Condition 選單 (#07-5)', icon: 'arrow_drop_down_circle', tip: '已設定的條件顯示 Disable。' },
+  { id: 'f-menu-cond', page: 'form', group: 'Budget Scope', label: '開啟 Add Condition 選單 (#07-5)', icon: 'arrow_drop_down_circle', tip: '已設定的條件顯示 Disabled。' },
   { id: 'f-multi', page: 'form', group: 'Budget Scope', label: '開啟條件下拉（搜尋 + Select All）(#07-6)', icon: 'checklist' },
   { id: 'f-switch', page: 'form', group: 'Budget Scope', label: '切換 Rule 平台 GCP → AWS（20250321 版）', icon: 'swap_horiz', tip: '保留各條件的 chips，但 Service / Project 欄位顯示為錯誤樣式；Group 跨平台有效。' },
   { id: 'f-batch-groups', page: 'form', group: 'Batch', label: 'Batch by Groups 已選 (#08-1)', icon: 'groups', tip: '開啟下拉。' },
@@ -3567,10 +3725,14 @@ window.DEMO_DEFAULT = 'set';
 
 function setRole(id) { state.role = id; if (window.LumitureTopbar) LumitureTopbar.setRole(ROLES[id].chip); }
 function setPageState(id) { state.pageState = id; _listShown = true; showList(); }
+/* X-9r2 第三輪 B10：表單類情境每次都從全新的表單開始（原本沿用上一個情境的表單，`f-recip-open` 打的字、`f-errors` 的錯誤態會一路殘留到後面的情境）；
+ * 刪除確認、成功 toast 這類真實流程只會出現在列表頁的，先回列表（demoEnsureList）；Edit 成功／失敗 toast 在 Edit 頁。 */
 function needForm(mode, fn) {
-  if (state.view !== mode || !state.form) startForm(mode);
+  startForm(mode);
   fn(state.form); renderForm();
 }
+function demoEnsureList() { if (state.view !== 'list' || state.pageState !== 'set') { state.pageState = 'set'; _listShown = true; showList(); } }
+function demoToastOnEdit(kind, msg) { if (state.view === 'edit' && state.form && !state.editLoading) toast(kind, msg); else openEdit(null, { record: REC_EDIT, after: () => toast(kind, msg) }); }
 function afterRender(fn) { setTimeout(fn, 60); }
 const DEMO_TARGETS = ['Mechanical Engineering Students', 'Electrical Engineering Students', 'Civil Engineering Students', 'Chemical Engineering Students'];
 function fullRules() {
@@ -3637,14 +3799,14 @@ window.DEMO_APPLY = function (id) {
 
   /* ---- Modal ---- */
   if (id === 'm-leave') { needForm('create', f => { f.name = 'Quantum Leap Innovation Catalyst Fund'; }); afterRender(() => openLeaveModal(() => {})); return; }   /* #16 是在表單頁離開時跳出，疊在 Create 表單上，不是列表 */
-  if (id === 'm-remove-1') return openRemoveModal([], ['Quantum Leap Innovation Catalyst Fund']);
-  if (id === 'm-remove-53') { const base = ['Quantum Leap Innovation Catalyst Fund', 'R&D Budget', 'Product Development Budget', 'Marketing & Sales Budget', 'IT Infrastructure Budget', 'Cloud Computing Budget', 'Cybersecurity Budget', 'Office Operations Budget', 'Human Resources Budget', 'Training & Development Budget Training & Development Budget Training & Development Budget Training & Development Budget', 'Legal & Compliance Budget', 'Project X Budget', 'New Product Launch Budget', 'Engineering Team Budget', 'Marketing Team Budget', 'Sales Team Budget', 'Customer Support Budget', 'Software Subscription Budget', 'Hardware Procurement Budget']; const names = []; for (let i = 0; i < 53; i++) names.push(i < base.length ? base[i] : 'Department Budget ' + (i - base.length + 1)); return openRemoveModal([], names); }
+  if (id === 'm-remove-1') { demoEnsureList(); return openRemoveModal([], ['Quantum Leap Innovation Catalyst Fund']); }
+  if (id === 'm-remove-53') { demoEnsureList(); const base = ['Quantum Leap Innovation Catalyst Fund', 'R&D Budget', 'Product Development Budget', 'Marketing & Sales Budget', 'IT Infrastructure Budget', 'Cloud Computing Budget', 'Cybersecurity Budget', 'Office Operations Budget', 'Human Resources Budget', 'Training & Development Budget Training & Development Budget Training & Development Budget Training & Development Budget', 'Legal & Compliance Budget', 'Project X Budget', 'New Product Launch Budget', 'Engineering Team Budget', 'Marketing Team Budget', 'Sales Team Budget', 'Customer Support Budget', 'Software Subscription Budget', 'Hardware Procurement Budget']; const names = []; for (let i = 0; i < 53; i++) names.push(i < base.length ? base[i] : 'Department Budget ' + (i - base.length + 1)); return openRemoveModal([], names); }
   if (id === 'm-batch-4') return needForm('batch', f => { f.name = 'Cloud Computing Budget'; f.batchTargets = ['Mechanical Engineering Students Mechanical Engineering Student', 'Electrical Engineering Students', 'Civil Engineering Students', 'Chemical Engineering Students']; }), openBatchConfirm();
   if (id === 'm-batch-123') return needForm('batch', f => { f.name = 'Cloud Computing Budget'; const t = []; for (let i = 0; i < 123; i++) t.push(GROUPS[i % GROUPS.length] + (i >= GROUPS.length ? ' ' + Math.floor(i / GROUPS.length) : '')); f.batchTargets = t; }), openBatchConfirm();
-  if (id === 't-created') return toast('ok', COPY.toast.created);
-  if (id === 't-create-fail') return toast('error', COPY.toast.createFail);
-  if (id === 't-updated') return toast('ok', COPY.toast.updated);
-  if (id === 't-update-fail') return toast('error', COPY.toast.updateFail);
+  if (id === 't-created') { demoEnsureList(); return toast('ok', COPY.toast.created); }   // 建立成功會回列表（#6）
+  if (id === 't-create-fail') { if (state.view !== 'create' && state.view !== 'batch') startForm('create'); return toast('error', COPY.toast.createFail); }   // 失敗留在表單（#6）
+  if (id === 't-updated') return demoToastOnEdit('ok', COPY.toast.updated);   // #19：成功留在 Edit
+  if (id === 't-update-fail') return demoToastOnEdit('error', COPY.toast.updateFail);
 };
 
 /* ============================================================
@@ -3657,6 +3819,92 @@ window.DEMO_APPLY = function (id) {
   if (h === 't1m' || h === 't2mb') { setRole(h); setPageState('no-auth'); return; }
   if (map[h] && !['t1m', 't2mb'].includes(h)) { _listShown = true; DEMO_APPLY(map[h]); return; }
   showList();
+})();
+</script>
+<script>
+/* ============================================================
+ * X-9r2 F2／F3（2026-11-05）：自製下拉與日期選擇器的鍵盤與讀屏語意
+ *   F2 單選下拉（.sel → .pop.menu）：aria-expanded、role=listbox/option、↑↓ Home End 移動、Enter／Space 選、Esc 關回觸發欄、Tab 離開即關、觸發欄 ↓↑ 可開
+ *   F3 日期選擇器（.pop.dp）：role=dialog、日期格 role=button 可 Tab、←→↑↓ 移日（跨月自動翻頁）、Enter／Space 選、Esc 關；前後月鈕與年月標題可 Tab
+ *   其他 popover（多選、收件人）：Esc 一律關並回到觸發欄
+ * ============================================================ */
+(function () {
+  const items = () => (POP && POP.kind === 'menu') ? Array.from(POP.el.querySelectorAll('.mi:not(.is-disabled)')) : [];
+  const hlIdx = its => its.findIndex(x => x.classList.contains('hl'));
+  function setHl(its, i) {
+    its.forEach((x, j) => { x.classList.toggle('hl', j === i); if (j === i) x.id = 'cb-mi-active'; else if (x.id === 'cb-mi-active') x.removeAttribute('id'); });
+    const a = anchorOf(POP.fid); if (a) { if (its[i]) a.setAttribute('aria-activedescendant', 'cb-mi-active'); else a.removeAttribute('aria-activedescendant'); }
+    if (its[i] && its[i].scrollIntoView) its[i].scrollIntoView({ block: 'nearest' });
+  }
+  const _openMenu = openMenu;
+  openMenu = function (fid, list, onPick) {
+    _openMenu(fid, list, onPick);
+    if (!POP || POP.kind !== 'menu') return;
+    POP.el.setAttribute('role', 'listbox');
+    POP.el.querySelectorAll('.mi').forEach(m => { m.setAttribute('role', 'option'); m.setAttribute('aria-selected', m.classList.contains('is-sel') ? 'true' : 'false'); if (m.classList.contains('is-disabled')) m.setAttribute('aria-disabled', 'true'); });
+    const a = anchorOf(fid); if (a) a.setAttribute('aria-expanded', 'true');
+    const its = items(); let i = its.findIndex(x => x.classList.contains('is-sel')); if (i < 0) i = hlIdx(its); if (i >= 0) setHl(its, i);
+  };
+  const _closePop = closePop;
+  closePop = function (silent) {
+    const p = POP; _closePop(silent);
+    if (!p) return;
+    const a = anchorOf(p.fid); if (a && a.getAttribute('aria-haspopup')) { a.setAttribute('aria-expanded', 'false'); a.removeAttribute('aria-activedescendant'); }
+  };
+  /* 日期選擇器：每次 render 後補語意 */
+  const _renderDP = renderDP;
+  renderDP = function () {
+    _renderDP();
+    if (!POP || POP.kind !== 'date') return;
+    const el = POP.el; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Choose date');
+    el.querySelectorAll('.dp-hd .nv').forEach(n => { n.setAttribute('role', 'button'); n.tabIndex = 0; n.setAttribute('aria-label', { py: 'Previous year', pm: 'Previous month', nm: 'Next month', ny: 'Next year' }[n.dataset.k] || 'Navigate'); });
+    const t = el.querySelector('.dp-hd .ttl'); if (t) { t.setAttribute('role', 'button'); t.tabIndex = 0; t.setAttribute('aria-label', (DP.mode === 'day' ? 'Choose month, ' : 'Choose year, ') + t.textContent.trim()); }
+    el.querySelectorAll('.dp-mg .m').forEach(m => { m.setAttribute('role', 'button'); m.tabIndex = 0; if (m.classList.contains('sel')) m.setAttribute('aria-pressed', 'true'); });
+    el.querySelectorAll('.dp-d[data-a="dp-day"]').forEach(d => { d.setAttribute('role', 'button'); d.tabIndex = 0; const dt = new Date(+d.dataset.t); d.setAttribute('aria-label', dt.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })); if (d.classList.contains('sel') || d.classList.contains('rs') || d.classList.contains('re')) d.setAttribute('aria-pressed', 'true'); });
+  };
+  function dpFocus(sel) { if (!POP || POP.kind !== 'date') return; const e = POP.el.querySelector(sel) || POP.el.querySelector('.dp-d[data-a="dp-day"]'); e && e.focus(); }
+  const _openDate = ACT['open-date'];
+  ACT['open-date'] = function (el) { _openDate(el); if (POP && POP.kind === 'date') dpFocus('.dp-d.sel, .dp-d.rs, .dp-d.today'); };
+  let swallowSpace = false;
+  document.addEventListener('keydown', e => {
+    const t = e.target;
+    /* 觸發欄：↓↑ 開選單（Enter／Space 原生 click 已會開） */
+    if (t.matches && t.matches('.sel[data-a="open-menu"]') && (e.key === 'ArrowDown' || e.key === 'ArrowUp') && !(POP && POP.kind === 'menu' && POP.fid === t.dataset.fid)) { e.preventDefault(); t.click(); return; }
+    if (!POP) return;
+    if (POP.kind === 'menu') {
+      const its = items(); let i = hlIdx(its);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!its.length) return; i = e.key === 'ArrowDown' ? (i + 1) % its.length : (i - 1 + its.length) % its.length; setHl(its, i); }
+      else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); if (its.length) setHl(its, e.key === 'Home' ? 0 : its.length - 1); }
+      else if (e.key === 'Enter' || e.key === ' ') { if (i >= 0) { e.preventDefault(); if (e.key === ' ') swallowSpace = true; const fid = POP.fid; ACT['mi-pick'](its[i]); setTimeout(() => { const a = anchorOf(fid); a && a.focus && a.focus(); }, 0); } }   /* 選完表單會重繪，觸發欄是新的節點，下一個 tick 再用 fid 找回來聚焦 */
+      else if (e.key === 'Escape') { e.preventDefault(); const a = anchorOf(POP.fid); closePop(); a && a.focus && a.focus(); }
+      else if (e.key === 'Tab') closePop();
+      return;
+    }
+    if (POP.kind === 'date') {
+      const el = POP.el, days = Array.from(el.querySelectorAll('.dp-d[data-a="dp-day"]'));
+      const onDay = t.matches && t.matches('.dp-d[data-a="dp-day"]') && el.contains(t);
+      if (e.key === 'Escape') { e.preventDefault(); const a = anchorOf('dp'); closePop(); a && a.focus(); return; }
+      if ((e.key === 'Enter' || e.key === ' ') && t.matches && t.matches('.dp-d[data-a="dp-day"], .dp-hd .nv, .dp-hd .ttl, .dp-mg .m') && el.contains(t)) {
+        e.preventDefault(); const isDay = onDay, k = t.dataset.k, wasM = t.classList.contains('m');
+        t.click();
+        if (!POP || POP.kind !== 'date') { const a = anchorOf('dp'); a && a.focus(); return; }
+        if (isDay) dpFocus('.dp-d.rs, .dp-d.sel'); else if (k) dpFocus('.dp-hd .nv[data-k="' + k + '"]'); else if (wasM) dpFocus('.dp-d.sel, .dp-d.today'); else dpFocus(DP.mode === 'day' ? '.dp-d.sel, .dp-d.today' : '.dp-mg .m.sel, .dp-mg .m');
+        return;
+      }
+      if (onDay && /^Arrow(Left|Right|Up|Down)$/.test(e.key)) {
+        e.preventDefault();
+        const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key], i = days.indexOf(t), j = i + step;
+        if (days[j]) { days[j].focus(); return; }
+        const target = new Date(+t.dataset.t + step * 864e5);
+        if (target < TODAY) return;
+        const nav = el.querySelector('.dp-hd .nv[data-k="' + (step > 0 ? 'nm' : 'pm') + '"]'); nav && nav.click();
+        const d2 = POP && POP.kind === 'date' ? POP.el.querySelector('.dp-d[data-t="' + target.getTime() + '"]') : null; (d2 || (step > 0 ? POP.el.querySelector('.dp-d[data-a="dp-day"]') : Array.from(POP.el.querySelectorAll('.dp-d[data-a="dp-day"]')).pop())).focus();
+      }
+      return;
+    }
+    if (e.key === 'Escape') { e.preventDefault(); const a = anchorOf(POP.fid); closePop(); a && a.focus && a.focus(); }
+  });
+  document.addEventListener('keyup', e => { if (swallowSpace && e.key === ' ') { e.preventDefault(); swallowSpace = false; } });
 })();
 </script>
 <script>
@@ -4136,6 +4384,14 @@ window.DEMO_APPLY = function (id) {
       } catch (err) {}
       return 8;
     }
+    /* X-9r1 B1（2026-11-05）：固定頂欄的下緣。tooltip 放在錨點上方時不能壓到頂欄（頁首那排 info icon／截圖鈕／幣別鈕的 tooltip 之前 top 9～54，蓋在鈴鐺與頭像上）；頂欄捲走或沒有頂欄時回 8 */
+    function topMin() {
+      try {
+        var tb = document.querySelector('.lt-topbar');
+        if (tb) { var b = tb.getBoundingClientRect().bottom; if (b > 0) return b + 4; }
+      } catch (err) {}
+      return 8;
+    }
     function place() {
       if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
@@ -4147,10 +4403,11 @@ window.DEMO_APPLY = function (id) {
       /* X-9r1 S2：放不下改靠右緣時，左緣不能落進 sidebar（600 寬在 1280 中間位置會伸進去）；沒有 sidebar 的頁維持 8，收合時 21＋8 */
       if (x + tw > vw - 8) x = Math.max(minX(), Math.min(r.right + 2, vw - 8) - tw);
       if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
+      x = Math.max(8, x);   /* X-9r1 11-13 S-A7：至少離視窗左緣 8（sidebar 裡的錨點不套 minX()，logo tooltip 原本貼在 left 0） */
       var below = cur.dataset.tipPos === 'below';
       var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
       var y = below ? r.bottom + dy : r.top - th - 6;
-      if (y < 8) y = r.bottom + 4;
+      if (y < topMin()) y = r.bottom + 4;   /* X-9r1 B1：上方放不下或會蓋到頂欄就翻到下方 */
       if (y + th > vh - 8) y = Math.max(8, r.top - th - 6);
       tip.style.left = x + 'px'; tip.style.top = y + 'px';
     }

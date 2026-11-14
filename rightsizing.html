@@ -84,6 +84,7 @@
   --lt-color-error-light:   #FFEBEF;   /* TBC: Figma audit needed */
   --lt-color-warning-base:  #FC9A0F;   /* TBC: Figma audit needed */
   --lt-color-warning-light: #FEF3E1;   /* TBC: Figma audit needed */
+  --lt-color-warning-dark:  #EC6F09;   /* CM Color Kit Warning/Dark（2026-11-02 補；FE warning.dark，LumiTag 過期與分到 0 提示用） */
   --lt-color-info-base:     #0B6DD7;   /* = blue-60，符合 Figma info usage */
   --lt-color-info-light:    #E6F6FF;   /* TBC: Figma audit needed */
 
@@ -140,6 +141,42 @@
 
   /* --- Typography: Letter Spacing (對齊 Figma: 全部 0) --- */
   --lt-tracking-normal: 0;
+
+  /* --- Typography: CMDS 文字樣式（composite，用在 `font:` 簡寫）2026-11-02 ---
+   * 一對一對應 Figma「CM Typography」的文字樣式；寫 CSS 一律從這組挑，不自己組字級／字重／行高。
+   * `font:` 簡寫會把 font-variant-numeric 重設成 normal，數字欄要另外補 tabular-nums。
+   * Link Bold 1 稿上自帶底線；底線由元件決定（Lumiture 文字按鈕不加底線，見 Guideline Text Button）。 */
+  --lt-type-h3:               700 24px/36px var(--lt-font-sans);    /* Headers/H3 頁面標題 */
+  --lt-type-h4:               700 20px/30px var(--lt-font-sans);    /* Headers/H4 頁面副標題 */
+  --lt-type-h5:               700 18px/27px var(--lt-font-sans);    /* Headers/H5 功能名稱 */
+  --lt-type-h6:               700 16px/24px var(--lt-font-sans);    /* Headers/H6 小標題 */
+  --lt-type-body:             400 14px/24.5px var(--lt-font-sans);  /* Body/Body Regular 內文 */
+  --lt-type-body-medium:      500 14px/24.5px var(--lt-font-sans);  /* Body/Body Medium 內文重點 */
+  --lt-type-body-bold:        700 14px/24.5px var(--lt-font-sans);  /* Body/Body Bold 內文標題 */
+  --lt-type-caption:          400 12px/18px var(--lt-font-sans);    /* Caption/Caption Regular 註記 */
+  --lt-type-caption-bold:     700 12px/18px var(--lt-font-sans);    /* Caption/Caption Bold 重要註記 */
+  --lt-type-button-regular-0: 400 12px/18px var(--lt-font-sans);    /* Content/Button Regular 0（chip 字） */
+  --lt-type-button-regular-1: 400 14px/21px var(--lt-font-sans);    /* Content/Button Regular 1（下拉選項字） */
+  --lt-type-button-bold-1:    700 14px/21px var(--lt-font-sans);    /* Content/Button Bold 1 */
+  --lt-type-button-bold-2:    700 16px/24px var(--lt-font-sans);    /* Content/Button Bold 2 */
+  --lt-type-link-bold-1:      700 14px/24.5px var(--lt-font-sans);  /* Content/Link Bold 1 超連結 */
+  --lt-type-link-medium-1:    500 14px/24.5px var(--lt-font-sans);  /* Content/Link Medium 1 超連結（2026-11-03 補，LumiTag Edit allocation card） */
+
+  /* --- Color: CM Color Kit（chip 等元件用；Light＝底、Main＝框、Dark＝字）2026-11-02，先收 #3、#11，其他色用到再補 --- */
+  --lt-kit-3-light:  var(--lt-turquoise-10);   /* #F0FFFF  #3 Turquoise Blue */
+  --lt-kit-3-main:   var(--lt-chart-3);        /* #9CF3FF */
+  --lt-kit-3-dark:   var(--lt-turquoise-70);   /* #34B5D9  CM Color Kit/Dark/#3 Dark */
+  --lt-kit-11-light: var(--lt-grey-100);       /* #F2F2F2  #11 Gray */
+  --lt-kit-11-main:  var(--lt-grey-400);       /* #B3B3B3 */
+  --lt-kit-11-dark:  #7C7C7C;                  /*          CM Color Kit/Dark/#11 Dark */
+  --lt-kit-4-light:  #E6FFF8;                  /* CM Color Kit/Light/#4 Light（2026-11-03 補，LumiTag Preview 狀態標籤） */
+  --lt-kit-4-main:   var(--lt-chart-4);        /* #00DCC2 */
+  --lt-kit-4-dark:   var(--lt-color-success);  /* #00B5A6  CM Color Kit/Dark/#4 Dark */
+  --lt-kit-6-light:  var(--lt-color-warning-light); /* #FEF3E1  #6 Tangerine Orange（2026-11-03 補，LumiTag Not split／Partially split） */
+  --lt-kit-6-main:   var(--lt-chart-6);        /* #F3BE68 */
+  --lt-kit-6-dark:   var(--lt-color-warning-base);  /* #FC9A0F  CM Color Kit/Dark/#6 Dark */
+  --lt-color-attention-main:    #FFA500;       /* CDP color/Attention/Attention1 Main（CMDS Alert / Large orange 頂條與 icon，2026-11-03 補） */
+  --lt-color-attention-lighter: #FFF3DE;       /* CDP color/Attention/Attention4 Lighter（Alert icon 底） */
 
   /* --- Shadow: 對齊 CMDS Figma 規範 (2026-05-12 audit)
    * 來源：Figma node 20599-107518 — CMDS 4 個官方 shadow variables
@@ -292,7 +329,7 @@
  * - ~~Chart palette~~ ✅ 已加入（2026-05-12 從 Figma General Behavior file audit）
  * - Gradient tokens (Figma 有 Lumiture.ai Blue / Orange / Lemon C 等)
  * - Opacity tokens (Figma 有 CM Opacity Color 系列)
- * - Composite typography tokens (--lt-type-h1, --lt-type-body 等 style sets)
+ * - ~~Composite typography tokens~~ ✅ 已加入 --lt-type-*（2026-11-02，H1／H2 用到再補）
  * - Focus / Inset shadow 特殊變體
  * - Dark mode 對應 token
  *
@@ -310,6 +347,7 @@
  *   .lt-skeleton 骨架屏（A-18）
  *   .lt-link     文字連結（B-14）
  *   .lt-btn-icon 表格 Action icon button（B-6，CB 版）
+ *   .lt-chip     CMDS「Deletable chips / Squared colors」（2026-11-02）
  *   空狀態／無權限見 lumiture-empty.js；Toast 見 lumiture-toast.js
  * ============================================================ */
 
@@ -369,6 +407,29 @@
 .lt-btn-icon:focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:1px}
 .lt-btn-icon:disabled{color:var(--lt-grey-400,#B3B3B3);cursor:not-allowed;background:none}
 
+/* ---------- .lt-chip ----------
+ * CMDS「Deletable chips / Squared colors」，Deletable=false。Lumiture 用到的 chip 一律走這個，不要各頁自刻。
+ * 結構：<span class="lt-chip lt-chip--outline lt-chip--c3"><span class="material-symbols-outlined lt-chip__icon">call_split</span>Allocation card</span>
+ * Size：預設 s（高 24）、.lt-chip--xs（高 20）。CMDS 只有這兩個尺寸。
+ * 圓角 4、左右內距 8、icon（Show icon L）16 與字間距 4、字 Button Regular 0（12／18）。
+ * Appearance：.lt-chip--outline 底 Light／框 Main／字 Dark；.lt-chip--solid 底 Dark／白字。
+ * Color：.lt-chip--c3（#3 Turquoise Blue）、.lt-chip--c4（#4 Green）、.lt-chip--c6（#6 Tangerine Orange）、.lt-chip--c11（#11 Gray）；其他色用到時照 CM Color Kit 在 tokens.css 補 --lt-kit-N-*。 */
+.lt-chip{display:inline-flex;align-items:center;gap:4px;box-sizing:border-box;height:24px;padding:0 8px;border-radius:4px;border:1px solid transparent;
+  font:var(--lt-type-button-regular-0,400 12px/18px sans-serif);white-space:nowrap;flex-shrink:0;vertical-align:middle}
+.lt-chip--xs{height:20px}
+.lt-chip__icon{font-size:16px;line-height:1;font-variation-settings:'FILL' 1}
+.lt-chip--outline.lt-chip--c3{background:var(--lt-kit-3-light,#F0FFFF);border-color:var(--lt-kit-3-main,#9CF3FF);color:var(--lt-kit-3-dark,#34B5D9)}
+.lt-chip--solid.lt-chip--c3{background:var(--lt-kit-3-dark,#34B5D9);color:var(--lt-white,#fff)}
+.lt-chip--outline.lt-chip--c11{background:var(--lt-kit-11-light,#F2F2F2);border-color:var(--lt-kit-11-main,#B3B3B3);color:var(--lt-kit-11-dark,#7C7C7C)}
+.lt-chip--solid.lt-chip--c11{background:var(--lt-kit-11-dark,#7C7C7C);color:var(--lt-white,#fff)}
+.lt-chip--outline.lt-chip--c4{background:var(--lt-kit-4-light,#E6FFF8);border-color:var(--lt-kit-4-main,#00DCC2);color:var(--lt-kit-4-dark,#00B5A6)}
+.lt-chip--outline.lt-chip--c6{background:var(--lt-kit-6-light,#FEF3E1);border-color:var(--lt-kit-6-main,#F3BE68);color:var(--lt-kit-6-dark,#FC9A0F)}
+
+/* X-9r1 11-13 S-FOCUS：鍵盤 focus 框統一 2px primary 外框（X-9r2／X-9r5 已定「focus 統一 2px primary 外框」）。
+   用 :where() 零權重：各頁自己寫了 :focus-visible 或 outline:none＋光暈的照舊贏。
+   排除共用外殼（sidebar／topbar／Account Menu／角色彈窗／Demo FAB／toast）：它們在深色底上有自己的青色或白色框。 */
+:where(button,[role="button"],[role="tab"],a[href]):where(:not(.lt-sidebar *,.lt-topbar *,.lt-tb-logo *,#lt-am *,.lt-rd-back *,.demo-fab,.demo-popover *,.lt-toast-wrap *)):focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:2px}
+
 </style>
 <style>
 :root{
@@ -426,7 +487,7 @@ h1.pg-title:focus,.modal:focus{outline:none}   /* RA24／RA27：程式把焦點�
 .btn-sm{height:30px;padding:0 12px;font-size:14px}
 .btn .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 16}
 .btn:disabled{background:var(--lt-button-disabled-bg,#CCCCCC)!important;color:var(--lt-button-disabled-text,#fff)!important;border-color:transparent!important;cursor:not-allowed}   /* B-1：FE 版停用按鈕 #CCCCCC 底白字 */
-.btn-o:disabled{background:#fff!important;color:var(--g400)!important;border-color:var(--g300)!important}
+.btn-o:disabled{background:#fff!important;color:var(--g300)!important;border-color:var(--g300)!important}   /* X-9r1 11-13 P3：外框鈕停用字與 icon #CCCCCC（稿 Overview #11／Rate Optimization #02、#11／General Budget #01-6 等一律白底、框字 icon #CCCCCC） */
 .btn-b:disabled{background:transparent!important;color:var(--g400)!important}
 .btn-b .btn-text{transition:text-decoration .15s}
 .btn-b:hover .btn-text{text-decoration:underline}
@@ -450,7 +511,7 @@ h1.pg-title:focus,.modal:focus{outline:none}   /* RA24／RA27：程式把焦點�
 .rs-banner{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:16px}
 .rs-banner-desc{font-size:12px;color:var(--g500);line-height:1.7}   /* A-16：不設 max-width */
 .rs-banner-desc b{color:var(--g700);font-weight:700;letter-spacing:.4px}
-.rs-learn{color:var(--lt-color-text-link,#004FB0);text-decoration:underline;cursor:help;font-weight:700}   /* B-14：連結 #004FB0＋底線；Learn More 12／700 */
+.rs-learn{color:var(--lt-color-text-link,#004FB0);text-decoration:underline;cursor:help;font-weight:700;padding:4px 0}   /* X-9r4 11-06 A15：inline 上下 padding 不動版面，點擊區 17→25 */   /* B-14：連結 #004FB0＋底線；Learn More 12／700 */
 .rs-banner-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
 /* ==== AI Quota: Rightsizing scans（LT-3140 — UO header + 達上限 banner）==== */
 /* Figma #01 — dot(8px) + "Rightsizing Scans: {remaining}/{total} left"；定義同 User Menu（淺色背景版） */
@@ -489,7 +550,7 @@ h1.pg-title:focus,.modal:focus{outline:none}   /* RA24／RA27：程式把焦點�
 .tab:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(0,79,176,.35)}
 /* RA2：讀取中分頁不能操作，字 #B3B3B3 且不帶計數（稿 #02） */
 .tab:disabled,.tab:disabled:hover{color:var(--g400);cursor:not-allowed;background:none}
-.tab.active:disabled,.tab.active:disabled:hover{background:var(--pri-lt20);color:var(--g400)}
+.tab.active:disabled,.tab.active:disabled:hover{background:#fff;color:var(--g400);font-weight:400}   /* X-9r1 11-13 P5：停用 Toggle Group 四格都沒有選中底色、字 400 #B3B3B3（稿 #02 Toggle / Status=disabled；原選中格留 #D1EEFF） */
 .tab-badge{font-size:14px;font-weight:700;background:var(--g500);color:#fff;border-radius:5px;padding:0 6px;line-height:20px;height:20px;min-width:20px;text-align:center}
 .tab.active .tab-badge{background:var(--pri);color:#fff}
 .rs-actions-row{display:flex;align-items:center;gap:10px;row-gap:12px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
@@ -501,7 +562,7 @@ h1.pg-title:focus,.modal:focus{outline:none}   /* RA24／RA27：程式把焦點�
 /* A-11（2026-10-15）：下拉觸發欄改掛 shared .lt-select（框 #CCCCCC、hover #B3B3B3、MUI 實心 ▾ 24px）。
    寬度仍照 Figma #01（220／200／100）：.lt-select 的 gap 與右內距在這裡收到 0／2，讓 100 寬的「All Types」放得下（A-32① 原本被截成「All Ty…」） */
 .rs-sel.lt-select{gap:0;padding:0 2px 0 12px;box-sizing:border-box;flex-shrink:0}
-.rs-sel:disabled{background:#fff;border-color:var(--g200);color:var(--g400);cursor:not-allowed}   /* RA2：讀取中篩選停用（同 Overview X-9r3 FA3：框 #E6E6E6、字 #B3B3B3、箭頭 #CCCCCC） */
+.rs-sel:disabled{background:var(--g100);border-color:var(--g200);color:var(--g400);cursor:not-allowed}   /* RA2：讀取中篩選停用（同 Overview X-9r3 FA3：框 #E6E6E6、字 #B3B3B3、箭頭 #CCCCCC） */   /* X-9r1 11-13 P4：底 #F2F2F2（稿 #02 CSP／Groups 停用下拉，原 #fff）；Types 在稿裡畫成啟用態是稿的殘留，三個一律停用 */
 .rs-sel:disabled .lt-select__arrow{color:var(--g300)}
 .rs-sel.on{border-color:var(--pri);color:var(--pri)}
 .rs-sel.on .lt-select__arrow{color:var(--pri)}
@@ -537,7 +598,7 @@ h1.pg-title:focus,.modal:focus{outline:none}   /* RA24／RA27：程式把焦點�
 .rs-search:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 .rs-search .material-symbols-outlined{font-size:20px;color:var(--g400);font-variation-settings:'FILL' 0}
 .rs-search input{border:none;outline:none;background:none;width:100%;height:100%;font-size:14px;color:var(--g700);text-overflow:ellipsis}   /* X-9r1 P3：放不下的 placeholder 加「…」 */   /* RA27：input 撐滿 36 高框，可點區不再只有 19 */
-.rs-search.is-disabled{border-color:var(--g200);background:#fff}   /* RA2：讀取中搜尋停用 */
+.rs-search.is-disabled{border-color:var(--g200);background:var(--g100)}   /* RA2：讀取中搜尋停用；X-9r1 11-13：底改 #F2F2F2（稿 #02 `2188:85391` 搜尋框停用底 #F2F2F2，跟同列停用下拉一致；Rate Optimization 稿畫白底，兩頁稿不同已列 F174，prototype 兩頁統一灰底） */
 .rs-search.is-disabled:hover{border-color:var(--g200)}
 .rs-search.is-disabled .material-symbols-outlined{color:var(--g300)}
 .rs-search input:disabled{cursor:not-allowed}
@@ -550,8 +611,8 @@ h1.pg-title:focus,.modal:focus{outline:none}   /* RA24／RA27：程式把焦點�
 .rs-tblscroll::-webkit-scrollbar-thumb{background:var(--g300);border-radius:5px}
 .rs-tblscroll::-webkit-scrollbar-track{background:transparent}
 table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;min-width:1888px}
-.rstbl thead th{background:var(--pri-lt10);height:50px;padding:0 12px;text-align:left;font-weight:700;font-size:14px;color:var(--g700);position:sticky;top:0;z-index:3;box-shadow:inset 0 -1px 0 var(--g400);white-space:nowrap;vertical-align:middle}
-.rstbl td{height:50px;padding:0 12px;border-bottom:1px solid var(--g100);background:#fff;color:var(--g700);vertical-align:middle;white-space:nowrap}
+.rstbl thead th{background:var(--pri-lt10);height:50px;padding:0 16px;text-align:left;font-weight:700;font-size:14px;color:var(--g700);position:sticky;top:0;z-index:3;box-shadow:inset 0 -1px 0 var(--g400);white-space:nowrap;vertical-align:middle}
+.rstbl td{height:50px;padding:0 16px;border-bottom:1px solid var(--g200);background:#fff;color:var(--g700);vertical-align:middle;white-space:nowrap}
 .rstbl tbody tr{cursor:pointer}
 .rstbl tbody tr:hover td{background:var(--g50)}
 .rstbl tbody tr.sel td{background:var(--pri-lt10)}
@@ -603,7 +664,8 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 
 /* ==== Empty / states ==== */
 /* A-19（2026-10-15）：空狀態／無權限／錯誤一律走 shared/lumiture-empty.js（FILL 0、#9ED7FF、48／64／80）；A-16：不設 max-width */
-.rs-tbl-empty{padding:48px 24px}   /* RA19（X-9r4 B9）：空狀態直接放在卡片裡，不再包 .rs-tblwrap 的 1px 外框（稿 #03） */
+.rs-tbl-empty{padding:48px 24px}
+   /* X-9r1 11-13 P10：原 .rs-tbl-empty／.rs-fullcard 標題 18 覆寫已刪，shared size l 預設改 18 */   /* RA19（X-9r4 B9）：空狀態直接放在卡片裡，不再包 .rs-tblwrap 的 1px 外框（稿 #03） */
 
 /* No-auth / first-time full card */
 .rs-fullcard{background:#fff;border-radius:var(--r-md);box-shadow:var(--lt-card-shadow,0 0 20px rgba(0,0,0,.10));min-height:420px;display:flex;align-items:center;justify-content:center;padding:48px}
@@ -633,13 +695,14 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .modal-sm{width:440px}
 /* B-11／B-4：確認類彈窗照稿寬 655、圓角 10（Figma #10 `8127:45914`） */
 .modal.modal-confirm{width:655px;border-radius:var(--lt-modal-radius-sm,10px)}
+#mo-remove .mh{margin-bottom:30px}#mo-remove .mf{margin-top:30px}   /* X-9r1 11-13 P7：稿 #10 `8127:45917` 標題列下緣到內文 30、內文（含清單框）到按鈕列 30（原 8／24）；只套 Remove 彈窗 */
 /* Dismiss 稿 #05 `8102:31643` 寬 800 */
 .modal.modal-dismiss{width:800px}
 .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:12px}
 .mt{font-size:20px;font-weight:700;color:var(--g900);line-height:1.5;display:flex;align-items:center;gap:10px}
-.mt .material-symbols-outlined.warn-ic{color:var(--err);font-size:24px}
+.mt .material-symbols-outlined.warn-ic{color:var(--err);font-size:30px;margin-right:5px}   /* X-9r4 11-06 A6：稿 #10 icon 30、到標題 15（.mt gap 10＋5）；同 X-9r5 Organization Settings／Executive Insights */
 .mx{color:var(--g500);cursor:pointer;display:flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:50%;background:none;border:none;padding:0;flex-shrink:0}
-.mx:hover{background:var(--g100);color:var(--g900)}
+.mx:hover{color:var(--g900)}   /* X-9r1 11-13 P1：拿掉 hover 底，只變 icon 色（Guideline:1467／:1662） */
 .mdesc{font-size:14px;color:var(--g700);margin-bottom:16px;line-height:1.7}
 .mb{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-right:6px;min-height:0}
 .mb:focus-visible{outline:2px solid var(--pri);outline-offset:2px;border-radius:4px}   /* RA24：Details 內容區可聚焦，鍵盤才捲得動 */
@@ -675,7 +738,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .dt-input:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 .dt-input input{border:none;outline:none;width:64px;font-size:14px;color:var(--g700)}
 .dt-input .suffix{font-size:13px;color:var(--g500)}
-.dt-insts-label{font-size:14px;font-weight:700;color:var(--g700);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.dt-insts-label{font-size:16px;font-weight:700;color:var(--g700);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .dt-insts{display:flex;gap:10px;flex-wrap:nowrap}
 .dt-inst{flex:1;min-width:100px;border:1px solid var(--g200);border-radius:var(--r-md);padding:16px 10px 12px;text-align:center;position:relative;background:#fff}
 .dt-inst.rec{border-color:var(--ok);background:var(--ok-lt)}
@@ -707,11 +770,11 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 
 /* ==== Scope Settings page ==== */
 .sc-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
-.sc-back{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--pri);font-weight:500;background:none;border:none;cursor:pointer;margin-bottom:8px;min-height:24px}   /* RA27 */
+.sc-back{display:inline-flex;align-items:center;gap:4px;font-size:16px;color:var(--lt-color-text-link,var(--pri));font-weight:700;background:none;border:none;cursor:pointer;margin-bottom:8px;min-height:24px}   /* RA27；X-9r4 11-06 A8：稿 #14-1 secondary/link/borderless 16／700＋arrow_circle_left 16（同 Group List） */
 .sc-back:hover .bt{text-decoration:underline}
-.sc-back .material-symbols-outlined{font-size:18px;font-variation-settings:'FILL' 0}
+.sc-back .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 1}   /* X-9r4 11-06 A8：稿 Arrow_Circle/Left 16；X-9r1 11-13 P6：FILL 0→1，全站 icon 預設實心、同 Group List */
 .sc-scopetabs{display:flex;align-items:center;gap:8px}
-.sc-scopetab{height:34px;padding:0 16px;border-radius:var(--r-sm);border:1px solid var(--pri);background:#fff;color:var(--pri);font-size:14px;font-weight:700;display:inline-flex;align-items:center;cursor:pointer}
+.sc-scopetab{height:36px;padding:0 16px;border-radius:var(--r-sm);border:1px solid var(--pri);background:#fff;color:var(--pri);font-size:14px;font-weight:700;display:inline-flex;align-items:center;cursor:pointer}
 .sc-scopetab.active{background:var(--pri);color:#fff}
 .sc-card{background:#fff;border-radius:var(--r-md);box-shadow:var(--lt-card-shadow,0 0 20px rgba(0,0,0,.10));padding:24px;margin-bottom:16px}
 .sc-card-h{display:flex;align-items:center;gap:10px;margin-bottom:6px}
@@ -743,10 +806,10 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .sc-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 
 /* Save bar */
-.savebar{display:none;position:fixed;left:var(--lt-sb-w,250px);right:0;bottom:0;background:#fff;border-top:1px solid var(--g200);padding:14px 32px;align-items:center;justify-content:space-between;z-index:60;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+.savebar{display:none;position:fixed;left:var(--lt-sb-w,250px);right:0;bottom:0;background:#fff;border-top:1px solid var(--g200);padding:14px 32px;height:68px;box-sizing:border-box;align-items:center;justify-content:space-between;z-index:60;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
 .app.savebar-on .savebar{display:flex}
 /* RA16（X-9r4 B6）：Scope Settings 的固定底列高 65，shared toast 的 bottom:24 會直接疊在底列上。底列出現時 toast 抬到底列上方 16（body class 由 showPage 切換；其他有固定底列的頁交 X-9r1 確認，見 shared-requests） */
-body.rs-savebar-on .lt-toast-wrap{bottom:81px}
+body.rs-savebar-on{--lt-toast-bottom:calc(68px + 16px)}   /* X-9r4 11-06 A10：底列照稿 #14-1 Fixed Button 68，toast 改吃 shared 變數（X-9r1 S3），原本頁面層寫死 81 */
 .savebar-l{font-size:13px;color:var(--g500);display:flex;align-items:center;gap:8px}
 .savebar-l .material-symbols-outlined{font-size:18px;color:var(--g400);font-variation-settings:'FILL' 0}
 .savebar-r{display:flex;gap:12px}
@@ -772,7 +835,7 @@ body.rs-savebar-on .lt-toast-wrap{bottom:81px}
 .curr-flag{font-size:15px}
 
 /* C-2 2026-10-29：現行稿重對，保留 A／B 與 X-9r4 已裁決規格。 */
-.rs-chip{font-size:12px;font-weight:400;border-radius:4px;line-height:18px;padding:0 4px}
+.rs-chip{font-size:12px;font-weight:400;border-radius:4px;line-height:22px;padding:0 4px}   /* X-9r4 11-06 A2：稿 #01 CMDS Squared colors chip 25 高（s 24），原 20 */
 .rs-chip.todo{background:#F2F2F2;border-color:#B3B3B3;color:#7C7C7C}
 .rs-chip.changed{background:#E6FFF8;border-color:#00B5A6;color:#00B5A6}
 .rs-chip.error{background:#FFEBEF;border-color:#FF403D;color:#FF403D}
@@ -1404,7 +1467,7 @@ body.rs-savebar-on .lt-toast-wrap{bottom:81px}
  * 規格（Guideline Empty State，全站唯一用 outlined icon 的元件）：
  *   icon：Material Symbols FILL 0、色 #9ED7FF（Primary Light 30）；尺寸 S 48／M 64／L 80
  *   標題色 #676767（2026-10-16 X-9r1：Overview、Executive Insights、Anomaly Detection、General Budget 的稿都是 text-secondary）
- *   標題 S 14／M 16／L 20，Bold｜說明 S 12／M 14／L 14（#676767）｜整體水平垂直置中｜icon→標題 12（page 版 16）→說明 4~8→按鈕 16
+ *   標題 S 14／M 16／L 18，Bold（L 20 → 18：X-9r1 11-13 S-S5，依據 Rightsizing #03／#04、Rate Optimization #03／#09／#04、Executive Insights #06／#11、Overview #07 的稿標題都是 18／27，行高 1.5＝27）｜說明 S 12／M 14／L 14（#676767）｜整體水平垂直置中｜icon→標題 12（page 版 16）→說明 4~8→按鈕 16
  *   page：整頁卡片版（ARL 10/09 裁決方案 B）：icon 64、標題 18／700、說明 14、按鈕離說明 32、卡片最小高 521
  *
  * 用法：
@@ -1435,7 +1498,7 @@ body.rs-savebar-on .lt-toast-wrap{bottom:81px}
       '.lt-empty__ic-svg{display:block;line-height:0}.lt-empty__ic-svg svg{display:block;width:64px;height:64px}',
       '.lt-empty--s .lt-empty__ic-svg svg{width:48px;height:48px}.lt-empty--l .lt-empty__ic-svg svg{width:80px;height:80px}',
       '.lt-empty__t{margin:12px 0 0;font-weight:700;line-height:1.5;color:var(--lt-color-text-secondary,#676767)}',
-      '.lt-empty--s .lt-empty__t{font-size:14px}.lt-empty--m .lt-empty__t{font-size:16px}.lt-empty--l .lt-empty__t{font-size:20px}.lt-empty--page .lt-empty__t{font-size:18px;margin-top:16px}',
+      '.lt-empty--s .lt-empty__t{font-size:14px}.lt-empty--m .lt-empty__t{font-size:16px}.lt-empty--l .lt-empty__t{font-size:18px}.lt-empty--page .lt-empty__t{font-size:18px;margin-top:16px}',
       '.lt-empty__d{margin:8px 0 0;font-size:14px;line-height:24.5px;color:var(--lt-color-text-secondary,#676767);white-space:pre-line}',
       '.lt-empty--s .lt-empty__d{font-size:12px;line-height:18px;margin-top:4px}',
       '.lt-empty__a{margin-top:16px}.lt-empty--page .lt-empty__a{margin-top:32px}',
@@ -2075,7 +2138,7 @@ function renderTable(){
 
   if(state.pageState==='loading'){ area.innerHTML = skeletonTable(); return; }
   if(state.pageState==='empty' || state.pageState==='nodata'){
-    area.innerHTML = '<div class="rs-tbl-empty">'+LumitureEmpty.noData({size:'m'})+'</div>';   /* A-19：共用空狀態（64px FILL 0 #9ED7FF）；RA19：不包 .rs-tblwrap 外框 */
+    area.innerHTML = '<div class="rs-tbl-empty">'+LumitureEmpty.noData({size:'l'})+'</div>';   /* A-19：共用空狀態（64px FILL 0 #9ED7FF）；RA19：不包 .rs-tblwrap 外框 */
     return;
   }
 
@@ -2092,7 +2155,7 @@ function renderTable(){
     rows.sort(function(a,b){
       var va=a[k], vb=b[k];
       if(k==='recDate'){ va=dateNum(a.recDate); vb=dateNum(b.recDate); }
-      if(k==='eot'){ va=String(a.eot); vb=String(b.eot); }
+      if(k==='eot'){ va=eotNum(a.eot); vb=eotNum(b.eot); }   /* X-9r4 11-06 A11：End of Month／Quarter／Year 換算成實際日期再排，不再用字串排 */
       if(k==='target'){ va=a.name.toLowerCase(); vb=b.name.toLowerCase(); }
       if(k==='kind'){ va=a.kind; vb=b.kind; }
       if(k==='assign'){ va=(a.assignTo||[]).join(', ').toLowerCase(); vb=(b.assignTo||[]).join(', ').toLowerCase(); }
@@ -2141,7 +2204,7 @@ function renderTable(){
   }).join('');
 
   if(rows.length===0){
-    area.innerHTML = '<div class="rs-tbl-empty">'+LumitureEmpty.html({size:'m', icon:'search_off', title:'No matching recommendations', desc:'Try adjusting your search or filters.'})+'</div>';   /* RA19：不包外框 */
+    area.innerHTML = '<div class="rs-tbl-empty">'+LumitureEmpty.html({size:'l', icon:'search_off', title:'No matching recommendations', desc:'Try adjusting your search or filters.'})+'</div>';   /* RA19：不包外框 */
     return;
   }
   area.innerHTML = '<div class="rs-tblwrap"><div class="rs-tblscroll"><table class="rstbl" aria-label="Rightsizing recommendations"><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div></div>';
@@ -2181,6 +2244,15 @@ function markRows(){
   renderTable(); // simplest: re-render to reflect .sel
 }
 function setTab(t){ state.tab=t; state.selection={}; state.sort={key:'recDate',dir:-1}; renderTabs(); renderActions(); renderTable(); }
+/* X-9r4 11-06 A11：End of Tracking 的排序鍵。End of Month／Quarter／Year 相對今天換算成實際日期，手動日期 dd/mm/yyyy 直接解析 */
+function eotNum(v){
+  var t = new Date(); var y = t.getFullYear(), m = t.getMonth();
+  if(v==='End of Month') return new Date(y, m+1, 0).getTime();
+  if(v==='End of Quarter') return new Date(y, Math.floor(m/3)*3+3, 0).getTime();
+  if(v==='End of Year') return new Date(y, 12, 0).getTime();
+  var p = String(v).split('/'); if(p.length===3) return new Date(+p[2], +p[1]-1, +p[0]).getTime();
+  return Number.MAX_SAFE_INTEGER;
+}
 function setSort(k){
   if(state.sort.key===k) state.sort.dir*=-1; else { state.sort.key=k; state.sort.dir=1; }
   renderTable();
@@ -2519,6 +2591,7 @@ function openRemove(){
   $('#rm-title').textContent = 'Remove '+recs.length+' Recommendation (s)';   /* 稿 #10 標題寫法含空格 */
   $('#rm-list').innerHTML = recs.map(function(r){return '<li>'+r.name+'</li>';}).join('');
   openModal('mo-remove');
+  var _c = document.querySelector('#mo-remove .mf .btn-o'); if(_c) setTimeout(function(){ _c.focus(); }, 0);   /* X-9r4 11-06 A16：破壞性確認開啟聚焦 Cancel（X-9r5 R5，同 Group List／Organization Settings #27） */
 }
 function confirmRemove(){
   var n = Object.keys(state.selection).length || 1;
@@ -2746,7 +2819,9 @@ function positionTip(el){
   var minX = Math.max(8, sbw + 8);
   left = Math.min(Math.max(minX, left), Math.max(minX, window.innerWidth - w - 8));
   var top = r.top - h - 6;
-  if(top < 8) top = r.bottom + 6;
+  /* X-9r1 B1（2026-11-05，同 shared demo-fab.js）：上方會蓋到固定頂欄（.lt-topbar 下緣）時翻到下方；Scope Settings 標題旁 info 的 tooltip 之前 top 31 壓在頂欄上 */
+  var tb = document.querySelector('.lt-topbar'); var tbB = tb ? tb.getBoundingClientRect().bottom : 0;
+  if(top < Math.max(8, tbB > 0 ? tbB + 4 : 8)) top = r.bottom + 6;
   _tipEl.style.left = left+'px'; _tipEl.style.top = top+'px';
 }
 function hideTip(){
@@ -3426,14 +3501,14 @@ bindTips();
   }
   function _renderLogo() {
     var href = _homeHref();
-    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-sb-logo">';
+    var open = href ? '<a class="lt-sb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-sb-logo">';
     return open + _logoBody(LOGO_ICON) + (href ? '</a>' : '</div>');
   }
   // 收合時顯示在 topbar 左側的 logo（同一組圖形，mask id 改 ltT* 避免跟 sidebar 那份撞 id）
   function _renderTopbarLogo() {
     var href = _homeHref();
     var icon = LOGO_ICON.replace(/ltH(ring|bars|leg)/g, 'ltT$1');
-    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below">' : '<div class="lt-tb-logo">';
+    var open = href ? '<a class="lt-tb-logo is-link" href="' + _esc(href) + '" data-tip="Go to Overview" data-tip-pos="below" data-tip-anchor=".lt-sb-logo-wrap">' : '<div class="lt-tb-logo">';
     return open + _logoBody(icon) + (href ? '</a>' : '</div>');
   }
   function _mountTopbarLogo(host) {
@@ -3685,7 +3760,7 @@ bindTips();
  *     version:     'v1.19.0',               // Software version 列
  *     addonPacks:  0,                       // 加購包數（>0 時 plan banner 後綴顯示 + AI Quota Add-on × N）
  *     quota: {                              // AI Quota box 數據；total 已含 add-on
- *       refreshDate: '2 Nov. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）
+ *       refreshDate: '2 Dec. 2026',         // 下次重置日（= 計費週期錨日，不是自然月 1 號；稿寫法「2 Apr. 2028」）。沒給（或給空值）就自動算下一個 2 號（X-9r1 11-13 S-A1，LumitureTopbar.nextRefreshDate）
  *       analyses:    { used: 32,  total: 80 },    // Cost Dashboard 的 AI-Powered Analyses
  *       rightsizing: { used: 410, total: 1000 },  // Usage Optimization 的 Rightsizing resources
  *     },
@@ -3696,6 +3771,7 @@ bindTips();
  *   window.LumitureTopbar.setRole('Manager - ...')— 只更新 role chip（Demo FAB role 切換用）
  *   window.LumitureTopbar.setPlan('Essential')    — 切 plan（連動 AI Quota box 顯示項目）
  *   window.LumitureTopbar.setQuota({analyses:{...}, rightsizing:{...}, refreshDate, addonPacks})
+ *   window.LumitureTopbar.nextRefreshDate()        — 依今天算下一個計費週期錨日（每月 2 號），回 '2 Dec. 2026' 這種寫法
  *   window.LumitureTopbar.openMenu() / closeMenu() / toggleMenu()
  *   window.LumitureTopbar.rerender()
  *   window.LumitureTopbar.openRoleDialog() / closeRoleDialog()   — View as Another Role 彈窗（#01-5；頁面掛勾見下方 role 區塊註解）
@@ -3704,6 +3780,16 @@ bindTips();
  */
 (function () {
   'use strict';
+
+  /* X-9r1 11-13 S-A1：下一個計費週期錨日（每月 2 號），格式照稿的「2 Apr. 2028」；今天 ≥ 2 號就取下個月。
+     原本寫死 '2 Nov. 2026'，過了那天 13 頁的 Account Menu 都顯示過期日（User Menu 頁自己算過，這裡搬進 shared 讓全站共用）。 */
+  function _nextRefreshDate() {
+    var M = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'];
+    var d = new Date(), y = d.getFullYear(), m = d.getMonth();
+    if (d.getDate() >= 2) m += 1;
+    if (m > 11) { m = 0; y += 1; }
+    return '2 ' + M[m] + ' ' + y;
+  }
 
   // ===== Defaults ===== (預設給 Standard plan + Normal 狀態，所有既有 prototype 直接吃，不破版)
   var DEFAULT_USER = {
@@ -3718,7 +3804,7 @@ bindTips();
     version: 'v1.19.0',
     addonPacks: 0,
     quota: {
-      refreshDate: '2 Nov. 2026',          // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期（原 2 Jul. 2026 已過期）
+      refreshDate: _nextRefreshDate(),     // 2026-10-15 A-40：Plan 2 Aug. 起算，下一個計費週期；X-9r1 11-13 S-A1：改成依今天自動算（原寫死 2 Nov. 2026 已過期）
       analyses:    { used: 32,  total: 80 },
       rightsizing: { used: 410, total: 1000 },
     },
@@ -3784,8 +3870,11 @@ bindTips();
     /* ---------- Account Menu popover ----------
        2026-10-14 逐格對 Figma #01-6（hover）／#01-7（loading & error）：左右內距 24、方案列 37 高、姓名 16/700、角色 chip 藍 #004FB0 方角、
        AI Quota 每列 24 高、狀態色 #00DCC2／#F4A938／#FF403D、功能列 40 高（外包 8／16）、陰影 0 0 6px .2。舊值（內距 16、狀態色提亮）是 06-22 的目視估計 */
-    '.lt-am-backdrop{position:fixed;inset:0;z-index:1000;background:transparent}',
-    '.lt-am{position:fixed;top:64px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
+    /* X-9r1 11-13 S-A2：背板 1000 → 997。Demo FAB 999、面板 998，背板要讓到它們底下，否則選單開著時（User Menu 頁進頁就開著）
+       第一下點 FAB 只會被背板吃掉去關選單，面板不開。選單本體 #lt-am 維持 1001。不要去抬 FAB 的層級：
+       Cost Dashboard、Group List、All Resource List 有 1000 以上的彈窗遮罩，FAB 抬上去會浮在遮罩上。 */
+    '.lt-am-backdrop{position:fixed;inset:0;z-index:997;background:transparent}',
+    '.lt-am{position:fixed;top:68px;right:24px;width:320px;z-index:1001;background:#002663;border-radius:8px;',
     'box-shadow:0 0 6px rgba(0,0,0,.2);font-family:\'Noto Sans\',sans-serif;color:#fff;',
     'animation:lt-am-in .14s ease;transform-origin:top right}',   /* 不設 overflow:hidden：hover tooltip（寬 400）要能伸出選單左邊，圓角改由第一／最後一個子區塊自己帶 */
     '@keyframes lt-am-in{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}',
@@ -3882,6 +3971,7 @@ bindTips();
   function _user() {
     var u = Object.assign({}, DEFAULT_USER, window.LUMITURE_USER || {});
     u.quota = Object.assign({}, DEFAULT_USER.quota, (window.LUMITURE_USER || {}).quota || {});
+    if (!u.quota.refreshDate) u.quota.refreshDate = _nextRefreshDate();   /* 頁面傳 undefined／null／'' 也吃自動值（S-A1） */
     return u;
   }
   function _status(used, total) {
@@ -4052,7 +4142,8 @@ bindTips();
     var m = document.getElementById('lt-am');
     return m ? Array.prototype.slice.call(m.querySelectorAll('.lt-am-item,.lt-q-err a,.lt-q-item.has-tip')) : [];
   }
-  function _openMenu() {
+  function _openMenu(opts) {
+    var noFocus = !!(opts && opts.focus === false);   /* X-9r1 11-13 S-B9：程式開選單（User Menu 進頁、Demo 情境）不搶焦點 */
     var wasOpen = _menuOpen, items0 = wasOpen ? _menuItems() : [], idx = items0.indexOf(document.activeElement);
     var u = _user();
     _menuHost().innerHTML = _renderMenu(u);
@@ -4060,7 +4151,7 @@ bindTips();
     var chip = document.getElementById('lt-tb-user');
     if (chip) { chip.classList.add('is-open'); chip.setAttribute('aria-expanded', 'true'); }
     var items = _menuItems(), t = null;
-    if (!wasOpen) t = document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
+    if (!wasOpen) t = noFocus ? null : document.querySelector('#lt-am .lt-am-item');      // 第一次開：第一個功能項（Retry 只走方向鍵到得了，不搶第一個焦點）
     else if (idx > -1 && items.length) t = items[Math.min(idx, items.length - 1)];            // 重繪（Retry、切 plan…）：焦點留在原位
     if (t) t.focus({ preventScroll: true });
   }
@@ -4133,7 +4224,7 @@ bindTips();
     '.lt-rd-btn.pri{background:#004FB0;color:#fff;border-color:#004FB0;min-width:160px}',
     '.lt-rd-btn.pri:hover{background:#0B6DD7;border-color:#0B6DD7}',
     '.lt-rd-btn.out{background:#fff;color:#004FB0;border-color:#004FB0}',
-    '.lt-rd-btn.out:hover{background:#F2FAFF}',
+    '.lt-rd-btn.out:hover{background:#F6F6F6;color:#0B6DD7;border-color:#0B6DD7}',   /* X-9r1 11-13 S-KCR：照全站外框主色鈕 hover（Guideline .btn--outlined-primary:hover） */
     '.lt-rd-btn[disabled]{background:#CCCCCC;border-color:#CCCCCC;color:#fff;cursor:not-allowed}',
     '.lt-rd-btn:focus-visible,.lt-rd-sel:focus-visible{outline:2px solid #004FB0;outline-offset:2px}',
     '.lt-rd-spin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:lt-rd-spin .8s linear infinite}',
@@ -4232,8 +4323,9 @@ bindTips();
         '" aria-controls="lt-rd-list" aria-labelledby="lt-rd-t"><span class="lt-rd-v">' + _esc(sel.name) + '</span><span class="lt-rd-chip">' + _esc(sel.role) +
         '</span><span class="material-symbols-outlined lt-rd-arr" aria-hidden="true">' + (r.ddOpen ? 'arrow_drop_up' : 'arrow_drop_down') + '</span></div></div>' +
       '<div class="lt-rd-act"><button type="button" class="lt-rd-btn out" id="lt-rd-keep"' + (r.loading ? ' disabled' : '') + '>' + ROLE_COPY.keep + '</button>' +
-        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') + '>' +
-        (r.loading ? '<span class="lt-rd-spin" role="status" aria-label="Loading"></span>' : ROLE_COPY.cont) + '</button></div>' +
+        '<button type="button" class="lt-rd-btn pri" id="lt-rd-go"' + (disabled ? ' disabled' : '') +
+        (r.loading ? ' aria-label="' + _esc(ROLE_COPY.cont) + '" aria-busy="true"' : '') + '>' +   /* X-9r1 11-13 S-A4：讀取中名稱維持 Continue（同 Auth 11-05 N2） */
+        (r.loading ? '<span class="lt-rd-spin" aria-hidden="true"></span>' : ROLE_COPY.cont) + '</button></div>' +
     '</div></div>';
   }
   function _rdRender(keepFocusId) {
@@ -4415,10 +4507,12 @@ bindTips();
       window.LUMITURE_USER = Object.assign({}, cur, {
         quota: Object.assign({}, DEFAULT_USER.quota, cur.quota || {}, q || {}),
       });
+      if (!window.LUMITURE_USER.quota.refreshDate) window.LUMITURE_USER.quota.refreshDate = _nextRefreshDate();   /* 空值用自動值（S-A1） */
       if (q && typeof q.addonPacks !== 'undefined') window.LUMITURE_USER.addonPacks = q.addonPacks;
       if (_menuOpen) _openMenu();
     },
-    openMenu: _openMenu,
+    openMenu: _openMenu,   /* openMenu({focus:false})：程式開選單不搶焦點（S-B9） */
+    nextRefreshDate: _nextRefreshDate,
     closeMenu: _closeMenu,
     toggleMenu: _toggleMenu,
     rerender: function () { _render(); if (_menuOpen) _openMenu(); },
@@ -4981,6 +5075,14 @@ bindTips();
       } catch (err) {}
       return 8;
     }
+    /* X-9r1 B1（2026-11-05）：固定頂欄的下緣。tooltip 放在錨點上方時不能壓到頂欄（頁首那排 info icon／截圖鈕／幣別鈕的 tooltip 之前 top 9～54，蓋在鈴鐺與頭像上）；頂欄捲走或沒有頂欄時回 8 */
+    function topMin() {
+      try {
+        var tb = document.querySelector('.lt-topbar');
+        if (tb) { var b = tb.getBoundingClientRect().bottom; if (b > 0) return b + 4; }
+      } catch (err) {}
+      return 8;
+    }
     function place() {
       if (!cur || !cur.isConnected) { hideTip(); return; }
       var a = (cur.dataset.tipAnchor && cur.querySelector(cur.dataset.tipAnchor)) || cur;
@@ -4992,10 +5094,11 @@ bindTips();
       /* X-9r1 S2：放不下改靠右緣時，左緣不能落進 sidebar（600 寬在 1280 中間位置會伸進去）；沒有 sidebar 的頁維持 8，收合時 21＋8 */
       if (x + tw > vw - 8) x = Math.max(minX(), Math.min(r.right + 2, vw - 8) - tw);
       if (cur.dataset.tipAlign === 'content-right') x = Math.max(8, r.right - 16 - tw);
+      x = Math.max(8, x);   /* X-9r1 11-13 S-A7：至少離視窗左緣 8（sidebar 裡的錨點不套 minX()，logo tooltip 原本貼在 left 0） */
       var below = cur.dataset.tipPos === 'below';
       var dy = cur.dataset.tipDy != null ? +cur.dataset.tipDy : 4;
       var y = below ? r.bottom + dy : r.top - th - 6;
-      if (y < 8) y = r.bottom + 4;
+      if (y < topMin()) y = r.bottom + 4;   /* X-9r1 B1：上方放不下或會蓋到頂欄就翻到下方 */
       if (y + th > vh - 8) y = Math.max(8, r.top - th - 6);
       tip.style.left = x + 'px'; tip.style.top = y + 'px';
     }
@@ -5278,7 +5381,7 @@ function scStatus(id){return '<span class="sc-status" id="sc-status-'+id+'">Comp
 function scRender(){
  clearTimeout(scTimer);
  const v=scScopes[scIndex];scCloseMenu();
- $('#page-scope').innerHTML=`<button class="sc-back" onclick="scNavigate('list')"><span class="material-symbols-outlined">arrow_back</span><span class="bt">Rightsizing</span></button><h1 class="pg-title" tabindex="-1">Scope Settings ${scInfo('Define up to 3 separate, non-overlapping scopes for your Rightsizing recommendations.')}</h1>
+ $('#page-scope').innerHTML=`<button class="sc-back" onclick="scNavigate('list')"><span class="material-symbols-outlined" aria-hidden="true">arrow_circle_left</span><span class="bt">Rightsizing</span></button><h1 class="pg-title" tabindex="-1">Scope Settings ${scInfo('Define up to 3 separate, non-overlapping scopes for your Rightsizing recommendations.')}</h1>
  <div class="sc-head c2-scope-head"><h2>Scope ${scIndex+1}</h2><div class="sc-scopetabs">${true?scScopes.map((_,i)=>`<button class="sc-scopetab ${i===scIndex?'active':''}" onclick="scNavigate(${i})">Scope ${i+1}</button>`).join(''):''}<span data-rs-tip="${scScopes.length>=3?"You've added all available scopes.":scDirty()?'Please complete the settings for Scope '+(scIndex+1)+' before adding a new one.':''}"><button class="btn btn-p" onclick="scAdd()" ${scScopes.length>=3||scDirty()||!v.groups.length?'disabled':''}><span class="material-symbols-outlined">add</span>Add New Scope</button></span></div></div>
  <section class="sc-card" id="sc-card-resources"><div class="sc-card-h"><h2 class="sc-card-t">Rightsizing Scope</h2>${scStatus('resources')}</div><p class="sc-card-d">First, select the groups for your rightsizing analysis. We will then list all authorized resources for your selected groups.<br>Note that a resource can only belong to one scope at a time to prevent logical conflicts.</p><div class="c2-blue"><label class="sc-label">Groups</label>${scChoice('groups',scSummary('groups','Select Group'))}</div>${v.groups.length?'<div class="sc-prov-row">'+['gcp','aws','azure'].filter(k=>scAvailable(k).length).map(k=>'<div class="sc-prov"><h3 class="sc-prov-h">'+provBadge(k)+(k==='gcp'?'Google Cloud':k==='aws'?'AWS':'Azure')+'</h3><label class="sc-label">'+(k==='gcp'?'Projects':'Accounts')+'</label>'+scChoice(k,scSummary(k,k==='gcp'?'Select Projects':'Select Accounts'))+'</div>').join('')+'</div>':''}</section>
  <section class="sc-card" id="sc-card-criteria"><div class="sc-card-h"><h2 class="sc-card-t">Criteria Settings</h2>${scStatus('criteria')}</div><p class="sc-card-d">Rightsizing recommendations are based on the following criteria:</p><div class="sc-vmtab"><button class="active">Virtual Machine</button></div><div class="c2-vm"><h3>Virtual Machine</h3><div class="sc-rule">Detect the following rules during past ${scNum('days','Detection period in days')} day(s).</div><div class="c2-blue">${[['cpu','CPU'],['memory','Memory']].map(([k,n])=>`<label class="sc-label c2-neutral">${n} Utilization <b>*</b></label><div class="sc-rule">When the ${n==='CPU'?'CPU':'memory'} usage rate is under ${scNum(k,n+' average utilization','%')}, or the peak is under ${scNum(k+'Peak',n+' peak utilization','%')}</div>`).join('')}</div><p class="sc-card-d c2-options-desc">Recommendations will be triggered by any criteria you enable below. Note that empty fields will not be used.</p>${[['network','Network'],['disk','Disk']].map(([k,n])=>`<div class="sc-rule"><label class="c2-switch"><input type="checkbox" role="switch" aria-label="Enable ${n} IOPS" ${v[k+'On']?'checked':''} onchange="scScopes[scIndex]['${k}On']=this.checked;scRender()"><span></span></label><strong>${n} IOPS</strong>${scNum(k,n+' IOPS','','Please enter a whole number greater than 0')}</div>`).join('')}</div></section>
