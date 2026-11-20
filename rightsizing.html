@@ -649,7 +649,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .rs-avoid{display:flex;flex-direction:column;line-height:1.3}
 .rs-avoid .amt{font-size:14px;color:var(--g700)}
 .rs-avoid .rate{font-size:12px}
-.rs-avoid .rate.pos{color:var(--ok)}.rs-avoid .rate.neg{color:var(--err)}.rs-avoid .rate.zero{color:var(--g400)}
+.rs-avoid .rate.pos{color:var(--g500)}.rs-avoid .rate.neg{color:var(--err)}.rs-avoid .rate.zero{color:var(--g400)}   /* X-9r4 11-20 Q7（Kabin 照推薦）：正向的 Avoid % 降成次要灰，只有 Increase（負向）上色；偏離稿 #01（稿每列綠），13 列整欄綠色會稀釋紅色警示 */
 .rs-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;font-size:14px;line-height:1.4;max-width:100%}
 .rs-eot{display:inline-flex;align-items:center;gap:8px}
 /* RA22：End of Tracking 的 event icon 改成 <button>（class 保留），padding 4 / margin -4 讓可點區 24×24 但版面不動 */
@@ -932,12 +932,10 @@ body.rs-savebar-on{--lt-toast-bottom:calc(68px + 16px)}   /* X-9r4 11-06 A10：�
            the white bordered card; only filter+table live inside it) -->
       <div class="paper-section-row">
         <h2 class="paper-section-title">Rightsizing Recommendation List
-          <span class="material-symbols-outlined ico-info" data-rs-tip="<b>Rightsizing</b> recommendations help you match cloud resources to actual usage. Review each recommendation and apply, dismiss, or archive as appropriate.">info</span>
+          <span class="material-symbols-outlined ico-info" data-rs-tip="Recommendations are displayed in order of <b>Recommendation Date</b>, with the most recent on top.<br>For recommendations from the same date, those with a higher <b>Estimated Avoidance</b> amount appear first.">info</span>
         </h2>
       </div>
-      <div class="paper-desc">Certain resources might be used for backup or load balancing. Please verify the usage before applying changes.<br>
-        Recommendations are displayed in order of <b>Recommendation Date</b>, with the most recent on top. For recommendations from the same date, those with a higher <b>Estimated Avoidance</b> amount appear first.<br>
-        Columns can be sorted by clicking their headers.</div>
+      <div class="paper-desc">Certain resources might be used for backup or load balancing. Please verify the usage before applying changes.</div>   <!-- X-9r4 11-20 Q2（Kabin 照推薦）：說明只留稿 #01 那一句，排序兩句搬進上方 info tooltip（稿 #01-2 原文）；「Columns can be sorted…」是 PRD 句、稿沒有，表頭本來就有排序箭頭 -->
 
       <div class="tabs-row">
         <div class="tabs" id="rs-tabs" role="tablist" aria-label="Recommendation status"></div>
@@ -1707,9 +1705,10 @@ var TAB_ACTIONS = {
               {label:'Archive', icon:'archive', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
   done:     [ {label:'Undo Review', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
               {label:'Archive', icon:'archive', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
-  dismiss:  [ {label:'Undo', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
-              {label:'Remove', icon:'delete', act:'remove', tip:'Permanently remove the selected items.'} ],
-  archived: [ {label:'Remove', icon:'delete', act:'remove', tip:'Permanently remove the selected items.'} ],
+  dismiss:  [ {label:'Undo Dismiss', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
+              {label:'Archive', icon:'archive', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
+  archived: [ {label:'Undo Archive', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
+              {label:'Remove', icon:'delete', act:'remove', tip:'The items will be permanently removed.'} ],   /* X-9r4 11-20 Q1（Kabin 照推薦）：Dismiss／Archived 動作照稿 #08／#09；原本照 FE 是 Undo＋Remove／只有 Remove */
 };
 
 /* ============================================================
