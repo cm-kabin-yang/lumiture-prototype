@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lumiture.ai — LumiTag v10 (Two-step Allocation Flow)</title>
+<title>Lumiture.ai — LumiTag v11 (Phase 2 Allocation Basis)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
@@ -334,6 +334,17 @@
  * Shadow 結構待 Figma audit：v7/v8 用單層、tokens.css 主階用雙層；Overlay 已用單層作折衷
  * ============================================================ */
 
+
+/* ============================================================
+ * 首屏預留：sidebar／topbar 注入前先佔位（X-9r6 2026-11-20，11-12 X-9r3 C-D2 登記的 CLS）
+ * ============================================================
+ * lumiture-sidebar.js／lumiture-topbar.js 放在 body 尾端，瀏覽器第一次繪製時 #lt-sidebar 是空的 <aside>（寬 0），
+ * 內容區先畫在 x=0，腳本跑完才被推到 250（Overview 1440 CLS 0.17、1280 0.49）。這裡只在腳本還沒接手前
+ * （mount 還沒有 .lt-sidebar／.lt-topbar class）先給一樣的寬高與底色；腳本接手後這兩條就不成立，最終畫面逐像素不變。
+ * 放 tokens.css 是因為它是唯一幾乎每頁都在 <head> 載入的共用檔（General Budget 沒載，已登記 G3）。 */
+#lt-sidebar:not(.lt-sidebar){width:var(--lt-sb-w,250px);flex:0 0 var(--lt-sb-w,250px);min-height:100vh;background:#002663}
+#lt-topbar:not(.lt-topbar){display:block;min-height:64px;background:#002663}
+
 </style>
 <style>
 /* === Inlined: shared/lumiture-ui.css === */
@@ -365,8 +376,9 @@
 .lt-select:focus-visible,.lt-select.is-open{outline:none;border-color:var(--lt-color-border-focus,#004FB0);box-shadow:var(--lt-button-focus-ring,0 0 0 3px rgba(0,79,176,.1))}
 .lt-select__v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lt-select.is-placeholder .lt-select__v{color:var(--lt-grey-400,#B3B3B3)}
-.lt-select__arrow{flex-shrink:0;font-size:24px;line-height:1;color:var(--lt-grey-500,#676767);transition:transform .2s ease;
+.lt-select__arrow{width:1em;overflow:hidden;flex-shrink:0;font-size:24px;line-height:1;color:var(--lt-grey-500,#676767);transition:transform .2s ease;
   font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+/* X-9r6 2026-11-20：width 1em＋overflow hidden，icon 字型載入前連字原文「arrow_drop_down」會把觸發欄撐到 197 寬、整頁橫捲一下（General Budget FY 下拉）；字型到了寬度本來就是 1em，畫面不變 */
 .lt-select.is-open .lt-select__arrow{transform:rotate(180deg)}
 .lt-select.is-error{border-color:var(--lt-color-error,#FF403D)}
 .lt-select.is-error:focus-visible,.lt-select.is-error.is-open{box-shadow:0 0 0 3px rgba(255,64,61,.1)}
@@ -411,7 +423,7 @@
  * Size：預設 s（高 24）、.lt-chip--xs（高 20）。CMDS 只有這兩個尺寸。
  * 圓角 4、左右內距 8、icon（Show icon L）16 與字間距 4、字 Button Regular 0（12／18）。
  * Appearance：.lt-chip--outline 底 Light／框 Main／字 Dark；.lt-chip--solid 底 Dark／白字。
- * Color：.lt-chip--c3（#3 Turquoise Blue）、.lt-chip--c11（#11 Gray）；其他色用到時照 CM Color Kit 在 tokens.css 補 --lt-kit-N-*。 */
+ * Color：.lt-chip--c3（#3 Turquoise Blue）、.lt-chip--c4（#4 Green）、.lt-chip--c6（#6 Tangerine Orange）、.lt-chip--c11（#11 Gray）；其他色用到時照 CM Color Kit 在 tokens.css 補 --lt-kit-N-*。 */
 .lt-chip{display:inline-flex;align-items:center;gap:4px;box-sizing:border-box;height:24px;padding:0 8px;border-radius:4px;border:1px solid transparent;
   font:var(--lt-type-button-regular-0,400 12px/18px sans-serif);white-space:nowrap;flex-shrink:0;vertical-align:middle}
 .lt-chip--xs{height:20px}
@@ -422,6 +434,11 @@
 .lt-chip--solid.lt-chip--c11{background:var(--lt-kit-11-dark,#7C7C7C);color:var(--lt-white,#fff)}
 .lt-chip--outline.lt-chip--c4{background:var(--lt-kit-4-light,#E6FFF8);border-color:var(--lt-kit-4-main,#00DCC2);color:var(--lt-kit-4-dark,#00B5A6)}
 .lt-chip--outline.lt-chip--c6{background:var(--lt-kit-6-light,#FEF3E1);border-color:var(--lt-kit-6-main,#F3BE68);color:var(--lt-kit-6-dark,#FC9A0F)}
+
+/* X-9r1 11-13 S-FOCUS：鍵盤 focus 框統一 2px primary 外框（X-9r2／X-9r5 已定「focus 統一 2px primary 外框」）。
+   用 :where() 零權重：各頁自己寫了 :focus-visible 或 outline:none＋光暈的照舊贏。
+   排除共用外殼（sidebar／topbar／Account Menu／角色彈窗／Demo FAB／toast）：它們在深色底上有自己的青色或白色框。 */
+:where(button,[role="button"],[role="tab"],a[href]):where(:not(.lt-sidebar *,.lt-topbar *,.lt-tb-logo *,#lt-am *,.lt-rd-back *,.demo-fab,.demo-popover *,.lt-toast-wrap *)):focus-visible{outline:2px solid var(--lt-color-primary,#004FB0);outline-offset:2px}
 
 </style>
 <!-- checkbox 共用元件放 head：body 尾端的 inline script 會在 shared script block 之前執行 -->
@@ -964,7 +981,7 @@
 .coll-card{border:1px solid var(--g200);border-radius:var(--r-md);margin-bottom:24px;overflow:hidden}.coll-hdr{display:flex;align-items:center;gap:10px;padding:16px 20px;cursor:pointer;user-select:none;background:var(--wh)}.coll-hdr:hover{background:var(--g50)}.coll-hdr-title{font-size:15px;font-weight:700;color:var(--g900);flex:1}.coll-body{border-top:1px solid var(--g100);padding:16px 20px;display:none}.coll-body.open{display:block}
 .cf-card{border:1px solid var(--g200);border-radius:var(--r-md);padding:14px 16px;margin-bottom:10px}.cf-res{font-size:14px;font-weight:700;color:var(--g900);margin-bottom:8px}.cf-rule{display:flex;align-items:baseline;gap:8px;font-size:13px;padding:3px 0}.cf-rule .material-symbols-outlined{font-size:16px;flex-shrink:0;margin-top:1px}.cf-applied{color:var(--g700)}.cf-applied strong{color:var(--pri)}.cf-override{color:var(--g400)}.cf-override .cf-val{text-decoration:line-through}
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}.mo.active{display:flex}.modal{background:var(--wh);border-radius:10px;padding:24px 32px;max-width:655px;min-width:0;width:655px;max-height:calc(100vh - 64px);box-shadow:0 0 6px rgba(0,0,0,.2);display:flex;flex-direction:column}.modal-xs{max-width:340px;min-width:0;width:340px;padding:24px}.modal-center{max-width:460px;min-width:0;width:460px}.modal-wide{max-width:720px;width:720px}.modal-lg{max-width:1000px;width:min(1000px,90%)}/* 2026-10-06 修：10/02 對稿把 .modal 寫死 655px，大彈窗（Resources Matched To）被一起縮小 */.modal-tall{min-height:720px}.modal-tall .mb{display:flex;flex-direction:column}.modal-tall #res-modal-inner{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}.modal-tall #res-modal-inner>div:first-child{flex-shrink:0}.modal-tall #res-modal-tbl-wrap{flex:1 1 auto!important;max-height:none!important;min-height:0}.modal-tall .mb>p{flex-shrink:0}.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px;flex-shrink:0}.mh>div{display:flex;align-items:center;gap:15px}.mh-ic{font-size:24px;width:30px;text-align:center;flex-shrink:0;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}.mt{font-size:20px;font-weight:700;line-height:30px}.mx{color:var(--g400);cursor:pointer}.mx:hover{color:var(--g700)}.mb{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;min-height:0}.mf{display:flex;justify-content:flex-end;gap:10px;margin-top:30px;padding-top:0;border-top:none;flex-shrink:0}
-.tc{position:fixed;bottom:24px;left:24px;z-index:300;display:flex;flex-direction:column;gap:8px}.toast{color:var(--wh);padding:8px 16px;border-radius:4px;font-size:14px;font-weight:400;line-height:1.75;display:flex;align-items:center;gap:10px;box-shadow:0 0 6px rgba(0,0,0,.2);animation:sIn .3s ease;width:400px}.toast.tok{background:#008F88}.toast.terr{background:#BF302E}.toast .material-symbols-outlined{font-size:20px;color:var(--wh);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}@keyframes sIn{from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.tc{position:fixed;bottom:24px;left:24px;z-index:300;display:flex;flex-direction:column;gap:8px}.toast{color:var(--wh);padding:8px 16px;border-radius:4px;font-size:14px;font-weight:400;line-height:1.75;display:flex;align-items:center;gap:10px;box-shadow:0 0 6px rgba(0,0,0,.2);animation:sIn .3s ease;width:400px}.toast.tok{background:#008F88}.toast.terr{background:#BF302E}.toast.tinfo{background:var(--lt-toast-info-bg)}.toast .material-symbols-outlined{font-size:20px;color:var(--wh);font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20}@keyframes sIn{from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1}}
 .ta{display:flex;align-items:center;gap:8px;margin-bottom:8px}.ta select{flex:1}.ta .fi{flex:1}.teq{font-weight:700;color:var(--g400)}
 .notice{display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:var(--r-md);margin-bottom:16px;font-size:13px}.n-info{background:var(--info-lt);color:var(--pri)}.n-warn{background:var(--warn-lt);color:#EC6F09}.n-ok{background:var(--ok-lt);color:var(--ok-dk)}.notice .material-symbols-outlined{font-size:18px;flex-shrink:0}
 .sbtm{position:fixed;bottom:0;right:0;background:var(--pri-lt10);border-top:none;box-shadow:0 0 6px rgba(0,0,0,.2);padding:16px 32px;display:flex;align-items:center;gap:12px;z-index:10;left:var(--sw);transition:left .2s ease}.ssp{flex:1}
@@ -1235,7 +1252,7 @@ select:not([multiple]){-webkit-appearance:none;appearance:none;background-image:
 <div class="view" id="v-preview"></div>
 <div class="view" id="v-batch"></div>
 </div>
-<div class="footer"><span class="footer-version">LumiTag Prototype<span class="ver-tag">v10 · Two-step Allocation</span></span><span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin · Special thanks to Jessie, Bater &amp; Consulting Team</span></div>
+<div class="footer"><span class="footer-version">LumiTag Prototype<span class="ver-tag">v11 · Phase 2 Basis</span></span><span class="footer-credit">Internal Review Only · Designed &amp; Built by Kabin · Special thanks to Jessie, Bater &amp; Consulting Team</span></div>
 </div>
 </div>
 <div class="mo" id="mo"><div class="modal" id="mc"></div></div>
@@ -2359,7 +2376,8 @@ function ubh(){const rows=document.querySelectorAll('#ba-a .ta');const h=documen
 /* ===== MODAL ===== */
 function showModal(h,size){const o=document.getElementById('mo');const c=document.getElementById('mc');const tokens=String(size||'').toLowerCase().split(/\s+/);let cls='modal';if(tokens.includes('xs'))cls+=' modal-xs';else if(tokens.includes('center')||tokens.includes('s'))cls+=' modal-center';else if(tokens.includes('wide')||tokens.includes('l'))cls+=' modal-wide';else if(tokens.includes('lg')||tokens.includes('xl')||size===true||size===1)cls+=' modal-lg';if(tokens.includes('tall'))cls+=' modal-tall';c.className=cls;c.innerHTML=h;/* Auto-wrap body (between .mh and .mf) into .mb so scroll lives inside body, not on outer modal */const mh=c.querySelector('.mh'),mf=c.querySelector('.mf');if(mh){const mb=document.createElement('div');mb.className='mb';let n=mh.nextSibling;while(n&&n!==mf){const next=n.nextSibling;mb.appendChild(n);n=next;}mh.insertAdjacentElement('afterend',mb);}o.classList.add('active');o.onclick=e=>{if(e.target===o)closeModal()}}
 function closeModal(){document.getElementById('mo').classList.remove('active')}
-function toast(msg,err){const c=document.getElementById('tc');const t=document.createElement('div');t.className='toast'+(err?' terr':' tok');t.innerHTML=`<span class="material-symbols-outlined">${err?'error':'task_alt'}</span>${msg}`;c.appendChild(t);setTimeout(()=>t.remove(),3000)}
+function toast(msg,err,ms){const c=document.getElementById('tc');const t=document.createElement('div');const info=err==='info'; /* err：真值＝錯誤；'info'＝資訊（11/23 自動切回 Spend 用，同 LumitureToast kind:'info'） */
+  t.className='toast'+(info?' tinfo':err?' terr':' tok');t.innerHTML=`<span class="material-symbols-outlined">${info?'info':err?'error':'task_alt'}</span>${msg}`;c.appendChild(t);setTimeout(()=>t.remove(),ms||3000)}
 
 function toggleSbGroup(id){document.getElementById(id).classList.toggle('collapsed')}
 function toggleSidebar(){const sb=document.querySelector('.sidebar');const mn=document.querySelector('.main');const ic=document.getElementById('sb-toggle-icon');sb.classList.toggle('collapsed');mn.classList.toggle('sb-collapsed');ic.textContent=sb.classList.contains('collapsed')?'chevron_right':'chevron_left';document.documentElement.style.setProperty('--sw',sb.classList.contains('collapsed')?'64px':'264px')}
@@ -2554,6 +2572,7 @@ window.LUMITURE_ACTIVE='lumitag';
     /* Cap tooltip dimensions to viewport (避免內容超大時溢出) */
     tip.style.maxWidth=(vw-16)+'px';
     tip.style.maxHeight=(vh-16)+'px';
+    if(cur.dataset.tipPos==='right'&&p2TipRight(cur,tip))return; // 11/23：下拉裡停用選項的 tooltip 放選單右側
     const r=cur.getBoundingClientRect(),tw=tip.offsetWidth,th=tip.offsetHeight;
     let x=r.left;if(x+tw>vw-8)x=Math.max(8,Math.min(r.right+2,vw-8)-tw);
     let y=r.top-th-6;if(y<8)y=r.bottom+4;if(y+th>vh-8)y=Math.max(8,vh-th-8);
@@ -2874,7 +2893,7 @@ const V10_RECALC_MS=1200;
 /* 2026-10-29：比對用的條件只算「計算真的會用到的」（同 v9Scope 的篩法：沒選值、Label 沒選 key 的條件不算），
    剛按 Add Condition 還沒填的那一列不會讓數字變成過期 */
 const v10CondSig=blocks=>JSON.stringify((blocks||[]).map(b=>({csp:b.csp,conds:(b.conds||[]).filter(c=>c.f&&(c.v||'').length&&(getFieldOpset(c.f)!=='tag'||c.k))})));
-const v10AcSig=c=>JSON.stringify({b:v10CondSig(c.cspBlocks),r:c.recipients});
+const v10AcSig=c=>JSON.stringify({b:v10CondSig(c.cspBlocks),r:c.recipients,k:c.basis||'spend',m:c.method||'prop',f:c.fixed||null}); /* P2：換分攤依據（與 Phase 3 預覽的分配方式、百分比）也算過期 */
 function v10RecalcAll(cid,then){
   const ctn=document.getElementById(cid);if(!ctn)return;const view=ctn.closest('#v-create,#v-edit');
   /* 2026-10-28 後端：不要每次全部重算 → 一顆按鈕，但只送過期的卡（每張卡各打一次 API），沒改過的卡不重算 */
@@ -2936,16 +2955,17 @@ function v9ParkedBadge(kind){
   // 2026-10-01 會議後加兩種：kind='deferred' 團隊確認這階段不做；kind='techlimit' 系統目前做不到
   const K={
     proposal:['UX 提案','這是設計端的提案，PRD 沒有或列在「待考慮」，還沒決定要不要做。','lightbulb',' is-proposal'],
-    parked:['已設計・PM 尚未安排開發','這個設計已經完成，但 PM 還沒安排開發。先保留在 prototype，之後可以直接拿來用。','pause_circle',''],
+    parked:['已設計・請依 PM 安排進行開發','這個設計已經完成，開發時程請依 PM 安排。先保留在 prototype，之後可以直接拿來用。','pause_circle',''], // P2 11/23 Kabin：文字改「請依 PM 安排進行開發」（只改 v11）
     deferred:['這階段不做','團隊討論過，這階段先不做。原因與重啟條件記在 specs/parked-designs.md。','schedule',''],
     // 2026-10-29：前端評估 Phase 1 做不完、排到 Phase 2 的設計（Reset）
     phase2:['Phase 2 才開發','前端評估這階段來不及，排到 Phase 2 才開發。設計先畫在 prototype 與設計稿，PRD 要寫進 Phase 2。','schedule',''],
+    resetpm:['待 PM 安排','Reset 按鈕已設計好，開發時程請依 PM 安排（Phase 2 PRD 列為這期不做、之後再排）。','pause_circle',''], // P2 11/23 Kabin：chip 只寫「待 PM 安排」，hover／focus 的 tooltip 才講是 Reset
     techlimit:['技術限制','系統目前做不到，設計先保留。原因與重啟條件記在 specs/parked-designs.md。','block',''],
     // 2026-10-15：FOCUS 資料來源 RD 確認目前做不到，設計稿與 prototype 都保留、標暫不開發（parked-designs #22）
     notdev:['暫不開發，請忽略','FOCUS 目前做不到，這階段請忽略。未來跨雲可能改成自建的分類，先保留這個入口與畫面。','block','']
   };
   const t=K[kind]||K.parked;
-  return `<span class="v9-parked-badge${t[3]}" data-tip="${t[1]}"><span class="material-symbols-outlined">${t[2]}</span>${t[0]}</span>`;
+  return `<span class="v9-parked-badge${t[3]}" data-tip="${t[1]}"${kind==='resetpm'?' tabindex="0"':''}><span class="material-symbols-outlined">${t[2]}</span>${t[0]}</span>`;
 }
 
 /* ⏸ PARKED：FOCUS 資料來源暫不開發（2026-10-15 RD），出現 FOCUS 的地方都掛 badge */
@@ -3103,7 +3123,7 @@ const V9_BASIS_COPY={
     basis:(amt,where)=>`Based on ${amt} direct cost ${where}.`,
   }
 };
-const v9Basis=()=>V9_BASIS_COPY.spend;
+const v9Basis=k=>V9_BASIS_COPY[k||(typeof p2CurBasis==='function'?p2CurBasis():'spend')]||V9_BASIS_COPY.spend; /* P2：依這張卡選的分攤依據 */
 function addAC(cid,cfg){
   const ctn=document.getElementById(cid);const emptyEl=document.getElementById(cid+'-empty');if(emptyEl)emptyEl.style.display='none';
   const num=ctn.querySelectorAll('.vc').length+1;const d=document.createElement('div');d.className='vc ac';d.draggable=true;
@@ -3367,7 +3387,7 @@ function v9UpdAll(cid){
     const al=[];
     if(info.stolenBelow){al.push(`<div class="ac-alert warn"><span class="material-symbols-outlined">warning</span><div>${v9fmt(info.stolenBelow)} of this cost also matches <strong>${[...info.stolenBy].join(', ')}</strong> below. Because this card is above them, that cost is being split instead of assigned directly.<div class="ac-alert-act"><button class="btn btn-o btn-sm" type="button" onclick="v9MoveToBottom(this)">Move to bottom</button></div></div></div>`)}
     if(S._showParked&&info.noNsParts.size){al.push(`<div class="ac-alert info"><span class="material-symbols-outlined">info</span><div>${v9ParkedBadge('techlimit')}<br><strong>${[...info.noNsParts].map(p=>p.split('|')[1]).join(', ')}</strong> has no namespace-level cost, so value cards can't match its teams. Turn on GKE cost allocation for this cluster. GKE pricing doesn't change, but your billing export gets more detail rows, which may increase BigQuery storage and query costs. Data appears within 3 days, and earlier periods aren't backfilled.</div></div>`)} // ⚠ ASSUMPTION（Q-F）文案；內容取自 RD doc 決定 12＋Bater 2026-09-29 Notion 留言（BigQuery 費用可能增加）
-    if(info.reason==='no-weight'||info.reason==='partial'){al.push(`<div class="ac-alert warn"><span class="material-symbols-outlined">error</span><div>${v9Basis().noWeight(v9fmt(info.unallocated),info.noWeight.map(v9PartLabel).join(', '))}${(()=>{const cl=info.noWeight.filter(p=>p!=='*').map(p=>p.split('|')[1]);return cl.length?`<div class="ac-alert-sub">If ${cl.length>1?'a cluster':'this cluster'} belongs to one team, add a value card with <code>goog-k8s-cluster-name equals ${cl[0]}</code> to assign it directly.</div>`:''})()}</div></div>`)} // 替代做法取自 Bater 2026-09-29 Notion 留言（〔待考慮〕「整個 tag key 範圍」的重啟條件）
+    if((info.reason==='no-weight'||info.reason==='partial')&&!info.basisKind){al.push(`<div class="ac-alert ${S._p2OrgNoUsage?'neutral':'warn'}"><span class="material-symbols-outlined">${S._p2OrgNoUsage?'info':'error'}</span><div>${v9Basis().noWeight(v9fmt(info.unallocated),info.noWeight.map(v9PartLabel).join(', '))}${(()=>{const cl=info.noWeight.filter(p=>p!=='*').map(p=>p.split('|')[1]);return cl.length?`<div class="ac-alert-sub">If ${cl.length>1?'a cluster':'this cluster'} belongs to one team, add a value card with <code>goog-k8s-cluster-name equals ${cl[0]}</code> to assign it directly.</div>`:''})()}</div></div>`)} // 替代做法取自 Bater 2026-09-29 Notion 留言（〔待考慮〕「整個 tag key 範圍」的重啟條件）  P2 11/23：org 還沒有容器用量是正常的起始狀態、可以存，改中性資訊樣式（Kabin 照推薦）。P2 11/23 文案表：用量依據（basisKind）不在這裡出 alert，改成權重表的 Not split yet 列（F1～F5），見檔尾 v11 區塊
     if(info.takenAbove&&S._takenInEdit){al.push(`<div class="ac-alert neutral"><span class="material-symbols-outlined">info</span><div>${v9fmt(info.takenAbove)} matching these conditions is already assigned by <strong>${[...info.takenBy].join(', ')}</strong> above.</div></div>`)}
     el.querySelector('.ac-alerts').innerHTML=al.join('');
     el.classList.remove('ac-err');
@@ -3529,8 +3549,8 @@ function v9RenderPreview(t,el){
     const gotList=v10List((c.recipients||[]).filter(n=>(info.byRecip||{})[n]>0).map(n=>`${n} (${v10Amt(info.byRecip[n])})`));
     const status=info.reason==='partial'?'Partially split':(info.reason==='no-match'||info.reason==='no-weight')?'Not split':''; // 11/03 Kabin：狀態不用 chip，改在說明句開頭用 Warning/Dark＋warning icon（跟 Step 2 分到 0 的提示同一套）
     const line=info.reason==='no-match'?`No cost matched the Step 2 conditions in the last 30 days.`
-      :info.reason==='no-weight'?`${v9fmt(info.unallocated)} stays Untagged: none of the values in Split across has direct cost to split by.` /* 11/04 Kabin：不列 value 名稱，value 多時寫不完 */
-      :info.reason==='partial'?`${v9fmt(info.unallocated)} couldn't be split and stays Untagged.` /* 11/04 Kabin：通用寫法，不列 value；寫出沒分掉的金額 */
+      :info.reason==='no-weight'?(v9Basis(c.basis).pvNoWeight?v9Basis(c.basis).pvNoWeight(v9fmt(info.unallocated)):`${v9fmt(info.unallocated)} stays Untagged: none of the values in Split across has direct cost to split by.`) /* 11/04 Kabin：不列 value 名稱，value 多時寫不完；11/20 Phase 2 用量依據另有說法 */
+      :info.reason==='partial'?(v9Basis(c.basis).pvPartial?v9Basis(c.basis).pvPartial(v9fmt(info.unallocated)):`${v9fmt(info.unallocated)} couldn't be split and stays Untagged.`) /* 11/04 Kabin：通用寫法，不列 value；寫出沒分掉的金額 */
       :'';
     const zeroNames=(c.recipients||[]).filter(n=>info.matched&&!(info.byRecip||{})[n]&&R.direct[n]>0&&info.noWeight.length===0);
     const zeroHtml=zeroNames.length&&info.reason!=='no-match'?`<div class="v9-warn-t" style="margin-top:4px">${zeroNames.map(n=>v9Basis().noShareHere(n,v10ZeroWhere(info))).join(' ')}</div>`:'';
@@ -3798,9 +3818,9 @@ function v10Apply(prefix){
        數字過期時 Recalculate 可按、Next 停用並說明要先算；算完 Recalculate 變停用＋打勾、Next 可按 */
     if(preview){let wrap=preview.parentElement.classList.contains('v10-next-wrap')?preview.parentElement:null;
       if(!wrap){wrap=document.createElement('span');wrap.className='v10-next-wrap';preview.before(wrap);wrap.appendChild(preview)}
-      /* 2026-10-29 團隊會議：Next 左邊加 Reset，把這一步改亂的設定回到上次儲存的狀態（前端評估 Phase 2 才開發，先畫） */
+      /* 2026-10-29 團隊會議：Next 左邊加 Reset，把這一步改亂的設定回到上次儲存的狀態（前端評估 Phase 2 才開發，先畫）。P2 11/23：Phase 2 PRD 把 Reset 列為「不做、待之後安排」，badge 改「已設計・請依 PM 安排進行開發」 */
       if(S._showParked){const rs=document.createElement('span');rs.className='v10-btn v10-reset-wrap';
-        rs.innerHTML=`${v9ParkedBadge('phase2')}<button type="button" class="btn btn-s v10-reset" disabled onclick="v10ConfirmReset('${prefix}')">Reset</button>`;wrap.before(rs)}}
+        rs.innerHTML=`${v9ParkedBadge('resetpm')}<button type="button" class="btn btn-s v10-reset" disabled onclick="v10ConfirmReset('${prefix}')">Reset</button>`;wrap.before(rs)}}
   }
   v9Sched(cid);
   if(S._step===2&&S._v10NeedLoad){S._v10NeedLoad=false;v10RunLoading(prefix)}else if(S._step!==2){clearTimeout(view._v10LoadT);view.classList.remove('v10-loading')}
@@ -3899,7 +3919,7 @@ const _v10RE=renderEdit;renderEdit=function(id){_v10RE(id);v10Apply('ed');
 /* 2026-10-05：banner 拿掉後，狀態 chip 的 tooltip 是唯一說明後果的地方 → 鍵盤 focus 也要看得到 */
 (function(){
   document.addEventListener('focusin',e=>{const el=e.target.closest&&e.target.closest('[data-tip]');const tip=document.getElementById('gl-tip');if(!el||!tip)return;
-    tip.textContent=el.dataset.tip;tip.style.display='block';const r=el.getBoundingClientRect();
+    tip.textContent=el.dataset.tip;tip.style.display='block';if(el.dataset.tipPos==='right'&&p2TipRight(el,tip))return;const r=el.getBoundingClientRect();
     tip.style.left=Math.max(8,Math.min(r.left,window.innerWidth-tip.offsetWidth-8))+'px';tip.style.top=(r.bottom+8)+'px'});
   document.addEventListener('focusout',e=>{const el=e.target.closest&&e.target.closest('[data-tip]');const tip=document.getElementById('gl-tip');if(el&&tip)tip.style.display='none'});
 })();
@@ -3931,10 +3951,10 @@ document.body.classList.add('v10-tb-total'); // 10/29 Kabin 定案：符合金�
 /* 從 allocation card 建 value card → 切到第 1 步；Back to allocation card → 切回第 2 步 */
 /* 2026-10-29 團隊會議：
  * ① 離開第 2 步（Previous、Edit value cards、stepper Step 1、Add Value 裡的 Create Value Card）時，這一步有改動就先確認，確認後捨棄這一步的改動
- * ② Reset：回到上次儲存的狀態（Phase 2 才開發）
+ * ② Reset：回到上次儲存的狀態（11/23 起等 PM 安排，PRD 列為不做）
  * 兩者都是「還原 allocation card 設定」：進第 2 步時存一份（離開用），編輯頁第一次進第 2 步時存一份（Reset 用）。還原沿用版面切換用的 v9CollectAC → addAC */
 S._s2Snap={};S._savedSnap={};
-function v10AcSnap(cid){const ctn=document.getElementById(cid);if(!ctn)return [];return [...ctn.querySelectorAll(':scope>.vc.ac')].map(el=>{const c=v9CollectAC(el);return {cspBlocks:c.cspBlocks,recipients:c.recipients}})}
+function v10AcSnap(cid){const ctn=document.getElementById(cid);if(!ctn)return [];return [...ctn.querySelectorAll(':scope>.vc.ac')].map(el=>{const c=v9CollectAC(el);return {cspBlocks:c.cspBlocks,recipients:c.recipients,basis:c.basis} /* P2 */})}
 function v10S2Dirty(prefix){const sn=S._s2Snap[prefix];return !!sn&&sn!==JSON.stringify(v10AcSnap(prefix+'-vals'))}
 function v10RestoreAcs(prefix,snapStr){const cid=prefix+'-vals';const ctn=document.getElementById(cid);if(!ctn||!snapStr)return;
   ctn.querySelectorAll(':scope>.vc.ac').forEach(c=>c.remove());
@@ -4104,6 +4124,672 @@ filterMs=function(inp){const panel=inp.closest('.ms-panel');if(!panel||!panel.cl
   const hint=panel.querySelector('.v10-ms-hint');
   if(hint)hint.textContent=q.length<2?'Type at least 2 characters to search workloads.':!n?'No workloads match this search.':n>50?`Showing 50 of ${n.toLocaleString()} matches. Type more to narrow down.`:`${n} match${n>1?'es':''}`;
 };
+</script>
+<script>
+/* ============================================================
+ * v11：Phase 2 分攤依據（2026-10-30 開工，範圍見 specs/2026-10-30-lumitag-phase2-start-scope.md）
+ * 只做「不管 Model A／B／C 怎麼定都用得到」的畫面＋Model A（max(Requests, Usage)，顧問已確認）：
+ *   ① allocation card 標頭的分攤依據選單＋停用原因（含 Cloud Monitoring 授權）
+ *   ② 資料截至時間（正常／更新中／資料較舊）
+ *   ③ 沒有用量資料的直接成本不計入（用金額，不用筆數）
+ *   ④ 選 Model A 時的第 2 步表格與 Coverage Preview
+ * 11/02 顧問會議後：Model B（Usage）＝只看實際用量、不需要預留量資料，拿掉 badge；Requests 單獨一項沒有對應模型，掛「待確認」可跟暫緩設計一起隱藏。
+ * idle 不在 LumiTag 呈現（之後放 rightsizing）；資源這一期只做 GCP 的 CPU 與 RAM。紀錄見 specs/2026-10-30-lumitag-phase2-start-scope.md 第 6 節。
+ * Model C、每列認定條件、Idle 拆層：等 11/2，不做。
+ * 11/20 照 PRD 11:39 版＋11/20 流程圖會議改：有效 Kubernetes 條件（非 Null＋有選 Kubernetes）與兩種停用原因（AND 那種 11/23 確認無效）；
+ *   全部停用不能存（Next 停用）；org 還沒有容器用量時提示、可以存；五種未攤分原因併成一種（用量或單價還沒到，那幾天不分攤）；
+ *   沒分攤時移進攤分池的 GKE 成本留在 Untagged、不退回直接成本；拿掉 workload 沒設預留量的停用（PRD：沒有用量資料不停用）。
+ *   11/23 PRD 留言回覆：「未驗證」與資料覆蓋率都拿掉（PRD 已刪），Preview 不另列 cluster 清單；沒分攤的天數 CSV 也要標，等 Figma 定。
+ * 跟 v10 的差異只有檔頭 title／footer、v10AcSig、v9Basis、v10AcSnap 四行（標 P2），其餘全部在這個區塊，v10 之後的修改照搬即可。
+ * ============================================================ */
+
+/* ---------- 選項名稱與說明集中在這裡：11/2 後名稱定了只改這裡 ⚠ 名稱暫定（用 PRD 的字） ---------- */
+const P2_BASIS=[
+  {k:'spend',   label:'Spend',                desc:"Each value's share follows its Direct cost."}, // 11/23 文案表 A1
+  /* 名稱：11/03 顧問團隊給的正式名稱（Model A／B／C 是內部溝通用，11/04 Kabin：只在下拉選單的選項後面標，按鈕、說明句、Step 3、設計稿畫面都不寫）；副標 sub 是顧問附的英文說明，畫面目前沒用，先留著。noun 給句子用 */
+  {k:'max',     label:'Capacity Share', sub:'Fairshare by Max(Request, Usage)', noun:'reserved or used CPU and memory (whichever is larger)', desc:"Each value's share follows the CPU and memory it reserves or uses in GKE, whichever is larger.", model:'A'}, // 11/23 文案表 A2
+  {k:'usage',   label:'Consumption Share', sub:'Fairshare by Actual Usage', noun:'actual CPU and memory usage', model:'B', desc:"Each value's share follows the CPU and memory it actually uses in GKE. Reserved but unused capacity doesn't count.", noReq:true}, // 11/23 文案表 A3 // 11/02 顧問會議：Model B 只看實際用量、不需要預留量資料
+  {k:'c',       label:'Variable Proportional Share', sub:'The Strongest Fairshare', noun:'CPU and memory usage', model:'C', desc:"Each team pays for what it reserves or uses, whichever is larger. Empty capacity is split by usage.", pending:'暫緩', pendingTip:'11/03 RD 會議：年底前只做 Model A、B，Model C 繼續評估。暫緩的設計，Demo FAB「Allocation → 暫緩的設計」可隱藏。名稱是顧問 11/03 給的，跟分配方式 Variable Proportional 幾乎同名。'}, // 在 LumiTag 裡跟 B 一樣照用量分剩下的錢（RD allocation-models〈對應到 LumiTag〉），只有用量超過預留時才不同
+  // 11/03 RD 會議：Requests 單獨一項拿掉（不屬於 Model A／B／C，PRD 也會刪）
+];
+const p2Opt=k=>P2_BASIS.find(o=>o.k===k)||P2_BASIS[0];
+/* 「待確認」chip：設計端先決議、等 PM 確認的地方。跟暫緩的設計一起隱藏（Demo FAB Allocation → 暫緩的設計） */
+/* CMDS Deletable chips / Squared colors：#11 Gray outline（中性狀態；選單裡用 xs 20，其他 s 24） */
+const p2Chip=(tip,xs)=>S._showParked?`<span class="lt-chip lt-chip--outline lt-chip--c11${xs?' lt-chip--xs':''} p2-chip" tabindex="0" data-tip="${tip}">待確認</span>`:'';
+/* 11/23：AND 混用這題結案。Jessie 問過 Bater：Kubernetes 條件跟其他條件用 AND 寫在同一組不算有效；PRD 刪掉那句、改寫「判斷方式請參考後端規格文件」（連結待 Bater 補）。「待確認」chip 拿掉，對照情境移到已不採用 */
+const P2_AUTH_URL='./organization-settings.html';
+
+/* 用量依據的文案（同 V9_BASIS_COPY.spend 的欄位）。11/23 照文案表 specs/2026-11-23-lumitag-p2-copy-deck.md 改寫（編號寫在各行） */
+const P2_SPLIT_DESC={ // 文案表 A5／A6：下拉正下方的說明句
+  max:"Splits the whole GKE cluster cost, including GKE cost from Step 1. Each value's share follows the CPU and memory it reserves or uses, whichever is larger.",
+  usage:"Splits the whole GKE cluster cost, including GKE cost from Step 1. Each value's share follows the CPU and memory it actually uses.",
+};
+/* 文案表 D5：Step 3 分到 0 的說明。AND 那種是設計端補的（同 D2 的說法），文案表只寫了沒有 Kubernetes 條件的那句 */
+const p2ZeroLine=n=>`${n} gets nothing from this card. Its value card ${p2StatusOf(S._p2CopyCards||[],n)==='and'?'combines Kubernetes with other conditions using AND':'has no Kubernetes condition'}.`;
+P2_BASIS.filter(o=>o.k!=='spend').forEach(o=>{
+  V9_BASIS_COPY[o.k]={
+    meta:`Split by ${o.label}`,
+    metaTip:o.desc, // G8：同選項副標
+    splitDesc:P2_SPLIT_DESC[o.k]||`Splits the whole GKE cluster cost, including GKE cost from Step 1. ${o.desc}`,
+    shareTip:V9_BASIS_COPY.spend.shareTip,
+    noShareHere:n=>p2ZeroLine(n),
+    noShareAny:n=>p2ZeroLine(n),
+    /* 11/20 PRD〈無依據值〉：五種原因併成一種「用量資料或單價還沒到，當天不分攤；補進來後那幾天重算」；收集開始前的日期不分攤、不補。
+       沒分掉的錢（含從 Step 1 移進攤分池的 GKE 成本）留在 Untagged，不退回直接成本。
+       11/23 文案表 F：Step 2 不再用橘色提示，改成權重表的 Not split yet 列（p2NsRow），這裡留空 */
+    noWeight:()=>'',
+    pvNoWeight:amt=>S._p2OrgNoUsage?`${amt} stays Untagged. No container usage data has come in yet.`:`${amt} stays Untagged until usage data comes in.`, // G6／G5
+    pvPartial:amt=>{const n=S._p2MissDays;return n?`${amt} stays Untagged until usage data for ${n} day${n>1?'s':''} comes in.`:`${amt} couldn't be split and stays Untagged.`}, // G4
+    previewSplit:(amt,parts,where)=>`${amt} split across ${parts} by ${o.label} ${where}.`,
+    basis:()=>'',
+  };
+});
+
+/* ---------- 示範用量（每個 namespace 的 CPU＋記憶體，已依成本比重合成一個數字；單位待 RD 定義） ---------- */
+const P2_NS_METRICS={
+  backend:{req:30,use:18},frontend:{req:10,use:14},
+  data:{req:20,use:12},search:{req:8,use:9},payments:{req:12,use:6},ml:{req:25,use:30},'mobile-api':{req:6,use:4},growth:{req:4,use:2},
+};
+const p2Measure=(k,m)=>(k==='usage'||k==='c')?m.use:k==='requests'?m.req:Math.max(m.req,m.use);
+const p2IsK8s=row=>!!(row.labels||{})['goog-k8s-cluster-name'];
+const p2Metric=row=>{const ns=(row.labels||{})['k8s-namespace'];return ns&&!ns.startsWith('kube:')?P2_NS_METRICS[ns]:null};
+
+/* ---------- 狀態 ---------- */
+S._p2Monitor=true;      // 客戶已給 Cloud Monitoring 唯讀權限
+S._p2NoRequest=false;   // 11/02：這張卡抓到的 workload 沒設預留量（requests）→ 只看預留量的選項停用，Usage 照常可用
+S._p2Fresh='ok';        // ok／updating／stale
+const P2_DATES={billing:'29/10/2026',usage:'28/10/2026',stale:'22/10/2026'};
+
+/* 目前這張卡的分攤依據（Phase 1 一個 key 只有一張 allocation card，所以取畫面上第一張） */
+function p2CurBasis(){
+  if(S._p2Cur)return S._p2Cur;
+  const el=document.querySelector('.view.active .vc.ac');return (el&&el.dataset.basis)||'spend';
+}
+
+/* Split across 那段說明（卡片裡有兩個 .ac-sec，第一個是 Shared cost to split） */
+const p2SplitDescEl=el=>[...el.querySelectorAll('.ac-sec')].find(x=>(x.querySelector('.ac-sec-t')?.textContent||'').startsWith('Split across'))?.querySelector('.ac-sec-d');
+/* ---------- 讀寫卡片：多帶 basis ---------- */
+const _p2ReadCards=v9ReadCards;
+v9ReadCards=function(cid){return _p2ReadCards(cid).map(c=>c.type==='alloc'?Object.assign(c,{basis:c.el.dataset.basis||'spend',method:c.el.dataset.method||'prop',fixed:p3Fixed(c.el)}):c)};
+function p3Fixed(el){try{return el.dataset.fixed?JSON.parse(el.dataset.fixed):null}catch(e){return null}}
+const _p2CollectAC=v9CollectAC;
+v9CollectAC=function(card){return Object.assign(_p2CollectAC(card),{basis:card.dataset.basis||'spend',method:card.dataset.method||'prop',fixed:p3Fixed(card)})};
+const _p2AddAC=addAC;
+addAC=function(cid,cfg){const d=_p2AddAC(cid,cfg);d.dataset.basis=(cfg&&cfg.basis)||'spend';d.dataset.method=(cfg&&cfg.method)||'prop';if(cfg&&cfg.fixed)d.dataset.fixed=JSON.stringify(cfg.fixed);p2RenderBasisCtl(d);return d};
+
+/* ---------- 計算：用量依據時，pool 改照各 value 的 Kubernetes 用量分 ---------- */
+const _p2Compute=v9Compute;
+v9Compute=function(cards,rows){
+  const R=_p2Compute(cards,rows);
+  if(!cards.some(c=>c.type==='alloc'&&((c.basis&&c.basis!=='spend')||(c.method&&c.method!=='prop'))))return R;
+  const first=rows.map(row=>cards.findIndex(c=>v9EvalCard(row,c)));
+  // 每個 value 的直接帳單列
+  const dRows={};rows.forEach((row,j)=>{const i=first[j];const c=cards[i];if(i<0||!c||c.type==='alloc'||!c.name)return;(dRows[c.name]=dRows[c.name]||[]).push(row)});
+  cards.forEach((c,i)=>{
+    if(c.type!=='alloc')return;
+    if(c.method==='even'||c.method==='fixed'){p3Split(R,c,i,rows,first);return} // Phase 3 預覽：均分／固定比例不看依據
+    if(!c.basis||c.basis==='spend')return;const info=R.cards[i];const k=c.basis;
+    const recips=[...new Set((c.recipients||[]).filter(Boolean))];
+    // 先把 Spend 算的結果拿掉
+    Object.entries(info.byRecip||{}).forEach(([n,a])=>{R.alloc[n]=(R.alloc[n]||0)-a});
+    R.untagged-=info.unallocated;
+    const pool=rows.filter((row,j)=>first[j]===i);const poolSet=new Set(pool);
+    R.untaggedRows=R.untaggedRows.filter(r=>!poolSet.has(r));
+    // 各 value 的用量（同一個 namespace 只算一次），沒有用量資料的直接成本另外記
+    const measure={},noUsage={},ru={},moved={};
+    recips.forEach(n=>{const seen=new Set();measure[n]=0;noUsage[n]=0;moved[n]=0;ru[n]={req:0,use:0};
+      if(p2StatusOf(cards,n)!=='ok')return; // 11/20：沒有有效 Kubernetes 條件的 value 停用，不分到共用成本，直接成本照常
+      (dRows[n]||[]).forEach(row=>{const m=p2IsK8s(row)?p2Metric(row):null;
+        if(!m){noUsage[n]+=row.cost;return}
+        moved[n]+=row.cost;
+        const ns=row.labels['k8s-namespace'];if(seen.has(ns))return;seen.add(ns);measure[n]+=p2Measure(k,m);ru[n].req+=m.req;ru[n].use+=m.use})});
+    if(S._p2OrgNoUsage)recips.forEach(n=>{measure[n]=0;ru[n]={req:0,use:0}}); // Demo：org 還沒有任何容器用量（收集剛開始）
+    const sum=recips.reduce((s,n)=>s+measure[n],0);
+    /* 11/04 17:3x Kabin 定方向（顧問公式不扣 Step 1）：Model A／B 時，各 value 在 Step 1 抓到的 GKE 成本也拿出來一起重分，
+       Direct 只留 GKE 以外的成本，Allocated＝比例 ×（Step 1 的 GKE 成本＋allocation card 抓到的成本）。
+       ⚠ 設計端暫擬：cluster 總額的定義待 RD 文件確認（交接 #12）。S._p2KeepDirect＝11/03 版（Step 1 照舊、只分剩下的）對照 */
+    /* 11/20 PRD〈無依據值〉：未攤分的那天，移進攤分池的成本不退回直接成本，留在 Untagged（所以不再看 sum） */
+    const moveOn=!S._p2KeepDirect&&!S._p2NoMove&&pool.length>0;
+    const movedTotal=moveOn?recips.reduce((s,n)=>s+moved[n],0):0;
+    if(moveOn)recips.forEach(n=>{if(moved[n])R.direct[n]=(R.direct[n]||0)-moved[n]});
+    Object.assign(info,{byRecip:{},allocated:0,unallocated:0,noWeight:[],allocByPart:{'*':{}},basis:measure,basisByPart:{'*':measure},usedParts:new Set(['*']),basisWhere:'in this tag',basisKind:k,reqUse:ru,
+      noUsage,noUsageTotal:recips.reduce((s,n)=>s+noUsage[n],0),moved:moveOn?moved:{},movedTotal});
+    pool.forEach(row=>{
+      // 11/03 RD 會議：pool 不管是不是 Kubernetes，整包照各 value 在 Step 1 的 cluster 用量分（不防呆）
+      if(!sum){R.untagged+=row.cost;R.untaggedRows.push(row);info.unallocated+=row.cost;if(!info.noWeight.length)info.noWeight.push('*');return}
+      recips.forEach(n=>{const a=row.cost*measure[n]/sum;if(!a)return;R.alloc[n]=(R.alloc[n]||0)+a;info.byRecip[n]=(info.byRecip[n]||0)+a;info.allocated+=a;info.allocByPart['*'][n]=(info.allocByPart['*'][n]||0)+a});
+    });
+    if(movedTotal&&sum)recips.forEach(n=>{const a=movedTotal*measure[n]/sum;if(!a)return;R.alloc[n]=(R.alloc[n]||0)+a;info.byRecip[n]=(info.byRecip[n]||0)+a;info.allocated+=a;info.allocByPart['*'][n]=(info.allocByPart['*'][n]||0)+a});
+    else if(movedTotal){R.untagged+=movedTotal;info.unallocated+=movedTotal;if(!info.noWeight.length)info.noWeight.push('*')}
+    /* Demo：有 N 天用量資料或單價還沒到 → 那幾天整個池子不分攤（PRD：多個 cluster 任一沒到，整個池子當天不分攤），先用 N/30 示意 */
+    if(S._p2MissDays&&info.allocated){const f=S._p2MissDays/30;
+      Object.keys(info.byRecip).forEach(n=>{const a=info.byRecip[n]*f;info.byRecip[n]-=a;R.alloc[n]-=a;info.allocByPart['*'][n]-=a;info.allocated-=a;info.unallocated+=a;R.untagged+=a})}
+    info.reason=!info.matched?'no-match':!info.allocated?'no-weight':info.unallocated?'partial':'ok';
+  });
+  return R;
+};
+
+/* ---------- 標頭：分攤依據選單 ---------- */
+function p2CardRowsInfo(card){
+  const cid=card.closest('[id]')?.id;const cards=v9ReadCards(cid);const idx=cards.findIndex(c=>c.el===card);if(idx<0)return {any:false,k8s:false};
+  const rows=v9RowsFor(cid);let any=false,k8s=false;
+  rows.forEach(row=>{if(cards.findIndex(c=>v9EvalCard(row,c))!==idx)return;any=true;if(p2IsK8s(row))k8s=true});
+  return {any,k8s};
+}
+/* 不能選的原因：沒授權 Cloud Monitoring 優先；其次是這張卡抓到的成本沒有用量資料 */
+/* 11/03 RD 會議：Model A、B 的前提是 Step 1 至少有一張 value card 的條件選到 GCP 的 Kubernetes（看條件選項，不看資料；選了但當期用量 0 照樣可以選）。
+   allocation card 自己抓到什麼都不擋（AWS、Azure、非 Kubernetes 的成本一樣照比例分），使用者是專業的人，不做防呆、不給預設 */
+const p2GkeCond=c=>c.f==='k8s'||(c.f==='labels'&&/^(goog-k8s-|k8s-)/.test(c.k||''));
+/* 11/20 PRD〈Capacity Share／Consumption Share 可選的前提〉〈比例計算的範圍〉：
+   有效 Kubernetes 條件＝value 條件非 Null，且有選 Kubernetes 選項（後端判斷）。有選但當期資料是 0 仍算有效、分到 0（11/20 會議）。
+   停用原因兩種：沒有 Kubernetes 條件；Kubernetes 條件和其他條件用 AND 寫在同一個規則組（11/23 Bater 確認無效；PRD 只寫一種原因，畫面保留兩種，AND 那句告訴使用者要改哪裡） */
+S._p2AndValid=false;
+const p2CondFilled=c=>c.f&&(c.v||'').length;
+function p2BlockStatus(b){const cs=(b.conds||[]).filter(p2CondFilled);if(!cs.some(p2GkeCond))return 'none';
+  if(S._p2AndValid)return 'ok';
+  return cs.some(c=>!p2GkeCond(c))&&cs.some((c,i)=>i>0&&c.c!=='OR')?'and':'ok'}
+function p2ValueStatus(v){const bs=(v.cspBlocks||[]).filter(b=>b.csp==='GCP').map(p2BlockStatus);return bs.includes('ok')?'ok':bs.includes('and')?'and':'none'}
+const p2StatusOf=(cards,n)=>{const v=(cards||[]).find(x=>(x.type||'value')==='value'&&x.name===n);return v?p2ValueStatus(v):'none'};
+/* Step 1 全部 value card 的狀態：有任何一張有效 → ok；沒有有效、但有 AND 混用 → and；都沒有 → none（文案表 A7／A8：兩種同時存在用 A8） */
+function p2StepOneStatus(card){
+  const cid=card.closest('[id]')?.id;const st=v9ReadCards(cid).filter(c=>c.type==='value').map(p2ValueStatus);
+  return st.includes('ok')?'ok':st.includes('and')?'and':'none';
+}
+function p2StepOneHasGke(card){return p2StepOneStatus(card)==='ok'}
+const P2_WHY_NONE="Not available. None of your value cards has a Kubernetes condition. Add one in Step 1 to use this."; // 文案表 A7
+const P2_WHY_AND="Not available. Your value cards combine Kubernetes with other conditions using AND. In Step 1, keep Kubernetes conditions in a group of their own to use this."; // 文案表 A8
+function p2Disabled(card,o){
+  if(o.k==='spend')return null;
+  /* A9：帶 Go to Authorization 連結，tooltip 放不了連結 → 這則留在選單底部寫一次；停用選項的 tooltip 寫短版（設計端暫擬，11/23 Kabin 照推薦） */
+  if(!S._p2Monitor)return {why:'Grant Cloud Monitoring read-only access to split by usage.',link:'Go to Authorization',tip:'Not available. Grant Cloud Monitoring read-only access first.',bottom:true};
+  const st=p2StepOneStatus(card);
+  if(st!=='ok')return {why:st==='and'?P2_WHY_AND:P2_WHY_NONE};
+  if(S._p2NoRequest&&!o.noReq)return {why:"The workloads in this card don't have reserved CPU and memory (requests) set. Use Consumption Share instead.",tbd:true}; // ⚠ 設計端暫擬：觸發條件與文案 11/03 會議沒談到，維持待確認
+  return null;
+}
+/* 2026-11-03：Preview 說明句的「依什麼分」跟著這張卡的分攤依據（非 Spend 時寫依據名稱，跟上一行 Split by … 一致） */
+const _v10SplitHead=v10SplitHead; // 11/03 Kabin：Phase 2 分攤成功時也不顯示底部區塊（跟 Phase 1 一致），說明改放 Spend Breakdown 表格下方
+v10SplitHead=function(c){if(c&&c.method==='even')return 'Split evenly';if(c&&c.method==='fixed')return 'Split by fixed %';return (c&&c.basis&&c.basis!=='spend')?`Split by ${p2Opt(c.basis).label}`:_v10SplitHead(c)}; // 11/03：依據改寫在每列標頭
+const _v10SplitBy=v10SplitBy;v10SplitBy=function(c,info){return (c&&c.basis&&c.basis!=='spend')?`by ${p2Opt(c.basis).label}`:_v10SplitBy(c,info)};
+function p2RenderBasisCtl(card){
+  /* 2026-11-02 Kabin（design critique 照推薦）：標頭只放卡片名稱與 Remove。chip 是 v9 混排清單時用來分卡型的，Step 2 只有 allocation card，已不帶資訊；
+     Split by 移到 Split across，因為它決定的是下面表格的 Share 欄（用量類還會拿掉 Direct cost 欄），寫成跟條件區一樣的句型「Split across ⓘ by [Spend ▾]」 */
+  if(card.querySelector('.p2-basis'))return;
+  card.querySelector('.vh .ac-meta')?.remove();
+  const bd=card.querySelector('.vh .ac-badge');if(bd){const t=document.createElement('span');t.className='p2-ac-ttl';t.innerHTML='<span class="material-symbols-outlined p2-ac-ic" aria-hidden="true">call_split</span><span class="p2-ac-ttl-t">Allocation card</span>';bd.replaceWith(t)} /* 11/02 Kabin：call_split icon 留著（卡型識別） */ // 一個 tag 只有一張 allocation card，不編號
+  const st=[...card.querySelectorAll('.ac-sec-t')].find(x=>x.textContent.startsWith('Split across'));if(!st)return;
+  const row=document.createElement('div');row.className='p2-split-h';st.replaceWith(row);row.appendChild(st);
+  const o=p2Opt(card.dataset.basis);
+  const w=document.createElement('span');w.className='p2-basis';
+  w.innerHTML=`<span class="p2-basis-l">by</span><button type="button" class="lt-select p2-basis-btn" aria-haspopup="listbox" aria-expanded="false" aria-describedby="${card.id||''}" onclick="p2OpenMenu(this)"><span class="lt-select__v p2-basis-v">${o.label}</span><span class="material-symbols-outlined lt-select__arrow" aria-hidden="true">arrow_drop_down</span></button>`;
+  w.querySelector('button').removeAttribute('aria-describedby');w.querySelector('button').setAttribute('aria-label','Split by');
+  if(S._p3Preview){ /* Phase 3 相容預覽（不開發）：分配方式選單接在 Split across 後面，句型變成「Split across ⓘ [proportionally ▾] by [Spend ▾]」；均分、固定比例時不顯示 by */
+    const m=document.createElement('span');m.className='p3-method';const mo=P3_METHOD.find(x=>x.k===(card.dataset.method||'prop'));
+    m.innerHTML=`<button type="button" class="lt-select p3-method-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Allocation method" onclick="p3OpenMenu(this)"><span class="lt-select__v">${mo.label}</span><span class="material-symbols-outlined lt-select__arrow" aria-hidden="true">arrow_drop_down</span></button>${S._showParked?'<span class="lt-chip lt-chip--outline lt-chip--c11 p2-chip" tabindex="0" data-tip="Phase 3 相容預覽，不在這一期開發。">Phase 3</span>':''}`;
+    row.appendChild(m);w.hidden=mo.k!=='prop';
+  }
+  row.appendChild(w);
+}
+/* 11/23 晚 Kabin：停用選項的 tooltip 出現在選單面板右緣外 8px、頂端對齊該選項，不往上彈蓋住上面的選項；右邊放不下（視窗太窄）回傳 false，走原本的上方規則。
+   只管 data-tip-pos="right"，全站 #gl-tip 預設規則不動（頁面自建 #gl-tip，shared 不接管位置） */
+function p2TipRight(el,tip){const m=el.closest&&el.closest('.p2-menu');if(!m)return false;
+  const vw=window.innerWidth,vh=window.innerHeight;const mr=m.getBoundingClientRect(),r=el.getBoundingClientRect(),x=mr.right+8,avail=vw-8-x;
+  if(avail<280){tip.style.maxWidth=(vw-16)+'px';return false} // 右邊放不下：回原本的上方規則
+  tip.style.maxWidth=Math.min(600,avail)+'px';tip.style.left=x+'px';tip.style.top='0px';const th=tip.offsetHeight; // 寬度限制在右側剩餘空間內，長句換行
+  tip.style.top=Math.max(8,Math.min(r.top,vh-th-8))+'px';return true}
+function p2CloseMenu(){const gt=document.getElementById('gl-tip');if(gt&&document.querySelector('.p2-menu'))gt.style.display='none'; // 停用選項的 tooltip 跟著選單收掉
+  document.querySelectorAll('.p2-menu').forEach(m=>{m._btn?.setAttribute('aria-expanded','false');m._btn?.classList.remove('is-open');m.remove()});document.removeEventListener('mousedown',p2Outside,true)}
+function p2Outside(e){const m=document.querySelector('.p2-menu');if(m&&!m.contains(e.target)&&!m._btn.contains(e.target))p2CloseMenu()}
+function p2OpenMenu(btn){
+  if(document.querySelector('.p2-menu')?._btn===btn){p2CloseMenu();return}
+  p2CloseMenu();const card=btn.closest('.vc.ac');const cur=card.dataset.basis||'spend';
+  const m=document.createElement('div');m.className='p2-menu';m.setAttribute('role','listbox');m.setAttribute('aria-label','Split by');m._btn=btn;m._card=card;
+  const opts=P2_BASIS.filter(o=>!o.pending||S._showParked);
+  /* 11/23 Kabin 照推薦（文案表 A7～A9）：停用的原因改成 hover 與鍵盤 focus 都會出現的 tooltip（游標 not-allowed），選單底部那句拿掉；
+     例外是沒授權 Cloud Monitoring：要帶 Go to Authorization 連結，tooltip 放不了連結，所以那一則留在選單底部 */
+  const bottom=opts.map(o=>p2Disabled(card,o)).find(d=>d&&d.bottom);
+  const esc=t=>String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  m.innerHTML=opts.map(o=>{const dis=p2Disabled(card,o);
+    return `<div class="p2-opt${o.k===cur?' is-cur':''}${dis?' is-dis':''}" role="option" tabindex="-1" data-k="${o.k}" aria-selected="${o.k===cur}"${dis?` aria-disabled="true" data-tip-pos="right" data-tip="${esc(dis.tip||dis.why)}"`:''}>
+<div class="p2-opt-t"><span>${o.label}${o.model?` (Model ${o.model})`:''}</span>${o.pending?`<span class="lt-chip lt-chip--outline lt-chip--c11 lt-chip--xs" data-tip="${o.pendingTip}">${o.pending}</span>`:''}${o.k===cur?'<span class="material-symbols-outlined p2-opt-ck" aria-hidden="true">check</span>':''}</div>
+<div class="p2-opt-d">${o.desc}</div>${dis&&dis.tbd?`<div class="p2-opt-why">${p2Chip('設計端暫擬：觸發條件與文案 11/03 會議沒談到。',true)}</div>`:''}</div>`}).join('')
+    +(bottom?`<div class="p2-menu-why"><span class="material-symbols-outlined" aria-hidden="true">info</span><span>${bottom.why} <a href="${P2_AUTH_URL}">${bottom.link}</a></span></div>`:'');
+  document.body.appendChild(m);const r=btn.getBoundingClientRect();m.style.top=(r.bottom+window.scrollY+4)+'px';m.style.left=(r.left+window.scrollX)+'px';
+  btn.setAttribute('aria-expanded','true');btn.classList.add('is-open');
+  m.addEventListener('click',e=>{if(e.target.closest('a'))return;const op=e.target.closest('.p2-opt');if(op&&!op.classList.contains('is-dis'))p2Pick(m,op.dataset.k)});
+  m.addEventListener('keydown',e=>{const ops=[...m.querySelectorAll('.p2-opt')];let i=ops.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();i=(i+(e.key==='ArrowDown'?1:-1)+ops.length)%ops.length;ops[i].focus()}
+    else if(e.key==='Enter'||e.key===' '){e.preventDefault();const op=ops[i];if(op&&!op.classList.contains('is-dis'))p2Pick(m,op.dataset.k)}
+    else if(e.key==='Escape'){e.preventDefault();p2CloseMenu();btn.focus()}
+    else if(e.key==='Tab')p2CloseMenu()});
+  m._at=Date.now();(m.querySelector('.p2-opt.is-cur')||m.querySelector('.p2-opt')).focus({preventScroll:true});
+  setTimeout(()=>document.addEventListener('mousedown',p2Outside,true),0);
+}
+function p2Pick(m,k){const card=m._card,btn=m._btn;p2CloseMenu();btn.focus();p2SetBasis(card,k)}
+/* 換依據：等同使用者自己從下拉選（數字變成過期，要按 Recalculate）。C1 的 Switch to Spend 也走這裡 */
+function p2SetBasis(card,k){
+  if((card.dataset.basis||'spend')===k)return;
+  card.dataset.basis=k;const v=card.querySelector('.p2-basis-v');if(v)v.textContent=p2Opt(k).label;
+  const sdp=p2SplitDescEl(card);if(sdp)sdp.textContent=v9Basis(k).splitDesc;
+  S._isDirty=true;const cid=card.closest('[id]')?.id;v9Sched(cid);setTimeout(()=>p2Stamp(cid),0);
+}
+/* 11/23 Kabin 照推薦（文案表 B1／B2）：卡片存的是 A／B，但 Step 1 已經沒有任何有效 Kubernetes 條件（例：回 Step 1 刪掉條件），
+   回到 Step 2（或直接跳 Step 3）時自動改成 Spend，切換真的發生那一刻跳一次 info toast（11/23 晚 Kabin：不放常駐提示）。
+   直接用新依據算好（keepFresh），不要求使用者按 Recalculate：這不是使用者自己改的 */
+function p2AutoSpend(cid){
+  const ctn=document.getElementById(cid);if(!ctn)return false;let hit=false,why='';
+  ctn.querySelectorAll(':scope>.vc.ac').forEach(card=>{
+    const k=card.dataset.basis||'spend';if(k==='spend'||(card.dataset.method&&card.dataset.method!=='prop'))return;
+    const st=p2StepOneStatus(card);if(st==='ok')return;
+    card.dataset.basis='spend';card.dataset.keepFresh='1';why=st;
+    const v=card.querySelector('.p2-basis-v');if(v)v.textContent=p2Opt('spend').label;
+    const sd=p2SplitDescEl(card);if(sd)sd.textContent=v9Basis('spend').splitDesc;
+    S._isDirty=true;hit=true;
+  });
+  if(hit)toast(`Split basis switched to Spend. ${why==='and'?'Your value cards now combine Kubernetes with other conditions using AND.':'No value card has a Kubernetes condition now.'}`,true,5000); /* 11/23 19:35 Kabin：改紅色（FE toast 只有成功綠、錯誤紅兩色；使用者原本的選擇沒能保留，用錯誤紅） */ // 文案表 B1／B2 縮成一句；p2AutoSpend 只在基準真的被改掉時進來，所以只跳一次
+  return hit;
+}
+const _p2Apply=v10Apply;
+v10Apply=function(prefix){_p2Apply(prefix);if(S._step===2&&p2AutoSpend(prefix+'-vals'))v9Sched(prefix+'-vals')};
+/* 步驟條直接從 Step 1 跳 Step 3：不經過 Step 2，所以在進 Preview 前也檢查一次 */
+const _p2Go=go;go=function(n,p){if(n==='preview'){const from=document.querySelector('.view.active')?.id;const pf=from==='v-edit'?'ed':from==='v-create'?'cr':null;if(pf)p2AutoSpend(pf+'-vals')}return _p2Go(n,p)};
+window.addEventListener('scroll',e=>{const m=document.querySelector('.p2-menu');if(m&&!m.contains(e.target)&&Date.now()-(m._at||0)>400)p2CloseMenu()},true); // 剛打開時的捲動（scrollIntoView）不算
+
+/* ---------- 第 2 步表格：依據欄、沒有用量資料的提示 ---------- */
+const _p2DcHead=v10UpdDcHead;
+v10UpdDcHead=function(el,info){
+  /* 11/02：用量類依據時拿掉 Direct cost 欄（value card 的直接成本照預留量計價，跟這裡的比例對不起來），只留 Share 與 Allocated；
+     各 value 預留／實際用量放 Share 的 tooltip（Kabin 11/02 同意） */
+  el.classList.toggle('p2-usage',!!(info.basisKind||info.methodKind));
+  if(!info.basisKind)return _p2DcHead(el,info);
+};
+const _p2DcCell=v10UpdDcCell;
+v10UpdDcCell=function(cell,n,info){
+  const w=cell&&cell.closest('.ac-row')?.querySelector('.ac-w');
+  if(info.methodKind){if(cell)cell.textContent='';return}
+  if(!info.basisKind){if(w&&w.dataset.p2tip){delete w.dataset.tip;delete w.dataset.p2tip;w.removeAttribute('tabindex')}return _p2DcCell(cell,n,info)}
+  if(!cell)return;cell.textContent='';
+  const r=(info.reqUse||{})[n];
+  if(w&&n&&info.matched&&r&&(info.byRecip||{})[n]>0){w.dataset.tip=info.basisKind==='usage'?`${n} used CPU and memory worth ${v9fmt(r.use)}.`:info.basisKind==='c'?`${n} reserved CPU and memory worth ${v9fmt(r.req)} and used ${v9fmt(r.use)}. Empty capacity is split by used amounts.`:`${n} reserved CPU and memory worth ${v9fmt(r.req)} and used ${v9fmt(r.use)}. The larger one counts.`;w.dataset.p2tip='1';w.tabIndex=0} // 11/23 文案表 D3／D4（該列有分到錢才掛） // 11/03 顧問 Excel：比例用「資源量 × 單價」加總（weighted unit），不是把 CPU 與記憶體的量直接相加。⚠ 單價從哪來、disk／GPU／network 這期算不算，待 RD
+  else if(w&&w.dataset.p2tip){delete w.dataset.tip;delete w.dataset.p2tip;w.removeAttribute('tabindex')}
+};
+const p2HasGke=(cards,n)=>p2StatusOf(cards,n)==='ok'; // 11/20：改看有效 Kubernetes 條件
+/* 11/23 文案表：Step 2 的金額一律寫全額（USD 100,000.00），不用 v9fmt 的縮寫（只限 Phase 2 這張表） */
+const p2Full=n=>fmtCurr(Math.round((n||0)*100)/100);
+/* 沒分攤的日期：從 Data through 的用量日期往回推（mock） */
+function p2MissDates(n){
+  const [d,m,y]=P2_DATES.usage.split('/').map(Number);const end=new Date(Date.UTC(y,m-1,d));const out=[];
+  for(let k=n-1;k>=0;k--){const t=new Date(end.getTime()-k*864e5);out.push(`${String(t.getUTCDate()).padStart(2,'0')}/${String(t.getUTCMonth()+1).padStart(2,'0')}/${t.getUTCFullYear()}`)}
+  return out.length<3?out.join(' and '):out.slice(0,-1).join(', ')+', and '+out[out.length-1];
+}
+/* 文案表 F1～F5：權重表多一列 Not split yet（排在 value 之後、Total 之前），取代原本的橘色提示 */
+function p2NsRow(info,allDis,label){
+  const amt=p2Full(info.unallocated);let name,tip;
+  if(allDis){name='Not split';tip=`${amt} stays Untagged while no value below can get a share by ${label}.`} // ⚠ 設計端暫擬：全部停用時的列名與 tooltip，文案表沒有
+  else{const n=S._p2OrgNoUsage?30:(S._p2MissDays||30);name=`Not split yet (${n} day${n>1?'s':''})`;
+    tip=S._p2OrgNoUsage?`${amt} stays Untagged. No container usage data has come in yet.` // F5
+      :n<=3?`${amt} stays Untagged for now. Usage data or unit prices for ${p2MissDates(n)} haven't come in. It's split when they do.` // F3
+      :`${amt} stays Untagged for now. Usage data or unit prices for ${n} of the last 30 days haven't come in. It's split when they do.`} // F4
+  const d=document.createElement('div');d.className='p2-ns-row';
+  d.innerHTML=`<div class="ac-row-main"><span class="ac-name"><span class="p2-ns-l" tabindex="0" data-tip="${tip}">${name}</span></span><span class="ac-dc"></span><span class="ac-w">--</span><span class="ac-amt">${amt}</span><span></span></div>`;
+  return d;
+}
+function p2EditVc(prefix,name){
+  v10Go(prefix,1);const t0=Date.now();
+  const tick=setInterval(()=>{
+    if(S._step!==1){if(!document.getElementById('mo')?.classList.contains('active')||Date.now()-t0>20000)clearInterval(tick);return} // 確認彈窗按取消就停
+    clearInterval(tick);if(!name)return;
+    setTimeout(()=>{const card=[...document.querySelectorAll('#'+prefix+'-vals>.vc:not(.ac)')].find(c=>(c.querySelector('.vni')?.value||'').trim()===name);
+      if(!card)return;card.scrollIntoView({behavior:'smooth',block:'center'});card.classList.remove('vc-new');void card.offsetWidth;card.classList.add('vc-new')},120);
+  },100);
+}
+const p2Link=(txt,js)=>`<a href="#" class="p2-dis-link" onclick="event.preventDefault();${js}">${txt}</a>`;
+const _p2UpdAll=v9UpdAll;
+v9UpdAll=function(cid){
+  const first=document.getElementById(cid)?.querySelector(':scope>.vc.ac');S._p2Cur=first?first.dataset.basis||'spend':null;S._p2CopyCards=v9ReadCards(cid);
+  try{_p2UpdAll(cid)}finally{S._p2Cur=null;S._p2CopyCards=null}
+  const ctn=document.getElementById(cid);if(!ctn)return;
+  const cards=v9ReadCards(cid);const R=v9Compute(cards,v9RowsFor(cid));
+  { const acs=[...ctn.querySelectorAll(':scope>.vc.ac')];acs.forEach((a,k)=>{const t=a.querySelector('.p2-ac-ttl-t');if(t)t.textContent=acs.length>1?`Allocation card ${k+1}`:'Allocation card'}) } // 多張卡時編號（Phase 1 一個 tag 一張，之後可能多張）
+  cards.forEach((c,i)=>{if(c.type!=='alloc')return;const el=c.el;const info=R.cards[i];
+    p3Decorate(el,c,info);
+    const sd=p2SplitDescEl(el);const want=c.method==='even'?P3_DESC.even:c.method==='fixed'?P3_DESC.fixed:v9Basis(c.basis).splitDesc;if(sd&&sd.textContent!==want)sd.textContent=want;
+    sd?.parentElement?.querySelector('.p2-split-h .p2-basis')?.querySelector('.p2-chip')?.remove(); /* 11/04：多個 cluster 的算法 RD 有解、介面不變，「待確認」chip 拿掉 */
+    const usage=(c.basis||'spend')!=='spend'&&(!c.method||c.method==='prop');const label=p2Opt(c.basis).label;const pf=v10Pfx(cid);
+    const head=el.querySelector('.p2-split-h');
+    { /* 11/04 RD 會議（奶油）：Model A／B 時，Step 1 沒有有效 Kubernetes 條件的 value 列自動停用：灰字、不能移除、數字為 0。依據改回 Spend 就恢復可用。
+         11/23 文案表 D1／D2：原因標在那一列下方（Warning/Dark＋warning icon），附 Edit value card 回 Step 1 */
+      const disRows=[];
+      el.querySelectorAll('.ac-row').forEach(r=>{
+        const n=(r.querySelector('.ac-sel')?.value||r.querySelector('.ac-txt')?.value||r.dataset.name||'').trim();
+        const st=usage&&n?p2StatusOf(cards,n):'ok';const dis=st!=='ok';
+        r.classList.toggle('p2-row-dis',dis);r.querySelector('.p2-dis-hint')?.remove();
+        const rm=r.querySelector('.ac-rm'),hint=r.querySelector('.ac-row-hint');
+        if(usage&&hint)hint.textContent=''; // 11/23：用量依據時不用 Phase 1「沒有直接成本所以分到 0」那句（原因看停用提示或 Not split yet 列；p2-org-nousage 曾誤掛成停用原因）
+        if(dis){disRows.push([r,n,st]);
+          if(rm){rm.disabled=true;rm.setAttribute('aria-disabled','true')}
+        }else if(rm&&rm.getAttribute('aria-disabled')==='true'){rm.disabled=false;rm.removeAttribute('aria-disabled')}
+      });
+      el.querySelector('.p2-dis-sum')?.remove();
+      /* 11/23 Kabin 照推薦（文案表 C1～C3）：Step 1 還有有效條件、但清單每一列都停用 → 錯誤放在分攤依據下拉正下方、下拉紅框，
+         附兩個出路（Edit value cards、Switch to Spend）；各列的停用提示收掉；Next 與 Step 3 停用並掛 tooltip；仍然不能存。
+         Step 1 完全沒有有效條件時走 p2AutoSpend（優先），不會到這裡 */
+      const allDis=usage&&disRows.length>0&&disRows.length===el.querySelectorAll('.ac-row').length;
+      if(!allDis)disRows.forEach(([r,n,st])=>r.querySelector('.ac-row-main').insertAdjacentHTML('afterend',`<div class="p2-dis-hint"><span>${n} gets ${S._currency} 0. ${st==='and'?'Its value card combines Kubernetes with other conditions using AND.':'Its value card has no Kubernetes condition.'} ${p2Link('Edit value card',`p2EditVc('${pf}','${n.replace(/'/g,"\\'")}')`)}</span></div>`));
+      v10CardMsg(el,'.ac-addrow','p2-emsg-none',''); // 舊位置（Add Value 下方）拿掉
+      el.querySelector('.p2-emsg-all')?.remove();
+      const bb=el.querySelector('.p2-basis-btn');if(bb){bb.classList.toggle('is-err',allDis);if(allDis)bb.setAttribute('aria-invalid','true');else bb.removeAttribute('aria-invalid')}
+      if(allDis&&head){const e=document.createElement('div');e.className='p2-emsg-all';e.id=(el.id||cid)+'-p2err';e.setAttribute('role','alert');
+        /* 11/23 排版方案比較（S._p2ErrLay；11/23 晚 Kabin 選定 c 當預設，a／b／d 留在 Demo「已不採用」對照）。⚠ 設計端暫擬：a～d 的句子為了把出路寫進句內有改寫
+           a 句內連結、b 欄位下只寫原因＋出路放 Not split 列、c CMDS Alert（Large_BG／Error）帶按鈕、d 只留一個連結（另一個出路就是上面的下拉） */
+        const lay=S._p2ErrLay||'c';const lkE=p2Link('Edit value cards',`p2EditVc('${pf}')`);const swJs=`p2SetBasis(this.closest('.vc.ac'),'spend')`;
+        if(lay==='a')e.innerHTML=`<span>No value below can get a share by ${label}. Each one needs a Kubernetes condition in Step 1. ${lkE} or ${p2Link('switch to Spend',swJs)}.</span>`;
+        else if(lay==='b')e.innerHTML=`<span>No value below can get a share by ${label}.</span>`;
+        else if(lay==='d')e.innerHTML=`<span>No value below can get a share by ${label}. ${lkE} to add a Kubernetes condition, or choose another option here.</span>`;
+        else if(lay==='c'){e.classList.add('p2-err-alert');
+          e.innerHTML=`<span class="material-symbols-outlined" aria-hidden="true">error</span><div class="p2-err-alert-b"><div class="p2-err-alert-t">No value below can get a share by ${label}</div><div class="p2-err-alert-d">Each one needs a Kubernetes condition in Step 1.</div></div><div class="p2-err-alert-acts"><button type="button" class="btn btn-o" onclick="p2EditVc('${pf}')">Edit value cards</button><button type="button" class="p2-err-alert-tx" onclick="${swJs}">Switch to Spend</button></div>`}
+        else e.innerHTML=`<span>No value below can get a share by ${label}. Each one needs a Kubernetes condition in Step 1.</span><span class="p2-emsg-acts">${lkE}${p2Link('Switch to Spend',swJs)}</span>`;
+        if(lay)e.classList.add('is-'+lay);
+        (lay==='c'&&sd?sd:head).after(e);bb?.setAttribute('aria-describedby',e.id);
+        if(bb&&'abd'.includes(lay)&&lay){const al=()=>{const x=bb.getBoundingClientRect().left-head.getBoundingClientRect().left;if(x>0)e.style.paddingLeft=x+'px'};al();requestAnimationFrame(al)}} // 錯誤字對齊下拉左緣（10/30 Kabin：錯誤字放在相關控制項正下方）
+      else bb?.removeAttribute('aria-describedby');
+      el.classList.toggle('p2-all-dis',allDis);
+      if(!allDis||S._p2ErrLay!=='b')el.querySelectorAll('.p2-ns-row.has-hint').forEach(n=>{n.classList.remove('has-hint');n.querySelector('.p2-dis-hint')?.remove()}); // 方案 b：換依據後數字過期、列會留著，提示要先收掉
+    }
+    /* 數字：過期或重算中保留上一次的畫面（Phase 1 同樣不動數字） */
+    if(el.classList.contains('ac-stale')||el.classList.contains('ac-recalc'))return;
+    el.querySelectorAll('.p2-ns-row,.p2-cost-line,.p2-orgnouse,.p2-nousage,.p2-moved').forEach(x=>x.remove());
+    if(!info.basisKind||el.classList.contains('ac-blank'))return;
+    const allDis=el.classList.contains('p2-all-dis');
+    // 各列與 Total 寫全額；Total＝各列加總（含 Not split yet 列）＝卡片抓到的＋Step 1 搬進來的 GKE 成本
+    el.querySelectorAll('.ac-row').forEach(r=>{const n=(r.dataset.name||r.querySelector('.ac-sel')?.value||'').trim();const a=r.querySelector('.ac-amt');if(n&&a)a.textContent=p2Full((info.byRecip||{})[n]||0)});
+    const total=info.matched+(info.movedTotal||0);
+    if(info.unallocated>0.005){const ns=p2NsRow(info,allDis,label);el.querySelector('.ac-rows')?.after(ns);
+      if(allDis&&S._p2ErrLay==='b'){const pf2=v10Pfx(cid);ns.classList.add('has-hint');ns.insertAdjacentHTML('beforeend',`<div class="p2-dis-hint"><span>Each value needs a Kubernetes condition in Step 1. ${p2Link('Edit value cards',`p2EditVc('${pf2}')`)} or ${p2Link('switch to Spend',`p2SetBasis(this.closest('.vc.ac'),'spend')`)}.</span></div>`)}}
+    const tn=[...el.querySelectorAll('.ac-total .ac-total-n')].pop();if(tn&&info.matched)tn.textContent=p2Full(total);
+    /* 文案表 E1／E2：要分的錢怎麼來的（取代原本三則 info）。有幾天沒分、或整筆沒分時也照樣顯示 */
+    if(info.movedTotal>0){const d=document.createElement('div');d.className='p2-cost-line';
+      d.innerHTML=`Cost to split: ${p2Full(total)} = ${p2Full(info.matched)} matched by this card + ${p2Full(info.movedTotal)} <span class="p2-cost-gke" tabindex="0" data-tip="${p2Full(info.movedTotal)} that your value cards assigned in Step 1 is split again here. ${label} splits the whole cluster by CPU and memory. In Step 3 this amount shows under Allocated, not Direct."><span class="p2-cost-gke-t">GKE cost from Step 1</span><span class="material-symbols-outlined" aria-hidden="true">info</span></span>`;
+      el.querySelector('.ac-total')?.after(d)}
+    /* 文案表 F6／F7：org 還沒有容器用量（中性資訊樣式，可以存） */
+    if(S._p2OrgNoUsage){const d=document.createElement('div');d.className='ac-alert neutral p2-orgnouse';
+      d.innerHTML=`<span class="material-symbols-outlined" aria-hidden="true">info</span><div>No container usage data yet, so nothing is split. You can still save this tag.<span class="info-tip" tabindex="0" data-tip="Splitting starts from the first day usage data is collected. Earlier days stay Untagged."><span class="material-symbols-outlined">info</span></span></div>`;
+      el.querySelector('.ac-alerts')?.prepend(d)}
+  });
+  p2Stamp(cid);
+  v10UpdRecalcBtn(cid); // 全部停用時擋 Next（p2-all-dis 在上面才標）
+};
+
+/* 11/20 PRD〈沒有分攤對象〉：所有 value 都停用時 Next 與 Step 3 停用（同條件不合法，#12-7 方案 A） */
+const _p2UpdRecalcBtn=v10UpdRecalcBtn;
+v10UpdRecalcBtn=function(cid){_p2UpdRecalcBtn(cid);
+  const ctn=document.getElementById(cid);const view=ctn?.closest('#v-create,#v-edit');if(!view||S._step!==2)return;
+  if(!ctn.querySelector(':scope>.vc.ac.p2-all-dis'))return;
+  const nx=view.querySelector('[data-v10preview]');const wrap=nx?.parentElement;const s3=view.querySelectorAll('.v10-stepper .v10-step')[2];
+  if(nx){nx.disabled=true;if(wrap?.classList.contains('v10-next-wrap'))wrap.dataset.tip=V10_INVALID_BTN_TIP}
+  if(s3){s3.classList.add('is-blocked');s3.setAttribute('aria-disabled','true');s3.dataset.tip=V10_INVALID_BTN_TIP}
+};
+document.addEventListener('click',e=>{ // Next 停用之外的保險：程式觸發的 click（例：重算完自動按 Next）也擋
+  const b=e.target.closest&&e.target.closest('[data-v10preview]');if(!b||S._step!==2)return;
+  const view=b.closest('#v-create,#v-edit');const card=view?.querySelector('.vc.ac.p2-all-dis');if(!card)return;
+  e.preventDefault();e.stopImmediatePropagation();card.querySelector('.p2-emsg-all')?.scrollIntoView({behavior:'smooth',block:'center'})},true);
+
+/* ---------- 資料截至時間：第 2 步標題、Coverage Preview 標題 ---------- */
+function p2StampHtml(usesUsage){
+  if(S._p2Fresh==='updating')return `<span class="p2-stamp is-upd" tabindex="0" data-tip="New data is being processed. Amounts may change when it finishes."><span class="material-symbols-outlined" aria-hidden="true">sync</span>Updating</span>`;
+  if(S._p2Fresh==='stale')return `<span class="p2-stamp is-stale" tabindex="0" data-tip="${usesUsage?'Usage':'Billing'} data hasn't updated for 7 days, so amounts may be out of date."><span class="material-symbols-outlined" aria-hidden="true">warning</span>Data through ${P2_DATES.stale}</span>`;
+  const d=usesUsage?P2_DATES.usage:P2_DATES.billing;
+  const tip=usesUsage?`Billing data through ${P2_DATES.billing}, usage data through ${P2_DATES.usage}. Amounts use the older of the two.`:`Billing data through ${P2_DATES.billing}.`;
+  return `<span class="p2-stamp" tabindex="0" data-tip="${tip}">Data through ${d}</span>`;
+}
+function p2Stamp(cid){
+  const box=document.getElementById(cid)?.closest('.card')?.querySelector('.v10-sum-h');if(!box)return;
+  box.querySelector('.p2-stamp')?.remove();
+  const usesUsage=[...document.getElementById(cid).querySelectorAll(':scope>.vc.ac')].some(el=>(el.dataset.basis||'spend')!=='spend');
+  box.querySelector('.v10-sum-period')?.insertAdjacentHTML('beforeend',p2StampHtml(usesUsage)); // 緊接在標題後面
+}
+const _p2UpdDirect=v10UpdDirect;
+v10UpdDirect=function(cid){S._p2NoMove=true;try{_p2UpdDirect(cid)}finally{S._p2NoMove=false}p2Stamp(cid)}; // 上方摘要是 Step 1 的結果（Assigned by value cards），不受 Model A／B 搬移影響
+
+/* ---------- Coverage Preview ---------- */
+const _p2RenderPreview=v9RenderPreview;
+v9RenderPreview=function(t,el){
+  const ac=(t.values||[]).find(v=>v.type==='alloc');S._p2Cur=ac?ac.basis||'spend':null;S._p2CopyCards=v9Ordered(t.values);
+  try{_p2RenderPreview(t,el)}finally{S._p2Cur=null;S._p2CopyCards=null}
+  const usesUsage=!!ac&&(ac.basis||'spend')!=='spend';
+  const ttl=el.querySelector('.st');if(ttl&&!el.querySelector('.p2-stamp')){ttl.classList.add('p2-ttl');ttl.insertAdjacentHTML('beforeend',p2StampHtml(usesUsage))} // Coverage 卡片標題旁（編輯流程的頁標題是 tag 名稱，不放這裡）
+  if(!usesUsage||(ac.method&&ac.method!=='prop'))return;
+  const label=p2Opt(ac.basis).label;
+  /* 11/23 文案表 G1／G2：GKE 成本從 Direct 搬到 Allocated 的說明放在兩個表頭的 tooltip；表格下方與 Shared Cost Not Split 裡的三則 info 拿掉（G3） */
+  const ths=[...el.querySelectorAll('.pt thead th')];
+  const addTip=(head,extra)=>{const tip=ths.find(x=>x.textContent.trim().startsWith(head))?.querySelector('.info-tip');if(tip&&!tip.dataset.p2){tip.dataset.tip=`${tip.dataset.tip} ${extra}`;tip.dataset.p2='1'}};
+  addTip('Direct',`With ${label}, GKE cost from Step 1 shows under Allocated. Only cost outside GKE clusters stays here.`);
+  addTip('Allocated',`With ${label}, this includes GKE cost that value cards assigned in Step 1.`);
+  /* 11/23 Kabin 照推薦：Untagged 全部是「資料還沒到、之後會分」的錢時，列不用紅底，改中性樣式（icon 換 schedule）。
+     還有別的 Untagged（條件沒抓到的成本）時照 Phase 1 維持紅色 */
+  const vals=v9Ordered(t.values);const R=v9Compute(vals.map(v=>Object.assign({},v)),t.rows);
+  const unsplit=R.cards.reduce((a,ci)=>a+((ci&&ci.basisKind)?ci.unallocated||0:0),0);
+  const tr=el.querySelector('tr.ua');
+  if(tr&&unsplit>0.005&&Math.abs(R.untagged-unsplit)<0.01){tr.classList.add('p2-ua-temp');const ic=tr.querySelector('.li .material-symbols-outlined');if(ic)ic.textContent='schedule'}
+};
+
+/* ---------- Phase 3 相容預覽（不開發）：分配方式 ---------- */
+S._p3Preview=false;
+const P3_METHOD=[
+  {k:'prop', label:'proportionally', desc:'Split by each value\u2019s share of the basis you pick (Phase 1 and 2).'},
+  {k:'even', label:'evenly',         desc:'Split equally across these values.'},
+  {k:'fixed',label:'by fixed %',     desc:'Split by the percentage you set for each value. Must add up to 100%.'},
+];
+const P3_DESC={even:'Shared cost is split equally across these values.',fixed:'Shared cost is split by the percentage you set for each value.'};
+function p3Split(R,c,i,rows,first){
+  const info=R.cards[i];const recips=[...new Set((c.recipients||[]).filter(Boolean))];
+  Object.entries(info.byRecip||{}).forEach(([n,a])=>{R.alloc[n]=(R.alloc[n]||0)-a});R.untagged-=info.unallocated;
+  const pool=rows.filter((row,j)=>first[j]===i);const ps=new Set(pool);R.untaggedRows=R.untaggedRows.filter(r=>!ps.has(r));
+  let share={},ok=recips.length>0,sum=null;
+  if(c.method==='even')recips.forEach(n=>share[n]=1/recips.length);
+  else{const f=c.fixed||{};sum=recips.reduce((s,n)=>s+(+f[n]||0),0);ok=ok&&Math.abs(sum-100)<0.01;recips.forEach(n=>share[n]=(+f[n]||0)/100)}
+  Object.assign(info,{byRecip:{},allocated:0,unallocated:0,noWeight:[],allocByPart:{'*':{}},basis:{},basisByPart:{'*':{}},usedParts:new Set(['*']),basisWhere:'in this tag',methodKind:c.method,fixedSum:c.method==='fixed'?sum:null});
+  pool.forEach(row=>{
+    if(!ok){R.untagged+=row.cost;R.untaggedRows.push(row);info.unallocated+=row.cost;if(!info.noWeight.length)info.noWeight.push('*');return}
+    recips.forEach(n=>{const a=row.cost*share[n];if(!a)return;R.alloc[n]=(R.alloc[n]||0)+a;info.byRecip[n]=(info.byRecip[n]||0)+a;info.allocated+=a;info.allocByPart['*'][n]=(info.allocByPart['*'][n]||0)+a});
+  });
+  info.reason=!info.matched?'no-match':!info.allocated?'no-weight':info.unallocated?'partial':'ok';
+}
+/* 固定比例：Share 欄換成輸入框；加總不是 100% 時提醒 */
+function p3Decorate(el,c,info){
+  el.querySelector('.p3-sum')?.remove();
+  if(c.method!=='fixed'){el.querySelectorAll('.p3-pct-wrap').forEach(x=>x.remove());el.querySelectorAll('.ac-w.p3-has').forEach(w=>w.classList.remove('p3-has'));return}
+  const f=c.fixed||{};
+  el.querySelectorAll('.ac-row').forEach(r=>{const n=r.dataset.name||r.querySelector('.ac-sel')?.value||'';const w=r.querySelector('.ac-w');if(!w||!n)return;
+    if(!w.querySelector('.p3-pct')){w.classList.add('p3-has');w.innerHTML=`<span class="p3-pct-wrap"><input type="number" min="0" max="100" step="1" class="p3-pct" aria-label="Share for ${n} (%)" value="${f[n]??''}" onchange="p3SetPct(this,'${String(n).replace(/'/g,"\\'")}')"><span>%</span></span>`}});
+  if(info&&info.fixedSum!=null&&Math.abs(info.fixedSum-100)>=0.01){const d=document.createElement('div');d.className='ac-alert warn p3-sum';d.innerHTML=`<span class="material-symbols-outlined">error</span><div>Shares must add up to 100%. They add up to ${+info.fixedSum.toFixed(2)}% now.</div>`;el.querySelector('.ac-alerts')?.prepend(d);el.querySelectorAll('.ac-alerts .ac-alert:not(.p3-sum)').forEach(x=>x.remove())} // 加總錯時只留這一則，不再說「沒有直接成本」
+}
+function p3SetPct(inp,n){const card=inp.closest('.vc.ac');const f=p3Fixed(card)||{};f[n]=inp.value===''?0:+inp.value;card.dataset.fixed=JSON.stringify(f);S._isDirty=true;v9Sched(card.closest('[id]')?.id)}
+function p3OpenMenu(btn){
+  if(document.querySelector('.p2-menu')?._btn===btn){p2CloseMenu();return}
+  p2CloseMenu();const card=btn.closest('.vc.ac');const cur=card.dataset.method||'prop';
+  const m=document.createElement('div');m.className='p2-menu';m.setAttribute('role','listbox');m.setAttribute('aria-label','Allocation method');m._btn=btn;m._card=card;
+  m.innerHTML=P3_METHOD.map(o=>`<div class="p2-opt${o.k===cur?' is-cur':''}" role="option" tabindex="-1" data-k="${o.k}" aria-selected="${o.k===cur}"><div class="p2-opt-t"><span>${o.label}</span>${o.k===cur?'<span class="material-symbols-outlined p2-opt-ck" aria-hidden="true">check</span>':''}</div><div class="p2-opt-d">${o.desc}</div></div>`).join('');
+  document.body.appendChild(m);const r=btn.getBoundingClientRect();m.style.top=(r.bottom+window.scrollY+4)+'px';m.style.left=(r.left+window.scrollX)+'px';
+  btn.setAttribute('aria-expanded','true');btn.classList.add('is-open');m._at=Date.now();
+  m.addEventListener('click',e=>{const op=e.target.closest('.p2-opt');if(!op)return;const k=op.dataset.k;p2CloseMenu();btn.focus();if(k===cur)return;
+    card.dataset.method=k;btn.querySelector('.lt-select__v').textContent=P3_METHOD.find(x=>x.k===k).label;
+    const bw=card.querySelector('.p2-basis');if(bw)bw.hidden=k!=='prop';
+    if(k==='fixed'&&!card.dataset.fixed){const ns=v9AutoRecips?v9AutoRecips(card):[];const each=ns.length?Math.floor(100/ns.length):0;const f={};ns.forEach((n,j)=>f[n]=j===ns.length-1?100-each*(ns.length-1):each);card.dataset.fixed=JSON.stringify(f)}
+    S._isDirty=true;v9Sched(card.closest('[id]')?.id)});
+  m.addEventListener('keydown',e=>{const ops=[...m.querySelectorAll('.p2-opt')];let i=ops.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();i=(i+(e.key==='ArrowDown'?1:-1)+ops.length)%ops.length;ops[i].focus()}
+    else if(e.key==='Enter'||e.key===' '){e.preventDefault();ops[i]?.click()}
+    else if(e.key==='Escape'){e.preventDefault();p2CloseMenu();btn.focus()}});
+  (m.querySelector('.p2-opt.is-cur')||m.querySelector('.p2-opt')).focus({preventScroll:true});
+  setTimeout(()=>document.addEventListener('mousedown',p2Outside,true),0);
+}
+/* ---------- 樣式 ---------- */
+(function(){const st=document.createElement('style');st.textContent=`
+.p2-basis{display:inline-flex;align-items:center;gap:8px;margin-left:4px}
+.p2-ac-ttl{display:inline-flex;align-items:center;gap:8px;font:var(--lt-type-h6);color:var(--lt-color-text-primary)}
+.p2-ac-ic{font-size:24px;color:var(--lt-color-text-primary)} /* 11/04 Kabin：標頭 icon 改黑色（Secondary 色放在標頭很怪） */
+.p3-method{display:inline-flex;align-items:center;gap:8px}
+.p3-method-btn.lt-select{width:auto;min-width:140px;font:var(--lt-type-button-regular-1)}
+.p3-pct-wrap{display:inline-flex;align-items:center;gap:4px;justify-self:end;font:var(--lt-type-button-regular-1);color:var(--lt-color-text-primary)}
+.p3-pct{width:72px;height:var(--lt-input-height);box-sizing:border-box;padding:0 8px;border:1px solid var(--lt-color-border-input);border-radius:var(--lt-input-radius);background:var(--lt-white);font:var(--lt-type-button-regular-1);font-variant-numeric:tabular-nums;text-align:right;color:var(--lt-color-text-primary)}
+.p3-pct:hover{border-color:var(--lt-color-border-input-hover)}.p3-pct:focus-visible{outline:none;border-color:var(--lt-color-border-focus)}
+.p2-basis[hidden]{display:none}
+.p2-split-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.p2-split-h .p2-basis{margin-left:0}
+.p2-basis-l{font:var(--lt-type-body);color:var(--lt-color-text-primary)}
+.p2-basis-btn.lt-select{width:auto;min-width:120px;font:var(--lt-type-button-regular-1)}
+.p2-menu{position:absolute;z-index:1200;width:340px;background:var(--lt-white);border-radius:4px;box-shadow:var(--lt-shadow-dialog);padding:8px 0;overscroll-behavior:contain}
+.p2-opt{padding:8px 16px;cursor:pointer;outline:none}
+.p2-opt:hover,.p2-opt:focus-visible{background:var(--lt-grey-50)}.p2-opt.is-cur{background:var(--lt-color-primary-bg)}
+.p2-opt-t{display:flex;align-items:center;gap:8px;font:var(--lt-type-button-regular-1);color:var(--lt-color-text-primary)}
+.p2-opt.is-cur .p2-opt-t{font:var(--lt-type-button-bold-1);color:var(--lt-color-primary)}
+.p2-opt-ck{margin-left:auto;font-size:18px;color:var(--lt-color-primary)}
+.p2-opt-d{font:var(--lt-type-caption);color:var(--lt-color-text-secondary);margin-top:2px}
+.p2-opt.is-dis{cursor:default}.p2-opt.is-dis:hover{background:transparent}
+.p2-opt.is-dis .p2-opt-t,.p2-opt.is-dis .p2-opt-d{color:var(--lt-color-text-tertiary)}
+.p2-opt-why,.p2-menu-why{display:flex;gap:4px;align-items:flex-start;font:var(--lt-type-caption);color:var(--lt-grey-600);margin-top:4px}
+.p2-menu-why{margin:4px 16px 0;padding:8px 0 0;border-top:1px solid var(--lt-grey-200)}
+.p2-opt-why .material-symbols-outlined,.p2-menu-why .material-symbols-outlined,.p2-pv-nousage .material-symbols-outlined{font-size:16px;color:var(--lt-grey-400);font-variation-settings:'FILL' 1;margin-top:1px}
+.p2-opt-why a,.p2-menu-why a{color:var(--lt-color-text-link);text-decoration:underline}.p2-opt-why a:hover,.p2-menu-why a:hover{color:var(--lt-color-text-link-hover)}
+.vc.ac.p2-usage .ac-tbl{--ac-cols:minmax(160px,1.6fr) minmax(80px,.7fr) minmax(120px,1fr) 24px}
+.vc.ac.p2-usage .ac-dc-h,.vc.ac.p2-usage .ac-dc,.vc.ac.p2-usage .ac-total>span:nth-child(2){display:none}
+.vc.ac.p2-usage .ac-w[data-tip]{text-decoration:underline dotted var(--lt-grey-400);text-underline-offset:3px;cursor:help}
+.p2-chip{margin-left:8px;cursor:help}
+.p2-basis .p2-chip{margin-left:0}
+.p2-opt-t .lt-chip{cursor:help}
+.p2-stamp{display:inline-flex;align-items:center;gap:4px;margin-left:12px;font:var(--lt-type-caption);color:var(--lt-color-text-secondary);cursor:default}
+.p2-stamp .material-symbols-outlined{font-size:16px}
+.p2-stamp.is-upd .material-symbols-outlined{color:var(--lt-grey-400)}
+.p2-stamp.is-stale,.p2-stamp.is-stale .material-symbols-outlined{color:var(--lt-color-warning-dark)}.p2-stamp.is-stale .material-symbols-outlined{font-variation-settings:'FILL' 1}
+.p2-ttl{display:inline-flex;align-items:baseline}
+.p2-pv-basis{font:var(--lt-type-caption);color:var(--lt-color-text-secondary);margin-bottom:4px}
+.p2-pv-nousage{display:flex;gap:4px;align-items:flex-start;margin-top:4px;font:var(--lt-type-caption);color:var(--lt-grey-600)}
+.p2-pv-under{margin-top:8px}
+.vc.ac .ac-row.p2-row-dis .ac-name,.vc.ac .ac-row.p2-row-dis .ac-w,.vc.ac .ac-row.p2-row-dis .ac-amt{color:var(--lt-color-text-tertiary)}
+.p2-dis-hint{font:var(--lt-type-caption);color:var(--lt-color-warning-dark,#EC6F09);display:flex;gap:4px;align-items:flex-start;margin-top:4px}.p2-dis-hint::before{content:'warning';font-family:'Material Symbols Outlined';font-variation-settings:'FILL' 1;font-size:16px;line-height:18px;color:var(--warn);flex-shrink:0}
+.p2-dis-link{color:var(--lt-color-text-link);text-decoration:underline;font-weight:400;white-space:nowrap} /* 11/23 Kabin：句內連結一律 regular，Alert 裡的按鈕不在此列 */.p2-dis-link:hover{color:var(--lt-color-text-link-hover)}
+.vc.ac .ac-row.p2-row-dis .ac-rm,.vc.ac .ac-row.p2-row-dis .ac-rm *{color:var(--lt-color-text-tertiary)!important;cursor:not-allowed}
+/* 2026-11-12 Split across 改 50 高標準表格後（Phase 1 c448117），停用列多一行說明會被壓成 52 高、上下貼線。
+   上內距 11 讓 value 名稱跟其他列同一個位置，下內距 12 */
+.vc.ac .ac-tbl .ac-row.p2-row-dis{padding-top:11px;padding-bottom:12px}
+/* 11/23 文案表：停用選項 hover／focus 出 tooltip */
+.p2-opt.is-dis,.p2-opt.is-dis *{cursor:not-allowed}
+/* C1 全部停用 */
+.p2-basis-btn.lt-select.is-err{border-color:var(--err)}
+.p2-emsg-all{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-top:4px;font:var(--lt-type-caption);color:var(--err)}
+.p2-emsg-acts{display:inline-flex;gap:16px}
+/* 11/23 全部停用錯誤：排版方案 a～d（S._p2ErrLay） */
+.p2-emsg-all.is-a,.p2-emsg-all.is-b,.p2-emsg-all.is-d{display:block;margin:0 0 4px} /* 父層 gap 4：離下拉 4、離說明句 8，錯誤字歸下拉 */
+.vc.ac .ac-tbl .p2-ns-row.has-hint{padding-top:11px;padding-bottom:12px}
+.p2-err-alert{display:flex;flex-wrap:nowrap;align-items:flex-start;gap:8px;margin:12px 0 -4px;padding:16px 24px;border-radius:var(--lt-radius-btn);background:var(--lt-color-error-light)}
+.p2-err-alert>.material-symbols-outlined{font-size:20px;line-height:24.5px;color:var(--lt-color-error);font-variation-settings:'FILL' 1;flex-shrink:0}
+.p2-err-alert-b{flex:1;min-width:0}
+.p2-err-alert-t{font:var(--lt-type-body-bold);color:var(--lt-color-text-primary)}
+.p2-err-alert-d{font:var(--lt-type-caption);color:var(--lt-color-text-secondary)}
+.p2-err-alert-acts{display:flex;align-items:center;gap:16px;align-self:center;flex-shrink:0}
+.p2-err-alert-acts .btn{height:30px;padding:0 12px;font:var(--lt-type-button-bold-1)}
+.p2-err-alert-tx{font:var(--lt-type-button-bold-1);color:var(--lt-color-primary);background:none;border:0;padding:0;cursor:pointer}.p2-err-alert-tx:hover{color:var(--lt-color-text-link-hover)}
+/* F1～F5 Not split yet 列（同權重表一列的高度與欄寬） */
+.vc.ac .ac-tbl .p2-ns-row{display:flex;flex-direction:column;justify-content:center;box-sizing:border-box;min-height:50px;padding:0 16px;border-top:1px solid var(--lt-color-border-default)} /* 11/23 Kabin：跟 value 列一樣用橫線隔開（上一列 value 是 :last-child 沒有底線，所以畫在這列上緣；下緣由 Total 的線負責） */
+.vc.ac .ac-tbl .p2-ns-row .ac-row-main{display:grid;grid-template-columns:var(--ac-cols);gap:16px;align-items:center}
+.vc.ac .ac-tbl .p2-ns-row .ac-name,.vc.ac .ac-tbl .p2-ns-row .ac-w,.vc.ac .ac-tbl .p2-ns-row .ac-amt{color:var(--lt-color-text-secondary)}
+.p2-ns-l{text-decoration:underline dotted var(--lt-grey-400);text-underline-offset:3px;cursor:help}
+/* E1 算式 */
+.p2-cost-line{padding:8px 16px 0;font:var(--lt-type-caption);font-variant-numeric:tabular-nums;color:var(--lt-color-text-secondary)}
+.p2-cost-gke{display:inline-flex;align-items:center;gap:4px;cursor:help}.p2-cost-gke-t{text-decoration:underline dotted var(--lt-grey-400);text-underline-offset:3px}
+.p2-cost-gke .material-symbols-outlined{font-size:16px;color:var(--lt-grey-400);font-variation-settings:'FILL' 1}
+.p2-orgnouse .info-tip{vertical-align:-3px}
+/* G：Untagged 全部是暫時沒分的錢時，中性樣式 */
+.pt tr.ua.p2-ua-temp td{background:transparent}
+.pt tr.ua.p2-ua-temp td{color:var(--lt-color-text-primary)!important}
+.pt tr.ua.p2-ua-temp a{color:var(--pri)!important}
+.pt tr.ua.p2-ua-temp .li .material-symbols-outlined{color:var(--lt-grey-400)}
+`;document.head.appendChild(st)})();
+
+/* ---------- Demo FAB：Phase 2 分頁 ---------- */
+window.DEMO_PAGES.push({id:'p2',label:'Phase 2',icon:'speed'});
+window.DEMO_SCENARIOS.push(
+  {id:'p2-menu',      tab:'p2',group:'分攤依據選單',label:'選單：Spend（預設），打開看選項',icon:'arrow_drop_down_circle',tip:'Spend 永遠可選；Capacity Share＝Model A、Consumption Share＝Model B（名稱是顧問 11/03 給的）。11/03 RD 會議：Requests 拿掉，Model C 年底前不做（暫緩，可隱藏）。換依據後數字變成過期，按 Recalculate。'},
+  {id:'p2-no-monitor',tab:'p2',group:'分攤依據選單',label:'停用：還沒給 Cloud Monitoring 權限',icon:'lock',tip:'PRD 停用原因之一。除了 Spend 都停用。這一則要帶 Go to Authorization 連結（連到 Organization Settings v4），tooltip 放不了連結，所以留在選單底部寫一次；停用選項的 tooltip 寫短版。'},
+  {id:'p2-non-gcp',  tab:'p2',group:'分攤依據選單',label:'不擋：allocation card 抓到 AWS 成本',icon:'cloud',tip:'11/03 RD 會議：只要 Step 1 有 GKE 條件就能選 Model A、B；allocation card 抓到什麼（AWS、Azure、非 Kubernetes）都不擋，整包照各 value 的 GKE 用量分。使用者是專業的人，不做防呆。'},
+  {id:'p2-no-request',tab:'p2',group:'已不採用',label:'停用：workload 沒設預留量（11/20 PRD：沒有用量資料不停用）',icon:'event_busy',tip:'11/02 顧問會議：Model B 只看實際用量，不需要預留量資料；客戶的程式沒設預留量時，Capacity Share 算不出來，只剩 Consumption Share。11/03 會議沒談到，觸發條件與文案仍是設計端暫擬。'},
+  {id:'p2-non-k8s',   tab:'p2',group:'分攤依據選單',label:'停用：Step 1 沒有任何 Kubernetes 條件',icon:'block',tip:'11/20 會議：Step 1 完全沒有 Kubernetes 條件時只能選 Spend。看的是條件選項，不看資料：選了但當期用量 0 照樣可以選。11/23：停用原因改成滑過（或鍵盤移到）選項才出現的 tooltip，選單底部那句拿掉。'},
+  {id:'p2-auto-spend',tab:'p2',group:'分攤依據選單',label:'自動切回 Spend：回 Step 1 刪掉 Kubernetes 條件後',icon:'undo',tip:'11/23 Kabin 照推薦、晚上改 toast：卡片原本選 Capacity Share，但 Step 1 已經沒有任何有效 Kubernetes 條件，進到 Step 2 時自動改成 Spend，同時在左下角跳一則 info toast（只跳一次，沒有常駐提示）。從 Step 1 刪完條件直接點 stepper 的 Step 3 也會跳。'},
+  {id:'p2-max',       tab:'p2',group:'Model A：Capacity Share',label:'第 2 步：照 Model A 分 shared-gke',icon:'call_split',tip:'Backend 的 CPU、記憶體加權後 USD 30（預留 30、用 18，取大）、Frontend USD 14（預留 10、用 14），60K 依 30:14 分。加權＝資源量 × 單價（11/03 顧問 Excel），Share 滑過看兩個金額；單價來源待 RD。Backend 的 Cloud SQL 20K 不在 GKE，不算進比例，表格下方寫出金額。對照 Spend 是 50:10。'},
+  {id:'p2-max-keep',  tab:'p2',group:'已不採用',label:'對照：Step 1 的 GKE 成本照舊、只分剩下的（11/03 版）',icon:'compare_arrows',tip:'11/04 RD 發現顧問公式不扣 Step 1，Kabin 定方向改成 GKE 成本搬到 Allocated。這是改之前的算法，留著對照數字差多少。'},
+  {id:'p2-max-zero',  tab:'p2',group:'Model A：Capacity Share',label:'某個 value 沒有 Kubernetes 條件（停用、分到 0）',icon:'exposure_zero',tip:'11/20 PRD 停用原因第一種。11/04 RD 會議：Step 1 沒選到 GKE 的 value 在 Model A／B 下自動停用（灰字、不能移除、0），原因直接標在那一列下方，附 Edit value card 回 Step 1；改回 Spend 就恢復。這個 value 只拿自己的直接成本。'},
+  {id:'p2-max-none',  tab:'p2',group:'Model A：Capacity Share',label:'所有 value 都停用：不能儲存（Next 停用）',icon:'do_not_disturb_on',tip:'Step 1 還有 Backend 帶 Kubernetes 條件，但清單只剩 Data Platform（Backend 被 × 拿掉）。11/23 晚 Kabin 選方案 C：下拉只留紅框，表格上方放 CMDS 紅底 Alert，右側 Edit value cards（外框鈕）與 Switch to Spend（文字鈕）；各列的停用提示收掉；Next 與 Step 3 停用。沒分出去的錢寫成 Not split 一列，Total 等於各列加總。'},
+  {id:'p2-max-none-a',tab:'p2',group:'已不採用',label:'對照：A 句內連結：出路寫進錯誤句，對齊下拉（11/23 未採用）',icon:'short_text',tip:'紅字移到下拉正下方，兩個出路改成句子裡的連結（同 Customized Budget 的 invalidCond、停用列提示的寫法），不再有獨立的連結區。'},
+  {id:'p2-max-none-b',tab:'p2',group:'已不採用',label:'對照：B 欄位下只寫原因，出路放 Not split 列（11/23 未採用）',icon:'table_rows',tip:'下拉下方紅字只講原因。怎麼修跟兩個連結放在表格 Not split 那一列下方，用停用列提示的樣式（Warning/Dark）。'},
+  {id:'p2-max-none-d',tab:'p2',group:'已不採用',label:'對照：D 只留一個連結：另一個出路就是下拉（11/23 未採用）',icon:'link',tip:'紅字在下拉正下方，只留 Edit value cards 一個連結。換依據不另給連結，句子請使用者直接改上面的下拉。'},
+  {id:'p2-max-and',   tab:'p2',group:'Model A：Capacity Share',label:'某個 value 的 Kubernetes 條件跟其他條件用 AND 寫在一起（停用）',icon:'join_inner',tip:'11/20 PRD 停用原因第二種。Search 的條件是 namespace＝search AND Service＝Vertex AI。11/23 Jessie 問過 Bater，確認無效；PRD 改寫「判斷方式請參考後端規格文件」。'},
+  {id:'p2-max-and-ok',tab:'p2',group:'已不採用',label:'對照：AND 混用也算有效（11/23 確認不採用）',icon:'join_full',tip:'11/23 確認 AND 混用無效，這版不採用。當時的另一種讀法：Search 不停用。它在 shared-gke 沒有符合兩個條件的容器，所以有效但分到 0（11/20 會議：有選 Kubernetes 但資料是 0 仍算有效）。'},
+  {id:'p2-org-nousage',tab:'p2',group:'沒有分攤的天數',label:'org 還沒有任何容器用量：提示、可以存',icon:'hourglass_empty',tip:'11/20 PRD：org 完全沒有容器用量時不停用，整筆 100,000（含 Step 1 搬進來的 GKE 成本 40,000）留在 Untagged，寫成 Not split yet 列。11/20 會議：可以存（客戶可以提早設定）。表格下方一則中性提示，「從開啟那天起收集、之前不補」放 tooltip。'},
+  {id:'p2-miss-days', tab:'p2',group:'沒有分攤的天數',label:'有 2 天用量或單價還沒到：那幾天不分攤',icon:'event_busy',tip:'11/20 PRD〈無依據值〉：以天判斷，用量資料或單價還沒到就當天不分攤，補進來後重算。示範用 2／30 天的金額。11/23 Kabin 照推薦：權重表多一列 Not split yet，滑過看日期（3 天以內列日期），橘色提示拿掉。'},
+  {id:'p2-miss-days-preview',tab:'p2',group:'沒有分攤的天數',label:'Coverage Preview：有 2 天沒分攤',icon:'visibility',tip:'Step 3 Shared Cost Not Split 只留一句（金額與天數）。Untagged 全部是暫時沒分的錢，所以不用紅底。'},
+  {id:'p2-multi',     tab:'p2',group:'已不採用',label:'兩張 allocation card 各選各的依據（11/03：一個 key 一個模型，不開多張卡）',icon:'stacks',tip:'Phase 1 一個 tag 只能一張卡；這裡示範之後若開放多張，每張卡在自己的 Split across 那列選依據：第 1 張分 shared-gke 用 Capacity Share（Model A），第 2 張分 Support Plan 用 Spend，互不影響。'},
+  {id:'p2-p3-prop',   tab:'p2',group:'Phase 3 相容（預覽）',label:'Phase 3：分配方式接在 Split across 後面',icon:'tune',tip:'PRD Phase 3 加 Even Split、Fixed Proportional，且「分攤依據只在 Variable Proportional 時出現」。句型：Split across ⓘ [proportionally ▾] by [Spend ▾]，分配方式在前、依據在後，不用另開一列。'},
+  {id:'p2-p3-even',   tab:'p2',group:'Phase 3 相容（預覽）',label:'Phase 3：Evenly（by 消失）',icon:'drag_handle',tip:'選 evenly 時 by [▾] 整段收起，平均分給每個 value；表格不顯示 Direct cost 欄。'},
+  {id:'p2-p3-fixed',  tab:'p2',group:'Phase 3 相容（預覽）',label:'Phase 3：By fixed %（Share 欄變輸入框）',icon:'percent',tip:'選 by fixed % 時 by [▾] 收起，Share 欄變成輸入框；加總不是 100% 時不分、顯示提醒（PRD：未達 100 不可儲存）。改了數字一樣按 Recalculate。'},
+  {id:'p2-c',         tab:'p2',group:'Model A：Capacity Share',label:'Model C（暫緩：年底前不做）：第 2 步',icon:'pending',tip:'11/02 顧問定義的 Model C：自己預留的自己付、空位照用量分。在 LumiTag 裡跟 Usage 一樣照用量分剩下的錢，示範資料沒有用量超過預留的團隊，所以數字跟 Usage 相同。這一期做不做、名稱等 PM 確認。'},
+  {id:'p2-max-preview',tab:'p2',group:'Model A：Capacity Share',label:'Coverage Preview：Model A',icon:'visibility',tip:'Shared Cost Allocation 那一列先寫用哪個依據，再寫分給誰，最後寫沒算進比例的金額。標題旁是資料截至時間（用量依據取帳單與用量資料較晚的那天）。'},
+  {id:'p2-fresh-ok',  tab:'p2',group:'資料截至時間',label:'正常：Data through（Spend）',icon:'event_available',tip:'第 2 步標題旁、Coverage Preview 標題旁都有。Spend 只看帳單；改成用量依據時取帳單與用量資料比較舊的那天，滑過看兩個日期。'},
+  {id:'p2-fresh-upd', tab:'p2',group:'資料截至時間',label:'更新中',icon:'sync',tip:'RD spec §4：新資料進來、背景重算時，先顯示舊結果並標示更新中。'},
+  {id:'p2-fresh-stale',tab:'p2',group:'資料截至時間',label:'資料較舊（7 天沒更新）',icon:'warning',tip:'RD spec §4、D5：某朵雲或用量資料好幾天沒進來。天數 RD 還沒定，這裡先用 7 天。Warning/Dark 色。'},
+);
+(function(){
+  const _prev=window.DEMO_APPLY;
+  /* 11/03：Phase 2 情境一律用目前定案的 Phase 1 設定看（先點過「設定」或「已不採用」情境，
+     例如自由輸入 value、過期改 alert 樣式，會一直留著，Phase 2 畫面就混進舊樣式） */
+  const P2_DEF_KEYS=['_staleStyle','_chooseVals','_zeroGroup','_whereGroup','_multiWhere','_takenInEdit','_deptModel','_recipFree','_autoRecip','_orRow','_orSep','_orDash','_orDashAll','_acPillExc','_stepClick','_applyThree'];
+  const P2_DEF=Object.fromEntries(P2_DEF_KEYS.map(k=>[k,S[k]]));
+  const p2ResetSettings=()=>{Object.assign(S,P2_DEF);document.body.classList.toggle('v10-recip-select',!S._autoRecip)};
+  window.DEMO_APPLY=function(name,btn){
+    if(name.startsWith('p2-'))p2ResetSettings();
+    if(!name.startsWith('p2-')){S._p3Preview=false;S._p2KeepDirect=false;S._p2Monitor=true;S._p2NoRequest=false;S._p2Fresh='ok';S._p2AndValid=false;S._p2OrgNoUsage=false;S._p2MissDays=0;S._p2ErrLay='c';return _prev(name,btn)}
+    const C=V9_CARDS;const A=(r,k)=>Object.assign(C.alloc(r),{basis:k||'max'});
+    const P2_BACKEND_NOK8S={name:'Backend',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'team',o:'is',v:'backend',c:''}]}]}; // 回 Step 1 刪掉 Kubernetes 條件後的 Backend
+    const P2_SEARCH_AND={name:'Search',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'k8s-namespace',o:'is',v:'search',c:''},{f:'service_description',o:'is',v:'Vertex AI',c:'AND'}]}]};
+    S._p3Preview=name.startsWith('p2-p3-');S._p2Monitor=name!=='p2-no-monitor';S._p2NoRequest=name==='p2-no-request';S._p2Fresh=name==='p2-fresh-upd'?'updating':name==='p2-fresh-stale'?'stale':'ok';S._p2KeepDirect=name==='p2-max-keep';S._p2AndValid=name==='p2-max-and-ok';S._p2OrgNoUsage=name==='p2-org-nousage';S._p2MissDays=name.startsWith('p2-miss-days')?2:0;
+    const _lay=/^p2-max-none-([a-d])$/.exec(name);S._p2ErrLay=_lay?_lay[1]:'c';if(_lay)name='p2-max-none'; // 排版方案：同一份資料，只換旗標
+    const P={
+      'p2-menu':{values:[C.backend,C.frontend,A(null,'spend')],open:true},
+      'p2-no-monitor':{values:[C.backend,C.frontend,A(null,'spend')],open:true},
+      'p2-non-gcp':{values:[C.backend,C.frontend,Object.assign(A(null,'spend'),{cspBlocks:[A(null,'spend').cspBlocks[0],{csp:'AWS',conds:[]}]})],open:true},
+      'p2-no-request':{values:[C.backend,C.frontend,A(null,'spend')],open:true},
+      'p2-non-k8s':{values:V9_SHARED_CARDS.slice(0,4).map(v=>Object.assign(v9Clone(v),v.type==='alloc'?{basis:'spend'}:{})),rows:DEMO_ROWS_SHARED,open:true},
+      'p2-max':{values:[C.backend,C.frontend,A()]},
+      'p2-max-keep':{values:[C.backend,C.frontend,A()]},
+      'p2-max-zero':{values:[C.dataPlatform,C.backend,C.frontend,A(['Data Platform','Backend','Frontend'])]},
+      'p2-max-none':{values:[C.backend,C.dataPlatform,A(['Data Platform'])]}, // 11/23：Step 1 還有有效條件（Backend），清單只剩停用的 Data Platform；Step 1 完全沒有時走自動切回
+      'p2-auto-spend':{values:[P2_BACKEND_NOK8S,C.dataPlatform,A(['Backend','Data Platform'])]}, // 卡片存的是 Capacity Share，Step 1 沒有任何 Kubernetes 條件 → 進 Step 2 時自動切回 Spend
+      'p2-max-and':{values:[C.backend,C.frontend,P2_SEARCH_AND,A(['Backend','Frontend','Search'])]},
+      'p2-max-and-ok':{values:[C.backend,C.frontend,P2_SEARCH_AND,A(['Backend','Frontend','Search'])]},
+      'p2-org-nousage':{values:[C.backend,C.frontend,A()]},
+      'p2-miss-days':{values:[C.backend,C.frontend,A()]},
+      'p2-miss-days-preview':{values:[C.backend,C.frontend,A()],preview:true},
+      'p2-multi':{values:[C.backend,C.frontend,A(),Object.assign(A(['Backend','Frontend'],'spend'),{cspBlocks:[{csp:'GCP',conds:[{f:'service_description',o:'is',v:'Support',c:''}]}]})],rows:DEMO_ROWS.concat([V9_ROW({id:'sp1',project_id:'',service_description:'Support',sku_description:'Enhanced Support',resource_name:'',labels:{},cost:6000})])},
+      'p2-p3-prop':{values:[C.backend,C.frontend,A(null,'spend')]},
+      'p2-p3-even':{values:[C.backend,C.frontend,Object.assign(A(null,'spend'),{method:'even'})]},
+      'p2-p3-fixed':{values:[C.backend,C.frontend,Object.assign(A(null,'spend'),{method:'fixed',fixed:{Backend:70,Frontend:30}})]},
+      'p2-c':{values:[C.backend,C.frontend,A(null,'c')]},
+      'p2-max-preview':{values:[C.backend,C.frontend,A()],preview:true},
+      'p2-fresh-ok':{values:[C.backend,C.frontend,A(null,'spend')]},
+      'p2-fresh-upd':{values:[C.backend,C.frontend,A()]},
+      'p2-fresh-stale':{values:[C.backend,C.frontend,A()]},
+    }[name];
+    S._p2Pending=P;
+    try{_prev(P.preview?'v9-preview':'v9-default',btn)}finally{S._p2Pending=null}
+    if(P.open)setTimeout(()=>{const b=document.querySelector('.view.active .p2-basis-btn');if(b){b.scrollIntoView({block:'center'});p2OpenMenu(b)}},250);
+  };
+  const _tag=v9Tag;
+  v9Tag=function(id,values,extra){
+    const P=S._p2Pending;if(!P||id!=='__demo__')return _tag(id,values,extra);
+    return _tag(id,P.values,Object.assign({},extra,P.rows?{rows:P.rows}:{}));
+  };
+})();
+// 網址直接帶到某個 Demo 情境：?demo=<情境 id>（例：?demo=p2-max-preview），給沒找到 Demo FAB 的人點連結就到
+(function(){const id=new URLSearchParams(location.search).get('demo');if(id)window.addEventListener('load',()=>setTimeout(()=>{try{DEMO_APPLY(id,null);setTimeout(()=>document.querySelector('.view.active #v10-ac-sec, .view.active .vc.ac')?.scrollIntoView({block:'center'}),600)}catch(e){console.warn('demo',id,e)}},300))})();
 </script>
 <!-- SHARED COMPONENTS — order matters: nav data must load BEFORE sidebar renderer.
      ?v=... is a cache-buster; bump when shared scripts change to force refetch. -->
