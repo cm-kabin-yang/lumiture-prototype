@@ -334,6 +334,17 @@
  * Shadow 結構待 Figma audit：v7/v8 用單層、tokens.css 主階用雙層；Overlay 已用單層作折衷
  * ============================================================ */
 
+
+/* ============================================================
+ * 首屏預留：sidebar／topbar 注入前先佔位（X-9r6 2026-11-20，11-12 X-9r3 C-D2 登記的 CLS）
+ * ============================================================
+ * lumiture-sidebar.js／lumiture-topbar.js 放在 body 尾端，瀏覽器第一次繪製時 #lt-sidebar 是空的 <aside>（寬 0），
+ * 內容區先畫在 x=0，腳本跑完才被推到 250（Overview 1440 CLS 0.17、1280 0.49）。這裡只在腳本還沒接手前
+ * （mount 還沒有 .lt-sidebar／.lt-topbar class）先給一樣的寬高與底色；腳本接手後這兩條就不成立，最終畫面逐像素不變。
+ * 放 tokens.css 是因為它是唯一幾乎每頁都在 <head> 載入的共用檔（General Budget 沒載，已登記 G3）。 */
+#lt-sidebar:not(.lt-sidebar){width:var(--lt-sb-w,250px);flex:0 0 var(--lt-sb-w,250px);min-height:100vh;background:#002663}
+#lt-topbar:not(.lt-topbar){display:block;min-height:64px;background:#002663}
+
 </style>
 <style>
 /* === Inlined: shared/lumiture-ui.css === */
@@ -365,8 +376,9 @@
 .lt-select:focus-visible,.lt-select.is-open{outline:none;border-color:var(--lt-color-border-focus,#004FB0);box-shadow:var(--lt-button-focus-ring,0 0 0 3px rgba(0,79,176,.1))}
 .lt-select__v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lt-select.is-placeholder .lt-select__v{color:var(--lt-grey-400,#B3B3B3)}
-.lt-select__arrow{flex-shrink:0;font-size:24px;line-height:1;color:var(--lt-grey-500,#676767);transition:transform .2s ease;
+.lt-select__arrow{width:1em;overflow:hidden;flex-shrink:0;font-size:24px;line-height:1;color:var(--lt-grey-500,#676767);transition:transform .2s ease;
   font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+/* X-9r6 2026-11-20：width 1em＋overflow hidden，icon 字型載入前連字原文「arrow_drop_down」會把觸發欄撐到 197 寬、整頁橫捲一下（General Budget FY 下拉）；字型到了寬度本來就是 1em，畫面不變 */
 .lt-select.is-open .lt-select__arrow{transform:rotate(180deg)}
 .lt-select.is-error{border-color:var(--lt-color-error,#FF403D)}
 .lt-select.is-error:focus-visible,.lt-select.is-error.is-open{box-shadow:0 0 0 3px rgba(255,64,61,.1)}
@@ -1138,6 +1150,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
     '.lt-sb-item:hover{background:var(--lt-sb-hov);color:#fff}',
     '.lt-sb-item.lt-active{background:var(--lt-sb-active);color:#fff}',
     '.lt-sb-item.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
+    '.lt-sidebar .material-symbols-outlined{width:1em;overflow:hidden}',   /* X-9r6 2026-11-20：字型載入前連字原文佔寬（分組箭頭 210→24，CLS）；sidebar icon 最終寬度都量過＝1em，畫面不變 */
     '.lt-sb-item .material-symbols-outlined{font-size:24px;flex-shrink:0}',
 
     /* Group section */
@@ -1147,6 +1160,7 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
     'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0;',
     'width:100%;background:none;border:0;font-family:inherit;text-align:left;appearance:none;-webkit-appearance:none}',   /* X-9r6 F16：div 改 button，樣式 reset 回跟原本一樣 */
     '.lt-sb-group-hdr:focus-visible{outline:2px solid #fff;outline-offset:-2px}',
+    '.lt-sb-item:focus-visible,.lt-sb-subitem:focus-visible{outline:2px solid #fff;outline-offset:-2px}',   /* X-9r6 2026-11-20 C1：導覽項原本是瀏覽器預設框，跟分組標題同一條 */
     '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
     '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
     '.lt-sb-group-arrow{font-size:24px;transition:transform .18s;flex-shrink:0}',
@@ -1581,6 +1595,9 @@ body #gl-tip{max-width:600px;white-space:pre-line;font-size:14px;line-height:24.
     '.lt-tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;',
     'cursor:pointer;color:#fff;background:none;border:none;padding:0;position:relative;font-family:inherit;transition:background .15s,color .15s}',
     '.lt-tb-ic:hover{background:rgba(255,255,255,.08);color:#fff}',
+    '.lt-tb-ic:focus-visible,.lt-tb-user:focus-visible{outline:2px solid #fff;outline-offset:2px}',   /* X-9r6 2026-11-20 C1：鈴鐺與帳號 chip 原本是瀏覽器預設框；深藍底用白框，同 sidebar */
+    /* X-9r6 2026-11-20：icon 字型載入前連字原文（account_circle…）會把帳號 chip 撐到 537 寬再縮回 155（CLS）。頂欄與帳號選單的 icon 都量過最終寬度＝1em，固定寬度不改最終畫面 */
+    '.lt-topbar .material-symbols-outlined,.lt-am .material-symbols-outlined{width:1em;overflow:hidden}',
     '.lt-tb-ic .material-symbols-outlined{font-size:30px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 30}',
     '.lt-tb-ic .lt-tb-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:#FF403D;',
     'border:2px solid #002663;border-radius:50%}',

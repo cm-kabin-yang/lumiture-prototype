@@ -336,6 +336,17 @@
  * Shadow 結構待 Figma audit：v7/v8 用單層、tokens.css 主階用雙層；Overlay 已用單層作折衷
  * ============================================================ */
 
+
+/* ============================================================
+ * 首屏預留：sidebar／topbar 注入前先佔位（X-9r6 2026-11-20，11-12 X-9r3 C-D2 登記的 CLS）
+ * ============================================================
+ * lumiture-sidebar.js／lumiture-topbar.js 放在 body 尾端，瀏覽器第一次繪製時 #lt-sidebar 是空的 <aside>（寬 0），
+ * 內容區先畫在 x=0，腳本跑完才被推到 250（Overview 1440 CLS 0.17、1280 0.49）。這裡只在腳本還沒接手前
+ * （mount 還沒有 .lt-sidebar／.lt-topbar class）先給一樣的寬高與底色；腳本接手後這兩條就不成立，最終畫面逐像素不變。
+ * 放 tokens.css 是因為它是唯一幾乎每頁都在 <head> 載入的共用檔（General Budget 沒載，已登記 G3）。 */
+#lt-sidebar:not(.lt-sidebar){width:var(--lt-sb-w,250px);flex:0 0 var(--lt-sb-w,250px);min-height:100vh;background:#002663}
+#lt-topbar:not(.lt-topbar){display:block;min-height:64px;background:#002663}
+
 </style>
 <style>
 /* === Inlined: shared/lumiture-ui.css === */
@@ -367,8 +378,9 @@
 .lt-select:focus-visible,.lt-select.is-open{outline:none;border-color:var(--lt-color-border-focus,#004FB0);box-shadow:var(--lt-button-focus-ring,0 0 0 3px rgba(0,79,176,.1))}
 .lt-select__v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lt-select.is-placeholder .lt-select__v{color:var(--lt-grey-400,#B3B3B3)}
-.lt-select__arrow{flex-shrink:0;font-size:24px;line-height:1;color:var(--lt-grey-500,#676767);transition:transform .2s ease;
+.lt-select__arrow{width:1em;overflow:hidden;flex-shrink:0;font-size:24px;line-height:1;color:var(--lt-grey-500,#676767);transition:transform .2s ease;
   font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+/* X-9r6 2026-11-20：width 1em＋overflow hidden，icon 字型載入前連字原文「arrow_drop_down」會把觸發欄撐到 197 寬、整頁橫捲一下（General Budget FY 下拉）；字型到了寬度本來就是 1em，畫面不變 */
 .lt-select.is-open .lt-select__arrow{transform:rotate(180deg)}
 .lt-select.is-error{border-color:var(--lt-color-error,#FF403D)}
 .lt-select.is-error:focus-visible,.lt-select.is-error.is-open{box-shadow:0 0 0 3px rgba(255,64,61,.1)}
@@ -462,7 +474,9 @@ input,select,textarea{font-family:inherit;font-size:14px}
  */
 .pg-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:16px;flex-wrap:wrap}
 .pg-hdr-l{display:flex;align-items:center;gap:12px}
-.pg-title{font-size:24px;font-weight:700;color:var(--g900);line-height:1.4}
+.pg-title{font-size:24px;font-weight:700;color:var(--g900);line-height:1.5}   /* X-9r3 11-20（X-9r1 A9）：1.4 → 1.5（36），同 token --lt-type-h3 與其他頁 */
+/* X-9r3 11-20 CLS：同 Overview，頁首與幣別／月份列的 icon 字型載入前撐寬（1440 CLS 0.17）；curr-arrow 不套 */
+.pg-hdr .material-symbols-outlined,.pg-desc-r .material-symbols-outlined:not(.curr-arrow){width:1em}
 .pg-hdr-meta{display:flex;align-items:center;gap:18px;font-size:12px;color:var(--g500);flex-wrap:wrap}
 .pg-hdr-meta .lu-item{display:inline-flex;align-items:center;gap:4px}   /* X-9r3 FB3：標籤與時間間距 4（同 Overview .upd-times b） */
 .pg-hdr-meta .lu-lbl{font-weight:500;color:var(--g500)}   /* X-9r3 FB3：標籤 12／500、時間 12／400（稿 #01） */
@@ -1773,7 +1787,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
             <span class="material-symbols-outlined" style="font-size:20px;color:#EC6F09;font-variation-settings:'FILL' 1">warning</span>
             <span style="font-size:14px;color:#EC6F09;line-height:1.75">When you change the fiscal start month:</span>
           </div>
-          <ul style="margin:0;padding-left:28px;color:#EC6F09;font-size:14px;line-height:1.75">
+          <ul style="margin:0 0 0 28px;padding-left:21px;color:#EC6F09;font-size:14px;line-height:1.75"><!-- X-9r3 11-20 B21：稿 #09 清單從標題文字左緣（icon 20＋gap 8）起，圓點在內 -->
             <li>Your existing monthly data is preserved and remapped to the new FY range.</li>
             <li>FY-based aggregations are recalculated automatically.</li>
             <li>Changes will sync across all features, including <strong>General Budget</strong>.</li>
@@ -2010,6 +2024,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     '.lt-sb-item:hover{background:var(--lt-sb-hov);color:#fff}',
     '.lt-sb-item.lt-active{background:var(--lt-sb-active);color:#fff}',
     '.lt-sb-item.lt-dis{color:rgba(255,255,255,.35);cursor:not-allowed;pointer-events:none}',
+    '.lt-sidebar .material-symbols-outlined{width:1em;overflow:hidden}',   /* X-9r6 2026-11-20：字型載入前連字原文佔寬（分組箭頭 210→24，CLS）；sidebar icon 最終寬度都量過＝1em，畫面不變 */
     '.lt-sb-item .material-symbols-outlined{font-size:24px;flex-shrink:0}',
 
     /* Group section */
@@ -2019,6 +2034,7 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     'cursor:pointer;white-space:nowrap;overflow:hidden;letter-spacing:0;',
     'width:100%;background:none;border:0;font-family:inherit;text-align:left;appearance:none;-webkit-appearance:none}',   /* X-9r6 F16：div 改 button，樣式 reset 回跟原本一樣 */
     '.lt-sb-group-hdr:focus-visible{outline:2px solid #fff;outline-offset:-2px}',
+    '.lt-sb-item:focus-visible,.lt-sb-subitem:focus-visible{outline:2px solid #fff;outline-offset:-2px}',   /* X-9r6 2026-11-20 C1：導覽項原本是瀏覽器預設框，跟分組標題同一條 */
     '.lt-sb-group-hdr > span:first-child{overflow:hidden;text-overflow:ellipsis}',
     '.lt-sb-group-hdr:hover{color:rgba(255,255,255,.85)}',
     '.lt-sb-group-arrow{font-size:24px;transition:transform .18s;flex-shrink:0}',
@@ -2453,6 +2469,9 @@ body.ei-d-loading #page-dashboard .pg-hdr-meta .ei-sk-time{display:inline-block}
     '.lt-tb-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;',
     'cursor:pointer;color:#fff;background:none;border:none;padding:0;position:relative;font-family:inherit;transition:background .15s,color .15s}',
     '.lt-tb-ic:hover{background:rgba(255,255,255,.08);color:#fff}',
+    '.lt-tb-ic:focus-visible,.lt-tb-user:focus-visible{outline:2px solid #fff;outline-offset:2px}',   /* X-9r6 2026-11-20 C1：鈴鐺與帳號 chip 原本是瀏覽器預設框；深藍底用白框，同 sidebar */
+    /* X-9r6 2026-11-20：icon 字型載入前連字原文（account_circle…）會把帳號 chip 撐到 537 寬再縮回 155（CLS）。頂欄與帳號選單的 icon 都量過最終寬度＝1em，固定寬度不改最終畫面 */
+    '.lt-topbar .material-symbols-outlined,.lt-am .material-symbols-outlined{width:1em;overflow:hidden}',
     '.lt-tb-ic .material-symbols-outlined{font-size:30px;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 30}',
     '.lt-tb-ic .lt-tb-badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:#FF403D;',
     'border:2px solid #002663;border-radius:50%}',
@@ -4342,6 +4361,27 @@ document.addEventListener('keydown', e => {
   if(fsw && fsw.classList.contains('open')){ closeFYSwitcher(); const ft = document.getElementById('fy-sw-trigger'); if(ft) ft.focus({preventScroll:true}); }
 });
 
+/* X-9r3 11-20 N3：FY 下拉方向鍵（同幣別下拉、Display Frequency）：開著時 ↑↓ Home End 在選項間移動焦點；
+   觸發欄聚焦時按 ↓／↑ 打開並把焦點放到目前選中的那一年。Enter／Space 照原本按鈕行為選取 */
+document.addEventListener('keydown', e => {
+  if(!/^(ArrowDown|ArrowUp|Home|End)$/.test(e.key)) return;
+  const sw = document.getElementById('fy-sw'); if(!sw) return;
+  const trig = document.getElementById('fy-sw-trigger');
+  const opts = [].slice.call(sw.querySelectorAll('.fy-sw-opt'));
+  if(!opts.length) return;
+  if(!sw.classList.contains('open')){
+    if(document.activeElement !== trig || !/^Arrow/.test(e.key) || (trig && trig.disabled)) return;
+    e.preventDefault(); toggleFYSwitcher();
+    (sw.querySelector('.fy-sw-opt.sel') || opts[0]).focus({preventScroll:true}); return;
+  }
+  e.preventDefault();
+  let i = opts.indexOf(document.activeElement);
+  if(e.key === 'Home') i = 0; else if(e.key === 'End') i = opts.length - 1;
+  else if(i < 0) i = Math.max(0, opts.findIndex(o => o.classList.contains('sel')));
+  else i = (i + (e.key === 'ArrowDown' ? 1 : -1) + opts.length) % opts.length;
+  opts[i].focus({preventScroll:true});
+});
+
 /* ===== Take screenshot (demo only) ===== */
 function takeScreenshot(){
   showToast('Screenshot saved as LumiTure_executive_insights.png');
@@ -4907,18 +4947,24 @@ function eiNiceMax(max){
 }
 // X 軸團隊名：最多兩行，超過可視範圍以 "..." 取代（#01 註記）
 function eiWrap2(s, w){
-  const words = String(s).split(' '); const lines = ['']; 
+  /* X-9r3 11-20 B17：照稿 #01（「Communicat-ion」「Administrat…」）：放不下一行的長字用連字號斷開，第一行不截；
+     超過兩行時只截第二行，尾端用「…」 */
+  const words = [];
+  String(s).split(' ').flatMap(x => x.split(/(?<=-)/)).forEach(word => {   /* 原本就有的連字號先當斷點 */
+    while (word.length > w) { words.push(word.slice(0, w-1) + '-'); word = word.slice(w-1); }
+    words.push(word);
+  });
+  for (let i = words.length - 1; i > 0; i--) if (/^[\/&|]$/.test(words[i]) && !words[i-1].endsWith('-')) { words[i-1] += ' ' + words[i]; words.splice(i, 1); }   /* B10：單獨的「/」「&」黏在前一個字尾（可以超出 1～2 字），第二行不用符號開頭 */
+  const lines = [''];
   words.forEach(word => {
     const cur = lines[lines.length-1];
+    const glue = cur.endsWith('-') ? '' : ' ';
     if (!cur) lines[lines.length-1] = word;
-    else if ((cur + ' ' + word).length <= w) lines[lines.length-1] = cur + ' ' + word;
+    else if (!cur.endsWith('-') && (cur + glue + word).length <= w) lines[lines.length-1] = cur + glue + word;
     else lines.push(word);
   });
-  let out = lines.slice(0, 2);
-  if (lines.length > 2 || out.some(l => l.length > w)) {
-    out = out.map(l => l.length > w ? l.slice(0, w-3) + '...' : l);
-    if (lines.length > 2) out[1] = (out[1].length > w-3 ? out[1].slice(0, w-3) : out[1]) + '...';
-  }
+  const out = lines.slice(0, 2);
+  if (lines.length > 2) out[1] = out[1].replace(/-$/, '').slice(0, w-1) + '…';
   return out.join('\n');
 }
 // 白底圖表 tooltip 一列：色點＋名稱＋右側金額（#01-1 Chart / Tooltip）
@@ -4993,7 +5039,7 @@ function renderTop10(data, opts){
       data: data.map(d=>d.name),
       axisLine:{ lineStyle:{ color:'#B3B3B3' } },
       axisTick:{ show:false },
-      axisLabel:{ color:'#262626', fontSize:12, lineHeight:16, rotate:45, interval:0, formatter:(v)=>eiWrap2(v, 12) },
+      axisLabel:{ color:'#262626', fontSize:12, lineHeight:18, rotate:45, interval:0, margin:12, formatter:(v)=>eiWrap2(v, 12) },   /* X-9r3 11-20 B17：稿 12／18、標籤離軸線 */
     },
     yAxis:{
       type:'value', min:0, max:niceMax, interval:niceMax/5,

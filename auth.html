@@ -334,6 +334,17 @@
  * Shadow 結構待 Figma audit：v7/v8 用單層、tokens.css 主階用雙層；Overlay 已用單層作折衷
  * ============================================================ */
 
+
+/* ============================================================
+ * 首屏預留：sidebar／topbar 注入前先佔位（X-9r6 2026-11-20，11-12 X-9r3 C-D2 登記的 CLS）
+ * ============================================================
+ * lumiture-sidebar.js／lumiture-topbar.js 放在 body 尾端，瀏覽器第一次繪製時 #lt-sidebar 是空的 <aside>（寬 0），
+ * 內容區先畫在 x=0，腳本跑完才被推到 250（Overview 1440 CLS 0.17、1280 0.49）。這裡只在腳本還沒接手前
+ * （mount 還沒有 .lt-sidebar／.lt-topbar class）先給一樣的寬高與底色；腳本接手後這兩條就不成立，最終畫面逐像素不變。
+ * 放 tokens.css 是因為它是唯一幾乎每頁都在 <head> 載入的共用檔（General Budget 沒載，已登記 G3）。 */
+#lt-sidebar:not(.lt-sidebar){width:var(--lt-sb-w,250px);flex:0 0 var(--lt-sb-w,250px);min-height:100vh;background:#002663}
+#lt-topbar:not(.lt-topbar){display:block;min-height:64px;background:#002663}
+
 </style>
 <style>
 /* ============================================================
@@ -560,6 +571,11 @@ body.fld-fe .tel .cc .flag{font-size:20px;line-height:1;filter:none}
 .lnk{font-size:12px;line-height:18px;font-weight:400;color:var(--lt-color-primary);text-decoration:underline;cursor:pointer;background:none;border:0;padding:0;font-family:inherit;text-underline-position:from-font}
 .lnk:not(.plain):hover{color:var(--lt-color-text-link-hover)}   /* X-9r6 第三輪 A8（照推薦，Kabin 未勾）：全站 B-14 文字連結 hover #0B6DD7、底線保留；FE typography 的 link／linkBold 沒有 hover，這裡跟全站一致 → ⚠ DEVIATION（相對 FE） */
 .lnk.b{font-weight:700}
+/* Kabin 2026-11-20 裁決（X-9r6 BQ1）：表單底部連結列照稿 16／24（稿 #01～#05 Forgot Password?、Don't have an account?／Sign Up、Back to Login、Already have an account?／Login、Privacy Policy 都是 16／24），
+   推翻 10/13「色、字、元件外觀照 FE」裡這一處（FE 是 12／18）。字重維持 FE（連結 700），標題下的說明句維持粗體。
+   ⚠ DEVIATION（相對 FE）。連結改 inline-block 讓點擊區高 24 */
+.foot-links .lnk,.foot-links .cap,a.lnk.foot-links{font-size:16px;line-height:24px}
+.foot-links .lnk,a.lnk.foot-links{display:inline-block}
 .lnk.plain{color:inherit}
 .cap{font-size:12px;line-height:18px}
 .row-sb{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
@@ -1214,7 +1230,7 @@ function loginView() {
         <button type="button" class="sso-b" data-sso="microsoft" aria-label="Microsoft">${SVG.microsoft}</button>
         <button type="button" class="sso-b" data-sso="github" aria-label="GitHub">${SVG.github}</button>
       </div></div>
-    <div class="row-sb login-links">
+    <div class="row-sb login-links foot-links">
       <a class="lnk" href="#forgot">${COPY.login.forgot}</a>
       <span class="inline-4"><span class="cap">${COPY.login.noAcct}</span><a class="lnk b" href="#signup">${COPY.login.signUp}</a></span>
     </div>`, { head: [COPY.login.title, COPY.login.desc] });
@@ -1224,7 +1240,7 @@ function forgotView() {
   return shell(`
     ${fieldHtml('forgot', { name: 'email', label: COPY.lbl.email, ph: COPY.ph.email, required: false, autofocus: true })}
     ${submitBtn('forgot', COPY.forgot.btn, '32px 0 16px')}   <!-- ⚠ DEVIATION 間距照稿：欄位到按鈕 48（三個 Spacing 16）、按鈕到 Back to Login 16 -->
-    <a class="lnk b" href="#login" style="display:block;text-align:right">${COPY.forgot.back}</a>`, { head: [COPY.forgot.title, COPY.forgot.desc] });
+    <a class="lnk b foot-links" href="#login" style="display:block;text-align:right">${COPY.forgot.back}</a>`, { head: [COPY.forgot.title, COPY.forgot.desc] });
 }
 /* ---- 5-3 Reset（#03／#03-1／#03-2） ---- */
 function resetView() {
@@ -1254,7 +1270,7 @@ function signupView() {
     </div>
     ${submitBtn('signup', COPY.signup.btn, '16px 0 0')}   <!-- ⚠ DEVIATION 間距照稿：最後一欄到按鈕 32、按鈕到說明 8（.agree） -->
     <p class="cap agree">${COPY.signup.agree1} <a class="lnk plain" href="#terms" style="white-space:nowrap">${COPY.signup.tos}</a> ${COPY.signup.and} <a class="lnk plain" href="#privacy" style="white-space:nowrap">${COPY.signup.privacy}</a>.</p>
-    <div class="row-end" style="margin-top:16px"><span class="cap">${COPY.signup.has}</span><a class="lnk b" href="#login">${COPY.signup.login}</a></div>`,
+    <div class="row-end foot-links" style="margin-top:16px"><span class="cap">${COPY.signup.has}</span><a class="lnk b" href="#login">${COPY.signup.login}</a></div>`,
     { head: [COPY.signup.title, COPY.signup.desc] });
 }
 /* ---- 5-5 Activate（#05／#05-1／#05-2；Owner 以外才需要填姓名，Owner 在 Sign Up 填過所以兩格帶入且 disabled） ---- */
@@ -1271,7 +1287,7 @@ function activateView() {
     </div>
     ${rulesHtml()}
     ${submitBtn('activate', COPY.activate.btn, '32px 0 16px')}   <!-- ⚠ DEVIATION 間距照稿：規則清單到按鈕 32、按鈕到連結列 16 -->
-    <div class="row-sb ac-foot"><a class="lnk" href="#activate-privacy">${COPY.activate.privacy}</a>
+    <div class="row-sb ac-foot foot-links"><a class="lnk" href="#activate-privacy">${COPY.activate.privacy}</a>
       <span style="display:flex;align-items:baseline;gap:8px"><span class="cap">${COPY.activate.has}</span><a class="lnk b" href="#login">${COPY.activate.login}</a></span></div>`,
     { head: [COPY.activate.title, COPY.activate.desc] });
 }

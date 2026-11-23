@@ -334,6 +334,17 @@
  * Shadow 結構待 Figma audit：v7/v8 用單層、tokens.css 主階用雙層；Overlay 已用單層作折衷
  * ============================================================ */
 
+
+/* ============================================================
+ * 首屏預留：sidebar／topbar 注入前先佔位（X-9r6 2026-11-20，11-12 X-9r3 C-D2 登記的 CLS）
+ * ============================================================
+ * lumiture-sidebar.js／lumiture-topbar.js 放在 body 尾端，瀏覽器第一次繪製時 #lt-sidebar 是空的 <aside>（寬 0），
+ * 內容區先畫在 x=0，腳本跑完才被推到 250（Overview 1440 CLS 0.17、1280 0.49）。這裡只在腳本還沒接手前
+ * （mount 還沒有 .lt-sidebar／.lt-topbar class）先給一樣的寬高與底色；腳本接手後這兩條就不成立，最終畫面逐像素不變。
+ * 放 tokens.css 是因為它是唯一幾乎每頁都在 <head> 載入的共用檔（General Budget 沒載，已登記 G3）。 */
+#lt-sidebar:not(.lt-sidebar){width:var(--lt-sb-w,250px);flex:0 0 var(--lt-sb-w,250px);min-height:100vh;background:#002663}
+#lt-topbar:not(.lt-topbar){display:block;min-height:64px;background:#002663}
+
 </style>
 <style>
 /* ============================================================
