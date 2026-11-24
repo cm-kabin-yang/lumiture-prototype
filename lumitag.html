@@ -2609,12 +2609,13 @@ window.LUMITURE_ACTIVE='lumitag';
 
 /* ---------- 示範帳單：跟提問清單裡講過的例子同一份（×1000） ---------- */
 const V9_ROW=(o)=>Object.assign({csp:'GCP',billing_account_id:'012345-6789AB-CDEF01',location_region:'asia-east1'},o);
+/* 11/24 Ben、Han 回饋：Direct 合計與共用費原本都是 60K 容易搞混，kube:unallocated 35K→23K，共用費改 48K（Direct 仍 60K） */
 const DEMO_ROWS=[
   V9_ROW({id:'r1',project_id:'prd-platform-gke',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'gke-shared-pool-node-a',labels:{'goog-k8s-cluster-name':'shared-gke','k8s-namespace':'backend'},cost:30000}),
   V9_ROW({id:'r2',project_id:'prd-platform-gke',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'gke-shared-pool-node-b',labels:{'goog-k8s-cluster-name':'shared-gke','k8s-namespace':'frontend'},cost:10000}),
   V9_ROW({id:'r3',project_id:'prd-platform-gke',service_description:'GKE',sku_description:'Zonal Kubernetes Clusters',resource_name:'shared-gke',labels:{'goog-k8s-cluster-name':'shared-gke'},cost:10000}),
   V9_ROW({id:'r4',project_id:'prd-platform-gke',service_description:'Compute Engine',sku_description:'Balanced PD Capacity',resource_name:'pvc-shared-disk-01',labels:{'goog-k8s-cluster-name':'shared-gke'},cost:10000}),
-  V9_ROW({id:'r5',project_id:'prd-platform-gke',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'gke-shared-pool-node-a',labels:{'goog-k8s-cluster-name':'shared-gke','k8s-namespace':'kube:unallocated'},cost:35000}),
+  V9_ROW({id:'r5',project_id:'prd-platform-gke',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'gke-shared-pool-node-a',labels:{'goog-k8s-cluster-name':'shared-gke','k8s-namespace':'kube:unallocated'},cost:23000}),
   V9_ROW({id:'r6',project_id:'prd-platform-gke',service_description:'Compute Engine',sku_description:'N2 Instance Core',resource_name:'gke-shared-pool-node-b',labels:{'goog-k8s-cluster-name':'shared-gke','k8s-namespace':'kube:system-overhead'},cost:5000}),
   V9_ROW({id:'r7',project_id:'prd-backend-001',service_description:'Cloud SQL',sku_description:'Cloud SQL for PostgreSQL: vCPU',resource_name:'cloud-sql-prod',labels:{team:'backend'},cost:20000})
 ];
@@ -2722,7 +2723,7 @@ const V9_CARDS={
 };
 const v9Clone=o=>JSON.parse(JSON.stringify(o));
 function v9Tag(id,values,extra){
-  return Object.assign({id,name:'cost-owner',preset:false,status:'active',wasActive:true,editor:'Kabin Yang',modified:'2026-09-29',totalRes:10000,totalCost:120000,rows:DEMO_ROWS,
+  return Object.assign({id,name:'cost-owner',preset:false,status:'active',wasActive:true,editor:'Kabin Yang',modified:'2026-09-29',totalRes:10000,totalCost:108000,rows:DEMO_ROWS,
     values:(()=>{const vs=values.map((v,i)=>Object.assign({id:'cv'+i,res:0,cost:0},v9Clone(v)));v9K8sConvValues(vs,S._k8sNorm?S._k8sMode:'native');return vs})()},extra||{});
 }
 const V9_DEFAULT_VALUES=[V9_CARDS.backend,V9_CARDS.frontend,V9_CARDS.alloc()];
@@ -3613,7 +3614,7 @@ function v9ShowApply(id,cover,uc,valCount,splitAmt){
 window.DEMO_PAGES.push({id:'alloc',label:'Allocation',icon:'call_split'});
 window.DEMO_SCENARIOS.push(
   // ── 基本流程 ──
-  {id:'v9-default',     tab:'alloc',group:'基本流程',label:'Edit：共用 cluster 分給 Backend、Frontend',icon:'call_split',tip:'10/29 規則：整個 tag 一起比。Backend 直接 $50K（含 shared-gke 30K 與 Cloud SQL 20K）、Frontend 直接 $10K，所以 shared-gke 的 60K 依 50:10 分：Backend 分到 $50K、Frontend $10K。Backend 因為有 Cloud SQL，分到的 cluster 費用比它在 cluster 裡的用量（75%）多，這是 RD spec 寫明要接受的結果。'},
+  {id:'v9-default',     tab:'alloc',group:'基本流程',label:'Edit：共用 cluster 分給 Backend、Frontend',icon:'call_split',tip:'10/29 規則：整個 tag 一起比。Backend 直接 $50K（含 shared-gke 30K 與 Cloud SQL 20K）、Frontend 直接 $10K，所以 shared-gke 的 48K 依 50:10 分：Backend 分到 $40K、Frontend $8K。Backend 因為有 Cloud SQL，分到的 cluster 費用比它在 cluster 裡的用量（75%）多，這是 RD spec 寫明要接受的結果。'},
   {id:'v9-two-groups',   tab:'alloc',group:'基本流程',label:'同一朵雲兩組 WHERE（取代同名卡）',icon:'library_add',tip:'Backend 一張卡裡放兩個 GCP 區塊：(Namespace = backend 且 Region = asia-east1) 或 (team = backend 且 Project = prd-backend-001)。區塊之間是 OR。2026-10-01 會議方向，待 RD 確認資料結構與 20 條上限算法。'},
   {id:'v9-value-only',   tab:'alloc',group:'基本流程',label:'只用 value card（剩下的整筆給一個團隊）',icon:'sell',tip:'不用 allocation card：Backend、Frontend 用 Namespace 抓，最後一張 Infrastructure 用 Cluster 接住剩下的管理費、硬碟與空位，整筆給基礎架構。Infrastructure 要排在最下面，不然會先把整個 cluster 抓走。'},
   {id:'v9-preview',     tab:'alloc',group:'基本流程',label:'Preview：分攤後',icon:'visibility',tip:'Spend Breakdown 每一列拆成 Direct 與 Allocated（Estimated）。'},
@@ -3637,8 +3638,8 @@ window.DEMO_SCENARIOS.push(
   {id:'v9-many-values',tab:'alloc',group:'資料狀況',label:'8 個團隊（連按 × 看重算）',icon:'groups',tip:'8 個團隊、三個 cluster 的共用費一起分，比例看各團隊在整個 tag 的直接成本。連按幾個 ×，最後一下之後 0.5 秒才開始重算（重算模擬 1.5 秒）。'},
   {id:'v9-many-one',tab:'alloc',group:'已不採用（留著對照）',label:'分 cluster 規則：8 個團隊只分 prd shared-gke（3 個分到 0）（10/28，10/29 改成整個 tag 一起比）',icon:'unfold_less',tip:'10/28 以前的決定 4（cluster 內只跟 cluster 比），10/29 RD spec 改成整個 tag 一起比，留著對照。Data、ML 只在 data-gke 跑，Growth 只在 stg 的 shared-gke，這三個在 prd shared-gke 分到 0，列下方有灰色說明。'},
   {id:'v9-by-ba',tab:'alloc',group:'已不採用（留著對照）',label:'分 cluster 規則：用 Billing account 抓（in 2 clusters + other）（10/28，10/29 改成整個 tag 一起比）',icon:'account_balance',tip:'10/28 以前的決定 4（cluster 內只跟 cluster 比），10/29 RD spec 改成整個 tag 一起比，留著對照。條件不寫 cluster，改寫 Billing account：抓到兩個 cluster 的剩餘費用，加上不在 cluster 的共用 Logging $12K。欄名變成「in 2 clusters + other」。cluster 內照 cluster 內的比例分；cluster 外的 $12K 照整個 tag 的比例（Backend 含 Cloud SQL 是 $50K）分。'},
-  {id:'v9-two-clusters',tab:'alloc',group:'已不採用（留著對照）',label:'分 cluster 規則：一張卡分兩個 cluster（10/28，10/29 改成整個 tag 一起比）',icon:'hub',tip:'10/28 以前的決定 4（cluster 內只跟 cluster 比），10/29 RD spec 改成整個 tag 一起比，留著對照。shared-gke 照 30K：10K 分 60K；data-gke 只有 Frontend 在跑（5K），20K 全給 Frontend。Direct cost 欄加總是 30K：15K，但 Share 是 56%：44%，滑過金額看每個 cluster。'},
-  {id:'v9-infra',       tab:'alloc',group:'資料狀況',label:'空位先歸 Infrastructure',icon:'dns',tip:'Infrastructure 先拿走 kube:* 的 $40K，allocation card 只分管理費和磁碟 $20K。'},
+  {id:'v9-two-clusters',tab:'alloc',group:'已不採用（留著對照）',label:'分 cluster 規則：一張卡分兩個 cluster（10/28，10/29 改成整個 tag 一起比）',icon:'hub',tip:'10/28 以前的決定 4（cluster 內只跟 cluster 比），10/29 RD spec 改成整個 tag 一起比，留著對照。shared-gke 照 30K：10K 分 48K；data-gke 只有 Frontend 在跑（5K），20K 全給 Frontend。Direct cost 欄加總是 30K：15K，但 Share 是 56%：44%，滑過金額看每個 cluster。'},
+  {id:'v9-infra',       tab:'alloc',group:'資料狀況',label:'空位先歸 Infrastructure',icon:'dns',tip:'Infrastructure 先拿走 kube:* 的 $28K，allocation card 只分管理費和磁碟 $20K。'},
   {id:'v9-mixed-trap',   tab:'alloc',group:'已不採用（留著對照）',label:'分 cluster 規則：Backend 只用 Project 抓（分不到共用 cluster）（10/28，10/29 改成整個 tag 一起比）',icon:'error',tip:'10/28 以前的決定 4（cluster 內只跟 cluster 比），10/29 RD spec 改成整個 tag 一起比，留著對照。Backend 的 value card 只寫 Project，在 shared-gke 裡沒有直接成本，所以 allocation card 分給它 0。卡上與 Preview 都會提醒補 Namespace 條件。'},
   {id:'v9-no-match',    tab:'alloc',group:'資料狀況',label:'條件抓不到任何錢（未攤分）',icon:'search_off',tip:'條件寫 data-gke，這份帳單沒有這個 cluster。'},
   {id:'v9-zero',        tab:'alloc',group:'資料狀況',label:'分給沒有 value card 的 value（Data）',icon:'exposure_zero',tip:'Data 沒有任何 value card，直接花費永遠是 0，永遠分不到錢。'},
@@ -4545,6 +4546,7 @@ function p2StampHtml(usesUsage){
 function p2Stamp(cid){
   const box=document.getElementById(cid)?.closest('.card')?.querySelector('.v10-sum-h');if(!box)return;
   box.querySelector('.p2-stamp')?.remove();
+  if(!S._p2ShowStamp)return; // 11/24 拿掉：現行 PRD 已刪「頁面須顯示資料截至時間」，改用 Not split yet 標沒分攤的天數；後端也說帳單與用量實務上同一天。只在已不採用的情境顯示
   const usesUsage=[...document.getElementById(cid).querySelectorAll(':scope>.vc.ac')].some(el=>(el.dataset.basis||'spend')!=='spend');
   box.querySelector('.v10-sum-period')?.insertAdjacentHTML('beforeend',p2StampHtml(usesUsage)); // 緊接在標題後面
 }
@@ -4557,7 +4559,7 @@ v9RenderPreview=function(t,el){
   const ac=(t.values||[]).find(v=>v.type==='alloc');S._p2Cur=ac?ac.basis||'spend':null;S._p2CopyCards=v9Ordered(t.values);
   try{_p2RenderPreview(t,el)}finally{S._p2Cur=null;S._p2CopyCards=null}
   const usesUsage=!!ac&&(ac.basis||'spend')!=='spend';
-  const ttl=el.querySelector('.st');if(ttl&&!el.querySelector('.p2-stamp')){ttl.classList.add('p2-ttl');ttl.insertAdjacentHTML('beforeend',p2StampHtml(usesUsage))} // Coverage 卡片標題旁（編輯流程的頁標題是 tag 名稱，不放這裡）
+  const ttl=el.querySelector('.st');if(S._p2ShowStamp&&ttl&&!el.querySelector('.p2-stamp')){ttl.classList.add('p2-ttl');ttl.insertAdjacentHTML('beforeend',p2StampHtml(usesUsage))} // Coverage 卡片標題旁（編輯流程的頁標題是 tag 名稱，不放這裡）
   if(!usesUsage||(ac.method&&ac.method!=='prop'))return;
   const label=p2Opt(ac.basis).label;
   /* 11/23 文案表 G1／G2：GKE 成本從 Direct 搬到 Allocated 的說明放在兩個表頭的 tooltip；表格下方與 Shared Cost Not Split 裡的三則 info 拿掉（G3） */
@@ -4709,33 +4711,33 @@ function p3OpenMenu(btn){
 /* ---------- Demo FAB：Phase 2 分頁 ---------- */
 window.DEMO_PAGES.push({id:'p2',label:'Phase 2',icon:'speed'});
 window.DEMO_SCENARIOS.push(
-  {id:'p2-menu',      tab:'p2',group:'分攤依據選單',label:'選單：Spend（預設），打開看選項',icon:'arrow_drop_down_circle',tip:'Spend 永遠可選；Capacity Share＝Model A、Consumption Share＝Model B（名稱是顧問 11/03 給的）。11/03 RD 會議：Requests 拿掉，Model C 年底前不做（暫緩，可隱藏）。換依據後數字變成過期，按 Recalculate。'},
-  {id:'p2-no-monitor',tab:'p2',group:'分攤依據選單',label:'停用：還沒給 Cloud Monitoring 權限',icon:'lock',tip:'PRD 停用原因之一。除了 Spend 都停用。這一則要帶 Go to Authorization 連結（連到 Organization Settings v4），tooltip 放不了連結，所以留在選單底部寫一次；停用選項的 tooltip 寫短版。'},
-  {id:'p2-non-gcp',  tab:'p2',group:'分攤依據選單',label:'不擋：allocation card 抓到 AWS 成本',icon:'cloud',tip:'11/03 RD 會議：只要 Step 1 有 GKE 條件就能選 Model A、B；allocation card 抓到什麼（AWS、Azure、非 Kubernetes）都不擋，整包照各 value 的 GKE 用量分。使用者是專業的人，不做防呆。'},
-  {id:'p2-no-request',tab:'p2',group:'已不採用',label:'停用：workload 沒設預留量（11/20 PRD：沒有用量資料不停用）',icon:'event_busy',tip:'11/02 顧問會議：Model B 只看實際用量，不需要預留量資料；客戶的程式沒設預留量時，Capacity Share 算不出來，只剩 Consumption Share。11/03 會議沒談到，觸發條件與文案仍是設計端暫擬。'},
-  {id:'p2-non-k8s',   tab:'p2',group:'分攤依據選單',label:'停用：Step 1 沒有任何 Kubernetes 條件',icon:'block',tip:'11/20 會議：Step 1 完全沒有 Kubernetes 條件時只能選 Spend。看的是條件選項，不看資料：選了但當期用量 0 照樣可以選。11/23：停用原因改成滑過（或鍵盤移到）選項才出現的 tooltip，選單底部那句拿掉。'},
-  {id:'p2-auto-spend',tab:'p2',group:'分攤依據選單',label:'自動切回 Spend：回 Step 1 刪掉 Kubernetes 條件後',icon:'undo',tip:'11/23 Kabin 照推薦、晚上改 toast：卡片原本選 Capacity Share，但 Step 1 已經沒有任何有效 Kubernetes 條件，進到 Step 2 時自動改成 Spend，同時在左下角跳一則 info toast（只跳一次，沒有常駐提示）。從 Step 1 刪完條件直接點 stepper 的 Step 3 也會跳。'},
-  {id:'p2-max',       tab:'p2',group:'Model A：Capacity Share',label:'第 2 步：照 Model A 分 shared-gke',icon:'call_split',tip:'Backend 的 CPU、記憶體加權後 USD 30（預留 30、用 18，取大）、Frontend USD 14（預留 10、用 14），60K 依 30:14 分。加權＝資源量 × 單價（11/03 顧問 Excel），Share 滑過看兩個金額；單價來源待 RD。Backend 的 Cloud SQL 20K 不在 GKE，不算進比例，表格下方寫出金額。對照 Spend 是 50:10。'},
-  {id:'p2-max-keep',  tab:'p2',group:'已不採用',label:'對照：Step 1 的 GKE 成本照舊、只分剩下的（11/03 版）',icon:'compare_arrows',tip:'11/04 RD 發現顧問公式不扣 Step 1，Kabin 定方向改成 GKE 成本搬到 Allocated。這是改之前的算法，留著對照數字差多少。'},
-  {id:'p2-max-zero',  tab:'p2',group:'Model A：Capacity Share',label:'某個 value 沒有 Kubernetes 條件（停用、分到 0）',icon:'exposure_zero',tip:'11/20 PRD 停用原因第一種。11/04 RD 會議：Step 1 沒選到 GKE 的 value 在 Model A／B 下自動停用（灰字、不能移除、0），原因直接標在那一列下方，附 Edit value card 回 Step 1；改回 Spend 就恢復。這個 value 只拿自己的直接成本。'},
-  {id:'p2-max-none',  tab:'p2',group:'Model A：Capacity Share',label:'所有 value 都停用：不能儲存（Next 停用）',icon:'do_not_disturb_on',tip:'Step 1 還有 Backend 帶 Kubernetes 條件，但清單只剩 Data Platform（Backend 被 × 拿掉）。11/23 晚 Kabin 選方案 C：下拉只留紅框，表格上方放 CMDS 紅底 Alert，右側 Edit value cards（外框鈕）與 Switch to Spend（文字鈕）；各列的停用提示收掉；Next 與 Step 3 停用。沒分出去的錢寫成 Not split 一列，Total 等於各列加總。'},
-  {id:'p2-max-none-a',tab:'p2',group:'已不採用',label:'對照：A 句內連結：出路寫進錯誤句，對齊下拉（11/23 未採用）',icon:'short_text',tip:'紅字移到下拉正下方，兩個出路改成句子裡的連結（同 Customized Budget 的 invalidCond、停用列提示的寫法），不再有獨立的連結區。'},
-  {id:'p2-max-none-b',tab:'p2',group:'已不採用',label:'對照：B 欄位下只寫原因，出路放 Not split 列（11/23 未採用）',icon:'table_rows',tip:'下拉下方紅字只講原因。怎麼修跟兩個連結放在表格 Not split 那一列下方，用停用列提示的樣式（Warning/Dark）。'},
-  {id:'p2-max-none-d',tab:'p2',group:'已不採用',label:'對照：D 只留一個連結：另一個出路就是下拉（11/23 未採用）',icon:'link',tip:'紅字在下拉正下方，只留 Edit value cards 一個連結。換依據不另給連結，句子請使用者直接改上面的下拉。'},
-  {id:'p2-max-and',   tab:'p2',group:'Model A：Capacity Share',label:'某個 value 的 Kubernetes 條件跟其他條件用 AND 寫在一起（停用）',icon:'join_inner',tip:'11/20 PRD 停用原因第二種。Search 的條件是 namespace＝search AND Service＝Vertex AI。11/23 Jessie 問過 Bater，確認無效；PRD 改寫「判斷方式請參考後端規格文件」。'},
-  {id:'p2-max-and-ok',tab:'p2',group:'已不採用',label:'對照：AND 混用也算有效（11/23 確認不採用）',icon:'join_full',tip:'11/23 確認 AND 混用無效，這版不採用。當時的另一種讀法：Search 不停用。它在 shared-gke 沒有符合兩個條件的容器，所以有效但分到 0（11/20 會議：有選 Kubernetes 但資料是 0 仍算有效）。'},
-  {id:'p2-org-nousage',tab:'p2',group:'沒有分攤的天數',label:'org 還沒有任何容器用量：提示、可以存',icon:'hourglass_empty',tip:'11/20 PRD：org 完全沒有容器用量時不停用，整筆 100,000（含 Step 1 搬進來的 GKE 成本 40,000）留在 Untagged，寫成 Not split yet 列。11/20 會議：可以存（客戶可以提早設定）。表格下方一則中性提示，「從開啟那天起收集、之前不補」放 tooltip。'},
-  {id:'p2-miss-days', tab:'p2',group:'沒有分攤的天數',label:'有 2 天用量或單價還沒到：那幾天不分攤',icon:'event_busy',tip:'11/20 PRD〈無依據值〉：以天判斷，用量資料或單價還沒到就當天不分攤，補進來後重算。示範用 2／30 天的金額。11/23 Kabin 照推薦：權重表多一列 Not split yet，滑過看日期（3 天以內列日期），橘色提示拿掉。'},
-  {id:'p2-miss-days-preview',tab:'p2',group:'沒有分攤的天數',label:'Coverage Preview：有 2 天沒分攤',icon:'visibility',tip:'Step 3 Shared Cost Not Split 只留一句（金額與天數）。Untagged 全部是暫時沒分的錢，所以不用紅底。'},
-  {id:'p2-multi',     tab:'p2',group:'已不採用',label:'兩張 allocation card 各選各的依據（11/03：一個 key 一個模型，不開多張卡）',icon:'stacks',tip:'Phase 1 一個 tag 只能一張卡；這裡示範之後若開放多張，每張卡在自己的 Split across 那列選依據：第 1 張分 shared-gke 用 Capacity Share（Model A），第 2 張分 Support Plan 用 Spend，互不影響。'},
-  {id:'p2-p3-prop',   tab:'p2',group:'Phase 3 相容（預覽）',label:'Phase 3：分配方式接在 Split across 後面',icon:'tune',tip:'PRD Phase 3 加 Even Split、Fixed Proportional，且「分攤依據只在 Variable Proportional 時出現」。句型：Split across ⓘ [proportionally ▾] by [Spend ▾]，分配方式在前、依據在後，不用另開一列。'},
-  {id:'p2-p3-even',   tab:'p2',group:'Phase 3 相容（預覽）',label:'Phase 3：Evenly（by 消失）',icon:'drag_handle',tip:'選 evenly 時 by [▾] 整段收起，平均分給每個 value；表格不顯示 Direct cost 欄。'},
-  {id:'p2-p3-fixed',  tab:'p2',group:'Phase 3 相容（預覽）',label:'Phase 3：By fixed %（Share 欄變輸入框）',icon:'percent',tip:'選 by fixed % 時 by [▾] 收起，Share 欄變成輸入框；加總不是 100% 時不分、顯示提醒（PRD：未達 100 不可儲存）。改了數字一樣按 Recalculate。'},
-  {id:'p2-c',         tab:'p2',group:'Model A：Capacity Share',label:'Model C（暫緩：年底前不做）：第 2 步',icon:'pending',tip:'11/02 顧問定義的 Model C：自己預留的自己付、空位照用量分。在 LumiTag 裡跟 Usage 一樣照用量分剩下的錢，示範資料沒有用量超過預留的團隊，所以數字跟 Usage 相同。這一期做不做、名稱等 PM 確認。'},
-  {id:'p2-max-preview',tab:'p2',group:'Model A：Capacity Share',label:'Coverage Preview：Model A',icon:'visibility',tip:'Shared Cost Allocation 那一列先寫用哪個依據，再寫分給誰，最後寫沒算進比例的金額。標題旁是資料截至時間（用量依據取帳單與用量資料較晚的那天）。'},
-  {id:'p2-fresh-ok',  tab:'p2',group:'資料截至時間',label:'正常：Data through（Spend）',icon:'event_available',tip:'第 2 步標題旁、Coverage Preview 標題旁都有。Spend 只看帳單；改成用量依據時取帳單與用量資料比較舊的那天，滑過看兩個日期。'},
-  {id:'p2-fresh-upd', tab:'p2',group:'資料截至時間',label:'更新中',icon:'sync',tip:'RD spec §4：新資料進來、背景重算時，先顯示舊結果並標示更新中。'},
-  {id:'p2-fresh-stale',tab:'p2',group:'資料截至時間',label:'資料較舊（7 天沒更新）',icon:'warning',tip:'RD spec §4、D5：某朵雲或用量資料好幾天沒進來。天數 RD 還沒定，這裡先用 7 天。Warning/Dark 色。'},
+  {id:'p2-menu',      tab:'p2',group:'Step 2・分攤依據選單',label:'選單：Spend（預設），打開看選項',icon:'arrow_drop_down_circle',tip:'Spend 永遠可選；Capacity Share＝Model A、Consumption Share＝Model B（名稱是顧問 11/03 給的）。11/03 RD 會議：Requests 拿掉，Model C 年底前不做（暫緩，可隱藏）。換依據後數字變成過期，按 Recalculate。'},
+  {id:'p2-no-monitor',tab:'p2',group:'Step 2・分攤依據選單',label:'停用：還沒給 Cloud Monitoring 權限',icon:'lock',tip:'PRD 停用原因之一。除了 Spend 都停用。這一則要帶 Go to Authorization 連結（連到 Organization Settings v4），tooltip 放不了連結，所以留在選單底部寫一次；停用選項的 tooltip 寫短版。'},
+  {id:'p2-non-gcp',  tab:'p2',group:'Step 2・分攤依據選單',label:'不擋：allocation card 抓到 AWS 成本',icon:'cloud',tip:'11/03 RD 會議：只要 Step 1 有 GKE 條件就能選 Model A、B；allocation card 抓到什麼（AWS、Azure、非 Kubernetes）都不擋，整包照各 value 的 GKE 用量分。使用者是專業的人，不做防呆。'},
+  {id:'p2-no-request',tab:'p2',group:'已不採用（留著對照）',label:'停用：workload 沒設預留量（11/20 PRD：沒有用量資料不停用）',icon:'event_busy',tip:'11/02 顧問會議：Model B 只看實際用量，不需要預留量資料；客戶的程式沒設預留量時，Capacity Share 算不出來，只剩 Consumption Share。11/03 會議沒談到，觸發條件與文案仍是設計端暫擬。'},
+  {id:'p2-non-k8s',   tab:'p2',group:'Step 2・分攤依據選單',label:'停用：Step 1 沒有任何 Kubernetes 條件',icon:'block',tip:'11/20 會議：Step 1 完全沒有 Kubernetes 條件時只能選 Spend。看的是條件選項，不看資料：選了但當期用量 0 照樣可以選。11/23：停用原因改成滑過（或鍵盤移到）選項才出現的 tooltip，選單底部那句拿掉。'},
+  {id:'p2-auto-spend',tab:'p2',group:'Step 2・分攤依據選單',label:'自動切回 Spend：回 Step 1 刪掉 Kubernetes 條件後',icon:'undo',tip:'11/23 Kabin 照推薦、晚上改 toast：卡片原本選 Capacity Share，但 Step 1 已經沒有任何有效 Kubernetes 條件，進到 Step 2 時自動改成 Spend，同時在左下角跳一則 info toast（只跳一次，沒有常駐提示）。從 Step 1 刪完條件直接點 stepper 的 Step 3 也會跳。'},
+  {id:'p2-max',       tab:'p2',group:'Step 2・照 Capacity Share 分',label:'照 Capacity Share（Model A）分 shared-gke',icon:'call_split',tip:'Backend 的 CPU、記憶體加權後 USD 30（預留 30、用 18，取大）、Frontend USD 14（預留 10、用 14），88K（共用 48K＋Step 1 的 GKE 成本 40K）依 30:14 分。加權＝資源量 × 單價（11/03 顧問 Excel），Share 滑過看兩個金額；單價來源待 RD。Backend 的 Cloud SQL 20K 不在 GKE，不算進比例，表格下方寫出金額。對照 Spend 是 50:10。'},
+  {id:'p2-max-keep',  tab:'p2',group:'已不採用（留著對照）',label:'對照：Step 1 的 GKE 成本照舊、只分剩下的（11/03 版）',icon:'compare_arrows',tip:'11/04 RD 發現顧問公式不扣 Step 1，Kabin 定方向改成 GKE 成本搬到 Allocated。這是改之前的算法，留著對照數字差多少。'},
+  {id:'p2-max-zero',  tab:'p2',group:'Step 2・照 Capacity Share 分',label:'某個 value 沒有 Kubernetes 條件（停用、分到 0）',icon:'exposure_zero',tip:'11/20 PRD 停用原因第一種。11/04 RD 會議：Step 1 沒選到 GKE 的 value 在 Model A／B 下自動停用（灰字、不能移除、0），原因直接標在那一列下方，附 Edit value card 回 Step 1；改回 Spend 就恢復。這個 value 只拿自己的直接成本。'},
+  {id:'p2-max-none',  tab:'p2',group:'Step 2・照 Capacity Share 分',label:'所有 value 都停用：不能儲存（Next 停用）',icon:'do_not_disturb_on',tip:'Step 1 還有 Backend 帶 Kubernetes 條件，但清單只剩 Data Platform（Backend 被 × 拿掉）。11/23 晚 Kabin 選方案 C：下拉只留紅框，表格上方放 CMDS 紅底 Alert，右側 Edit value cards（外框鈕）與 Switch to Spend（文字鈕）；各列的停用提示收掉；Next 與 Step 3 停用。沒分出去的錢寫成 Not split 一列，Total 等於各列加總。'},
+  {id:'p2-max-none-a',tab:'p2',group:'已不採用（留著對照）',label:'對照：A 句內連結：出路寫進錯誤句，對齊下拉（11/23 未採用）',icon:'short_text',tip:'紅字移到下拉正下方，兩個出路改成句子裡的連結（同 Customized Budget 的 invalidCond、停用列提示的寫法），不再有獨立的連結區。'},
+  {id:'p2-max-none-b',tab:'p2',group:'已不採用（留著對照）',label:'對照：B 欄位下只寫原因，出路放 Not split 列（11/23 未採用）',icon:'table_rows',tip:'下拉下方紅字只講原因。怎麼修跟兩個連結放在表格 Not split 那一列下方，用停用列提示的樣式（Warning/Dark）。'},
+  {id:'p2-max-none-d',tab:'p2',group:'已不採用（留著對照）',label:'對照：D 只留一個連結：另一個出路就是下拉（11/23 未採用）',icon:'link',tip:'紅字在下拉正下方，只留 Edit value cards 一個連結。換依據不另給連結，句子請使用者直接改上面的下拉。'},
+  {id:'p2-max-and',   tab:'p2',group:'Step 2・照 Capacity Share 分',label:'某個 value 的 Kubernetes 條件跟其他條件用 AND 寫在一起（停用）',icon:'join_inner',tip:'11/20 PRD 停用原因第二種。Search 的條件是 namespace＝search AND Service＝Vertex AI。11/23 Jessie 問過 Bater，確認無效；PRD 改寫「判斷方式請參考後端規格文件」。'},
+  {id:'p2-max-and-ok',tab:'p2',group:'已不採用（留著對照）',label:'對照：AND 混用也算有效（11/23 確認不採用）',icon:'join_full',tip:'11/23 確認 AND 混用無效，這版不採用。當時的另一種讀法：Search 不停用。它在 shared-gke 沒有符合兩個條件的容器，所以有效但分到 0（11/20 會議：有選 Kubernetes 但資料是 0 仍算有效）。'},
+  {id:'p2-org-nousage',tab:'p2',group:'Step 2・有幾天沒分攤',label:'org 還沒有任何容器用量：提示、可以存',icon:'hourglass_empty',tip:'11/20 PRD：org 完全沒有容器用量時不停用，整筆 88,000（含 Step 1 搬進來的 GKE 成本 40,000）留在 Untagged，寫成 Not split yet 列。11/20 會議：可以存（客戶可以提早設定）。表格下方一則中性提示，「從開啟那天起收集、之前不補」放 tooltip。'},
+  {id:'p2-miss-days', tab:'p2',group:'Step 2・有幾天沒分攤',label:'有 2 天用量或單價還沒到：那幾天不分攤',icon:'event_busy',tip:'11/20 PRD〈無依據值〉：以天判斷，用量資料或單價還沒到就當天不分攤，補進來後重算。示範用 2／30 天的金額。11/23 Kabin 照推薦：權重表多一列 Not split yet，滑過看日期（3 天以內列日期），橘色提示拿掉。'},
+  {id:'p2-miss-days-preview',tab:'p2',group:'Step 3・Coverage Preview',label:'有 2 天沒分攤（Shared Cost Not Split 說明句）',icon:'visibility',tip:'Step 3 Shared Cost Not Split 只留一句（金額與天數）。Untagged 全部是暫時沒分的錢，所以不用紅底。'},
+  {id:'p2-multi',     tab:'p2',group:'已不採用（留著對照）',label:'兩張 allocation card 各選各的依據（11/03：一個 key 一個模型，不開多張卡）',icon:'stacks',tip:'Phase 1 一個 tag 只能一張卡；這裡示範之後若開放多張，每張卡在自己的 Split across 那列選依據：第 1 張分 shared-gke 用 Capacity Share（Model A），第 2 張分 Support Plan 用 Spend，互不影響。'},
+  {id:'p2-p3-prop',   tab:'p2',group:'暫緩：Model C、Phase 3',label:'Phase 3：分配方式接在 Split across 後面',icon:'tune',tip:'PRD Phase 3 加 Even Split、Fixed Proportional，且「分攤依據只在 Variable Proportional 時出現」。句型：Split across ⓘ [proportionally ▾] by [Spend ▾]，分配方式在前、依據在後，不用另開一列。'},
+  {id:'p2-p3-even',   tab:'p2',group:'暫緩：Model C、Phase 3',label:'Phase 3：Evenly（by 消失）',icon:'drag_handle',tip:'選 evenly 時 by [▾] 整段收起，平均分給每個 value；表格不顯示 Direct cost 欄。'},
+  {id:'p2-p3-fixed',  tab:'p2',group:'暫緩：Model C、Phase 3',label:'Phase 3：By fixed %（Share 欄變輸入框）',icon:'percent',tip:'選 by fixed % 時 by [▾] 收起，Share 欄變成輸入框；加總不是 100% 時不分、顯示提醒（PRD：未達 100 不可儲存）。改了數字一樣按 Recalculate。'},
+  {id:'p2-c',         tab:'p2',group:'暫緩：Model C、Phase 3',label:'Model C（年底前不做）',icon:'pending',tip:'11/02 顧問定義的 Model C：自己預留的自己付、空位照用量分。在 LumiTag 裡跟 Usage 一樣照用量分剩下的錢，示範資料沒有用量超過預留的團隊，所以數字跟 Usage 相同。這一期做不做、名稱等 PM 確認。'},
+  {id:'p2-max-preview',tab:'p2',group:'Step 3・Coverage Preview',label:'照 Capacity Share 分完（GKE 成本移到 Allocated）',icon:'visibility',tip:'Phase 2 沒改 Step 3 版面，變的是數字：選 Capacity Share 時 Step 1 的 GKE 成本移到 Allocated，所以 Frontend 的 Direct 變 0、Backend 只剩 Cloud SQL。Direct、Allocated 表頭滑過看說明（文案表 G1／G2）。'},
+  {id:'p2-fresh-ok',  tab:'p2',group:'已不採用（留著對照）',label:'Data through（11/24 拿掉：現行 PRD 已刪）',icon:'event_available',tip:'第 2 步標題旁、Coverage Preview 標題旁都有。Spend 只看帳單；改成用量依據時取帳單與用量資料比較舊的那天，滑過看兩個日期。'},
+  {id:'p2-fresh-upd', tab:'p2',group:'已不採用（留著對照）',label:'Data through：更新中（11/24 拿掉）',icon:'sync',tip:'RD spec §4：新資料進來、背景重算時，先顯示舊結果並標示更新中。'},
+  {id:'p2-fresh-stale',tab:'p2',group:'已不採用（留著對照）',label:'Data through：資料較舊（11/24 拿掉）',icon:'warning',tip:'RD spec §4、D5：某朵雲或用量資料好幾天沒進來。天數 RD 還沒定，這裡先用 7 天。Warning/Dark 色。'},
 );
 (function(){
   const _prev=window.DEMO_APPLY;
@@ -4745,12 +4747,13 @@ window.DEMO_SCENARIOS.push(
   const P2_DEF=Object.fromEntries(P2_DEF_KEYS.map(k=>[k,S[k]]));
   const p2ResetSettings=()=>{Object.assign(S,P2_DEF);document.body.classList.toggle('v10-recip-select',!S._autoRecip)};
   window.DEMO_APPLY=function(name,btn){
+    if(!name.startsWith('p2-fresh'))document.querySelectorAll('.p2-stamp').forEach(e=>e.remove()); // 11/24：Data through 已拿掉，切走時清掉已不採用情境留下的標示
     if(name.startsWith('p2-'))p2ResetSettings();
-    if(!name.startsWith('p2-')){S._p3Preview=false;S._p2KeepDirect=false;S._p2Monitor=true;S._p2NoRequest=false;S._p2Fresh='ok';S._p2AndValid=false;S._p2OrgNoUsage=false;S._p2MissDays=0;S._p2ErrLay='c';return _prev(name,btn)}
+    if(!name.startsWith('p2-')){S._p3Preview=false;S._p2KeepDirect=false;S._p2Monitor=true;S._p2NoRequest=false;S._p2Fresh='ok';S._p2ShowStamp=false;S._p2AndValid=false;S._p2OrgNoUsage=false;S._p2MissDays=0;S._p2ErrLay='c';return _prev(name,btn)}
     const C=V9_CARDS;const A=(r,k)=>Object.assign(C.alloc(r),{basis:k||'max'});
     const P2_BACKEND_NOK8S={name:'Backend',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'team',o:'is',v:'backend',c:''}]}]}; // 回 Step 1 刪掉 Kubernetes 條件後的 Backend
     const P2_SEARCH_AND={name:'Search',cspBlocks:[{csp:'GCP',conds:[{f:'labels',k:'k8s-namespace',o:'is',v:'search',c:''},{f:'service_description',o:'is',v:'Vertex AI',c:'AND'}]}]};
-    S._p3Preview=name.startsWith('p2-p3-');S._p2Monitor=name!=='p2-no-monitor';S._p2NoRequest=name==='p2-no-request';S._p2Fresh=name==='p2-fresh-upd'?'updating':name==='p2-fresh-stale'?'stale':'ok';S._p2KeepDirect=name==='p2-max-keep';S._p2AndValid=name==='p2-max-and-ok';S._p2OrgNoUsage=name==='p2-org-nousage';S._p2MissDays=name.startsWith('p2-miss-days')?2:0;
+    S._p3Preview=name.startsWith('p2-p3-');S._p2Monitor=name!=='p2-no-monitor';S._p2NoRequest=name==='p2-no-request';S._p2Fresh=name==='p2-fresh-upd'?'updating':name==='p2-fresh-stale'?'stale':'ok';S._p2ShowStamp=name.startsWith('p2-fresh');S._p2KeepDirect=name==='p2-max-keep';S._p2AndValid=name==='p2-max-and-ok';S._p2OrgNoUsage=name==='p2-org-nousage';S._p2MissDays=name.startsWith('p2-miss-days')?2:0;
     const _lay=/^p2-max-none-([a-d])$/.exec(name);S._p2ErrLay=_lay?_lay[1]:'c';if(_lay)name='p2-max-none'; // 排版方案：同一份資料，只換旗標
     const P={
       'p2-menu':{values:[C.backend,C.frontend,A(null,'spend')],open:true},
@@ -4789,7 +4792,15 @@ window.DEMO_SCENARIOS.push(
   };
 })();
 // 網址直接帶到某個 Demo 情境：?demo=<情境 id>（例：?demo=p2-max-preview），給沒找到 Demo FAB 的人點連結就到
-(function(){const id=new URLSearchParams(location.search).get('demo');if(id)window.addEventListener('load',()=>setTimeout(()=>{try{DEMO_APPLY(id,null);setTimeout(()=>document.querySelector('.view.active #v10-ac-sec, .view.active .vc.ac')?.scrollIntoView({block:'center'}),600)}catch(e){console.warn('demo',id,e)}},300))})();
+/* 11/24：燒瓶分組照步驟排，「已不採用」一律放最後（demo-fab 依第一次出現的順序排組） */
+(function(){const rank={p2:['Step 2・分攤依據選單','Step 2・照 Capacity Share 分','Step 2・有幾天沒分攤','Step 3・Coverage Preview','暫緩：Model C、Phase 3','已不採用（留著對照）'],alloc:['基本流程','資料狀況','暫緩的設計','設定（切換後停在目前畫面）','已不採用（留著對照）']};
+  const arr=window.DEMO_SCENARIOS;const idx=new Map(arr.map((x,i)=>[x,i]));
+  const r=x=>{const l=rank[x.tab];if(!l||!x.group)return 0;const k=l.indexOf(x.group);return k<0?l.length-1:k};
+  /* 只在同一個 tab 內重排：保留各 tab 的相對位置 */
+  const byTab={};arr.forEach(x=>(byTab[x.tab]=byTab[x.tab]||[]).push(x));
+  Object.values(byTab).forEach(l=>l.sort((a,b)=>(r(a)-r(b))||(idx.get(a)-idx.get(b))));const cur={};
+  for(let i=0;i<arr.length;i++){const t=arr[i].tab;cur[t]=cur[t]||0;arr[i]=byTab[t][cur[t]++]}})();
+(function(){const id=new URLSearchParams(location.search).get('demo');if(id)window.addEventListener('load',()=>setTimeout(()=>{try{DEMO_APPLY(id,null);const sc=(window.DEMO_SCENARIOS||[]).find(x=>x.id===id);if(sc&&window._demoFabSetPage)window._demoFabSetPage(sc.tab); /* 11/24：用連結開情境時，燒瓶停在那個情境的分頁 */setTimeout(()=>document.querySelector('.view.active #v10-ac-sec, .view.active .vc.ac')?.scrollIntoView({block:'center'}),600)}catch(e){console.warn('demo',id,e)}},300))})();
 </script>
 <!-- SHARED COMPONENTS — order matters: nav data must load BEFORE sidebar renderer.
      ?v=... is a cache-buster; bump when shared scripts change to force refetch. -->
