@@ -6,8 +6,7 @@
 <title>Lumiture.ai — Rightsizing v2 (Object Storage Delivery Adjustments)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>   <!-- X-9r4 RA29：補 gstatic（icon 字型從這裡來） -->
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400..600,0..1,0&display=swap" rel="stylesheet">   <!-- X-9r4 11-25 C8：icon 只留用得到的軸（wght 400..600、GRAD 0），跟 Noto Sans 合成一支請求（同 All Resource List／Audit Log） -->
 <!-- 2026-10-15 修正輪（P2）：tokens.css 讀 --lt-modal-radius／--lt-card-shadow／--lt-sb-w 等；lumiture-ui.css 給 .lt-select／.lt-skeleton -->
 <style>
 /* === Inlined: shared/tokens.css === */
@@ -459,6 +458,10 @@ a{color:var(--pri);text-decoration:none}
 button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:14px;letter-spacing:0}
 input,select,textarea{font-family:inherit;font-size:14px}
 .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;vertical-align:middle}
+/* X-9r4 11-25 A1：icon 字型載入前連字原文會把 icon 撐很寬（settings 59px），整頁首屏跳版 CLS 0.3～0.5。
+   只對「最終寬度＝font-size」的 icon 釘 1em 並裁掉溢出；最終寬 24 的有點擊區（border-box 的 event 鈕）直接釘 24。 */
+.btn>.material-symbols-outlined,.rs-search>.material-symbols-outlined,.th-sort .material-symbols-outlined,.sc-back .material-symbols-outlined,.savebar-l .material-symbols-outlined,.ico-info,.dt-inst .rec-ic{width:1em;overflow:hidden}
+.rs-eot-btn.material-symbols-outlined{width:24px;overflow:hidden}
 
 /* ==== App layout ==== */
 .app{display:flex;min-height:100vh}
@@ -559,7 +562,7 @@ h1.pg-title:focus,.modal:focus{outline:none}   /* RA24／RA27：程式把焦點�
 .tab:hover{background:var(--g50)}
 .tab.active{background:var(--pri-lt20);color:var(--pri-dk)}
 .tab.active:hover{background:var(--pri-lt20)}
-.tab:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(0,79,176,.35)}
+.tab:focus-visible{outline:2px solid var(--pri);outline-offset:-2px;box-shadow:none}   /* X-9r4 11-25 C7：2px #004FB0 內框（原 35% 內框對白底約 1.8:1） */
 /* RA2：讀取中分頁不能操作，字 #B3B3B3 且不帶計數（稿 #02） */
 .tab:disabled,.tab:disabled:hover{color:var(--g400);cursor:not-allowed;background:none}
 .tab.active:disabled,.tab.active:disabled:hover{background:#fff;color:var(--g400);font-weight:400}   /* X-9r1 11-13 P5：停用 Toggle Group 四格都沒有選中底色、字 400 #B3B3B3（稿 #02 Toggle / Status=disabled；原選中格留 #D1EEFF） */
@@ -605,11 +608,12 @@ h1.pg-title:focus,.modal:focus{outline:none}   /* RA24／RA27：程式把焦點�
 .rs-eot-opt.on{border-color:var(--pri);background:rgba(0,79,176,.04)}
 .rs-eot-opt input[type=date]{margin-left:auto;font-family:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--tf-border);border-radius:4px}
 .rs-eot-manual{font-size:11px;color:var(--g400);margin-left:4px}
-.rs-search{margin-left:auto;flex:none;display:flex;align-items:center;gap:4px;height:36px;width:300px;box-sizing:border-box;padding:0 8px;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff}   /* 內距 8、icon 20、gap 4、寬 300（⚠ 設計端暫擬：稿是 284＋icon 在右，icon 改左（B-9）後實量 placeholder 約 253px，284 放不下完整「Search items, resources, or label / tags」），placeholder 才放得下完整「Search items, resources, or label / tags」（A-32①）；icon 放左（B-9） */
+.rs-search{margin-left:auto;flex:none;display:flex;align-items:center;gap:4px;height:36px;width:340px;box-sizing:border-box;padding:0 8px;border:1px solid var(--tf-border);border-radius:var(--r-sm);background:#fff}   /* 內距 8、icon 20、gap 4、寬 300（⚠ 設計端暫擬：稿是 284＋icon 在右，icon 改左（B-9）後實量 placeholder 約 253px，284 放不下完整「Search items, resources, or label / tags」），placeholder 才放得下完整「Search items, resources, or label / tags」（A-32①）；icon 放左（B-9） */
 .rs-search:hover{border-color:var(--g400)}
 .rs-search:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 .rs-search .material-symbols-outlined{font-size:20px;color:var(--g400);font-variation-settings:'FILL' 0}
 .rs-search input{border:none;outline:none;background:none;width:100%;height:100%;font-size:14px;color:var(--g700);text-overflow:ellipsis}   /* X-9r1 P3：放不下的 placeholder 加「…」 */   /* RA27：input 撐滿 36 高框，可點區不再只有 19 */
+.rs-search{} /* X-9r4 11-25 B14：寬 300→340，完整顯示「Search items, resources, or label / tags」不再截成「…label / t…」（實量 placeholder 約 270；⚠ 設計端暫擬，稿是 284＋icon 在右） */
 .rs-search.is-disabled{border-color:var(--g200);background:var(--g100)}   /* RA2：讀取中搜尋停用；X-9r1 11-13：底改 #F2F2F2（稿 #02 `2188:85391` 搜尋框停用底 #F2F2F2，跟同列停用下拉一致；Rate Optimization 稿畫白底，兩頁稿不同已列 F174，prototype 兩頁統一灰底） */
 .rs-search.is-disabled:hover{border-color:var(--g200)}
 .rs-search.is-disabled .material-symbols-outlined{color:var(--g300)}
@@ -677,6 +681,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 /* ==== Empty / states ==== */
 /* A-19（2026-10-15）：空狀態／無權限／錯誤一律走 shared/lumiture-empty.js（FILL 0、#9ED7FF、48／64／80）；A-16：不設 max-width */
 .rs-tbl-empty{padding:48px 24px}
+.rs-fullcard .lt-empty__a{margin-top:16px}   /* X-9r4 11-25 B13：稿 #04 內文到按鈕約 38，原 20 */
    /* X-9r1 11-13 P10：原 .rs-tbl-empty／.rs-fullcard 標題 18 覆寫已刪，shared size l 預設改 18 */   /* RA19（X-9r4 B9）：空狀態直接放在卡片裡，不再包 .rs-tblwrap 的 1px 外框（稿 #03） */
 
 /* No-auth / first-time full card */
@@ -717,6 +722,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .mx:hover{color:var(--g900)}   /* X-9r1 11-13 P1：拿掉 hover 底，只變 icon 色（Guideline:1467／:1662） */
 .mdesc{font-size:14px;color:var(--g700);margin-bottom:16px;line-height:1.7}
 .mb{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-right:6px;min-height:0}
+#dt-body{padding:20px 6px 0 20px;margin:-8px 0 0 -20px}   /* X-9r4 R3：Summary 白卡陰影 0 0 20px 被 .mb 的 overflow 裁掉上緣與左緣，捲動容器四周留 20 出陰影（左用負 margin 抵銷，內容 x 與彈窗總高 720 不變） */
 .mb:focus-visible{outline:2px solid var(--pri);outline-offset:2px;border-radius:4px}   /* RA24：Details 內容區可聚焦，鍵盤才捲得動 */
 .mf{display:flex;justify-content:flex-end;gap:12px;margin-top:24px;align-items:center}   /* 稿：footer 上方無分隔線 */
 .mf .btn{min-width:100px}
@@ -746,9 +752,11 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .dt-calc-box{border:1px solid var(--g200);border-radius:var(--r-md);padding:16px 20px;margin-top:4px}
 .dt-calc-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
 .dt-calc-label{font-size:14px;color:var(--g700)}
-.dt-input{display:inline-flex;align-items:center;border:1px solid var(--tf-border);border-radius:var(--r-sm);height:36px;padding:0 10px;background:#fff;gap:6px}
+.dt-input{display:inline-flex;align-items:center;border:1px solid var(--tf-border);border-radius:var(--r-sm);height:36px;width:120px;padding:0 10px;background:#fff;gap:6px}   /* X-9r4 11-25 B6：稿 #12 框裡只有 720，hours / month 在框外右側 */
+.dt-input.is-disabled,.dt-input:has(input:disabled){background:var(--g100);border-color:var(--g200)}.dt-input input:disabled{color:var(--g400);cursor:not-allowed}   /* B9：稿 #12-2 時數輸入框停用 */
+.dt-calc-row .suffix{font-size:14px;color:var(--g700)}
 .dt-input:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
-.dt-input input{border:none;outline:none;width:64px;font-size:14px;color:var(--g700)}
+.dt-input input{border:none;outline:none;width:100%;height:100%;font-size:14px;color:var(--g700);background:none}
 .dt-input .suffix{font-size:13px;color:var(--g500)}
 .dt-insts-label{font-size:16px;font-weight:700;color:var(--g700);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .dt-insts{display:flex;gap:10px;flex-wrap:nowrap}
@@ -760,7 +768,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .dt-inst .rec-ic{font-size:14px;color:var(--ok);font-variation-settings:'FILL' 1}
 .dt-inst .specs{font-size:11px;color:var(--g500);margin-bottom:6px}
 .dt-inst .pr-mo{font-size:13px;font-weight:700;color:var(--g900)}
-.dt-inst.rec .pr-mo{color:var(--ok-dk)}
+/* X-9r4 11-25 B7：推薦卡月費跟其他卡一樣黑字，推薦靠綠框、淡綠底與 thumb_up 表示（稿 #12／#18；原 #008F88 壓 #E6FFF8 只有 3.79:1） */
 .dt-inst .pr-hr{font-size:11px;color:var(--g500);margin-top:2px}
 .dt-calc-empty{text-align:center;padding:24px 16px;font-size:13px;color:var(--g400);line-height:1.6}
 
@@ -768,6 +776,12 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .dm-opt{display:flex;align-items:flex-start;gap:10px;padding:9px 4px;cursor:pointer;border-radius:var(--r-sm)}
 .dm-opt:hover{background:var(--g50)}
 .dm-opt input{margin-top:5px;accent-color:var(--pri);width:16px;height:16px;flex-shrink:0}
+/* X-9r4 11-25 B11：稿 #05 radio 是 primary 藍框（未選也是），跟同頁 checkbox 同一種臉；選中＝藍框＋實心點 */
+.dm-opt input[type=radio]{appearance:none;-webkit-appearance:none;border:2px solid var(--pri);border-radius:50%;background:#fff;display:inline-grid;place-content:center;margin-top:4px}
+.dm-opt input[type=radio]::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--pri);transform:scale(0)}
+.dm-opt input[type=radio]:checked::before{transform:scale(1)}
+.dm-opt input[type=radio]:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+.mf-left .btn-text{text-decoration:underline}   /* B11：稿 #05 Skip and Dismiss 常態有底線 */
 .dm-opt .o-t{font-size:14px;color:var(--g900);font-weight:500}
 .dm-opt .o-d{font-size:12px;color:var(--g500);line-height:1.4}
 .dm-textarea{width:100%;border:1px solid var(--tf-border);border-radius:var(--r-sm);padding:10px 12px;font-size:14px;color:var(--g700);min-height:96px;resize:vertical;margin-top:8px;outline:none;font-family:inherit}
@@ -786,8 +800,12 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .sc-back:hover .bt{text-decoration:underline}
 .sc-back .material-symbols-outlined{font-size:16px;font-variation-settings:'FILL' 1}   /* X-9r4 11-06 A8：稿 Arrow_Circle/Left 16；X-9r1 11-13 P6：FILL 0→1，全站 icon 預設實心、同 Group List */
 .sc-scopetabs{display:flex;align-items:center;gap:8px}
-.sc-scopetab{height:36px;padding:0 16px;border-radius:var(--r-sm);border:1px solid var(--pri);background:#fff;color:var(--pri);font-size:14px;font-weight:700;display:inline-flex;align-items:center;cursor:pointer}
-.sc-scopetab.active{background:var(--pri);color:#fff}
+#page-scope .sc-scopetabs .sc-scopegroup{display:inline-flex;height:36px;border:1px solid var(--g300);border-radius:6px;overflow:hidden;background:#fff}
+.sc-scopetab{height:34px;padding:0 16px;border:0;border-radius:0;background:#fff;color:var(--g500);font:var(--lt-type-body,400 14px/24.5px 'Noto Sans');display:inline-flex;align-items:center;cursor:pointer}
+.sc-scopetab+.sc-scopetab{border-left:1px solid var(--g300)}
+.sc-scopetab:hover{background:var(--g50)}
+.sc-scopetab.active,.sc-scopetab.active:hover{background:var(--pri-lt20);color:var(--pri-dk)}
+/* X-9r4 11-25 B1：稿 #17 是三格連在一起的 Button Group（同主清單的 Toggle Group）：未選白底灰框字 400 偏灰，選中淡藍；旁邊只有 Add New Scope 一顆鈕的重量 */
 .sc-card{background:#fff;border-radius:var(--r-md);box-shadow:var(--lt-card-shadow,0 0 20px rgba(0,0,0,.10));padding:24px;margin-bottom:16px}
 .sc-card-h{display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .sc-card-t{font-size:16px;font-weight:700;color:var(--g900)}
@@ -800,6 +818,7 @@ table.rstbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;
 .sc-input,.sc-select{width:100%;height:36px;padding:0 12px;border:1px solid var(--tf-border);border-radius:var(--r-sm);font-size:14px;color:var(--g900);background:#fff;outline:none}
 .sc-select{appearance:none;cursor:pointer;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%23676767'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 8px center / 24px 24px}   /* A-11：MUI 實心 ▾ 24px（原 16px 小三角） */
 .sc-select:hover{border-color:var(--g400)}
+.sc-select.is-ph{color:var(--g400)}   /* X-9r4 11-25 B15：稿 #14-1 未選時的「Select Group」是淺灰 placeholder，不是已選的值 */
 .sc-input:focus,.sc-select:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}
 .sc-prov-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .sc-prov{border:1px solid var(--g200);border-radius:var(--r-md);padding:16px}
@@ -844,6 +863,7 @@ body.rs-savebar-on{--lt-toast-bottom:calc(68px + 16px)}   /* X-9r4 11-06 A10：�
 .footer-credit{color:#676767;font-size:12px}
 
 .hide{display:none!important}
+.sr-only{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .curr-flag{font-size:15px}
 
 /* C-2 2026-10-29：現行稿重對，保留 A／B 與 X-9r4 已裁決規格。 */
@@ -854,25 +874,27 @@ body.rs-savebar-on{--lt-toast-bottom:calc(68px + 16px)}   /* X-9r4 11-06 A10：�
 .rs-tblwrap{border:0;border-radius:0}.rs-tblscroll{max-height:590px;scrollbar-gutter:stable}.rs-tblscroll::-webkit-scrollbar{width:15px;height:15px}.rs-tblscroll::-webkit-scrollbar-thumb{border:3px solid #F2F2F2}.rs-tblscroll::-webkit-scrollbar-track{background:#F2F2F2}
 .rs-eot-btn:disabled{color:#B3B3B3;cursor:not-allowed}
 .dt-head{background:#fff;border:0;box-shadow:var(--lt-card-shadow);padding:16px;margin-bottom:20px}
-.dt-target .rs-prov{display:none}.dt-target{font-size:16px}.dt-saving{font-size:20px}.dt-change{font-size:14px;font-weight:700}
+.dt-target .rs-prov{display:none}.dt-target{font-size:16px;font-weight:700;color:var(--g900)}   /* X-9r4 11-25 B4：稿 #12／#18 資源名稱深色粗體（跟第三行同一階），是這張白卡的標題 */.dt-saving{font-size:20px}.dt-change{font-size:14px;font-weight:700}
 .dt-util:not(.is-storage){grid-auto-flow:column;grid-template-rows:repeat(4,auto)}
 .dt-util-item{flex-direction:row;align-items:baseline;gap:8px;min-width:0}.dt-util-item .k{white-space:normal}.dt-util-item .v{flex-shrink:0}.dt-util-count{display:none}
 .dt-toggle{display:block;margin:8px auto;font-size:0}.dt-toggle .material-symbols-outlined{font-size:24px}
 .dt-sec:has(#dt-hours){background:#F6F6F6;padding:16px;border-radius:8px}.dt-calc-box{border:0;background:#F6F6F6;padding:16px;border-radius:8px}.dt-sec:has(#dt-hours) .dt-calc-box{padding:0}.dt-inst .specs,.dt-inst .pr-hr{font-size:12px}.dt-inst .nm,.dt-inst .pr-mo{font-size:14px}
-.dm-opt .o-d,.dm-opt .o-t{font-size:14px;font-weight:400;color:#262626;line-height:24.5px}.dm-opt{padding:8px}.dm-textarea{height:170px}.c2-dm-invalid>span{color:#FF403D}
+.dm-opt .o-d,.dm-opt .o-t{font-size:14px;font-weight:400;color:#262626;line-height:24.5px}.dm-opt{padding:8px}.dm-textarea{height:170px;resize:none;margin-left:34px;width:calc(100% - 34px);background:var(--g100);border-color:var(--g200)}.dm-textarea:not(:disabled){background:#fff;border-color:var(--tf-border)}.dm-textarea::placeholder{color:var(--g400)}.dm-textarea:not(:disabled):focus{border-color:var(--pri)}.dm-textarea:disabled{background:var(--g100)}   /* X-9r4 11-25 B11：輸入框縮排到跟選項文字對齊（radio 16＋gap 10＋內距 8），沒選 Other 時停用灰、提示字淺、不給拉伸把手 */.c2-dm-invalid>span{color:#FF403D}
 .c2-first-card{background:#fff;border-radius:8px;box-shadow:var(--lt-card-shadow);padding:36px 24px;text-align:center;margin-top:32px}.c2-first-card h3{font-size:18px;color:#676767;margin:28px 0 12px}.c2-first-card p{margin-bottom:32px;color:#676767}.c2-preview{height:300px;width:535px;max-width:100%;overflow:hidden;margin:auto;pointer-events:none}.c2-preview>div{width:1070px;transform:scale(.5);transform-origin:top left}.c2-preview .rs-cards{margin-top:16px}.rs-fullcard{min-height:520px}.rs-fullcard .lt-empty__icon{width:80px;height:80px}
 @media(max-width:700px){.rs-cards{grid-template-columns:repeat(2,1fr)}.content{padding:32px 16px}.dt-util,.dt-util:not(.is-storage){grid-auto-flow:row;grid-template-columns:1fr;grid-template-rows:auto}.dt-insts{overflow-x:auto}.c2-preview{height:160px}.c2-preview>div{transform:scale(.26)}.sc-grid2,.sc-grid3,.sc-prov-row{grid-template-columns:1fr}}
 
 .c2-scope-head{margin-top:36px}.c2-scope-head h2{font-size:18px}.sc-card{margin-bottom:20px}.sc-card-t{font-size:18px}.sc-card-h{margin-bottom:16px}.sc-status{font-size:12px;font-weight:400;border-radius:4px;padding:2px 8px;color:#fff}.sc-status.done{background:#00B5A6;color:#fff}.sc-status.todo{background:#FF403D;color:#fff}
-.c2-blue{padding:16px;background:#F2FAFF;border-radius:8px}.sc-label{font-size:14px;font-weight:700;color:#004FB0;margin-bottom:4px}.sc-label b{color:#FF403D}.sc-label.c2-neutral{color:#676767}.sc-prov-row{margin-top:16px;grid-template-columns:repeat(2,minmax(0,1fr))}.sc-prov{border:1px solid #E6E6E6;padding:16px}.sc-prov-h{font-size:16px}.sc-prov .sc-label{font-size:12px}.sc-prov .c2-sc-choice{width:100%}
+.c2-blue{padding:16px;background:#F2FAFF;border-radius:8px}.sc-label{font-size:14px;font-weight:700;color:#004FB0;margin-bottom:4px}.sc-label b{color:#FF403D}.sc-label.c2-neutral{color:#676767}.sc-prov-row{margin-top:16px;grid-template-columns:repeat(2,minmax(0,1fr))}.sc-prov{border:1px solid #E6E6E6;padding:0;border-radius:var(--r-md);overflow:visible}.sc-prov-h{font-size:14px;margin:0;padding:12px 16px;border-bottom:1px solid #E6E6E6}.sc-prov-b{padding:16px}   /* X-9r4 11-25 B19：稿 #14-4 雲名稱 14／700 一列、下面一條分隔線再接 Projects／Accounts */.sc-prov .sc-label{font-size:12px}.sc-prov .c2-sc-choice{width:100%}
 .sc-vmtab{margin:0;padding:0;background:none}.sc-vmtab button.active{background:#D1EEFF;color:#002663;border:1px solid #CCC;box-shadow:none;border-radius:5px 5px 0 0;height:36px;font-size:14px}.c2-vm{border:1px solid #E6E6E6;border-radius:0 8px 8px;padding:16px}.c2-vm h3{font-size:16px;margin-bottom:8px}.c2-vm .sc-rule{margin-bottom:8px}.c2-input{display:inline-flex;position:relative;flex:1;min-width:100px;max-width:none;align-items:center}.c2-input input{height:36px;width:100%;padding:0 32px 0 8px;border:1px solid #CCC;border-radius:5px;min-width:0}.c2-input>span{position:absolute;right:8px;color:#676767;font-size:12px;pointer-events:none}.c2-input input:disabled{background:#F2F2F2;color:#CCC}.c2-input input::placeholder{color:#B3B3B3}.c2-vm .c2-input{flex:0 1 212px}.c2-options-desc{margin:16px 0 8px}.sc-sub-t{font-size:16px;color:#676767}.c2-impact-select{width:360px;max-width:100%;margin-bottom:20px}.sc-grid3{gap:16px}.sc-grid3 .c2-input{display:flex;width:100%}.sc-error{display:block;color:#FF403D;font-size:12px;line-height:20px}.sc-error:empty{display:none}[aria-invalid=true]{border-color:#FF403D!important}.sc-rule:has(.sc-error:not(:empty)){align-items:baseline}
 .c2-switch{display:inline-flex;align-items:center;position:relative;width:30px;flex-shrink:0}.c2-switch input{position:absolute;opacity:0;width:30px;height:20px}.c2-switch span{width:30px;height:16px;border:1px solid #004FB0;border-radius:10px;background:white}.c2-switch span:before{content:'';display:block;width:12px;height:12px;border-radius:50%;border:1px solid #004FB0;margin:1px;background:#fff}.c2-switch input:checked+span{background:#004FB0}.c2-switch input:checked+span:before{transform:translateX(14px)}.c2-switch input:focus-visible+span{outline:2px solid #004FB0;outline-offset:3px}
-.c2-sc-choice{position:relative}.c2-sc-choice>button{text-align:left;padding-right:32px}.c2-sc-menu{position:absolute;top:100%;left:0;right:0;z-index:100;background:white;border:1px solid #CCC;box-shadow:0 2px 8px #0002;padding:8px;border-radius:5px;max-height:280px;overflow:auto;overscroll-behavior:contain}.c2-sc-menu>input{width:100%;height:30px;border:1px solid #CCC;padding:0 8px}.c2-sc-menu label,.c2-sc-menu>button{display:flex;align-items:center;gap:8px;text-align:left;width:100%;padding:8px;font-size:14px}.c2-sc-menu [hidden]{display:none}.c2-sc-menu label:hover,.c2-sc-menu>button:hover{background:#F2FAFF}.c2-sc-menu input[type=checkbox]{accent-color:#004FB0}.sc-scopetab.active{background:#D1EEFF;color:#002663;border-color:#CCC}.savebar{background:#F2FAFF;justify-content:space-between}
+.c2-sc-choice{position:relative}.c2-sc-choice>button{text-align:left;padding-right:32px}.c2-sc-menu{position:absolute;top:100%;left:0;right:0;z-index:100;background:white;border:1px solid #CCC;box-shadow:0 2px 8px #0002;padding:8px;border-radius:5px;max-height:280px;overflow:auto;overscroll-behavior:contain}.c2-sc-menu>input{width:100%;height:36px;border:1px solid var(--tf-border);border-radius:var(--r-sm);padding:0 12px;margin-bottom:4px;font-size:14px;color:var(--g700);outline:none}.c2-sc-menu>input::placeholder{color:var(--g400)}.c2-sc-menu>input:hover{border-color:var(--g400)}.c2-sc-menu>input:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(0,79,176,.1)}   /* X-9r4 11-25 B16：搜尋框與勾選框改全站樣式（lumiture-checkbox.js 藍框），不再是原生細框與灰框 */
+.c2-sc-menu label.checkbox{padding:7px 8px}.c2-sc-menu label,.c2-sc-menu>button{display:flex;align-items:center;gap:8px;text-align:left;width:100%;padding:8px;font-size:14px}.c2-sc-menu [hidden]{display:none}.c2-sc-menu label:hover,.c2-sc-menu>button:hover{background:#F2FAFF}.c2-sc-menu input[type=checkbox]{accent-color:#004FB0}.savebar{background:#F2FAFF;justify-content:space-between}
 #c2-calendar{position:fixed;z-index:2200;width:300px;padding:16px 20px;background:#fff;border-radius:5px;box-shadow:0 0 8px #0003;overscroll-behavior:contain}.c2-calendar-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #CCC;padding-bottom:12px;margin-bottom:12px}.c2-calendar-head button{width:24px;height:24px;color:#676767}.c2-calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}.c2-calendar-grid>*{display:grid;place-items:center;height:32px;font-size:14px}.c2-calendar-grid .selected{background:#004FB0;color:white;border-radius:5px}.c2-calendar-grid .outside{color:#CCC}.c2-calendar-grid button:hover{background:#D1EEFF;color:#262626}.c2-calendar-actions{display:flex;justify-content:flex-end;gap:16px;margin-top:12px}
 @media(max-width:700px){.sc-grid2,.sc-grid3{grid-template-columns:1fr}.sc-head{gap:12px}.c2-vm .sc-rule{align-items:stretch}.c2-vm .c2-input{flex:1 0 120px}.sc-card{padding:16px}.sc-prov-row{grid-template-columns:1fr}}
 
-.c2-calc-empty{grid-column:1/-1;text-align:center;padding:24px}.c2-calc-empty>.material-symbols-outlined{color:#34B5D9;font-size:40px}.c2-calc-empty p{font-size:16px}
+.c2-calc-empty{grid-column:1/-1;text-align:center;padding:24px}.c2-calc-empty p{font-size:16px;font-weight:700;color:var(--g500)}   /* X-9r4 11-25 B8：稿 #12-1 插圖是 #9ED7FF 折線加星（Figma insights 向量 64），提示句粗體灰字 */
 .c2-field{display:inline-flex;flex-direction:column;flex:1;min-width:100px}.c2-field>.c2-input{display:flex;width:100%;flex:auto}.c2-vm .c2-field{flex:0 1 212px}.c2-vm .c2-field .c2-input{flex:0 0 auto}.c2-vm .sc-rule:has(.c2-switch) .c2-field{flex-basis:360px}.sc-rule:has(.sc-error:not(:empty)){align-items:flex-start}.sc-grid3 .c2-field{display:flex;width:100%}
+.c2-iops-l{display:inline-block;width:116px;flex-shrink:0;font-size:16px}   /* X-9r4 11-25 B2：稿 #14-1 兩個標籤同一欄寬（Network IOPS 文字 108），兩個輸入框左緣對齊 */
 .c2-blue.lt-skeleton{background:var(--lt-color-bg-skeleton,#E6E6E6)}
 /* Narrow screens keep all content available; table and tab strips scroll locally. */
 @media(max-width:700px){
@@ -918,12 +940,12 @@ body.rs-savebar-on{--lt-toast-bottom:calc(68px + 16px)}   /* X-9r4 11-06 A10：�
           (<span class="rs-learn" data-rs-tip="According to the status of cloud platform's data, the usage data for the current day may be available only on the next day and may differ from actual usage. Accurate cost information is typically available approximately 48 hours after the usage is generated.">Learn More</span>)
         </div>
         <div class="rs-banner-r">
-          <button class="curr-btn" id="curr-btn" onclick="openCurrPicker(this)">
+          <button class="curr-btn" id="curr-btn" aria-label="Currency" onclick="openCurrPicker(this)">
             <span class="curr-flag" id="curr-flag">🇺🇸</span>
             <span class="curr-code" id="curr-code">USD</span>
-            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16">expand_more</span>
+            <span class="material-symbols-outlined" aria-hidden="true" style="font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 16">expand_more</span>
           </button>
-          <button class="btn btn-p" id="scope-btn" onclick="showPage('scope')"><span class="material-symbols-outlined">settings</span>Scope Settings</button>   <!-- Figma #01：實心 primary；B-15：icon FILL 1 -->
+          <button class="btn btn-p" id="scope-btn" onclick="showPage('scope')"><span class="material-symbols-outlined" aria-hidden="true">settings</span>Scope Settings</button>   <!-- Figma #01：實心 primary；B-15：icon FILL 1 -->
         </div>
       </div>
       <!-- AI Quota: Rightsizing scans 達上限 banner（LT-3140 — Figma #01-6 Alert/Large；無 Contact Sales，PM 確認）-->
@@ -953,7 +975,7 @@ body.rs-savebar-on{--lt-toast-bottom:calc(68px + 16px)}   /* X-9r4 11-06 A10：�
         <div class="tabs" id="rs-tabs" role="tablist" aria-label="Recommendation status"></div>
         <div class="rs-actions-row" id="rs-actions-row">
           <div id="rs-actions"></div>
-          <button class="btn btn-p" id="rs-export" onclick="exportCsv()"><span class="material-symbols-outlined">download</span>Export CSV</button>   <!-- Figma #01：實心 primary；empty／nodata／loading 時 disabled（#03） -->
+          <button class="btn btn-p" id="rs-export" onclick="exportCsv()"><span class="material-symbols-outlined" aria-hidden="true">download</span>Export CSV</button>   <!-- Figma #01：實心 primary；empty／nodata／loading 時 disabled（#03） -->
         </div>
       </div>
 
@@ -965,6 +987,7 @@ body.rs-savebar-on{--lt-toast-bottom:calc(68px + 16px)}   /* X-9r4 11-06 A10：�
         </div>
 
         <div id="rs-tablearea" role="tabpanel"></div>
+        <div id="sr-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>   <!-- X-9r4 11-25 C4：搜尋、篩選、排序、切分頁後的結果播報（同 Group List／Audit Log #sr-status，1 秒內同句不重播） -->
       </div>
       </div><!-- /#rs-normal -->
     </div>
@@ -1711,14 +1734,15 @@ var TABS = [
 ];
 
 // Action buttons per tab (shown when ≥1 selected)
+/* X-9r4 11-25 B10：icon 照稿 #01-3 節點名稱：Review＝Task Alt（圓底打勾）、Dismiss＝time_log（Material 沒有，最接近 pending_actions）、Archive＝inbox；一律 FILL 1 */
 var TAB_ACTIONS = {
-  rec:      [ {label:'Review', icon:'check', act:'done', tip:"The items will be transferred to 'Reviewed'."},
-              {label:'Dismiss', icon:'block', act:'dismiss', tip:"Choose a reason, then move the items to 'Dismiss'."},
-              {label:'Archive', icon:'archive', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
+  rec:      [ {label:'Review', icon:'task_alt', act:'done', tip:"The items will be transferred to 'Reviewed'."},
+              {label:'Dismiss', icon:'pending_actions', act:'dismiss', tip:"Choose a reason, then move the items to 'Dismiss'."},
+              {label:'Archive', icon:'inbox', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
   done:     [ {label:'Undo Review', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
-              {label:'Archive', icon:'archive', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
+              {label:'Archive', icon:'inbox', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
   dismiss:  [ {label:'Undo Dismiss', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
-              {label:'Archive', icon:'archive', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
+              {label:'Archive', icon:'inbox', act:'archive', tip:"The items will be transferred to 'Archived'."} ],
   archived: [ {label:'Undo Archive', icon:'undo', act:'undo', tip:"The items will be restored to 'Recommendations'."},
               {label:'Remove', icon:'delete', act:'remove', tip:'The items will be permanently removed.'} ],   /* X-9r4 11-20 Q1（Kabin 照推薦）：Dismiss／Archived 動作照稿 #08／#09；原本照 FE 是 Undo＋Remove／只有 Remove */
 };
@@ -1813,8 +1837,9 @@ function renderCards(){
   if(loading){
     /* 稿 #01-6：卡片標題照常，只有數字與副標換灰條（A-18） */
     var cardLbls = ['Optimization Score','Recommendations Reviewed','Current Monthly Cost Avoidance','Cost Avoidance to Date'];
-    cards = cardLbls.map(function(l){
-      return '<div class="rs-card"><span class="lbl">'+l+'</span>'
+    cards = cardLbls.map(function(l,i){
+      /* X-9r4 11-25 B12：稿 #02 讀取中 Optimization Score 標題後仍有 info icon */
+      return '<div class="rs-card"><span class="lbl">'+l+(i===0?' <span class="material-symbols-outlined ico-info" data-rs-tip="'+SCORE_TIP+'">info</span>':'')+'</span>'
         +'<span class="lt-skeleton sk-line" style="width:90px;height:30px;margin-top:8px"></span>'
         +'<span class="lt-skeleton sk-line" style="width:140px;height:12px;justify-self:end;align-self:end"></span></div>';
     }).join('');
@@ -1880,7 +1905,7 @@ function renderActions(){
   if(selCount===0 || state.pageState!=='set'){ box.innerHTML=''; return; }
   var acts = TAB_ACTIONS[state.tab] || [];
   box.innerHTML = acts.map(function(a){
-    return '<button class="btn btn-o" data-rs-tip="'+escTip(a.tip)+'" onclick="doAction(\''+a.act+'\')"><span class="material-symbols-outlined">'+a.icon+'</span>'+a.label+'</button>';
+    return '<button class="btn btn-o" data-rs-tip="'+escTip(a.tip)+'" onclick="doAction(\''+a.act+'\')"><span class="material-symbols-outlined" aria-hidden="true">'+a.icon+'</span>'+a.label+'</button>';
   }).join('');
 }
 
@@ -1905,6 +1930,9 @@ var COLS = [
      的文字註記與實際渲染，2026-07 查證過。
 ============================================================ */
 var _visibleRows = [];
+var _annLast = '', _annAt = 0;
+function announce(text){ var el = $('#sr-status'); if(!el) return; var now = Date.now(); if(text===_annLast && now-_annAt<1000) return; _annLast = text; _annAt = now; el.textContent = ''; setTimeout(function(){ el.textContent = text; }, 40); }
+function announceResults(){ var n = _visibleRows.length; announce(state.pageState!=='set' || !n ? 'No data found' : n+' result'+(n===1?'':'s')); }
 function thSort(label, key){
   var on = state.sort.key===key ? ' on' : '';
   var arrow = state.sort.key!==key ? 'arrow_upward' : (state.sort.dir===1 ? 'arrow_upward' : 'arrow_downward');   /* A-12：未選＝灰色單箭頭 */
@@ -1958,7 +1986,7 @@ function onSearchInput(v){
   clearTimeout(_searchTimer);
   _searchTimer = setTimeout(function(){
     state.searchQ = String(v||'').toLowerCase().trim();
-    renderTable();
+    renderTable(); announceResults();
   }, 1000);
 }
 
@@ -2044,14 +2072,14 @@ function closeFilterPops(){
 function toggleFilterOpt(key,v){
   var a = state.filters[key], i = a.indexOf(v);
   if(i>=0) a.splice(i,1); else a.push(v);
-  renderFilters(); renderTable();
+  renderFilters(); renderTable(); announceResults();
   setFilterOpen(key, true);   /* 多選：選完不關 */
   var c = filterChk(key, v); if(c) c.focus({preventScroll:true});   /* 重畫後焦點放回剛勾的選項 */
 }
 function clearFilter(key,e){
   if(e) e.stopPropagation();
   state.filters[key] = [];
-  renderFilters(); renderTable();
+  renderFilters(); renderTable(); announceResults();
   setFilterOpen(key, true);
   var c = filterChk(key); if(c) c.focus({preventScroll:true});   /* Clear 按完自己變 disabled，焦點回第一個選項 */
 }
@@ -2254,7 +2282,7 @@ function markRows(){
   document.querySelectorAll('#rs-tablearea tbody tr').forEach(function(tr){});
   renderTable(); // simplest: re-render to reflect .sel
 }
-function setTab(t){ state.tab=t; state.selection={}; state.sort={key:'recDate',dir:-1}; renderTabs(); renderActions(); renderTable(); }
+function setTab(t){ state.tab=t; state.selection={}; state.sort={key:'recDate',dir:-1}; renderTabs(); renderActions(); renderTable(); announceResults(); }
 /* X-9r4 11-06 A11：End of Tracking 的排序鍵。End of Month／Quarter／Year 相對今天換算成實際日期，手動日期 dd/mm/yyyy 直接解析 */
 function eotNum(v){
   var t = new Date(); var y = t.getFullYear(), m = t.getMonth();
@@ -2267,6 +2295,8 @@ function eotNum(v){
 function setSort(k){
   if(state.sort.key===k) state.sort.dir*=-1; else { state.sort.key=k; state.sort.dir=1; }
   renderTable();
+  var _lb = (document.querySelector('.th-sort[data-sort="'+k+'"]')||{}).textContent || k;
+  announce('Sorted by '+_lb.replace(/arrow_\w+/,'').trim()+', '+(state.sort.dir===1?'ascending':'descending'));
 }
 function doAction(act){
   var ids = Object.keys(state.selection);
@@ -2275,6 +2305,13 @@ function doAction(act){
   if(act==='remove'){ openRemove(); return; }
   actionOk(act, ids.length);
   state.selection={}; renderTable(); renderActions();
+  focusAfterAction();
+}
+/* X-9r4 11-25 C5：動作完成後動作列消失，焦點不要掉到 body；移到表格第一列，沒有列就回目前分頁鈕（同 Customized Budget「刪完焦點到下一列」） */
+function focusAfterAction(){
+  var tr = document.querySelector('#rs-tablearea tbody tr');
+  if(tr){ tr.focus({preventScroll:true}); return; }
+  var t = $('#rs-tab-'+state.tab); if(t) t.focus({preventScroll:true});
 }
 
 /* ============================================================
@@ -2348,20 +2385,23 @@ function usageMetricVal(key, r){
 }
 var _detailRec = null;   // 目前開著的 Details 對應的推薦（計算器重算時要知道是哪一朵雲）
 function buildInstCards(hours, r){
-  if(!(hours>0))return '<div class="c2-calc-empty"><span class="material-symbols-outlined">auto_awesome</span><p>Please enter the hours above to get intelligent rightsizing recommendations from LumiTure.ai</p></div>';
+  if(!(hours>0))return '<div class="c2-calc-empty"><svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path fill="#9ED7FF" d="M8.26608 53.5999C6.62164 53.5999 5.23319 53.0328 4.10075 51.8986C2.96653 50.7661 2.39941 49.3777 2.39941 47.7332C2.39941 46.1332 2.97719 44.767 4.13275 43.6346C5.2883 42.5003 6.66608 41.9332 8.26608 41.9332H9.03408C9.27764 41.9332 9.51052 41.9777 9.73275 42.0666L20.9994 30.8666C20.9105 30.5999 20.8661 30.3439 20.8661 30.0986V29.3332C20.8661 27.7332 21.4332 26.3661 22.5674 25.2319C23.6999 24.0995 25.0661 23.5332 26.6661 23.5332C28.2661 23.5332 29.6332 24.0995 30.7674 25.2319C31.8999 26.3661 32.4661 27.7332 32.4661 29.3332C32.4661 29.511 32.4216 29.9999 32.3327 30.7999L38.5327 36.9999C38.7994 36.911 39.0439 36.8666 39.2661 36.8666H40.7674C41.011 36.8666 41.2439 36.911 41.4661 36.9999L50.0661 28.3999C49.9772 28.1777 49.9327 27.9439 49.9327 27.6986V26.9332C49.9327 25.3332 50.4999 23.9555 51.6341 22.7999C52.7665 21.6443 54.1327 21.0666 55.7327 21.0666C57.3772 21.0666 58.7665 21.6328 59.9007 22.7652C61.0332 23.8995 61.5994 25.2888 61.5994 26.9332C61.5994 28.5332 61.0216 29.8995 59.8661 31.0319C58.7105 32.1661 57.3327 32.7332 55.7327 32.7332H54.9674C54.7221 32.7332 54.4883 32.6888 54.2661 32.5999L45.6661 41.1999C45.755 41.4221 45.7994 41.655 45.7994 41.8986V42.6666C45.7994 44.2666 45.2332 45.6337 44.1007 46.7679C42.9665 47.9003 41.5994 48.4666 39.9994 48.4666C38.3994 48.4666 37.0332 47.9003 35.9007 46.7679C34.7665 45.6337 34.1994 44.2666 34.1994 42.6666V41.8986C34.1994 41.655 34.2439 41.3999 34.3327 41.1332L28.1994 34.9999C27.9327 35.0888 27.6776 35.1332 27.4341 35.1332H26.6661C26.4883 35.1332 25.9994 35.0888 25.1994 34.9999L13.9327 46.2666C14.0216 46.5332 14.0661 46.7777 14.0661 46.9999V47.7332C14.0661 49.3332 13.4999 50.711 12.3674 51.8666C11.2332 53.0221 9.86608 53.5999 8.26608 53.5999ZM10.6661 26.9999L8.86608 23.1332L4.99941 21.3332L8.86608 19.5332L10.6661 15.6666L12.4661 19.5332L16.3327 21.3332L12.4661 23.1332L10.6661 26.9999ZM39.9994 24.5999L37.2661 18.7332L31.3994 15.9999L37.2661 13.2666L39.9994 7.3999L42.7327 13.2666L48.5994 15.9999L42.7327 18.7332L39.9994 24.5999Z"/></svg><p>Please enter the hours above to get intelligent rightsizing recommendations from LumiTure.ai</p></div>';
   r = r || _detailRec;
   var list = (r && INSTANCES_BY_PROV[r.prov]) || INSTANCES_GCP;
   // 推薦卡 = 摘要句「to <機型>」那一張；清單裡沒有那個機型才退回該雲的預設推薦
   var hasTo = !!(r && list.some(function(it){ return it.name === r.to; }));
-  return list.map(function(it){
-    var isRec = hasTo ? it.name === r.to : it.rec;
+  /* B3（X-9r4 11-25）：稿 #12 註記「由左至右排序為最推薦至最不推薦」，推薦卡抽到最左（用排序，不改 mock 機型）；其餘維持原序 */
+  var items = list.map(function(it){ return {it:it, isRec: hasTo ? it.name === r.to : it.rec}; });
+  items.sort(function(a,b){ return (b.isRec?1:0)-(a.isRec?1:0); });
+  return items.map(function(x){
+    var it = x.it, isRec = x.isRec;
     var mo = it.base * (hours/720);
     var hr = mo / (hours||720);
     return '<div class="dt-inst'+(isRec?' rec':'')+'">'
       + '<div class="nm">'+(isRec?'<span class="material-symbols-outlined rec-ic">thumb_up</span>':'')+it.name+'</div>'
       + '<div class="specs">'+it.vcpu+' vCPUs, '+it.ram+'GB RAM</div>'
-      + '<div class="pr-mo" data-usd="'+mo+'">'+state.currency+' '+money(cvt(mo))+' / mo</div>'
-      + '<div class="pr-hr" data-usd="'+hr+'">'+state.currency+' '+money(cvt(hr),3)+' / hr</div>'
+      + '<div class="pr-mo" data-usd="'+mo+'">'+state.currency+' '+money(cvt(mo))+' / month</div>'
+      + '<div class="pr-hr" data-usd="'+hr+'">'+curSym()+money(cvt(hr),3)+' / hr</div>'
       + '</div>';
   }).join('');
 }
@@ -2438,7 +2478,7 @@ function buildStorageCostCards(r){
     return '<div class="dt-inst'+(c.rec?' rec':'')+'">'
       + '<div class="nm">'+(c.rec?'<span class="material-symbols-outlined rec-ic">thumb_up</span>':'')+c.name+'</div>'
       + '<div class="specs">'+c.line2+'</div>'
-      + '<div class="pr-mo" data-usd="'+c.mo+'">'+state.currency+' '+money(cvt(c.mo))+' / mo</div>'
+      + '<div class="pr-mo" data-usd="'+c.mo+'">'+state.currency+' '+money(cvt(c.mo))+' / month</div>'
       + '<div class="pr-hr">'+c.unit+'</div>'
       + '</div>';
   }).join('');
@@ -2528,15 +2568,26 @@ function renderDetail(r){
       +'<div class="dt-analysis'+(_detailExpanded?'':' clamp')+'" id="dt-analysis">'+ANALYSIS+'</div>'
       +'<button class="dt-toggle" aria-label="Toggle detailed analysis" data-rs-tip="Show All" onclick="toggleAnalysis()">'+(_detailExpanded?'Show Less <span class="material-symbols-outlined">expand_less</span>':'Show All <span class="material-symbols-outlined">expand_more</span>')+'</button>'
     +'</div>'
-    +'<div class="dt-sec"><h3 class="dt-sec-t lg">Cost Calculator <span class="material-symbols-outlined ico-info" data-rs-tip="AI Notice: All figures are estimates generated at the time of viewing and are for reference only.">info</span></h3>'
+    +'<div class="dt-sec"><h3 class="dt-sec-t">Cost Calculator</h3>'
       +'<div class="dt-calc-box">'
         +'<div class="dt-calc-row"><span class="dt-calc-label">Enter monthly usage to compare instance costs:</span>'
-          +'<span class="dt-input"><input id="dt-hours" type="number" style="align-self:stretch" value="720" aria-label="Hours per month" oninput="recalcInsts()"><span class="suffix">hours / month</span></span></div>'
-        +'<div class="dt-insts-label"><span class="material-symbols-outlined" style="font-size:16px">auto_awesome</span>Recommended Instance Costs</div>'
+          +'<span class="dt-input"><input id="dt-hours" type="number" value="720" aria-label="Hours per month" oninput="recalcInsts()"></span><span class="suffix">hours / month</span></div>'
+        +'<div class="dt-insts-label">Recommended Instance Costs <span class="material-symbols-outlined ico-info" data-rs-tip="AI Notice: All figures are estimates generated at the time of viewing and are for reference only.">info</span></div>'
         +'<div class="dt-insts" id="dt-insts">'+buildInstCards(hours, r)+'</div>'
       +'</div>'
     +'</div>';
   bindTips();
+}
+/* X-9r4 11-25 B9：稿 #12-2「固定的讀取畫面」：Summary 四條（短長長短）、Usage Analysis 一列五條、Detailed Analysis 一塊（沒有展開箭頭）、
+   時數輸入框停用、下面五張灰卡（內容全空）；標題與說明文字照常。靜態不閃（A-18）。 */
+function detailSkeleton(){
+  var bar=function(w,h,m){return '<span class="lt-skeleton" style="display:block;width:'+w+';height:'+(h||14)+'px;'+(m||'')+'"></span>';};
+  var cards='';for(var i=0;i<5;i++)cards+='<div class="lt-skeleton" style="flex:1;min-width:100px;height:105px;border-radius:8px"></div>';
+  return '<div class="dt-head" aria-hidden="true">'+bar('200px','14','margin:0 auto 12px')+bar('400px','18','margin:0 auto 8px')+bar('400px','14','margin:0 auto 8px')+bar('140px','12','margin:0 auto')+'</div>'
+   +'<div class="dt-sec"><h3 class="dt-sec-t lg">Usage Analysis</h3><div style="display:flex;gap:8px" aria-hidden="true">'+bar('20%','14')+bar('20%','14')+bar('20%','14')+bar('20%','14')+bar('20%','14')+'</div></div>'
+   +'<div class="dt-sec"><h3 class="dt-sec-t">Detailed Analysis</h3><div class="lt-skeleton" style="height:76px;border-radius:4px" aria-hidden="true"></div></div>'
+   +'<div class="dt-sec"><h3 class="dt-sec-t">Cost Calculator</h3><div class="dt-calc-box"><div class="dt-calc-row"><span class="dt-calc-label">Enter monthly usage to compare instance costs:</span><span class="dt-input is-disabled"><input id="dt-hours" type="number" value="720" disabled aria-label="Hours per month"></span><span class="suffix">hours / month</span></div>'
+   +'<div class="dt-insts-label">Recommended Instance Costs <span class="material-symbols-outlined ico-info" data-rs-tip="AI Notice: All figures are estimates generated at the time of viewing and are for reference only.">info</span></div><div class="dt-insts" aria-hidden="true">'+cards+'</div></div></div>';
 }
 function toggleAnalysis(){
   _detailExpanded = !_detailExpanded;
@@ -2698,6 +2749,7 @@ function setPageState(s){ state.pageState=s; renderListPage(); }
 function applyLoadingChrome(){
   var loading = state.pageState==='loading';
   var cb = $('#curr-btn'); if(cb) cb.disabled = loading;
+  var sc = $('#scope-btn'); if(sc) sc.disabled = loading;   /* X-9r4 11-25 B12：稿 #02「讀取中不能操作的按鈕或元件呈現 Disabled」，Scope Settings 也是停用灰（Rate Optimization 的 Data Sources 稿 #11 另有定義可點，不動）；離開讀取中回復 */
   var sb = $('.rs-search'); if(sb) sb.classList.toggle('is-disabled', loading);
   var si = $('#rs-search-input'); if(si) si.disabled = loading;
   var uw = $('#updwrap'); if(uw) uw.classList.toggle('is-loading', loading);
@@ -2738,7 +2790,7 @@ function renderListPage(){
 function authState(){
   var admin = state.role==='admin';
   var sub = admin
-    ? "Begin your cloud cost optimization journey by authorizing both your billing and usage data. You'll be able to identify underutilized instances, compare estimated vs. actual savings, and take action to maximize efficiency while reducing unnecessary cloud spend. Please click the button below to proceed with the authorization."
+    ? "Begin your cloud cost optimization journey by authorizing both your billing and usage data.\nYou'll be able to identify underutilized instances, compare estimated vs. actual savings,\nand take action to maximize efficiency while reducing unnecessary cloud spend.\nPlease click the button below to proceed with the authorization."   /* X-9r4 11-25 B13：稿 #04 在每句後換行（四行置中） */
     : "To kickstart your cloud cost optimization journey, please reach out to your organization's administrator for authorization.";
   var cta = admin ? '<div class="lt-empty__a"><a class="btn btn-p" href="./organization-settings.html" style="text-decoration:none"><span class="material-symbols-outlined">add</span>Add Your Authorization</a></div>' : '';
   /* A-19：版型走共用 LumitureEmpty（page 版：64px FILL 0 #9ED7FF）；CTA 帶 icon 所以自己接在後面 */
@@ -5388,25 +5440,32 @@ scResources.gcp.push('unassigned-project');
 function scAvailable(k){return [...new Set(scScopes[scIndex].groups.flatMap(g=>scGroupResources[g]?.[k]||[]))]}
 function scOptions(k){return k==='groups'?scGroupOptions:scResources[k]?scAvailable(k):k==='eot'?['End of Month','End of Quarter','End of Year','Customized']:['Amount','Percentage (%)']}
 
+/* X-9r4 11-25 B17：稿 #14-1／#14-2 標題後沒有 info icon，「Define up to 3…」這句掛在 Add New Scope 的 hover；停用時（已滿 3 個、未完成）換成稿 #17 的兩句停用說明。
+   tooltip 掛在外面那層 span（停用的 button 收不到滑鼠事件）；C2-03 何時停用照推薦不動 */
+function scAddTip(v){
+  if(scScopes.length>=3) return "You've added all available scopes.";
+  if(scDirty()||!v.groups.length) return 'Please complete the settings for Scope '+(scIndex+1)+' before adding a new one.';
+  return 'Define up to 3 separate, non-overlapping scopes for your Rightsizing recommendations.';
+}
 function scDirty(){return JSON.stringify(scScopes)!==JSON.stringify(scSaved)}
 function scInfo(text){return '<span class="material-symbols-outlined ico-info" data-rs-tip="'+esc(text)+'">info</span>'}
 function scNum(k,label,suffix='',placeholder=''){let v=scScopes[scIndex][k];return '<span class="c2-field"><span class="c2-input"><input id="sc-'+k+'" inputmode="decimal" aria-label="'+label+'" data-sc-key="'+k+'" value="'+esc(v)+'" placeholder="'+placeholder+'" oninput="scInput(this)"><span>'+suffix+'</span></span><span class="sc-error" id="sc-error-'+k+'" role="alert"></span></span>'}
-function scChoice(k,label){return '<div class="c2-sc-choice"><button class="sc-select" type="button" id="sc-'+k+'" aria-haspopup="listbox" aria-expanded="false" onclick="scOpenMenu(\''+k+'\',this)">'+esc(label)+'</button></div><span class="sc-error" id="sc-error-'+k+'" role="alert"></span></span>'}
+function scChoice(k,label){return '<div class="c2-sc-choice"><button class="sc-select'+(/^Select /.test(label)?' is-ph':'')+'" type="button" id="sc-'+k+'" aria-haspopup="listbox" aria-expanded="false" onclick="scOpenMenu(\''+k+'\',this)">'+esc(label)+'</button></div><span class="sc-error" id="sc-error-'+k+'" role="alert"></span></span>'}
 function scSummary(k,empty){let v=scScopes[scIndex][k];return v.length?v.length+' of '+(k==='groups'?scGroupOptions.length:scAvailable(k).length)+' Selected':empty}
 function scStatus(id){return '<span class="sc-status" id="sc-status-'+id+'">Completed</span>'}
 function scRender(){
  clearTimeout(scTimer);
  const v=scScopes[scIndex];scCloseMenu();
- $('#page-scope').innerHTML=`<button class="sc-back" onclick="scNavigate('list')"><span class="material-symbols-outlined" aria-hidden="true">arrow_circle_left</span><span class="bt">Rightsizing</span></button><h1 class="pg-title" tabindex="-1">Scope Settings ${scInfo('Define up to 3 separate, non-overlapping scopes for your Rightsizing recommendations.')}</h1>
- <div class="sc-head c2-scope-head"><h2>Scope ${scIndex+1}</h2><div class="sc-scopetabs">${true?scScopes.map((_,i)=>`<button class="sc-scopetab ${i===scIndex?'active':''}" onclick="scNavigate(${i})">Scope ${i+1}</button>`).join(''):''}<span data-rs-tip="${scScopes.length>=3?"You've added all available scopes.":scDirty()?'Please complete the settings for Scope '+(scIndex+1)+' before adding a new one.':''}"><button class="btn btn-p" onclick="scAdd()" ${scScopes.length>=3||scDirty()||!v.groups.length?'disabled':''}><span class="material-symbols-outlined">add</span>Add New Scope</button></span></div></div>
- <section class="sc-card" id="sc-card-resources"><div class="sc-card-h"><h2 class="sc-card-t">Rightsizing Scope</h2>${scStatus('resources')}</div><p class="sc-card-d">First, select the groups for your rightsizing analysis. We will then list all authorized resources for your selected groups.<br>Note that a resource can only belong to one scope at a time to prevent logical conflicts.</p><div class="c2-blue"><label class="sc-label">Groups</label>${scChoice('groups',scSummary('groups','Select Group'))}</div>${v.groups.length?'<div class="sc-prov-row">'+['gcp','aws','azure'].filter(k=>scAvailable(k).length).map(k=>'<div class="sc-prov"><h3 class="sc-prov-h">'+provBadge(k)+(k==='gcp'?'Google Cloud':k==='aws'?'AWS':'Azure')+'</h3><label class="sc-label">'+(k==='gcp'?'Projects':'Accounts')+'</label>'+scChoice(k,scSummary(k,k==='gcp'?'Select Projects':'Select Accounts'))+'</div>').join('')+'</div>':''}</section>
- <section class="sc-card" id="sc-card-criteria"><div class="sc-card-h"><h2 class="sc-card-t">Criteria Settings</h2>${scStatus('criteria')}</div><p class="sc-card-d">Rightsizing recommendations are based on the following criteria:</p><div class="sc-vmtab"><button class="active">Virtual Machine</button></div><div class="c2-vm"><h3>Virtual Machine</h3><div class="sc-rule">Detect the following rules during past ${scNum('days','Detection period in days')} day(s).</div><div class="c2-blue">${[['cpu','CPU'],['memory','Memory']].map(([k,n])=>`<label class="sc-label c2-neutral">${n} Utilization <b>*</b></label><div class="sc-rule">When the ${n==='CPU'?'CPU':'memory'} usage rate is under ${scNum(k,n+' average utilization','%')}, or the peak is under ${scNum(k+'Peak',n+' peak utilization','%')}</div>`).join('')}</div><p class="sc-card-d c2-options-desc">Recommendations will be triggered by any criteria you enable below. Note that empty fields will not be used.</p>${[['network','Network'],['disk','Disk']].map(([k,n])=>`<div class="sc-rule"><label class="c2-switch"><input type="checkbox" role="switch" aria-label="Enable ${n} IOPS" ${v[k+'On']?'checked':''} onchange="scScopes[scIndex]['${k}On']=this.checked;scRender()"><span></span></label><strong>${n} IOPS</strong>${scNum(k,n+' IOPS','','Please enter a whole number greater than 0')}</div>`).join('')}</div></section>
+ $('#page-scope').innerHTML=`<button class="sc-back" onclick="scNavigate('list')"><span class="material-symbols-outlined" aria-hidden="true">arrow_circle_left</span><span class="bt">Rightsizing</span></button><h1 class="pg-title" tabindex="-1">Scope Settings</h1>
+ <div class="sc-head c2-scope-head"><h2>Scope ${scIndex+1}</h2><div class="sc-scopetabs"><div class="sc-scopegroup" role="group" aria-label="Scopes">${scScopes.map((_,i)=>`<button class="sc-scopetab ${i===scIndex?'active':''}" aria-pressed="${i===scIndex}" onclick="scNavigate(${i})">Scope ${i+1}</button>`).join('')}</div><span id="sc-add-tip" data-rs-tip="${esc(scAddTip(v))}"><button class="btn btn-p" onclick="scAdd()" ${scScopes.length>=3||scDirty()||!v.groups.length?'disabled':''}><span class="material-symbols-outlined" aria-hidden="true">add</span>Add New Scope</button></span></div></div>
+ <section class="sc-card" id="sc-card-resources"><div class="sc-card-h"><h2 class="sc-card-t">Rightsizing Scope</h2>${scStatus('resources')}</div><p class="sc-card-d">First, select the groups for your rightsizing analysis. We will then list all authorized resources for your selected groups.<br>Note that a resource can only belong to one scope at a time to prevent logical conflicts.</p><div class="c2-blue"><label class="sc-label">Groups</label>${scChoice('groups',scSummary('groups','Select Group'))}</div>${v.groups.length?'<div class="sc-prov-row">'+['gcp','aws','azure'].filter(k=>scAvailable(k).length).map(k=>'<div class="sc-prov"><h3 class="sc-prov-h">'+provBadge(k)+(k==='gcp'?'Google Cloud':k==='aws'?'AWS':'Azure')+'</h3><div class="sc-prov-b"><label class="sc-label">'+(k==='gcp'?'Projects':'Accounts')+'</label>'+scChoice(k,scSummary(k,k==='gcp'?'Select Projects':'Select Accounts'))+'</div></div>').join('')+'</div>':''}</section>
+ <section class="sc-card" id="sc-card-criteria"><div class="sc-card-h"><h2 class="sc-card-t">Criteria Settings</h2>${scStatus('criteria')}</div><p class="sc-card-d">Rightsizing recommendations are based on the following criteria:</p><div class="sc-vmtab"><button class="active">Virtual Machine</button></div><div class="c2-vm"><h3>Virtual Machine</h3><div class="sc-rule">Detect the following rules during past ${scNum('days','Detection period in days')} day(s).</div><div class="c2-blue">${[['cpu','CPU'],['memory','Memory']].map(([k,n])=>`<label class="sc-label c2-neutral">${n} Utilization <b>*</b></label><div class="sc-rule">When the ${n==='CPU'?'CPU':'memory'} usage rate is under ${scNum(k,n+' average utilization','%')}, or the peak is under ${scNum(k+'Peak',n+' peak utilization','%')}</div>`).join('')}</div><p class="sc-card-d c2-options-desc">Recommendations will be triggered by any criteria you enable below. Note that empty fields will not be used.</p>${[['network','Network'],['disk','Disk']].map(([k,n])=>`<div class="sc-rule"><label class="c2-switch"><input type="checkbox" role="switch" aria-label="Enable ${n} IOPS" ${v[k+'On']?'checked':''} onchange="scScopes[scIndex]['${k}On']=this.checked;scRender()"><span></span></label><strong class="c2-iops-l">${n} IOPS</strong>${scNum(k,n+' IOPS','','Please enter a whole number greater than 0')}</div>`).join('')}</div></section>
  <section class="sc-card" id="sc-card-advanced"><div class="sc-card-h"><h2 class="sc-card-t">Advanced Settings</h2>${scStatus('advanced')}</div><h3 class="sc-sub-t">Tracking Configuration</h3><div class="sc-grid2"><div><label class="sc-label">Dismissal Period <b>*</b> ${scInfo('This option allows you to set your default dismissal period in days. After you dismiss a recommendation, it will be hidden for this amount of time.')}</label><div class="sc-rule">${scNum('dismissal','Dismissal period in days')} day(s)</div></div><div><label class="sc-label">End of Tracking <b>*</b> ${scInfo('All existing recommendations are automatically updated by your new settings, except for manually-set End of tracking dates.')}</label>${scChoice('eot',v.eot)}${v.eot==='Customized'?'<div class="sc-rule">Ends on <button class="btn btn-b" onclick="c2OpenCalendar(this,null,true)">'+(v.date||'Select Date')+'</button></div><span class="sc-error" id="sc-error-date"></span>':''}</div></div><h3 class="sc-sub-t">Impact Settings</h3><p class="sc-card-d">Define the criteria for recommendation impact. If the Impact Type is selected as "Amount," the currency will be automatically set to <b>USD</b>.</p><div class="c2-blue"><div class="c2-impact-select"><label class="sc-label">Impact Criteria Type</label>${scChoice('impact',v.impact)}</div><div class="sc-grid3">${[['high','High','Above the medium threshold, e.g., 30.'],['medium','Medium','Between the high and Low thresholds, e.g., 15.'],['low','Low','Below the medium threshold, e.g., 5.']].map(([k,n,t])=>`<div><label class="sc-label">${n} Threshold <b>*</b> ${scInfo(t)}</label>${scNum(k,n+' threshold',v.impact==='Amount'?'USD':'%')}</div>`).join('')}</div></div></section>`;
  $('#savebar').innerHTML='<button class="btn btn-b" onclick="scReset()"><span class="btn-text">Reset</span></button><div class="savebar-r"><button class="btn btn-o" onclick="scDiscard()">Discard Changes</button><button class="btn btn-p" onclick="scSave()">Save</button></div>';
  for(const k of ['network','disk'])$('#sc-'+k).disabled=!v[k+'On'];scValidate(false);bindTips();
 }
 function scInput(el){let k=el.dataset.scKey,decimal=['high','medium','low'].includes(k)&&scScopes[scIndex].impact==='Amount';el.value=decimal?el.value.replace(/[^0-9.]/g,'').replace(/(\..*)\./g,'$1'):el.value.replace(/\D/g,'');scScopes[scIndex][k]=el.value;clearTimeout(scTimer);scTimer=setTimeout(()=>scValidate(true),1000);}
-function scValidate(show){let add=document.querySelector('.c2-scope-head .btn');if(add)add.disabled=scDirty()||scScopes.length>=3||!scScopes[scIndex].groups.length;const v=scScopes[scIndex],errors={};const range=(k,min,max,required=true)=>{if(v[k]===''&&!required)return;if(v[k]===''||!Number.isFinite(+v[k])||+v[k]<min||+v[k]>max)errors[k]=`Please enter a number from ${min} to ${max}.`;};
+function scValidate(show){let add=document.querySelector('.c2-scope-head .btn');if(add)add.disabled=scDirty()||scScopes.length>=3||!scScopes[scIndex].groups.length;let atip=$('#sc-add-tip');if(atip)atip.setAttribute('data-rs-tip',scAddTip(scScopes[scIndex]));const v=scScopes[scIndex],errors={};const range=(k,min,max,required=true)=>{if(v[k]===''&&!required)return;if(v[k]===''||!Number.isFinite(+v[k])||+v[k]<min||+v[k]>max)errors[k]=`Please enter a number from ${min} to ${max}.`;};
  if(!v.groups.length)errors.groups='Please select at least one group.';else if(v.groups.every(g=>g==='Empty Group')||!v.gcp.length&&!v.aws.length)errors.groups='The selected group has no resources. Please choose other groups that contain resources to proceed.';
  for(const c of ['gcp','aws','azure'])if(v[c].some(x=>scScopes.some((s,i)=>i!==scIndex&&s[c].includes(x))))errors[c]='This resource is already assigned to another scope.';
  range('days',1,30);for(const k of ['cpu','memory']){range(k,1,100,false);range(k+'Peak',1,100,false);if(v[k]===''&&v[k+'Peak']==='')errors[k]='Please enter a number from 1 to 100.';}
@@ -5418,7 +5477,7 @@ function scValidate(show){let add=document.querySelector('.c2-scope-head .btn');
  for(const [part,keys] of Object.entries({resources:['groups','gcp','aws','azure'],criteria:['days','cpu','cpuPeak','memory','memoryPeak','network','disk'],advanced:['dismissal','date','high','medium','low']})){let incomplete=keys.some(k=>errors[k])||(part==='criteria'&&(['cpu','cpuPeak','memory','memoryPeak'].some(k=>v[k]==='')||['network','disk'].some(k=>v[k+'On']&&v[k]==='')));let chip=$('#sc-status-'+part);if(chip){chip.textContent=incomplete?'Incomplete':'Completed';chip.className='sc-status '+(incomplete?'todo':'done')}}return errors;
 }
 function scCloseMenu(){document.querySelectorAll('.c2-sc-menu').forEach(e=>e.remove());document.querySelectorAll('.c2-sc-choice button').forEach(e=>e.setAttribute('aria-expanded','false'))}
-function scOpenMenu(k,trigger){const open=trigger.getAttribute('aria-expanded')==='true';scCloseMenu();if(open)return;trigger.setAttribute('aria-expanded','true');let multi=Array.isArray(scScopes[scIndex][k]);let options=scOptions(k);let menu=document.createElement('div');menu.className='c2-sc-menu';menu.setAttribute('role',multi?'group':'listbox');menu.setAttribute('aria-label',k+' options');menu.innerHTML=(multi?'<input aria-label="Search '+k+'" placeholder="Search…" oninput="this.parentElement.querySelectorAll(\'label\').forEach(e=>e.hidden=!e.textContent.toLowerCase().includes(this.value.toLowerCase()))">':'')+options.map((x,i)=>{let used=multi&&scScopes.some((s,j)=>j!==scIndex&&s[k]?.includes(x));return multi?'<label><input type="checkbox" '+(scScopes[scIndex][k].includes(x)?'checked':'')+' '+(used?'disabled':'')+' onchange="scChoose(\''+k+'\','+i+',this.checked)">'+esc(x)+(used?' (Already assigned)':'')+'</label>':'<button role="option" aria-selected="'+(scScopes[scIndex][k]===x)+'" onclick="scChoose(\''+k+'\','+i+')">'+x+'</button>'}).join('');trigger.parentElement.appendChild(menu);menu.querySelector('input,button')?.focus({preventScroll:true})}
+function scOpenMenu(k,trigger){const open=trigger.getAttribute('aria-expanded')==='true';scCloseMenu();if(open)return;trigger.setAttribute('aria-expanded','true');let multi=Array.isArray(scScopes[scIndex][k]);let options=scOptions(k);let menu=document.createElement('div');menu.className='c2-sc-menu';menu.setAttribute('role',multi?'group':'listbox');menu.setAttribute('aria-label',k+' options');menu.innerHTML=(multi?'<input aria-label="Search '+k+'" placeholder="Search…" oninput="this.parentElement.querySelectorAll(\'label\').forEach(e=>e.hidden=!e.textContent.toLowerCase().includes(this.value.toLowerCase()))">':'')+options.map((x,i)=>{let used=multi&&scScopes.some((s,j)=>j!==scIndex&&s[k]?.includes(x));return multi?LumiCheckbox.html({stateful:true,checked:scScopes[scIndex][k].includes(x),disabled:used,label:x+(used?' (Already assigned)':''),onchange:'scChoose(\''+k+'\','+i+',this.checked)'}):'<button role="option" aria-selected="'+(scScopes[scIndex][k]===x)+'" onclick="scChoose(\''+k+'\','+i+')">'+x+'</button>'}).join('');trigger.parentElement.appendChild(menu);menu.querySelector('input,button')?.focus({preventScroll:true})}
 function scChoose(k,i,on){let v=scScopes[scIndex],options=scOptions(k),value=options[i],multi=Array.isArray(v[k]);if(multi){if(on&&scScopes.some((s,j)=>j!==scIndex&&s[k]?.includes(value)))return;v[k]=on?[...new Set([...v[k],value])]:v[k].filter(x=>x!==value);if(k==='groups'){for(const c of ['gcp','aws'])v[c]=v.groups.some(x=>x!=='Empty Group')?scAvailable(c).filter(x=>!scScopes.some((s,i)=>i!==scIndex&&s[c].includes(x))):[];}}else {if(k==='impact'&&v[k]!==value)for(const t of ['high','medium','low'])v[t]='';v[k]=value;}scRender();if(multi)scOpenMenu(k,$('#sc-'+k));}
 function scRowResource(r){let resources=scResources[r.prov]||[];let index=allRows().filter(x=>x.prov===r.prov).findIndex(x=>x.recId===r.recId);return resources[index%resources.length]}
 function scSave(){let err=scValidate(true);if(Object.keys(err).length){let el=$('#sc-'+Object.keys(err)[0]);el?.scrollIntoView({block:'center'});el?.focus({preventScroll:true});return false}for(const k of ['high','medium','low'])scScopes[scIndex][k]=String(+scScopes[scIndex][k]);scSaved=scCopy(scScopes);for(const r of allRows())if(!r.eotManual&&(scScopes[scIndex][r.prov]||[]).includes(scRowResource(r)))r.eot=scScopes[scIndex].eot==='Customized'?scScopes[scIndex].date.split('-').reverse().join('/'):scScopes[scIndex].eot;scRender();toast('Scope '+(scIndex+1)+' updated successfully.');return true}
@@ -5432,7 +5491,13 @@ var c2ShowPage=showPage;showPage=function(p,force){if(!force&&state.page==='scop
 // Shared visual calendar for per-row End of Tracking and scope custom dates.
 var c2Calendar=null,c2CalendarReturn=null;
 function c2OpenCalendar(trigger,recId,scope){c2CloseCalendar();c2CalendarReturn=trigger;let value=scope?scScopes[scIndex].date:'';if(recId){let r=findRec(recId),m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(r.eot);if(m)value=m[3]+'-'+m[2]+'-'+m[1]};let d=value?new Date(value+'T00:00:00'):new Date(2026,7,25);c2Calendar={recId,scope,date:value,month:new Date(d.getFullYear(),d.getMonth(),1)};let pop=document.createElement('div');pop.id='c2-calendar';pop.setAttribute('role','dialog');pop.setAttribute('aria-label','End of Tracking');document.body.appendChild(pop);let r=trigger.getBoundingClientRect();pop.style.left=Math.max(8,Math.min(innerWidth-308,r.left))+'px';pop.style.top=Math.max(8,Math.min(innerHeight-370,r.bottom+4))+'px';c2RenderCalendar();pop.querySelector('button').focus({preventScroll:true})}
-function c2RenderCalendar(){const p=$('#c2-calendar'),v=c2Calendar;if(!p||!v)return;let start=new Date(v.month);start.setDate(1-start.getDay());let days='';for(let i=0;i<42;i++){let d=new Date(start);d.setDate(d.getDate()+i);let iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');days+='<button class="'+(iso===v.date?'selected ':'')+(d.getMonth()!==v.month.getMonth()?'outside':'')+'" aria-label="'+iso+'" aria-pressed="'+(iso===v.date)+'" onclick="c2Calendar.date=\''+iso+'\';c2RenderCalendar()">'+d.getDate()+'</button>';}p.innerHTML='<div class="c2-calendar-head"><button aria-label="Previous year" onclick="c2MoveCalendar(-12)">«</button><button aria-label="Previous month" onclick="c2MoveCalendar(-1)">‹</button><strong>'+v.month.toLocaleDateString('en-GB',{month:'short',year:'numeric'})+'</strong><button aria-label="Next month" onclick="c2MoveCalendar(1)">›</button><button aria-label="Next year" onclick="c2MoveCalendar(12)">»</button></div><div class="c2-calendar-grid">'+['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>'<span>'+d+'</span>').join('')+days+'</div><div class="c2-calendar-actions"><button class="btn btn-o btn-sm" onclick="c2CloseCalendar()">Cancel</button><button class="btn btn-p btn-sm" '+(!v.date?'disabled':'')+' onclick="c2ApplyCalendar()">Apply</button></div>'}
+var C2_MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];   // X-9r4 11-25 C3：固定陣列（en-GB short 在新版 Chrome 回 Sept）
+function c2Iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function c2RenderCalendar(focusLabel){const p=$('#c2-calendar'),v=c2Calendar;if(!p||!v)return;const prevLabel=focusLabel||(p.contains(document.activeElement)?document.activeElement.getAttribute('aria-label'):null);const mIso=c2Iso(v.month).slice(0,7),todayIso=c2Iso(new Date()),tabIso=(v.date&&v.date.slice(0,7)===mIso)?v.date:(todayIso.slice(0,7)===mIso?todayIso:c2Iso(v.month));let start=new Date(v.month);start.setDate(1-start.getDay());let days='';for(let i=0;i<42;i++){let d=new Date(start);d.setDate(d.getDate()+i);let iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');days+='<button tabindex="'+(iso===tabIso?0:-1)+'" class="'+(iso===v.date?'selected ':'')+(d.getMonth()!==v.month.getMonth()?'outside':'')+'" aria-label="'+iso+'" aria-pressed="'+(iso===v.date)+'" onclick="c2Calendar.date=\''+iso+'\';c2RenderCalendar()">'+d.getDate()+'</button>';}p.innerHTML='<div class="c2-calendar-head"><button aria-label="Previous year" onclick="c2MoveCalendar(-12)">«</button><button aria-label="Previous month" onclick="c2MoveCalendar(-1)">‹</button><strong>'+C2_MON[v.month.getMonth()]+' '+v.month.getFullYear()+'</strong><button aria-label="Next month" onclick="c2MoveCalendar(1)">›</button><button aria-label="Next year" onclick="c2MoveCalendar(12)">»</button></div><div class="c2-calendar-grid">'+['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>'<span>'+d+'</span>').join('')+days+'</div><div class="c2-calendar-actions"><button class="btn btn-o btn-sm" onclick="c2CloseCalendar()">Cancel</button><button class="btn btn-p btn-sm" '+(!v.date?'disabled':'')+' onclick="c2ApplyCalendar()">Apply</button></div>';
+ /* X-9r4 11-25 C2：整塊重繪後焦點放回同一顆（用 aria-label 找回），選完日期不再掉到 body */
+ if(prevLabel){const el=[...p.querySelectorAll('button')].find(b=>b.getAttribute('aria-label')===prevLabel&&!b.disabled);if(el)el.focus({preventScroll:true})}}
+/* X-9r4 11-25 C2：日期格方向鍵 ←→ 移一天、↑↓ 移一週，跨月自動翻頁（同 Customized Budget 日期選擇器） */
+document.addEventListener('keydown',e=>{if(e.key==='Tab'&&c2Calendar){const pop=$('#c2-calendar');if(pop&&pop.contains(e.target)){const f=[...pop.querySelectorAll('button:not([disabled])')].filter(x=>x.tabIndex>=0);if(f.length&&(e.shiftKey?e.target===f[0]:e.target===f[f.length-1])){c2CloseCalendar();return}}}const b=e.target.closest&&e.target.closest('#c2-calendar .c2-calendar-grid button');if(!b||!c2Calendar)return;const d={ArrowLeft:-1,ArrowRight:1,ArrowUp:-7,ArrowDown:7}[e.key];if(!d)return;e.preventDefault();const cur=new Date(b.getAttribute('aria-label')+'T00:00:00');cur.setDate(cur.getDate()+d);if(cur.getMonth()!==c2Calendar.month.getMonth()||cur.getFullYear()!==c2Calendar.month.getFullYear())c2Calendar.month=new Date(cur.getFullYear(),cur.getMonth(),1);c2RenderCalendar();const t=document.querySelector('#c2-calendar [aria-label="'+c2Iso(cur)+'"]');if(t){document.querySelectorAll('#c2-calendar .c2-calendar-grid button').forEach(x=>x.tabIndex=-1);t.tabIndex=0;t.focus({preventScroll:true})}});
 function c2MoveCalendar(n){c2Calendar.month.setMonth(c2Calendar.month.getMonth()+n);c2RenderCalendar()}
 function c2ApplyCalendar(){if(!c2Calendar?.date)return;let v=c2Calendar;if(v.scope){scScopes[scIndex].date=v.date;scRender()}else{let r=findRec(v.recId);r.eot=v.date.split('-').reverse().join('/');r.eotManual=true;renderTable();toast('Date updated successfully.')}c2CloseCalendar()}
 function c2CloseCalendar(){document.getElementById('c2-calendar')?.remove();c2Calendar=null;if(c2CalendarReturn?.isConnected)c2CalendarReturn.focus({preventScroll:true});c2CalendarReturn=null}
@@ -5478,10 +5543,7 @@ function c2ApplyFigmaCase(id){
  const vm=()=>openDetail(DATA.rec.find(r=>r.kind!=='storage').recId);
  const select=(tab,many)=>{setTab(tab);state.selection={};DATA[tab].slice(0,many?2:1).forEach(r=>state.selection[r.recId]=true);renderTable();renderActions()};
  if(kind.startsWith('vm')||kind==='detail-loading'){vm();if(kind==='vm-other'){toggleAnalysis();$('#dt-hours').value='';$('#dt-insts').innerHTML=buildInstCards(0);$('#dt-body').scrollTop=$('#dt-body').scrollHeight;}if(kind==='vm-full'){toggleAnalysis();$('#dt-body').scrollTop=$('#dt-body').scrollHeight}if(kind==='detail-loading'){
- $('#dt-body').setAttribute('aria-busy','true');
- document.querySelectorAll('#dt-body .dt-head>*').forEach(e=>e.innerHTML='<span class="lt-skeleton" style="display:block;width:60%;height:16px;margin:12px auto"></span>');
- document.querySelectorAll('#dt-body .dt-util-item').forEach(e=>e.innerHTML='<span class="lt-skeleton" style="width:100%;height:14px"></span>');
- $('#dt-analysis').innerHTML='<div class="lt-skeleton" style="height:80px"></div>';$('.dt-toggle').disabled=true;$('#dt-hours').disabled=true;$('#dt-insts').innerHTML=Array.from({length:5},()=>'<div class="lt-skeleton" style="height:120px"></div>').join('');
+ $('#dt-body').setAttribute('aria-busy','true');$('#dt-body').innerHTML=detailSkeleton();bindTips();
  };return}
  if(kind.startsWith('storage')){openDetail('s1');$('#dt-body').scrollTop=$('#dt-body').scrollHeight;if(kind==='storage-hover'){let el=$('#dt-body .dt-insts-label .ico-info');if(el)showTip(el)}return}
  if(kind==='dismiss'||kind==='dismiss-invalid'){select('rec',false);openDismiss();if(kind==='dismiss-invalid')confirmDismiss(false);return}
@@ -5502,13 +5564,18 @@ function c2ApplyFigmaCase(id){
    if(kind==='scope-options'){scOpenMenu('groups',$('#sc-groups'));return}
    if(kind==='impact'){scChoose('impact',0);$('#sc-impact').scrollIntoView({block:'center'});return}if(kind==='eot-options'){let k='eot';$('#sc-'+k).scrollIntoView({block:'center'});scOpenMenu(k,$('#sc-'+k));return}
    if(kind==='scope-calendar'){scScopes[0].eot='Customized';scScopes[0].date='2026-08-25';scRender();let b=$('#sc-card-advanced .btn');b.scrollIntoView({block:'center'});c2OpenCalendar(b,null,true);return}
-   if(kind==='scope-hover'){showTip($('#page-scope .pg-title .ico-info'));return}
+   if(kind==='scope-hover'){showTip($('#sc-add-tip'));return}
    if(kind==='advanced-hover'){let el=$('#sc-card-advanced .sc-grid2 > div:last-child .ico-info');el.scrollIntoView({block:'center'});showTip(el);return}
    if(kind==='add-scope'){let second=scDefaults();second.groups=['Finance'];second.gcp=['finance-analytics'];second.aws=['finance-billing'];scScopes.push(second);scSaved=scCopy(scScopes);scAdd();return}
    if(kind==='scope-invalid'){Object.assign(scScopes[0],{days:'0',cpu:'293',cpuPeak:'33333',memory:'4298',memoryPeak:'887777',dismissal:'0',high:'2',medium:'999',low:'100'});scRender();scValidate(true);return}
    if(kind==='scope-loading'){
+ /* X-9r4 11-25 B18：稿 #15 構成：Rightsizing Scope 一塊；Criteria 在邊框內上下兩塊（238／106）；Tracking Configuration 左右兩塊；Impact 一塊 */
+ const blk=(h,extra)=>'<div class="lt-skeleton" style="height:'+h+'px;border-radius:8px;'+(extra||'')+'"></div>';
  document.querySelectorAll('#page-scope .sc-status').forEach(e=>e.style.visibility='hidden');
- ['#sc-card-resources .c2-blue','#sc-card-criteria .c2-vm','#sc-card-advanced .sc-grid2','#sc-card-advanced .c2-blue'].forEach(sel=>{let e=$(sel);e.style.height=e.offsetHeight+'px';e.classList.add('lt-skeleton');e.innerHTML=''});
+ {let e=$('#sc-card-resources .c2-blue');e.className='';e.style.cssText='';e.innerHTML=blk(90)}
+ {let e=$('#sc-card-criteria .c2-vm');e.innerHTML='<div style="display:flex;flex-direction:column;gap:16px">'+blk(238)+blk(106)+'</div>'}
+ {let e=$('#sc-card-advanced .sc-grid2');e.innerHTML=blk(61)+blk(61)}
+ {let e=$('#sc-card-advanced .c2-blue');e.className='';e.style.cssText='';e.innerHTML=blk(174)}
  document.querySelectorAll('#page-scope button,#savebar button').forEach(b=>b.disabled=true);return}
 
    if(kind==='scope-toast'){toast('Scope 1 updated successfully.');toast('Unable to update Scope 1. Please try again later.','err');return}
